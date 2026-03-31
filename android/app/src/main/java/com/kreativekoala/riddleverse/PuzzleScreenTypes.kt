@@ -1,0 +1,71 @@
+package com.kreativekoala.riddleverse
+
+enum class PuzzleScreenType(val typeName: String) {
+    QA("qa"),
+    MULTIPLE_CHOICE("multipleChoice"),
+    SENTENCE_TRANSITIONS_SCREEN("Sentence Transitions Screen"),
+    MATCH_SCREEN("Match Screen"),
+    SWIPE_WORD_SCREEN("Swipe Word Screen"),
+    JUMBLE_INPUT_SCREEN("Jumble Input Screen"),
+    TRIANGLE_DOT_MEMORY_SCREEN("Triangle Dot Memory Screen"),
+    FALLING_GAME_SCREEN("Falling Game Screen"),
+    MEMORY_PREVIOUS_SINGLE_SCREEN("Memory Previous Single Screen"),
+    MEMORY_PREVIOUS_PAIR_SCREEN("Memory Previous Pair Screen"),
+    MATH_ESTIMATION_SCREEN("Math Estimation Screen"),
+    PENDULUM_CHOICE_SCREEN("Pendulum Choice Screen"),
+    COLOR_TEXT_MATCHING_SCREEN("Color Text Matching Screen"),
+    DISCOUNT_PRICE_SCREEN("Discount Price Screen"),
+    DIVISION_SCREEN("Division Screen"),
+    PERCENTAGE_SCREEN("Percentage Screen"),
+    SUBSCRIPTION_SCREEN("Subscription Screen"),
+    SUBTRACTION_SCREEN("Subtraction Screen"),
+    CONVERSION_SCREEN("Conversion Screen"),
+    TIP_BUBBLE_SCREEN("Tip Bubble Screen"),
+    ANTONYM_BALLOON_SCREEN("Antonym Balloon Screen"),
+    SYNONYM_GROUPING_SCREEN("Synonym Grouping Screen"),
+    AVERAGES_SCREEN("Averages Screen"),
+    MEMORY_STORY_SCREEN("Memory Story Screen"),
+    MEMORY_SEQUENCING_SCREEN("Memory Sequencing Screen"),
+    CROSSWORD_SCREEN("Crossword Screen"),
+    WORDPREFIX_SCREEN("Word Prefix Screen"),
+    IMAGE_MATCH_SCREEN("Image Match Screen"),
+    LETTER_SET_SCREEN("Letter Set Puzzle Screen"),
+    MEMORY_RETENTION_SCREEN("Memory Retention Screen"),
+    PINBALL_DEFLECTOR_SCREEN("Pinball Deflector Screen"),
+    MEMORY_SQUARES_SCREEN("Memory Squares Screen"),
+    TRAIN_ROUTING_SCREEN("Train Routing Screen"),
+    UNIQUE_OBJECT_SCREEN("Unique Object Screen"),
+    MATH_COMPARISON_SCREEN("Math Comparison Screen"),
+    NUMBER_SEQUENCE_SCREEN("Number Sequence Screen"),
+    COLOR_SHAPE_MATCHING_SCREEN("Color Shape Matching Screen"),
+    SYMBOL_SWIPE_SCREEN("Symbol Swipe Screen"),
+    SYMMETRY_SCREEN("Symmetry Screen"),
+    NUMBER_SUM_SCREEN("Number Sum Screen"),
+    IMAGE_VORTEX_SCREEN("Image Vortex Screen"),
+    MATH_EXPRESSION_SCREEN("Math Expression Screen"),
+    CONTEXT_SWITCH_SCREEN("Context Switch Screen"),
+    MATH_CROSSWORD_SCREEN("Math Crossword Screen"),
+    DUAL_CARD_SCREEN("Dual Card Screen"),
+    IMAGE_PUZZLE_SCREEN("Image Puzzle Screen"),
+    MULTI_MATCH_MUSIC_SCREEN("Multi-Match Music Screen"),
+    GEOGRAPHY_CITY_SELECTION_SCREEN("Geography City Selection Screen"),
+    CRYPTO_WORD_SCREEN("Crypto Word Screen"),
+    GEOGRAPHY_COUNTRY_SELECTION_SCREEN("Geography Country Selection Screen"),
+    WORD_SNAKE_SCREEN("Word Snake Screen"),
+    FIND_DIFFERENCES("Find Differences Screen"),
+    FIND_OBJECT("Find Object Screen"),
+    WALDO_PUZZLE_SCREEN("Waldo Puzzle Screen"),
+    IMAGE_QUESTION_SCREEN("Image Question Screen"),
+    FLOW_SCREEN("Flow Puzzle Screen"),
+    PROGRESSIVE_REVEAL("Progressive Reveal Screen"),
+    REAL_OR_AI("Real or AI"),
+    WORD_SEARCH_SCREEN("Word Search Screen");
+
+    companion object {
+        fun fromString(type: String): PuzzleScreenType {
+            return values().find { it.typeName == type } ?: QA
+        }
+    }
+}
+
+data class Tuple4<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)

@@ -1,0 +1,726 @@
+/* Localizable.strings (Italian)
+   PuzzleForge / RiddleVerse */
+
+// MARK: - Common / Shared
+"OK" = "OK";
+"Cancel" = "Annulla";
+"Done" = "Fatto";
+"Back" = "Indietro";
+"Next" = "Avanti";
+"Skip" = "Salta";
+"Close" = "Chiudi";
+"Continue" = "Continua";
+"Submit" = "Invia";
+"Retry" = "Riprova";
+"Exit" = "Esci";
+"Share" = "Condividi";
+"Reset" = "Ripristina";
+"Clear" = "Cancella";
+"Error" = "Errore";
+"Loading..." = "Caricamento...";
+"YES" = "SÌ";
+"NO" = "NO";
+"NEW" = "NUOVO";
+"Play" = "Gioca";
+"Edit" = "Modifica";
+"Hint" = "Suggerimento";
+"Show" = "Mostra";
+"Begin" = "Inizia";
+"Modify" = "Modifica";
+"CONTINUE" = "CONTINUA";
+"SUBMIT" = "INVIA";
+"CLEAR" = "CANCELLA";
+"REVEAL" = "RIVELA";
+"START" = "INIZIA";
+
+// MARK: - Home View
+"Score: %@" = "Punteggio: %@";
+"Settings" = "Impostazioni";
+"Profile" = "Profilo";
+"Account" = "Account";
+"Sign In" = "Accedi";
+"Sign Out" = "Esci";
+"Sign Up" = "Registrati";
+"Create Account" = "Crea account";
+"Notification Settings" = "Impostazioni notifiche";
+"Custom Puzzles" = "Puzzle personalizzati";
+"Quick Actions" = "Azioni rapide";
+"Popular Categories" = "Categorie popolari";
+"Tap any to start earning points!" = "Tocca qualsiasi per iniziare a guadagnare punti!";
+"Random" = "Casuale";
+"Surprise me!" = "Sorprendimi!";
+"Loading puzzle..." = "Caricamento puzzle...";
+"Loading personalized puzzles..." = "Caricamento puzzle personalizzati...";
+"Puzzles Loading" = "Caricamento puzzle";
+"We're fetching your personalized puzzles. This usually takes just a few moments." = "Stiamo recuperando i tuoi puzzle personalizzati. Di solito ci vogliono solo pochi istanti.";
+"We're fetching your puzzles from our servers. This usually takes just a few moments." = "Stiamo recuperando i tuoi puzzle dai nostri server. Di solito ci vogliono solo pochi istanti.";
+"No puzzle selected" = "Nessun puzzle selezionato";
+"Filter Categories" = "Filtra categorie";
+"No Categories" = "Nessuna categoria";
+"Adjust your filter to see more categories." = "Regola il filtro per vedere più categorie.";
+"Featured Custom Puzzles" = "Puzzle personalizzati in evidenza";
+"Debug & Testing" = "Debug e test";
+"Test Notifications" = "Testa notifiche";
+
+// MARK: - Update Dialog
+"Version %@" = "Versione %@";
+"What's New:" = "Novità:";
+"Update Now" = "Aggiorna ora";
+"Later" = "Dopo";
+
+// MARK: - Content Moderation
+"Puzzle Name:" = "Nome puzzle:";
+"Creator:" = "Creatore:";
+"Format:" = "Formato:";
+"What happened?" = "Cosa è successo?";
+"This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly." = "Questo argomento è stato segnalato dal nostro sistema di revisione dei contenuti come potenzialmente inappropriato. Si tratta di un processo automatizzato che può occasionalmente segnalare contenuti in modo errato.";
+
+// MARK: - Profile & Creator
+"By %@" = "Di %@";
+"Creator Earnings" = "Guadagni del creatore";
+"Coins Earned" = "Monete guadagnate";
+"Plays Monetized" = "Partite monetizzate";
+"Per Game" = "Per partita";
+"Cash Out Earnings" = "Ritira i guadagni";
+"Earn coins when players enjoy your games!" = "Guadagna monete quando i giocatori apprezzano i tuoi giochi!";
+"You get 55% of coins spent on your games. Tap to view payouts." = "Ricevi il 55% delle monete spese nei tuoi giochi. Tocca per vedere i pagamenti.";
+"Checking eligibility..." = "Verifica dell'idoneità...";
+"coins available" = "monete disponibili";
+
+// MARK: - Stripe / Payouts
+"Cash Out" = "Ritira";
+"Connect Stripe to receive payouts" = "Collega Stripe per ricevere pagamenti";
+"Set up your Stripe account to cash out your earned coins as real money." = "Configura il tuo account Stripe per ritirare le monete guadagnate come denaro reale.";
+"Connect Stripe Account" = "Collega account Stripe";
+"Complete Stripe Setup" = "Completa configurazione Stripe";
+"Your Stripe account setup is incomplete. Tap below to finish." = "La configurazione del tuo account Stripe è incompleta. Tocca sotto per completarla.";
+"Continue Setup" = "Continua configurazione";
+"Request Payout" = "Richiedi pagamento";
+"Payout History" = "Storico pagamenti";
+
+// MARK: - App Features & Account
+"App Features" = "Funzionalità dell'app";
+"Account Management" = "Gestione account";
+"Delete Account" = "Elimina account";
+"This will permanently delete your account and all associated data. This action cannot be undone." = "Questo eliminerà permanentemente il tuo account e tutti i dati associati. Questa azione non può essere annullata.";
+
+// MARK: - Sign In
+"Sign In Required" = "Accesso richiesto";
+"Sign in to access leaderboards, track your progress, and save your scores." = "Accedi per consultare le classifiche, monitorare i tuoi progressi e salvare i tuoi punteggi.";
+"Sign in to track progress and scores" = "Accedi per monitorare progressi e punteggi";
+"Sign in with Google" = "Accedi con Google";
+"Enable Notifications?" = "Attivare le notifiche?";
+"Yes, Notify Me" = "Sì, avvisami";
+"Not Now" = "Non ora";
+"Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge." = "Ricevi una notifica quando i tuoi puzzle giornalieri sono pronti! Ti invieremo un avviso rapido per non perdere mai la sfida quotidiana.";
+"Daily Puzzle Notifications" = "Notifiche puzzle giornalieri";
+"Notification Status:" = "Stato notifiche:";
+"Enabled" = "Attivato";
+"Not enabled" = "Non attivato";
+
+// MARK: - Onboarding
+"Train Your Brain Daily" = "Allena il cervello ogni giorno";
+"Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills" = "Affina la mente con matematica, giochi di parole e rompicapo progettati per migliorare le capacità cognitive";
+"Track Your Progress" = "Monitora i tuoi progressi";
+"Level up, earn badges, and see your improvement over time with detailed analytics" = "Sali di livello, guadagna badge e osserva i tuoi miglioramenti nel tempo con analisi dettagliate";
+"Compete & Achieve" = "Competi e raggiungi";
+"Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type" = "Sfida gli amici, scala le classifiche e sblocca ricompense esclusive padroneggiando ogni tipo di puzzle";
+"Ready to Start?" = "Pronto per iniziare?";
+"Join thousands of puzzle enthusiasts and start your brain training journey today!" = "Unisciti a migliaia di appassionati di puzzle e inizia il tuo percorso di allenamento cerebrale oggi!";
+"Let's Get Started!" = "Iniziamo!";
+"Free to play \u{2022} No ads during puzzles" = "Gratis \u{2022} Nessuna pubblicità durante i puzzle";
+"Level 5" = "Livello 5";
+
+// MARK: - Start Puzzle View
+"Take a quick interactive tutorial to get started!" = "Fai un rapido tutorial interattivo per iniziare!";
+"Start Tutorial" = "Inizia tutorial";
+"Reset Tutorial" = "Ripristina tutorial";
+"Dismiss" = "Chiudi";
+"Loading your stats..." = "Caricamento delle tue statistiche...";
+"TOP SCORES" = "MIGLIORI PUNTEGGI";
+"BENEFITS" = "VANTAGGI";
+"Game Settings" = "Impostazioni di gioco";
+"Difficulty Level" = "Livello di difficoltà";
+"Game Mode" = "Modalità di gioco";
+"Number of Puzzles" = "Numero di puzzle";
+"Start Playing" = "Inizia a giocare";
+"Create Your Version" = "Crea la tua versione";
+"Earn coins" = "Guadagna monete";
+"Back to Home" = "Torna alla home";
+
+// MARK: - Difficulty
+"DIFFICULTY PROGRESSION" = "PROGRESSIONE DIFFICOLTÀ";
+"Current Level" = "Livello attuale";
+"Progress" = "Progresso";
+"Next:" = "Prossimo:";
+"CURRENT LEVEL DETAILS" = "DETTAGLI LIVELLO ATTUALE";
+"Default Difficulty" = "Difficoltà predefinita";
+"Set your preferred difficulty level for all puzzles" = "Imposta il livello di difficoltà preferito per tutti i puzzle";
+"You can still change difficulty when starting any puzzle" = "Puoi ancora cambiare la difficoltà all'inizio di ogni puzzle";
+"Difficulty Adapted!" = "Difficoltà adattata!";
+"Difficulty Adjusted" = "Difficoltà regolata";
+"DIFFICULTY" = "DIFFICOLTÀ";
+
+// MARK: - Puzzle Completion
+"Puzzle Set Complete!" = "Serie di puzzle completata!";
+"Share Achievement" = "Condividi risultato";
+"Remix & earn real money when others play" = "Remixa e guadagna denaro reale quando altri giocano";
+"Return Home" = "Torna alla home";
+"No More Puzzles Available" = "Nessun altro puzzle disponibile";
+"Generate new puzzles to continue playing." = "Genera nuovi puzzle per continuare a giocare.";
+"Generate New Puzzles" = "Genera nuovi puzzle";
+"Generating New Puzzles" = "Generazione nuovi puzzle";
+"This usually takes 30-60 seconds..." = "Di solito ci vogliono 30-60 secondi...";
+"Home" = "Home";
+"Try These Next" = "Prova questi dopo";
+"TOP 5 SCORES" = "5 MIGLIORI PUNTEGGI";
+
+// MARK: - Session/Score Feedback
+"Session Complete!" = "Sessione completata!";
+"Final Score:" = "Punteggio finale:";
+"Accuracy:" = "Precisione:";
+"Best Streak:" = "Miglior serie:";
+"Your answer: %@" = "La tua risposta: %@";
+"Correct answer: %@" = "Risposta corretta: %@";
+"Updating score..." = "Aggiornamento punteggio...";
+"Tap to continue" = "Tocca per continuare";
+"Keep trying! You've got this! \u{1F4AA}" = "Continua così! Ce la puoi fare! \u{1F4AA}";
+"LEVEL UP!" = "LIVELLO SUPERIORE!";
+"Level %@ \u{2192} %@" = "Livello %@ \u{2192} %@";
+"Score submitted!" = "Punteggio inviato!";
+
+// MARK: - Leaderboard
+"Leaderboard" = "Classifica";
+"View Leaderboard" = "Vedi classifica";
+"Rank #%@" = "Posizione #%@";
+"Your rank: #%@" = "La tua posizione: #%@";
+"No scores yet" = "Nessun punteggio ancora";
+"Play the game to set the first high score!" = "Gioca per stabilire il primo record!";
+
+// MARK: - Subscription & Limits
+"Upgrade to Premium" = "Passa a Premium";
+"Running Low on Puzzles!" = "Pochi puzzle rimasti!";
+"Generation Limit Reached" = "Limite di generazione raggiunto";
+"Maybe Later" = "Forse dopo";
+"Upgrade" = "Aggiorna";
+"IS ANNUALLY:" = "È ANNUALMENTE:";
+"A YEAR" = "ALL'ANNO";
+
+// MARK: - Coins / Store
+"Your Coins" = "Le tue monete";
+"Coins added!" = "Monete aggiunte!";
+"Coins are used to continue games and support creators." = "Le monete servono per continuare i giochi e supportare i creatori.";
+"Best Value" = "Miglior offerta";
+"Get Coins" = "Ottieni monete";
+"Coin Store" = "Negozio monete";
+"Buy Coins" = "Acquista monete";
+"points" = "punti";
+
+// MARK: - Game Play
+"Game Over!" = "Fine partita!";
+"Play Again" = "Gioca ancora";
+"Customize" = "Personalizza";
+"Customizing Game" = "Personalizzazione gioco";
+"This may take 2-5 minutes..." = "Questo potrebbe richiedere 2-5 minuti...";
+"Fixing game..." = "Correzione gioco...";
+"This may take a couple minutes..." = "Questo potrebbe richiedere qualche minuto...";
+"Did this game work?" = "Questo gioco ha funzionato?";
+"Yes, it works!" = "Sì, funziona!";
+"No, it has issues" = "No, ha dei problemi";
+"What's wrong?" = "Cosa c'è che non va?";
+"Fix It" = "Correggi";
+"Brief description \u{2014} even a couple words helps" = "Breve descrizione \u{2014} anche poche parole aiutano";
+"Customize This Game" = "Personalizza questo gioco";
+"Create Customized Game" = "Crea gioco personalizzato";
+"Game Name" = "Nome del gioco";
+"What would you like to change?" = "Cosa vorresti cambiare?";
+"Describe what you'd like to change. A new game will be created under your name." = "Descrivi cosa vorresti cambiare. Un nuovo gioco sarà creato con il tuo nome.";
+"Lv.%@" = "Lv.%@";
+
+// MARK: - Game Browse
+"Community Games" = "Giochi della community";
+"My Games" = "I miei giochi";
+"No games yet" = "Nessun gioco ancora";
+"Be the first to create and share a game!" = "Sii il primo a creare e condividere un gioco!";
+"Load More" = "Carica altro";
+"Draft" = "Bozza";
+"by %@" = "di %@";
+"Newest" = "Più recenti";
+"Most Played" = "Più giocati";
+
+// MARK: - Game Remix
+"Create your version" = "Crea la tua versione";
+"Create & Earn Real Money" = "Crea e guadagna denaro reale";
+"Earn coins when others play \u{2014} cash out via Stripe!" = "Guadagna monete quando altri giocano \u{2014} ritira tramite Stripe!";
+"You earn 55% of every coin spent on your game" = "Guadagni il 55% di ogni moneta spesa nel tuo gioco";
+"Game Title" = "Titolo del gioco";
+"Describe Your Version" = "Descrivi la tua versione";
+"Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules..." = "Descrivi cambiamenti di gameplay, stile visivo, tema, regolazioni di difficoltà, regole di punteggio...";
+"Reference image" = "Immagine di riferimento";
+"AI will use this as visual context" = "L'IA userà questo come contesto visivo";
+"Quick Ideas" = "Idee rapide";
+"Create Game" = "Crea gioco";
+"Creating Your Game" = "Creazione del tuo gioco";
+"Notify Me When Done" = "Avvisami quando è pronto";
+"You can leave this screen \u{2014} we'll notify you!" = "Puoi lasciare questa schermata \u{2014} ti avviseremo!";
+"Your game will appear in Explore > Custom Games" = "Il tuo gioco apparirà in Esplora > Giochi personalizzati";
+"Free Generations Used Up" = "Generazioni gratuite esaurite";
+"Subscribe for Unlimited" = "Abbonati per illimitato";
+"Get unlimited generations + monthly coins" = "Ottieni generazioni illimitate + monete mensili";
+"Game Ready!" = "Gioco pronto!";
+"Tap to preview \u{2014} also in Explore > Custom Games" = "Tocca per anteprima \u{2014} anche in Esplora > Giochi personalizzati";
+
+// MARK: - Game Preview
+"This game may have issues" = "Questo gioco potrebbe avere problemi";
+"Modifying game..." = "Modifica gioco...";
+"Game saved!" = "Gioco salvato!";
+"You'll earn coins when others play!" = "Guadagnerai monete quando altri giocano!";
+"Describe what's wrong or what to change:" = "Descrivi cosa non va o cosa cambiare:";
+"Modify Game" = "Modifica gioco";
+
+// MARK: - Game Tweak
+"Loading version history..." = "Caricamento cronologia versioni...";
+"No version history yet" = "Nessuna cronologia versioni ancora";
+"Describe your change below to start editing your game" = "Descrivi la tua modifica qui sotto per iniziare a modificare il gioco";
+"Applying Edit" = "Applicazione modifica";
+"This may take a minute..." = "Questo potrebbe richiedere un minuto...";
+"Original" = "Originale";
+
+// MARK: - Create Puzzle
+"Create Custom Puzzle" = "Crea puzzle personalizzato";
+"Generate personalized puzzles on any topic you love!" = "Genera puzzle personalizzati su qualsiasi argomento ti piaccia!";
+"Puzzle Topic" = "Argomento puzzle";
+"Popular Topics" = "Argomenti popolari";
+"Puzzle Format" = "Formato puzzle";
+"Creating Magic..." = "Creazione in corso...";
+"Generate Puzzle" = "Genera puzzle";
+"puzzles" = "puzzle";
+"\u{1F389} Puzzle Creation Started!" = "\u{1F389} Creazione puzzle avviata!";
+"Your custom puzzle set is being generated! Check back in a few minutes to see your creation." = "Il tuo set di puzzle personalizzati è in fase di generazione! Torna tra qualche minuto per vedere la tua creazione.";
+
+// MARK: - Daily Puzzles
+"Daily Puzzles" = "Puzzle giornalieri";
+"New Daily Puzzles!" = "Nuovi puzzle giornalieri!";
+"Your daily puzzles are ready!" = "I tuoi puzzle giornalieri sono pronti!";
+"Topics Saved!" = "Argomenti salvati!";
+"Let's Go!" = "Andiamo!";
+"Topics" = "Argomenti";
+"Refresh" = "Aggiorna";
+"Choose Your Daily Puzzle Topics" = "Scegli i tuoi argomenti per i puzzle giornalieri";
+"Select topics you're interested in. We'll generate daily puzzles for each topic." = "Seleziona gli argomenti che ti interessano. Genereremo puzzle giornalieri per ogni argomento.";
+"Welcome to Daily Puzzles!" = "Benvenuto nei puzzle giornalieri!";
+"Choose your favorite topics and we'll generate personalized daily puzzles just for you." = "Scegli i tuoi argomenti preferiti e genereremo puzzle giornalieri personalizzati solo per te.";
+"Choose Topics" = "Scegli argomenti";
+"Oops!" = "Ops!";
+"Try Again" = "Riprova";
+"Solve Puzzle" = "Risolvi puzzle";
+"Show Answer" = "Mostra risposta";
+
+// MARK: - Daily Streak
+"Daily Streak Stats" = "Statistiche serie giornaliera";
+"Current Streak" = "Serie attuale";
+"Total Coins" = "Monete totali";
+"Days Played" = "Giorni giocati";
+"Best Streak" = "Miglior serie";
+"To Milestone" = "Al traguardo";
+"day" = "giorno";
+"days" = "giorni";
+"Let's Play! \u{1F3AE}" = "Giochiamo! \u{1F3AE}";
+
+// MARK: - Achievement Dashboard
+"Progress Dashboard" = "Pannello progressi";
+"Next Tier Rewards:" = "Ricompense del prossimo livello:";
+"Rewards:" = "Ricompense:";
+"Complete some puzzles to see your performance stats!" = "Completa qualche puzzle per vedere le tue statistiche di rendimento!";
+"Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!" = "Inizia a giocare puzzle per sbloccare il pannello progressi. Ogni partita guadagna XP, costruisce serie e sblocca risultati!";
+"Achievements" = "Risultati";
+
+// MARK: - Preferred Topics
+"Preferred Topics" = "Argomenti preferiti";
+"Available Topics" = "Argomenti disponibili";
+"Your Preferred Topics" = "I tuoi argomenti preferiti";
+"Search Custom Puzzles" = "Cerca puzzle personalizzati";
+
+// MARK: - Notification Settings
+"Notifications" = "Notifiche";
+"Notification Permissions" = "Permessi notifiche";
+"Push Notifications" = "Notifiche push";
+"Daily Puzzle Alerts" = "Avvisi puzzle giornalieri";
+"Get notified when your daily puzzles are ready" = "Ricevi una notifica quando i tuoi puzzle giornalieri sono pronti";
+"FCM Token Status" = "Stato token FCM";
+"Notification Test" = "Test notifica";
+"Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time." = "Le notifiche ti aiutano a restare aggiornato con nuovi puzzle giornalieri e sfide. Puoi disattivarle nelle Impostazioni iOS in qualsiasi momento.";
+
+// MARK: - Social Sharing
+"Share Your Success!" = "Condividi il tuo successo!";
+"Share Puzzle" = "Condividi puzzle";
+"Recipient Email" = "Email del destinatario";
+"Recipient Name" = "Nome del destinatario";
+
+// MARK: - Puzzle UI Components
+"Level %@" = "Livello %@";
+"Quick Stats" = "Statistiche rapide";
+
+// MARK: - Difficulty Manager HUD
+"LEVEL %@" = "LIVELLO %@";
+"TIME" = "TEMPO";
+"SCORE" = "PUNTEGGIO";
+"RANK" = "POSIZIONE";
+"LIVES" = "VITE";
+
+// MARK: - Multiple Choice
+"Exit Puzzle" = "Esci dal puzzle";
+"Are you sure you want to exit? Your progress will be lost." = "Sei sicuro di voler uscire? I tuoi progressi andranno persi.";
+"Question %@/%@" = "Domanda %@/%@";
+"Got it!" = "Capito!";
+
+// MARK: - Q&A Puzzle
+"All Puzzles Completed!" = "Tutti i puzzle completati!";
+
+// MARK: - Crossword
+"All Hints" = "Tutti i suggerimenti";
+"Puzzle solved in %@" = "Puzzle risolto in %@";
+"Next Puzzle" = "Prossimo puzzle";
+"Some answers are incorrect" = "Alcune risposte sono errate";
+"Try again or use the REVEAL button to fix incorrect answers." = "Riprova o usa il pulsante RIVELA per correggere le risposte errate.";
+
+// MARK: - Word Search
+"Tips" = "Consigli";
+"Word Search Help" = "Aiuto Cerca Parole";
+
+// MARK: - Word Snake
+"Find these snake words:" = "Trova queste parole serpente:";
+"Clear Word" = "Cancella parola";
+"Loading Word Snake puzzle..." = "Caricamento puzzle Parola Serpente...";
+"Word Snake Hints" = "Suggerimenti Parola Serpente";
+"Clear Found Word?" = "Cancellare la parola trovata?";
+"Completed" = "Completato";
+"Found" = "Trovato";
+"Shown" = "Mostrato";
+"Avg/Word" = "Media/Parola";
+"Performance:" = "Prestazione:";
+
+// MARK: - Synonym
+"Group the synonyms! Tap the set that matches the word above." = "Raggruppa i sinonimi! Tocca il gruppo che corrisponde alla parola sopra.";
+
+// MARK: - Antonym
+"Tap balloons to match opposite words" = "Tocca i palloncini per abbinare parole opposte";
+
+// MARK: - Crypto Puzzle
+"Game Over" = "Fine partita";
+"How to Play" = "Come giocare";
+"You've run out of hearts! Crypto puzzles take practice." = "Hai finito i cuori! I puzzle crittografici richiedono pratica.";
+"Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'." = "Cerca schemi comuni come 'THE', 'AND', o lettere singole come 'A' e 'I'.";
+"Unable to load adaptive crypto puzzle" = "Impossibile caricare il puzzle crittografico adattivo";
+"Adaptive Crypto Puzzle" = "Puzzle crittografico adattivo";
+"Adaptive Crypto Solved!" = "Puzzle crittografico adattivo risolto!";
+"Hidden Message:" = "Messaggio nascosto:";
+"Time Used" = "Tempo utilizzato";
+"Difficulty" = "Difficoltà";
+"Continue Adaptive Journey" = "Continua il percorso adattivo";
+"\u{1F4A1} Adaptive Hint" = "\u{1F4A1} Suggerimento adattivo";
+"Unable to load tutorial puzzle" = "Impossibile caricare il puzzle tutorial";
+"Try again!" = "Riprova!";
+
+// MARK: - Letter Set
+"No words found yet" = "Nessuna parola trovata ancora";
+"Finish Early?" = "Finire in anticipo?";
+"Invalid Word" = "Parola non valida";
+
+// MARK: - Number Sequence
+"Adaptive Number Sequence" = "Sequenza numerica adattiva";
+"Tap numbers in ascending order\n(smallest to largest)" = "Tocca i numeri in ordine crescente\n(dal più piccolo al più grande)";
+"START ADAPTIVE CHALLENGE" = "INIZIA SFIDA ADATTIVA";
+"Adaptive Challenge Complete!" = "Sfida adattiva completata!";
+"Round %@" = "Round %@";
+
+// MARK: - Number Sum
+"Adaptive Number Sum" = "Somma numerica adattiva";
+"Select numbers that add up\nto the target sum" = "Seleziona i numeri che sommati\nraggiungono la somma obiettivo";
+"Target" = "Obiettivo";
+
+// MARK: - Math Expression
+"Which value is greater?" = "Quale valore è maggiore?";
+"EQUAL" = "UGUALE";
+"Loading math problems..." = "Caricamento problemi di matematica...";
+"Math Challenge Adapted!" = "Sfida matematica adattata!";
+
+// MARK: - Math Crossword
+"Select a number:" = "Seleziona un numero:";
+"Complete the math equations by placing the missing numbers" = "Completa le equazioni inserendo i numeri mancanti";
+"Game Result" = "Risultato partita";
+"Result" = "Risultato";
+
+// MARK: - Math Difference
+"FIND THE DIFFERENCE" = "TROVA LA DIFFERENZA";
+"Enter the difference between these numbers" = "Inserisci la differenza tra questi numeri";
+
+// MARK: - Estimation
+"Error loading estimation data" = "Errore nel caricamento dei dati di stima";
+"drag finger to estimate sum" = "trascina il dito per stimare la somma";
+
+// MARK: - Price Ordering
+"CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE" = "CALCOLA IL PREZZO FINALE E ORDINA DAL MENO AL PIÙ COSTOSO";
+"OFF" = "SCONTO";
+
+// MARK: - Conversion Puzzle
+"Drag blocks to compare their values" = "Trascina i blocchi per confrontare i loro valori";
+"Higher position = Greater value" = "Posizione più alta = Valore maggiore";
+
+// MARK: - Percentage / Tip
+"TAP THE CORRECT TIP" = "TOCCA LA MANCIA CORRETTA";
+"Tap the bubble with the correct tip amount!" = "Tocca la bolla con l'importo corretto della mancia!";
+"Bill Amount" = "Importo del conto";
+"Puzzle Completed!" = "Puzzle completato!";
+
+// MARK: - Subscription Puzzle
+"Hint: %@" = "Suggerimento: %@";
+
+// MARK: - Image Puzzle
+"Loading Image Puzzle..." = "Caricamento puzzle immagine...";
+"Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan" = "Tocca per chiudere \u{2022} Pizzica per zoom \u{2022} Doppio tocco per zoom \u{2022} Trascina per spostare";
+"START ADAPTIVE PUZZLE" = "INIZIA PUZZLE ADATTIVO";
+"How to Play:" = "Come giocare:";
+"Original Image" = "Immagine originale";
+"Double-tap to rotate" = "Doppio tocco per ruotare";
+"Long press a piece to drag it to the grid" = "Tieni premuto un pezzo per trascinarlo sulla griglia";
+"Puzzle Adapted!" = "Puzzle adattato!";
+"Score" = "Punteggio";
+"Drop" = "Rilascia";
+"Here" = "Qui";
+
+// MARK: - Image Questions
+"Image Questions" = "Domande sull'immagine";
+"Memorize the image!" = "Memorizza l'immagine!";
+"Complete!" = "Completo!";
+"Loading image..." = "Caricamento immagine...";
+"Countdown will start when ready" = "Il conto alla rovescia inizierà quando pronto";
+"Study this image carefully!" = "Studia attentamente questa immagine!";
+"Image Hidden" = "Immagine nascosta";
+"Reveal Image" = "Rivela immagine";
+"LOCATION" = "POSIZIONE";
+"Your answer:" = "La tua risposta:";
+"Correct answer:" = "Risposta corretta:";
+"Next time, try to rely more on your memory!" = "La prossima volta, prova ad affidarti di più alla tua memoria!";
+
+// MARK: - Image Vortex
+"Find the NEW image" = "Trova l'immagine NUOVA";
+
+// MARK: - Progressive Reveal
+"Progressive Reveal" = "Rivelazione progressiva";
+"Mystery Image" = "Immagine misteriosa";
+"Your Answer:" = "La tua risposta:";
+"Next Clue" = "Prossimo indizio";
+"Reveal" = "Rivela";
+"Congratulations!" = "Congratulazioni!";
+
+// MARK: - Odd One Out
+"Look at the images carefully and find the one that doesn't belong with the others." = "Osserva attentamente le immagini e trova quella che non appartiene al gruppo.";
+"Which one doesn't belong?" = "Quale non appartiene?";
+"How It Works" = "Come funziona";
+"Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!" = "Osserva le immagini e trova quella che non appartiene al gruppo. Allena il riconoscimento dei pattern e il pensiero critico!";
+"Start Challenge" = "Inizia sfida";
+"Continue to Next Puzzle" = "Continua al prossimo puzzle";
+
+// MARK: - Which Is Real
+"Why This Matters" = "Perché è importante";
+"In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking." = "Nel mondo di oggi, l'IA può generare immagini incredibilmente realistiche. Distinguere tra contenuti reali e generati dall'IA sta diventando una competenza essenziale per l'alfabetizzazione mediatica e il pensiero critico.";
+"Which image is AI-generated?" = "Quale immagine è generata dall'IA?";
+"Look for real photos:" = "Cerca foto reali:";
+"AI tells:" = "L'IA rivela:";
+"Learn from Community Insights" = "Impara dagli spunti della community";
+"Help others learn! Why did you think this was the AI image?" = "Aiuta gli altri a imparare! Perché pensavi che questa fosse l'immagine IA?";
+"Submit (+20% bonus)" = "Invia (+20% bonus)";
+"Learn from others who identified the AI image correctly:" = "Impara da chi ha identificato correttamente l'immagine IA:";
+
+// MARK: - Find Object / Waldo
+"Hidden Objects" = "Oggetti nascosti";
+"Failed to load image" = "Impossibile caricare l'immagine";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "Pizzica per zoom \u{2022} Trascina per spostare \u{2022} Tocca per trovare oggetti";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them" = "Pizzica per zoom \u{2022} Trascina per spostare \u{2022} Tocca gli oggetti per trovarli";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision" = "Pizzica per zoom \u{2022} Trascina per spostare \u{2022} Tocca gli oggetti trovati dall'IA";
+"Natural Discovery" = "Scoperta naturale";
+"Objects to Find" = "Oggetti da trovare";
+"These objects were naturally discovered by AI vision in the scene" = "Questi oggetti sono stati scoperti naturalmente dalla visione IA nella scena";
+"Show Hint" = "Mostra suggerimento";
+"ENHANCED WALDO" = "WALDO POTENZIATO";
+
+// MARK: - Geography
+"Geography Cities Challenge" = "Sfida geografica città";
+"Place cities in their correct locations on the world map" = "Posiziona le città nelle loro posizioni corrette sulla mappa mondiale";
+"START CHALLENGE" = "INIZIA SFIDA";
+"Exact location!" = "Posizione esatta!";
+"Geography Challenge Complete!" = "Sfida geografica completata!";
+"Final Score" = "Punteggio finale";
+"Geography Countries Challenge" = "Sfida geografica paesi";
+"Place countries in their correct locations on the world map" = "Posiziona i paesi nelle loro posizioni corrette sulla mappa mondiale";
+"Tap on a continent" = "Tocca un continente";
+"Or tap a continent name:" = "O tocca il nome di un continente:";
+"Country spans" = "Il paese si estende su";
+"You selected" = "Hai selezionato";
+"Landlocked" = "Senza sbocco al mare";
+"Very Close!" = "Molto vicino!";
+"Great geographical knowledge!" = "Ottima conoscenza geografica!";
+"Skip Tutorial" = "Salta tutorial";
+
+// MARK: - Memory Puzzles
+"Remember this symbol" = "Ricorda questo simbolo";
+"NEXT" = "AVANTI";
+"Memory Pairs" = "Coppie di memoria";
+"Memory Pair Challenge" = "Sfida coppie di memoria";
+"Does this pattern match the\nprevious pattern?" = "Questo schema corrisponde\nallo schema precedente?";
+"Memory Challenge Complete!" = "Sfida di memoria completata!";
+"Final Results" = "Risultati finali";
+"Session Score" = "Punteggio sessione";
+"Total Score" = "Punteggio totale";
+"Correct Answers" = "Risposte corrette";
+"Accuracy" = "Precisione";
+"Example Pattern" = "Schema esempio";
+"Red dot at bottom-left" = "Punto rosso in basso a sinistra";
+"START GAME" = "INIZIA PARTITA";
+
+// MARK: - Memory Story
+"Error loading Memory Story puzzle" = "Errore nel caricamento del puzzle Storia di Memoria";
+"THIS GAME REQUIRES AUDIO" = "QUESTO GIOCO RICHIEDE L'AUDIO";
+"MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY" = "ASSICURATI DI POTER\nSENTIRE IL TONO CHIARAMENTE";
+
+// MARK: - Memory Sequencing
+"LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS" = "ASCOLTA DUE PARTI E\nMETTI IN SEQUENZA GLI EVENTI";
+"DRAG TO REORDER" = "TRASCINA PER RIORDINARE";
+"PART TWO OF TWO" = "PARTE DUE DI DUE";
+"Continue to Part Two" = "Continua alla parte due";
+
+// MARK: - Memory Retention
+"Audio Error" = "Errore audio";
+"Continue Without Audio" = "Continua senza audio";
+
+// MARK: - Memory Squares
+"Clear" = "Cancella";
+
+// MARK: - Context Switch
+"Excellent!" = "Eccellente!";
+"Not quite" = "Non proprio";
+"Working Memory" = "Memoria di lavoro";
+"Executive Load" = "Carico esecutivo";
+"Dual Task" = "Doppio compito";
+"Attention" = "Attenzione";
+"Time Pressure" = "Pressione temporale";
+"Context Switch Adapted!" = "Cambio di contesto adattato!";
+"Study these items" = "Studia questi elementi";
+"I'm Ready!" = "Sono pronto!";
+"Alphabetization Task" = "Compito di alfabetizzazione";
+"Drag to reorder alphabetically:" = "Trascina per riordinare alfabeticamente:";
+"Continue \u{2192}" = "Continua \u{2192}";
+"Recognition Test" = "Test di riconoscimento";
+"Select all items from the original list" = "Seleziona tutti gli elementi dalla lista originale";
+"Items are arranged to test attention control" = "Gli elementi sono disposti per testare il controllo dell'attenzione";
+"Submit Answer \u{2713}" = "Invia risposta \u{2713}";
+
+// MARK: - Color Text Matching
+"Adaptive Color-Text Matching" = "Abbinamento adattivo colore-testo";
+"Compare the color name meaning with the actual text color and decide if they match." = "Confronta il significato del nome del colore con il colore effettivo del testo e decidi se corrispondono.";
+"Adaptive Example" = "Esempio adattivo";
+"Answer: YES (both are blue)" = "Risposta: SÌ (entrambi sono blu)";
+"Does the meaning match the text color?" = "Il significato corrisponde al colore del testo?";
+"Color Challenge Adapted!" = "Sfida colore adattata!";
+"meaning" = "significato";
+"text color" = "colore del testo";
+"Avg Time" = "Tempo medio";
+"Streak" = "Serie";
+"START ADAPTIVE CHALLENGE" = "INIZIA SFIDA ADATTIVA";
+
+// MARK: - Color Shape Matching
+"Visual Challenge Adapted!" = "Sfida visiva adattata!";
+"Does the text meaning match the shape color?" = "Il significato del testo corrisponde al colore della forma?";
+
+// MARK: - Dual Card
+"Adaptive Dual-Task Complete!" = "Doppio compito adattivo completato!";
+"Switching pattern: %@" = "Schema di cambio: %@";
+
+// MARK: - Symbol Swipe
+"When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT" = "Quando vedi il simbolo SINISTRO, scorri a SINISTRA\nQuando vedi il simbolo DESTRO, scorri a DESTRA";
+"SWIPE RIGHT \u{2192}" = "SCORRI A DESTRA \u{2192}";
+"LEFT" = "SINISTRA";
+"RIGHT" = "DESTRA";
+
+// MARK: - Unique Object
+"STREAK" = "SERIE";
+
+// MARK: - Flow Puzzle
+"Clear All" = "Cancella tutto";
+"Give Up" = "Arrendersi";
+"Solution Shown" = "Soluzione mostrata";
+"Moving to next puzzle..." = "Passaggio al prossimo puzzle...";
+"Path Conflict!" = "Conflitto di percorso!";
+
+// MARK: - Pinball Deflector
+"Pinball Deflector" = "Deflettore pinball";
+"Challenge Complete" = "Sfida completata";
+"Memorize deflector positions" = "Memorizza le posizioni dei deflettori";
+"Predict where the ball will exit" = "Prevedi dove uscirà la pallina";
+"Continue Challenge" = "Continua sfida";
+
+// MARK: - Swipe Word
+"Next Puzzle" = "Prossimo puzzle";
+"Back to Home" = "Torna alla home";
+
+// MARK: - Limit Reached
+"Running Low on Puzzles!" = "Pochi puzzle rimasti!";
+"Generation Limit Reached" = "Limite di generazione raggiunto";
+"Maybe Later" = "Forse dopo";
+"Upgrade to Premium" = "Passa a Premium";
+
+// MARK: - Puzzle Limit Network
+"Checking Puzzle Availability" = "Verifica disponibilità puzzle";
+
+// MARK: - Music Puzzle
+"TUTORIAL" = "TUTORIAL";
+"MUSIC MATCH" = "ABBINAMENTO MUSICALE";
+"Loading music puzzle..." = "Caricamento puzzle musicale...";
+"Tap to expand..." = "Tocca per espandere...";
+"Music Match Tutorial" = "Tutorial abbinamento musicale";
+
+// MARK: - Quiz Card
+"Start Quiz" = "Inizia quiz";
+
+// MARK: - Tutorial Views
+"How to Play" = "Come giocare";
+"Got it! Let's Play" = "Capito! Giochiamo!";
+"Skip Tutorial" = "Salta tutorial";
+
+// MARK: - Group Completion
+"Puzzle Collections" = "Collezioni puzzle";
+"Each type has 5 puzzles" = "Ogni tipo ha 5 puzzle";
+"How it works:" = "Come funziona:";
+"Each puzzle type contains 5 challenges" = "Ogni tipo di puzzle contiene 5 sfide";
+"Complete all 5 to unlock the next puzzle type" = "Completa tutti e 5 per sbloccare il prossimo tipo di puzzle";
+"Try different types to discover your favorites!" = "Prova diversi tipi per scoprire i tuoi preferiti!";
+"Group Completed!" = "Gruppo completato!";
+"Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?" = "Fantastico! Hai padroneggiato tutti i tipi di puzzle in questo gruppo. Pronto per la prossima sfida?";
+
+// MARK: - Word Prefix
+"\u{1F4A1} Hint" = "\u{1F4A1} Suggerimento";
+
+// MARK: - Notification Debug
+"Current Status" = "Stato attuale";
+"Token Preview:" = "Anteprima token:";
+"Quick Tests" = "Test rapidi";
+"Test User Email" = "Email utente di test";
+"Test Results" = "Risultati test";
+"No tests run yet" = "Nessun test eseguito ancora";
+"Advanced Tests" = "Test avanzati";
+"Running tests..." = "Esecuzione test...";
+"Notification Tests" = "Test notifiche";
+"1. Request Permission" = "1. Richiedi permesso";
+"2. Get FCM Token" = "2. Ottieni token FCM";
+"3. Register with Server" = "3. Registra con server";
+"4. Send Test Notification" = "4. Invia notifica di test";
+"5. Schedule Local Test" = "5. Programma test locale";
+"Use Current" = "Usa attuale";
+"Clear Results" = "Cancella risultati";
+"Run Full Test Suite" = "Esegui suite completa di test";
+
+// MARK: - Difficulty Settings
+"Default Difficulty" = "Difficoltà predefinita";
+"Set your preferred difficulty level for all puzzles" = "Imposta il livello di difficoltà preferito per tutti i puzzle";
+"You can still change difficulty when starting any puzzle" = "Puoi ancora cambiare la difficoltà all'inizio di ogni puzzle";

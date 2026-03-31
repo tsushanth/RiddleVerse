@@ -1,0 +1,386 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">Vind verborgen woorden in een raster</string>
+    <string name="crossword_description">Vul woorden in met behulp van aanwijzingen</string>
+    <string name="anagram_description">Herschik letters om woorden te vormen</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">Spel voorbij!</string>
+    <string name="points">punten</string>
+    <string name="score_submitted">Score ingediend!</string>
+    <string name="play_again">Opnieuw spelen</string>
+    <string name="try_harder_version">Probeer moeilijkere versie</string>
+    <string name="try_hard_version">Probeer moeilijke versie</string>
+    <string name="try_very_hard_version">Probeer zeer moeilijke versie</string>
+    <string name="try_expert_version">Probeer expertversie</string>
+    <string name="customize">Aanpassen</string>
+    <string name="get_coins">Munten ophalen</string>
+    <string name="view_leaderboard">Scorebord bekijken</string>
+    <string name="done">Klaar</string>
+    <string name="earn_coins_tip">Verdien dagelijks munten door puzzels te spelen!</string>
+    <string name="coins_label">munten</string>
+    <string name="no_games_yet">Nog geen spellen</string>
+    <string name="be_first_to_create">Wees de eerste die een spel maakt en deelt!</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">Nieuwste</string>
+    <string name="most_played">Meest gespeeld</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">Voor jou</string>
+    <string name="tab_categories">Categorieën</string>
+    <string name="tab_games">Spellen</string>
+    <string name="tab_puzzles">Puzzels</string>
+    <string name="tab_settings">Instellingen</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">Bladeren</string>
+    <string name="subtab_your_puzzles">Jouw puzzels</string>
+    <string name="subtab_featured">Uitgelicht</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">Geniet je van RiddleVerse?</string>
+    <string name="rate_in_play_store">Beoordeel ons in de Play Store!</string>
+    <string name="help_us_improve">Help ons verbeteren!</string>
+    <string name="rate_experience">Hoe beoordeel je jouw ervaring met RiddleVerse?</string>
+    <string name="rate_incentive">Krijg 100 munten + vroege toegang door ons te beoordelen!</string>
+    <string name="thanks_great_rating">Bedankt voor de geweldige beoordeling! Wil je deze delen in de Play Store?</string>
+    <string name="share_detailed_feedback">Je kunt ook eerst gedetailleerde feedback met ons delen!</string>
+    <string name="sorry_bad_experience">Het spijt ons dat je geen goede ervaring hebt. Kun je ons vertellen wat we kunnen verbeteren?</string>
+    <string name="continue_label">Doorgaan</string>
+    <string name="rate">Beoordelen</string>
+    <string name="rate_in_store">Beoordeel in Store</string>
+    <string name="give_feedback">Feedback geven</string>
+    <string name="not_now">Niet nu</string>
+    <string name="maybe_later">Misschien later</string>
+    <string name="feedback_first">Eerst feedback</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">Beoordelingsherinnering</string>
+    <string name="when_remind_again">Wanneer wil je opnieuw herinnerd worden?</string>
+    <string name="remind_in_week">Herinner me over een week</string>
+    <string name="remind_in_month">Herinner me over een maand</string>
+    <string name="dont_ask_again">Niet meer vragen</string>
+    <string name="cancel">Annuleren</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">Vertel ons wat je leuk vindt!</string>
+    <string name="what_enjoy_most">Wat vind je het leukst aan RiddleVerse?</string>
+    <string name="what_can_we_improve">Wat kunnen we beter doen? Jouw feedback helpt ons verbeteren.</string>
+    <string name="your_feedback">Jouw feedback</string>
+    <string name="feedback_placeholder_positive">Ik hou van de verscheidenheid aan puzzels…</string>
+    <string name="feedback_placeholder_negative">Ik wou dat de app…</string>
+    <string name="submitted_successfully">Succesvol ingediend!</string>
+    <string name="submission_failed">Indiening mislukt</string>
+    <string name="submit">Indienen</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">Muntenwinkel</string>
+    <string name="your_coins">Jouw munten</string>
+    <string name="coins_used_description">Munten worden gebruikt om spellen voort te zetten en makers te ondersteunen.</string>
+    <string name="best_value">Beste waarde</string>
+    <string name="rate_for_early_access">Beoordeel voor vroege toegang!</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">OK</string>
+    <string name="back">Terug</string>
+    <string name="close">Sluiten</string>
+    <string name="start">Start</string>
+    <string name="next">Volgende</string>
+
+    <!-- Game UI -->
+    <string name="correct">Correct!</string>
+    <string name="wrong">Fout!</string>
+    <string name="times_up">Tijd is om!</string>
+    <string name="score_label">Score</string>
+    <string name="streak_label">Reeks</string>
+    <string name="level_label">Niveau</string>
+    <string name="hint">Hint</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">Nog geen scores</string>
+    <string name="play_to_set_score">Speel het spel om de eerste highscore neer te zetten!</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">Goedemorgen</string>
+    <string name="good_afternoon">Goedemiddag</string>
+    <string name="good_evening">Goedenavond</string>
+
+    <!-- Settings -->
+    <string name="premium_label">Premium</string>
+    <string name="unlimited_label">Onbeperkt</string>
+    <string name="daily_rewards">Dagelijkse beloningen</string>
+    <string name="notifications">Meldingen</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">Er is iets misgegaan</string>
+    <string name="no_internet">Geen internetverbinding</string>
+    <string name="please_try_again">Probeer het opnieuw</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">Dit spel aanpassen</string>
+    <string name="what_would_you_change">Wat wil je veranderen?</string>
+    <string name="customizing_game">Spel aanpassen…</string>
+
+    <!-- Language Picker -->
+    <string name="language">Taal</string>
+    <string name="language_picker_title">Taal selecteren</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">Opnieuw proberen</string>
+    <string name="skip">Overslaan</string>
+    <string name="skip_puzzle">Puzzel overslaan</string>
+    <string name="retry">Opnieuw</string>
+    <string name="share">Delen</string>
+    <string name="share_puzzle">Puzzel delen</string>
+    <string name="play">Spelen</string>
+    <string name="edit">Bewerken</string>
+    <string name="create">Maken</string>
+    <string name="explore">Ontdekken</string>
+    <string name="reset">Resetten</string>
+    <string name="reveal">Onthullen</string>
+    <string name="clear">Wissen</string>
+    <string name="clear_all">Alles wissen</string>
+    <string name="check">Controleren</string>
+    <string name="go_back">Ga terug</string>
+    <string name="home">Home</string>
+    <string name="upgrade">Upgraden</string>
+    <string name="manage">Beheren</string>
+    <string name="got_it">Begrepen!</string>
+    <string name="fix_it">Repareren</string>
+    <string name="just_close">Gewoon sluiten</string>
+    <string name="modify">Wijzigen</string>
+    <string name="load_more">Meer laden</string>
+    <string name="loading">Laden\u2026</string>
+    <string name="save">Opslaan</string>
+    <string name="yes">JA</string>
+    <string name="yes_finish">Ja, afronden</string>
+    <string name="yes_it_works">Ja, het werkt!</string>
+    <string name="no_it_has_issues">Nee, er zijn problemen</string>
+    <string name="finish_now">Nu afronden</string>
+    <string name="keep_playing">Blijven spelen</string>
+    <string name="finish_early">Vroeg stoppen</string>
+    <string name="give_up">Opgeven</string>
+    <string name="back_to_home">Terug naar home</string>
+    <string name="submit_answer">Antwoord indienen</string>
+    <string name="start_game">SPEL STARTEN</string>
+    <string name="start_puzzle">PUZZEL STARTEN</string>
+    <string name="start_challenge">UITDAGING STARTEN</string>
+    <string name="begin">Beginnen</string>
+    <string name="im_ready">Ik ben klaar!</string>
+    <string name="im_done">Ik ben klaar</string>
+    <string name="skip_tutorial">Tutorial overslaan</string>
+    <string name="same">HETZELFDE</string>
+    <string name="different">ANDERS</string>
+    <string name="next_puzzle">Volgende puzzel</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">Volgende puzzel laden\u2026</string>
+    <string name="loading_puzzle">Puzzel laden\u2026</string>
+    <string name="generating">Genereren\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">Snelle acties</string>
+    <string name="start_playing_instantly">Begin direct met spelen</string>
+    <string name="your_favorites">Jouw favorieten</string>
+    <string name="trending_now">Nu trending</string>
+    <string name="recommended_for_you">Aanbevolen voor jou</string>
+    <string name="puzzle_collections">Puzzelcollecties</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">Spelfout</string>
+    <string name="quiz_categories">Quizcategorieën</string>
+    <string name="subscription">Abonnement</string>
+    <string name="current_tier">Huidig niveau</string>
+    <string name="active_streaks">Actieve reeksen</string>
+    <string name="time_label">Tijd</string>
+    <string name="badges">Badges</string>
+    <string name="unable_to_load_progress">Kan voortgangsgegevens niet laden</string>
+    <string name="custom_puzzles">Aangepaste puzzels</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">Verdien munten wanneer spelers van je spellen genieten!</string>
+    <string name="creator_revenue_share">Je krijgt 55%% van de munten die aan je spellen worden besteed</string>
+    <string name="coins_earned">Munten verdiend</string>
+    <string name="plays_monetized">Betaalde speelsessies</string>
+    <string name="per_game">Per spel</string>
+    <string name="cash_out">Uitbetalen</string>
+    <string name="cash_out_earnings">Inkomsten uitbetalen</string>
+    <string name="connect_stripe_to_receive">Verbind Stripe om uitbetalingen te ontvangen</string>
+    <string name="connect_stripe_account">Stripe-account verbinden</string>
+    <string name="complete_stripe_setup">Stripe-installatie voltooien</string>
+    <string name="continue_setup">Installatie voortzetten</string>
+    <string name="request_payout">Uitbetaling aanvragen</string>
+    <string name="payout_history">Uitbetalingsgeschiedenis</string>
+    <string name="checking_eligibility">Geschiktheid controleren\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">Een spel maken</string>
+    <string name="describe_game_prompt">Beschrijf een spel en AI bouwt het voor je</string>
+    <string name="describe_game_placeholder">Beschrijf je spel\u2026</string>
+    <string name="generate_game">Spel genereren</string>
+    <string name="free_generations_used_up">Gratis generaties opgebruikt</string>
+    <string name="buy_coins">Munten kopen</string>
+    <string name="subscribe_for_unlimited">Abonneer voor onbeperkt</string>
+    <string name="get_unlimited_generations">Onbeperkt genereren + maandelijkse munten</string>
+    <string name="reference_image">Referentieafbeelding</string>
+    <string name="try_these_ideas">Probeer deze ideeën</string>
+    <string name="game_title">Speltitel</string>
+    <string name="describe_your_version">Beschrijf jouw versie</string>
+    <string name="create_game">Spel maken</string>
+    <string name="create_your_version">Maak jouw versie</string>
+    <string name="creating_your_game">Je spel wordt gemaakt</string>
+    <string name="this_may_take_2_5_minutes">Dit kan 2\u20135 minuten duren\u2026</string>
+    <string name="notify_me_when_done">Meld me wanneer klaar</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">Communityspellen</string>
+    <string name="my_games">Mijn spellen</string>
+    <string name="draft">Concept</string>
+    <string name="generating_harder_challenge">Moeilijkere uitdaging genereren</string>
+    <string name="did_this_game_work">Werkte dit spel?</string>
+    <string name="whats_wrong">Wat is er mis?</string>
+    <string name="modify_game">Spel wijzigen</string>
+    <string name="game_name">Spelnaam</string>
+    <string name="create_customized_game">Aangepast spel maken</string>
+    <string name="original">Origineel</string>
+    <string name="sort_by">Sorteren op</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">Dit spel kan problemen hebben</string>
+    <string name="game_saved">Spel opgeslagen!</string>
+    <string name="game_ready">Spel klaar!</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">Sla het wachten over!</string>
+    <string name="get_instant_generation">Directe puzzelgeneratie</string>
+    <string name="wait_time">Wachttijd</string>
+    <string name="instant">Direct</string>
+    <string name="premium_member">Premiumlid</string>
+    <string name="upgrade_now">Nu upgraden</string>
+    <string name="upgrade_for_unlimited">Upgraden voor onbeperkt</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">Spelinstellingen</string>
+    <string name="difficulty_level">Moeilijkheidsgraad</string>
+    <string name="game_mode">Spelmodus</string>
+    <string name="default_difficulty">Standaard moeilijkheid</string>
+    <string name="checking">Controleren\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">Hoe het werkt:</string>
+    <string name="progress">Voortgang</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">Via e-mail verzenden</string>
+    <string name="copy_to_clipboard">Kopiëren naar klembord</string>
+    <string name="puzzle_completed">Puzzel voltooid!</string>
+    <string name="achievement_unlocked">Prestatie ontgrendeld!</string>
+    <string name="level_up">Niveau omhoog!</string>
+    <string name="recipient_email">E-mail ontvanger</string>
+    <string name="recipient_name">Naam ontvanger</string>
+    <string name="copied_to_clipboard">Gekopieerd naar klembord!</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">Scorebord</string>
+    <string name="your_performance">Jouw prestaties</string>
+    <string name="other_top_players">Andere topspelers</string>
+    <string name="puzzle_statistics">Puzzelstatistieken</string>
+    <string name="overview">Overzicht</string>
+    <string name="detailed_statistics">Gedetailleerde statistieken</string>
+    <string name="records">Records</string>
+    <string name="no_players_yet">Nog geen spelers</string>
+    <string name="rank_label">Rang</string>
+    <string name="percentile_label">Percentiel</string>
+    <string name="total_players">Totaal spelers</string>
+    <string name="avg_score">Gem. score</string>
+    <string name="fastest_time">Snelste tijd</string>
+    <string name="highest_score">Hoogste score</string>
+
+    <!-- Game State -->
+    <string name="game_complete">Spel voltooid!</string>
+    <string name="final_score">Eindscore</string>
+    <string name="final_results">Eindresultaten</string>
+    <string name="session_score">Sessiescore</string>
+    <string name="total_score">Totale score</string>
+    <string name="correct_answers">Correcte antwoorden</string>
+    <string name="accuracy">Nauwkeurigheid</string>
+    <string name="avg_time">Gem. tijd</string>
+    <string name="puzzle_complete">Puzzel voltooid!</string>
+    <string name="difficulty_advanced">Moeilijkheid verhoogd!</string>
+    <string name="continue_label_caps">DOORGAAN</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">Geheugenvakjes</string>
+    <string name="get_ready">Maak je klaar!</string>
+    <string name="memorize_the_pattern">Onthoud het patroon!</string>
+    <string name="click_squares_you_remember">Klik op de vakjes die je onthoudt!</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">Komt de betekenis overeen met de tekstkleur?</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">Hoe te spelen</string>
+    <string name="drop_here">Hier neerzetten</string>
+    <string name="completed">Voltooid</string>
+    <string name="time_used">Gebruikte tijd</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">Sommige antwoorden zijn onjuist</string>
+    <string name="all_hints">Alle hints</string>
+
+    <!-- Word Search -->
+    <string name="found">Gevonden</string>
+    <string name="revealed">Onthuld</string>
+    <string name="best_streak">Beste reeks</string>
+    <string name="drag_to_find_words">Sleep over letters om verborgen woorden te vinden</string>
+    <string name="find_these_words">Vind deze woorden:</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">Goud niveau bereikt!</string>
+    <string name="bonus_words_found">Bonuswoorden gevonden:</string>
+    <string name="great_job">Goed gedaan!</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorial_mode">Tutorialmodus</string>
+    <string name="got_it_lets_play">Begrepen! Laten we spelen</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">Favoriete onderwerpen</string>
+    <string name="popular_topics">Populaire onderwerpen</string>
+    <string name="add_custom_topic">Eigen onderwerp toevoegen</string>
+    <string name="your_selected_topics">Jouw geselecteerde onderwerpen</string>
+    <string name="no_topics_selected">Nog geen onderwerpen geselecteerd</string>
+    <string name="saving">Opslaan\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">Prestatieanalyse</string>
+    <string name="performance_stats">Prestatiestatistieken</string>
+    <string name="daily_streak">Dagelijkse reeks</string>
+    <string name="lets_play">Laten we spelen!</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">Fout bij laden puzzel</string>
+    <string name="no_hint_available">Geen hint beschikbaar</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">Tik op nummers in oplopende volgorde (kleinste naar grootste)</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">Landengeografie-uitdaging</string>
+</resources>

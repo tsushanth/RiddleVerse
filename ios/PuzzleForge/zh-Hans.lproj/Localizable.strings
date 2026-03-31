@@ -1,0 +1,726 @@
+/* Localizable.strings (Simplified Chinese)
+   PuzzleForge / RiddleVerse */
+
+// MARK: - Common / Shared
+"OK" = "好的";
+"Cancel" = "取消";
+"Done" = "完成";
+"Back" = "返回";
+"Next" = "下一步";
+"Skip" = "跳过";
+"Close" = "关闭";
+"Continue" = "继续";
+"Submit" = "提交";
+"Retry" = "重试";
+"Exit" = "退出";
+"Share" = "分享";
+"Reset" = "重置";
+"Clear" = "清除";
+"Error" = "错误";
+"Loading..." = "加载中...";
+"YES" = "是";
+"NO" = "否";
+"NEW" = "新";
+"Play" = "开始";
+"Edit" = "编辑";
+"Hint" = "提示";
+"Show" = "显示";
+"Begin" = "开始";
+"Modify" = "修改";
+"CONTINUE" = "继续";
+"SUBMIT" = "提交";
+"CLEAR" = "清除";
+"REVEAL" = "揭晓";
+"START" = "开始";
+
+// MARK: - Home View
+"Score: %@" = "分数: %@";
+"Settings" = "设置";
+"Profile" = "个人资料";
+"Account" = "账户";
+"Sign In" = "登录";
+"Sign Out" = "退出登录";
+"Sign Up" = "注册";
+"Create Account" = "创建账户";
+"Notification Settings" = "通知设置";
+"Custom Puzzles" = "自定义谜题";
+"Quick Actions" = "快捷操作";
+"Popular Categories" = "热门分类";
+"Tap any to start earning points!" = "点击任意一个开始赚取积分！";
+"Random" = "随机";
+"Surprise me!" = "随便来一个！";
+"Loading puzzle..." = "正在加载谜题...";
+"Loading personalized puzzles..." = "正在加载个性化谜题...";
+"Puzzles Loading" = "谜题加载中";
+"We're fetching your personalized puzzles. This usually takes just a few moments." = "正在获取您的个性化谜题。通常只需几秒钟。";
+"We're fetching your puzzles from our servers. This usually takes just a few moments." = "正在从服务器获取您的谜题。通常只需几秒钟。";
+"No puzzle selected" = "未选择谜题";
+"Filter Categories" = "筛选分类";
+"No Categories" = "没有分类";
+"Adjust your filter to see more categories." = "调整筛选条件以查看更多分类。";
+"Featured Custom Puzzles" = "精选自定义谜题";
+"Debug & Testing" = "调试与测试";
+"Test Notifications" = "测试通知";
+
+// MARK: - Update Dialog
+"Version %@" = "版本 %@";
+"What's New:" = "更新内容:";
+"Update Now" = "立即更新";
+"Later" = "稍后";
+
+// MARK: - Content Moderation
+"Puzzle Name:" = "谜题名称:";
+"Creator:" = "创作者:";
+"Format:" = "格式:";
+"What happened?" = "发生了什么？";
+"This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly." = "此主题已被我们的内容审查系统标记为可能不当内容。这是自动化流程，偶尔可能会错误标记。";
+
+// MARK: - Profile & Creator
+"By %@" = "作者 %@";
+"Creator Earnings" = "创作者收益";
+"Coins Earned" = "获得的金币";
+"Plays Monetized" = "已变现的游戏次数";
+"Per Game" = "每局游戏";
+"Cash Out Earnings" = "提取收益";
+"Earn coins when players enjoy your games!" = "当玩家喜欢你的游戏时赚取金币！";
+"You get 55% of coins spent on your games. Tap to view payouts." = "你可以获得游戏消费金币的55%。点击查看支付详情。";
+"Checking eligibility..." = "正在检查资格...";
+"coins available" = "可用金币";
+
+// MARK: - Stripe / Payouts
+"Cash Out" = "提现";
+"Connect Stripe to receive payouts" = "连接Stripe接收付款";
+"Set up your Stripe account to cash out your earned coins as real money." = "设置你的Stripe账户，将获得的金币兑换成真实货币。";
+"Connect Stripe Account" = "连接Stripe账户";
+"Complete Stripe Setup" = "完成Stripe设置";
+"Your Stripe account setup is incomplete. Tap below to finish." = "你的Stripe账户设置未完成。点击下方完成设置。";
+"Continue Setup" = "继续设置";
+"Request Payout" = "请求付款";
+"Payout History" = "付款历史";
+
+// MARK: - App Features & Account
+"App Features" = "应用功能";
+"Account Management" = "账户管理";
+"Delete Account" = "删除账户";
+"This will permanently delete your account and all associated data. This action cannot be undone." = "这将永久删除你的账户和所有相关数据。此操作无法撤销。";
+
+// MARK: - Sign In
+"Sign In Required" = "需要登录";
+"Sign in to access leaderboards, track your progress, and save your scores." = "登录以访问排行榜、追踪进度并保存分数。";
+"Sign in to track progress and scores" = "登录以追踪进度和分数";
+"Sign in with Google" = "使用Google登录";
+"Enable Notifications?" = "启用通知？";
+"Yes, Notify Me" = "是的，通知我";
+"Not Now" = "暂时不用";
+"Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge." = "当每日谜题准备就绪时收到通知！我们会发送快速提醒，让你不会错过每日挑战。";
+"Daily Puzzle Notifications" = "每日谜题通知";
+"Notification Status:" = "通知状态:";
+"Enabled" = "已启用";
+"Not enabled" = "未启用";
+
+// MARK: - Onboarding
+"Train Your Brain Daily" = "每日大脑训练";
+"Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills" = "通过数学、文字谜题和脑筋急转弯来锻炼思维，提升认知能力";
+"Track Your Progress" = "追踪你的进度";
+"Level up, earn badges, and see your improvement over time with detailed analytics" = "升级、获得徽章，通过详细分析查看你的进步";
+"Compete & Achieve" = "竞争与成就";
+"Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type" = "挑战朋友、攀登排行榜、掌握各种谜题类型以解锁专属奖励";
+"Ready to Start?" = "准备好了吗？";
+"Join thousands of puzzle enthusiasts and start your brain training journey today!" = "加入数千名谜题爱好者，今天就开始你的大脑训练之旅！";
+"Let's Get Started!" = "开始吧！";
+"Free to play \u{2022} No ads during puzzles" = "免费游玩 \u{2022} 谜题中无广告";
+"Level 5" = "等级5";
+
+// MARK: - Start Puzzle View
+"Take a quick interactive tutorial to get started!" = "通过快速互动教程开始吧！";
+"Start Tutorial" = "开始教程";
+"Reset Tutorial" = "重置教程";
+"Dismiss" = "关闭";
+"Loading your stats..." = "正在加载你的统计数据...";
+"TOP SCORES" = "最高分";
+"BENEFITS" = "福利";
+"Game Settings" = "游戏设置";
+"Difficulty Level" = "难度等级";
+"Game Mode" = "游戏模式";
+"Number of Puzzles" = "谜题数量";
+"Start Playing" = "开始游戏";
+"Create Your Version" = "创建你的版本";
+"Earn coins" = "赚取金币";
+"Back to Home" = "返回首页";
+
+// MARK: - Difficulty
+"DIFFICULTY PROGRESSION" = "难度进度";
+"Current Level" = "当前等级";
+"Progress" = "进度";
+"Next:" = "下一个:";
+"CURRENT LEVEL DETAILS" = "当前等级详情";
+"Default Difficulty" = "默认难度";
+"Set your preferred difficulty level for all puzzles" = "设置所有谜题的首选难度等级";
+"You can still change difficulty when starting any puzzle" = "开始任何谜题时仍可更改难度";
+"Difficulty Adapted!" = "难度已调整！";
+"Difficulty Adjusted" = "难度已调整";
+"DIFFICULTY" = "难度";
+
+// MARK: - Puzzle Completion
+"Puzzle Set Complete!" = "谜题集完成！";
+"Share Achievement" = "分享成就";
+"Remix & earn real money when others play" = "重混并在他人游玩时赚取真实收入";
+"Return Home" = "返回首页";
+"No More Puzzles Available" = "没有更多可用谜题";
+"Generate new puzzles to continue playing." = "生成新谜题以继续游戏。";
+"Generate New Puzzles" = "生成新谜题";
+"Generating New Puzzles" = "正在生成新谜题";
+"This usually takes 30-60 seconds..." = "通常需要30-60秒...";
+"Home" = "首页";
+"Try These Next" = "接下来试试这些";
+"TOP 5 SCORES" = "前5名分数";
+
+// MARK: - Session/Score Feedback
+"Session Complete!" = "本次完成！";
+"Final Score:" = "最终分数:";
+"Accuracy:" = "准确率:";
+"Best Streak:" = "最佳连续记录:";
+"Your answer: %@" = "你的答案: %@";
+"Correct answer: %@" = "正确答案: %@";
+"Updating score..." = "正在更新分数...";
+"Tap to continue" = "点击继续";
+"Keep trying! You've got this! \u{1F4AA}" = "继续加油！你可以的！ \u{1F4AA}";
+"LEVEL UP!" = "升级了！";
+"Level %@ \u{2192} %@" = "等级 %@ \u{2192} %@";
+"Score submitted!" = "分数已提交！";
+
+// MARK: - Leaderboard
+"Leaderboard" = "排行榜";
+"View Leaderboard" = "查看排行榜";
+"Rank #%@" = "排名 #%@";
+"Your rank: #%@" = "你的排名: #%@";
+"No scores yet" = "暂无分数";
+"Play the game to set the first high score!" = "开始游戏来创造第一个最高分！";
+
+// MARK: - Subscription & Limits
+"Upgrade to Premium" = "升级到高级版";
+"Running Low on Puzzles!" = "谜题即将用完！";
+"Generation Limit Reached" = "已达到生成上限";
+"Maybe Later" = "以后再说";
+"Upgrade" = "升级";
+"IS ANNUALLY:" = "年付:";
+"A YEAR" = "每年";
+
+// MARK: - Coins / Store
+"Your Coins" = "你的金币";
+"Coins added!" = "金币已添加！";
+"Coins are used to continue games and support creators." = "金币用于继续游戏和支持创作者。";
+"Best Value" = "最超值";
+"Get Coins" = "获取金币";
+"Coin Store" = "金币商店";
+"Buy Coins" = "购买金币";
+"points" = "积分";
+
+// MARK: - Game Play
+"Game Over!" = "游戏结束！";
+"Play Again" = "再玩一次";
+"Customize" = "自定义";
+"Customizing Game" = "正在自定义游戏";
+"This may take 2-5 minutes..." = "这可能需要2-5分钟...";
+"Fixing game..." = "正在修复游戏...";
+"This may take a couple minutes..." = "这可能需要几分钟...";
+"Did this game work?" = "这个游戏正常运行了吗？";
+"Yes, it works!" = "是的，正常运行！";
+"No, it has issues" = "不，有问题";
+"What's wrong?" = "出了什么问题？";
+"Fix It" = "修复";
+"Brief description \u{2014} even a couple words helps" = "简要描述 \u{2014} 哪怕几个字也有帮助";
+"Customize This Game" = "自定义此游戏";
+"Create Customized Game" = "创建自定义游戏";
+"Game Name" = "游戏名称";
+"What would you like to change?" = "你想更改什么？";
+"Describe what you'd like to change. A new game will be created under your name." = "描述你想更改的内容。将以你的名字创建一个新游戏。";
+"Lv.%@" = "Lv.%@";
+
+// MARK: - Game Browse
+"Community Games" = "社区游戏";
+"My Games" = "我的游戏";
+"No games yet" = "暂无游戏";
+"Be the first to create and share a game!" = "成为第一个创建和分享游戏的人！";
+"Load More" = "加载更多";
+"Draft" = "草稿";
+"by %@" = "%@ 作";
+"Newest" = "最新";
+"Most Played" = "最多游玩";
+
+// MARK: - Game Remix
+"Create your version" = "创建你的版本";
+"Create & Earn Real Money" = "创建并赚取真实收入";
+"Earn coins when others play \u{2014} cash out via Stripe!" = "他人游玩时赚取金币 \u{2014} 通过Stripe提现！";
+"You earn 55% of every coin spent on your game" = "你可以获得游戏中每个金币消费的55%";
+"Game Title" = "游戏标题";
+"Describe Your Version" = "描述你的版本";
+"Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules..." = "描述游戏玩法变更、视觉风格、主题、难度调整、计分规则...";
+"Reference image" = "参考图片";
+"AI will use this as visual context" = "AI将使用此作为视觉参考";
+"Quick Ideas" = "快速创意";
+"Create Game" = "创建游戏";
+"Creating Your Game" = "正在创建你的游戏";
+"Notify Me When Done" = "完成后通知我";
+"You can leave this screen \u{2014} we'll notify you!" = "你可以离开此页面 \u{2014} 我们会通知你！";
+"Your game will appear in Explore > Custom Games" = "你的游戏将出现在 探索 > 自定义游戏";
+"Free Generations Used Up" = "免费生成次数已用完";
+"Subscribe for Unlimited" = "订阅获取无限次数";
+"Get unlimited generations + monthly coins" = "获取无限生成次数 + 每月金币";
+"Game Ready!" = "游戏就绪！";
+"Tap to preview \u{2014} also in Explore > Custom Games" = "点击预览 \u{2014} 也可在 探索 > 自定义游戏 中找到";
+
+// MARK: - Game Preview
+"This game may have issues" = "此游戏可能存在问题";
+"Modifying game..." = "正在修改游戏...";
+"Game saved!" = "游戏已保存！";
+"You'll earn coins when others play!" = "他人游玩时你将获得金币！";
+"Describe what's wrong or what to change:" = "描述问题或需要更改的内容:";
+"Modify Game" = "修改游戏";
+
+// MARK: - Game Tweak
+"Loading version history..." = "正在加载版本历史...";
+"No version history yet" = "暂无版本历史";
+"Describe your change below to start editing your game" = "在下方描述你的更改以开始编辑游戏";
+"Applying Edit" = "正在应用编辑";
+"This may take a minute..." = "这可能需要一分钟...";
+"Original" = "原版";
+
+// MARK: - Create Puzzle
+"Create Custom Puzzle" = "创建自定义谜题";
+"Generate personalized puzzles on any topic you love!" = "在你喜欢的任何主题上生成个性化谜题！";
+"Puzzle Topic" = "谜题主题";
+"Popular Topics" = "热门主题";
+"Puzzle Format" = "谜题格式";
+"Creating Magic..." = "正在创造奇迹...";
+"Generate Puzzle" = "生成谜题";
+"puzzles" = "谜题";
+"\u{1F389} Puzzle Creation Started!" = "\u{1F389} 谜题创建已开始！";
+"Your custom puzzle set is being generated! Check back in a few minutes to see your creation." = "你的自定义谜题集正在生成中！几分钟后回来查看你的作品。";
+
+// MARK: - Daily Puzzles
+"Daily Puzzles" = "每日谜题";
+"New Daily Puzzles!" = "新的每日谜题！";
+"Your daily puzzles are ready!" = "你的每日谜题已就绪！";
+"Topics Saved!" = "主题已保存！";
+"Let's Go!" = "出发！";
+"Topics" = "主题";
+"Refresh" = "刷新";
+"Choose Your Daily Puzzle Topics" = "选择你的每日谜题主题";
+"Select topics you're interested in. We'll generate daily puzzles for each topic." = "选择你感兴趣的主题。我们将为每个主题生成每日谜题。";
+"Welcome to Daily Puzzles!" = "欢迎来到每日谜题！";
+"Choose your favorite topics and we'll generate personalized daily puzzles just for you." = "选择你最喜欢的主题，我们将为你生成个性化的每日谜题。";
+"Choose Topics" = "选择主题";
+"Oops!" = "哎呀！";
+"Try Again" = "再试一次";
+"Solve Puzzle" = "解谜";
+"Show Answer" = "显示答案";
+
+// MARK: - Daily Streak
+"Daily Streak Stats" = "每日连续统计";
+"Current Streak" = "当前连续";
+"Total Coins" = "总金币";
+"Days Played" = "游玩天数";
+"Best Streak" = "最佳连续";
+"To Milestone" = "距里程碑";
+"day" = "天";
+"days" = "天";
+"Let's Play! \u{1F3AE}" = "开始游戏！ \u{1F3AE}";
+
+// MARK: - Achievement Dashboard
+"Progress Dashboard" = "进度面板";
+"Next Tier Rewards:" = "下一级奖励:";
+"Rewards:" = "奖励:";
+"Complete some puzzles to see your performance stats!" = "完成一些谜题来查看你的表现统计！";
+"Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!" = "开始玩谜题来解锁你的进度面板。每局游戏都能获得经验值、累积连续记录并解锁成就！";
+"Achievements" = "成就";
+
+// MARK: - Preferred Topics
+"Preferred Topics" = "首选主题";
+"Available Topics" = "可用主题";
+"Your Preferred Topics" = "你的首选主题";
+"Search Custom Puzzles" = "搜索自定义谜题";
+
+// MARK: - Notification Settings
+"Notifications" = "通知";
+"Notification Permissions" = "通知权限";
+"Push Notifications" = "推送通知";
+"Daily Puzzle Alerts" = "每日谜题提醒";
+"Get notified when your daily puzzles are ready" = "当每日谜题就绪时收到通知";
+"FCM Token Status" = "FCM令牌状态";
+"Notification Test" = "通知测试";
+"Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time." = "通知帮助你及时了解新的每日谜题和挑战。你可以随时在iOS设置中禁用。";
+
+// MARK: - Social Sharing
+"Share Your Success!" = "分享你的成功！";
+"Share Puzzle" = "分享谜题";
+"Recipient Email" = "收件人邮箱";
+"Recipient Name" = "收件人姓名";
+
+// MARK: - Puzzle UI Components
+"Level %@" = "等级 %@";
+"Quick Stats" = "快速统计";
+
+// MARK: - Difficulty Manager HUD
+"LEVEL %@" = "等级 %@";
+"TIME" = "时间";
+"SCORE" = "分数";
+"RANK" = "排名";
+"LIVES" = "生命";
+
+// MARK: - Multiple Choice
+"Exit Puzzle" = "退出谜题";
+"Are you sure you want to exit? Your progress will be lost." = "确定要退出吗？你的进度将会丢失。";
+"Question %@/%@" = "问题 %@/%@";
+"Got it!" = "明白了！";
+
+// MARK: - Q&A Puzzle
+"All Puzzles Completed!" = "所有谜题已完成！";
+
+// MARK: - Crossword
+"All Hints" = "所有提示";
+"Puzzle solved in %@" = "用时 %@ 完成";
+"Next Puzzle" = "下一个谜题";
+"Some answers are incorrect" = "某些答案不正确";
+"Try again or use the REVEAL button to fix incorrect answers." = "请重试或使用揭晓按钮修正错误答案。";
+
+// MARK: - Word Search
+"Tips" = "提示";
+"Word Search Help" = "单词搜索帮助";
+
+// MARK: - Word Snake
+"Find these snake words:" = "找到这些蛇形单词:";
+"Clear Word" = "清除单词";
+"Loading Word Snake puzzle..." = "正在加载蛇形单词谜题...";
+"Word Snake Hints" = "蛇形单词提示";
+"Clear Found Word?" = "清除已找到的单词？";
+"Completed" = "已完成";
+"Found" = "已找到";
+"Shown" = "已显示";
+"Avg/Word" = "平均/词";
+"Performance:" = "表现:";
+
+// MARK: - Synonym
+"Group the synonyms! Tap the set that matches the word above." = "将同义词分组！点击与上方单词匹配的组合。";
+
+// MARK: - Antonym
+"Tap balloons to match opposite words" = "点击气球匹配反义词";
+
+// MARK: - Crypto Puzzle
+"Game Over" = "游戏结束";
+"How to Play" = "游戏方法";
+"You've run out of hearts! Crypto puzzles take practice." = "你的心用完了！密码谜题需要练习。";
+"Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'." = "寻找常见模式如'THE'、'AND'，或单个字母如'A'和'I'。";
+"Unable to load adaptive crypto puzzle" = "无法加载自适应密码谜题";
+"Adaptive Crypto Puzzle" = "自适应密码谜题";
+"Adaptive Crypto Solved!" = "自适应密码谜题已解决！";
+"Hidden Message:" = "隐藏消息:";
+"Time Used" = "用时";
+"Difficulty" = "难度";
+"Continue Adaptive Journey" = "继续自适应旅程";
+"\u{1F4A1} Adaptive Hint" = "\u{1F4A1} 自适应提示";
+"Unable to load tutorial puzzle" = "无法加载教程谜题";
+"Try again!" = "再试一次！";
+
+// MARK: - Letter Set
+"No words found yet" = "尚未找到单词";
+"Finish Early?" = "提前结束？";
+"Invalid Word" = "无效单词";
+
+// MARK: - Number Sequence
+"Adaptive Number Sequence" = "自适应数字序列";
+"Tap numbers in ascending order\n(smallest to largest)" = "按升序点击数字\n（从小到大）";
+"START ADAPTIVE CHALLENGE" = "开始自适应挑战";
+"Adaptive Challenge Complete!" = "自适应挑战完成！";
+"Round %@" = "第 %@ 轮";
+
+// MARK: - Number Sum
+"Adaptive Number Sum" = "自适应数字求和";
+"Select numbers that add up\nto the target sum" = "选择数字使其总和\n等于目标值";
+"Target" = "目标";
+
+// MARK: - Math Expression
+"Which value is greater?" = "哪个值更大？";
+"EQUAL" = "相等";
+"Loading math problems..." = "正在加载数学题...";
+"Math Challenge Adapted!" = "数学挑战已适应！";
+
+// MARK: - Math Crossword
+"Select a number:" = "选择一个数字:";
+"Complete the math equations by placing the missing numbers" = "通过放置缺失的数字来完成数学等式";
+"Game Result" = "游戏结果";
+"Result" = "结果";
+
+// MARK: - Math Difference
+"FIND THE DIFFERENCE" = "找出差值";
+"Enter the difference between these numbers" = "输入这些数字之间的差值";
+
+// MARK: - Estimation
+"Error loading estimation data" = "加载估算数据时出错";
+"drag finger to estimate sum" = "滑动手指来估算总和";
+
+// MARK: - Price Ordering
+"CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE" = "计算最终价格并从最便宜到最贵排序";
+"OFF" = "折扣";
+
+// MARK: - Conversion Puzzle
+"Drag blocks to compare their values" = "拖动方块以比较它们的值";
+"Higher position = Greater value" = "位置越高 = 值越大";
+
+// MARK: - Percentage / Tip
+"TAP THE CORRECT TIP" = "点击正确的小费";
+"Tap the bubble with the correct tip amount!" = "点击带有正确小费金额的气泡！";
+"Bill Amount" = "账单金额";
+"Puzzle Completed!" = "谜题完成！";
+
+// MARK: - Subscription Puzzle
+"Hint: %@" = "提示: %@";
+
+// MARK: - Image Puzzle
+"Loading Image Puzzle..." = "正在加载图片谜题...";
+"Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan" = "点击关闭 \u{2022} 捏合缩放 \u{2022} 双击缩放 \u{2022} 拖动平移";
+"START ADAPTIVE PUZZLE" = "开始自适应谜题";
+"How to Play:" = "游戏方法:";
+"Original Image" = "原始图片";
+"Double-tap to rotate" = "双击旋转";
+"Long press a piece to drag it to the grid" = "长按拼图块将其拖到网格上";
+"Puzzle Adapted!" = "谜题已适应！";
+"Score" = "分数";
+"Drop" = "放置";
+"Here" = "这里";
+
+// MARK: - Image Questions
+"Image Questions" = "图片问题";
+"Memorize the image!" = "记住这张图片！";
+"Complete!" = "完成！";
+"Loading image..." = "正在加载图片...";
+"Countdown will start when ready" = "准备就绪后开始倒计时";
+"Study this image carefully!" = "仔细观察这张图片！";
+"Image Hidden" = "图片已隐藏";
+"Reveal Image" = "显示图片";
+"LOCATION" = "位置";
+"Your answer:" = "你的答案:";
+"Correct answer:" = "正确答案:";
+"Next time, try to rely more on your memory!" = "下次试着更多依靠记忆力！";
+
+// MARK: - Image Vortex
+"Find the NEW image" = "找到新的图片";
+
+// MARK: - Progressive Reveal
+"Progressive Reveal" = "渐进揭示";
+"Mystery Image" = "神秘图片";
+"Your Answer:" = "你的答案:";
+"Next Clue" = "下一条线索";
+"Reveal" = "揭晓";
+"Congratulations!" = "恭喜！";
+
+// MARK: - Odd One Out
+"Look at the images carefully and find the one that doesn't belong with the others." = "仔细观察图片，找出与其他不同的那个。";
+"Which one doesn't belong?" = "哪一个不属于这组？";
+"How It Works" = "游戏方法";
+"Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!" = "观察图片，找出不属于这组的那个。训练你的模式识别和批判性思维能力！";
+"Start Challenge" = "开始挑战";
+"Continue to Next Puzzle" = "继续下一个谜题";
+
+// MARK: - Which Is Real
+"Why This Matters" = "为什么这很重要";
+"In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking." = "在当今世界，AI可以生成极其逼真的图像。区分真实内容和AI生成内容正成为媒体素养和批判性思维的重要技能。";
+"Which image is AI-generated?" = "哪张图片是AI生成的？";
+"Look for real photos:" = "寻找真实照片:";
+"AI tells:" = "AI特征:";
+"Learn from Community Insights" = "从社区见解中学习";
+"Help others learn! Why did you think this was the AI image?" = "帮助他人学习！你为什么认为这是AI图片？";
+"Submit (+20% bonus)" = "提交 (+20%奖励)";
+"Learn from others who identified the AI image correctly:" = "向正确识别AI图片的人学习:";
+
+// MARK: - Find Object / Waldo
+"Hidden Objects" = "隐藏物品";
+"Failed to load image" = "图片加载失败";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "捏合缩放 \u{2022} 拖动平移 \u{2022} 点击寻找物品";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them" = "捏合缩放 \u{2022} 拖动平移 \u{2022} 点击物品找到它们";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision" = "捏合缩放 \u{2022} 拖动平移 \u{2022} 点击AI发现的物品";
+"Natural Discovery" = "自然发现";
+"Objects to Find" = "需要找到的物品";
+"These objects were naturally discovered by AI vision in the scene" = "这些物品是由AI视觉在场景中自然发现的";
+"Show Hint" = "显示提示";
+"ENHANCED WALDO" = "增强版沃尔多";
+
+// MARK: - Geography
+"Geography Cities Challenge" = "地理城市挑战";
+"Place cities in their correct locations on the world map" = "将城市放在世界地图上的正确位置";
+"START CHALLENGE" = "开始挑战";
+"Exact location!" = "精确位置！";
+"Geography Challenge Complete!" = "地理挑战完成！";
+"Final Score" = "最终分数";
+"Geography Countries Challenge" = "地理国家挑战";
+"Place countries in their correct locations on the world map" = "将国家放在世界地图上的正确位置";
+"Tap on a continent" = "点击一个大洲";
+"Or tap a continent name:" = "或点击大洲名称:";
+"Country spans" = "国家跨越";
+"You selected" = "你选择了";
+"Landlocked" = "内陆国";
+"Very Close!" = "非常接近！";
+"Great geographical knowledge!" = "出色的地理知识！";
+"Skip Tutorial" = "跳过教程";
+
+// MARK: - Memory Puzzles
+"Remember this symbol" = "记住这个符号";
+"NEXT" = "下一个";
+"Memory Pairs" = "记忆配对";
+"Memory Pair Challenge" = "记忆配对挑战";
+"Does this pattern match the\nprevious pattern?" = "这个图案与\n上一个图案匹配吗？";
+"Memory Challenge Complete!" = "记忆挑战完成！";
+"Final Results" = "最终结果";
+"Session Score" = "本次分数";
+"Total Score" = "总分";
+"Correct Answers" = "正确答案";
+"Accuracy" = "准确率";
+"Example Pattern" = "示例图案";
+"Red dot at bottom-left" = "左下角的红点";
+"START GAME" = "开始游戏";
+
+// MARK: - Memory Story
+"Error loading Memory Story puzzle" = "加载记忆故事谜题时出错";
+"THIS GAME REQUIRES AUDIO" = "此游戏需要音频";
+"MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY" = "请确保你能\n清楚听到声音";
+
+// MARK: - Memory Sequencing
+"LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS" = "听两个部分并\n排列事件顺序";
+"DRAG TO REORDER" = "拖动重新排序";
+"PART TWO OF TWO" = "第二部分（共两部分）";
+"Continue to Part Two" = "继续第二部分";
+
+// MARK: - Memory Retention
+"Audio Error" = "音频错误";
+"Continue Without Audio" = "无音频继续";
+
+// MARK: - Memory Squares
+"Clear" = "清除";
+
+// MARK: - Context Switch
+"Excellent!" = "优秀！";
+"Not quite" = "差一点";
+"Working Memory" = "工作记忆";
+"Executive Load" = "执行负荷";
+"Dual Task" = "双重任务";
+"Attention" = "注意力";
+"Time Pressure" = "时间压力";
+"Context Switch Adapted!" = "上下文切换已适应！";
+"Study these items" = "记住这些项目";
+"I'm Ready!" = "我准备好了！";
+"Alphabetization Task" = "字母排序任务";
+"Drag to reorder alphabetically:" = "拖动按字母顺序重新排列:";
+"Continue \u{2192}" = "继续 \u{2192}";
+"Recognition Test" = "识别测试";
+"Select all items from the original list" = "从原始列表中选择所有项目";
+"Items are arranged to test attention control" = "项目的排列是为了测试注意力控制";
+"Submit Answer \u{2713}" = "提交答案 \u{2713}";
+
+// MARK: - Color Text Matching
+"Adaptive Color-Text Matching" = "自适应颜色文字匹配";
+"Compare the color name meaning with the actual text color and decide if they match." = "比较颜色名称的含义与实际文字颜色，判断它们是否匹配。";
+"Adaptive Example" = "自适应示例";
+"Answer: YES (both are blue)" = "答案: 是（都是蓝色）";
+"Does the meaning match the text color?" = "含义与文字颜色匹配吗？";
+"Color Challenge Adapted!" = "颜色挑战已适应！";
+"meaning" = "含义";
+"text color" = "文字颜色";
+"Avg Time" = "平均时间";
+"Streak" = "连续";
+"START ADAPTIVE CHALLENGE" = "开始自适应挑战";
+
+// MARK: - Color Shape Matching
+"Visual Challenge Adapted!" = "视觉挑战已适应！";
+"Does the text meaning match the shape color?" = "文字含义与图形颜色匹配吗？";
+
+// MARK: - Dual Card
+"Adaptive Dual-Task Complete!" = "自适应双重任务完成！";
+"Switching pattern: %@" = "切换模式: %@";
+
+// MARK: - Symbol Swipe
+"When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT" = "看到左边符号时向左滑动\n看到右边符号时向右滑动";
+"SWIPE RIGHT \u{2192}" = "向右滑动 \u{2192}";
+"LEFT" = "左";
+"RIGHT" = "右";
+
+// MARK: - Unique Object
+"STREAK" = "连续";
+
+// MARK: - Flow Puzzle
+"Clear All" = "全部清除";
+"Give Up" = "放弃";
+"Solution Shown" = "已显示解答";
+"Moving to next puzzle..." = "正在前往下一个谜题...";
+"Path Conflict!" = "路径冲突！";
+
+// MARK: - Pinball Deflector
+"Pinball Deflector" = "弹球偏转器";
+"Challenge Complete" = "挑战完成";
+"Memorize deflector positions" = "记住偏转器位置";
+"Predict where the ball will exit" = "预测球将从哪里出来";
+"Continue Challenge" = "继续挑战";
+
+// MARK: - Swipe Word
+"Next Puzzle" = "下一个谜题";
+"Back to Home" = "返回首页";
+
+// MARK: - Limit Reached
+"Running Low on Puzzles!" = "谜题即将用完！";
+"Generation Limit Reached" = "已达到生成上限";
+"Maybe Later" = "以后再说";
+"Upgrade to Premium" = "升级到高级版";
+
+// MARK: - Puzzle Limit Network
+"Checking Puzzle Availability" = "正在检查谜题可用性";
+
+// MARK: - Music Puzzle
+"TUTORIAL" = "教程";
+"MUSIC MATCH" = "音乐匹配";
+"Loading music puzzle..." = "正在加载音乐谜题...";
+"Tap to expand..." = "点击展开...";
+"Music Match Tutorial" = "音乐匹配教程";
+
+// MARK: - Quiz Card
+"Start Quiz" = "开始测验";
+
+// MARK: - Tutorial Views
+"How to Play" = "游戏方法";
+"Got it! Let's Play" = "明白了！开始游戏！";
+"Skip Tutorial" = "跳过教程";
+
+// MARK: - Group Completion
+"Puzzle Collections" = "谜题合集";
+"Each type has 5 puzzles" = "每种类型有5个谜题";
+"How it works:" = "游戏方法:";
+"Each puzzle type contains 5 challenges" = "每种谜题类型包含5个挑战";
+"Complete all 5 to unlock the next puzzle type" = "完成全部5个以解锁下一个谜题类型";
+"Try different types to discover your favorites!" = "尝试不同类型来发现你的最爱！";
+"Group Completed!" = "组已完成！";
+"Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?" = "太棒了！你已经掌握了这组中所有的谜题类型。准备好迎接下一个挑战了吗？";
+
+// MARK: - Word Prefix
+"\u{1F4A1} Hint" = "\u{1F4A1} 提示";
+
+// MARK: - Notification Debug
+"Current Status" = "当前状态";
+"Token Preview:" = "令牌预览:";
+"Quick Tests" = "快速测试";
+"Test User Email" = "测试用户邮箱";
+"Test Results" = "测试结果";
+"No tests run yet" = "尚未运行测试";
+"Advanced Tests" = "高级测试";
+"Running tests..." = "正在运行测试...";
+"Notification Tests" = "通知测试";
+"1. Request Permission" = "1. 请求权限";
+"2. Get FCM Token" = "2. 获取FCM令牌";
+"3. Register with Server" = "3. 注册到服务器";
+"4. Send Test Notification" = "4. 发送测试通知";
+"5. Schedule Local Test" = "5. 安排本地测试";
+"Use Current" = "使用当前";
+"Clear Results" = "清除结果";
+"Run Full Test Suite" = "运行完整测试套件";
+
+// MARK: - Difficulty Settings
+"Default Difficulty" = "默认难度";
+"Set your preferred difficulty level for all puzzles" = "设置所有谜题的首选难度等级";
+"You can still change difficulty when starting any puzzle" = "开始任何谜题时仍可更改难度";

@@ -1,0 +1,698 @@
+{
+  "reportType": "antonym_rebuild",
+  "generatedAt": "2025-07-17T20:38:45.347Z",
+  "summary": {
+    "originalPuzzleCount": 188,
+    "uniquePairsFound": 150,
+    "newPuzzleCount": 25,
+    "pairsUsed": 150,
+    "pairsRemaining": 0,
+    "puzzlesToRemove": 163,
+    "executionTime": 383,
+    "backupPath": null
+  },
+  "originalPuzzlesSample": [
+    {
+      "puzzleid": "13a8eb53-b8f6-40b8-978d-d06f36d02774",
+      "question": "[[\"decline\",\"ascend\"],[\"lavish\",\"squalid\"],[\"tardy\",\"punctual\"],[\"covert\",\"overt\"],[\"innocent\",\"guilty\"],[\"compliment\",\"insult\"]]",
+      "answer": "antonym",
+      "timestamp": "2025-06-11T15:44:33.025+00:00",
+      "difficulty": "medium"
+    },
+    {
+      "puzzleid": "64ab7cd4-54cd-4a2e-bb4a-52dc980a0f1c",
+      "question": "[[\"accept\",\"reject\"],[\"advance\",\"retreat\"],[\"benefit\",\"detriment\"],[\"access\",\"prohibit\"],[\"laughter\",\"sorrow\"]]",
+      "answer": "antonym",
+      "timestamp": "2025-06-11T23:00:05.155+00:00",
+      "difficulty": "medium"
+    },
+    {
+      "puzzleid": "dc56c0d7-99a5-461f-83cd-89922bbdd09d",
+      "question": "[[\"explicit\",\"implicit\"],[\"inferior\",\"superior\"],[\"commence\",\"terminate\"],[\"optimistic\",\"pessimistic\"],[\"authentic\",\"fake\"],[\"expand\",\"contract\"]]",
+      "answer": "antonym",
+      "timestamp": "2025-06-12T05:00:08.037+00:00",
+      "difficulty": "medium"
+    },
+    {
+      "puzzleid": "ab607bc6-7d38-448e-94a7-ed99a87ea3fd",
+      "question": "[[\"profound\",\"superficial\"],[\"conceal\",\"reveal\"],[\"liberate\",\"imprison\"],[\"humble\",\"arrogant\"],[\"prior\",\"subsequent\"],[\"conventional\",\"innovative\"]]",
+      "answer": "antonym",
+      "timestamp": "2025-06-12T11:00:27.26+00:00",
+      "difficulty": "medium"
+    },
+    {
+      "puzzleid": "61eb00c6-0c67-4782-b727-805a33bf7152",
+      "question": "[[\"ascend\",\"descend\"],[\"conceal\",\"reveal\"],[\"create\",\"destroy\"],[\"humble\",\"arrogant\"],[\"major\",\"minor\"],[\"rural\",\"urban\"]]",
+      "answer": "antonym",
+      "timestamp": "2025-06-12T17:01:50.136+00:00",
+      "difficulty": "medium"
+    }
+  ],
+  "uniquePairsSample": [
+    {
+      "words": [
+        "far",
+        "near"
+      ],
+      "usageCount": 60,
+      "pairString": "[\"far\",\"near\"]"
+    },
+    {
+      "words": [
+        "poor",
+        "rich"
+      ],
+      "usageCount": 58,
+      "pairString": "[\"poor\",\"rich\"]"
+    },
+    {
+      "words": [
+        "high",
+        "low"
+      ],
+      "usageCount": 58,
+      "pairString": "[\"high\",\"low\"]"
+    },
+    {
+      "words": [
+        "big",
+        "small"
+      ],
+      "usageCount": 57,
+      "pairString": "[\"big\",\"small\"]"
+    },
+    {
+      "words": [
+        "loud",
+        "quiet"
+      ],
+      "usageCount": 56,
+      "pairString": "[\"loud\",\"quiet\"]"
+    },
+    {
+      "words": [
+        "day",
+        "night"
+      ],
+      "usageCount": 56,
+      "pairString": "[\"day\",\"night\"]"
+    },
+    {
+      "words": [
+        "cold",
+        "hot"
+      ],
+      "usageCount": 56,
+      "pairString": "[\"cold\",\"hot\"]"
+    },
+    {
+      "words": [
+        "dry",
+        "wet"
+      ],
+      "usageCount": 55,
+      "pairString": "[\"dry\",\"wet\"]"
+    },
+    {
+      "words": [
+        "new",
+        "old"
+      ],
+      "usageCount": 55,
+      "pairString": "[\"new\",\"old\"]"
+    },
+    {
+      "words": [
+        "narrow",
+        "wide"
+      ],
+      "usageCount": 54,
+      "pairString": "[\"narrow\",\"wide\"]"
+    },
+    {
+      "words": [
+        "fast",
+        "slow"
+      ],
+      "usageCount": 53,
+      "pairString": "[\"fast\",\"slow\"]"
+    },
+    {
+      "words": [
+        "bad",
+        "good"
+      ],
+      "usageCount": 52,
+      "pairString": "[\"bad\",\"good\"]"
+    },
+    {
+      "words": [
+        "no",
+        "yes"
+      ],
+      "usageCount": 51,
+      "pairString": "[\"no\",\"yes\"]"
+    },
+    {
+      "words": [
+        "left",
+        "right"
+      ],
+      "usageCount": 51,
+      "pairString": "[\"left\",\"right\"]"
+    },
+    {
+      "words": [
+        "down",
+        "up"
+      ],
+      "usageCount": 51,
+      "pairString": "[\"down\",\"up\"]"
+    },
+    {
+      "words": [
+        "accept",
+        "reject"
+      ],
+      "usageCount": 9,
+      "pairString": "[\"accept\",\"reject\"]"
+    },
+    {
+      "words": [
+        "ascend",
+        "descend"
+      ],
+      "usageCount": 8,
+      "pairString": "[\"ascend\",\"descend\"]"
+    },
+    {
+      "words": [
+        "complex",
+        "simple"
+      ],
+      "usageCount": 8,
+      "pairString": "[\"complex\",\"simple\"]"
+    },
+    {
+      "words": [
+        "profound",
+        "superficial"
+      ],
+      "usageCount": 7,
+      "pairString": "[\"profound\",\"superficial\"]"
+    },
+    {
+      "words": [
+        "above",
+        "below"
+      ],
+      "usageCount": 6,
+      "pairString": "[\"above\",\"below\"]"
+    }
+  ],
+  "newPuzzlesSample": [
+    {
+      "pairs": [
+        {
+          "words": [
+            "far",
+            "near"
+          ],
+          "usageCount": 60,
+          "pairString": "[\"far\",\"near\"]"
+        },
+        {
+          "words": [
+            "poor",
+            "rich"
+          ],
+          "usageCount": 58,
+          "pairString": "[\"poor\",\"rich\"]"
+        },
+        {
+          "words": [
+            "high",
+            "low"
+          ],
+          "usageCount": 58,
+          "pairString": "[\"high\",\"low\"]"
+        },
+        {
+          "words": [
+            "big",
+            "small"
+          ],
+          "usageCount": 57,
+          "pairString": "[\"big\",\"small\"]"
+        },
+        {
+          "words": [
+            "loud",
+            "quiet"
+          ],
+          "usageCount": 56,
+          "pairString": "[\"loud\",\"quiet\"]"
+        },
+        {
+          "words": [
+            "day",
+            "night"
+          ],
+          "usageCount": 56,
+          "pairString": "[\"day\",\"night\"]"
+        }
+      ],
+      "question": "[[\"far\",\"near\"],[\"poor\",\"rich\"],[\"high\",\"low\"],[\"big\",\"small\"],[\"loud\",\"quiet\"],[\"day\",\"night\"]]",
+      "pairCount": 6
+    },
+    {
+      "pairs": [
+        {
+          "words": [
+            "cold",
+            "hot"
+          ],
+          "usageCount": 56,
+          "pairString": "[\"cold\",\"hot\"]"
+        },
+        {
+          "words": [
+            "dry",
+            "wet"
+          ],
+          "usageCount": 55,
+          "pairString": "[\"dry\",\"wet\"]"
+        },
+        {
+          "words": [
+            "new",
+            "old"
+          ],
+          "usageCount": 55,
+          "pairString": "[\"new\",\"old\"]"
+        },
+        {
+          "words": [
+            "narrow",
+            "wide"
+          ],
+          "usageCount": 54,
+          "pairString": "[\"narrow\",\"wide\"]"
+        },
+        {
+          "words": [
+            "fast",
+            "slow"
+          ],
+          "usageCount": 53,
+          "pairString": "[\"fast\",\"slow\"]"
+        },
+        {
+          "words": [
+            "bad",
+            "good"
+          ],
+          "usageCount": 52,
+          "pairString": "[\"bad\",\"good\"]"
+        }
+      ],
+      "question": "[[\"cold\",\"hot\"],[\"dry\",\"wet\"],[\"new\",\"old\"],[\"narrow\",\"wide\"],[\"fast\",\"slow\"],[\"bad\",\"good\"]]",
+      "pairCount": 6
+    },
+    {
+      "pairs": [
+        {
+          "words": [
+            "no",
+            "yes"
+          ],
+          "usageCount": 51,
+          "pairString": "[\"no\",\"yes\"]"
+        },
+        {
+          "words": [
+            "left",
+            "right"
+          ],
+          "usageCount": 51,
+          "pairString": "[\"left\",\"right\"]"
+        },
+        {
+          "words": [
+            "down",
+            "up"
+          ],
+          "usageCount": 51,
+          "pairString": "[\"down\",\"up\"]"
+        },
+        {
+          "words": [
+            "accept",
+            "reject"
+          ],
+          "usageCount": 9,
+          "pairString": "[\"accept\",\"reject\"]"
+        },
+        {
+          "words": [
+            "ascend",
+            "descend"
+          ],
+          "usageCount": 8,
+          "pairString": "[\"ascend\",\"descend\"]"
+        },
+        {
+          "words": [
+            "complex",
+            "simple"
+          ],
+          "usageCount": 8,
+          "pairString": "[\"complex\",\"simple\"]"
+        }
+      ],
+      "question": "[[\"no\",\"yes\"],[\"left\",\"right\"],[\"down\",\"up\"],[\"accept\",\"reject\"],[\"ascend\",\"descend\"],[\"complex\",\"simple\"]]",
+      "pairCount": 6
+    },
+    {
+      "pairs": [
+        {
+          "words": [
+            "profound",
+            "superficial"
+          ],
+          "usageCount": 7,
+          "pairString": "[\"profound\",\"superficial\"]"
+        },
+        {
+          "words": [
+            "above",
+            "below"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"above\",\"below\"]"
+        },
+        {
+          "words": [
+            "ancient",
+            "modern"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"ancient\",\"modern\"]"
+        },
+        {
+          "words": [
+            "clean",
+            "dirty"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"clean\",\"dirty\"]"
+        },
+        {
+          "words": [
+            "strong",
+            "weak"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"strong\",\"weak\"]"
+        },
+        {
+          "words": [
+            "happy",
+            "sad"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"happy\",\"sad\"]"
+        }
+      ],
+      "question": "[[\"profound\",\"superficial\"],[\"above\",\"below\"],[\"ancient\",\"modern\"],[\"clean\",\"dirty\"],[\"strong\",\"weak\"],[\"happy\",\"sad\"]]",
+      "pairCount": 6
+    },
+    {
+      "pairs": [
+        {
+          "words": [
+            "closed",
+            "open"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"closed\",\"open\"]"
+        },
+        {
+          "words": [
+            "empty",
+            "full"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"empty\",\"full\"]"
+        },
+        {
+          "words": [
+            "early",
+            "late"
+          ],
+          "usageCount": 6,
+          "pairString": "[\"early\",\"late\"]"
+        },
+        {
+          "words": [
+            "guilty",
+            "innocent"
+          ],
+          "usageCount": 5,
+          "pairString": "[\"guilty\",\"innocent\"]"
+        },
+        {
+          "words": [
+            "invisible",
+            "visible"
+          ],
+          "usageCount": 5,
+          "pairString": "[\"invisible\",\"visible\"]"
+        },
+        {
+          "words": [
+            "dark",
+            "light"
+          ],
+          "usageCount": 5,
+          "pairString": "[\"dark\",\"light\"]"
+        }
+      ],
+      "question": "[[\"closed\",\"open\"],[\"empty\",\"full\"],[\"early\",\"late\"],[\"guilty\",\"innocent\"],[\"invisible\",\"visible\"],[\"dark\",\"light\"]]",
+      "pairCount": 6
+    }
+  ],
+  "structureAnalysis": {
+    "totalPuzzles": 188,
+    "validPuzzles": 188,
+    "invalidPuzzles": 0,
+    "pairCounts": [
+      6,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      4,
+      3,
+      4,
+      4,
+      4
+    ],
+    "avgPairsPerPuzzle": 5.925531914893617,
+    "minPairs": 3,
+    "maxPairs": 6,
+    "pairDistribution": {
+      "3": 1,
+      "4": 4,
+      "5": 3,
+      "6": 180
+    }
+  },
+  "unusedPairsSample": [],
+  "recommendations": [
+    {
+      "priority": "high",
+      "category": "content",
+      "issue": "New puzzle count (25) is much lower than original (188)",
+      "action": "Generate additional unique antonym pairs to maintain content volume"
+    }
+  ]
+}

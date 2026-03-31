@@ -1,0 +1,2 @@
+// config/constants.js
+export const JWT_SECRET = process.env.JWT_SECRET || "b5fb9069f2c8583af04ec1b456fdce71fe38f144fc95e82c4e34fb6b857522d548114c2ead0c3f9471b37064f1735edac5afb330b3e1b6f82d52cec7590449dd";

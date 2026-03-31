@@ -1,0 +1,16 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kreativekoala.riddlebot",
+      "sha256_cert_fingerprints": [
+        "94:00:BC:49:6D:EE:33:3D:06:6E:69:76:E8:1B:A3:71:1D:93:07:F4:2D:D4:25:94:1B:77:A4:E9:12:E5:98:C4",
+        "FE:A3:97:71:64:32:C8:B9:F1:6F:93:54:9A:18:D5:68:FB:8F:9D:B5:10:17:EE:1A:5F:BB:3E:6D:60:69:E6:7B"
+      ]
+    }
+  }
+]

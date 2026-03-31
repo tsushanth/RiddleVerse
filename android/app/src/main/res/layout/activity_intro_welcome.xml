@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient"
+    android:padding="24dp">
+
+    <!-- Decorative question marks -->
+    <ImageView
+        android:id="@+id/questionImage"
+        android:layout_width="wrap_content"
+        android:layout_height="300dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/question_marks"
+        android:contentDescription="Decorative question marks"
+        android:scaleType="fitCenter" />
+
+    <!-- Card with intro text -->
+    <LinearLayout
+        android:id="@+id/cardContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/questionImage"
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="80dp"
+        android:orientation="vertical"
+        android:background="@drawable/white_card"
+        android:padding="24dp"
+        android:elevation="4dp"
+        android:layout_centerHorizontal="true">
+
+        <TextView
+            android:id="@+id/titleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Interesting QUIZ\nAwaits You"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#2C2C54"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            android:paddingBottom="8dp" />
+
+        <TextView
+            android:id="@+id/subtitleText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="play quizzes with your friends\nand get various prizes"
+            android:textSize="14sp"
+            android:textColor="#888888"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
+
+    <!-- Floating arrow button -->
+    <ImageButton
+        android:id="@+id/startButton"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_below="@id/cardContainer"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/orange_circle"
+        android:src="@drawable/ic_arrow_back"
+        android:padding="12dp"
+        android:scaleType="fitCenter"
+        android:contentDescription="Start" />
+</RelativeLayout>

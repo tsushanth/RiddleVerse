@@ -1,0 +1,384 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">Cari perkataan tersembunyi dalam grid</string>
+    <string name="crossword_description">Isi perkataan menggunakan petunjuk</string>
+    <string name="anagram_description">Susun semula huruf untuk membentuk perkataan</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">Permainan Tamat!</string>
+    <string name="points">mata</string>
+    <string name="score_submitted">Skor dihantar!</string>
+    <string name="play_again">Main Semula</string>
+    <string name="try_harder_version">Cuba Versi Lebih Sukar</string>
+    <string name="try_hard_version">Cuba Versi Sukar</string>
+    <string name="try_very_hard_version">Cuba Versi Sangat Sukar</string>
+    <string name="try_expert_version">Cuba Versi Pakar</string>
+    <string name="customize">Sesuaikan</string>
+    <string name="get_coins">Dapatkan Syiling</string>
+    <string name="view_leaderboard">Lihat Papan Pendahulu</string>
+    <string name="done">Selesai</string>
+    <string name="earn_coins_tip">Dapatkan syiling setiap hari dengan bermain teka-teki!</string>
+    <string name="coins_label">syiling</string>
+    <string name="no_games_yet">Belum ada permainan</string>
+    <string name="be_first_to_create">Jadilah yang pertama mencipta dan berkongsi permainan!</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">Terbaharu</string>
+    <string name="most_played">Paling Banyak Dimainkan</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">Untuk Anda</string>
+    <string name="tab_categories">Kategori</string>
+    <string name="tab_games">Permainan</string>
+    <string name="tab_puzzles">Teka-teki</string>
+    <string name="tab_settings">Tetapan</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">Layari</string>
+    <string name="subtab_your_puzzles">Teka-teki Anda</string>
+    <string name="subtab_featured">Pilihan</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">Menikmati RiddleVerse?</string>
+    <string name="rate_in_play_store">Nilai kami di Play Store!</string>
+    <string name="help_us_improve">Bantu kami memperbaiki!</string>
+    <string name="rate_experience">Bagaimana anda menilai pengalaman anda dengan RiddleVerse?</string>
+    <string name="rate_incentive">Dapatkan 100 syiling + akses awal dengan menilai kami!</string>
+    <string name="thanks_great_rating">Terima kasih atas penilaian yang hebat! Adakah anda sudi berkongsi di Play Store?</string>
+    <string name="share_detailed_feedback">Anda juga boleh berkongsi maklum balas terperinci dengan kami terlebih dahulu!</string>
+    <string name="sorry_bad_experience">Kami kesal anda tidak mempunyai pengalaman yang baik. Bolehkah anda beritahu kami apa yang boleh diperbaiki?</string>
+    <string name="continue_label">Teruskan</string>
+    <string name="rate">Nilai</string>
+    <string name="rate_in_store">Nilai di Store</string>
+    <string name="give_feedback">Beri Maklum Balas</string>
+    <string name="not_now">Bukan Sekarang</string>
+    <string name="maybe_later">Mungkin Nanti</string>
+    <string name="feedback_first">Maklum Balas Dahulu</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">Peringatan Penilaian</string>
+    <string name="when_remind_again">Bilakah anda mahu diingatkan semula?</string>
+    <string name="remind_in_week">Ingatkan saya dalam seminggu</string>
+    <string name="remind_in_month">Ingatkan saya dalam sebulan</string>
+    <string name="dont_ask_again">Jangan tanya lagi</string>
+    <string name="cancel">Batal</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">Beritahu kami apa yang anda suka!</string>
+    <string name="what_enjoy_most">Apa yang paling anda nikmati tentang RiddleVerse?</string>
+    <string name="what_can_we_improve">Apa yang boleh kami perbaiki? Maklum balas anda membantu kami meningkatkan mutu.</string>
+    <string name="your_feedback">Maklum balas anda</string>
+    <string name="feedback_placeholder_positive">Saya suka kepelbagaian teka-teki\u2026</string>
+    <string name="feedback_placeholder_negative">Saya harap aplikasi ini\u2026</string>
+    <string name="submitted_successfully">Berjaya dihantar!</string>
+    <string name="submission_failed">Penghantaran gagal</string>
+    <string name="submit">Hantar</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">Kedai Syiling</string>
+    <string name="your_coins">Syiling Anda</string>
+    <string name="coins_used_description">Syiling digunakan untuk meneruskan permainan dan menyokong pencipta.</string>
+    <string name="best_value">Nilai Terbaik</string>
+    <string name="rate_for_early_access">Nilai untuk akses awal!</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">OK</string>
+    <string name="back">Kembali</string>
+    <string name="close">Tutup</string>
+    <string name="start">Mula</string>
+    <string name="next">Seterusnya</string>
+
+    <!-- Game UI -->
+    <string name="correct">Betul!</string>
+    <string name="wrong">Salah!</string>
+    <string name="times_up">Masa tamat!</string>
+    <string name="score_label">Skor</string>
+    <string name="streak_label">Siri</string>
+    <string name="level_label">Tahap</string>
+    <string name="hint">Petunjuk</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">Belum ada skor</string>
+    <string name="play_to_set_score">Main permainan untuk menetapkan skor tertinggi pertama!</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">Selamat Pagi</string>
+    <string name="good_afternoon">Selamat Tengah Hari</string>
+    <string name="good_evening">Selamat Petang</string>
+
+    <!-- Settings -->
+    <string name="premium_label">Premium</string>
+    <string name="unlimited_label">Tanpa Had</string>
+    <string name="daily_rewards">Ganjaran Harian</string>
+    <string name="notifications">Pemberitahuan</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">Sesuatu tidak kena</string>
+    <string name="no_internet">Tiada sambungan internet</string>
+    <string name="please_try_again">Sila cuba lagi</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">Sesuaikan Permainan Ini</string>
+    <string name="what_would_you_change">Apa yang anda ingin ubah?</string>
+    <string name="customizing_game">Menyesuaikan Permainan\u2026</string>
+
+    <!-- Language Picker -->
+    <string name="language">Bahasa</string>
+    <string name="language_picker_title">Pilih Bahasa</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">Cuba Lagi</string>
+    <string name="skip">Langkau</string>
+    <string name="skip_puzzle">Langkau Teka-teki</string>
+    <string name="retry">Cuba Semula</string>
+    <string name="share">Kongsi</string>
+    <string name="share_puzzle">Kongsi Teka-teki</string>
+    <string name="play">Main</string>
+    <string name="edit">Edit</string>
+    <string name="create">Cipta</string>
+    <string name="explore">Teroka</string>
+    <string name="reset">Set Semula</string>
+    <string name="reveal">Dedahkan</string>
+    <string name="clear">Kosongkan</string>
+    <string name="clear_all">Kosongkan Semua</string>
+    <string name="check">Semak</string>
+    <string name="go_back">Kembali</string>
+    <string name="home">Laman Utama</string>
+    <string name="upgrade">Naik Taraf</string>
+    <string name="manage">Urus</string>
+    <string name="got_it">Faham!</string>
+    <string name="fix_it">Baiki</string>
+    <string name="just_close">Tutup Sahaja</string>
+    <string name="modify">Ubah Suai</string>
+    <string name="load_more">Muat Lagi</string>
+    <string name="loading">Memuatkan\u2026</string>
+    <string name="save">Simpan</string>
+    <string name="yes">YA</string>
+    <string name="yes_finish">Ya, Selesaikan</string>
+    <string name="yes_it_works">Ya, ia berfungsi!</string>
+    <string name="no_it_has_issues">Tidak, ada masalah</string>
+    <string name="finish_now">Selesaikan Sekarang</string>
+    <string name="keep_playing">Terus Main</string>
+    <string name="finish_early">Selesai Awal</string>
+    <string name="give_up">Berputus Asa</string>
+    <string name="back_to_home">Kembali ke Laman Utama</string>
+    <string name="submit_answer">Hantar Jawapan</string>
+    <string name="start_game">MULA PERMAINAN</string>
+    <string name="start_puzzle">MULA TEKA-TEKI</string>
+    <string name="start_challenge">MULA CABARAN</string>
+    <string name="begin">Mulakan</string>
+    <string name="im_ready">Saya Sedia!</string>
+    <string name="im_done">Saya Selesai</string>
+    <string name="skip_tutorial">Langkau Tutorial</string>
+    <string name="same">SAMA</string>
+    <string name="different">BERBEZA</string>
+    <string name="next_puzzle">Teka-teki Seterusnya</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">Memuatkan teka-teki seterusnya\u2026</string>
+    <string name="loading_puzzle">Memuatkan teka-teki\u2026</string>
+    <string name="generating">Menjana\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">Tindakan Pantas</string>
+    <string name="start_playing_instantly">Mula bermain serta-merta</string>
+    <string name="your_favorites">Kegemaran Anda</string>
+    <string name="trending_now">Trending Sekarang</string>
+    <string name="recommended_for_you">Disyorkan untuk Anda</string>
+    <string name="puzzle_collections">Koleksi Teka-teki</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">Ralat Permainan</string>
+    <string name="quiz_categories">Kategori Kuiz</string>
+    <string name="subscription">Langganan</string>
+    <string name="current_tier">Tahap Semasa</string>
+    <string name="active_streaks">Siri Aktif</string>
+    <string name="time_label">Masa</string>
+    <string name="badges">Lencana</string>
+    <string name="unable_to_load_progress">Tidak dapat memuatkan data kemajuan</string>
+    <string name="custom_puzzles">Teka-teki Tersuai</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">Dapatkan syiling apabila pemain menikmati permainan anda!</string>
+    <string name="creator_revenue_share">Anda mendapat 55%% syiling yang dibelanjakan untuk permainan anda</string>
+    <string name="coins_earned">Syiling Diperoleh</string>
+    <string name="plays_monetized">Permainan Dimonetisasi</string>
+    <string name="per_game">Setiap Permainan</string>
+    <string name="cash_out">Tunaikan</string>
+    <string name="cash_out_earnings">Tunaikan Pendapatan</string>
+    <string name="connect_stripe_to_receive">Sambungkan Stripe untuk menerima pembayaran</string>
+    <string name="connect_stripe_account">Sambung Akaun Stripe</string>
+    <string name="complete_stripe_setup">Lengkapkan Persediaan Stripe</string>
+    <string name="continue_setup">Teruskan Persediaan</string>
+    <string name="request_payout">Minta Pembayaran</string>
+    <string name="payout_history">Sejarah Pembayaran</string>
+    <string name="checking_eligibility">Menyemak kelayakan\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">Cipta Permainan</string>
+    <string name="describe_game_prompt">Huraikan sebarang permainan dan AI akan membinanya untuk anda</string>
+    <string name="describe_game_placeholder">Huraikan permainan anda\u2026</string>
+    <string name="generate_game">Jana Permainan</string>
+    <string name="free_generations_used_up">Penjanaan Percuma Habis</string>
+    <string name="buy_coins">Beli Syiling</string>
+    <string name="subscribe_for_unlimited">Langgan untuk Tanpa Had</string>
+    <string name="get_unlimited_generations">Dapatkan penjanaan tanpa had + syiling bulanan</string>
+    <string name="reference_image">Imej rujukan</string>
+    <string name="try_these_ideas">Cuba idea-idea ini</string>
+    <string name="game_title">Tajuk Permainan</string>
+    <string name="describe_your_version">Huraikan Versi Anda</string>
+    <string name="create_game">Cipta Permainan</string>
+    <string name="create_your_version">Cipta versi anda</string>
+    <string name="creating_your_game">Mencipta Permainan Anda</string>
+    <string name="this_may_take_2_5_minutes">Ini mungkin mengambil masa 2\u20135 minit\u2026</string>
+    <string name="notify_me_when_done">Beritahu Saya Apabila Selesai</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">Permainan Komuniti</string>
+    <string name="my_games">Permainan Saya</string>
+    <string name="draft">Draf</string>
+    <string name="generating_harder_challenge">Menjana Cabaran Lebih Sukar</string>
+    <string name="did_this_game_work">Adakah permainan ini berfungsi?</string>
+    <string name="whats_wrong">Apa yang salah?</string>
+    <string name="modify_game">Ubah Suai Permainan</string>
+    <string name="game_name">Nama Permainan</string>
+    <string name="create_customized_game">Cipta Permainan Tersuai</string>
+    <string name="original">Asal</string>
+    <string name="sort_by">Isih mengikut</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">Permainan ini mungkin mempunyai masalah</string>
+    <string name="game_saved">Permainan disimpan!</string>
+    <string name="game_ready">Permainan Sedia!</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">Langkau Penantian!</string>
+    <string name="get_instant_generation">Dapatkan penjanaan teka-teki serta-merta</string>
+    <string name="wait_time">Masa Menunggu</string>
+    <string name="instant">Serta-merta</string>
+    <string name="premium_member">Ahli Premium</string>
+    <string name="upgrade_now">Naik Taraf Sekarang</string>
+    <string name="upgrade_for_unlimited">Naik Taraf untuk Tanpa Had</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">Tetapan Permainan</string>
+    <string name="difficulty_level">Tahap Kesukaran</string>
+    <string name="game_mode">Mod Permainan</string>
+    <string name="default_difficulty">Kesukaran Lalai</string>
+    <string name="checking">Menyemak\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">Cara ia berfungsi:</string>
+    <string name="progress">Kemajuan</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">Hantar melalui E-mel</string>
+    <string name="copy_to_clipboard">Salin ke Papan Keratan</string>
+    <string name="puzzle_completed">Teka-teki Selesai!</string>
+    <string name="achievement_unlocked">Pencapaian Dibuka!</string>
+    <string name="level_up">Naik Tahap!</string>
+    <string name="recipient_email">E-mel Penerima</string>
+    <string name="recipient_name">Nama Penerima</string>
+    <string name="copied_to_clipboard">Disalin ke papan keratan!</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">Papan Pendahulu</string>
+    <string name="your_performance">Prestasi Anda</string>
+    <string name="other_top_players">Pemain Terbaik Lain</string>
+    <string name="puzzle_statistics">Statistik Teka-teki</string>
+    <string name="overview">Gambaran Keseluruhan</string>
+    <string name="detailed_statistics">Statistik Terperinci</string>
+    <string name="records">Rekod</string>
+    <string name="no_players_yet">Belum Ada Pemain</string>
+    <string name="rank_label">Kedudukan</string>
+    <string name="percentile_label">Persentil</string>
+    <string name="total_players">Jumlah Pemain</string>
+    <string name="avg_score">Purata Skor</string>
+    <string name="fastest_time">Masa Terpantas</string>
+    <string name="highest_score">Skor Tertinggi</string>
+
+    <!-- Game State -->
+    <string name="game_complete">Permainan Selesai!</string>
+    <string name="final_score">Skor Akhir</string>
+    <string name="final_results">Keputusan Akhir</string>
+    <string name="session_score">Skor Sesi</string>
+    <string name="total_score">Jumlah Skor</string>
+    <string name="correct_answers">Jawapan Betul</string>
+    <string name="accuracy">Ketepatan</string>
+    <string name="avg_time">Purata Masa</string>
+    <string name="puzzle_complete">Teka-teki Selesai!</string>
+    <string name="difficulty_advanced">Kesukaran Ditingkatkan!</string>
+    <string name="continue_label_caps">TERUSKAN</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">Petak Ingatan</string>
+    <string name="get_ready">Bersiap Sedia!</string>
+    <string name="memorize_the_pattern">Hafal coraknya!</string>
+    <string name="click_squares_you_remember">Klik petak yang anda ingat!</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">Adakah makna sepadan dengan warna teks?</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">Cara Bermain</string>
+    <string name="drop_here">Letakkan Di Sini</string>
+    <string name="completed">Selesai</string>
+    <string name="time_used">Masa Digunakan</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">Beberapa jawapan tidak betul</string>
+    <string name="all_hints">Semua Petunjuk</string>
+
+    <!-- Word Search -->
+    <string name="found">Dijumpai</string>
+    <string name="revealed">Didedahkan</string>
+    <string name="best_streak">Siri Terbaik</string>
+    <string name="drag_to_find_words">Seret merentasi huruf untuk mencari perkataan tersembunyi</string>
+    <string name="find_these_words">Cari perkataan ini:</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">Tahap Emas Dicapai!</string>
+    <string name="bonus_words_found">Perkataan Bonus Dijumpai:</string>
+    <string name="great_job">Kerja Bagus!</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorial_mode">Mod Tutorial</string>
+    <string name="got_it_lets_play">Faham! Jom Main</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">Topik Pilihan</string>
+    <string name="popular_topics">Topik Popular</string>
+    <string name="add_custom_topic">Tambah Topik Tersuai</string>
+    <string name="your_selected_topics">Topik Pilihan Anda</string>
+    <string name="no_topics_selected">Belum ada topik dipilih</string>
+    <string name="saving">Menyimpan\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">Analitik Prestasi</string>
+    <string name="performance_stats">Statistik Prestasi</string>
+    <string name="daily_streak">Siri Harian</string>
+    <string name="lets_play">Jom Main!</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">Ralat memuatkan teka-teki</string>
+    <string name="no_hint_available">Tiada petunjuk tersedia</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">Ketik nombor dalam susunan menaik (terkecil ke terbesar)</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">Cabaran Geografi Negara</string>
+</resources>

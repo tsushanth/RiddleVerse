@@ -1,0 +1,726 @@
+/* Localizable.strings (Hindi)
+   PuzzleForge / RiddleVerse */
+
+// MARK: - Common / Shared
+"OK" = "ठीक है";
+"Cancel" = "रद्द करें";
+"Done" = "पूर्ण";
+"Back" = "वापस";
+"Next" = "अगला";
+"Skip" = "छोड़ें";
+"Close" = "बंद करें";
+"Continue" = "जारी रखें";
+"Submit" = "जमा करें";
+"Retry" = "पुनः प्रयास";
+"Exit" = "बाहर निकलें";
+"Share" = "साझा करें";
+"Reset" = "रीसेट";
+"Clear" = "मिटाएँ";
+"Error" = "त्रुटि";
+"Loading..." = "लोड हो रहा है...";
+"YES" = "हाँ";
+"NO" = "नहीं";
+"NEW" = "नया";
+"Play" = "खेलें";
+"Edit" = "संपादित करें";
+"Hint" = "संकेत";
+"Show" = "दिखाएँ";
+"Begin" = "शुरू करें";
+"Modify" = "बदलें";
+"CONTINUE" = "जारी रखें";
+"SUBMIT" = "जमा करें";
+"CLEAR" = "मिटाएँ";
+"REVEAL" = "प्रकट करें";
+"START" = "शुरू करें";
+
+// MARK: - Home View
+"Score: %@" = "स्कोर: %@";
+"Settings" = "सेटिंग्स";
+"Profile" = "प्रोफ़ाइल";
+"Account" = "खाता";
+"Sign In" = "साइन इन";
+"Sign Out" = "साइन आउट";
+"Sign Up" = "साइन अप";
+"Create Account" = "खाता बनाएँ";
+"Notification Settings" = "सूचना सेटिंग्स";
+"Custom Puzzles" = "कस्टम पहेलियाँ";
+"Quick Actions" = "त्वरित कार्य";
+"Popular Categories" = "लोकप्रिय श्रेणियाँ";
+"Tap any to start earning points!" = "पॉइंट कमाने के लिए किसी पर भी टैप करें!";
+"Random" = "यादृच्छिक";
+"Surprise me!" = "मुझे चौंकाओ!";
+"Loading puzzle..." = "पहेली लोड हो रही है...";
+"Loading personalized puzzles..." = "व्यक्तिगत पहेलियाँ लोड हो रही हैं...";
+"Puzzles Loading" = "पहेलियाँ लोड हो रही हैं";
+"We're fetching your personalized puzzles. This usually takes just a few moments." = "हम आपकी व्यक्तिगत पहेलियाँ ला रहे हैं। इसमें आमतौर पर कुछ ही पल लगते हैं।";
+"We're fetching your puzzles from our servers. This usually takes just a few moments." = "हम अपने सर्वर से आपकी पहेलियाँ ला रहे हैं। इसमें आमतौर पर कुछ ही पल लगते हैं।";
+"No puzzle selected" = "कोई पहेली चयनित नहीं";
+"Filter Categories" = "श्रेणियाँ फ़िल्टर करें";
+"No Categories" = "कोई श्रेणी नहीं";
+"Adjust your filter to see more categories." = "अधिक श्रेणियाँ देखने के लिए अपना फ़िल्टर समायोजित करें।";
+"Featured Custom Puzzles" = "विशेष कस्टम पहेलियाँ";
+"Debug & Testing" = "डीबग और परीक्षण";
+"Test Notifications" = "सूचना परीक्षण";
+
+// MARK: - Update Dialog
+"Version %@" = "संस्करण %@";
+"What's New:" = "नया क्या है:";
+"Update Now" = "अभी अपडेट करें";
+"Later" = "बाद में";
+
+// MARK: - Content Moderation
+"Puzzle Name:" = "पहेली का नाम:";
+"Creator:" = "निर्माता:";
+"Format:" = "प्रारूप:";
+"What happened?" = "क्या हुआ?";
+"This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly." = "इस विषय को हमारी सामग्री समीक्षा प्रणाली द्वारा संभावित रूप से अनुचित के रूप में चिह्नित किया गया है। यह एक स्वचालित प्रक्रिया है और कभी-कभी सामग्री को गलत तरीके से चिह्नित कर सकती है।";
+
+// MARK: - Profile & Creator
+"By %@" = "%@ द्वारा";
+"Creator Earnings" = "निर्माता की कमाई";
+"Coins Earned" = "अर्जित सिक्के";
+"Plays Monetized" = "मुद्रीकृत खेल";
+"Per Game" = "प्रति खेल";
+"Cash Out Earnings" = "कमाई निकालें";
+"Earn coins when players enjoy your games!" = "जब खिलाड़ी आपके खेल का आनंद लेते हैं तो सिक्के कमाएँ!";
+"You get 55% of coins spent on your games. Tap to view payouts." = "आपको अपने खेलों पर खर्च किए गए सिक्कों का 55% मिलता है। भुगतान देखने के लिए टैप करें।";
+"Checking eligibility..." = "पात्रता जाँच रहे हैं...";
+"coins available" = "सिक्के उपलब्ध";
+
+// MARK: - Stripe / Payouts
+"Cash Out" = "निकालें";
+"Connect Stripe to receive payouts" = "भुगतान प्राप्त करने के लिए Stripe कनेक्ट करें";
+"Set up your Stripe account to cash out your earned coins as real money." = "अपने अर्जित सिक्कों को वास्तविक धन के रूप में निकालने के लिए अपना Stripe खाता सेट करें।";
+"Connect Stripe Account" = "Stripe खाता कनेक्ट करें";
+"Complete Stripe Setup" = "Stripe सेटअप पूर्ण करें";
+"Your Stripe account setup is incomplete. Tap below to finish." = "आपका Stripe खाता सेटअप अधूरा है। पूर्ण करने के लिए नीचे टैप करें।";
+"Continue Setup" = "सेटअप जारी रखें";
+"Request Payout" = "भुगतान का अनुरोध करें";
+"Payout History" = "भुगतान इतिहास";
+
+// MARK: - App Features & Account
+"App Features" = "ऐप सुविधाएँ";
+"Account Management" = "खाता प्रबंधन";
+"Delete Account" = "खाता हटाएँ";
+"This will permanently delete your account and all associated data. This action cannot be undone." = "यह आपके खाते और सभी संबंधित डेटा को स्थायी रूप से हटा देगा। यह क्रिया पूर्ववत नहीं की जा सकती।";
+
+// MARK: - Sign In
+"Sign In Required" = "साइन इन आवश्यक";
+"Sign in to access leaderboards, track your progress, and save your scores." = "लीडरबोर्ड एक्सेस करने, अपनी प्रगति ट्रैक करने और अपने स्कोर सहेजने के लिए साइन इन करें।";
+"Sign in to track progress and scores" = "प्रगति और स्कोर ट्रैक करने के लिए साइन इन करें";
+"Sign in with Google" = "Google से साइन इन करें";
+"Enable Notifications?" = "सूचनाएँ सक्षम करें?";
+"Yes, Notify Me" = "हाँ, मुझे सूचित करें";
+"Not Now" = "अभी नहीं";
+"Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge." = "जब आपकी दैनिक पहेलियाँ तैयार हों तो सूचना पाएँ! हम आपको एक त्वरित अलर्ट भेजेंगे ताकि आप अपनी दैनिक चुनौती कभी न चूकें।";
+"Daily Puzzle Notifications" = "दैनिक पहेली सूचनाएँ";
+"Notification Status:" = "सूचना स्थिति:";
+"Enabled" = "सक्षम";
+"Not enabled" = "सक्षम नहीं";
+
+// MARK: - Onboarding
+"Train Your Brain Daily" = "रोज़ अपने दिमाग को प्रशिक्षित करें";
+"Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills" = "गणित, शब्द पहेलियों और दिमागी पहेलियों से अपने दिमाग को तेज़ करें जो संज्ञानात्मक कौशल को बढ़ाने के लिए डिज़ाइन किए गए हैं";
+"Track Your Progress" = "अपनी प्रगति ट्रैक करें";
+"Level up, earn badges, and see your improvement over time with detailed analytics" = "लेवल अप करें, बैज अर्जित करें और विस्तृत विश्लेषण के साथ समय के साथ अपनी प्रगति देखें";
+"Compete & Achieve" = "प्रतिस्पर्धा करें और हासिल करें";
+"Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type" = "दोस्तों को चुनौती दें, लीडरबोर्ड पर चढ़ें और प्रत्येक पहेली प्रकार में महारत हासिल करते हुए विशेष पुरस्कार अनलॉक करें";
+"Ready to Start?" = "शुरू करने के लिए तैयार?";
+"Join thousands of puzzle enthusiasts and start your brain training journey today!" = "हज़ारों पहेली प्रेमियों से जुड़ें और आज ही अपनी मस्तिष्क प्रशिक्षण यात्रा शुरू करें!";
+"Let's Get Started!" = "चलिए शुरू करते हैं!";
+"Free to play \u{2022} No ads during puzzles" = "मुफ़्त में खेलें \u{2022} पहेलियों के दौरान कोई विज्ञापन नहीं";
+"Level 5" = "लेवल 5";
+
+// MARK: - Start Puzzle View
+"Take a quick interactive tutorial to get started!" = "शुरू करने के लिए एक त्वरित इंटरैक्टिव ट्यूटोरियल लें!";
+"Start Tutorial" = "ट्यूटोरियल शुरू करें";
+"Reset Tutorial" = "ट्यूटोरियल रीसेट करें";
+"Dismiss" = "खारिज करें";
+"Loading your stats..." = "आपके आँकड़े लोड हो रहे हैं...";
+"TOP SCORES" = "शीर्ष स्कोर";
+"BENEFITS" = "लाभ";
+"Game Settings" = "खेल सेटिंग्स";
+"Difficulty Level" = "कठिनाई स्तर";
+"Game Mode" = "खेल मोड";
+"Number of Puzzles" = "पहेलियों की संख्या";
+"Start Playing" = "खेलना शुरू करें";
+"Create Your Version" = "अपना संस्करण बनाएँ";
+"Earn coins" = "सिक्के कमाएँ";
+"Back to Home" = "होम पर वापस जाएँ";
+
+// MARK: - Difficulty
+"DIFFICULTY PROGRESSION" = "कठिनाई प्रगति";
+"Current Level" = "वर्तमान लेवल";
+"Progress" = "प्रगति";
+"Next:" = "अगला:";
+"CURRENT LEVEL DETAILS" = "वर्तमान लेवल विवरण";
+"Default Difficulty" = "डिफ़ॉल्ट कठिनाई";
+"Set your preferred difficulty level for all puzzles" = "सभी पहेलियों के लिए अपनी पसंदीदा कठिनाई स्तर सेट करें";
+"You can still change difficulty when starting any puzzle" = "किसी भी पहेली शुरू करते समय आप अभी भी कठिनाई बदल सकते हैं";
+"Difficulty Adapted!" = "कठिनाई अनुकूलित!";
+"Difficulty Adjusted" = "कठिनाई समायोजित";
+"DIFFICULTY" = "कठिनाई";
+
+// MARK: - Puzzle Completion
+"Puzzle Set Complete!" = "पहेली सेट पूर्ण!";
+"Share Achievement" = "उपलब्धि साझा करें";
+"Remix & earn real money when others play" = "रीमिक्स करें और जब दूसरे खेलें तो असली पैसे कमाएँ";
+"Return Home" = "होम पर लौटें";
+"No More Puzzles Available" = "और कोई पहेली उपलब्ध नहीं";
+"Generate new puzzles to continue playing." = "खेलना जारी रखने के लिए नई पहेलियाँ बनाएँ।";
+"Generate New Puzzles" = "नई पहेलियाँ बनाएँ";
+"Generating New Puzzles" = "नई पहेलियाँ बन रही हैं";
+"This usually takes 30-60 seconds..." = "इसमें आमतौर पर 30-60 सेकंड लगते हैं...";
+"Home" = "होम";
+"Try These Next" = "अगली बार ये आज़माएँ";
+"TOP 5 SCORES" = "शीर्ष 5 स्कोर";
+
+// MARK: - Session/Score Feedback
+"Session Complete!" = "सत्र पूर्ण!";
+"Final Score:" = "अंतिम स्कोर:";
+"Accuracy:" = "सटीकता:";
+"Best Streak:" = "सर्वश्रेष्ठ लगातार:";
+"Your answer: %@" = "आपका उत्तर: %@";
+"Correct answer: %@" = "सही उत्तर: %@";
+"Updating score..." = "स्कोर अपडेट हो रहा है...";
+"Tap to continue" = "जारी रखने के लिए टैप करें";
+"Keep trying! You've got this! \u{1F4AA}" = "कोशिश जारी रखें! आप कर सकते हैं! \u{1F4AA}";
+"LEVEL UP!" = "लेवल अप!";
+"Level %@ \u{2192} %@" = "लेवल %@ \u{2192} %@";
+"Score submitted!" = "स्कोर जमा किया गया!";
+
+// MARK: - Leaderboard
+"Leaderboard" = "लीडरबोर्ड";
+"View Leaderboard" = "लीडरबोर्ड देखें";
+"Rank #%@" = "रैंक #%@";
+"Your rank: #%@" = "आपकी रैंक: #%@";
+"No scores yet" = "अभी तक कोई स्कोर नहीं";
+"Play the game to set the first high score!" = "पहला उच्च स्कोर बनाने के लिए खेलें!";
+
+// MARK: - Subscription & Limits
+"Upgrade to Premium" = "प्रीमियम में अपग्रेड करें";
+"Running Low on Puzzles!" = "पहेलियाँ कम हो रही हैं!";
+"Generation Limit Reached" = "जनरेशन सीमा पूरी हुई";
+"Maybe Later" = "शायद बाद में";
+"Upgrade" = "अपग्रेड";
+"IS ANNUALLY:" = "वार्षिक है:";
+"A YEAR" = "प्रति वर्ष";
+
+// MARK: - Coins / Store
+"Your Coins" = "आपके सिक्के";
+"Coins added!" = "सिक्के जोड़े गए!";
+"Coins are used to continue games and support creators." = "सिक्कों का उपयोग खेल जारी रखने और निर्माताओं का समर्थन करने के लिए किया जाता है।";
+"Best Value" = "सर्वश्रेष्ठ मूल्य";
+"Get Coins" = "सिक्के प्राप्त करें";
+"Coin Store" = "सिक्का स्टोर";
+"Buy Coins" = "सिक्के खरीदें";
+"points" = "अंक";
+
+// MARK: - Game Play
+"Game Over!" = "खेल समाप्त!";
+"Play Again" = "फिर से खेलें";
+"Customize" = "अनुकूलित करें";
+"Customizing Game" = "खेल अनुकूलित हो रहा है";
+"This may take 2-5 minutes..." = "इसमें 2-5 मिनट लग सकते हैं...";
+"Fixing game..." = "खेल ठीक हो रहा है...";
+"This may take a couple minutes..." = "इसमें कुछ मिनट लग सकते हैं...";
+"Did this game work?" = "क्या यह खेल काम किया?";
+"Yes, it works!" = "हाँ, यह काम करता है!";
+"No, it has issues" = "नहीं, इसमें समस्याएँ हैं";
+"What's wrong?" = "क्या गलत है?";
+"Fix It" = "ठीक करें";
+"Brief description \u{2014} even a couple words helps" = "संक्षिप्त विवरण \u{2014} कुछ शब्द भी मदद करेंगे";
+"Customize This Game" = "इस खेल को अनुकूलित करें";
+"Create Customized Game" = "कस्टम खेल बनाएँ";
+"Game Name" = "खेल का नाम";
+"What would you like to change?" = "आप क्या बदलना चाहेंगे?";
+"Describe what you'd like to change. A new game will be created under your name." = "बताएँ कि आप क्या बदलना चाहते हैं। आपके नाम से एक नया खेल बनाया जाएगा।";
+"Lv.%@" = "Lv.%@";
+
+// MARK: - Game Browse
+"Community Games" = "कम्युनिटी गेम्स";
+"My Games" = "मेरे खेल";
+"No games yet" = "अभी तक कोई खेल नहीं";
+"Be the first to create and share a game!" = "पहले बनें खेल बनाने और साझा करने वाले!";
+"Load More" = "और लोड करें";
+"Draft" = "ड्राफ्ट";
+"by %@" = "%@ द्वारा";
+"Newest" = "नवीनतम";
+"Most Played" = "सबसे ज़्यादा खेले गए";
+
+// MARK: - Game Remix
+"Create your version" = "अपना संस्करण बनाएँ";
+"Create & Earn Real Money" = "बनाएँ और असली पैसे कमाएँ";
+"Earn coins when others play \u{2014} cash out via Stripe!" = "जब दूसरे खेलें तो सिक्के कमाएँ \u{2014} Stripe से निकालें!";
+"You earn 55% of every coin spent on your game" = "आपके खेल पर खर्च किए गए हर सिक्के का 55% आप कमाते हैं";
+"Game Title" = "खेल का शीर्षक";
+"Describe Your Version" = "अपने संस्करण का वर्णन करें";
+"Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules..." = "गेमप्ले परिवर्तन, विज़ुअल स्टाइल, थीम, कठिनाई समायोजन, स्कोरिंग नियमों का वर्णन करें...";
+"Reference image" = "संदर्भ छवि";
+"AI will use this as visual context" = "AI इसे विज़ुअल संदर्भ के रूप में उपयोग करेगा";
+"Quick Ideas" = "त्वरित विचार";
+"Create Game" = "खेल बनाएँ";
+"Creating Your Game" = "आपका खेल बन रहा है";
+"Notify Me When Done" = "पूर्ण होने पर सूचित करें";
+"You can leave this screen \u{2014} we'll notify you!" = "आप इस स्क्रीन को छोड़ सकते हैं \u{2014} हम आपको सूचित करेंगे!";
+"Your game will appear in Explore > Custom Games" = "आपका खेल एक्सप्लोर > कस्टम गेम्स में दिखाई देगा";
+"Free Generations Used Up" = "मुफ्त जनरेशन समाप्त";
+"Subscribe for Unlimited" = "असीमित के लिए सब्सक्राइब करें";
+"Get unlimited generations + monthly coins" = "असीमित जनरेशन + मासिक सिक्के प्राप्त करें";
+"Game Ready!" = "खेल तैयार!";
+"Tap to preview \u{2014} also in Explore > Custom Games" = "प्रीव्यू के लिए टैप करें \u{2014} एक्सप्लोर > कस्टम गेम्स में भी";
+
+// MARK: - Game Preview
+"This game may have issues" = "इस खेल में समस्याएँ हो सकती हैं";
+"Modifying game..." = "खेल संशोधित हो रहा है...";
+"Game saved!" = "खेल सहेजा गया!";
+"You'll earn coins when others play!" = "जब दूसरे खेलेंगे तो आप सिक्के कमाएँगे!";
+"Describe what's wrong or what to change:" = "बताएँ क्या गलत है या क्या बदलना है:";
+"Modify Game" = "खेल संशोधित करें";
+
+// MARK: - Game Tweak
+"Loading version history..." = "संस्करण इतिहास लोड हो रहा है...";
+"No version history yet" = "अभी तक कोई संस्करण इतिहास नहीं";
+"Describe your change below to start editing your game" = "अपने खेल की संपादन शुरू करने के लिए नीचे अपना परिवर्तन बताएँ";
+"Applying Edit" = "संपादन लागू हो रहा है";
+"This may take a minute..." = "इसमें एक मिनट लग सकता है...";
+"Original" = "मूल";
+
+// MARK: - Create Puzzle
+"Create Custom Puzzle" = "कस्टम पहेली बनाएँ";
+"Generate personalized puzzles on any topic you love!" = "अपने पसंदीदा किसी भी विषय पर व्यक्तिगत पहेलियाँ बनाएँ!";
+"Puzzle Topic" = "पहेली विषय";
+"Popular Topics" = "लोकप्रिय विषय";
+"Puzzle Format" = "पहेली प्रारूप";
+"Creating Magic..." = "जादू बन रहा है...";
+"Generate Puzzle" = "पहेली बनाएँ";
+"puzzles" = "पहेलियाँ";
+"\u{1F389} Puzzle Creation Started!" = "\u{1F389} पहेली निर्माण शुरू!";
+"Your custom puzzle set is being generated! Check back in a few minutes to see your creation." = "आपका कस्टम पहेली सेट बन रहा है! अपनी रचना देखने के लिए कुछ मिनटों में वापस आएँ।";
+
+// MARK: - Daily Puzzles
+"Daily Puzzles" = "दैनिक पहेलियाँ";
+"New Daily Puzzles!" = "नई दैनिक पहेलियाँ!";
+"Your daily puzzles are ready!" = "आपकी दैनिक पहेलियाँ तैयार हैं!";
+"Topics Saved!" = "विषय सहेजे गए!";
+"Let's Go!" = "चलिए!";
+"Topics" = "विषय";
+"Refresh" = "रीफ्रेश";
+"Choose Your Daily Puzzle Topics" = "अपने दैनिक पहेली विषय चुनें";
+"Select topics you're interested in. We'll generate daily puzzles for each topic." = "उन विषयों को चुनें जिनमें आपकी रुचि है। हम प्रत्येक विषय के लिए दैनिक पहेलियाँ बनाएँगे।";
+"Welcome to Daily Puzzles!" = "दैनिक पहेलियों में आपका स्वागत है!";
+"Choose your favorite topics and we'll generate personalized daily puzzles just for you." = "अपने पसंदीदा विषय चुनें और हम केवल आपके लिए व्यक्तिगत दैनिक पहेलियाँ बनाएँगे।";
+"Choose Topics" = "विषय चुनें";
+"Oops!" = "उफ़!";
+"Try Again" = "फिर से प्रयास करें";
+"Solve Puzzle" = "पहेली हल करें";
+"Show Answer" = "उत्तर दिखाएँ";
+
+// MARK: - Daily Streak
+"Daily Streak Stats" = "दैनिक लगातार आँकड़े";
+"Current Streak" = "वर्तमान लगातार";
+"Total Coins" = "कुल सिक्के";
+"Days Played" = "खेले गए दिन";
+"Best Streak" = "सर्वश्रेष्ठ लगातार";
+"To Milestone" = "माइलस्टोन तक";
+"day" = "दिन";
+"days" = "दिन";
+"Let's Play! \u{1F3AE}" = "चलो खेलें! \u{1F3AE}";
+
+// MARK: - Achievement Dashboard
+"Progress Dashboard" = "प्रगति डैशबोर्ड";
+"Next Tier Rewards:" = "अगले स्तर के पुरस्कार:";
+"Rewards:" = "पुरस्कार:";
+"Complete some puzzles to see your performance stats!" = "अपने प्रदर्शन आँकड़े देखने के लिए कुछ पहेलियाँ पूरी करें!";
+"Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!" = "अपना प्रगति डैशबोर्ड अनलॉक करने के लिए पहेलियाँ खेलना शुरू करें। हर खेल XP कमाता है, लगातार बनाता है और उपलब्धियाँ अनलॉक करता है!";
+"Achievements" = "उपलब्धियाँ";
+
+// MARK: - Preferred Topics
+"Preferred Topics" = "पसंदीदा विषय";
+"Available Topics" = "उपलब्ध विषय";
+"Your Preferred Topics" = "आपके पसंदीदा विषय";
+"Search Custom Puzzles" = "कस्टम पहेलियाँ खोजें";
+
+// MARK: - Notification Settings
+"Notifications" = "सूचनाएँ";
+"Notification Permissions" = "सूचना अनुमतियाँ";
+"Push Notifications" = "पुश सूचनाएँ";
+"Daily Puzzle Alerts" = "दैनिक पहेली अलर्ट";
+"Get notified when your daily puzzles are ready" = "जब आपकी दैनिक पहेलियाँ तैयार हों तो सूचना प्राप्त करें";
+"FCM Token Status" = "FCM टोकन स्थिति";
+"Notification Test" = "सूचना परीक्षण";
+"Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time." = "सूचनाएँ आपको नई दैनिक पहेलियों और चुनौतियों से अपडेट रहने में मदद करती हैं। आप उन्हें किसी भी समय iOS सेटिंग्स में अक्षम कर सकते हैं।";
+
+// MARK: - Social Sharing
+"Share Your Success!" = "अपनी सफलता साझा करें!";
+"Share Puzzle" = "पहेली साझा करें";
+"Recipient Email" = "प्राप्तकर्ता ईमेल";
+"Recipient Name" = "प्राप्तकर्ता नाम";
+
+// MARK: - Puzzle UI Components
+"Level %@" = "लेवल %@";
+"Quick Stats" = "त्वरित आँकड़े";
+
+// MARK: - Difficulty Manager HUD
+"LEVEL %@" = "लेवल %@";
+"TIME" = "समय";
+"SCORE" = "स्कोर";
+"RANK" = "रैंक";
+"LIVES" = "जीवन";
+
+// MARK: - Multiple Choice
+"Exit Puzzle" = "पहेली से बाहर निकलें";
+"Are you sure you want to exit? Your progress will be lost." = "क्या आप वाकई बाहर निकलना चाहते हैं? आपकी प्रगति खो जाएगी।";
+"Question %@/%@" = "प्रश्न %@/%@";
+"Got it!" = "समझ गया!";
+
+// MARK: - Q&A Puzzle
+"All Puzzles Completed!" = "सभी पहेलियाँ पूर्ण!";
+
+// MARK: - Crossword
+"All Hints" = "सभी संकेत";
+"Puzzle solved in %@" = "%@ में पहेली हल हुई";
+"Next Puzzle" = "अगली पहेली";
+"Some answers are incorrect" = "कुछ उत्तर गलत हैं";
+"Try again or use the REVEAL button to fix incorrect answers." = "फिर से प्रयास करें या गलत उत्तरों को ठीक करने के लिए प्रकट करें बटन का उपयोग करें।";
+
+// MARK: - Word Search
+"Tips" = "सुझाव";
+"Word Search Help" = "शब्द खोज सहायता";
+
+// MARK: - Word Snake
+"Find these snake words:" = "ये साँप शब्द खोजें:";
+"Clear Word" = "शब्द मिटाएँ";
+"Loading Word Snake puzzle..." = "शब्द साँप पहेली लोड हो रही है...";
+"Word Snake Hints" = "शब्द साँप संकेत";
+"Clear Found Word?" = "मिला हुआ शब्द मिटाएँ?";
+"Completed" = "पूर्ण";
+"Found" = "मिला";
+"Shown" = "दिखाया गया";
+"Avg/Word" = "औसत/शब्द";
+"Performance:" = "प्रदर्शन:";
+
+// MARK: - Synonym
+"Group the synonyms! Tap the set that matches the word above." = "समानार्थी शब्दों को समूहित करें! ऊपर के शब्द से मेल खाने वाले सेट पर टैप करें।";
+
+// MARK: - Antonym
+"Tap balloons to match opposite words" = "विपरीत शब्दों को मिलाने के लिए गुब्बारों पर टैप करें";
+
+// MARK: - Crypto Puzzle
+"Game Over" = "खेल समाप्त";
+"How to Play" = "कैसे खेलें";
+"You've run out of hearts! Crypto puzzles take practice." = "आपके दिल खत्म हो गए! क्रिप्टो पहेलियों में अभ्यास लगता है।";
+"Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'." = "'THE', 'AND' जैसे सामान्य पैटर्न या 'A' और 'I' जैसे एकल अक्षर खोजें।";
+"Unable to load adaptive crypto puzzle" = "अनुकूली क्रिप्टो पहेली लोड करने में असमर्थ";
+"Adaptive Crypto Puzzle" = "अनुकूली क्रिप्टो पहेली";
+"Adaptive Crypto Solved!" = "अनुकूली क्रिप्टो पहेली हल!";
+"Hidden Message:" = "छिपा संदेश:";
+"Time Used" = "उपयोग किया गया समय";
+"Difficulty" = "कठिनाई";
+"Continue Adaptive Journey" = "अनुकूली यात्रा जारी रखें";
+"\u{1F4A1} Adaptive Hint" = "\u{1F4A1} अनुकूली संकेत";
+"Unable to load tutorial puzzle" = "ट्यूटोरियल पहेली लोड करने में असमर्थ";
+"Try again!" = "फिर से प्रयास करें!";
+
+// MARK: - Letter Set
+"No words found yet" = "अभी तक कोई शब्द नहीं मिला";
+"Finish Early?" = "जल्दी समाप्त करें?";
+"Invalid Word" = "अमान्य शब्द";
+
+// MARK: - Number Sequence
+"Adaptive Number Sequence" = "अनुकूली संख्या अनुक्रम";
+"Tap numbers in ascending order\n(smallest to largest)" = "बढ़ते क्रम में संख्याओं पर टैप करें\n(सबसे छोटी से सबसे बड़ी)";
+"START ADAPTIVE CHALLENGE" = "अनुकूली चुनौती शुरू करें";
+"Adaptive Challenge Complete!" = "अनुकूली चुनौती पूर्ण!";
+"Round %@" = "राउंड %@";
+
+// MARK: - Number Sum
+"Adaptive Number Sum" = "अनुकूली संख्या योग";
+"Select numbers that add up\nto the target sum" = "ऐसी संख्याएँ चुनें जिनका योग\nलक्ष्य राशि के बराबर हो";
+"Target" = "लक्ष्य";
+
+// MARK: - Math Expression
+"Which value is greater?" = "कौन सा मान बड़ा है?";
+"EQUAL" = "बराबर";
+"Loading math problems..." = "गणित के प्रश्न लोड हो रहे हैं...";
+"Math Challenge Adapted!" = "गणित चुनौती अनुकूलित!";
+
+// MARK: - Math Crossword
+"Select a number:" = "एक संख्या चुनें:";
+"Complete the math equations by placing the missing numbers" = "गायब संख्याओं को रखकर गणित समीकरण पूरे करें";
+"Game Result" = "खेल परिणाम";
+"Result" = "परिणाम";
+
+// MARK: - Math Difference
+"FIND THE DIFFERENCE" = "अंतर खोजें";
+"Enter the difference between these numbers" = "इन संख्याओं के बीच का अंतर दर्ज करें";
+
+// MARK: - Estimation
+"Error loading estimation data" = "अनुमान डेटा लोड करने में त्रुटि";
+"drag finger to estimate sum" = "योग का अनुमान लगाने के लिए उंगली खींचें";
+
+// MARK: - Price Ordering
+"CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE" = "अंतिम मूल्य की गणना करें और सबसे सस्ते से सबसे महंगे तक क्रमबद्ध करें";
+"OFF" = "छूट";
+
+// MARK: - Conversion Puzzle
+"Drag blocks to compare their values" = "उनके मानों की तुलना करने के लिए ब्लॉक खींचें";
+"Higher position = Greater value" = "ऊँची स्थिति = बड़ा मान";
+
+// MARK: - Percentage / Tip
+"TAP THE CORRECT TIP" = "सही टिप पर टैप करें";
+"Tap the bubble with the correct tip amount!" = "सही टिप राशि वाले बुलबुले पर टैप करें!";
+"Bill Amount" = "बिल राशि";
+"Puzzle Completed!" = "पहेली पूर्ण!";
+
+// MARK: - Subscription Puzzle
+"Hint: %@" = "संकेत: %@";
+
+// MARK: - Image Puzzle
+"Loading Image Puzzle..." = "छवि पहेली लोड हो रही है...";
+"Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan" = "बंद करने के लिए टैप \u{2022} ज़ूम के लिए पिंच \u{2022} ज़ूम के लिए डबल-टैप \u{2022} पैन के लिए खींचें";
+"START ADAPTIVE PUZZLE" = "अनुकूली पहेली शुरू करें";
+"How to Play:" = "कैसे खेलें:";
+"Original Image" = "मूल छवि";
+"Double-tap to rotate" = "घुमाने के लिए डबल-टैप";
+"Long press a piece to drag it to the grid" = "ग्रिड पर खींचने के लिए टुकड़े को लंबे समय तक दबाएँ";
+"Puzzle Adapted!" = "पहेली अनुकूलित!";
+"Score" = "स्कोर";
+"Drop" = "रखें";
+"Here" = "यहाँ";
+
+// MARK: - Image Questions
+"Image Questions" = "छवि प्रश्न";
+"Memorize the image!" = "छवि याद करें!";
+"Complete!" = "पूर्ण!";
+"Loading image..." = "छवि लोड हो रही है...";
+"Countdown will start when ready" = "तैयार होने पर उलटी गिनती शुरू होगी";
+"Study this image carefully!" = "इस छवि को ध्यान से देखें!";
+"Image Hidden" = "छवि छिपी हुई";
+"Reveal Image" = "छवि प्रकट करें";
+"LOCATION" = "स्थान";
+"Your answer:" = "आपका उत्तर:";
+"Correct answer:" = "सही उत्तर:";
+"Next time, try to rely more on your memory!" = "अगली बार अपनी याददाश्त पर ज़्यादा भरोसा करने की कोशिश करें!";
+
+// MARK: - Image Vortex
+"Find the NEW image" = "नई छवि खोजें";
+
+// MARK: - Progressive Reveal
+"Progressive Reveal" = "क्रमिक प्रकटीकरण";
+"Mystery Image" = "रहस्यमय छवि";
+"Your Answer:" = "आपका उत्तर:";
+"Next Clue" = "अगला सुराग";
+"Reveal" = "प्रकट करें";
+"Congratulations!" = "बधाई!";
+
+// MARK: - Odd One Out
+"Look at the images carefully and find the one that doesn't belong with the others." = "छवियों को ध्यान से देखें और उसे खोजें जो बाकियों से अलग है।";
+"Which one doesn't belong?" = "कौन सा अलग है?";
+"How It Works" = "यह कैसे काम करता है";
+"Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!" = "छवियों को देखें और वह खोजें जो बाकियों से अलग है। अपने पैटर्न पहचान और आलोचनात्मक सोच कौशल को प्रशिक्षित करें!";
+"Start Challenge" = "चुनौती शुरू करें";
+"Continue to Next Puzzle" = "अगली पहेली पर जाएँ";
+
+// MARK: - Which Is Real
+"Why This Matters" = "यह क्यों मायने रखता है";
+"In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking." = "आज की दुनिया में, AI अविश्वसनीय रूप से यथार्थवादी छवियाँ बना सकता है। वास्तविक और AI-जनित सामग्री के बीच अंतर करना मीडिया साक्षरता और आलोचनात्मक सोच के लिए एक आवश्यक कौशल बन रहा है।";
+"Which image is AI-generated?" = "कौन सी छवि AI-जनित है?";
+"Look for real photos:" = "असली फ़ोटो खोजें:";
+"AI tells:" = "AI संकेत:";
+"Learn from Community Insights" = "समुदाय की अंतर्दृष्टि से सीखें";
+"Help others learn! Why did you think this was the AI image?" = "दूसरों को सीखने में मदद करें! आपने क्यों सोचा कि यह AI छवि थी?";
+"Submit (+20% bonus)" = "जमा करें (+20% बोनस)";
+"Learn from others who identified the AI image correctly:" = "उन लोगों से सीखें जिन्होंने AI छवि को सही तरीके से पहचाना:";
+
+// MARK: - Find Object / Waldo
+"Hidden Objects" = "छिपी वस्तुएँ";
+"Failed to load image" = "छवि लोड करने में विफल";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "ज़ूम के लिए पिंच \u{2022} पैन के लिए खींचें \u{2022} वस्तुएँ खोजने के लिए टैप करें";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them" = "ज़ूम के लिए पिंच \u{2022} पैन के लिए खींचें \u{2022} वस्तुओं पर टैप करके खोजें";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision" = "ज़ूम के लिए पिंच \u{2022} पैन के लिए खींचें \u{2022} AI द्वारा पाई गई वस्तुओं पर टैप करें";
+"Natural Discovery" = "प्राकृतिक खोज";
+"Objects to Find" = "खोजने वाली वस्तुएँ";
+"These objects were naturally discovered by AI vision in the scene" = "ये वस्तुएँ दृश्य में AI दृष्टि द्वारा स्वाभाविक रूप से खोजी गई थीं";
+"Show Hint" = "संकेत दिखाएँ";
+"ENHANCED WALDO" = "उन्नत वॉल्डो";
+
+// MARK: - Geography
+"Geography Cities Challenge" = "भूगोल शहर चुनौती";
+"Place cities in their correct locations on the world map" = "विश्व मानचित्र पर शहरों को सही स्थानों पर रखें";
+"START CHALLENGE" = "चुनौती शुरू करें";
+"Exact location!" = "सटीक स्थान!";
+"Geography Challenge Complete!" = "भूगोल चुनौती पूर्ण!";
+"Final Score" = "अंतिम स्कोर";
+"Geography Countries Challenge" = "भूगोल देश चुनौती";
+"Place countries in their correct locations on the world map" = "विश्व मानचित्र पर देशों को सही स्थानों पर रखें";
+"Tap on a continent" = "एक महाद्वीप पर टैप करें";
+"Or tap a continent name:" = "या महाद्वीप का नाम टैप करें:";
+"Country spans" = "देश फैला हुआ है";
+"You selected" = "आपने चुना";
+"Landlocked" = "भूमि-बद्ध";
+"Very Close!" = "बहुत करीब!";
+"Great geographical knowledge!" = "शानदार भौगोलिक ज्ञान!";
+"Skip Tutorial" = "ट्यूटोरियल छोड़ें";
+
+// MARK: - Memory Puzzles
+"Remember this symbol" = "इस प्रतीक को याद रखें";
+"NEXT" = "अगला";
+"Memory Pairs" = "स्मृति जोड़ियाँ";
+"Memory Pair Challenge" = "स्मृति जोड़ी चुनौती";
+"Does this pattern match the\nprevious pattern?" = "क्या यह पैटर्न\nपिछले पैटर्न से मेल खाता है?";
+"Memory Challenge Complete!" = "स्मृति चुनौती पूर्ण!";
+"Final Results" = "अंतिम परिणाम";
+"Session Score" = "सत्र स्कोर";
+"Total Score" = "कुल स्कोर";
+"Correct Answers" = "सही उत्तर";
+"Accuracy" = "सटीकता";
+"Example Pattern" = "उदाहरण पैटर्न";
+"Red dot at bottom-left" = "नीचे-बाएँ लाल बिंदु";
+"START GAME" = "खेल शुरू करें";
+
+// MARK: - Memory Story
+"Error loading Memory Story puzzle" = "स्मृति कहानी पहेली लोड करने में त्रुटि";
+"THIS GAME REQUIRES AUDIO" = "इस खेल में ऑडियो आवश्यक है";
+"MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY" = "सुनिश्चित करें कि आप\nध्वनि स्पष्ट रूप से सुन सकते हैं";
+
+// MARK: - Memory Sequencing
+"LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS" = "दो भागों को सुनें और\nघटनाओं को क्रमबद्ध करें";
+"DRAG TO REORDER" = "पुनः क्रमबद्ध करने के लिए खींचें";
+"PART TWO OF TWO" = "दो में से भाग दो";
+"Continue to Part Two" = "भाग दो पर जाएँ";
+
+// MARK: - Memory Retention
+"Audio Error" = "ऑडियो त्रुटि";
+"Continue Without Audio" = "ऑडियो के बिना जारी रखें";
+
+// MARK: - Memory Squares
+"Clear" = "मिटाएँ";
+
+// MARK: - Context Switch
+"Excellent!" = "उत्कृष्ट!";
+"Not quite" = "बिल्कुल नहीं";
+"Working Memory" = "कार्यशील स्मृति";
+"Executive Load" = "कार्यकारी भार";
+"Dual Task" = "दोहरा कार्य";
+"Attention" = "ध्यान";
+"Time Pressure" = "समय का दबाव";
+"Context Switch Adapted!" = "संदर्भ स्विच अनुकूलित!";
+"Study these items" = "इन वस्तुओं का अध्ययन करें";
+"I'm Ready!" = "मैं तैयार हूँ!";
+"Alphabetization Task" = "वर्णमाला क्रम कार्य";
+"Drag to reorder alphabetically:" = "वर्णमाला क्रम में पुनः व्यवस्थित करने के लिए खींचें:";
+"Continue \u{2192}" = "जारी रखें \u{2192}";
+"Recognition Test" = "पहचान परीक्षण";
+"Select all items from the original list" = "मूल सूची से सभी आइटम चुनें";
+"Items are arranged to test attention control" = "ध्यान नियंत्रण का परीक्षण करने के लिए आइटम व्यवस्थित हैं";
+"Submit Answer \u{2713}" = "उत्तर जमा करें \u{2713}";
+
+// MARK: - Color Text Matching
+"Adaptive Color-Text Matching" = "अनुकूली रंग-पाठ मिलान";
+"Compare the color name meaning with the actual text color and decide if they match." = "रंग के नाम के अर्थ की तुलना वास्तविक पाठ रंग से करें और तय करें कि क्या वे मेल खाते हैं।";
+"Adaptive Example" = "अनुकूली उदाहरण";
+"Answer: YES (both are blue)" = "उत्तर: हाँ (दोनों नीले हैं)";
+"Does the meaning match the text color?" = "क्या अर्थ पाठ के रंग से मेल खाता है?";
+"Color Challenge Adapted!" = "रंग चुनौती अनुकूलित!";
+"meaning" = "अर्थ";
+"text color" = "पाठ रंग";
+"Avg Time" = "औसत समय";
+"Streak" = "लगातार";
+"START ADAPTIVE CHALLENGE" = "अनुकूली चुनौती शुरू करें";
+
+// MARK: - Color Shape Matching
+"Visual Challenge Adapted!" = "दृश्य चुनौती अनुकूलित!";
+"Does the text meaning match the shape color?" = "क्या पाठ का अर्थ आकार के रंग से मेल खाता है?";
+
+// MARK: - Dual Card
+"Adaptive Dual-Task Complete!" = "अनुकूली दोहरा कार्य पूर्ण!";
+"Switching pattern: %@" = "स्विचिंग पैटर्न: %@";
+
+// MARK: - Symbol Swipe
+"When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT" = "जब आप बाएँ प्रतीक देखें, बाएँ स्वाइप करें\nजब आप दाएँ प्रतीक देखें, दाएँ स्वाइप करें";
+"SWIPE RIGHT \u{2192}" = "दाएँ स्वाइप करें \u{2192}";
+"LEFT" = "बाएँ";
+"RIGHT" = "दाएँ";
+
+// MARK: - Unique Object
+"STREAK" = "लगातार";
+
+// MARK: - Flow Puzzle
+"Clear All" = "सब मिटाएँ";
+"Give Up" = "हार मानें";
+"Solution Shown" = "समाधान दिखाया गया";
+"Moving to next puzzle..." = "अगली पहेली पर जा रहे हैं...";
+"Path Conflict!" = "पथ संघर्ष!";
+
+// MARK: - Pinball Deflector
+"Pinball Deflector" = "पिनबॉल डिफ्लेक्टर";
+"Challenge Complete" = "चुनौती पूर्ण";
+"Memorize deflector positions" = "डिफ्लेक्टर की स्थिति याद रखें";
+"Predict where the ball will exit" = "अनुमान लगाएँ कि गेंद कहाँ से निकलेगी";
+"Continue Challenge" = "चुनौती जारी रखें";
+
+// MARK: - Swipe Word
+"Next Puzzle" = "अगली पहेली";
+"Back to Home" = "होम पर वापस जाएँ";
+
+// MARK: - Limit Reached
+"Running Low on Puzzles!" = "पहेलियाँ कम हो रही हैं!";
+"Generation Limit Reached" = "जनरेशन सीमा पूरी हुई";
+"Maybe Later" = "शायद बाद में";
+"Upgrade to Premium" = "प्रीमियम में अपग्रेड करें";
+
+// MARK: - Puzzle Limit Network
+"Checking Puzzle Availability" = "पहेली उपलब्धता जाँच रहे हैं";
+
+// MARK: - Music Puzzle
+"TUTORIAL" = "ट्यूटोरियल";
+"MUSIC MATCH" = "संगीत मिलान";
+"Loading music puzzle..." = "संगीत पहेली लोड हो रही है...";
+"Tap to expand..." = "विस्तार करने के लिए टैप करें...";
+"Music Match Tutorial" = "संगीत मिलान ट्यूटोरियल";
+
+// MARK: - Quiz Card
+"Start Quiz" = "क्विज़ शुरू करें";
+
+// MARK: - Tutorial Views
+"How to Play" = "कैसे खेलें";
+"Got it! Let's Play" = "समझ गया! चलो खेलें!";
+"Skip Tutorial" = "ट्यूटोरियल छोड़ें";
+
+// MARK: - Group Completion
+"Puzzle Collections" = "पहेली संग्रह";
+"Each type has 5 puzzles" = "प्रत्येक प्रकार में 5 पहेलियाँ हैं";
+"How it works:" = "यह कैसे काम करता है:";
+"Each puzzle type contains 5 challenges" = "प्रत्येक पहेली प्रकार में 5 चुनौतियाँ हैं";
+"Complete all 5 to unlock the next puzzle type" = "अगले पहेली प्रकार को अनलॉक करने के लिए सभी 5 पूरी करें";
+"Try different types to discover your favorites!" = "अपने पसंदीदा खोजने के लिए विभिन्न प्रकार आज़माएँ!";
+"Group Completed!" = "समूह पूर्ण!";
+"Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?" = "शानदार! आपने इस समूह में सभी पहेली प्रकारों में महारत हासिल कर ली है। अगली चुनौती के लिए तैयार?";
+
+// MARK: - Word Prefix
+"\u{1F4A1} Hint" = "\u{1F4A1} संकेत";
+
+// MARK: - Notification Debug
+"Current Status" = "वर्तमान स्थिति";
+"Token Preview:" = "टोकन पूर्वावलोकन:";
+"Quick Tests" = "त्वरित परीक्षण";
+"Test User Email" = "परीक्षण उपयोगकर्ता ईमेल";
+"Test Results" = "परीक्षण परिणाम";
+"No tests run yet" = "अभी तक कोई परीक्षण नहीं चला";
+"Advanced Tests" = "उन्नत परीक्षण";
+"Running tests..." = "परीक्षण चल रहे हैं...";
+"Notification Tests" = "सूचना परीक्षण";
+"1. Request Permission" = "1. अनुमति का अनुरोध करें";
+"2. Get FCM Token" = "2. FCM टोकन प्राप्त करें";
+"3. Register with Server" = "3. सर्वर के साथ पंजीकरण करें";
+"4. Send Test Notification" = "4. परीक्षण सूचना भेजें";
+"5. Schedule Local Test" = "5. स्थानीय परीक्षण शेड्यूल करें";
+"Use Current" = "वर्तमान उपयोग करें";
+"Clear Results" = "परिणाम मिटाएँ";
+"Run Full Test Suite" = "पूर्ण परीक्षण सूट चलाएँ";
+
+// MARK: - Difficulty Settings
+"Default Difficulty" = "डिफ़ॉल्ट कठिनाई";
+"Set your preferred difficulty level for all puzzles" = "सभी पहेलियों के लिए अपनी पसंदीदा कठिनाई स्तर सेट करें";
+"You can still change difficulty when starting any puzzle" = "किसी भी पहेली शुरू करते समय आप अभी भी कठिनाई बदल सकते हैं";

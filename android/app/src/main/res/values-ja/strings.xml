@@ -1,0 +1,386 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">グリッドから隠された単語を見つけよう</string>
+    <string name="crossword_description">ヒントを使って単語を埋めよう</string>
+    <string name="anagram_description">文字を並べ替えて単語を作ろう</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">ゲームオーバー！</string>
+    <string name="points">ポイント</string>
+    <string name="score_submitted">スコア送信完了！</string>
+    <string name="play_again">もう一度プレイ</string>
+    <string name="try_harder_version">難しいバージョンに挑戦</string>
+    <string name="try_hard_version">ハードバージョンに挑戦</string>
+    <string name="try_very_hard_version">超難関バージョンに挑戦</string>
+    <string name="try_expert_version">エキスパートバージョンに挑戦</string>
+    <string name="customize">カスタマイズ</string>
+    <string name="get_coins">コインを入手</string>
+    <string name="view_leaderboard">リーダーボードを見る</string>
+    <string name="done">完了</string>
+    <string name="earn_coins_tip">毎日パズルをプレイしてコインを獲得しよう！</string>
+    <string name="coins_label">コイン</string>
+    <string name="no_games_yet">まだゲームがありません</string>
+    <string name="be_first_to_create">最初にゲームを作成して共有しよう！</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">新着順</string>
+    <string name="most_played">人気順</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">おすすめ</string>
+    <string name="tab_categories">カテゴリ</string>
+    <string name="tab_games">ゲーム</string>
+    <string name="tab_puzzles">パズル</string>
+    <string name="tab_settings">設定</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">閲覧</string>
+    <string name="subtab_your_puzzles">あなたのパズル</string>
+    <string name="subtab_featured">注目</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">RiddleVerseを楽しんでいますか？</string>
+    <string name="rate_in_play_store">Play Storeで評価してください！</string>
+    <string name="help_us_improve">改善にご協力ください！</string>
+    <string name="rate_experience">RiddleVerseの体験を評価してください</string>
+    <string name="rate_incentive">評価で100コイン＋早期アクセスをゲット！</string>
+    <string name="thanks_great_rating">高評価ありがとうございます！Play Storeでも共有していただけますか？</string>
+    <string name="share_detailed_feedback">先に詳しいフィードバックを送ることもできます！</string>
+    <string name="sorry_bad_experience">ご不便をおかけして申し訳ありません。改善点を教えていただけますか？</string>
+    <string name="continue_label">続ける</string>
+    <string name="rate">評価する</string>
+    <string name="rate_in_store">ストアで評価</string>
+    <string name="give_feedback">フィードバック</string>
+    <string name="not_now">今はしない</string>
+    <string name="maybe_later">あとで</string>
+    <string name="feedback_first">先にフィードバック</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">評価リマインダー</string>
+    <string name="when_remind_again">次のリマインドはいつにしますか？</string>
+    <string name="remind_in_week">1週間後にリマインド</string>
+    <string name="remind_in_month">1ヶ月後にリマインド</string>
+    <string name="dont_ask_again">もう聞かない</string>
+    <string name="cancel">キャンセル</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">好きなところを教えてください！</string>
+    <string name="what_enjoy_most">RiddleVerseで一番楽しいのは何ですか？</string>
+    <string name="what_can_we_improve">改善できる点はありますか？フィードバックは改善に役立ちます。</string>
+    <string name="your_feedback">フィードバック</string>
+    <string name="feedback_placeholder_positive">パズルの種類が豊富で\u2026</string>
+    <string name="feedback_placeholder_negative">こんな機能があれば\u2026</string>
+    <string name="submitted_successfully">送信完了！</string>
+    <string name="submission_failed">送信に失敗しました</string>
+    <string name="submit">送信</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">コインストア</string>
+    <string name="your_coins">所持コイン</string>
+    <string name="coins_used_description">コインはゲームの続行やクリエイターの応援に使えます。</string>
+    <string name="best_value">お得</string>
+    <string name="rate_for_early_access">評価して早期アクセスをゲット！</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">OK</string>
+    <string name="back">戻る</string>
+    <string name="close">閉じる</string>
+    <string name="start">スタート</string>
+    <string name="next">次へ</string>
+
+    <!-- Game UI -->
+    <string name="correct">正解！</string>
+    <string name="wrong">不正解！</string>
+    <string name="times_up">時間切れ！</string>
+    <string name="score_label">スコア</string>
+    <string name="streak_label">連続</string>
+    <string name="level_label">レベル</string>
+    <string name="hint">ヒント</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">まだスコアがありません</string>
+    <string name="play_to_set_score">プレイして最初のハイスコアを記録しよう！</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">おはようございます</string>
+    <string name="good_afternoon">こんにちは</string>
+    <string name="good_evening">こんばんは</string>
+
+    <!-- Settings -->
+    <string name="premium_label">プレミアム</string>
+    <string name="unlimited_label">無制限</string>
+    <string name="daily_rewards">デイリー報酬</string>
+    <string name="notifications">通知</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">エラーが発生しました</string>
+    <string name="no_internet">インターネット接続なし</string>
+    <string name="please_try_again">もう一度お試しください</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">このゲームをカスタマイズ</string>
+    <string name="what_would_you_change">何を変更しますか？</string>
+    <string name="customizing_game">ゲームをカスタマイズ中\u2026</string>
+
+    <!-- Language Picker -->
+    <string name="language">言語</string>
+    <string name="language_picker_title">言語を選択</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">リトライ</string>
+    <string name="skip">スキップ</string>
+    <string name="skip_puzzle">パズルをスキップ</string>
+    <string name="retry">再試行</string>
+    <string name="share">共有</string>
+    <string name="share_puzzle">パズルを共有</string>
+    <string name="play">プレイ</string>
+    <string name="edit">編集</string>
+    <string name="create">作成</string>
+    <string name="explore">探索</string>
+    <string name="reset">リセット</string>
+    <string name="reveal">表示</string>
+    <string name="clear">クリア</string>
+    <string name="clear_all">すべてクリア</string>
+    <string name="check">チェック</string>
+    <string name="go_back">戻る</string>
+    <string name="home">ホーム</string>
+    <string name="upgrade">アップグレード</string>
+    <string name="manage">管理</string>
+    <string name="got_it">了解！</string>
+    <string name="fix_it">修正する</string>
+    <string name="just_close">閉じるだけ</string>
+    <string name="modify">変更</string>
+    <string name="load_more">もっと見る</string>
+    <string name="loading">読み込み中\u2026</string>
+    <string name="save">保存</string>
+    <string name="yes">はい</string>
+    <string name="yes_finish">はい、終了する</string>
+    <string name="yes_it_works">はい、動きます！</string>
+    <string name="no_it_has_issues">いいえ、問題があります</string>
+    <string name="finish_now">今すぐ終了</string>
+    <string name="keep_playing">プレイを続ける</string>
+    <string name="finish_early">早めに終了</string>
+    <string name="give_up">ギブアップ</string>
+    <string name="back_to_home">ホームに戻る</string>
+    <string name="submit_answer">回答を送信</string>
+    <string name="start_game">ゲーム開始</string>
+    <string name="start_puzzle">パズル開始</string>
+    <string name="start_challenge">チャレンジ開始</string>
+    <string name="begin">開始</string>
+    <string name="im_ready">準備完了！</string>
+    <string name="im_done">完了！</string>
+    <string name="skip_tutorial">チュートリアルをスキップ</string>
+    <string name="same">同じ</string>
+    <string name="different">違う</string>
+    <string name="next_puzzle">次のパズル</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">次のパズルを読み込み中\u2026</string>
+    <string name="loading_puzzle">パズルを読み込み中\u2026</string>
+    <string name="generating">生成中\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">クイックアクション</string>
+    <string name="start_playing_instantly">すぐにプレイ開始</string>
+    <string name="your_favorites">お気に入り</string>
+    <string name="trending_now">トレンド</string>
+    <string name="recommended_for_you">あなたへのおすすめ</string>
+    <string name="puzzle_collections">パズルコレクション</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">ゲームエラー</string>
+    <string name="quiz_categories">クイズカテゴリ</string>
+    <string name="subscription">サブスクリプション</string>
+    <string name="current_tier">現在のティア</string>
+    <string name="active_streaks">継続中の連続記録</string>
+    <string name="time_label">時間</string>
+    <string name="badges">バッジ</string>
+    <string name="unable_to_load_progress">進捗データを読み込めません</string>
+    <string name="custom_puzzles">カスタムパズル</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">プレイヤーがゲームを楽しむとコインを獲得できます！</string>
+    <string name="creator_revenue_share">ゲームで使われたコインの55%%を獲得</string>
+    <string name="coins_earned">獲得コイン</string>
+    <string name="plays_monetized">収益化プレイ数</string>
+    <string name="per_game">ゲームごと</string>
+    <string name="cash_out">換金</string>
+    <string name="cash_out_earnings">収益を換金</string>
+    <string name="connect_stripe_to_receive">Stripeを接続して支払いを受け取る</string>
+    <string name="connect_stripe_account">Stripeアカウントを接続</string>
+    <string name="complete_stripe_setup">Stripeセットアップを完了</string>
+    <string name="continue_setup">セットアップを続ける</string>
+    <string name="request_payout">支払いをリクエスト</string>
+    <string name="payout_history">支払い履歴</string>
+    <string name="checking_eligibility">資格を確認中\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">ゲームを作成</string>
+    <string name="describe_game_prompt">ゲームを説明すると、AIが作成します</string>
+    <string name="describe_game_placeholder">ゲームを説明\u2026</string>
+    <string name="generate_game">ゲームを生成</string>
+    <string name="free_generations_used_up">無料生成を使い切りました</string>
+    <string name="buy_coins">コインを購入</string>
+    <string name="subscribe_for_unlimited">無制限プランに登録</string>
+    <string name="get_unlimited_generations">無制限の生成＋毎月のコイン</string>
+    <string name="reference_image">参考画像</string>
+    <string name="try_these_ideas">これらのアイデアを試そう</string>
+    <string name="game_title">ゲームタイトル</string>
+    <string name="describe_your_version">あなたのバージョンを説明</string>
+    <string name="create_game">ゲームを作成</string>
+    <string name="create_your_version">あなたのバージョンを作成</string>
+    <string name="creating_your_game">ゲームを作成中</string>
+    <string name="this_may_take_2_5_minutes">2\u20135分かかる場合があります\u2026</string>
+    <string name="notify_me_when_done">完了時に通知</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">コミュニティゲーム</string>
+    <string name="my_games">マイゲーム</string>
+    <string name="draft">下書き</string>
+    <string name="generating_harder_challenge">より難しいチャレンジを生成中</string>
+    <string name="did_this_game_work">このゲームは動作しましたか？</string>
+    <string name="whats_wrong">何が問題ですか？</string>
+    <string name="modify_game">ゲームを変更</string>
+    <string name="game_name">ゲーム名</string>
+    <string name="create_customized_game">カスタマイズゲームを作成</string>
+    <string name="original">オリジナル</string>
+    <string name="sort_by">並べ替え</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">このゲームには問題がある可能性があります</string>
+    <string name="game_saved">ゲームを保存しました！</string>
+    <string name="game_ready">ゲーム準備完了！</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">待ち時間をスキップ！</string>
+    <string name="get_instant_generation">パズルの即時生成を入手</string>
+    <string name="wait_time">待ち時間</string>
+    <string name="instant">即時</string>
+    <string name="premium_member">プレミアム会員</string>
+    <string name="upgrade_now">今すぐアップグレード</string>
+    <string name="upgrade_for_unlimited">無制限にアップグレード</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">ゲーム設定</string>
+    <string name="difficulty_level">難易度</string>
+    <string name="game_mode">ゲームモード</string>
+    <string name="default_difficulty">デフォルト難易度</string>
+    <string name="checking">確認中\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">遊び方：</string>
+    <string name="progress">進捗</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">メールで送信</string>
+    <string name="copy_to_clipboard">クリップボードにコピー</string>
+    <string name="puzzle_completed">パズル完了！</string>
+    <string name="achievement_unlocked">実績解除！</string>
+    <string name="level_up">レベルアップ！</string>
+    <string name="recipient_email">受信者メール</string>
+    <string name="recipient_name">受信者名</string>
+    <string name="copied_to_clipboard">クリップボードにコピーしました！</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">リーダーボード</string>
+    <string name="your_performance">あなたの成績</string>
+    <string name="other_top_players">他のトッププレイヤー</string>
+    <string name="puzzle_statistics">パズル統計</string>
+    <string name="overview">概要</string>
+    <string name="detailed_statistics">詳細統計</string>
+    <string name="records">記録</string>
+    <string name="no_players_yet">まだプレイヤーがいません</string>
+    <string name="rank_label">ランク</string>
+    <string name="percentile_label">パーセンタイル</string>
+    <string name="total_players">合計プレイヤー数</string>
+    <string name="avg_score">平均スコア</string>
+    <string name="fastest_time">最速タイム</string>
+    <string name="highest_score">最高スコア</string>
+
+    <!-- Game State -->
+    <string name="game_complete">ゲーム完了！</string>
+    <string name="final_score">最終スコア</string>
+    <string name="final_results">最終結果</string>
+    <string name="session_score">セッションスコア</string>
+    <string name="total_score">合計スコア</string>
+    <string name="correct_answers">正解数</string>
+    <string name="accuracy">正確さ</string>
+    <string name="avg_time">平均時間</string>
+    <string name="puzzle_complete">パズル完了！</string>
+    <string name="difficulty_advanced">難易度アップ！</string>
+    <string name="continue_label_caps">続ける</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">記憶スクエア</string>
+    <string name="get_ready">準備して！</string>
+    <string name="memorize_the_pattern">パターンを覚えよう！</string>
+    <string name="click_squares_you_remember">覚えたマスをクリック！</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">意味とテキストの色は一致していますか？</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">遊び方</string>
+    <string name="drop_here">ここにドロップ</string>
+    <string name="completed">完了</string>
+    <string name="time_used">使用時間</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">一部の回答が間違っています</string>
+    <string name="all_hints">すべてのヒント</string>
+
+    <!-- Word Search -->
+    <string name="found">発見</string>
+    <string name="revealed">公開済み</string>
+    <string name="best_streak">最高連続記録</string>
+    <string name="drag_to_find_words">文字をなぞって隠された単語を見つけよう</string>
+    <string name="find_these_words">これらの単語を見つけよう：</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">ゴールドレベル達成！</string>
+    <string name="bonus_words_found">ボーナスワード発見：</string>
+    <string name="great_job">素晴らしい！</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">チュートリアル</string>
+    <string name="tutorial_mode">チュートリアルモード</string>
+    <string name="got_it_lets_play">了解！プレイしよう</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">お気に入りのトピック</string>
+    <string name="popular_topics">人気のトピック</string>
+    <string name="add_custom_topic">カスタムトピックを追加</string>
+    <string name="your_selected_topics">選択したトピック</string>
+    <string name="no_topics_selected">まだトピックが選択されていません</string>
+    <string name="saving">保存中\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">パフォーマンス分析</string>
+    <string name="performance_stats">パフォーマンス統計</string>
+    <string name="daily_streak">デイリー連続記録</string>
+    <string name="lets_play">プレイしよう！</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">パズルの読み込みエラー</string>
+    <string name="no_hint_available">ヒントがありません</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">数字を昇順にタップ（小さい方から大きい方へ）</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">国の地理チャレンジ</string>
+</resources>

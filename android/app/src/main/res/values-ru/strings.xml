@@ -1,0 +1,341 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+
+    <string name="word_search_description">Найдите скрытые слова в сетке</string>
+    <string name="crossword_description">Заполните слова с помощью подсказок</string>
+    <string name="anagram_description">Переставьте буквы, чтобы составить слова</string>
+
+    <string name="game_over">Игра окончена!</string>
+    <string name="points">очки</string>
+    <string name="score_submitted">Результат отправлен!</string>
+    <string name="play_again">Играть снова</string>
+    <string name="try_harder_version">Попробовать сложнее</string>
+    <string name="try_hard_version">Попробовать сложный вариант</string>
+    <string name="try_very_hard_version">Попробовать очень сложный вариант</string>
+    <string name="try_expert_version">Попробовать экспертный вариант</string>
+    <string name="customize">Настроить</string>
+    <string name="get_coins">Получить монеты</string>
+    <string name="view_leaderboard">Таблица лидеров</string>
+    <string name="done">Готово</string>
+    <string name="earn_coins_tip">Зарабатывайте монеты ежедневно, решая головоломки!</string>
+    <string name="coins_label">монеты</string>
+    <string name="no_games_yet">Пока нет игр</string>
+    <string name="be_first_to_create">Будьте первым, кто создаст и поделится игрой!</string>
+
+    <string name="newest">Новейшие</string>
+    <string name="most_played">Самые популярные</string>
+
+    <string name="tab_for_you">Для вас</string>
+    <string name="tab_categories">Категории</string>
+    <string name="tab_games">Игры</string>
+    <string name="tab_puzzles">Головоломки</string>
+    <string name="tab_settings">Настройки</string>
+
+    <string name="subtab_browse">Обзор</string>
+    <string name="subtab_your_puzzles">Ваши головоломки</string>
+    <string name="subtab_featured">Рекомендуемые</string>
+
+    <string name="enjoying_app">Вам нравится RiddleVerse?</string>
+    <string name="rate_in_play_store">Оцените нас в Play Store!</string>
+    <string name="help_us_improve">Помогите нам улучшиться!</string>
+    <string name="rate_experience">Как бы вы оценили опыт использования RiddleVerse?</string>
+    <string name="rate_incentive">Получите 100 монет + ранний доступ, оценив нас!</string>
+    <string name="thanks_great_rating">Спасибо за высокую оценку! Не могли бы вы поделиться ей в Play Store?</string>
+    <string name="share_detailed_feedback">Вы также можете сначала отправить подробный отзыв!</string>
+    <string name="sorry_bad_experience">Нам жаль, что у вас не лучший опыт. Подскажите, что мы можем улучшить?</string>
+    <string name="continue_label">Продолжить</string>
+    <string name="rate">Оценить</string>
+    <string name="rate_in_store">Оценить в магазине</string>
+    <string name="give_feedback">Оставить отзыв</string>
+    <string name="not_now">Не сейчас</string>
+    <string name="maybe_later">Может быть позже</string>
+    <string name="feedback_first">Сначала отзыв</string>
+
+    <string name="rating_reminder">Напоминание об оценке</string>
+    <string name="when_remind_again">Когда напомнить снова?</string>
+    <string name="remind_in_week">Напомнить через неделю</string>
+    <string name="remind_in_month">Напомнить через месяц</string>
+    <string name="dont_ask_again">Больше не спрашивать</string>
+    <string name="cancel">Отмена</string>
+
+    <string name="tell_us_what_you_love">Расскажите, что вам нравится!</string>
+    <string name="what_enjoy_most">Что вам больше всего нравится в RiddleVerse?</string>
+    <string name="what_can_we_improve">Что мы можем улучшить? Ваш отзыв помогает нам стать лучше.</string>
+    <string name="your_feedback">Ваш отзыв</string>
+    <string name="feedback_placeholder_positive">Мне нравится разнообразие головоломок…</string>
+    <string name="feedback_placeholder_negative">Хотелось бы, чтобы в приложении было…</string>
+    <string name="submitted_successfully">Успешно отправлено!</string>
+    <string name="submission_failed">Ошибка отправки</string>
+    <string name="submit">Отправить</string>
+
+    <string name="coin_store">Магазин монет</string>
+    <string name="your_coins">Ваши монеты</string>
+    <string name="coins_used_description">Монеты используются для продолжения игр и поддержки создателей.</string>
+    <string name="best_value">Лучшее предложение</string>
+    <string name="rate_for_early_access">Оцените для раннего доступа!</string>
+
+    <string name="ok">ОК</string>
+    <string name="back">Назад</string>
+    <string name="close">Закрыть</string>
+    <string name="start">Старт</string>
+    <string name="next">Далее</string>
+
+    <string name="correct">Правильно!</string>
+    <string name="wrong">Неправильно!</string>
+    <string name="times_up">Время вышло!</string>
+    <string name="score_label">Счёт</string>
+    <string name="streak_label">Серия</string>
+    <string name="level_label">Уровень</string>
+    <string name="hint">Подсказка</string>
+
+    <string name="no_scores_yet">Пока нет результатов</string>
+    <string name="play_to_set_score">Играйте, чтобы установить первый рекорд!</string>
+
+    <string name="good_morning">Доброе утро</string>
+    <string name="good_afternoon">Добрый день</string>
+    <string name="good_evening">Добрый вечер</string>
+
+    <string name="premium_label">Премиум</string>
+    <string name="unlimited_label">Безлимит</string>
+    <string name="daily_rewards">Ежедневные награды</string>
+    <string name="notifications">Уведомления</string>
+
+    <string name="something_went_wrong">Что-то пошло не так</string>
+    <string name="no_internet">Нет подключения к интернету</string>
+    <string name="please_try_again">Пожалуйста, попробуйте ещё раз</string>
+
+    <string name="customize_this_game">Настроить эту игру</string>
+    <string name="what_would_you_change">Что бы вы хотели изменить?</string>
+    <string name="customizing_game">Настройка игры…</string>
+
+    <string name="language">Язык</string>
+    <string name="language_picker_title">Выберите язык</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <string name="try_again">Попробовать снова</string>
+    <string name="skip">Пропустить</string>
+    <string name="skip_puzzle">Пропустить головоломку</string>
+    <string name="retry">Повторить</string>
+    <string name="share">Поделиться</string>
+    <string name="share_puzzle">Поделиться головоломкой</string>
+    <string name="play">Играть</string>
+    <string name="edit">Редактировать</string>
+    <string name="create">Создать</string>
+    <string name="explore">Исследовать</string>
+    <string name="reset">Сбросить</string>
+    <string name="reveal">Раскрыть</string>
+    <string name="clear">Очистить</string>
+    <string name="clear_all">Очистить всё</string>
+    <string name="check">Проверить</string>
+    <string name="go_back">Назад</string>
+    <string name="home">Главная</string>
+    <string name="upgrade">Улучшить</string>
+    <string name="manage">Управлять</string>
+    <string name="got_it">Понятно!</string>
+    <string name="fix_it">Исправить</string>
+    <string name="just_close">Просто закрыть</string>
+    <string name="modify">Изменить</string>
+    <string name="load_more">Загрузить ещё</string>
+    <string name="loading">Загрузка\u2026</string>
+    <string name="save">Сохранить</string>
+    <string name="yes">ДА</string>
+    <string name="yes_finish">Да, завершить</string>
+    <string name="yes_it_works">Да, работает!</string>
+    <string name="no_it_has_issues">Нет, есть проблемы</string>
+    <string name="finish_now">Завершить сейчас</string>
+    <string name="keep_playing">Продолжить игру</string>
+    <string name="finish_early">Завершить досрочно</string>
+    <string name="give_up">Сдаться</string>
+    <string name="back_to_home">На главную</string>
+    <string name="submit_answer">Отправить ответ</string>
+    <string name="start_game">НАЧАТЬ ИГРУ</string>
+    <string name="start_puzzle">НАЧАТЬ ГОЛОВОЛОМКУ</string>
+    <string name="start_challenge">НАЧАТЬ ВЫЗОВ</string>
+    <string name="begin">Начать</string>
+    <string name="im_ready">Я готов!</string>
+    <string name="im_done">Я закончил</string>
+    <string name="skip_tutorial">Пропустить обучение</string>
+    <string name="same">ОДИНАКОВО</string>
+    <string name="different">РАЗЛИЧНО</string>
+    <string name="next_puzzle">Следующая головоломка</string>
+
+    <string name="loading_next_puzzle">Загрузка следующей головоломки\u2026</string>
+    <string name="loading_puzzle">Загрузка головоломки\u2026</string>
+    <string name="generating">Генерация\u2026</string>
+
+    <string name="quick_actions">Быстрые действия</string>
+    <string name="start_playing_instantly">Начните играть мгновенно</string>
+    <string name="your_favorites">Ваши избранные</string>
+    <string name="trending_now">Сейчас в тренде</string>
+    <string name="recommended_for_you">Рекомендовано для вас</string>
+    <string name="puzzle_collections">Коллекции головоломок</string>
+
+    <string name="game_error">Ошибка игры</string>
+    <string name="quiz_categories">Категории викторин</string>
+    <string name="subscription">Подписка</string>
+    <string name="current_tier">Текущий уровень</string>
+    <string name="active_streaks">Активные серии</string>
+    <string name="time_label">Время</string>
+    <string name="badges">Значки</string>
+    <string name="unable_to_load_progress">Не удалось загрузить данные прогресса</string>
+    <string name="custom_puzzles">Пользовательские головоломки</string>
+
+    <string name="earn_coins_from_games">Зарабатывайте монеты, когда игрокам нравятся ваши игры!</string>
+    <string name="creator_revenue_share">Вы получаете 55%% монет, потраченных на ваши игры</string>
+    <string name="coins_earned">Заработано монет</string>
+    <string name="plays_monetized">Монетизированные игры</string>
+    <string name="per_game">За игру</string>
+    <string name="cash_out">Вывести средства</string>
+    <string name="cash_out_earnings">Вывести заработок</string>
+    <string name="connect_stripe_to_receive">Подключите Stripe для получения выплат</string>
+    <string name="connect_stripe_account">Подключить аккаунт Stripe</string>
+    <string name="complete_stripe_setup">Завершить настройку Stripe</string>
+    <string name="continue_setup">Продолжить настройку</string>
+    <string name="request_payout">Запросить выплату</string>
+    <string name="payout_history">История выплат</string>
+    <string name="checking_eligibility">Проверка соответствия\u2026</string>
+
+    <string name="create_a_game">Создать игру</string>
+    <string name="describe_game_prompt">Опишите любую игру, и ИИ создаст её для вас</string>
+    <string name="describe_game_placeholder">Опишите вашу игру\u2026</string>
+    <string name="generate_game">Сгенерировать игру</string>
+    <string name="free_generations_used_up">Бесплатные генерации исчерпаны</string>
+    <string name="buy_coins">Купить монеты</string>
+    <string name="subscribe_for_unlimited">Подписка на безлимит</string>
+    <string name="get_unlimited_generations">Безлимитные генерации + ежемесячные монеты</string>
+    <string name="reference_image">Референсное изображение</string>
+    <string name="try_these_ideas">Попробуйте эти идеи</string>
+    <string name="game_title">Название игры</string>
+    <string name="describe_your_version">Опишите вашу версию</string>
+    <string name="create_game">Создать игру</string>
+    <string name="create_your_version">Создайте свою версию</string>
+    <string name="creating_your_game">Создаём вашу игру</string>
+    <string name="this_may_take_2_5_minutes">Это может занять 2\u20135 минут\u2026</string>
+    <string name="notify_me_when_done">Уведомить по завершении</string>
+
+    <string name="community_games">Игры сообщества</string>
+    <string name="my_games">Мои игры</string>
+    <string name="draft">Черновик</string>
+    <string name="generating_harder_challenge">Генерация более сложного вызова</string>
+    <string name="did_this_game_work">Эта игра работала?</string>
+    <string name="whats_wrong">Что не так?</string>
+    <string name="modify_game">Изменить игру</string>
+    <string name="game_name">Название игры</string>
+    <string name="create_customized_game">Создать настроенную игру</string>
+    <string name="original">Оригинал</string>
+    <string name="sort_by">Сортировать по</string>
+
+    <string name="game_may_have_issues">Эта игра может иметь проблемы</string>
+    <string name="game_saved">Игра сохранена!</string>
+    <string name="game_ready">Игра готова!</string>
+
+    <string name="skip_the_wait">Пропустите ожидание!</string>
+    <string name="get_instant_generation">Мгновенная генерация головоломок</string>
+    <string name="wait_time">Время ожидания</string>
+    <string name="instant">Мгновенно</string>
+    <string name="premium_member">Премиум-участник</string>
+    <string name="upgrade_now">Улучшить сейчас</string>
+    <string name="upgrade_for_unlimited">Улучшить для безлимита</string>
+
+    <string name="game_settings">Настройки игры</string>
+    <string name="difficulty_level">Уровень сложности</string>
+    <string name="game_mode">Режим игры</string>
+    <string name="default_difficulty">Сложность по умолчанию</string>
+    <string name="checking">Проверка\u2026</string>
+
+    <string name="how_it_works">Как это работает:</string>
+    <string name="progress">Прогресс</string>
+
+    <string name="send_via_email">Отправить по email</string>
+    <string name="copy_to_clipboard">Копировать в буфер</string>
+    <string name="puzzle_completed">Головоломка решена!</string>
+    <string name="achievement_unlocked">Достижение разблокировано!</string>
+    <string name="level_up">Новый уровень!</string>
+    <string name="recipient_email">Email получателя</string>
+    <string name="recipient_name">Имя получателя</string>
+    <string name="copied_to_clipboard">Скопировано в буфер!</string>
+
+    <string name="leaderboard">Таблица лидеров</string>
+    <string name="your_performance">Ваши результаты</string>
+    <string name="other_top_players">Другие лучшие игроки</string>
+    <string name="puzzle_statistics">Статистика головоломок</string>
+    <string name="overview">Обзор</string>
+    <string name="detailed_statistics">Подробная статистика</string>
+    <string name="records">Рекорды</string>
+    <string name="no_players_yet">Пока нет игроков</string>
+    <string name="rank_label">Ранг</string>
+    <string name="percentile_label">Процентиль</string>
+    <string name="total_players">Всего игроков</string>
+    <string name="avg_score">Средний счёт</string>
+    <string name="fastest_time">Лучшее время</string>
+    <string name="highest_score">Лучший счёт</string>
+
+    <string name="game_complete">Игра завершена!</string>
+    <string name="final_score">Итоговый счёт</string>
+    <string name="final_results">Итоговые результаты</string>
+    <string name="session_score">Счёт сессии</string>
+    <string name="total_score">Общий счёт</string>
+    <string name="correct_answers">Правильные ответы</string>
+    <string name="accuracy">Точность</string>
+    <string name="avg_time">Среднее время</string>
+    <string name="puzzle_complete">Головоломка решена!</string>
+    <string name="difficulty_advanced">Сложность повышена!</string>
+    <string name="continue_label_caps">ПРОДОЛЖИТЬ</string>
+
+    <string name="memory_squares">Квадраты памяти</string>
+    <string name="get_ready">Приготовьтесь!</string>
+    <string name="memorize_the_pattern">Запомните паттерн!</string>
+    <string name="click_squares_you_remember">Нажмите на запомнившиеся квадраты!</string>
+
+    <string name="color_match_question">Совпадает ли значение с цветом текста?</string>
+
+    <string name="how_to_play">Как играть</string>
+    <string name="drop_here">Бросить сюда</string>
+    <string name="completed">Завершено</string>
+    <string name="time_used">Затраченное время</string>
+
+    <string name="some_answers_incorrect">Некоторые ответы неверны</string>
+    <string name="all_hints">Все подсказки</string>
+
+    <string name="found">Найдено</string>
+    <string name="revealed">Раскрыто</string>
+    <string name="best_streak">Лучшая серия</string>
+    <string name="drag_to_find_words">Проведите по буквам, чтобы найти скрытые слова</string>
+    <string name="find_these_words">Найдите эти слова:</string>
+
+    <string name="gold_level_reached">Золотой уровень достигнут!</string>
+    <string name="bonus_words_found">Найдено бонусных слов:</string>
+    <string name="great_job">Отличная работа!</string>
+
+    <string name="tutorial">Обучение</string>
+    <string name="tutorial_mode">Режим обучения</string>
+    <string name="got_it_lets_play">Понятно! Поехали</string>
+
+    <string name="preferred_topics">Предпочитаемые темы</string>
+    <string name="popular_topics">Популярные темы</string>
+    <string name="add_custom_topic">Добавить свою тему</string>
+    <string name="your_selected_topics">Ваши выбранные темы</string>
+    <string name="no_topics_selected">Темы не выбраны</string>
+    <string name="saving">Сохранение\u2026</string>
+
+    <string name="performance_analytics">Аналитика производительности</string>
+    <string name="performance_stats">Статистика</string>
+    <string name="daily_streak">Ежедневная серия</string>
+    <string name="lets_play">Поехали!</string>
+
+    <string name="error_loading_puzzle">Ошибка загрузки головоломки</string>
+    <string name="no_hint_available">Подсказка недоступна</string>
+
+    <string name="tap_ascending_order">Нажимайте числа в порядке возрастания (от наименьшего к наибольшему)</string>
+
+    <string name="country_geography_challenge">Географический вызов стран</string>
+</resources>
