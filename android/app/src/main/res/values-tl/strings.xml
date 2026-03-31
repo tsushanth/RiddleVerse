@@ -1,0 +1,384 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">Maghanap ng mga nakatagong salita sa grid</string>
+    <string name="crossword_description">Punan ang mga salita gamit ang mga pahiwatig</string>
+    <string name="anagram_description">Ayusin ang mga letra upang makabuo ng mga salita</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">Tapos na ang Laro!</string>
+    <string name="points">puntos</string>
+    <string name="score_submitted">Naisumite na ang puntos!</string>
+    <string name="play_again">Maglaro Muli</string>
+    <string name="try_harder_version">Subukan ang Mas Mahirap na Bersyon</string>
+    <string name="try_hard_version">Subukan ang Mahirap na Bersyon</string>
+    <string name="try_very_hard_version">Subukan ang Napakahirap na Bersyon</string>
+    <string name="try_expert_version">Subukan ang Bersyon ng Eksperto</string>
+    <string name="customize">I-customize</string>
+    <string name="get_coins">Kumuha ng Barya</string>
+    <string name="view_leaderboard">Tingnan ang Leaderboard</string>
+    <string name="done">Tapos</string>
+    <string name="earn_coins_tip">Kumita ng barya araw-araw sa paglalaro ng mga palaisipan!</string>
+    <string name="coins_label">barya</string>
+    <string name="no_games_yet">Wala pang mga laro</string>
+    <string name="be_first_to_create">Maging una sa paglikha at pagbabahagi ng laro!</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">Pinakabago</string>
+    <string name="most_played">Pinaka-maraming Nilaro</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">Para sa Iyo</string>
+    <string name="tab_categories">Mga Kategorya</string>
+    <string name="tab_games">Mga Laro</string>
+    <string name="tab_puzzles">Mga Palaisipan</string>
+    <string name="tab_settings">Mga Setting</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">Mag-browse</string>
+    <string name="subtab_your_puzzles">Iyong mga Palaisipan</string>
+    <string name="subtab_featured">Tampok</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">Nag-eenjoy ka ba sa RiddleVerse?</string>
+    <string name="rate_in_play_store">I-rate kami sa Play Store!</string>
+    <string name="help_us_improve">Tulungan kaming mapabuti!</string>
+    <string name="rate_experience">Paano mo ire-rate ang iyong karanasan sa RiddleVerse?</string>
+    <string name="rate_incentive">Makakuha ng 100 barya + maagang access sa pag-rate sa amin!</string>
+    <string name="thanks_great_rating">Salamat sa magandang rating! Maaari mo ba itong ibahagi sa Play Store?</string>
+    <string name="share_detailed_feedback">Maaari ka ring magbahagi ng detalyadong feedback sa amin muna!</string>
+    <string name="sorry_bad_experience">Paumanhin na hindi maganda ang karanasan mo. Maaari mo ba kaming sabihan kung ano ang mapapabuti namin?</string>
+    <string name="continue_label">Magpatuloy</string>
+    <string name="rate">I-rate</string>
+    <string name="rate_in_store">I-rate sa Store</string>
+    <string name="give_feedback">Magbigay ng Feedback</string>
+    <string name="not_now">Hindi Ngayon</string>
+    <string name="maybe_later">Mamaya Na Lang</string>
+    <string name="feedback_first">Feedback Muna</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">Paalala sa Rating</string>
+    <string name="when_remind_again">Kailan mo gustong paalalahanan muli?</string>
+    <string name="remind_in_week">Paalalahanan ako sa isang linggo</string>
+    <string name="remind_in_month">Paalalahanan ako sa isang buwan</string>
+    <string name="dont_ask_again">Huwag nang itanong muli</string>
+    <string name="cancel">Kanselahin</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">Sabihin sa amin ang gusto mo!</string>
+    <string name="what_enjoy_most">Ano ang pinaka-naeenjoy mo sa RiddleVerse?</string>
+    <string name="what_can_we_improve">Ano ang mapapabuti namin? Ang iyong feedback ay tumutulong sa aming pagpapabuti.</string>
+    <string name="your_feedback">Ang iyong feedback</string>
+    <string name="feedback_placeholder_positive">Gusto ko ang iba\'t ibang palaisipan\u2026</string>
+    <string name="feedback_placeholder_negative">Sana ay mayroon ang app na\u2026</string>
+    <string name="submitted_successfully">Matagumpay na naisumite!</string>
+    <string name="submission_failed">Nabigong isumite</string>
+    <string name="submit">Isumite</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">Tindahan ng Barya</string>
+    <string name="your_coins">Iyong mga Barya</string>
+    <string name="coins_used_description">Ang mga barya ay ginagamit upang magpatuloy sa mga laro at suportahan ang mga tagalikha.</string>
+    <string name="best_value">Pinakamahusay na Halaga</string>
+    <string name="rate_for_early_access">Mag-rate para sa maagang access!</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">OK</string>
+    <string name="back">Bumalik</string>
+    <string name="close">Isara</string>
+    <string name="start">Simulan</string>
+    <string name="next">Susunod</string>
+
+    <!-- Game UI -->
+    <string name="correct">Tama!</string>
+    <string name="wrong">Mali!</string>
+    <string name="times_up">Tapos na ang oras!</string>
+    <string name="score_label">Puntos</string>
+    <string name="streak_label">Sunod-sunod</string>
+    <string name="level_label">Antas</string>
+    <string name="hint">Pahiwatig</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">Wala pang mga puntos</string>
+    <string name="play_to_set_score">Maglaro upang magtakda ng unang mataas na puntos!</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">Magandang Umaga</string>
+    <string name="good_afternoon">Magandang Tanghali</string>
+    <string name="good_evening">Magandang Gabi</string>
+
+    <!-- Settings -->
+    <string name="premium_label">Premium</string>
+    <string name="unlimited_label">Walang Limitasyon</string>
+    <string name="daily_rewards">Araw-araw na Gantimpala</string>
+    <string name="notifications">Mga Abiso</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">May nangyaring mali</string>
+    <string name="no_internet">Walang koneksyon sa internet</string>
+    <string name="please_try_again">Pakisubukang muli</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">I-customize ang Larong Ito</string>
+    <string name="what_would_you_change">Ano ang gusto mong baguhin?</string>
+    <string name="customizing_game">Kina-customize ang Laro\u2026</string>
+
+    <!-- Language Picker -->
+    <string name="language">Wika</string>
+    <string name="language_picker_title">Pumili ng Wika</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">Subukang Muli</string>
+    <string name="skip">Laktawan</string>
+    <string name="skip_puzzle">Laktawan ang Palaisipan</string>
+    <string name="retry">Ulitin</string>
+    <string name="share">Ibahagi</string>
+    <string name="share_puzzle">Ibahagi ang Palaisipan</string>
+    <string name="play">Maglaro</string>
+    <string name="edit">I-edit</string>
+    <string name="create">Lumikha</string>
+    <string name="explore">Mag-explore</string>
+    <string name="reset">I-reset</string>
+    <string name="reveal">Ipakita</string>
+    <string name="clear">I-clear</string>
+    <string name="clear_all">I-clear Lahat</string>
+    <string name="check">Suriin</string>
+    <string name="go_back">Bumalik</string>
+    <string name="home">Home</string>
+    <string name="upgrade">Mag-upgrade</string>
+    <string name="manage">Pamahalaan</string>
+    <string name="got_it">Nakuha ko!</string>
+    <string name="fix_it">Ayusin</string>
+    <string name="just_close">Isara Na Lang</string>
+    <string name="modify">Baguhin</string>
+    <string name="load_more">Mag-load Pa</string>
+    <string name="loading">Naglo-load\u2026</string>
+    <string name="save">I-save</string>
+    <string name="yes">OO</string>
+    <string name="yes_finish">Oo, Tapusin</string>
+    <string name="yes_it_works">Oo, gumagana!</string>
+    <string name="no_it_has_issues">Hindi, may mga problema</string>
+    <string name="finish_now">Tapusin Ngayon</string>
+    <string name="keep_playing">Magpatuloy sa Paglalaro</string>
+    <string name="finish_early">Tapusin Nang Maaga</string>
+    <string name="give_up">Sumuko</string>
+    <string name="back_to_home">Bumalik sa Home</string>
+    <string name="submit_answer">Isumite ang Sagot</string>
+    <string name="start_game">SIMULAN ANG LARO</string>
+    <string name="start_puzzle">SIMULAN ANG PALAISIPAN</string>
+    <string name="start_challenge">SIMULAN ANG HAMON</string>
+    <string name="begin">Magsimula</string>
+    <string name="im_ready">Handa Na Ako!</string>
+    <string name="im_done">Tapos Na Ako</string>
+    <string name="skip_tutorial">Laktawan ang Tutorial</string>
+    <string name="same">PAREHO</string>
+    <string name="different">MAGKAIBA</string>
+    <string name="next_puzzle">Susunod na Palaisipan</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">Nilo-load ang susunod na palaisipan\u2026</string>
+    <string name="loading_puzzle">Nilo-load ang palaisipan\u2026</string>
+    <string name="generating">Ginagawa\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">Mabilis na Aksyon</string>
+    <string name="start_playing_instantly">Magsimulang maglaro agad</string>
+    <string name="your_favorites">Mga Paborito Mo</string>
+    <string name="trending_now">Trending Ngayon</string>
+    <string name="recommended_for_you">Inirerekomenda para sa Iyo</string>
+    <string name="puzzle_collections">Mga Koleksyon ng Palaisipan</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">Error sa Laro</string>
+    <string name="quiz_categories">Mga Kategorya ng Quiz</string>
+    <string name="subscription">Subscription</string>
+    <string name="current_tier">Kasalukuyang Antas</string>
+    <string name="active_streaks">Mga Aktibong Sunod-sunod</string>
+    <string name="time_label">Oras</string>
+    <string name="badges">Mga Badge</string>
+    <string name="unable_to_load_progress">Hindi ma-load ang datos ng progreso</string>
+    <string name="custom_puzzles">Custom na Palaisipan</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">Kumita ng barya kapag nag-eenjoy ang mga manlalaro sa iyong mga laro!</string>
+    <string name="creator_revenue_share">Makukuha mo ang 55%% ng barya na ginastos sa iyong mga laro</string>
+    <string name="coins_earned">Baryang Nakuha</string>
+    <string name="plays_monetized">Mga Laro na Namonetize</string>
+    <string name="per_game">Bawat Laro</string>
+    <string name="cash_out">I-cash Out</string>
+    <string name="cash_out_earnings">I-cash Out ang Kita</string>
+    <string name="connect_stripe_to_receive">Ikonekta ang Stripe upang makatanggap ng bayad</string>
+    <string name="connect_stripe_account">Ikonekta ang Stripe Account</string>
+    <string name="complete_stripe_setup">Kumpletuhin ang Stripe Setup</string>
+    <string name="continue_setup">Ipagpatuloy ang Setup</string>
+    <string name="request_payout">Humiling ng Bayad</string>
+    <string name="payout_history">Kasaysayan ng Bayad</string>
+    <string name="checking_eligibility">Sinusuri ang kwalipikasyon\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">Lumikha ng Laro</string>
+    <string name="describe_game_prompt">Ilarawan ang anumang laro at itatayo ito ng AI para sa iyo</string>
+    <string name="describe_game_placeholder">Ilarawan ang iyong laro\u2026</string>
+    <string name="generate_game">I-generate ang Laro</string>
+    <string name="free_generations_used_up">Naubos na ang Libreng Generation</string>
+    <string name="buy_coins">Bumili ng Barya</string>
+    <string name="subscribe_for_unlimited">Mag-subscribe para sa Walang Limitasyon</string>
+    <string name="get_unlimited_generations">Walang limitasyong generation + buwanang barya</string>
+    <string name="reference_image">Larawan na sanggunian</string>
+    <string name="try_these_ideas">Subukan ang mga ideyang ito</string>
+    <string name="game_title">Pamagat ng Laro</string>
+    <string name="describe_your_version">Ilarawan ang Iyong Bersyon</string>
+    <string name="create_game">Lumikha ng Laro</string>
+    <string name="create_your_version">Lumikha ng iyong bersyon</string>
+    <string name="creating_your_game">Ginagawa ang Iyong Laro</string>
+    <string name="this_may_take_2_5_minutes">Maaaring tumagal ng 2\u20135 minuto\u2026</string>
+    <string name="notify_me_when_done">Abisuhan Ako Kapag Tapos Na</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">Mga Laro ng Komunidad</string>
+    <string name="my_games">Mga Laro Ko</string>
+    <string name="draft">Draft</string>
+    <string name="generating_harder_challenge">Gumagawa ng Mas Mahirap na Hamon</string>
+    <string name="did_this_game_work">Gumana ba ang larong ito?</string>
+    <string name="whats_wrong">Ano ang mali?</string>
+    <string name="modify_game">Baguhin ang Laro</string>
+    <string name="game_name">Pangalan ng Laro</string>
+    <string name="create_customized_game">Lumikha ng Custom na Laro</string>
+    <string name="original">Orihinal</string>
+    <string name="sort_by">Pag-uri-uriin ayon sa</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">Ang larong ito ay maaaring may mga problema</string>
+    <string name="game_saved">Na-save ang laro!</string>
+    <string name="game_ready">Handa na ang Laro!</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">Laktawan ang Paghihintay!</string>
+    <string name="get_instant_generation">Makakuha ng instant na generation ng palaisipan</string>
+    <string name="wait_time">Oras ng Paghihintay</string>
+    <string name="instant">Agad-agad</string>
+    <string name="premium_member">Miyembro ng Premium</string>
+    <string name="upgrade_now">Mag-upgrade Ngayon</string>
+    <string name="upgrade_for_unlimited">Mag-upgrade para sa Walang Limitasyon</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">Mga Setting ng Laro</string>
+    <string name="difficulty_level">Antas ng Kahirapan</string>
+    <string name="game_mode">Mode ng Laro</string>
+    <string name="default_difficulty">Default na Kahirapan</string>
+    <string name="checking">Sinusuri\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">Paano ito gumagana:</string>
+    <string name="progress">Progreso</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">Ipadala sa pamamagitan ng Email</string>
+    <string name="copy_to_clipboard">Kopyahin sa Clipboard</string>
+    <string name="puzzle_completed">Tapos na ang Palaisipan!</string>
+    <string name="achievement_unlocked">Na-unlock ang Achievement!</string>
+    <string name="level_up">Level Up!</string>
+    <string name="recipient_email">Email ng Tatanggap</string>
+    <string name="recipient_name">Pangalan ng Tatanggap</string>
+    <string name="copied_to_clipboard">Nakopya sa clipboard!</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">Leaderboard</string>
+    <string name="your_performance">Iyong Performance</string>
+    <string name="other_top_players">Ibang Nangungunang Manlalaro</string>
+    <string name="puzzle_statistics">Mga Estadistika ng Palaisipan</string>
+    <string name="overview">Pangkalahatang-tanaw</string>
+    <string name="detailed_statistics">Detalyadong Estadistika</string>
+    <string name="records">Mga Rekord</string>
+    <string name="no_players_yet">Wala Pang mga Manlalaro</string>
+    <string name="rank_label">Ranggo</string>
+    <string name="percentile_label">Percentile</string>
+    <string name="total_players">Kabuuang Manlalaro</string>
+    <string name="avg_score">Ave. Puntos</string>
+    <string name="fastest_time">Pinakamabilis na Oras</string>
+    <string name="highest_score">Pinakamataas na Puntos</string>
+
+    <!-- Game State -->
+    <string name="game_complete">Tapos na ang Laro!</string>
+    <string name="final_score">Huling Puntos</string>
+    <string name="final_results">Mga Huling Resulta</string>
+    <string name="session_score">Puntos ng Session</string>
+    <string name="total_score">Kabuuang Puntos</string>
+    <string name="correct_answers">Tamang mga Sagot</string>
+    <string name="accuracy">Katumpakan</string>
+    <string name="avg_time">Ave. Oras</string>
+    <string name="puzzle_complete">Tapos na ang Palaisipan!</string>
+    <string name="difficulty_advanced">Tumaas ang Kahirapan!</string>
+    <string name="continue_label_caps">MAGPATULOY</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">Mga Parisukat ng Alaala</string>
+    <string name="get_ready">Maghanda!</string>
+    <string name="memorize_the_pattern">Tandaan ang pattern!</string>
+    <string name="click_squares_you_remember">I-click ang mga parisukat na naaalala mo!</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">Tumutugma ba ang kahulugan sa kulay ng teksto?</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">Paano Maglaro</string>
+    <string name="drop_here">Ilagay Dito</string>
+    <string name="completed">Tapos Na</string>
+    <string name="time_used">Oras na Ginamit</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">May mga sagot na hindi tama</string>
+    <string name="all_hints">Lahat ng Pahiwatig</string>
+
+    <!-- Word Search -->
+    <string name="found">Nahanap</string>
+    <string name="revealed">Naipakita</string>
+    <string name="best_streak">Pinakamahusay na Sunod-sunod</string>
+    <string name="drag_to_find_words">Mag-drag sa mga letra upang mahanap ang nakatagong mga salita</string>
+    <string name="find_these_words">Hanapin ang mga salitang ito:</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">Naabot ang Gold Level!</string>
+    <string name="bonus_words_found">Mga Bonus na Salitang Nahanap:</string>
+    <string name="great_job">Mahusay!</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorial_mode">Tutorial Mode</string>
+    <string name="got_it_lets_play">Nakuha ko! Maglaro Tayo</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">Mga Gustong Paksa</string>
+    <string name="popular_topics">Mga Sikat na Paksa</string>
+    <string name="add_custom_topic">Magdagdag ng Custom na Paksa</string>
+    <string name="your_selected_topics">Iyong mga Napiling Paksa</string>
+    <string name="no_topics_selected">Wala pang napiling paksa</string>
+    <string name="saving">Sine-save\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">Analytics ng Performance</string>
+    <string name="performance_stats">Mga Estadistika ng Performance</string>
+    <string name="daily_streak">Araw-araw na Sunod-sunod</string>
+    <string name="lets_play">Maglaro Tayo!</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">Error sa paglo-load ng palaisipan</string>
+    <string name="no_hint_available">Walang available na pahiwatig</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">I-tap ang mga numero sa pataas na pagkakasunod-sunod (pinakamaliit hanggang pinakamalaki)</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">Hamon sa Heograpiya ng Bansa</string>
+</resources>

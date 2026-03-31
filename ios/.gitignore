@@ -1,0 +1,7 @@
+
+# Xcode SPM & Build caches
+SourcePackages/
+*.noindex/
+*.noindex
+build/
+DerivedData/

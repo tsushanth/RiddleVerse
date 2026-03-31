@@ -1,0 +1,726 @@
+/* Localizable.strings (Korean)
+   PuzzleForge / RiddleVerse */
+
+// MARK: - Common / Shared
+"OK" = "확인";
+"Cancel" = "취소";
+"Done" = "완료";
+"Back" = "뒤로";
+"Next" = "다음";
+"Skip" = "건너뛰기";
+"Close" = "닫기";
+"Continue" = "계속";
+"Submit" = "제출";
+"Retry" = "다시 시도";
+"Exit" = "나가기";
+"Share" = "공유";
+"Reset" = "초기화";
+"Clear" = "지우기";
+"Error" = "오류";
+"Loading..." = "로딩 중...";
+"YES" = "예";
+"NO" = "아니오";
+"NEW" = "새로운";
+"Play" = "플레이";
+"Edit" = "편집";
+"Hint" = "힌트";
+"Show" = "보기";
+"Begin" = "시작";
+"Modify" = "수정";
+"CONTINUE" = "계속";
+"SUBMIT" = "제출";
+"CLEAR" = "지우기";
+"REVEAL" = "공개";
+"START" = "시작";
+
+// MARK: - Home View
+"Score: %@" = "점수: %@";
+"Settings" = "설정";
+"Profile" = "프로필";
+"Account" = "계정";
+"Sign In" = "로그인";
+"Sign Out" = "로그아웃";
+"Sign Up" = "회원가입";
+"Create Account" = "계정 만들기";
+"Notification Settings" = "알림 설정";
+"Custom Puzzles" = "맞춤 퍼즐";
+"Quick Actions" = "빠른 동작";
+"Popular Categories" = "인기 카테고리";
+"Tap any to start earning points!" = "아무거나 탭해서 포인트를 모으세요!";
+"Random" = "랜덤";
+"Surprise me!" = "랜덤 선택!";
+"Loading puzzle..." = "퍼즐 로딩 중...";
+"Loading personalized puzzles..." = "맞춤 퍼즐 로딩 중...";
+"Puzzles Loading" = "퍼즐 로딩 중";
+"We're fetching your personalized puzzles. This usually takes just a few moments." = "맞춤 퍼즐을 가져오는 중입니다. 보통 몇 초면 완료됩니다.";
+"We're fetching your puzzles from our servers. This usually takes just a few moments." = "서버에서 퍼즐을 가져오는 중입니다. 보통 몇 초면 완료됩니다.";
+"No puzzle selected" = "선택된 퍼즐 없음";
+"Filter Categories" = "카테고리 필터";
+"No Categories" = "카테고리 없음";
+"Adjust your filter to see more categories." = "필터를 조정하여 더 많은 카테고리를 확인하세요.";
+"Featured Custom Puzzles" = "추천 맞춤 퍼즐";
+"Debug & Testing" = "디버그 및 테스트";
+"Test Notifications" = "알림 테스트";
+
+// MARK: - Update Dialog
+"Version %@" = "버전 %@";
+"What's New:" = "새로운 기능:";
+"Update Now" = "지금 업데이트";
+"Later" = "나중에";
+
+// MARK: - Content Moderation
+"Puzzle Name:" = "퍼즐 이름:";
+"Creator:" = "제작자:";
+"Format:" = "형식:";
+"What happened?" = "무슨 일이 있었나요?";
+"This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly." = "이 주제는 콘텐츠 검토 시스템에 의해 부적절할 수 있다고 표시되었습니다. 이는 자동화된 프로세스이며 때때로 콘텐츠를 잘못 표시할 수 있습니다.";
+
+// MARK: - Profile & Creator
+"By %@" = "%@ 제작";
+"Creator Earnings" = "크리에이터 수익";
+"Coins Earned" = "획득한 코인";
+"Plays Monetized" = "수익화된 플레이";
+"Per Game" = "게임당";
+"Cash Out Earnings" = "수익 인출";
+"Earn coins when players enjoy your games!" = "플레이어가 게임을 즐기면 코인을 획득하세요!";
+"You get 55% of coins spent on your games. Tap to view payouts." = "게임에 사용된 코인의 55%를 받습니다. 탭하여 지급 내역을 확인하세요.";
+"Checking eligibility..." = "자격 확인 중...";
+"coins available" = "사용 가능한 코인";
+
+// MARK: - Stripe / Payouts
+"Cash Out" = "인출";
+"Connect Stripe to receive payouts" = "Stripe를 연결하여 지급받기";
+"Set up your Stripe account to cash out your earned coins as real money." = "Stripe 계정을 설정하여 획득한 코인을 실제 돈으로 인출하세요.";
+"Connect Stripe Account" = "Stripe 계정 연결";
+"Complete Stripe Setup" = "Stripe 설정 완료";
+"Your Stripe account setup is incomplete. Tap below to finish." = "Stripe 계정 설정이 완료되지 않았습니다. 아래를 탭하여 완료하세요.";
+"Continue Setup" = "설정 계속";
+"Request Payout" = "지급 요청";
+"Payout History" = "지급 내역";
+
+// MARK: - App Features & Account
+"App Features" = "앱 기능";
+"Account Management" = "계정 관리";
+"Delete Account" = "계정 삭제";
+"This will permanently delete your account and all associated data. This action cannot be undone." = "계정과 모든 관련 데이터가 영구적으로 삭제됩니다. 이 작업은 취소할 수 없습니다.";
+
+// MARK: - Sign In
+"Sign In Required" = "로그인 필요";
+"Sign in to access leaderboards, track your progress, and save your scores." = "로그인하여 리더보드에 접근하고, 진행 상황을 추적하고, 점수를 저장하세요.";
+"Sign in to track progress and scores" = "로그인하여 진행 상황과 점수를 추적";
+"Sign in with Google" = "Google로 로그인";
+"Enable Notifications?" = "알림을 활성화할까요?";
+"Yes, Notify Me" = "네, 알려주세요";
+"Not Now" = "나중에";
+"Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge." = "매일 퍼즐이 준비되면 알림을 받으세요! 빠른 알림으로 매일 도전을 놓치지 마세요.";
+"Daily Puzzle Notifications" = "매일 퍼즐 알림";
+"Notification Status:" = "알림 상태:";
+"Enabled" = "활성화됨";
+"Not enabled" = "비활성화됨";
+
+// MARK: - Onboarding
+"Train Your Brain Daily" = "매일 두뇌를 훈련하세요";
+"Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills" = "수학, 단어 퍼즐, 두뇌 트레이닝으로 인지 능력을 향상시키세요";
+"Track Your Progress" = "진행 상황을 추적하세요";
+"Level up, earn badges, and see your improvement over time with detailed analytics" = "레벨업하고, 배지를 획득하고, 상세한 분석으로 시간에 따른 향상을 확인하세요";
+"Compete & Achieve" = "경쟁하고 달성하세요";
+"Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type" = "친구에게 도전하고, 리더보드를 올라가고, 각 퍼즐 유형을 마스터하여 독점 보상을 잠금 해제하세요";
+"Ready to Start?" = "시작할 준비가 되셨나요?";
+"Join thousands of puzzle enthusiasts and start your brain training journey today!" = "수천 명의 퍼즐 애호가와 함께 오늘부터 두뇌 훈련 여정을 시작하세요!";
+"Let's Get Started!" = "시작해 봅시다!";
+"Free to play \u{2022} No ads during puzzles" = "무료 플레이 \u{2022} 퍼즐 중 광고 없음";
+"Level 5" = "레벨 5";
+
+// MARK: - Start Puzzle View
+"Take a quick interactive tutorial to get started!" = "빠른 대화형 튜토리얼로 시작하세요!";
+"Start Tutorial" = "튜토리얼 시작";
+"Reset Tutorial" = "튜토리얼 초기화";
+"Dismiss" = "닫기";
+"Loading your stats..." = "통계 로딩 중...";
+"TOP SCORES" = "최고 점수";
+"BENEFITS" = "혜택";
+"Game Settings" = "게임 설정";
+"Difficulty Level" = "난이도";
+"Game Mode" = "게임 모드";
+"Number of Puzzles" = "퍼즐 수";
+"Start Playing" = "플레이 시작";
+"Create Your Version" = "나만의 버전 만들기";
+"Earn coins" = "코인 획득";
+"Back to Home" = "홈으로 돌아가기";
+
+// MARK: - Difficulty
+"DIFFICULTY PROGRESSION" = "난이도 진행";
+"Current Level" = "현재 레벨";
+"Progress" = "진행";
+"Next:" = "다음:";
+"CURRENT LEVEL DETAILS" = "현재 레벨 상세";
+"Default Difficulty" = "기본 난이도";
+"Set your preferred difficulty level for all puzzles" = "모든 퍼즐의 선호 난이도를 설정하세요";
+"You can still change difficulty when starting any puzzle" = "퍼즐 시작 시 언제든 난이도를 변경할 수 있습니다";
+"Difficulty Adapted!" = "난이도가 조정되었습니다!";
+"Difficulty Adjusted" = "난이도 조정됨";
+"DIFFICULTY" = "난이도";
+
+// MARK: - Puzzle Completion
+"Puzzle Set Complete!" = "퍼즐 세트 완료!";
+"Share Achievement" = "업적 공유";
+"Remix & earn real money when others play" = "리믹스하고 다른 사람이 플레이하면 실제 수익 획득";
+"Return Home" = "홈으로 돌아가기";
+"No More Puzzles Available" = "더 이상 이용 가능한 퍼즐이 없습니다";
+"Generate new puzzles to continue playing." = "계속 플레이하려면 새 퍼즐을 생성하세요.";
+"Generate New Puzzles" = "새 퍼즐 생성";
+"Generating New Puzzles" = "새 퍼즐 생성 중";
+"This usually takes 30-60 seconds..." = "보통 30-60초 소요됩니다...";
+"Home" = "홈";
+"Try These Next" = "다음에 이것을 시도해 보세요";
+"TOP 5 SCORES" = "상위 5 점수";
+
+// MARK: - Session/Score Feedback
+"Session Complete!" = "세션 완료!";
+"Final Score:" = "최종 점수:";
+"Accuracy:" = "정확도:";
+"Best Streak:" = "최고 연속 기록:";
+"Your answer: %@" = "당신의 답: %@";
+"Correct answer: %@" = "정답: %@";
+"Updating score..." = "점수 업데이트 중...";
+"Tap to continue" = "탭하여 계속";
+"Keep trying! You've got this! \u{1F4AA}" = "계속 도전하세요! 할 수 있어요! \u{1F4AA}";
+"LEVEL UP!" = "레벨 업!";
+"Level %@ \u{2192} %@" = "레벨 %@ \u{2192} %@";
+"Score submitted!" = "점수가 제출되었습니다!";
+
+// MARK: - Leaderboard
+"Leaderboard" = "리더보드";
+"View Leaderboard" = "리더보드 보기";
+"Rank #%@" = "순위 #%@";
+"Your rank: #%@" = "내 순위: #%@";
+"No scores yet" = "아직 점수가 없습니다";
+"Play the game to set the first high score!" = "게임을 플레이하여 첫 최고 점수를 기록하세요!";
+
+// MARK: - Subscription & Limits
+"Upgrade to Premium" = "프리미엄으로 업그레이드";
+"Running Low on Puzzles!" = "퍼즐이 거의 소진되었습니다!";
+"Generation Limit Reached" = "생성 한도에 도달했습니다";
+"Maybe Later" = "나중에";
+"Upgrade" = "업그레이드";
+"IS ANNUALLY:" = "연간:";
+"A YEAR" = "1년";
+
+// MARK: - Coins / Store
+"Your Coins" = "내 코인";
+"Coins added!" = "코인이 추가되었습니다!";
+"Coins are used to continue games and support creators." = "코인은 게임을 계속하고 크리에이터를 지원하는 데 사용됩니다.";
+"Best Value" = "최고 가치";
+"Get Coins" = "코인 얻기";
+"Coin Store" = "코인 상점";
+"Buy Coins" = "코인 구매";
+"points" = "포인트";
+
+// MARK: - Game Play
+"Game Over!" = "게임 오버!";
+"Play Again" = "다시 플레이";
+"Customize" = "커스터마이즈";
+"Customizing Game" = "게임 커스터마이즈 중";
+"This may take 2-5 minutes..." = "2-5분 소요될 수 있습니다...";
+"Fixing game..." = "게임 수정 중...";
+"This may take a couple minutes..." = "몇 분 소요될 수 있습니다...";
+"Did this game work?" = "이 게임이 제대로 작동했나요?";
+"Yes, it works!" = "네, 작동합니다!";
+"No, it has issues" = "아니요, 문제가 있습니다";
+"What's wrong?" = "무엇이 잘못되었나요?";
+"Fix It" = "수정";
+"Brief description \u{2014} even a couple words helps" = "간단한 설명 \u{2014} 몇 마디라도 도움이 됩니다";
+"Customize This Game" = "이 게임 커스터마이즈";
+"Create Customized Game" = "맞춤 게임 만들기";
+"Game Name" = "게임 이름";
+"What would you like to change?" = "무엇을 변경하고 싶으신가요?";
+"Describe what you'd like to change. A new game will be created under your name." = "변경하고 싶은 내용을 설명해 주세요. 새 게임이 당신의 이름으로 생성됩니다.";
+"Lv.%@" = "Lv.%@";
+
+// MARK: - Game Browse
+"Community Games" = "커뮤니티 게임";
+"My Games" = "내 게임";
+"No games yet" = "아직 게임이 없습니다";
+"Be the first to create and share a game!" = "처음으로 게임을 만들고 공유하세요!";
+"Load More" = "더 보기";
+"Draft" = "초안";
+"by %@" = "%@ 제작";
+"Newest" = "최신순";
+"Most Played" = "인기순";
+
+// MARK: - Game Remix
+"Create your version" = "나만의 버전 만들기";
+"Create & Earn Real Money" = "만들고 실제 수익 획득";
+"Earn coins when others play \u{2014} cash out via Stripe!" = "다른 사람이 플레이하면 코인 획득 \u{2014} Stripe로 인출!";
+"You earn 55% of every coin spent on your game" = "게임에서 사용된 모든 코인의 55%를 획득";
+"Game Title" = "게임 제목";
+"Describe Your Version" = "버전 설명";
+"Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules..." = "게임플레이 변경, 시각적 스타일, 테마, 난이도 조정, 점수 규칙 등을 설명하세요...";
+"Reference image" = "참고 이미지";
+"AI will use this as visual context" = "AI가 이를 시각적 참고로 사용합니다";
+"Quick Ideas" = "빠른 아이디어";
+"Create Game" = "게임 만들기";
+"Creating Your Game" = "게임 생성 중";
+"Notify Me When Done" = "완료되면 알려주세요";
+"You can leave this screen \u{2014} we'll notify you!" = "이 화면을 떠나도 됩니다 \u{2014} 알려드리겠습니다!";
+"Your game will appear in Explore > Custom Games" = "게임이 탐색 > 맞춤 게임에 표시됩니다";
+"Free Generations Used Up" = "무료 생성 횟수를 모두 사용했습니다";
+"Subscribe for Unlimited" = "무제한 구독하기";
+"Get unlimited generations + monthly coins" = "무제한 생성 + 월간 코인 획득";
+"Game Ready!" = "게임 완성!";
+"Tap to preview \u{2014} also in Explore > Custom Games" = "탭하여 미리보기 \u{2014} 탐색 > 맞춤 게임에도 있습니다";
+
+// MARK: - Game Preview
+"This game may have issues" = "이 게임에 문제가 있을 수 있습니다";
+"Modifying game..." = "게임 수정 중...";
+"Game saved!" = "게임이 저장되었습니다!";
+"You'll earn coins when others play!" = "다른 사람이 플레이하면 코인을 획득합니다!";
+"Describe what's wrong or what to change:" = "문제점이나 변경할 내용을 설명하세요:";
+"Modify Game" = "게임 수정";
+
+// MARK: - Game Tweak
+"Loading version history..." = "버전 기록 로딩 중...";
+"No version history yet" = "아직 버전 기록이 없습니다";
+"Describe your change below to start editing your game" = "아래에 변경 내용을 설명하여 게임 편집을 시작하세요";
+"Applying Edit" = "편집 적용 중";
+"This may take a minute..." = "1분 정도 소요될 수 있습니다...";
+"Original" = "원본";
+
+// MARK: - Create Puzzle
+"Create Custom Puzzle" = "맞춤 퍼즐 만들기";
+"Generate personalized puzzles on any topic you love!" = "좋아하는 주제로 맞춤 퍼즐을 생성하세요!";
+"Puzzle Topic" = "퍼즐 주제";
+"Popular Topics" = "인기 주제";
+"Puzzle Format" = "퍼즐 형식";
+"Creating Magic..." = "마법 생성 중...";
+"Generate Puzzle" = "퍼즐 생성";
+"puzzles" = "퍼즐";
+"\u{1F389} Puzzle Creation Started!" = "\u{1F389} 퍼즐 생성이 시작되었습니다!";
+"Your custom puzzle set is being generated! Check back in a few minutes to see your creation." = "맞춤 퍼즐 세트가 생성되고 있습니다! 몇 분 후에 다시 확인해 보세요.";
+
+// MARK: - Daily Puzzles
+"Daily Puzzles" = "매일 퍼즐";
+"New Daily Puzzles!" = "새로운 매일 퍼즐!";
+"Your daily puzzles are ready!" = "매일 퍼즐이 준비되었습니다!";
+"Topics Saved!" = "주제가 저장되었습니다!";
+"Let's Go!" = "시작하자!";
+"Topics" = "주제";
+"Refresh" = "새로고침";
+"Choose Your Daily Puzzle Topics" = "매일 퍼즐 주제 선택";
+"Select topics you're interested in. We'll generate daily puzzles for each topic." = "관심 있는 주제를 선택하세요. 각 주제에 대해 매일 퍼즐을 생성합니다.";
+"Welcome to Daily Puzzles!" = "매일 퍼즐에 오신 것을 환영합니다!";
+"Choose your favorite topics and we'll generate personalized daily puzzles just for you." = "좋아하는 주제를 선택하면 당신만을 위한 맞춤 매일 퍼즐을 생성합니다.";
+"Choose Topics" = "주제 선택";
+"Oops!" = "앗!";
+"Try Again" = "다시 시도";
+"Solve Puzzle" = "퍼즐 풀기";
+"Show Answer" = "정답 보기";
+
+// MARK: - Daily Streak
+"Daily Streak Stats" = "매일 연속 통계";
+"Current Streak" = "현재 연속";
+"Total Coins" = "총 코인";
+"Days Played" = "플레이한 날";
+"Best Streak" = "최고 연속";
+"To Milestone" = "마일스톤까지";
+"day" = "일";
+"days" = "일";
+"Let's Play! \u{1F3AE}" = "플레이하자! \u{1F3AE}";
+
+// MARK: - Achievement Dashboard
+"Progress Dashboard" = "진행 대시보드";
+"Next Tier Rewards:" = "다음 등급 보상:";
+"Rewards:" = "보상:";
+"Complete some puzzles to see your performance stats!" = "퍼즐을 완료하여 성과 통계를 확인하세요!";
+"Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!" = "퍼즐을 플레이하여 진행 대시보드를 잠금 해제하세요. 매 게임마다 XP를 획득하고, 연속 기록을 쌓고, 업적을 잠금 해제합니다!";
+"Achievements" = "업적";
+
+// MARK: - Preferred Topics
+"Preferred Topics" = "선호 주제";
+"Available Topics" = "이용 가능한 주제";
+"Your Preferred Topics" = "내 선호 주제";
+"Search Custom Puzzles" = "맞춤 퍼즐 검색";
+
+// MARK: - Notification Settings
+"Notifications" = "알림";
+"Notification Permissions" = "알림 권한";
+"Push Notifications" = "푸시 알림";
+"Daily Puzzle Alerts" = "매일 퍼즐 알림";
+"Get notified when your daily puzzles are ready" = "매일 퍼즐이 준비되면 알림 받기";
+"FCM Token Status" = "FCM 토큰 상태";
+"Notification Test" = "알림 테스트";
+"Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time." = "알림은 새로운 매일 퍼즐과 도전에 대한 최신 정보를 제공합니다. iOS 설정에서 언제든지 비활성화할 수 있습니다.";
+
+// MARK: - Social Sharing
+"Share Your Success!" = "성공을 공유하세요!";
+"Share Puzzle" = "퍼즐 공유";
+"Recipient Email" = "수신자 이메일";
+"Recipient Name" = "수신자 이름";
+
+// MARK: - Puzzle UI Components
+"Level %@" = "레벨 %@";
+"Quick Stats" = "빠른 통계";
+
+// MARK: - Difficulty Manager HUD
+"LEVEL %@" = "레벨 %@";
+"TIME" = "시간";
+"SCORE" = "점수";
+"RANK" = "순위";
+"LIVES" = "생명";
+
+// MARK: - Multiple Choice
+"Exit Puzzle" = "퍼즐 나가기";
+"Are you sure you want to exit? Your progress will be lost." = "나가시겠습니까? 진행 상황이 사라집니다.";
+"Question %@/%@" = "문제 %@/%@";
+"Got it!" = "알겠습니다!";
+
+// MARK: - Q&A Puzzle
+"All Puzzles Completed!" = "모든 퍼즐 완료!";
+
+// MARK: - Crossword
+"All Hints" = "모든 힌트";
+"Puzzle solved in %@" = "%@만에 풀었습니다";
+"Next Puzzle" = "다음 퍼즐";
+"Some answers are incorrect" = "일부 답이 틀렸습니다";
+"Try again or use the REVEAL button to fix incorrect answers." = "다시 시도하거나 공개 버튼을 사용하여 틀린 답을 수정하세요.";
+
+// MARK: - Word Search
+"Tips" = "팁";
+"Word Search Help" = "단어 찾기 도움말";
+
+// MARK: - Word Snake
+"Find these snake words:" = "이 뱀 단어를 찾으세요:";
+"Clear Word" = "단어 지우기";
+"Loading Word Snake puzzle..." = "단어 뱀 퍼즐 로딩 중...";
+"Word Snake Hints" = "단어 뱀 힌트";
+"Clear Found Word?" = "찾은 단어를 지울까요?";
+"Completed" = "완료";
+"Found" = "발견";
+"Shown" = "표시됨";
+"Avg/Word" = "평균/단어";
+"Performance:" = "성과:";
+
+// MARK: - Synonym
+"Group the synonyms! Tap the set that matches the word above." = "동의어를 그룹으로! 위의 단어와 일치하는 세트를 탭하세요.";
+
+// MARK: - Antonym
+"Tap balloons to match opposite words" = "풍선을 탭하여 반대말을 매치하세요";
+
+// MARK: - Crypto Puzzle
+"Game Over" = "게임 오버";
+"How to Play" = "플레이 방법";
+"You've run out of hearts! Crypto puzzles take practice." = "하트가 다 떨어졌습니다! 암호 퍼즐은 연습이 필요합니다.";
+"Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'." = "'THE', 'AND' 같은 일반적인 패턴이나 'A', 'I' 같은 단독 문자를 찾아보세요.";
+"Unable to load adaptive crypto puzzle" = "적응형 암호 퍼즐을 로드할 수 없습니다";
+"Adaptive Crypto Puzzle" = "적응형 암호 퍼즐";
+"Adaptive Crypto Solved!" = "적응형 암호 퍼즐 해결!";
+"Hidden Message:" = "숨겨진 메시지:";
+"Time Used" = "사용 시간";
+"Difficulty" = "난이도";
+"Continue Adaptive Journey" = "적응형 여정 계속";
+"\u{1F4A1} Adaptive Hint" = "\u{1F4A1} 적응형 힌트";
+"Unable to load tutorial puzzle" = "튜토리얼 퍼즐을 로드할 수 없습니다";
+"Try again!" = "다시 시도하세요!";
+
+// MARK: - Letter Set
+"No words found yet" = "아직 발견된 단어가 없습니다";
+"Finish Early?" = "일찍 끝내시겠습니까?";
+"Invalid Word" = "유효하지 않은 단어";
+
+// MARK: - Number Sequence
+"Adaptive Number Sequence" = "적응형 숫자 시퀀스";
+"Tap numbers in ascending order\n(smallest to largest)" = "숫자를 오름차순으로 탭하세요\n(작은 수부터 큰 수까지)";
+"START ADAPTIVE CHALLENGE" = "적응형 도전 시작";
+"Adaptive Challenge Complete!" = "적응형 도전 완료!";
+"Round %@" = "라운드 %@";
+
+// MARK: - Number Sum
+"Adaptive Number Sum" = "적응형 숫자 합계";
+"Select numbers that add up\nto the target sum" = "합계가 목표값이 되는\n숫자를 선택하세요";
+"Target" = "목표";
+
+// MARK: - Math Expression
+"Which value is greater?" = "어떤 값이 더 큰가요?";
+"EQUAL" = "같음";
+"Loading math problems..." = "수학 문제 로딩 중...";
+"Math Challenge Adapted!" = "수학 도전이 적응되었습니다!";
+
+// MARK: - Math Crossword
+"Select a number:" = "숫자를 선택하세요:";
+"Complete the math equations by placing the missing numbers" = "빠진 숫자를 배치하여 수학 방정식을 완성하세요";
+"Game Result" = "게임 결과";
+"Result" = "결과";
+
+// MARK: - Math Difference
+"FIND THE DIFFERENCE" = "차이를 찾으세요";
+"Enter the difference between these numbers" = "이 숫자들의 차이를 입력하세요";
+
+// MARK: - Estimation
+"Error loading estimation data" = "추정 데이터 로딩 오류";
+"drag finger to estimate sum" = "손가락을 끌어 합계를 추정하세요";
+
+// MARK: - Price Ordering
+"CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE" = "최종 가격을 계산하고 저렴한 순서대로 정렬하세요";
+"OFF" = "할인";
+
+// MARK: - Conversion Puzzle
+"Drag blocks to compare their values" = "블록을 끌어 값을 비교하세요";
+"Higher position = Greater value" = "높은 위치 = 큰 값";
+
+// MARK: - Percentage / Tip
+"TAP THE CORRECT TIP" = "올바른 팁을 탭하세요";
+"Tap the bubble with the correct tip amount!" = "올바른 팁 금액의 버블을 탭하세요!";
+"Bill Amount" = "청구 금액";
+"Puzzle Completed!" = "퍼즐 완료!";
+
+// MARK: - Subscription Puzzle
+"Hint: %@" = "힌트: %@";
+
+// MARK: - Image Puzzle
+"Loading Image Puzzle..." = "이미지 퍼즐 로딩 중...";
+"Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan" = "탭하여 닫기 \u{2022} 핀치로 확대 \u{2022} 더블탭으로 확대 \u{2022} 드래그로 이동";
+"START ADAPTIVE PUZZLE" = "적응형 퍼즐 시작";
+"How to Play:" = "플레이 방법:";
+"Original Image" = "원본 이미지";
+"Double-tap to rotate" = "더블탭으로 회전";
+"Long press a piece to drag it to the grid" = "조각을 길게 눌러 그리드로 끌어오세요";
+"Puzzle Adapted!" = "퍼즐이 적응되었습니다!";
+"Score" = "점수";
+"Drop" = "놓기";
+"Here" = "여기";
+
+// MARK: - Image Questions
+"Image Questions" = "이미지 문제";
+"Memorize the image!" = "이미지를 기억하세요!";
+"Complete!" = "완료!";
+"Loading image..." = "이미지 로딩 중...";
+"Countdown will start when ready" = "준비되면 카운트다운이 시작됩니다";
+"Study this image carefully!" = "이 이미지를 주의 깊게 살펴보세요!";
+"Image Hidden" = "이미지 숨김";
+"Reveal Image" = "이미지 공개";
+"LOCATION" = "위치";
+"Your answer:" = "당신의 답:";
+"Correct answer:" = "정답:";
+"Next time, try to rely more on your memory!" = "다음에는 기억력에 더 의존해 보세요!";
+
+// MARK: - Image Vortex
+"Find the NEW image" = "새로운 이미지를 찾으세요";
+
+// MARK: - Progressive Reveal
+"Progressive Reveal" = "점진적 공개";
+"Mystery Image" = "미스터리 이미지";
+"Your Answer:" = "당신의 답:";
+"Next Clue" = "다음 단서";
+"Reveal" = "공개";
+"Congratulations!" = "축하합니다!";
+
+// MARK: - Odd One Out
+"Look at the images carefully and find the one that doesn't belong with the others." = "이미지를 주의 깊게 살펴보고 나머지와 다른 것을 찾으세요.";
+"Which one doesn't belong?" = "어떤 것이 다른가요?";
+"How It Works" = "플레이 방법";
+"Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!" = "이미지를 보고 나머지와 다른 것을 찾으세요. 패턴 인식과 비판적 사고 능력을 훈련하세요!";
+"Start Challenge" = "도전 시작";
+"Continue to Next Puzzle" = "다음 퍼즐로 계속";
+
+// MARK: - Which Is Real
+"Why This Matters" = "왜 중요한가";
+"In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking." = "오늘날의 세계에서 AI는 놀라울 정도로 사실적인 이미지를 생성할 수 있습니다. 실제와 AI 생성 콘텐츠를 구별하는 것은 미디어 리터러시와 비판적 사고의 필수 기술이 되고 있습니다.";
+"Which image is AI-generated?" = "어떤 이미지가 AI로 생성된 것인가요?";
+"Look for real photos:" = "실제 사진을 찾으세요:";
+"AI tells:" = "AI 특징:";
+"Learn from Community Insights" = "커뮤니티 인사이트에서 배우기";
+"Help others learn! Why did you think this was the AI image?" = "다른 사람의 학습을 도와주세요! 왜 이것이 AI 이미지라고 생각했나요?";
+"Submit (+20% bonus)" = "제출 (+20% 보너스)";
+"Learn from others who identified the AI image correctly:" = "AI 이미지를 올바르게 식별한 사람들에게서 배우세요:";
+
+// MARK: - Find Object / Waldo
+"Hidden Objects" = "숨겨진 물체";
+"Failed to load image" = "이미지 로딩 실패";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "핀치로 확대 \u{2022} 드래그로 이동 \u{2022} 탭하여 물체 찾기";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them" = "핀치로 확대 \u{2022} 드래그로 이동 \u{2022} 물체를 탭하여 찾기";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision" = "핀치로 확대 \u{2022} 드래그로 이동 \u{2022} AI가 발견한 물체 탭";
+"Natural Discovery" = "자연 발견";
+"Objects to Find" = "찾을 물체";
+"These objects were naturally discovered by AI vision in the scene" = "이 물체들은 AI 비전에 의해 장면에서 자연스럽게 발견되었습니다";
+"Show Hint" = "힌트 보기";
+"ENHANCED WALDO" = "강화된 월도";
+
+// MARK: - Geography
+"Geography Cities Challenge" = "지리 도시 도전";
+"Place cities in their correct locations on the world map" = "세계 지도에서 도시를 올바른 위치에 배치하세요";
+"START CHALLENGE" = "도전 시작";
+"Exact location!" = "정확한 위치!";
+"Geography Challenge Complete!" = "지리 도전 완료!";
+"Final Score" = "최종 점수";
+"Geography Countries Challenge" = "지리 국가 도전";
+"Place countries in their correct locations on the world map" = "세계 지도에서 국가를 올바른 위치에 배치하세요";
+"Tap on a continent" = "대륙을 탭하세요";
+"Or tap a continent name:" = "또는 대륙 이름을 탭하세요:";
+"Country spans" = "국가 범위";
+"You selected" = "선택하셨습니다";
+"Landlocked" = "내륙국";
+"Very Close!" = "아주 가까워요!";
+"Great geographical knowledge!" = "훌륭한 지리 지식!";
+"Skip Tutorial" = "튜토리얼 건너뛰기";
+
+// MARK: - Memory Puzzles
+"Remember this symbol" = "이 기호를 기억하세요";
+"NEXT" = "다음";
+"Memory Pairs" = "메모리 페어";
+"Memory Pair Challenge" = "메모리 페어 도전";
+"Does this pattern match the\nprevious pattern?" = "이 패턴이\n이전 패턴과 일치하나요?";
+"Memory Challenge Complete!" = "메모리 도전 완료!";
+"Final Results" = "최종 결과";
+"Session Score" = "세션 점수";
+"Total Score" = "총 점수";
+"Correct Answers" = "정답";
+"Accuracy" = "정확도";
+"Example Pattern" = "예시 패턴";
+"Red dot at bottom-left" = "왼쪽 하단의 빨간 점";
+"START GAME" = "게임 시작";
+
+// MARK: - Memory Story
+"Error loading Memory Story puzzle" = "메모리 스토리 퍼즐 로딩 오류";
+"THIS GAME REQUIRES AUDIO" = "이 게임에는 오디오가 필요합니다";
+"MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY" = "소리가 분명히 들리는지\n확인하세요";
+
+// MARK: - Memory Sequencing
+"LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS" = "두 파트를 듣고\n사건을 순서대로 배열하세요";
+"DRAG TO REORDER" = "드래그하여 재정렬";
+"PART TWO OF TWO" = "2부 중 2부";
+"Continue to Part Two" = "2부로 계속";
+
+// MARK: - Memory Retention
+"Audio Error" = "오디오 오류";
+"Continue Without Audio" = "오디오 없이 계속";
+
+// MARK: - Memory Squares
+"Clear" = "지우기";
+
+// MARK: - Context Switch
+"Excellent!" = "훌륭합니다!";
+"Not quite" = "아쉽습니다";
+"Working Memory" = "작업 기억";
+"Executive Load" = "실행 부하";
+"Dual Task" = "이중 과제";
+"Attention" = "주의력";
+"Time Pressure" = "시간 압박";
+"Context Switch Adapted!" = "컨텍스트 전환이 적응되었습니다!";
+"Study these items" = "이 항목들을 공부하세요";
+"I'm Ready!" = "준비됐어요!";
+"Alphabetization Task" = "알파벳 순서 정렬 과제";
+"Drag to reorder alphabetically:" = "드래그하여 알파벳순으로 재정렬:";
+"Continue \u{2192}" = "계속 \u{2192}";
+"Recognition Test" = "인식 테스트";
+"Select all items from the original list" = "원래 목록에서 모든 항목을 선택하세요";
+"Items are arranged to test attention control" = "주의력 제어를 테스트하기 위해 항목이 배치되었습니다";
+"Submit Answer \u{2713}" = "답 제출 \u{2713}";
+
+// MARK: - Color Text Matching
+"Adaptive Color-Text Matching" = "적응형 색상-텍스트 매칭";
+"Compare the color name meaning with the actual text color and decide if they match." = "색상 이름의 의미와 실제 텍스트 색상을 비교하여 일치하는지 결정하세요.";
+"Adaptive Example" = "적응형 예시";
+"Answer: YES (both are blue)" = "답: 예 (둘 다 파란색)";
+"Does the meaning match the text color?" = "의미가 텍스트 색상과 일치하나요?";
+"Color Challenge Adapted!" = "색상 도전이 적응되었습니다!";
+"meaning" = "의미";
+"text color" = "텍스트 색상";
+"Avg Time" = "평균 시간";
+"Streak" = "연속";
+"START ADAPTIVE CHALLENGE" = "적응형 도전 시작";
+
+// MARK: - Color Shape Matching
+"Visual Challenge Adapted!" = "시각 도전이 적응되었습니다!";
+"Does the text meaning match the shape color?" = "텍스트 의미가 도형 색상과 일치하나요?";
+
+// MARK: - Dual Card
+"Adaptive Dual-Task Complete!" = "적응형 이중 과제 완료!";
+"Switching pattern: %@" = "전환 패턴: %@";
+
+// MARK: - Symbol Swipe
+"When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT" = "왼쪽 기호가 보이면 왼쪽으로 스와이프\n오른쪽 기호가 보이면 오른쪽으로 스와이프";
+"SWIPE RIGHT \u{2192}" = "오른쪽 스와이프 \u{2192}";
+"LEFT" = "왼쪽";
+"RIGHT" = "오른쪽";
+
+// MARK: - Unique Object
+"STREAK" = "연속";
+
+// MARK: - Flow Puzzle
+"Clear All" = "모두 지우기";
+"Give Up" = "포기";
+"Solution Shown" = "해답 표시됨";
+"Moving to next puzzle..." = "다음 퍼즐로 이동 중...";
+"Path Conflict!" = "경로 충돌!";
+
+// MARK: - Pinball Deflector
+"Pinball Deflector" = "핀볼 디플렉터";
+"Challenge Complete" = "도전 완료";
+"Memorize deflector positions" = "디플렉터 위치를 기억하세요";
+"Predict where the ball will exit" = "공이 어디로 나갈지 예측하세요";
+"Continue Challenge" = "도전 계속";
+
+// MARK: - Swipe Word
+"Next Puzzle" = "다음 퍼즐";
+"Back to Home" = "홈으로 돌아가기";
+
+// MARK: - Limit Reached
+"Running Low on Puzzles!" = "퍼즐이 거의 소진되었습니다!";
+"Generation Limit Reached" = "생성 한도에 도달했습니다";
+"Maybe Later" = "나중에";
+"Upgrade to Premium" = "프리미엄으로 업그레이드";
+
+// MARK: - Puzzle Limit Network
+"Checking Puzzle Availability" = "퍼즐 이용 가능 여부 확인 중";
+
+// MARK: - Music Puzzle
+"TUTORIAL" = "튜토리얼";
+"MUSIC MATCH" = "음악 매칭";
+"Loading music puzzle..." = "음악 퍼즐 로딩 중...";
+"Tap to expand..." = "탭하여 확장...";
+"Music Match Tutorial" = "음악 매칭 튜토리얼";
+
+// MARK: - Quiz Card
+"Start Quiz" = "퀴즈 시작";
+
+// MARK: - Tutorial Views
+"How to Play" = "플레이 방법";
+"Got it! Let's Play" = "알겠어요! 플레이하자!";
+"Skip Tutorial" = "튜토리얼 건너뛰기";
+
+// MARK: - Group Completion
+"Puzzle Collections" = "퍼즐 컬렉션";
+"Each type has 5 puzzles" = "각 유형에 5개의 퍼즐";
+"How it works:" = "플레이 방법:";
+"Each puzzle type contains 5 challenges" = "각 퍼즐 유형에는 5개의 도전이 있습니다";
+"Complete all 5 to unlock the next puzzle type" = "5개를 모두 완료하여 다음 퍼즐 유형을 잠금 해제하세요";
+"Try different types to discover your favorites!" = "다양한 유형을 시도하여 즐겨찾기를 발견하세요!";
+"Group Completed!" = "그룹 완료!";
+"Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?" = "놀라워요! 이 그룹의 모든 퍼즐 유형을 마스터했습니다. 다음 도전을 할 준비가 되셨나요?";
+
+// MARK: - Word Prefix
+"\u{1F4A1} Hint" = "\u{1F4A1} 힌트";
+
+// MARK: - Notification Debug
+"Current Status" = "현재 상태";
+"Token Preview:" = "토큰 미리보기:";
+"Quick Tests" = "빠른 테스트";
+"Test User Email" = "테스트 사용자 이메일";
+"Test Results" = "테스트 결과";
+"No tests run yet" = "아직 실행된 테스트 없음";
+"Advanced Tests" = "고급 테스트";
+"Running tests..." = "테스트 실행 중...";
+"Notification Tests" = "알림 테스트";
+"1. Request Permission" = "1. 권한 요청";
+"2. Get FCM Token" = "2. FCM 토큰 가져오기";
+"3. Register with Server" = "3. 서버에 등록";
+"4. Send Test Notification" = "4. 테스트 알림 보내기";
+"5. Schedule Local Test" = "5. 로컬 테스트 예약";
+"Use Current" = "현재 사용";
+"Clear Results" = "결과 지우기";
+"Run Full Test Suite" = "전체 테스트 스위트 실행";
+
+// MARK: - Difficulty Settings
+"Default Difficulty" = "기본 난이도";
+"Set your preferred difficulty level for all puzzles" = "모든 퍼즐의 선호 난이도를 설정하세요";
+"You can still change difficulty when starting any puzzle" = "퍼즐 시작 시 언제든 난이도를 변경할 수 있습니다";

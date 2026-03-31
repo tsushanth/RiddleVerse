@@ -1,0 +1,11 @@
+{
+    "applinks": {
+        "apps": [],
+        "details": [
+            {
+                "appID": "7RS696YC75.KreativeKoala.riddlebot",
+                "paths": [ "/share-riddle*", "/open-riddle*" ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,386 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">在网格中找到隐藏的单词</string>
+    <string name="crossword_description">根据提示填写单词</string>
+    <string name="anagram_description">重新排列字母组成单词</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">游戏结束！</string>
+    <string name="points">分</string>
+    <string name="score_submitted">分数已提交！</string>
+    <string name="play_again">再玩一次</string>
+    <string name="try_harder_version">挑战更难版本</string>
+    <string name="try_hard_version">挑战困难版本</string>
+    <string name="try_very_hard_version">挑战超难版本</string>
+    <string name="try_expert_version">挑战专家版本</string>
+    <string name="customize">自定义</string>
+    <string name="get_coins">获取金币</string>
+    <string name="view_leaderboard">查看排行榜</string>
+    <string name="done">完成</string>
+    <string name="earn_coins_tip">每天玩谜题赚取金币！</string>
+    <string name="coins_label">金币</string>
+    <string name="no_games_yet">还没有游戏</string>
+    <string name="be_first_to_create">成为第一个创建和分享游戏的人！</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">最新</string>
+    <string name="most_played">最多人玩</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">推荐</string>
+    <string name="tab_categories">分类</string>
+    <string name="tab_games">游戏</string>
+    <string name="tab_puzzles">谜题</string>
+    <string name="tab_settings">设置</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">浏览</string>
+    <string name="subtab_your_puzzles">我的谜题</string>
+    <string name="subtab_featured">精选</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">喜欢RiddleVerse吗？</string>
+    <string name="rate_in_play_store">在Play商店给我们评分！</string>
+    <string name="help_us_improve">帮助我们改进！</string>
+    <string name="rate_experience">您对RiddleVerse的体验评分如何？</string>
+    <string name="rate_incentive">评分即可获得100金币+抢先体验！</string>
+    <string name="thanks_great_rating">感谢您的好评！能否在Play商店分享您的评价？</string>
+    <string name="share_detailed_feedback">您也可以先向我们提供详细反馈！</string>
+    <string name="sorry_bad_experience">很抱歉您的体验不佳。能告诉我们如何改进吗？</string>
+    <string name="continue_label">继续</string>
+    <string name="rate">评分</string>
+    <string name="rate_in_store">去商店评分</string>
+    <string name="give_feedback">反馈</string>
+    <string name="not_now">暂时不要</string>
+    <string name="maybe_later">以后再说</string>
+    <string name="feedback_first">先反馈</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">评分提醒</string>
+    <string name="when_remind_again">您希望何时再次提醒？</string>
+    <string name="remind_in_week">一周后提醒</string>
+    <string name="remind_in_month">一个月后提醒</string>
+    <string name="dont_ask_again">不再询问</string>
+    <string name="cancel">取消</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">告诉我们您喜欢什么！</string>
+    <string name="what_enjoy_most">您最喜欢RiddleVerse的什么？</string>
+    <string name="what_can_we_improve">我们如何改进？您的反馈帮助我们变得更好。</string>
+    <string name="your_feedback">您的反馈</string>
+    <string name="feedback_placeholder_positive">我喜欢丰富的谜题种类\u2026</string>
+    <string name="feedback_placeholder_negative">我希望应用能有\u2026</string>
+    <string name="submitted_successfully">提交成功！</string>
+    <string name="submission_failed">提交失败</string>
+    <string name="submit">提交</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">金币商店</string>
+    <string name="your_coins">您的金币</string>
+    <string name="coins_used_description">金币用于继续游戏和支持创作者。</string>
+    <string name="best_value">超值</string>
+    <string name="rate_for_early_access">评分获取抢先体验！</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">确定</string>
+    <string name="back">返回</string>
+    <string name="close">关闭</string>
+    <string name="start">开始</string>
+    <string name="next">下一步</string>
+
+    <!-- Game UI -->
+    <string name="correct">正确！</string>
+    <string name="wrong">错误！</string>
+    <string name="times_up">时间到！</string>
+    <string name="score_label">分数</string>
+    <string name="streak_label">连续</string>
+    <string name="level_label">等级</string>
+    <string name="hint">提示</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">还没有分数</string>
+    <string name="play_to_set_score">开始游戏，创造第一个高分！</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">早上好</string>
+    <string name="good_afternoon">下午好</string>
+    <string name="good_evening">晚上好</string>
+
+    <!-- Settings -->
+    <string name="premium_label">高级版</string>
+    <string name="unlimited_label">无限</string>
+    <string name="daily_rewards">每日奖励</string>
+    <string name="notifications">通知</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">出了点问题</string>
+    <string name="no_internet">无网络连接</string>
+    <string name="please_try_again">请重试</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">自定义此游戏</string>
+    <string name="what_would_you_change">您想修改什么？</string>
+    <string name="customizing_game">正在自定义游戏\u2026</string>
+
+    <!-- Language Picker -->
+    <string name="language">语言</string>
+    <string name="language_picker_title">选择语言</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">重试</string>
+    <string name="skip">跳过</string>
+    <string name="skip_puzzle">跳过谜题</string>
+    <string name="retry">重试</string>
+    <string name="share">分享</string>
+    <string name="share_puzzle">分享谜题</string>
+    <string name="play">开始</string>
+    <string name="edit">编辑</string>
+    <string name="create">创建</string>
+    <string name="explore">探索</string>
+    <string name="reset">重置</string>
+    <string name="reveal">揭示</string>
+    <string name="clear">清除</string>
+    <string name="clear_all">全部清除</string>
+    <string name="check">检查</string>
+    <string name="go_back">返回</string>
+    <string name="home">首页</string>
+    <string name="upgrade">升级</string>
+    <string name="manage">管理</string>
+    <string name="got_it">明白了！</string>
+    <string name="fix_it">修复</string>
+    <string name="just_close">直接关闭</string>
+    <string name="modify">修改</string>
+    <string name="load_more">加载更多</string>
+    <string name="loading">加载中\u2026</string>
+    <string name="save">保存</string>
+    <string name="yes">是</string>
+    <string name="yes_finish">是，结束</string>
+    <string name="yes_it_works">是，可以运行！</string>
+    <string name="no_it_has_issues">不，有问题</string>
+    <string name="finish_now">立即结束</string>
+    <string name="keep_playing">继续玩</string>
+    <string name="finish_early">提前结束</string>
+    <string name="give_up">放弃</string>
+    <string name="back_to_home">返回首页</string>
+    <string name="submit_answer">提交答案</string>
+    <string name="start_game">开始游戏</string>
+    <string name="start_puzzle">开始谜题</string>
+    <string name="start_challenge">开始挑战</string>
+    <string name="begin">开始</string>
+    <string name="im_ready">准备好了！</string>
+    <string name="im_done">完成了！</string>
+    <string name="skip_tutorial">跳过教程</string>
+    <string name="same">相同</string>
+    <string name="different">不同</string>
+    <string name="next_puzzle">下一个谜题</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">正在加载下一个谜题\u2026</string>
+    <string name="loading_puzzle">正在加载谜题\u2026</string>
+    <string name="generating">正在生成\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">快捷操作</string>
+    <string name="start_playing_instantly">立即开始游戏</string>
+    <string name="your_favorites">我的收藏</string>
+    <string name="trending_now">热门趋势</string>
+    <string name="recommended_for_you">为您推荐</string>
+    <string name="puzzle_collections">谜题合集</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">游戏错误</string>
+    <string name="quiz_categories">问答分类</string>
+    <string name="subscription">订阅</string>
+    <string name="current_tier">当前等级</string>
+    <string name="active_streaks">进行中的连续记录</string>
+    <string name="time_label">时间</string>
+    <string name="badges">徽章</string>
+    <string name="unable_to_load_progress">无法加载进度数据</string>
+    <string name="custom_puzzles">自定义谜题</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">玩家喜欢您的游戏时，您就能赚取金币！</string>
+    <string name="creator_revenue_share">您获得游戏中消耗金币的55%%</string>
+    <string name="coins_earned">已赚取金币</string>
+    <string name="plays_monetized">已变现次数</string>
+    <string name="per_game">每个游戏</string>
+    <string name="cash_out">提现</string>
+    <string name="cash_out_earnings">提现收益</string>
+    <string name="connect_stripe_to_receive">连接Stripe以接收付款</string>
+    <string name="connect_stripe_account">连接Stripe账户</string>
+    <string name="complete_stripe_setup">完成Stripe设置</string>
+    <string name="continue_setup">继续设置</string>
+    <string name="request_payout">申请付款</string>
+    <string name="payout_history">付款记录</string>
+    <string name="checking_eligibility">正在检查资格\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">创建游戏</string>
+    <string name="describe_game_prompt">描述任何游戏，AI将为您构建</string>
+    <string name="describe_game_placeholder">描述您的游戏\u2026</string>
+    <string name="generate_game">生成游戏</string>
+    <string name="free_generations_used_up">免费生成次数已用完</string>
+    <string name="buy_coins">购买金币</string>
+    <string name="subscribe_for_unlimited">订阅无限版</string>
+    <string name="get_unlimited_generations">无限生成+每月金币</string>
+    <string name="reference_image">参考图片</string>
+    <string name="try_these_ideas">试试这些创意</string>
+    <string name="game_title">游戏标题</string>
+    <string name="describe_your_version">描述您的版本</string>
+    <string name="create_game">创建游戏</string>
+    <string name="create_your_version">创建您的版本</string>
+    <string name="creating_your_game">正在创建您的游戏</string>
+    <string name="this_may_take_2_5_minutes">这可能需要2\u20135分钟\u2026</string>
+    <string name="notify_me_when_done">完成后通知我</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">社区游戏</string>
+    <string name="my_games">我的游戏</string>
+    <string name="draft">草稿</string>
+    <string name="generating_harder_challenge">正在生成更难的挑战</string>
+    <string name="did_this_game_work">这个游戏正常运行吗？</string>
+    <string name="whats_wrong">哪里有问题？</string>
+    <string name="modify_game">修改游戏</string>
+    <string name="game_name">游戏名称</string>
+    <string name="create_customized_game">创建自定义游戏</string>
+    <string name="original">原版</string>
+    <string name="sort_by">排序方式</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">此游戏可能存在问题</string>
+    <string name="game_saved">游戏已保存！</string>
+    <string name="game_ready">游戏准备就绪！</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">跳过等待！</string>
+    <string name="get_instant_generation">获取即时谜题生成</string>
+    <string name="wait_time">等待时间</string>
+    <string name="instant">即时</string>
+    <string name="premium_member">高级会员</string>
+    <string name="upgrade_now">立即升级</string>
+    <string name="upgrade_for_unlimited">升级为无限版</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">游戏设置</string>
+    <string name="difficulty_level">难度等级</string>
+    <string name="game_mode">游戏模式</string>
+    <string name="default_difficulty">默认难度</string>
+    <string name="checking">检查中\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">玩法说明：</string>
+    <string name="progress">进度</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">通过邮件发送</string>
+    <string name="copy_to_clipboard">复制到剪贴板</string>
+    <string name="puzzle_completed">谜题完成！</string>
+    <string name="achievement_unlocked">成就解锁！</string>
+    <string name="level_up">升级了！</string>
+    <string name="recipient_email">收件人邮箱</string>
+    <string name="recipient_name">收件人姓名</string>
+    <string name="copied_to_clipboard">已复制到剪贴板！</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">排行榜</string>
+    <string name="your_performance">您的表现</string>
+    <string name="other_top_players">其他顶尖玩家</string>
+    <string name="puzzle_statistics">谜题统计</string>
+    <string name="overview">概览</string>
+    <string name="detailed_statistics">详细统计</string>
+    <string name="records">记录</string>
+    <string name="no_players_yet">还没有玩家</string>
+    <string name="rank_label">排名</string>
+    <string name="percentile_label">百分位</string>
+    <string name="total_players">总玩家数</string>
+    <string name="avg_score">平均分</string>
+    <string name="fastest_time">最快时间</string>
+    <string name="highest_score">最高分</string>
+
+    <!-- Game State -->
+    <string name="game_complete">游戏完成！</string>
+    <string name="final_score">最终分数</string>
+    <string name="final_results">最终结果</string>
+    <string name="session_score">本次分数</string>
+    <string name="total_score">总分</string>
+    <string name="correct_answers">正确答案</string>
+    <string name="accuracy">准确率</string>
+    <string name="avg_time">平均时间</string>
+    <string name="puzzle_complete">谜题完成！</string>
+    <string name="difficulty_advanced">难度提升！</string>
+    <string name="continue_label_caps">继续</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">记忆方块</string>
+    <string name="get_ready">准备好！</string>
+    <string name="memorize_the_pattern">记住图案！</string>
+    <string name="click_squares_you_remember">点击你记住的方块！</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">文字含义和文字颜色一致吗？</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">玩法</string>
+    <string name="drop_here">拖放到此处</string>
+    <string name="completed">已完成</string>
+    <string name="time_used">用时</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">部分答案不正确</string>
+    <string name="all_hints">所有提示</string>
+
+    <!-- Word Search -->
+    <string name="found">已找到</string>
+    <string name="revealed">已揭示</string>
+    <string name="best_streak">最佳连续</string>
+    <string name="drag_to_find_words">滑动字母找到隐藏的单词</string>
+    <string name="find_these_words">找到这些单词：</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">达到金牌等级！</string>
+    <string name="bonus_words_found">奖励单词已找到：</string>
+    <string name="great_job">太棒了！</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">教程</string>
+    <string name="tutorial_mode">教程模式</string>
+    <string name="got_it_lets_play">明白了！开始玩吧</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">偏好主题</string>
+    <string name="popular_topics">热门主题</string>
+    <string name="add_custom_topic">添加自定义主题</string>
+    <string name="your_selected_topics">已选主题</string>
+    <string name="no_topics_selected">还未选择主题</string>
+    <string name="saving">保存中\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">表现分析</string>
+    <string name="performance_stats">表现统计</string>
+    <string name="daily_streak">每日连续</string>
+    <string name="lets_play">开始玩吧！</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">加载谜题出错</string>
+    <string name="no_hint_available">没有可用提示</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">按升序点击数字（从小到大）</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">国家地理挑战</string>
+</resources>

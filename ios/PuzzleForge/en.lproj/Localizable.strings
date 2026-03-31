@@ -1,0 +1,737 @@
+/* Localizable.strings (English - Base)
+   PuzzleForge / RiddleVerse
+   Comprehensive internationalization strings */
+
+// MARK: - Common / Shared
+"OK" = "OK";
+"Cancel" = "Cancel";
+"Done" = "Done";
+"Back" = "Back";
+"Next" = "Next";
+"Skip" = "Skip";
+"Close" = "Close";
+"Continue" = "Continue";
+"Submit" = "Submit";
+"Retry" = "Retry";
+"Exit" = "Exit";
+"Share" = "Share";
+"Reset" = "Reset";
+"Clear" = "Clear";
+"Error" = "Error";
+"Loading..." = "Loading...";
+"YES" = "YES";
+"NO" = "NO";
+"NEW" = "NEW";
+"Play" = "Play";
+"Edit" = "Edit";
+"Hint" = "Hint";
+"Show" = "Show";
+"Begin" = "Begin";
+"Modify" = "Modify";
+"CONTINUE" = "CONTINUE";
+"SUBMIT" = "SUBMIT";
+"CLEAR" = "CLEAR";
+"REVEAL" = "REVEAL";
+"START" = "START";
+
+// MARK: - Home View
+"Score: %@" = "Score: %@";
+"Settings" = "Settings";
+"Profile" = "Profile";
+"Account" = "Account";
+"Sign In" = "Sign In";
+"Sign Out" = "Sign Out";
+"Sign Up" = "Sign Up";
+"Create Account" = "Create Account";
+"Notification Settings" = "Notification Settings";
+"Custom Puzzles" = "Custom Puzzles";
+"Quick Actions" = "Quick Actions";
+"Popular Categories" = "Popular Categories";
+"Tap any to start earning points!" = "Tap any to start earning points!";
+"Random" = "Random";
+"Surprise me!" = "Surprise me!";
+"Loading puzzle..." = "Loading puzzle...";
+"Loading personalized puzzles..." = "Loading personalized puzzles...";
+"Puzzles Loading" = "Puzzles Loading";
+"We're fetching your personalized puzzles. This usually takes just a few moments." = "We're fetching your personalized puzzles. This usually takes just a few moments.";
+"We're fetching your puzzles from our servers. This usually takes just a few moments." = "We're fetching your puzzles from our servers. This usually takes just a few moments.";
+"No puzzle selected" = "No puzzle selected";
+"Filter Categories" = "Filter Categories";
+"No Categories" = "No Categories";
+"Adjust your filter to see more categories." = "Adjust your filter to see more categories.";
+"Featured Custom Puzzles" = "Featured Custom Puzzles";
+"Debug & Testing" = "Debug & Testing";
+"Test Notifications" = "Test Notifications";
+
+// MARK: - Update Dialog
+"Version %@" = "Version %@";
+"What's New:" = "What's New:";
+"Update Now" = "Update Now";
+"Later" = "Later";
+
+// MARK: - Content Moderation
+"Puzzle Name:" = "Puzzle Name:";
+"Creator:" = "Creator:";
+"Format:" = "Format:";
+"What happened?" = "What happened?";
+"This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly." = "This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly.";
+
+// MARK: - Profile & Creator
+"By %@" = "By %@";
+"Creator Earnings" = "Creator Earnings";
+"Coins Earned" = "Coins Earned";
+"Plays Monetized" = "Plays Monetized";
+"Per Game" = "Per Game";
+"Cash Out Earnings" = "Cash Out Earnings";
+"Earn coins when players enjoy your games!" = "Earn coins when players enjoy your games!";
+"You get 55% of coins spent on your games. Tap to view payouts." = "You get 55% of coins spent on your games. Tap to view payouts.";
+"Checking eligibility..." = "Checking eligibility...";
+"coins available" = "coins available";
+
+// MARK: - Stripe / Payouts
+"Cash Out" = "Cash Out";
+"Connect Stripe to receive payouts" = "Connect Stripe to receive payouts";
+"Set up your Stripe account to cash out your earned coins as real money." = "Set up your Stripe account to cash out your earned coins as real money.";
+"Connect Stripe Account" = "Connect Stripe Account";
+"Complete Stripe Setup" = "Complete Stripe Setup";
+"Your Stripe account setup is incomplete. Tap below to finish." = "Your Stripe account setup is incomplete. Tap below to finish.";
+"Continue Setup" = "Continue Setup";
+"Request Payout" = "Request Payout";
+"Payout History" = "Payout History";
+
+// MARK: - App Features & Account
+"App Features" = "App Features";
+"Account Management" = "Account Management";
+"Delete Account" = "Delete Account";
+"This will permanently delete your account and all associated data. This action cannot be undone." = "This will permanently delete your account and all associated data. This action cannot be undone.";
+
+// MARK: - Sign In
+"Sign In Required" = "Sign In Required";
+"Sign in to access leaderboards, track your progress, and save your scores." = "Sign in to access leaderboards, track your progress, and save your scores.";
+"Sign in to track progress and scores" = "Sign in to track progress and scores";
+"Sign in with Google" = "Sign in with Google";
+"Enable Notifications?" = "Enable Notifications?";
+"Yes, Notify Me" = "Yes, Notify Me";
+"Not Now" = "Not Now";
+"Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge." = "Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge.";
+"Daily Puzzle Notifications" = "Daily Puzzle Notifications";
+"Notification Status:" = "Notification Status:";
+"Enabled" = "Enabled";
+"Not enabled" = "Not enabled";
+
+// MARK: - Onboarding
+"Train Your Brain Daily" = "Train Your Brain Daily";
+"Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills" = "Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills";
+"Track Your Progress" = "Track Your Progress";
+"Level up, earn badges, and see your improvement over time with detailed analytics" = "Level up, earn badges, and see your improvement over time with detailed analytics";
+"Compete & Achieve" = "Compete & Achieve";
+"Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type" = "Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type";
+"Ready to Start?" = "Ready to Start?";
+"Join thousands of puzzle enthusiasts and start your brain training journey today!" = "Join thousands of puzzle enthusiasts and start your brain training journey today!";
+"Let's Get Started!" = "Let's Get Started!";
+"Free to play \u{2022} No ads during puzzles" = "Free to play \u{2022} No ads during puzzles";
+"Level 5" = "Level 5";
+
+// MARK: - Start Puzzle View
+"Take a quick interactive tutorial to get started!" = "Take a quick interactive tutorial to get started!";
+"Start Tutorial" = "Start Tutorial";
+"Reset Tutorial" = "Reset Tutorial";
+"Dismiss" = "Dismiss";
+"Loading your stats..." = "Loading your stats...";
+"TOP SCORES" = "TOP SCORES";
+"BENEFITS" = "BENEFITS";
+"Game Settings" = "Game Settings";
+"Difficulty Level" = "Difficulty Level";
+"Game Mode" = "Game Mode";
+"Number of Puzzles" = "Number of Puzzles";
+"Start Playing" = "Start Playing";
+"Create Your Version" = "Create Your Version";
+"Earn coins" = "Earn coins";
+"Back to Home" = "Back to Home";
+
+// MARK: - Difficulty
+"DIFFICULTY PROGRESSION" = "DIFFICULTY PROGRESSION";
+"Current Level" = "Current Level";
+"Progress" = "Progress";
+"Next:" = "Next:";
+"CURRENT LEVEL DETAILS" = "CURRENT LEVEL DETAILS";
+"Default Difficulty" = "Default Difficulty";
+"Set your preferred difficulty level for all puzzles" = "Set your preferred difficulty level for all puzzles";
+"You can still change difficulty when starting any puzzle" = "You can still change difficulty when starting any puzzle";
+"Difficulty Adapted!" = "Difficulty Adapted!";
+"Difficulty Adjusted" = "Difficulty Adjusted";
+"DIFFICULTY" = "DIFFICULTY";
+
+// MARK: - Puzzle Completion
+"Puzzle Set Complete!" = "Puzzle Set Complete!";
+"Share Achievement" = "Share Achievement";
+"Remix & earn real money when others play" = "Remix & earn real money when others play";
+"Return Home" = "Return Home";
+"No More Puzzles Available" = "No More Puzzles Available";
+"Generate new puzzles to continue playing." = "Generate new puzzles to continue playing.";
+"Generate New Puzzles" = "Generate New Puzzles";
+"Generating New Puzzles" = "Generating New Puzzles";
+"This usually takes 30-60 seconds..." = "This usually takes 30-60 seconds...";
+"Home" = "Home";
+"Try These Next" = "Try These Next";
+"TOP 5 SCORES" = "TOP 5 SCORES";
+
+// MARK: - Session/Score Feedback
+"Session Complete!" = "Session Complete!";
+"Final Score:" = "Final Score:";
+"Accuracy:" = "Accuracy:";
+"Best Streak:" = "Best Streak:";
+"Your answer: %@" = "Your answer: %@";
+"Correct answer: %@" = "Correct answer: %@";
+"Updating score..." = "Updating score...";
+"Tap to continue" = "Tap to continue";
+"Keep trying! You've got this! \u{1F4AA}" = "Keep trying! You've got this! \u{1F4AA}";
+"LEVEL UP!" = "LEVEL UP!";
+"Level %@ \u{2192} %@" = "Level %@ \u{2192} %@";
+"Score submitted!" = "Score submitted!";
+
+// MARK: - Leaderboard
+"Leaderboard" = "Leaderboard";
+"View Leaderboard" = "View Leaderboard";
+"Rank #%@" = "Rank #%@";
+"Your rank: #%@" = "Your rank: #%@";
+"No scores yet" = "No scores yet";
+"Play the game to set the first high score!" = "Play the game to set the first high score!";
+
+// MARK: - Subscription & Limits
+"Upgrade to Premium" = "Upgrade to Premium";
+"Running Low on Puzzles!" = "Running Low on Puzzles!";
+"Generation Limit Reached" = "Generation Limit Reached";
+"Maybe Later" = "Maybe Later";
+"Upgrade" = "Upgrade";
+"IS ANNUALLY:" = "IS ANNUALLY:";
+"A YEAR" = "A YEAR";
+
+// MARK: - Coins / Store
+"Your Coins" = "Your Coins";
+"Coins added!" = "Coins added!";
+"Coins are used to continue games and support creators." = "Coins are used to continue games and support creators.";
+"Best Value" = "Best Value";
+"Get Coins" = "Get Coins";
+"Coin Store" = "Coin Store";
+"Buy Coins" = "Buy Coins";
+"points" = "points";
+
+// MARK: - Game Play
+"Game Over!" = "Game Over!";
+"Play Again" = "Play Again";
+"Customize" = "Customize";
+"Customizing Game" = "Customizing Game";
+"This may take 2-5 minutes..." = "This may take 2-5 minutes...";
+"Fixing game..." = "Fixing game...";
+"This may take a couple minutes..." = "This may take a couple minutes...";
+"Did this game work?" = "Did this game work?";
+"Yes, it works!" = "Yes, it works!";
+"No, it has issues" = "No, it has issues";
+"What's wrong?" = "What's wrong?";
+"Fix It" = "Fix It";
+"Brief description \u{2014} even a couple words helps" = "Brief description \u{2014} even a couple words helps";
+"Customize This Game" = "Customize This Game";
+"Create Customized Game" = "Create Customized Game";
+"Game Name" = "Game Name";
+"What would you like to change?" = "What would you like to change?";
+"Describe what you'd like to change. A new game will be created under your name." = "Describe what you'd like to change. A new game will be created under your name.";
+"Lv.%@" = "Lv.%@";
+
+// MARK: - Game Browse
+"Community Games" = "Community Games";
+"My Games" = "My Games";
+"No games yet" = "No games yet";
+"Be the first to create and share a game!" = "Be the first to create and share a game!";
+"Load More" = "Load More";
+"Draft" = "Draft";
+"by %@" = "by %@";
+"Newest" = "Newest";
+"Most Played" = "Most Played";
+
+// MARK: - Game Remix
+"Create your version" = "Create your version";
+"Create & Earn Real Money" = "Create & Earn Real Money";
+"Earn coins when others play \u{2014} cash out via Stripe!" = "Earn coins when others play \u{2014} cash out via Stripe!";
+"You earn 55% of every coin spent on your game" = "You earn 55% of every coin spent on your game";
+"Game Title" = "Game Title";
+"Describe Your Version" = "Describe Your Version";
+"Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules..." = "Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules...";
+"Reference image" = "Reference image";
+"AI will use this as visual context" = "AI will use this as visual context";
+"Quick Ideas" = "Quick Ideas";
+"Create Game" = "Create Game";
+"Creating Your Game" = "Creating Your Game";
+"Notify Me When Done" = "Notify Me When Done";
+"You can leave this screen \u{2014} we'll notify you!" = "You can leave this screen \u{2014} we'll notify you!";
+"Your game will appear in Explore > Custom Games" = "Your game will appear in Explore > Custom Games";
+"Free Generations Used Up" = "Free Generations Used Up";
+"Subscribe for Unlimited" = "Subscribe for Unlimited";
+"Get unlimited generations + monthly coins" = "Get unlimited generations + monthly coins";
+"Game Ready!" = "Game Ready!";
+"Tap to preview \u{2014} also in Explore > Custom Games" = "Tap to preview \u{2014} also in Explore > Custom Games";
+
+// MARK: - Game Preview
+"This game may have issues" = "This game may have issues";
+"Modifying game..." = "Modifying game...";
+"Game saved!" = "Game saved!";
+"You'll earn coins when others play!" = "You'll earn coins when others play!";
+"Describe what's wrong or what to change:" = "Describe what's wrong or what to change:";
+"Modify Game" = "Modify Game";
+
+// MARK: - Game Tweak
+"Loading version history..." = "Loading version history...";
+"No version history yet" = "No version history yet";
+"Describe your change below to start editing your game" = "Describe your change below to start editing your game";
+"Applying Edit" = "Applying Edit";
+"This may take a minute..." = "This may take a minute...";
+"Original" = "Original";
+
+// MARK: - Create Puzzle
+"Create Custom Puzzle" = "Create Custom Puzzle";
+"Generate personalized puzzles on any topic you love!" = "Generate personalized puzzles on any topic you love!";
+"Puzzle Topic" = "Puzzle Topic";
+"Popular Topics" = "Popular Topics";
+"Puzzle Format" = "Puzzle Format";
+"Creating Magic..." = "Creating Magic...";
+"Generate Puzzle" = "Generate Puzzle";
+"puzzles" = "puzzles";
+"\u{1F389} Puzzle Creation Started!" = "\u{1F389} Puzzle Creation Started!";
+"Your custom puzzle set is being generated! Check back in a few minutes to see your creation." = "Your custom puzzle set is being generated! Check back in a few minutes to see your creation.";
+
+// MARK: - Daily Puzzles
+"Daily Puzzles" = "Daily Puzzles";
+"New Daily Puzzles!" = "New Daily Puzzles!";
+"Your daily puzzles are ready!" = "Your daily puzzles are ready!";
+"Topics Saved!" = "Topics Saved!";
+"Let's Go!" = "Let's Go!";
+"Topics" = "Topics";
+"Refresh" = "Refresh";
+"Choose Your Daily Puzzle Topics" = "Choose Your Daily Puzzle Topics";
+"Select topics you're interested in. We'll generate daily puzzles for each topic." = "Select topics you're interested in. We'll generate daily puzzles for each topic.";
+"Welcome to Daily Puzzles!" = "Welcome to Daily Puzzles!";
+"Choose your favorite topics and we'll generate personalized daily puzzles just for you." = "Choose your favorite topics and we'll generate personalized daily puzzles just for you.";
+"Choose Topics" = "Choose Topics";
+"Oops!" = "Oops!";
+"Try Again" = "Try Again";
+"Solve Puzzle" = "Solve Puzzle";
+"Show Answer" = "Show Answer";
+
+// MARK: - Daily Streak
+"Daily Streak Stats" = "Daily Streak Stats";
+"Current Streak" = "Current Streak";
+"Total Coins" = "Total Coins";
+"Days Played" = "Days Played";
+"Best Streak" = "Best Streak";
+"To Milestone" = "To Milestone";
+"day" = "day";
+"days" = "days";
+"Let's Play! \u{1F3AE}" = "Let's Play! \u{1F3AE}";
+
+// MARK: - Achievement Dashboard
+"Progress Dashboard" = "Progress Dashboard";
+"Next Tier Rewards:" = "Next Tier Rewards:";
+"Rewards:" = "Rewards:";
+"Complete some puzzles to see your performance stats!" = "Complete some puzzles to see your performance stats!";
+"Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!" = "Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!";
+"Achievements" = "Achievements";
+
+// MARK: - Preferred Topics
+"Preferred Topics" = "Preferred Topics";
+"Available Topics" = "Available Topics";
+"Your Preferred Topics" = "Your Preferred Topics";
+"Search Custom Puzzles" = "Search Custom Puzzles";
+
+// MARK: - Notification Settings
+"Notifications" = "Notifications";
+"Notification Permissions" = "Notification Permissions";
+"Push Notifications" = "Push Notifications";
+"Daily Puzzle Alerts" = "Daily Puzzle Alerts";
+"Get notified when your daily puzzles are ready" = "Get notified when your daily puzzles are ready";
+"FCM Token Status" = "FCM Token Status";
+"Notification Test" = "Notification Test";
+"Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time." = "Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time.";
+
+// MARK: - Social Sharing
+"Share Your Success!" = "Share Your Success!";
+"Share Puzzle" = "Share Puzzle";
+"Recipient Email" = "Recipient Email";
+"Recipient Name" = "Recipient Name";
+
+// MARK: - Puzzle UI Components
+"Level %@" = "Level %@";
+"Quick Stats" = "Quick Stats";
+
+// MARK: - Difficulty Manager HUD
+"LEVEL %@" = "LEVEL %@";
+"TIME" = "TIME";
+"SCORE" = "SCORE";
+"RANK" = "RANK";
+"LIVES" = "LIVES";
+
+// MARK: - Multiple Choice
+"Exit Puzzle" = "Exit Puzzle";
+"Are you sure you want to exit? Your progress will be lost." = "Are you sure you want to exit? Your progress will be lost.";
+"Question %@/%@" = "Question %@/%@";
+"Got it!" = "Got it!";
+
+// MARK: - Q&A Puzzle
+"All Puzzles Completed!" = "All Puzzles Completed!";
+"Back to Home" = "Back to Home";
+
+// MARK: - Crossword
+"All Hints" = "All Hints";
+"Puzzle solved in %@" = "Puzzle solved in %@";
+"Next Puzzle" = "Next Puzzle";
+"Some answers are incorrect" = "Some answers are incorrect";
+"Try again or use the REVEAL button to fix incorrect answers." = "Try again or use the REVEAL button to fix incorrect answers.";
+"Try Again" = "Try Again";
+
+// MARK: - Word Search
+"Tips" = "Tips";
+"Word Search Help" = "Word Search Help";
+
+// MARK: - Word Snake
+"Find these snake words:" = "Find these snake words:";
+"Clear Word" = "Clear Word";
+"Loading Word Snake puzzle..." = "Loading Word Snake puzzle...";
+"Word Snake Hints" = "Word Snake Hints";
+"Clear Found Word?" = "Clear Found Word?";
+"Completed" = "Completed";
+"Found" = "Found";
+"Shown" = "Shown";
+"Avg/Word" = "Avg/Word";
+"Performance:" = "Performance:";
+
+// MARK: - Anagram
+"Skip" = "Skip";
+
+// MARK: - Synonym
+"Group the synonyms! Tap the set that matches the word above." = "Group the synonyms! Tap the set that matches the word above.";
+
+// MARK: - Antonym
+"Tap balloons to match opposite words" = "Tap balloons to match opposite words";
+
+// MARK: - Crypto Puzzle
+"Game Over" = "Game Over";
+"How to Play" = "How to Play";
+"You've run out of hearts! Crypto puzzles take practice." = "You've run out of hearts! Crypto puzzles take practice.";
+"Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'." = "Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'.";
+"Unable to load adaptive crypto puzzle" = "Unable to load adaptive crypto puzzle";
+"Adaptive Crypto Puzzle" = "Adaptive Crypto Puzzle";
+"Adaptive Crypto Solved!" = "Adaptive Crypto Solved!";
+"Hidden Message:" = "Hidden Message:";
+"Time Used" = "Time Used";
+"Difficulty" = "Difficulty";
+"Continue Adaptive Journey" = "Continue Adaptive Journey";
+"\u{1F4A1} Adaptive Hint" = "\u{1F4A1} Adaptive Hint";
+"Unable to load tutorial puzzle" = "Unable to load tutorial puzzle";
+"Try again!" = "Try again!";
+
+// MARK: - Letter Set
+"No words found yet" = "No words found yet";
+"Finish Early?" = "Finish Early?";
+"Invalid Word" = "Invalid Word";
+
+// MARK: - Number Sequence
+"Adaptive Number Sequence" = "Adaptive Number Sequence";
+"Tap numbers in ascending order\n(smallest to largest)" = "Tap numbers in ascending order\n(smallest to largest)";
+"START ADAPTIVE CHALLENGE" = "START ADAPTIVE CHALLENGE";
+"Adaptive Challenge Complete!" = "Adaptive Challenge Complete!";
+"Round %@" = "Round %@";
+
+// MARK: - Number Sum
+"Adaptive Number Sum" = "Adaptive Number Sum";
+"Select numbers that add up\nto the target sum" = "Select numbers that add up\nto the target sum";
+"Target" = "Target";
+
+// MARK: - Math Expression
+"Which value is greater?" = "Which value is greater?";
+"EQUAL" = "EQUAL";
+"Loading math problems..." = "Loading math problems...";
+"Math Challenge Adapted!" = "Math Challenge Adapted!";
+
+// MARK: - Math Crossword
+"Select a number:" = "Select a number:";
+"Complete the math equations by placing the missing numbers" = "Complete the math equations by placing the missing numbers";
+"Game Result" = "Game Result";
+"Result" = "Result";
+
+// MARK: - Math Difference
+"FIND THE DIFFERENCE" = "FIND THE DIFFERENCE";
+"Enter the difference between these numbers" = "Enter the difference between these numbers";
+
+// MARK: - Estimation
+"Error loading estimation data" = "Error loading estimation data";
+"drag finger to estimate sum" = "drag finger to estimate sum";
+
+// MARK: - Price Ordering
+"CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE" = "CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE";
+"OFF" = "OFF";
+
+// MARK: - Conversion Puzzle
+"Drag blocks to compare their values" = "Drag blocks to compare their values";
+"Higher position = Greater value" = "Higher position = Greater value";
+
+// MARK: - Percentage / Tip
+"TAP THE CORRECT TIP" = "TAP THE CORRECT TIP";
+"Tap the bubble with the correct tip amount!" = "Tap the bubble with the correct tip amount!";
+"Bill Amount" = "Bill Amount";
+"Puzzle Completed!" = "Puzzle Completed!";
+
+// MARK: - Subscription Puzzle
+"Hint: %@" = "Hint: %@";
+
+// MARK: - Image Puzzle
+"Loading Image Puzzle..." = "Loading Image Puzzle...";
+"Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan" = "Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan";
+"START ADAPTIVE PUZZLE" = "START ADAPTIVE PUZZLE";
+"How to Play:" = "How to Play:";
+"Original Image" = "Original Image";
+"Double-tap to rotate" = "Double-tap to rotate";
+"Long press a piece to drag it to the grid" = "Long press a piece to drag it to the grid";
+"Puzzle Adapted!" = "Puzzle Adapted!";
+"Score" = "Score";
+"Drop" = "Drop";
+"Here" = "Here";
+
+// MARK: - Image Questions
+"Image Questions" = "Image Questions";
+"Memorize the image!" = "Memorize the image!";
+"Complete!" = "Complete!";
+"Loading image..." = "Loading image...";
+"Countdown will start when ready" = "Countdown will start when ready";
+"Study this image carefully!" = "Study this image carefully!";
+"Image Hidden" = "Image Hidden";
+"Reveal Image" = "Reveal Image";
+"LOCATION" = "LOCATION";
+"Your answer:" = "Your answer:";
+"Correct answer:" = "Correct answer:";
+"Next time, try to rely more on your memory!" = "Next time, try to rely more on your memory!";
+
+// MARK: - Image Vortex
+"Find the NEW image" = "Find the NEW image";
+
+// MARK: - Progressive Reveal
+"Progressive Reveal" = "Progressive Reveal";
+"Mystery Image" = "Mystery Image";
+"Your Answer:" = "Your Answer:";
+"Next Clue" = "Next Clue";
+"Reveal" = "Reveal";
+"Congratulations!" = "Congratulations!";
+
+// MARK: - Odd One Out
+"Look at the images carefully and find the one that doesn't belong with the others." = "Look at the images carefully and find the one that doesn't belong with the others.";
+"Which one doesn't belong?" = "Which one doesn't belong?";
+"How It Works" = "How It Works";
+"Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!" = "Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!";
+"Start Challenge" = "Start Challenge";
+"Continue to Next Puzzle" = "Continue to Next Puzzle";
+
+// MARK: - Which Is Real
+"Why This Matters" = "Why This Matters";
+"In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking." = "In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking.";
+"Which image is AI-generated?" = "Which image is AI-generated?";
+"Look for real photos:" = "Look for real photos:";
+"AI tells:" = "AI tells:";
+"Learn from Community Insights" = "Learn from Community Insights";
+"Help others learn! Why did you think this was the AI image?" = "Help others learn! Why did you think this was the AI image?";
+"Submit (+20% bonus)" = "Submit (+20% bonus)";
+"Learn from others who identified the AI image correctly:" = "Learn from others who identified the AI image correctly:";
+
+// MARK: - Find Object / Waldo
+"Hidden Objects" = "Hidden Objects";
+"Failed to load image" = "Failed to load image";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them" = "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision" = "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision";
+"Natural Discovery" = "Natural Discovery";
+"Objects to Find" = "Objects to Find";
+"These objects were naturally discovered by AI vision in the scene" = "These objects were naturally discovered by AI vision in the scene";
+"Show Hint" = "Show Hint";
+"ENHANCED WALDO" = "ENHANCED WALDO";
+
+// MARK: - Geography
+"Geography Cities Challenge" = "Geography Cities Challenge";
+"Place cities in their correct locations on the world map" = "Place cities in their correct locations on the world map";
+"START CHALLENGE" = "START CHALLENGE";
+"Exact location!" = "Exact location!";
+"Geography Challenge Complete!" = "Geography Challenge Complete!";
+"Final Score" = "Final Score";
+"Geography Countries Challenge" = "Geography Countries Challenge";
+"Place countries in their correct locations on the world map" = "Place countries in their correct locations on the world map";
+"Tap on a continent" = "Tap on a continent";
+"Or tap a continent name:" = "Or tap a continent name:";
+"Country spans" = "Country spans";
+"You selected" = "You selected";
+"Landlocked" = "Landlocked";
+"Very Close!" = "Very Close!";
+"Great geographical knowledge!" = "Great geographical knowledge!";
+"Skip Tutorial" = "Skip Tutorial";
+
+// MARK: - Memory Puzzles
+"Remember this symbol" = "Remember this symbol";
+"NEXT" = "NEXT";
+"Memory Pairs" = "Memory Pairs";
+"Memory Pair Challenge" = "Memory Pair Challenge";
+"Does this pattern match the\nprevious pattern?" = "Does this pattern match the\nprevious pattern?";
+"Memory Challenge Complete!" = "Memory Challenge Complete!";
+"Final Results" = "Final Results";
+"Session Score" = "Session Score";
+"Total Score" = "Total Score";
+"Correct Answers" = "Correct Answers";
+"Accuracy" = "Accuracy";
+"Example Pattern" = "Example Pattern";
+"Red dot at bottom-left" = "Red dot at bottom-left";
+"START GAME" = "START GAME";
+
+// MARK: - Memory Story
+"Error loading Memory Story puzzle" = "Error loading Memory Story puzzle";
+"THIS GAME REQUIRES AUDIO" = "THIS GAME REQUIRES AUDIO";
+"MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY" = "MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY";
+
+// MARK: - Memory Sequencing
+"LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS" = "LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS";
+"DRAG TO REORDER" = "DRAG TO REORDER";
+"PART TWO OF TWO" = "PART TWO OF TWO";
+"Continue to Part Two" = "Continue to Part Two";
+
+// MARK: - Memory Retention
+"Audio Error" = "Audio Error";
+"Try Again" = "Try Again";
+"Continue Without Audio" = "Continue Without Audio";
+
+// MARK: - Memory Squares
+"Clear" = "Clear";
+
+// MARK: - Context Switch
+"Excellent!" = "Excellent!";
+"Not quite" = "Not quite";
+"Working Memory" = "Working Memory";
+"Executive Load" = "Executive Load";
+"Dual Task" = "Dual Task";
+"Attention" = "Attention";
+"Time Pressure" = "Time Pressure";
+"Context Switch Adapted!" = "Context Switch Adapted!";
+"Study these items" = "Study these items";
+"I'm Ready!" = "I'm Ready!";
+"Alphabetization Task" = "Alphabetization Task";
+"Drag to reorder alphabetically:" = "Drag to reorder alphabetically:";
+"Continue \u{2192}" = "Continue \u{2192}";
+"Recognition Test" = "Recognition Test";
+"Select all items from the original list" = "Select all items from the original list";
+"Items are arranged to test attention control" = "Items are arranged to test attention control";
+"Submit Answer \u{2713}" = "Submit Answer \u{2713}";
+
+// MARK: - Color Text Matching
+"Adaptive Color-Text Matching" = "Adaptive Color-Text Matching";
+"Compare the color name meaning with the actual text color and decide if they match." = "Compare the color name meaning with the actual text color and decide if they match.";
+"Adaptive Example" = "Adaptive Example";
+"Answer: YES (both are blue)" = "Answer: YES (both are blue)";
+"Does the meaning match the text color?" = "Does the meaning match the text color?";
+"Color Challenge Adapted!" = "Color Challenge Adapted!";
+"meaning" = "meaning";
+"text color" = "text color";
+"Avg Time" = "Avg Time";
+"Streak" = "Streak";
+"START ADAPTIVE CHALLENGE" = "START ADAPTIVE CHALLENGE";
+
+// MARK: - Color Shape Matching
+"Visual Challenge Adapted!" = "Visual Challenge Adapted!";
+"Does the text meaning match the shape color?" = "Does the text meaning match the shape color?";
+
+// MARK: - Dual Card
+"Adaptive Dual-Task Complete!" = "Adaptive Dual-Task Complete!";
+"Switching pattern: %@" = "Switching pattern: %@";
+
+// MARK: - Symbol Swipe
+"When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT" = "When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT";
+"SWIPE RIGHT \u{2192}" = "SWIPE RIGHT \u{2192}";
+"LEFT" = "LEFT";
+"RIGHT" = "RIGHT";
+
+// MARK: - Unique Object
+"STREAK" = "STREAK";
+"Loading puzzle..." = "Loading puzzle...";
+
+// MARK: - Flow Puzzle
+"Clear All" = "Clear All";
+"Give Up" = "Give Up";
+"Solution Shown" = "Solution Shown";
+"Moving to next puzzle..." = "Moving to next puzzle...";
+"Path Conflict!" = "Path Conflict!";
+
+// MARK: - Pinball Deflector
+"Pinball Deflector" = "Pinball Deflector";
+"Challenge Complete" = "Challenge Complete";
+"Memorize deflector positions" = "Memorize deflector positions";
+"Predict where the ball will exit" = "Predict where the ball will exit";
+"Continue Challenge" = "Continue Challenge";
+
+// MARK: - Swipe Word
+"Next Puzzle" = "Next Puzzle";
+"Back to Home" = "Back to Home";
+
+// MARK: - Limit Reached
+"Running Low on Puzzles!" = "Running Low on Puzzles!";
+"Generation Limit Reached" = "Generation Limit Reached";
+"Maybe Later" = "Maybe Later";
+"Upgrade to Premium" = "Upgrade to Premium";
+
+// MARK: - Regeneration Limit
+"Upgrade to Premium" = "Upgrade to Premium";
+
+// MARK: - Puzzle Limit Network
+"Checking Puzzle Availability" = "Checking Puzzle Availability";
+
+// MARK: - Music Puzzle
+"TUTORIAL" = "TUTORIAL";
+"MUSIC MATCH" = "MUSIC MATCH";
+"Loading music puzzle..." = "Loading music puzzle...";
+"Tap to expand..." = "Tap to expand...";
+"Music Match Tutorial" = "Music Match Tutorial";
+
+// MARK: - Quiz Card
+"Start Quiz" = "Start Quiz";
+
+// MARK: - Tutorial Views
+"How to Play" = "How to Play";
+"Got it! Let's Play" = "Got it! Let's Play";
+"Skip Tutorial" = "Skip Tutorial";
+
+// MARK: - Group Completion
+"Puzzle Collections" = "Puzzle Collections";
+"Each type has 5 puzzles" = "Each type has 5 puzzles";
+"How it works:" = "How it works:";
+"Each puzzle type contains 5 challenges" = "Each puzzle type contains 5 challenges";
+"Complete all 5 to unlock the next puzzle type" = "Complete all 5 to unlock the next puzzle type";
+"Try different types to discover your favorites!" = "Try different types to discover your favorites!";
+"Group Completed!" = "Group Completed!";
+"Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?" = "Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?";
+
+// MARK: - Word Prefix
+"\u{1F4A1} Hint" = "\u{1F4A1} Hint";
+
+// MARK: - Notification Debug
+"Current Status" = "Current Status";
+"Token Preview:" = "Token Preview:";
+"Quick Tests" = "Quick Tests";
+"Test User Email" = "Test User Email";
+"Test Results" = "Test Results";
+"No tests run yet" = "No tests run yet";
+"Advanced Tests" = "Advanced Tests";
+"Running tests..." = "Running tests...";
+"Notification Tests" = "Notification Tests";
+"1. Request Permission" = "1. Request Permission";
+"2. Get FCM Token" = "2. Get FCM Token";
+"3. Register with Server" = "3. Register with Server";
+"4. Send Test Notification" = "4. Send Test Notification";
+"5. Schedule Local Test" = "5. Schedule Local Test";
+"Use Current" = "Use Current";
+"Clear Results" = "Clear Results";
+"Run Full Test Suite" = "Run Full Test Suite";
+
+// MARK: - Difficulty Settings
+"Default Difficulty" = "Default Difficulty";
+"Set your preferred difficulty level for all puzzles" = "Set your preferred difficulty level for all puzzles";
+"You can still change difficulty when starting any puzzle" = "You can still change difficulty when starting any puzzle";

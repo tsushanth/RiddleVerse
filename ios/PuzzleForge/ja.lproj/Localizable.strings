@@ -1,0 +1,726 @@
+/* Localizable.strings (Japanese)
+   PuzzleForge / RiddleVerse */
+
+// MARK: - Common / Shared
+"OK" = "OK";
+"Cancel" = "キャンセル";
+"Done" = "完了";
+"Back" = "戻る";
+"Next" = "次へ";
+"Skip" = "スキップ";
+"Close" = "閉じる";
+"Continue" = "続ける";
+"Submit" = "送信";
+"Retry" = "再試行";
+"Exit" = "終了";
+"Share" = "共有";
+"Reset" = "リセット";
+"Clear" = "クリア";
+"Error" = "エラー";
+"Loading..." = "読み込み中...";
+"YES" = "はい";
+"NO" = "いいえ";
+"NEW" = "新着";
+"Play" = "プレイ";
+"Edit" = "編集";
+"Hint" = "ヒント";
+"Show" = "表示";
+"Begin" = "開始";
+"Modify" = "変更";
+"CONTINUE" = "続ける";
+"SUBMIT" = "送信";
+"CLEAR" = "クリア";
+"REVEAL" = "公開";
+"START" = "スタート";
+
+// MARK: - Home View
+"Score: %@" = "スコア: %@";
+"Settings" = "設定";
+"Profile" = "プロフィール";
+"Account" = "アカウント";
+"Sign In" = "サインイン";
+"Sign Out" = "サインアウト";
+"Sign Up" = "新規登録";
+"Create Account" = "アカウント作成";
+"Notification Settings" = "通知設定";
+"Custom Puzzles" = "カスタムパズル";
+"Quick Actions" = "クイックアクション";
+"Popular Categories" = "人気カテゴリ";
+"Tap any to start earning points!" = "タップしてポイントを獲得しよう！";
+"Random" = "ランダム";
+"Surprise me!" = "おまかせ！";
+"Loading puzzle..." = "パズルを読み込み中...";
+"Loading personalized puzzles..." = "パーソナライズされたパズルを読み込み中...";
+"Puzzles Loading" = "パズル読み込み中";
+"We're fetching your personalized puzzles. This usually takes just a few moments." = "パーソナライズされたパズルを取得中です。通常は数秒で完了します。";
+"We're fetching your puzzles from our servers. This usually takes just a few moments." = "サーバーからパズルを取得中です。通常は数秒で完了します。";
+"No puzzle selected" = "パズルが選択されていません";
+"Filter Categories" = "カテゴリをフィルター";
+"No Categories" = "カテゴリなし";
+"Adjust your filter to see more categories." = "フィルターを調整してもっとカテゴリを表示しましょう。";
+"Featured Custom Puzzles" = "注目のカスタムパズル";
+"Debug & Testing" = "デバッグ＆テスト";
+"Test Notifications" = "通知をテスト";
+
+// MARK: - Update Dialog
+"Version %@" = "バージョン %@";
+"What's New:" = "新機能:";
+"Update Now" = "今すぐアップデート";
+"Later" = "後で";
+
+// MARK: - Content Moderation
+"Puzzle Name:" = "パズル名:";
+"Creator:" = "作成者:";
+"Format:" = "フォーマット:";
+"What happened?" = "何が起きましたか？";
+"This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly." = "このトピックはコンテンツ審査システムにより不適切な可能性があると判定されました。これは自動処理であり、誤って判定される場合があります。";
+
+// MARK: - Profile & Creator
+"By %@" = "%@ 作";
+"Creator Earnings" = "クリエイター収益";
+"Coins Earned" = "獲得コイン";
+"Plays Monetized" = "収益化されたプレイ";
+"Per Game" = "ゲームごと";
+"Cash Out Earnings" = "収益を引き出す";
+"Earn coins when players enjoy your games!" = "プレイヤーがあなたのゲームを楽しむとコインを獲得！";
+"You get 55% of coins spent on your games. Tap to view payouts." = "ゲームで使用されたコインの55%を獲得できます。タップして支払い情報を確認。";
+"Checking eligibility..." = "資格を確認中...";
+"coins available" = "コイン利用可能";
+
+// MARK: - Stripe / Payouts
+"Cash Out" = "引き出し";
+"Connect Stripe to receive payouts" = "Stripeに接続して支払いを受け取る";
+"Set up your Stripe account to cash out your earned coins as real money." = "Stripeアカウントを設定して、獲得コインを現金に換えましょう。";
+"Connect Stripe Account" = "Stripeアカウントに接続";
+"Complete Stripe Setup" = "Stripe設定を完了";
+"Your Stripe account setup is incomplete. Tap below to finish." = "Stripeアカウントの設定が未完了です。下をタップして完了してください。";
+"Continue Setup" = "設定を続ける";
+"Request Payout" = "支払いをリクエスト";
+"Payout History" = "支払い履歴";
+
+// MARK: - App Features & Account
+"App Features" = "アプリ機能";
+"Account Management" = "アカウント管理";
+"Delete Account" = "アカウント削除";
+"This will permanently delete your account and all associated data. This action cannot be undone." = "アカウントとすべての関連データが永久に削除されます。この操作は元に戻せません。";
+
+// MARK: - Sign In
+"Sign In Required" = "サインインが必要です";
+"Sign in to access leaderboards, track your progress, and save your scores." = "サインインしてリーダーボード、進捗状況の追跡、スコアの保存にアクセスしましょう。";
+"Sign in to track progress and scores" = "サインインして進捗とスコアを追跡";
+"Sign in with Google" = "Googleでサインイン";
+"Enable Notifications?" = "通知を有効にしますか？";
+"Yes, Notify Me" = "はい、通知してください";
+"Not Now" = "今はしない";
+"Get notified when your daily puzzles are ready! We'll send you a quick alert so you never miss your daily challenge." = "デイリーパズルの準備ができたら通知を受け取りましょう！デイリーチャレンジを見逃さないようアラートをお送りします。";
+"Daily Puzzle Notifications" = "デイリーパズル通知";
+"Notification Status:" = "通知ステータス:";
+"Enabled" = "有効";
+"Not enabled" = "無効";
+
+// MARK: - Onboarding
+"Train Your Brain Daily" = "毎日脳をトレーニング";
+"Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills" = "数学、言葉パズル、脳トレで認知能力を高めましょう";
+"Track Your Progress" = "進捗を追跡しよう";
+"Level up, earn badges, and see your improvement over time with detailed analytics" = "レベルアップし、バッジを獲得し、詳細な分析で上達を確認しましょう";
+"Compete & Achieve" = "競争して達成しよう";
+"Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type" = "友達に挑戦し、リーダーボードを登り、各パズルタイプをマスターして限定報酬をアンロックしましょう";
+"Ready to Start?" = "始める準備はできましたか？";
+"Join thousands of puzzle enthusiasts and start your brain training journey today!" = "数千人のパズル愛好者に加わり、今日から脳トレの旅を始めましょう！";
+"Let's Get Started!" = "さあ始めましょう！";
+"Free to play \u{2022} No ads during puzzles" = "無料プレイ \u{2022} パズル中は広告なし";
+"Level 5" = "レベル5";
+
+// MARK: - Start Puzzle View
+"Take a quick interactive tutorial to get started!" = "クイックチュートリアルで始めましょう！";
+"Start Tutorial" = "チュートリアル開始";
+"Reset Tutorial" = "チュートリアルリセット";
+"Dismiss" = "閉じる";
+"Loading your stats..." = "統計を読み込み中...";
+"TOP SCORES" = "トップスコア";
+"BENEFITS" = "特典";
+"Game Settings" = "ゲーム設定";
+"Difficulty Level" = "難易度";
+"Game Mode" = "ゲームモード";
+"Number of Puzzles" = "パズル数";
+"Start Playing" = "プレイ開始";
+"Create Your Version" = "自分のバージョンを作成";
+"Earn coins" = "コインを獲得";
+"Back to Home" = "ホームに戻る";
+
+// MARK: - Difficulty
+"DIFFICULTY PROGRESSION" = "難易度の進行";
+"Current Level" = "現在のレベル";
+"Progress" = "進捗";
+"Next:" = "次:";
+"CURRENT LEVEL DETAILS" = "現在のレベル詳細";
+"Default Difficulty" = "デフォルト難易度";
+"Set your preferred difficulty level for all puzzles" = "すべてのパズルの優先難易度を設定";
+"You can still change difficulty when starting any puzzle" = "パズル開始時にいつでも難易度を変更できます";
+"Difficulty Adapted!" = "難易度が適応されました！";
+"Difficulty Adjusted" = "難易度調整済み";
+"DIFFICULTY" = "難易度";
+
+// MARK: - Puzzle Completion
+"Puzzle Set Complete!" = "パズルセット完了！";
+"Share Achievement" = "実績を共有";
+"Remix & earn real money when others play" = "リミックスして他のプレイヤーから実収入を獲得";
+"Return Home" = "ホームに戻る";
+"No More Puzzles Available" = "利用可能なパズルがありません";
+"Generate new puzzles to continue playing." = "新しいパズルを生成してプレイを続けましょう。";
+"Generate New Puzzles" = "新しいパズルを生成";
+"Generating New Puzzles" = "新しいパズルを生成中";
+"This usually takes 30-60 seconds..." = "通常30-60秒かかります...";
+"Home" = "ホーム";
+"Try These Next" = "次はこちらを試そう";
+"TOP 5 SCORES" = "トップ5スコア";
+
+// MARK: - Session/Score Feedback
+"Session Complete!" = "セッション完了！";
+"Final Score:" = "最終スコア:";
+"Accuracy:" = "正確率:";
+"Best Streak:" = "最高連続記録:";
+"Your answer: %@" = "あなたの回答: %@";
+"Correct answer: %@" = "正解: %@";
+"Updating score..." = "スコア更新中...";
+"Tap to continue" = "タップして続ける";
+"Keep trying! You've got this! \u{1F4AA}" = "頑張って！きっとできる！ \u{1F4AA}";
+"LEVEL UP!" = "レベルアップ！";
+"Level %@ \u{2192} %@" = "レベル %@ \u{2192} %@";
+"Score submitted!" = "スコア送信完了！";
+
+// MARK: - Leaderboard
+"Leaderboard" = "リーダーボード";
+"View Leaderboard" = "リーダーボードを見る";
+"Rank #%@" = "ランク #%@";
+"Your rank: #%@" = "あなたのランク: #%@";
+"No scores yet" = "まだスコアがありません";
+"Play the game to set the first high score!" = "プレイして最初のハイスコアを記録しよう！";
+
+// MARK: - Subscription & Limits
+"Upgrade to Premium" = "プレミアムにアップグレード";
+"Running Low on Puzzles!" = "パズルが残りわずかです！";
+"Generation Limit Reached" = "生成回数の上限に達しました";
+"Maybe Later" = "また後で";
+"Upgrade" = "アップグレード";
+"IS ANNUALLY:" = "年額:";
+"A YEAR" = "年間";
+
+// MARK: - Coins / Store
+"Your Coins" = "あなたのコイン";
+"Coins added!" = "コインが追加されました！";
+"Coins are used to continue games and support creators." = "コインはゲームの続行やクリエイターの支援に使用されます。";
+"Best Value" = "お得";
+"Get Coins" = "コインを入手";
+"Coin Store" = "コインストア";
+"Buy Coins" = "コインを購入";
+"points" = "ポイント";
+
+// MARK: - Game Play
+"Game Over!" = "ゲームオーバー！";
+"Play Again" = "もう一度プレイ";
+"Customize" = "カスタマイズ";
+"Customizing Game" = "ゲームをカスタマイズ中";
+"This may take 2-5 minutes..." = "2-5分かかる場合があります...";
+"Fixing game..." = "ゲームを修正中...";
+"This may take a couple minutes..." = "数分かかる場合があります...";
+"Did this game work?" = "このゲームは正常に動作しましたか？";
+"Yes, it works!" = "はい、動作します！";
+"No, it has issues" = "いいえ、問題があります";
+"What's wrong?" = "何が問題ですか？";
+"Fix It" = "修正する";
+"Brief description \u{2014} even a couple words helps" = "簡単な説明 \u{2014} 数語でも役立ちます";
+"Customize This Game" = "このゲームをカスタマイズ";
+"Create Customized Game" = "カスタマイズゲームを作成";
+"Game Name" = "ゲーム名";
+"What would you like to change?" = "何を変更しますか？";
+"Describe what you'd like to change. A new game will be created under your name." = "変更したい内容を説明してください。あなたの名前で新しいゲームが作成されます。";
+"Lv.%@" = "Lv.%@";
+
+// MARK: - Game Browse
+"Community Games" = "コミュニティゲーム";
+"My Games" = "マイゲーム";
+"No games yet" = "まだゲームがありません";
+"Be the first to create and share a game!" = "最初にゲームを作成して共有しよう！";
+"Load More" = "もっと読み込む";
+"Draft" = "下書き";
+"by %@" = "%@ 作";
+"Newest" = "最新";
+"Most Played" = "人気順";
+
+// MARK: - Game Remix
+"Create your version" = "自分のバージョンを作成";
+"Create & Earn Real Money" = "作成して実収入を獲得";
+"Earn coins when others play \u{2014} cash out via Stripe!" = "他の人がプレイするとコインを獲得 \u{2014} Stripeで引き出し！";
+"You earn 55% of every coin spent on your game" = "あなたのゲームで使用されたコインの55%を獲得";
+"Game Title" = "ゲームタイトル";
+"Describe Your Version" = "あなたのバージョンを説明";
+"Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules..." = "ゲームプレイの変更、ビジュアルスタイル、テーマ、難易度調整、スコアリングルールなどを説明...";
+"Reference image" = "参照画像";
+"AI will use this as visual context" = "AIがこれをビジュアルコンテキストとして使用します";
+"Quick Ideas" = "クイックアイデア";
+"Create Game" = "ゲーム作成";
+"Creating Your Game" = "ゲームを作成中";
+"Notify Me When Done" = "完了したら通知";
+"You can leave this screen \u{2014} we'll notify you!" = "この画面から離れてOK \u{2014} 通知します！";
+"Your game will appear in Explore > Custom Games" = "ゲームは「探索 > カスタムゲーム」に表示されます";
+"Free Generations Used Up" = "無料生成回数を使い切りました";
+"Subscribe for Unlimited" = "無制限にサブスクライブ";
+"Get unlimited generations + monthly coins" = "無制限の生成 + 月間コインを入手";
+"Game Ready!" = "ゲーム完成！";
+"Tap to preview \u{2014} also in Explore > Custom Games" = "タップしてプレビュー \u{2014}「探索 > カスタムゲーム」にもあります";
+
+// MARK: - Game Preview
+"This game may have issues" = "このゲームには問題がある場合があります";
+"Modifying game..." = "ゲームを変更中...";
+"Game saved!" = "ゲームが保存されました！";
+"You'll earn coins when others play!" = "他の人がプレイするとコインを獲得！";
+"Describe what's wrong or what to change:" = "問題点や変更したい内容を説明してください:";
+"Modify Game" = "ゲームを変更";
+
+// MARK: - Game Tweak
+"Loading version history..." = "バージョン履歴を読み込み中...";
+"No version history yet" = "まだバージョン履歴がありません";
+"Describe your change below to start editing your game" = "下に変更内容を記述してゲームの編集を開始";
+"Applying Edit" = "編集を適用中";
+"This may take a minute..." = "1分程かかる場合があります...";
+"Original" = "オリジナル";
+
+// MARK: - Create Puzzle
+"Create Custom Puzzle" = "カスタムパズルを作成";
+"Generate personalized puzzles on any topic you love!" = "好きなトピックでパーソナライズされたパズルを生成しよう！";
+"Puzzle Topic" = "パズルのトピック";
+"Popular Topics" = "人気のトピック";
+"Puzzle Format" = "パズルフォーマット";
+"Creating Magic..." = "マジックを作成中...";
+"Generate Puzzle" = "パズルを生成";
+"puzzles" = "パズル";
+"\u{1F389} Puzzle Creation Started!" = "\u{1F389} パズル作成開始！";
+"Your custom puzzle set is being generated! Check back in a few minutes to see your creation." = "カスタムパズルセットを生成中です！数分後にあなたの作品をご確認ください。";
+
+// MARK: - Daily Puzzles
+"Daily Puzzles" = "デイリーパズル";
+"New Daily Puzzles!" = "新しいデイリーパズル！";
+"Your daily puzzles are ready!" = "デイリーパズルの準備ができました！";
+"Topics Saved!" = "トピックが保存されました！";
+"Let's Go!" = "さあ始めよう！";
+"Topics" = "トピック";
+"Refresh" = "更新";
+"Choose Your Daily Puzzle Topics" = "デイリーパズルのトピックを選択";
+"Select topics you're interested in. We'll generate daily puzzles for each topic." = "興味のあるトピックを選択してください。各トピックのデイリーパズルを生成します。";
+"Welcome to Daily Puzzles!" = "デイリーパズルへようこそ！";
+"Choose your favorite topics and we'll generate personalized daily puzzles just for you." = "お気に入りのトピックを選んで、あなただけのデイリーパズルを生成します。";
+"Choose Topics" = "トピックを選択";
+"Oops!" = "おっと！";
+"Try Again" = "もう一度";
+"Solve Puzzle" = "パズルを解く";
+"Show Answer" = "答えを表示";
+
+// MARK: - Daily Streak
+"Daily Streak Stats" = "デイリーストリーク統計";
+"Current Streak" = "現在のストリーク";
+"Total Coins" = "合計コイン";
+"Days Played" = "プレイ日数";
+"Best Streak" = "最高ストリーク";
+"To Milestone" = "マイルストーンまで";
+"day" = "日";
+"days" = "日";
+"Let's Play! \u{1F3AE}" = "プレイしよう！ \u{1F3AE}";
+
+// MARK: - Achievement Dashboard
+"Progress Dashboard" = "進捗ダッシュボード";
+"Next Tier Rewards:" = "次のティアの報酬:";
+"Rewards:" = "報酬:";
+"Complete some puzzles to see your performance stats!" = "パズルをいくつか完了してパフォーマンス統計を表示しましょう！";
+"Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!" = "パズルをプレイして進捗ダッシュボードをアンロックしましょう。各ゲームでXPを獲得し、ストリークを構築し、実績をアンロック！";
+"Achievements" = "実績";
+
+// MARK: - Preferred Topics
+"Preferred Topics" = "お気に入りのトピック";
+"Available Topics" = "利用可能なトピック";
+"Your Preferred Topics" = "あなたのお気に入りトピック";
+"Search Custom Puzzles" = "カスタムパズルを検索";
+
+// MARK: - Notification Settings
+"Notifications" = "通知";
+"Notification Permissions" = "通知の権限";
+"Push Notifications" = "プッシュ通知";
+"Daily Puzzle Alerts" = "デイリーパズルアラート";
+"Get notified when your daily puzzles are ready" = "デイリーパズルの準備ができたら通知を受け取る";
+"FCM Token Status" = "FCMトークンステータス";
+"Notification Test" = "通知テスト";
+"Notifications help you stay updated with new daily puzzles and challenges. You can disable them in iOS Settings at any time." = "通知は新しいデイリーパズルやチャレンジの情報をお届けします。iOSの設定からいつでも無効にできます。";
+
+// MARK: - Social Sharing
+"Share Your Success!" = "成功を共有しよう！";
+"Share Puzzle" = "パズルを共有";
+"Recipient Email" = "受信者のメール";
+"Recipient Name" = "受信者の名前";
+
+// MARK: - Puzzle UI Components
+"Level %@" = "レベル %@";
+"Quick Stats" = "クイック統計";
+
+// MARK: - Difficulty Manager HUD
+"LEVEL %@" = "レベル %@";
+"TIME" = "時間";
+"SCORE" = "スコア";
+"RANK" = "ランク";
+"LIVES" = "ライフ";
+
+// MARK: - Multiple Choice
+"Exit Puzzle" = "パズルを終了";
+"Are you sure you want to exit? Your progress will be lost." = "終了しますか？進捗が失われます。";
+"Question %@/%@" = "問題 %@/%@";
+"Got it!" = "了解！";
+
+// MARK: - Q&A Puzzle
+"All Puzzles Completed!" = "全パズル完了！";
+
+// MARK: - Crossword
+"All Hints" = "すべてのヒント";
+"Puzzle solved in %@" = "%@で解決";
+"Next Puzzle" = "次のパズル";
+"Some answers are incorrect" = "いくつかの回答が間違っています";
+"Try again or use the REVEAL button to fix incorrect answers." = "もう一度試すか、公開ボタンで間違った回答を修正してください。";
+
+// MARK: - Word Search
+"Tips" = "ヒント";
+"Word Search Help" = "ワードサーチヘルプ";
+
+// MARK: - Word Snake
+"Find these snake words:" = "これらのスネークワードを見つけよう:";
+"Clear Word" = "ワードをクリア";
+"Loading Word Snake puzzle..." = "ワードスネークパズルを読み込み中...";
+"Word Snake Hints" = "ワードスネークヒント";
+"Clear Found Word?" = "見つけたワードをクリアしますか？";
+"Completed" = "完了";
+"Found" = "発見";
+"Shown" = "表示済み";
+"Avg/Word" = "平均/語";
+"Performance:" = "パフォーマンス:";
+
+// MARK: - Synonym
+"Group the synonyms! Tap the set that matches the word above." = "類義語をグループ化！上の単語に合うセットをタップしてください。";
+
+// MARK: - Antonym
+"Tap balloons to match opposite words" = "風船をタップして反対語を一致させよう";
+
+// MARK: - Crypto Puzzle
+"Game Over" = "ゲームオーバー";
+"How to Play" = "遊び方";
+"You've run out of hearts! Crypto puzzles take practice." = "ハートがなくなりました！暗号パズルには練習が必要です。";
+"Look for common patterns like 'THE', 'AND', or single letters like 'A' and 'I'." = "'THE'、'AND'などの一般的なパターンや、'A'や'I'のような単独の文字を探しましょう。";
+"Unable to load adaptive crypto puzzle" = "アダプティブ暗号パズルを読み込めません";
+"Adaptive Crypto Puzzle" = "アダプティブ暗号パズル";
+"Adaptive Crypto Solved!" = "アダプティブ暗号パズル解決！";
+"Hidden Message:" = "隠されたメッセージ:";
+"Time Used" = "使用時間";
+"Difficulty" = "難易度";
+"Continue Adaptive Journey" = "アダプティブジャーニーを続ける";
+"\u{1F4A1} Adaptive Hint" = "\u{1F4A1} アダプティブヒント";
+"Unable to load tutorial puzzle" = "チュートリアルパズルを読み込めません";
+"Try again!" = "もう一度！";
+
+// MARK: - Letter Set
+"No words found yet" = "まだ単語が見つかっていません";
+"Finish Early?" = "早めに終了しますか？";
+"Invalid Word" = "無効な単語";
+
+// MARK: - Number Sequence
+"Adaptive Number Sequence" = "アダプティブ数列";
+"Tap numbers in ascending order\n(smallest to largest)" = "数字を昇順にタップ\n（小さい順から大きい順へ）";
+"START ADAPTIVE CHALLENGE" = "アダプティブチャレンジ開始";
+"Adaptive Challenge Complete!" = "アダプティブチャレンジ完了！";
+"Round %@" = "ラウンド %@";
+
+// MARK: - Number Sum
+"Adaptive Number Sum" = "アダプティブ数字の合計";
+"Select numbers that add up\nto the target sum" = "合計が目標値になる\n数字を選択";
+"Target" = "目標";
+
+// MARK: - Math Expression
+"Which value is greater?" = "どちらの値が大きい？";
+"EQUAL" = "等しい";
+"Loading math problems..." = "数学の問題を読み込み中...";
+"Math Challenge Adapted!" = "数学チャレンジが適応されました！";
+
+// MARK: - Math Crossword
+"Select a number:" = "数字を選択:";
+"Complete the math equations by placing the missing numbers" = "不足している数字を配置して数式を完成させてください";
+"Game Result" = "ゲーム結果";
+"Result" = "結果";
+
+// MARK: - Math Difference
+"FIND THE DIFFERENCE" = "差を求めよう";
+"Enter the difference between these numbers" = "これらの数字の差を入力してください";
+
+// MARK: - Estimation
+"Error loading estimation data" = "推定データの読み込みエラー";
+"drag finger to estimate sum" = "指をスライドして合計を推定";
+
+// MARK: - Price Ordering
+"CALCULATE THE FINAL PRICE AND ORDER FROM LEAST TO MOST EXPENSIVE" = "最終価格を計算し、安い順に並べてください";
+"OFF" = "オフ";
+
+// MARK: - Conversion Puzzle
+"Drag blocks to compare their values" = "ブロックをドラッグして値を比較";
+"Higher position = Greater value" = "高い位置 = より大きな値";
+
+// MARK: - Percentage / Tip
+"TAP THE CORRECT TIP" = "正しいチップをタップ";
+"Tap the bubble with the correct tip amount!" = "正しいチップ額のバブルをタップ！";
+"Bill Amount" = "請求額";
+"Puzzle Completed!" = "パズル完了！";
+
+// MARK: - Subscription Puzzle
+"Hint: %@" = "ヒント: %@";
+
+// MARK: - Image Puzzle
+"Loading Image Puzzle..." = "画像パズルを読み込み中...";
+"Tap to close \u{2022} Pinch to zoom \u{2022} Double-tap to zoom \u{2022} Drag to pan" = "タップで閉じる \u{2022} ピンチでズーム \u{2022} ダブルタップでズーム \u{2022} ドラッグで移動";
+"START ADAPTIVE PUZZLE" = "アダプティブパズル開始";
+"How to Play:" = "遊び方:";
+"Original Image" = "元の画像";
+"Double-tap to rotate" = "ダブルタップで回転";
+"Long press a piece to drag it to the grid" = "ピースを長押ししてグリッドにドラッグ";
+"Puzzle Adapted!" = "パズルが適応されました！";
+"Score" = "スコア";
+"Drop" = "ドロップ";
+"Here" = "ここ";
+
+// MARK: - Image Questions
+"Image Questions" = "画像問題";
+"Memorize the image!" = "画像を記憶しよう！";
+"Complete!" = "完了！";
+"Loading image..." = "画像を読み込み中...";
+"Countdown will start when ready" = "準備ができたらカウントダウンが始まります";
+"Study this image carefully!" = "この画像をよく観察してください！";
+"Image Hidden" = "画像が非表示";
+"Reveal Image" = "画像を表示";
+"LOCATION" = "場所";
+"Your answer:" = "あなたの回答:";
+"Correct answer:" = "正解:";
+"Next time, try to rely more on your memory!" = "次回はもっと記憶に頼ってみましょう！";
+
+// MARK: - Image Vortex
+"Find the NEW image" = "新しい画像を見つけよう";
+
+// MARK: - Progressive Reveal
+"Progressive Reveal" = "段階的公開";
+"Mystery Image" = "ミステリー画像";
+"Your Answer:" = "あなたの回答:";
+"Next Clue" = "次の手がかり";
+"Reveal" = "公開";
+"Congratulations!" = "おめでとうございます！";
+
+// MARK: - Odd One Out
+"Look at the images carefully and find the one that doesn't belong with the others." = "画像をよく見て、仲間外れを見つけてください。";
+"Which one doesn't belong?" = "どれが仲間外れ？";
+"How It Works" = "遊び方";
+"Look at the images and find the one that doesn't belong with the others. Train your pattern recognition and critical thinking skills!" = "画像を見て仲間外れを見つけましょう。パターン認識と批判的思考スキルを鍛えよう！";
+"Start Challenge" = "チャレンジ開始";
+"Continue to Next Puzzle" = "次のパズルへ進む";
+
+// MARK: - Which Is Real
+"Why This Matters" = "なぜ重要か";
+"In today's world, AI can generate incredibly realistic images. Distinguishing between real and AI-generated content is becoming an essential skill for media literacy and critical thinking." = "現代の世界では、AIは驚くほどリアルな画像を生成できます。本物とAI生成コンテンツを見分けることは、メディアリテラシーと批判的思考の重要なスキルになっています。";
+"Which image is AI-generated?" = "どちらの画像がAI生成？";
+"Look for real photos:" = "本物の写真を探しましょう:";
+"AI tells:" = "AIの特徴:";
+"Learn from Community Insights" = "コミュニティの知見から学ぶ";
+"Help others learn! Why did you think this was the AI image?" = "他の人の学びを助けよう！なぜこれがAI画像だと思いましたか？";
+"Submit (+20% bonus)" = "送信 (+20%ボーナス)";
+"Learn from others who identified the AI image correctly:" = "AI画像を正しく識別した人から学ぶ:";
+
+// MARK: - Find Object / Waldo
+"Hidden Objects" = "隠しオブジェクト";
+"Failed to load image" = "画像の読み込みに失敗";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "ピンチでズーム \u{2022} ドラッグで移動 \u{2022} タップでオブジェクトを探す";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects to find them" = "ピンチでズーム \u{2022} ドラッグで移動 \u{2022} オブジェクトをタップして見つける";
+"Pinch to zoom \u{2022} Drag to pan \u{2022} Tap objects found by AI vision" = "ピンチでズーム \u{2022} ドラッグで移動 \u{2022} AI検出オブジェクトをタップ";
+"Natural Discovery" = "自然な発見";
+"Objects to Find" = "見つけるオブジェクト";
+"These objects were naturally discovered by AI vision in the scene" = "これらのオブジェクトはAIビジョンによってシーン内で自然に発見されました";
+"Show Hint" = "ヒントを表示";
+"ENHANCED WALDO" = "強化版ウォーリー";
+
+// MARK: - Geography
+"Geography Cities Challenge" = "地理・都市チャレンジ";
+"Place cities in their correct locations on the world map" = "世界地図上の正しい位置に都市を配置";
+"START CHALLENGE" = "チャレンジ開始";
+"Exact location!" = "正確な位置！";
+"Geography Challenge Complete!" = "地理チャレンジ完了！";
+"Final Score" = "最終スコア";
+"Geography Countries Challenge" = "地理・国チャレンジ";
+"Place countries in their correct locations on the world map" = "世界地図上の正しい位置に国を配置";
+"Tap on a continent" = "大陸をタップ";
+"Or tap a continent name:" = "または大陸名をタップ:";
+"Country spans" = "国の範囲";
+"You selected" = "選択しました";
+"Landlocked" = "内陸国";
+"Very Close!" = "惜しい！";
+"Great geographical knowledge!" = "素晴らしい地理の知識！";
+"Skip Tutorial" = "チュートリアルをスキップ";
+
+// MARK: - Memory Puzzles
+"Remember this symbol" = "このシンボルを覚えてください";
+"NEXT" = "次へ";
+"Memory Pairs" = "メモリーペア";
+"Memory Pair Challenge" = "メモリーペアチャレンジ";
+"Does this pattern match the\nprevious pattern?" = "このパターンは\n前のパターンと一致しますか？";
+"Memory Challenge Complete!" = "メモリーチャレンジ完了！";
+"Final Results" = "最終結果";
+"Session Score" = "セッションスコア";
+"Total Score" = "合計スコア";
+"Correct Answers" = "正解数";
+"Accuracy" = "正確率";
+"Example Pattern" = "例のパターン";
+"Red dot at bottom-left" = "左下の赤い点";
+"START GAME" = "ゲーム開始";
+
+// MARK: - Memory Story
+"Error loading Memory Story puzzle" = "メモリーストーリーパズルの読み込みエラー";
+"THIS GAME REQUIRES AUDIO" = "このゲームにはオーディオが必要です";
+"MAKE SURE YOU CAN\nHEAR THE TONE CLEARLY" = "音がはっきり聞こえることを\n確認してください";
+
+// MARK: - Memory Sequencing
+"LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS" = "2つのパートを聞いて\nイベントを順序付け";
+"DRAG TO REORDER" = "ドラッグして並べ替え";
+"PART TWO OF TWO" = "パート2/2";
+"Continue to Part Two" = "パート2に進む";
+
+// MARK: - Memory Retention
+"Audio Error" = "オーディオエラー";
+"Continue Without Audio" = "オーディオなしで続ける";
+
+// MARK: - Memory Squares
+"Clear" = "クリア";
+
+// MARK: - Context Switch
+"Excellent!" = "素晴らしい！";
+"Not quite" = "惜しい";
+"Working Memory" = "ワーキングメモリ";
+"Executive Load" = "実行負荷";
+"Dual Task" = "デュアルタスク";
+"Attention" = "注意力";
+"Time Pressure" = "時間的プレッシャー";
+"Context Switch Adapted!" = "コンテキストスイッチが適応されました！";
+"Study these items" = "これらのアイテムを覚えてください";
+"I'm Ready!" = "準備OK！";
+"Alphabetization Task" = "アルファベット順タスク";
+"Drag to reorder alphabetically:" = "ドラッグしてアルファベット順に並べ替え:";
+"Continue \u{2192}" = "続ける \u{2192}";
+"Recognition Test" = "認識テスト";
+"Select all items from the original list" = "元のリストからすべてのアイテムを選択";
+"Items are arranged to test attention control" = "注意力制御をテストするためにアイテムが配置されています";
+"Submit Answer \u{2713}" = "回答を送信 \u{2713}";
+
+// MARK: - Color Text Matching
+"Adaptive Color-Text Matching" = "アダプティブ色・テキストマッチング";
+"Compare the color name meaning with the actual text color and decide if they match." = "色の名前の意味と実際のテキストの色を比較し、一致するか判断してください。";
+"Adaptive Example" = "アダプティブ例";
+"Answer: YES (both are blue)" = "回答: はい（両方とも青）";
+"Does the meaning match the text color?" = "意味はテキストの色と一致しますか？";
+"Color Challenge Adapted!" = "カラーチャレンジが適応されました！";
+"meaning" = "意味";
+"text color" = "テキストの色";
+"Avg Time" = "平均時間";
+"Streak" = "ストリーク";
+"START ADAPTIVE CHALLENGE" = "アダプティブチャレンジ開始";
+
+// MARK: - Color Shape Matching
+"Visual Challenge Adapted!" = "ビジュアルチャレンジが適応されました！";
+"Does the text meaning match the shape color?" = "テキストの意味は図形の色と一致しますか？";
+
+// MARK: - Dual Card
+"Adaptive Dual-Task Complete!" = "アダプティブデュアルタスク完了！";
+"Switching pattern: %@" = "切り替えパターン: %@";
+
+// MARK: - Symbol Swipe
+"When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT" = "左のシンボルが見えたら左にスワイプ\n右のシンボルが見えたら右にスワイプ";
+"SWIPE RIGHT \u{2192}" = "右にスワイプ \u{2192}";
+"LEFT" = "左";
+"RIGHT" = "右";
+
+// MARK: - Unique Object
+"STREAK" = "ストリーク";
+
+// MARK: - Flow Puzzle
+"Clear All" = "すべてクリア";
+"Give Up" = "ギブアップ";
+"Solution Shown" = "解答表示済み";
+"Moving to next puzzle..." = "次のパズルへ移動中...";
+"Path Conflict!" = "パスが競合しています！";
+
+// MARK: - Pinball Deflector
+"Pinball Deflector" = "ピンボールデフレクター";
+"Challenge Complete" = "チャレンジ完了";
+"Memorize deflector positions" = "デフレクターの位置を記憶";
+"Predict where the ball will exit" = "ボールがどこから出るか予測";
+"Continue Challenge" = "チャレンジを続ける";
+
+// MARK: - Swipe Word
+"Next Puzzle" = "次のパズル";
+"Back to Home" = "ホームに戻る";
+
+// MARK: - Limit Reached
+"Running Low on Puzzles!" = "パズルが残りわずかです！";
+"Generation Limit Reached" = "生成回数の上限に達しました";
+"Maybe Later" = "また後で";
+"Upgrade to Premium" = "プレミアムにアップグレード";
+
+// MARK: - Puzzle Limit Network
+"Checking Puzzle Availability" = "パズルの利用可能性を確認中";
+
+// MARK: - Music Puzzle
+"TUTORIAL" = "チュートリアル";
+"MUSIC MATCH" = "ミュージックマッチ";
+"Loading music puzzle..." = "音楽パズルを読み込み中...";
+"Tap to expand..." = "タップで展開...";
+"Music Match Tutorial" = "ミュージックマッチチュートリアル";
+
+// MARK: - Quiz Card
+"Start Quiz" = "クイズ開始";
+
+// MARK: - Tutorial Views
+"How to Play" = "遊び方";
+"Got it! Let's Play" = "了解！プレイしよう！";
+"Skip Tutorial" = "チュートリアルをスキップ";
+
+// MARK: - Group Completion
+"Puzzle Collections" = "パズルコレクション";
+"Each type has 5 puzzles" = "各タイプに5つのパズル";
+"How it works:" = "遊び方:";
+"Each puzzle type contains 5 challenges" = "各パズルタイプには5つのチャレンジがあります";
+"Complete all 5 to unlock the next puzzle type" = "5つすべてを完了して次のパズルタイプをアンロック";
+"Try different types to discover your favorites!" = "いろいろなタイプを試してお気に入りを見つけよう！";
+"Group Completed!" = "グループ完了！";
+"Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?" = "素晴らしい！このグループのすべてのパズルタイプをマスターしました。次のチャレンジの準備はいいですか？";
+
+// MARK: - Word Prefix
+"\u{1F4A1} Hint" = "\u{1F4A1} ヒント";
+
+// MARK: - Notification Debug
+"Current Status" = "現在のステータス";
+"Token Preview:" = "トークンプレビュー:";
+"Quick Tests" = "クイックテスト";
+"Test User Email" = "テストユーザーメール";
+"Test Results" = "テスト結果";
+"No tests run yet" = "まだテストが実行されていません";
+"Advanced Tests" = "高度なテスト";
+"Running tests..." = "テスト実行中...";
+"Notification Tests" = "通知テスト";
+"1. Request Permission" = "1. 権限をリクエスト";
+"2. Get FCM Token" = "2. FCMトークンを取得";
+"3. Register with Server" = "3. サーバーに登録";
+"4. Send Test Notification" = "4. テスト通知を送信";
+"5. Schedule Local Test" = "5. ローカルテストをスケジュール";
+"Use Current" = "現在のものを使用";
+"Clear Results" = "結果をクリア";
+"Run Full Test Suite" = "フルテストスイートを実行";
+
+// MARK: - Difficulty Settings
+"Default Difficulty" = "デフォルト難易度";
+"Set your preferred difficulty level for all puzzles" = "すべてのパズルの優先難易度を設定";
+"You can still change difficulty when starting any puzzle" = "パズル開始時にいつでも難易度を変更できます";

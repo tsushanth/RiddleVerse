@@ -1,0 +1,384 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">ابحث عن الكلمات المخفية في الشبكة</string>
+    <string name="crossword_description">املأ الكلمات باستخدام التلميحات</string>
+    <string name="anagram_description">أعد ترتيب الحروف لتكوين كلمات</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">انتهت اللعبة!</string>
+    <string name="points">نقاط</string>
+    <string name="score_submitted">تم إرسال النتيجة!</string>
+    <string name="play_again">العب مرة أخرى</string>
+    <string name="try_harder_version">جرّب النسخة الأصعب</string>
+    <string name="try_hard_version">جرّب النسخة الصعبة</string>
+    <string name="try_very_hard_version">جرّب النسخة الصعبة جدًا</string>
+    <string name="try_expert_version">جرّب نسخة الخبراء</string>
+    <string name="customize">تخصيص</string>
+    <string name="get_coins">احصل على عملات</string>
+    <string name="view_leaderboard">عرض لوحة المتصدرين</string>
+    <string name="done">تم</string>
+    <string name="earn_coins_tip">اكسب عملات يوميًا بحل الألغاز!</string>
+    <string name="coins_label">عملات</string>
+    <string name="no_games_yet">لا توجد ألعاب بعد</string>
+    <string name="be_first_to_create">كن أول من يبتكر ويشارك لعبة!</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">الأحدث</string>
+    <string name="most_played">الأكثر لعبًا</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">لك</string>
+    <string name="tab_categories">التصنيفات</string>
+    <string name="tab_games">الألعاب</string>
+    <string name="tab_puzzles">الألغاز</string>
+    <string name="tab_settings">الإعدادات</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">تصفح</string>
+    <string name="subtab_your_puzzles">ألغازك</string>
+    <string name="subtab_featured">مميز</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">هل تستمتع بـ RiddleVerse؟</string>
+    <string name="rate_in_play_store">قيّمنا في Play Store!</string>
+    <string name="help_us_improve">ساعدنا في التحسين!</string>
+    <string name="rate_experience">كيف تقيّم تجربتك مع RiddleVerse؟</string>
+    <string name="rate_incentive">احصل على 100 عملة + وصول مبكر بتقييمنا!</string>
+    <string name="thanks_great_rating">شكرًا على التقييم الرائع! هل تمانع في مشاركته في Play Store؟</string>
+    <string name="share_detailed_feedback">يمكنك أيضًا مشاركة ملاحظات مفصلة معنا أولًا!</string>
+    <string name="sorry_bad_experience">نأسف لعدم حصولك على تجربة رائعة. هل يمكنك إخبارنا بما يمكننا تحسينه؟</string>
+    <string name="continue_label">متابعة</string>
+    <string name="rate">تقييم</string>
+    <string name="rate_in_store">قيّم في المتجر</string>
+    <string name="give_feedback">إعطاء ملاحظات</string>
+    <string name="not_now">ليس الآن</string>
+    <string name="maybe_later">ربما لاحقًا</string>
+    <string name="feedback_first">الملاحظات أولًا</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">تذكير بالتقييم</string>
+    <string name="when_remind_again">متى تريد أن نذكرك مرة أخرى؟</string>
+    <string name="remind_in_week">ذكّرني بعد أسبوع</string>
+    <string name="remind_in_month">ذكّرني بعد شهر</string>
+    <string name="dont_ask_again">لا تسأل مرة أخرى</string>
+    <string name="cancel">إلغاء</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">أخبرنا بما تحبه!</string>
+    <string name="what_enjoy_most">ما أكثر شيء تستمتع به في RiddleVerse؟</string>
+    <string name="what_can_we_improve">ما الذي يمكننا تحسينه؟ ملاحظاتك تساعدنا في التحسين.</string>
+    <string name="your_feedback">ملاحظاتك</string>
+    <string name="feedback_placeholder_positive">أحب تنوع الألغاز…</string>
+    <string name="feedback_placeholder_negative">أتمنى لو كان التطبيق يحتوي على…</string>
+    <string name="submitted_successfully">تم الإرسال بنجاح!</string>
+    <string name="submission_failed">فشل الإرسال</string>
+    <string name="submit">إرسال</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">متجر العملات</string>
+    <string name="your_coins">عملاتك</string>
+    <string name="coins_used_description">تُستخدم العملات لمتابعة الألعاب ودعم المبدعين.</string>
+    <string name="best_value">أفضل قيمة</string>
+    <string name="rate_for_early_access">قيّم للحصول على وصول مبكر!</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">حسنًا</string>
+    <string name="back">رجوع</string>
+    <string name="close">إغلاق</string>
+    <string name="start">ابدأ</string>
+    <string name="next">التالي</string>
+
+    <!-- Game UI -->
+    <string name="correct">صحيح!</string>
+    <string name="wrong">خطأ!</string>
+    <string name="times_up">انتهى الوقت!</string>
+    <string name="score_label">النتيجة</string>
+    <string name="streak_label">السلسلة</string>
+    <string name="level_label">المستوى</string>
+    <string name="hint">تلميح</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">لا توجد نتائج بعد</string>
+    <string name="play_to_set_score">العب لتسجيل أول نتيجة عالية!</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">صباح الخير</string>
+    <string name="good_afternoon">مساء الخير</string>
+    <string name="good_evening">مساء الخير</string>
+
+    <!-- Settings -->
+    <string name="premium_label">مميز</string>
+    <string name="unlimited_label">غير محدود</string>
+    <string name="daily_rewards">مكافآت يومية</string>
+    <string name="notifications">الإشعارات</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">حدث خطأ ما</string>
+    <string name="no_internet">لا يوجد اتصال بالإنترنت</string>
+    <string name="please_try_again">يرجى المحاولة مرة أخرى</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">تخصيص هذه اللعبة</string>
+    <string name="what_would_you_change">ما الذي تريد تغييره؟</string>
+    <string name="customizing_game">جارٍ تخصيص اللعبة…</string>
+
+    <!-- Language Picker -->
+    <string name="language">اللغة</string>
+    <string name="language_picker_title">اختيار اللغة</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">حاول مرة أخرى</string>
+    <string name="skip">تخطي</string>
+    <string name="skip_puzzle">تخطي اللغز</string>
+    <string name="retry">إعادة المحاولة</string>
+    <string name="share">مشاركة</string>
+    <string name="share_puzzle">مشاركة اللغز</string>
+    <string name="play">لعب</string>
+    <string name="edit">تعديل</string>
+    <string name="create">إنشاء</string>
+    <string name="explore">استكشاف</string>
+    <string name="reset">إعادة تعيين</string>
+    <string name="reveal">كشف</string>
+    <string name="clear">مسح</string>
+    <string name="clear_all">مسح الكل</string>
+    <string name="check">تحقق</string>
+    <string name="go_back">رجوع</string>
+    <string name="home">الرئيسية</string>
+    <string name="upgrade">ترقية</string>
+    <string name="manage">إدارة</string>
+    <string name="got_it">فهمت!</string>
+    <string name="fix_it">إصلاح</string>
+    <string name="just_close">إغلاق فقط</string>
+    <string name="modify">تعديل</string>
+    <string name="load_more">تحميل المزيد</string>
+    <string name="loading">جارٍ التحميل\u2026</string>
+    <string name="save">حفظ</string>
+    <string name="yes">نعم</string>
+    <string name="yes_finish">نعم، إنهاء</string>
+    <string name="yes_it_works">نعم، يعمل!</string>
+    <string name="no_it_has_issues">لا، هناك مشاكل</string>
+    <string name="finish_now">إنهاء الآن</string>
+    <string name="keep_playing">تابع اللعب</string>
+    <string name="finish_early">إنهاء مبكر</string>
+    <string name="give_up">استسلام</string>
+    <string name="back_to_home">العودة للرئيسية</string>
+    <string name="submit_answer">إرسال الإجابة</string>
+    <string name="start_game">ابدأ اللعبة</string>
+    <string name="start_puzzle">ابدأ اللغز</string>
+    <string name="start_challenge">ابدأ التحدي</string>
+    <string name="begin">ابدأ</string>
+    <string name="im_ready">أنا جاهز!</string>
+    <string name="im_done">انتهيت</string>
+    <string name="skip_tutorial">تخطي الشرح</string>
+    <string name="same">نفسه</string>
+    <string name="different">مختلف</string>
+    <string name="next_puzzle">اللغز التالي</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">جارٍ تحميل اللغز التالي\u2026</string>
+    <string name="loading_puzzle">جارٍ تحميل اللغز\u2026</string>
+    <string name="generating">جارٍ التوليد\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">إجراءات سريعة</string>
+    <string name="start_playing_instantly">ابدأ اللعب فورًا</string>
+    <string name="your_favorites">مفضلاتك</string>
+    <string name="trending_now">رائج الآن</string>
+    <string name="recommended_for_you">موصى به لك</string>
+    <string name="puzzle_collections">مجموعات الألغاز</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">خطأ في اللعبة</string>
+    <string name="quiz_categories">تصنيفات الاختبارات</string>
+    <string name="subscription">الاشتراك</string>
+    <string name="current_tier">المستوى الحالي</string>
+    <string name="active_streaks">السلاسل النشطة</string>
+    <string name="time_label">الوقت</string>
+    <string name="badges">الشارات</string>
+    <string name="unable_to_load_progress">تعذر تحميل بيانات التقدم</string>
+    <string name="custom_puzzles">ألغاز مخصصة</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">اكسب عملات عندما يستمتع اللاعبون بألعابك!</string>
+    <string name="creator_revenue_share">تحصل على 55%% من العملات المنفقة على ألعابك</string>
+    <string name="coins_earned">العملات المكتسبة</string>
+    <string name="plays_monetized">اللعبات المحققة للدخل</string>
+    <string name="per_game">لكل لعبة</string>
+    <string name="cash_out">سحب الأموال</string>
+    <string name="cash_out_earnings">سحب الأرباح</string>
+    <string name="connect_stripe_to_receive">اربط Stripe لاستلام المدفوعات</string>
+    <string name="connect_stripe_account">ربط حساب Stripe</string>
+    <string name="complete_stripe_setup">إكمال إعداد Stripe</string>
+    <string name="continue_setup">متابعة الإعداد</string>
+    <string name="request_payout">طلب دفعة</string>
+    <string name="payout_history">سجل المدفوعات</string>
+    <string name="checking_eligibility">جارٍ التحقق من الأهلية\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">أنشئ لعبة</string>
+    <string name="describe_game_prompt">صف أي لعبة وسيبنيها الذكاء الاصطناعي لك</string>
+    <string name="describe_game_placeholder">صف لعبتك\u2026</string>
+    <string name="generate_game">إنشاء لعبة</string>
+    <string name="free_generations_used_up">نفدت عمليات الإنشاء المجانية</string>
+    <string name="buy_coins">شراء عملات</string>
+    <string name="subscribe_for_unlimited">اشترك للحصول على غير محدود</string>
+    <string name="get_unlimited_generations">احصل على إنشاءات غير محدودة + عملات شهرية</string>
+    <string name="reference_image">صورة مرجعية</string>
+    <string name="try_these_ideas">جرّب هذه الأفكار</string>
+    <string name="game_title">عنوان اللعبة</string>
+    <string name="describe_your_version">صف نسختك</string>
+    <string name="create_game">إنشاء لعبة</string>
+    <string name="create_your_version">أنشئ نسختك</string>
+    <string name="creating_your_game">جارٍ إنشاء لعبتك</string>
+    <string name="this_may_take_2_5_minutes">قد يستغرق هذا 2\u20135 دقائق\u2026</string>
+    <string name="notify_me_when_done">أخبرني عند الانتهاء</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">ألعاب المجتمع</string>
+    <string name="my_games">ألعابي</string>
+    <string name="draft">مسودة</string>
+    <string name="generating_harder_challenge">إنشاء تحدٍ أصعب</string>
+    <string name="did_this_game_work">هل عملت هذه اللعبة؟</string>
+    <string name="whats_wrong">ما المشكلة؟</string>
+    <string name="modify_game">تعديل اللعبة</string>
+    <string name="game_name">اسم اللعبة</string>
+    <string name="create_customized_game">إنشاء لعبة مخصصة</string>
+    <string name="original">أصلي</string>
+    <string name="sort_by">ترتيب حسب</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">قد تحتوي هذه اللعبة على مشاكل</string>
+    <string name="game_saved">تم حفظ اللعبة!</string>
+    <string name="game_ready">اللعبة جاهزة!</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">تخطَّ الانتظار!</string>
+    <string name="get_instant_generation">احصل على إنشاء فوري للألغاز</string>
+    <string name="wait_time">وقت الانتظار</string>
+    <string name="instant">فوري</string>
+    <string name="premium_member">عضو مميز</string>
+    <string name="upgrade_now">ترقية الآن</string>
+    <string name="upgrade_for_unlimited">ترقية للحصول على غير محدود</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">إعدادات اللعبة</string>
+    <string name="difficulty_level">مستوى الصعوبة</string>
+    <string name="game_mode">وضع اللعبة</string>
+    <string name="default_difficulty">الصعوبة الافتراضية</string>
+    <string name="checking">جارٍ التحقق\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">كيف يعمل:</string>
+    <string name="progress">التقدم</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">إرسال عبر البريد الإلكتروني</string>
+    <string name="copy_to_clipboard">نسخ إلى الحافظة</string>
+    <string name="puzzle_completed">تم إكمال اللغز!</string>
+    <string name="achievement_unlocked">تم فتح إنجاز!</string>
+    <string name="level_up">ارتقاء في المستوى!</string>
+    <string name="recipient_email">بريد المستلم</string>
+    <string name="recipient_name">اسم المستلم</string>
+    <string name="copied_to_clipboard">تم النسخ إلى الحافظة!</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">لوحة المتصدرين</string>
+    <string name="your_performance">أداؤك</string>
+    <string name="other_top_players">أفضل اللاعبين الآخرين</string>
+    <string name="puzzle_statistics">إحصائيات الألغاز</string>
+    <string name="overview">نظرة عامة</string>
+    <string name="detailed_statistics">إحصائيات مفصلة</string>
+    <string name="records">الأرقام القياسية</string>
+    <string name="no_players_yet">لا يوجد لاعبون بعد</string>
+    <string name="rank_label">الترتيب</string>
+    <string name="percentile_label">المئين</string>
+    <string name="total_players">إجمالي اللاعبين</string>
+    <string name="avg_score">متوسط النتيجة</string>
+    <string name="fastest_time">أسرع وقت</string>
+    <string name="highest_score">أعلى نتيجة</string>
+
+    <!-- Game State -->
+    <string name="game_complete">اللعبة مكتملة!</string>
+    <string name="final_score">النتيجة النهائية</string>
+    <string name="final_results">النتائج النهائية</string>
+    <string name="session_score">نتيجة الجلسة</string>
+    <string name="total_score">النتيجة الإجمالية</string>
+    <string name="correct_answers">الإجابات الصحيحة</string>
+    <string name="accuracy">الدقة</string>
+    <string name="avg_time">متوسط الوقت</string>
+    <string name="puzzle_complete">اللغز مكتمل!</string>
+    <string name="difficulty_advanced">تم تقدم الصعوبة!</string>
+    <string name="continue_label_caps">متابعة</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">مربعات الذاكرة</string>
+    <string name="get_ready">استعد!</string>
+    <string name="memorize_the_pattern">احفظ النمط!</string>
+    <string name="click_squares_you_remember">انقر على المربعات التي تتذكرها!</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">هل يتطابق المعنى مع لون النص؟</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">كيفية اللعب</string>
+    <string name="drop_here">أفلت هنا</string>
+    <string name="completed">مكتمل</string>
+    <string name="time_used">الوقت المستخدم</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">بعض الإجابات غير صحيحة</string>
+    <string name="all_hints">كل التلميحات</string>
+
+    <!-- Word Search -->
+    <string name="found">تم العثور</string>
+    <string name="revealed">تم الكشف</string>
+    <string name="best_streak">أفضل سلسلة</string>
+    <string name="drag_to_find_words">اسحب عبر الحروف للعثور على الكلمات المخفية</string>
+    <string name="find_these_words">ابحث عن هذه الكلمات:</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">تم الوصول للمستوى الذهبي!</string>
+    <string name="bonus_words_found">الكلمات الإضافية الموجودة:</string>
+    <string name="great_job">عمل رائع!</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">الشرح</string>
+    <string name="tutorial_mode">وضع الشرح</string>
+    <string name="got_it_lets_play">فهمت! هيا نلعب</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">المواضيع المفضلة</string>
+    <string name="popular_topics">المواضيع الشائعة</string>
+    <string name="add_custom_topic">إضافة موضوع مخصص</string>
+    <string name="your_selected_topics">مواضيعك المختارة</string>
+    <string name="no_topics_selected">لم يتم اختيار مواضيع بعد</string>
+    <string name="saving">جارٍ الحفظ\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">تحليلات الأداء</string>
+    <string name="performance_stats">إحصائيات الأداء</string>
+    <string name="daily_streak">السلسلة اليومية</string>
+    <string name="lets_play">هيا نلعب!</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">خطأ في تحميل اللغز</string>
+    <string name="no_hint_available">لا يوجد تلميح متاح</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">انقر على الأرقام بترتيب تصاعدي (من الأصغر إلى الأكبر)</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">تحدي جغرافيا الدول</string>
+</resources>

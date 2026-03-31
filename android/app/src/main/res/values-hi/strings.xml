@@ -1,0 +1,390 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">ग्रिड में छिपे शब्द खोजें</string>
+    <string name="crossword_description">सुरागों का उपयोग करके शब्द भरें</string>
+    <string name="anagram_description">शब्द बनाने के लिए अक्षरों को सही क्रम में लगाएँ</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">खेल समाप्त!</string>
+    <string name="points">अंक</string>
+    <string name="score_submitted">स्कोर जमा हो गया!</string>
+    <string name="play_again">फिर से खेलें</string>
+    <string name="try_harder_version">और कठिन संस्करण आज़माएँ</string>
+    <string name="try_hard_version">कठिन संस्करण आज़माएँ</string>
+    <string name="try_very_hard_version">बहुत कठिन संस्करण आज़माएँ</string>
+    <string name="try_expert_version">विशेषज्ञ संस्करण आज़माएँ</string>
+    <string name="customize">अनुकूलित करें</string>
+    <string name="get_coins">सिक्के पाएँ</string>
+    <string name="view_leaderboard">लीडरबोर्ड देखें</string>
+    <string name="done">हो गया</string>
+    <string name="earn_coins_tip">रोज़ पहेलियाँ खेलकर सिक्के कमाएँ!</string>
+    <string name="coins_label">सिक्के</string>
+    <string name="no_games_yet">अभी कोई खेल नहीं</string>
+    <string name="be_first_to_create">पहला खेल बनाएँ और साझा करें!</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">नवीनतम</string>
+    <string name="most_played">सबसे ज़्यादा खेले गए</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">आपके लिए</string>
+    <string name="tab_categories">श्रेणियाँ</string>
+    <string name="tab_games">खेल</string>
+    <string name="tab_puzzles">पहेलियाँ</string>
+    <string name="tab_settings">सेटिंग्स</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">ब्राउज़ करें</string>
+    <string name="subtab_your_puzzles">आपकी पहेलियाँ</string>
+    <string name="subtab_featured">विशेष</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">RiddleVerse पसंद आ रहा है?</string>
+    <string name="rate_in_play_store">Play Store पर रेट करें!</string>
+    <string name="help_us_improve">हमें बेहतर बनाने में मदद करें!</string>
+    <string name="rate_experience">RiddleVerse के साथ आपका अनुभव कैसा रहा?</string>
+    <string name="rate_incentive">रेट करके 100 सिक्के + अर्ली एक्सेस पाएँ!</string>
+    <string name="thanks_great_rating">बढ़िया रेटिंग के लिए धन्यवाद! क्या आप इसे Play Store पर साझा करेंगे?</string>
+    <string name="share_detailed_feedback">आप पहले हमें विस्तृत फ़ीडबैक भी दे सकते हैं!</string>
+    <string name="sorry_bad_experience">हमें खेद है कि आपका अनुभव अच्छा नहीं रहा। कृपया बताएँ कि हम क्या सुधार कर सकते हैं?</string>
+    <string name="continue_label">जारी रखें</string>
+    <string name="rate">रेट करें</string>
+    <string name="rate_in_store">स्टोर पर रेट करें</string>
+    <string name="give_feedback">फ़ीडबैक दें</string>
+    <string name="not_now">अभी नहीं</string>
+    <string name="maybe_later">शायद बाद में</string>
+    <string name="feedback_first">पहले फ़ीडबैक</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">रेटिंग रिमाइंडर</string>
+    <string name="when_remind_again">आप कब फिर से याद दिलाना चाहेंगे?</string>
+    <string name="remind_in_week">एक हफ़्ते में याद दिलाएँ</string>
+    <string name="remind_in_month">एक महीने में याद दिलाएँ</string>
+    <string name="dont_ask_again">दोबारा न पूछें</string>
+    <string name="cancel">रद्द करें</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">बताएँ कि आपको क्या पसंद है!</string>
+    <string name="what_enjoy_most">RiddleVerse में आपको सबसे ज़्यादा क्या पसंद है?</string>
+    <string name="what_can_we_improve">हम क्या बेहतर कर सकते हैं? आपका फ़ीडबैक हमें सुधरने में मदद करता है।</string>
+    <string name="your_feedback">आपका फ़ीडबैक</string>
+    <string name="feedback_placeholder_positive">मुझे पहेलियों की विविधता पसंद है\u2026</string>
+    <string name="feedback_placeholder_negative">काश इस ऐप में होता\u2026</string>
+    <string name="submitted_successfully">सफलतापूर्वक जमा हो गया!</string>
+    <string name="submission_failed">जमा करना विफल</string>
+    <string name="submit">जमा करें</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">सिक्कों की दुकान</string>
+    <string name="your_coins">आपके सिक्के</string>
+    <string name="coins_used_description">सिक्कों का उपयोग खेल जारी रखने और रचनाकारों का समर्थन करने के लिए किया जाता है।</string>
+    <string name="best_value">सर्वोत्तम मूल्य</string>
+    <string name="rate_for_early_access">अर्ली एक्सेस के लिए रेट करें!</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">ठीक है</string>
+    <string name="back">पीछे</string>
+    <string name="close">बंद करें</string>
+    <string name="start">शुरू</string>
+    <string name="next">अगला</string>
+
+    <!-- Game UI -->
+    <string name="correct">सही!</string>
+    <string name="wrong">ग़लत!</string>
+    <string name="times_up">समय समाप्त!</string>
+    <string name="score_label">स्कोर</string>
+    <string name="streak_label">लगातार</string>
+    <string name="level_label">स्तर</string>
+    <string name="hint">संकेत</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">अभी कोई स्कोर नहीं</string>
+    <string name="play_to_set_score">पहला हाई स्कोर बनाने के लिए खेलें!</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">सुप्रभात</string>
+    <string name="good_afternoon">नमस्कार</string>
+    <string name="good_evening">शुभ संध्या</string>
+
+    <!-- Settings -->
+    <string name="premium_label">प्रीमियम</string>
+    <string name="unlimited_label">असीमित</string>
+    <string name="daily_rewards">दैनिक पुरस्कार</string>
+    <string name="notifications">सूचनाएँ</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">कुछ ग़लत हो गया</string>
+    <string name="no_internet">इंटरनेट कनेक्शन नहीं है</string>
+    <string name="please_try_again">कृपया पुनः प्रयास करें</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">इस खेल को अनुकूलित करें</string>
+    <string name="what_would_you_change">आप क्या बदलना चाहेंगे?</string>
+    <string name="customizing_game">खेल अनुकूलित हो रहा है\u2026</string>
+
+    <!-- ============================================== -->
+    <!-- NEW ENTRIES BELOW                              -->
+    <!-- ============================================== -->
+
+    <!-- Language Picker -->
+    <string name="language">भाषा</string>
+    <string name="language_picker_title">भाषा चुनें</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">पुनः प्रयास करें</string>
+    <string name="skip">छोड़ें</string>
+    <string name="skip_puzzle">पहेली छोड़ें</string>
+    <string name="retry">पुनः प्रयास</string>
+    <string name="share">साझा करें</string>
+    <string name="share_puzzle">पहेली साझा करें</string>
+    <string name="play">खेलें</string>
+    <string name="edit">संपादित करें</string>
+    <string name="create">बनाएँ</string>
+    <string name="explore">खोजें</string>
+    <string name="reset">रीसेट</string>
+    <string name="reveal">प्रकट करें</string>
+    <string name="clear">मिटाएँ</string>
+    <string name="clear_all">सब मिटाएँ</string>
+    <string name="check">जाँचें</string>
+    <string name="go_back">वापस जाएँ</string>
+    <string name="home">होम</string>
+    <string name="upgrade">अपग्रेड</string>
+    <string name="manage">प्रबंधित करें</string>
+    <string name="got_it">समझ गए!</string>
+    <string name="fix_it">ठीक करें</string>
+    <string name="just_close">बस बंद करें</string>
+    <string name="modify">संशोधित करें</string>
+    <string name="load_more">और लोड करें</string>
+    <string name="loading">लोड हो रहा है\u2026</string>
+    <string name="save">सहेजें</string>
+    <string name="yes">हाँ</string>
+    <string name="yes_finish">हाँ, समाप्त करें</string>
+    <string name="yes_it_works">हाँ, काम करता है!</string>
+    <string name="no_it_has_issues">नहीं, समस्याएँ हैं</string>
+    <string name="finish_now">अभी समाप्त करें</string>
+    <string name="keep_playing">खेलते रहें</string>
+    <string name="finish_early">जल्दी समाप्त करें</string>
+    <string name="give_up">हार मानें</string>
+    <string name="back_to_home">होम पर वापस जाएँ</string>
+    <string name="submit_answer">उत्तर जमा करें</string>
+    <string name="start_game">खेल शुरू करें</string>
+    <string name="start_puzzle">पहेली शुरू करें</string>
+    <string name="start_challenge">चुनौती शुरू करें</string>
+    <string name="begin">शुरू करें</string>
+    <string name="im_ready">मैं तैयार हूँ!</string>
+    <string name="im_done">मैंने कर लिया</string>
+    <string name="skip_tutorial">ट्यूटोरियल छोड़ें</string>
+    <string name="same">समान</string>
+    <string name="different">भिन्न</string>
+    <string name="next_puzzle">अगली पहेली</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">अगली पहेली लोड हो रही है\u2026</string>
+    <string name="loading_puzzle">पहेली लोड हो रही है\u2026</string>
+    <string name="generating">बन रहा है\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">त्वरित कार्य</string>
+    <string name="start_playing_instantly">तुरंत खेलना शुरू करें</string>
+    <string name="your_favorites">आपके पसंदीदा</string>
+    <string name="trending_now">अभी ट्रेंडिंग</string>
+    <string name="recommended_for_you">आपके लिए अनुशंसित</string>
+    <string name="puzzle_collections">पहेली संग्रह</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">खेल त्रुटि</string>
+    <string name="quiz_categories">क्विज़ श्रेणियाँ</string>
+    <string name="subscription">सदस्यता</string>
+    <string name="current_tier">वर्तमान स्तर</string>
+    <string name="active_streaks">सक्रिय लगातार</string>
+    <string name="time_label">समय</string>
+    <string name="badges">बैज</string>
+    <string name="unable_to_load_progress">प्रगति डेटा लोड करने में असमर्थ</string>
+    <string name="custom_puzzles">कस्टम पहेलियाँ</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">जब खिलाड़ी आपके खेल का आनंद लें तो सिक्के कमाएँ!</string>
+    <string name="creator_revenue_share">आपको अपने खेलों पर ख़र्च किए गए सिक्कों का 55%% मिलता है</string>
+    <string name="coins_earned">कमाए गए सिक्के</string>
+    <string name="plays_monetized">मुद्रीकृत प्ले</string>
+    <string name="per_game">प्रति खेल</string>
+    <string name="cash_out">निकासी</string>
+    <string name="cash_out_earnings">कमाई निकालें</string>
+    <string name="connect_stripe_to_receive">भुगतान प्राप्त करने के लिए Stripe कनेक्ट करें</string>
+    <string name="connect_stripe_account">Stripe खाता कनेक्ट करें</string>
+    <string name="complete_stripe_setup">Stripe सेटअप पूरा करें</string>
+    <string name="continue_setup">सेटअप जारी रखें</string>
+    <string name="request_payout">भुगतान का अनुरोध करें</string>
+    <string name="payout_history">भुगतान इतिहास</string>
+    <string name="checking_eligibility">पात्रता जाँच रहे हैं\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">खेल बनाएँ</string>
+    <string name="describe_game_prompt">किसी भी खेल का वर्णन करें और AI उसे आपके लिए बनाएगा</string>
+    <string name="describe_game_placeholder">अपने खेल का वर्णन करें\u2026</string>
+    <string name="generate_game">खेल जनरेट करें</string>
+    <string name="free_generations_used_up">मुफ़्त जनरेशन समाप्त</string>
+    <string name="buy_coins">सिक्के ख़रीदें</string>
+    <string name="subscribe_for_unlimited">असीमित के लिए सदस्यता लें</string>
+    <string name="get_unlimited_generations">असीमित जनरेशन + मासिक सिक्के पाएँ</string>
+    <string name="reference_image">संदर्भ चित्र</string>
+    <string name="try_these_ideas">ये विचार आज़माएँ</string>
+    <string name="game_title">खेल का शीर्षक</string>
+    <string name="describe_your_version">अपने संस्करण का वर्णन करें</string>
+    <string name="create_game">खेल बनाएँ</string>
+    <string name="create_your_version">अपना संस्करण बनाएँ</string>
+    <string name="creating_your_game">आपका खेल बन रहा है</string>
+    <string name="this_may_take_2_5_minutes">इसमें 2\u20135 मिनट लग सकते हैं\u2026</string>
+    <string name="notify_me_when_done">तैयार होने पर सूचित करें</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">समुदाय के खेल</string>
+    <string name="my_games">मेरे खेल</string>
+    <string name="draft">ड्राफ़्ट</string>
+    <string name="generating_harder_challenge">कठिन चुनौती बन रही है</string>
+    <string name="did_this_game_work">क्या यह खेल काम किया?</string>
+    <string name="whats_wrong">क्या ग़लत है?</string>
+    <string name="modify_game">खेल संशोधित करें</string>
+    <string name="game_name">खेल का नाम</string>
+    <string name="create_customized_game">अनुकूलित खेल बनाएँ</string>
+    <string name="original">मूल</string>
+    <string name="sort_by">क्रमबद्ध करें</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">इस खेल में समस्याएँ हो सकती हैं</string>
+    <string name="game_saved">खेल सहेजा गया!</string>
+    <string name="game_ready">खेल तैयार!</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">प्रतीक्षा छोड़ें!</string>
+    <string name="get_instant_generation">तुरंत पहेली जनरेशन पाएँ</string>
+    <string name="wait_time">प्रतीक्षा समय</string>
+    <string name="instant">तुरंत</string>
+    <string name="premium_member">प्रीमियम सदस्य</string>
+    <string name="upgrade_now">अभी अपग्रेड करें</string>
+    <string name="upgrade_for_unlimited">असीमित के लिए अपग्रेड करें</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">खेल सेटिंग्स</string>
+    <string name="difficulty_level">कठिनाई स्तर</string>
+    <string name="game_mode">खेल मोड</string>
+    <string name="default_difficulty">डिफ़ॉल्ट कठिनाई</string>
+    <string name="checking">जाँच रहे हैं\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">यह कैसे काम करता है:</string>
+    <string name="progress">प्रगति</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">ई-मेल से भेजें</string>
+    <string name="copy_to_clipboard">क्लिपबोर्ड पर कॉपी करें</string>
+    <string name="puzzle_completed">पहेली पूरी हुई!</string>
+    <string name="achievement_unlocked">उपलब्धि अनलॉक!</string>
+    <string name="level_up">स्तर बढ़ा!</string>
+    <string name="recipient_email">प्राप्तकर्ता ई-मेल</string>
+    <string name="recipient_name">प्राप्तकर्ता का नाम</string>
+    <string name="copied_to_clipboard">क्लिपबोर्ड पर कॉपी हो गया!</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">लीडरबोर्ड</string>
+    <string name="your_performance">आपका प्रदर्शन</string>
+    <string name="other_top_players">अन्य शीर्ष खिलाड़ी</string>
+    <string name="puzzle_statistics">पहेली आँकड़े</string>
+    <string name="overview">अवलोकन</string>
+    <string name="detailed_statistics">विस्तृत आँकड़े</string>
+    <string name="records">रिकॉर्ड</string>
+    <string name="no_players_yet">अभी कोई खिलाड़ी नहीं</string>
+    <string name="rank_label">रैंक</string>
+    <string name="percentile_label">प्रतिशतक</string>
+    <string name="total_players">कुल खिलाड़ी</string>
+    <string name="avg_score">औसत स्कोर</string>
+    <string name="fastest_time">सबसे तेज़ समय</string>
+    <string name="highest_score">सर्वोच्च स्कोर</string>
+
+    <!-- Game State -->
+    <string name="game_complete">खेल पूरा हुआ!</string>
+    <string name="final_score">अंतिम स्कोर</string>
+    <string name="final_results">अंतिम परिणाम</string>
+    <string name="session_score">सत्र स्कोर</string>
+    <string name="total_score">कुल स्कोर</string>
+    <string name="correct_answers">सही उत्तर</string>
+    <string name="accuracy">सटीकता</string>
+    <string name="avg_time">औसत समय</string>
+    <string name="puzzle_complete">पहेली पूरी!</string>
+    <string name="difficulty_advanced">कठिनाई बढ़ी!</string>
+    <string name="continue_label_caps">जारी रखें</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">मेमोरी स्क्वेयर</string>
+    <string name="get_ready">तैयार हो जाएँ!</string>
+    <string name="memorize_the_pattern">पैटर्न याद रखें!</string>
+    <string name="click_squares_you_remember">जो स्क्वेयर याद हैं उन पर क्लिक करें!</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">क्या अर्थ टेक्स्ट के रंग से मेल खाता है?</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">कैसे खेलें</string>
+    <string name="drop_here">यहाँ छोड़ें</string>
+    <string name="completed">पूरा हुआ</string>
+    <string name="time_used">उपयोग किया गया समय</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">कुछ उत्तर ग़लत हैं</string>
+    <string name="all_hints">सभी संकेत</string>
+
+    <!-- Word Search -->
+    <string name="found">मिला</string>
+    <string name="revealed">प्रकट</string>
+    <string name="best_streak">सर्वश्रेष्ठ लगातार</string>
+    <string name="drag_to_find_words">छिपे शब्द खोजने के लिए अक्षरों पर खींचें</string>
+    <string name="find_these_words">ये शब्द खोजें:</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">गोल्ड स्तर पहुँचा!</string>
+    <string name="bonus_words_found">बोनस शब्द मिले:</string>
+    <string name="great_job">शानदार!</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">ट्यूटोरियल</string>
+    <string name="tutorial_mode">ट्यूटोरियल मोड</string>
+    <string name="got_it_lets_play">समझ गए! चलो खेलें</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">पसंदीदा विषय</string>
+    <string name="popular_topics">लोकप्रिय विषय</string>
+    <string name="add_custom_topic">कस्टम विषय जोड़ें</string>
+    <string name="your_selected_topics">आपके चुने हुए विषय</string>
+    <string name="no_topics_selected">अभी कोई विषय नहीं चुना</string>
+    <string name="saving">सहेज रहे हैं\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">प्रदर्शन विश्लेषण</string>
+    <string name="performance_stats">प्रदर्शन आँकड़े</string>
+    <string name="daily_streak">दैनिक लगातार</string>
+    <string name="lets_play">चलो खेलें!</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">पहेली लोड करने में त्रुटि</string>
+    <string name="no_hint_available">कोई संकेत उपलब्ध नहीं</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">संख्याओं को बढ़ते क्रम में टैप करें (सबसे छोटी से सबसे बड़ी)</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">देश भूगोल चुनौती</string>
+</resources>

@@ -1,0 +1,49 @@
+{
+  "reportType": "antonym_rebuild",
+  "generatedAt": "2025-07-17T20:46:33.229Z",
+  "summary": {
+    "originalPuzzleCount": 0,
+    "uniquePairsFound": 0,
+    "newPuzzleCount": 0,
+    "pairsUsed": 0,
+    "pairsRemaining": 0,
+    "puzzlesToRemove": 0,
+    "executionTime": 1314,
+    "backupPath": "backups/antonyms_original_backup_2025-07-17T20-46-32-304Z.json",
+    "validation": {
+      "isValid": false,
+      "issues": [
+        "0 end nodes (should be 1)",
+        "0 start nodes (should be 1)"
+      ],
+      "summary": {
+        "totalPuzzles": 0,
+        "totalPathEntries": 0,
+        "missingFromPath": 0,
+        "orphanedPaths": 0,
+        "endNodes": 0,
+        "brokenChains": 0
+      },
+      "recommendations": [
+        "Run path repair if issues persist",
+        "Consider manual path rebuild"
+      ]
+    },
+    "insertedPuzzleIds": []
+  },
+  "originalPuzzlesSample": [],
+  "uniquePairsSample": [],
+  "newPuzzlesSample": [],
+  "structureAnalysis": {
+    "totalPuzzles": 0,
+    "validPuzzles": 0,
+    "invalidPuzzles": 0,
+    "pairCounts": [],
+    "avgPairsPerPuzzle": 0,
+    "minPairs": null,
+    "maxPairs": null,
+    "pairDistribution": {}
+  },
+  "unusedPairsSample": [],
+  "recommendations": []
+}

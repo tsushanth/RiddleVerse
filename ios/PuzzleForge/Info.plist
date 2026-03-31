@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>RiddleVerse needs access to your photo library so you can attach images to your web apps.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb683240914470617</string>
+				<string></string>
+				<string>com.googleusercontent.apps.719851629523-vqof4ramsjqronhpfpit89up6n1d0d6u</string>
+			</array>
+		</dict>
+	</array>
+	<key>FacebookAppID</key>
+	<string>683240914470617</string>
+	<key>FacebookClientToken</key>
+	<string>3c5d2a4d8bc100f17828db3c930ebd15</string>
+	<key>FacebookDisplayName</key>
+	<string>RiddleVerse</string>
+	<key>FirebaseAppDelegateProxyEnabled</key>
+	<false/>
+	<key>FirebaseMessagingNotificationCategories</key>
+	<array>
+		<dict>
+			<key>actions</key>
+			<array>
+				<dict>
+					<key>identifier</key>
+					<string>view_puzzles</string>
+					<key>options</key>
+					<integer>1</integer>
+					<key>title</key>
+					<string>View Puzzles</string>
+				</dict>
+				<dict>
+					<key>identifier</key>
+					<string>remind_later</string>
+					<key>options</key>
+					<integer>0</integer>
+					<key>title</key>
+					<string>Remind Later</string>
+				</dict>
+			</array>
+			<key>identifier</key>
+			<string>daily_puzzles</string>
+		</dict>
+	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>RiddleVerse uses your device identifier to show you more relevant ads and measure performance.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>RiddleVerse uses your microphone so you can create web apps using voice commands.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>RiddleVerse uses speech recognition to understand your voice commands when creating web apps.</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-5764510017766009~5502569074</string>
+	<key>GIDClientID</key>
+	<string>719851629523-vqof4ramsjqronhpfpit89up6n1d0d6u.apps.googleusercontent.com</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>googlechrome</string>
+		<string>com.googleusercontent.apps.719851629523-vqof4ramsjqronhpfpit89up6n1d0d6u</string>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>puzzleverseai.com</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<!-- TikTok / Bytedance (Non-China) -->
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>22mmun2rn5.skadnetwork</string>
+		</dict>
+		<!-- TikTok / Bytedance (China / Pangle) -->
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>238da6jt44.skadnetwork</string>
+		</dict>
+	</array>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+</dict>
+</plist>

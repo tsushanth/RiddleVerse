@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Puzzle Game</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Optional CSS -->
+</head>
+<body>
+
+    <div class="container">
+        <!-- ✅ Google Sign-In (Only shown when NOT logged in) -->
+        <button id="login-button" style="display: none;">Google Sign in</button>
+        <!-- ✅ Email/Password Sign-In Form -->
+        <div id="email-auth-container" style="display: none;">
+            <input type="email" id="email-input" placeholder="Enter your email">
+            <input type="password" id="password-input" placeholder="Enter your password">
+            <button id="email-signup-button">Sign Up</button>
+            <button id="email-signin-button">Sign In</button>
+        </div>
+
+        <!-- ✅ Game Content (Hidden until user logs in) -->
+        <div id="gameContent" style="display: none;">
+            <h1>AI Puzzle Game</h1>
+
+            <label for="puzzleType">Choose Puzzle Type:</label>
+            <select id="puzzleType">
+                <option value="trivia">Trivia</option>
+                <option value="anagram">Anagram</option>
+                <option value="storypuzzle">Story Puzzle</option>
+                <option value="math">Math</option>
+            </select>
+            <button id="loadPuzzleBtn">Load Puzzle</button>
+
+            <div id="puzzleContainer" style="display: none;"></div>
+            <div id="scoreBoard">
+                <p>🎯 Your Score: <span id="userScore">0</span></p>
+                <p>🤖 DeepSeek Score: <span id="deepSeekScore">0</span></p>
+            </div>
+
+            <div id="answerSection" style="display: none;">
+                <input type="text" id="userAnswer" placeholder="Enter your answer">
+                <button id="checkAnswerBtn">Submit</button>
+                <button id="showAnswerBtn">Show Answer</button>
+                <button id="showHintBtn">Show Hint</button>
+                <p id="correctAnswer" style="display: none;"></p>
+                <p id="hintText" style="display: none;"></p>
+            </div>
+        </div>
+
+        <!-- ✅ Settings Dropdown (Appears only when signed in) -->
+        <div id="settings-container" style="display: none;">
+            <button id="settings-button">⚙️ Settings</button>
+            <div id="settings-dropdown" class="settings-dropdown" style="display: none;">
+                <button id="show-leaderboard-button">Show Leaderboard</button>
+                <button id="sign-out-button">Sign Out</button>
+                <button id="reset-progress-button">Reset Puzzle Progress</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ✅ Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>🏆 Leaderboard</h2>
+            <ul id="leaderboard-list"></ul>
+        </div>
+    </div>
+
+    <!-- ✅ Reference external JavaScript file -->
+    <script src="index.js" type="module"></script>
+
+</body>
+</html>

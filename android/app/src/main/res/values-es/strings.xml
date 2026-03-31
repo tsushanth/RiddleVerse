@@ -1,0 +1,390 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">Encuentra palabras ocultas en una cuadrícula</string>
+    <string name="crossword_description">Completa palabras usando pistas</string>
+    <string name="anagram_description">Reordena letras para formar palabras</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">¡Fin del juego!</string>
+    <string name="points">puntos</string>
+    <string name="score_submitted">¡Puntuación enviada!</string>
+    <string name="play_again">Jugar de nuevo</string>
+    <string name="try_harder_version">Probar versión más difícil</string>
+    <string name="try_hard_version">Probar versión difícil</string>
+    <string name="try_very_hard_version">Probar versión muy difícil</string>
+    <string name="try_expert_version">Probar versión experta</string>
+    <string name="customize">Personalizar</string>
+    <string name="get_coins">Obtener monedas</string>
+    <string name="view_leaderboard">Ver clasificación</string>
+    <string name="done">Hecho</string>
+    <string name="earn_coins_tip">¡Gana monedas diarias jugando puzzles!</string>
+    <string name="coins_label">monedas</string>
+    <string name="no_games_yet">Aún no hay juegos</string>
+    <string name="be_first_to_create">¡Sé el primero en crear y compartir un juego!</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">Más recientes</string>
+    <string name="most_played">Más jugados</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">Para ti</string>
+    <string name="tab_categories">Categorías</string>
+    <string name="tab_games">Juegos</string>
+    <string name="tab_puzzles">Puzzles</string>
+    <string name="tab_settings">Ajustes</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">Explorar</string>
+    <string name="subtab_your_puzzles">Tus puzzles</string>
+    <string name="subtab_featured">Destacados</string>
+
+    <!-- Rating Dialog -->
+    <string name="enjoying_app">¿Disfrutas RiddleVerse?</string>
+    <string name="rate_in_play_store">¡Califícanos en Play Store!</string>
+    <string name="help_us_improve">¡Ayúdanos a mejorar!</string>
+    <string name="rate_experience">¿Cómo calificarías tu experiencia con RiddleVerse?</string>
+    <string name="rate_incentive">¡Obtén 100 monedas + acceso anticipado al calificarnos!</string>
+    <string name="thanks_great_rating">¡Gracias por la gran calificación! ¿Te importaría compartirla en Play Store?</string>
+    <string name="share_detailed_feedback">¡También puedes compartir comentarios detallados con nosotros primero!</string>
+    <string name="sorry_bad_experience">Lamentamos que no estés teniendo una buena experiencia. ¿Podrías decirnos qué podemos mejorar?</string>
+    <string name="continue_label">Continuar</string>
+    <string name="rate">Calificar</string>
+    <string name="rate_in_store">Calificar en tienda</string>
+    <string name="give_feedback">Dar opinión</string>
+    <string name="not_now">Ahora no</string>
+    <string name="maybe_later">Quizás después</string>
+    <string name="feedback_first">Opinión primero</string>
+
+    <!-- Rating Reminder Dialog -->
+    <string name="rating_reminder">Recordatorio de calificación</string>
+    <string name="when_remind_again">¿Cuándo quieres que te recordemos?</string>
+    <string name="remind_in_week">Recordar en una semana</string>
+    <string name="remind_in_month">Recordar en un mes</string>
+    <string name="dont_ask_again">No preguntar de nuevo</string>
+    <string name="cancel">Cancelar</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">¡Cuéntanos qué te encanta!</string>
+    <string name="what_enjoy_most">¿Qué es lo que más disfrutas de RiddleVerse?</string>
+    <string name="what_can_we_improve">¿Qué podemos mejorar? Tus comentarios nos ayudan.</string>
+    <string name="your_feedback">Tu opinión</string>
+    <string name="feedback_placeholder_positive">Me encanta la variedad de puzzles\u2026</string>
+    <string name="feedback_placeholder_negative">Me gustaría que la app tuviera\u2026</string>
+    <string name="submitted_successfully">¡Enviado correctamente!</string>
+    <string name="submission_failed">Error al enviar</string>
+    <string name="submit">Enviar</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">Tienda de monedas</string>
+    <string name="your_coins">Tus monedas</string>
+    <string name="coins_used_description">Las monedas se usan para continuar juegos y apoyar a creadores.</string>
+    <string name="best_value">Mejor valor</string>
+    <string name="rate_for_early_access">¡Califica para acceso anticipado!</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">OK</string>
+    <string name="back">Atrás</string>
+    <string name="close">Cerrar</string>
+    <string name="start">Iniciar</string>
+    <string name="next">Siguiente</string>
+
+    <!-- Game UI -->
+    <string name="correct">¡Correcto!</string>
+    <string name="wrong">¡Incorrecto!</string>
+    <string name="times_up">¡Se acabó el tiempo!</string>
+    <string name="score_label">Puntuación</string>
+    <string name="streak_label">Racha</string>
+    <string name="level_label">Nivel</string>
+    <string name="hint">Pista</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">Aún no hay puntuaciones</string>
+    <string name="play_to_set_score">¡Juega para establecer la primera puntuación!</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">Buenos días</string>
+    <string name="good_afternoon">Buenas tardes</string>
+    <string name="good_evening">Buenas noches</string>
+
+    <!-- Settings -->
+    <string name="premium_label">Premium</string>
+    <string name="unlimited_label">Ilimitado</string>
+    <string name="daily_rewards">Recompensas diarias</string>
+    <string name="notifications">Notificaciones</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">Algo salió mal</string>
+    <string name="no_internet">Sin conexión a internet</string>
+    <string name="please_try_again">Inténtalo de nuevo</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">Personalizar este juego</string>
+    <string name="what_would_you_change">¿Qué te gustaría cambiar?</string>
+    <string name="customizing_game">Personalizando juego\u2026</string>
+
+    <!-- ============================================== -->
+    <!-- NEW ENTRIES BELOW                              -->
+    <!-- ============================================== -->
+
+    <!-- Language Picker -->
+    <string name="language">Idioma</string>
+    <string name="language_picker_title">Seleccionar idioma</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(简体)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">Reintentar</string>
+    <string name="skip">Omitir</string>
+    <string name="skip_puzzle">Omitir puzzle</string>
+    <string name="retry">Reintentar</string>
+    <string name="share">Compartir</string>
+    <string name="share_puzzle">Compartir puzzle</string>
+    <string name="play">Jugar</string>
+    <string name="edit">Editar</string>
+    <string name="create">Crear</string>
+    <string name="explore">Explorar</string>
+    <string name="reset">Reiniciar</string>
+    <string name="reveal">Revelar</string>
+    <string name="clear">Borrar</string>
+    <string name="clear_all">Borrar todo</string>
+    <string name="check">Comprobar</string>
+    <string name="go_back">Volver</string>
+    <string name="home">Inicio</string>
+    <string name="upgrade">Mejorar</string>
+    <string name="manage">Gestionar</string>
+    <string name="got_it">¡Entendido!</string>
+    <string name="fix_it">Corregir</string>
+    <string name="just_close">Solo cerrar</string>
+    <string name="modify">Modificar</string>
+    <string name="load_more">Cargar más</string>
+    <string name="loading">Cargando\u2026</string>
+    <string name="save">Guardar</string>
+    <string name="yes">SÍ</string>
+    <string name="yes_finish">Sí, terminar</string>
+    <string name="yes_it_works">¡Sí, funciona!</string>
+    <string name="no_it_has_issues">No, tiene problemas</string>
+    <string name="finish_now">Terminar ahora</string>
+    <string name="keep_playing">Seguir jugando</string>
+    <string name="finish_early">Terminar antes</string>
+    <string name="give_up">Rendirse</string>
+    <string name="back_to_home">Volver al inicio</string>
+    <string name="submit_answer">Enviar respuesta</string>
+    <string name="start_game">INICIAR JUEGO</string>
+    <string name="start_puzzle">INICIAR PUZZLE</string>
+    <string name="start_challenge">INICIAR DESAFÍO</string>
+    <string name="begin">Comenzar</string>
+    <string name="im_ready">¡Estoy listo!</string>
+    <string name="im_done">He terminado</string>
+    <string name="skip_tutorial">Omitir tutorial</string>
+    <string name="same">IGUAL</string>
+    <string name="different">DIFERENTE</string>
+    <string name="next_puzzle">Siguiente puzzle</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">Cargando siguiente puzzle\u2026</string>
+    <string name="loading_puzzle">Cargando puzzle\u2026</string>
+    <string name="generating">Generando\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">Acciones rápidas</string>
+    <string name="start_playing_instantly">Empieza a jugar al instante</string>
+    <string name="your_favorites">Tus favoritos</string>
+    <string name="trending_now">Tendencias ahora</string>
+    <string name="recommended_for_you">Recomendado para ti</string>
+    <string name="puzzle_collections">Colecciones de puzzles</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">Error del juego</string>
+    <string name="quiz_categories">Categorías de quiz</string>
+    <string name="subscription">Suscripción</string>
+    <string name="current_tier">Nivel actual</string>
+    <string name="active_streaks">Rachas activas</string>
+    <string name="time_label">Tiempo</string>
+    <string name="badges">Insignias</string>
+    <string name="unable_to_load_progress">No se pudieron cargar los datos de progreso</string>
+    <string name="custom_puzzles">Puzzles personalizados</string>
+
+    <!-- Creator Monetization -->
+    <string name="earn_coins_from_games">¡Gana monedas cuando los jugadores disfruten tus juegos!</string>
+    <string name="creator_revenue_share">Recibes el 55%% de las monedas gastadas en tus juegos</string>
+    <string name="coins_earned">Monedas ganadas</string>
+    <string name="plays_monetized">Partidas monetizadas</string>
+    <string name="per_game">Por juego</string>
+    <string name="cash_out">Retirar</string>
+    <string name="cash_out_earnings">Retirar ganancias</string>
+    <string name="connect_stripe_to_receive">Conecta Stripe para recibir pagos</string>
+    <string name="connect_stripe_account">Conectar cuenta de Stripe</string>
+    <string name="complete_stripe_setup">Completar configuración de Stripe</string>
+    <string name="continue_setup">Continuar configuración</string>
+    <string name="request_payout">Solicitar pago</string>
+    <string name="payout_history">Historial de pagos</string>
+    <string name="checking_eligibility">Verificando elegibilidad\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">Crear un juego</string>
+    <string name="describe_game_prompt">Describe cualquier juego y la IA lo creará por ti</string>
+    <string name="describe_game_placeholder">Describe tu juego\u2026</string>
+    <string name="generate_game">Generar juego</string>
+    <string name="free_generations_used_up">Generaciones gratuitas agotadas</string>
+    <string name="buy_coins">Comprar monedas</string>
+    <string name="subscribe_for_unlimited">Suscríbete para ilimitado</string>
+    <string name="get_unlimited_generations">Obtén generaciones ilimitadas + monedas mensuales</string>
+    <string name="reference_image">Imagen de referencia</string>
+    <string name="try_these_ideas">Prueba estas ideas</string>
+    <string name="game_title">Título del juego</string>
+    <string name="describe_your_version">Describe tu versión</string>
+    <string name="create_game">Crear juego</string>
+    <string name="create_your_version">Crea tu versión</string>
+    <string name="creating_your_game">Creando tu juego</string>
+    <string name="this_may_take_2_5_minutes">Esto puede tardar 2\u20135 minutos\u2026</string>
+    <string name="notify_me_when_done">Avisarme cuando termine</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">Juegos de la comunidad</string>
+    <string name="my_games">Mis juegos</string>
+    <string name="draft">Borrador</string>
+    <string name="generating_harder_challenge">Generando desafío más difícil</string>
+    <string name="did_this_game_work">¿Funcionó este juego?</string>
+    <string name="whats_wrong">¿Qué está mal?</string>
+    <string name="modify_game">Modificar juego</string>
+    <string name="game_name">Nombre del juego</string>
+    <string name="create_customized_game">Crear juego personalizado</string>
+    <string name="original">Original</string>
+    <string name="sort_by">Ordenar por</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">Este juego puede tener problemas</string>
+    <string name="game_saved">¡Juego guardado!</string>
+    <string name="game_ready">¡Juego listo!</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">¡Salta la espera!</string>
+    <string name="get_instant_generation">Obtén generación instantánea de puzzles</string>
+    <string name="wait_time">Tiempo de espera</string>
+    <string name="instant">Instantáneo</string>
+    <string name="premium_member">Miembro Premium</string>
+    <string name="upgrade_now">Mejorar ahora</string>
+    <string name="upgrade_for_unlimited">Mejorar para ilimitado</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">Ajustes del juego</string>
+    <string name="difficulty_level">Nivel de dificultad</string>
+    <string name="game_mode">Modo de juego</string>
+    <string name="default_difficulty">Dificultad predeterminada</string>
+    <string name="checking">Comprobando\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">Cómo funciona:</string>
+    <string name="progress">Progreso</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">Enviar por correo</string>
+    <string name="copy_to_clipboard">Copiar al portapapeles</string>
+    <string name="puzzle_completed">¡Puzzle completado!</string>
+    <string name="achievement_unlocked">¡Logro desbloqueado!</string>
+    <string name="level_up">¡Subiste de nivel!</string>
+    <string name="recipient_email">Correo del destinatario</string>
+    <string name="recipient_name">Nombre del destinatario</string>
+    <string name="copied_to_clipboard">¡Copiado al portapapeles!</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">Clasificación</string>
+    <string name="your_performance">Tu rendimiento</string>
+    <string name="other_top_players">Otros mejores jugadores</string>
+    <string name="puzzle_statistics">Estadísticas de puzzles</string>
+    <string name="overview">Resumen</string>
+    <string name="detailed_statistics">Estadísticas detalladas</string>
+    <string name="records">Récords</string>
+    <string name="no_players_yet">Aún no hay jugadores</string>
+    <string name="rank_label">Rango</string>
+    <string name="percentile_label">Percentil</string>
+    <string name="total_players">Total de jugadores</string>
+    <string name="avg_score">Puntuación media</string>
+    <string name="fastest_time">Tiempo más rápido</string>
+    <string name="highest_score">Puntuación más alta</string>
+
+    <!-- Game State -->
+    <string name="game_complete">¡Juego completado!</string>
+    <string name="final_score">Puntuación final</string>
+    <string name="final_results">Resultados finales</string>
+    <string name="session_score">Puntuación de sesión</string>
+    <string name="total_score">Puntuación total</string>
+    <string name="correct_answers">Respuestas correctas</string>
+    <string name="accuracy">Precisión</string>
+    <string name="avg_time">Tiempo medio</string>
+    <string name="puzzle_complete">¡Puzzle completado!</string>
+    <string name="difficulty_advanced">¡Dificultad avanzada!</string>
+    <string name="continue_label_caps">CONTINUAR</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">Cuadrados de memoria</string>
+    <string name="get_ready">¡Prepárate!</string>
+    <string name="memorize_the_pattern">¡Memoriza el patrón!</string>
+    <string name="click_squares_you_remember">¡Haz clic en los cuadrados que recuerdes!</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">¿El significado coincide con el color del texto?</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">Cómo jugar</string>
+    <string name="drop_here">Soltar aquí</string>
+    <string name="completed">Completado</string>
+    <string name="time_used">Tiempo usado</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">Algunas respuestas son incorrectas</string>
+    <string name="all_hints">Todas las pistas</string>
+
+    <!-- Word Search -->
+    <string name="found">Encontrada</string>
+    <string name="revealed">Revelada</string>
+    <string name="best_streak">Mejor racha</string>
+    <string name="drag_to_find_words">Arrastra sobre las letras para encontrar palabras ocultas</string>
+    <string name="find_these_words">Encuentra estas palabras:</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">¡Nivel oro alcanzado!</string>
+    <string name="bonus_words_found">Palabras extra encontradas:</string>
+    <string name="great_job">¡Buen trabajo!</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">Tutorial</string>
+    <string name="tutorial_mode">Modo tutorial</string>
+    <string name="got_it_lets_play">¡Entendido! A jugar</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">Temas preferidos</string>
+    <string name="popular_topics">Temas populares</string>
+    <string name="add_custom_topic">Añadir tema personalizado</string>
+    <string name="your_selected_topics">Tus temas seleccionados</string>
+    <string name="no_topics_selected">Aún no hay temas seleccionados</string>
+    <string name="saving">Guardando\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">Análisis de rendimiento</string>
+    <string name="performance_stats">Estadísticas de rendimiento</string>
+    <string name="daily_streak">Racha diaria</string>
+    <string name="lets_play">¡A jugar!</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">Error al cargar el puzzle</string>
+    <string name="no_hint_available">No hay pista disponible</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">Toca los números en orden ascendente (del menor al mayor)</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">Desafío de geografía de países</string>
+</resources>

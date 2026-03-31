@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.BILLING"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:hardwareAccelerated="true"
+        android:largeHeap="true"
+        android:usesCleartextTraffic="true"
+        android:name="com.kreativekoala.riddleverse.MyApplication"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.RiddleVerse"
+        android:localeConfig="@xml/locales_config"
+        tools:targetApi="34">
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <!-- Firebase Messaging Configuration -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_notification" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="puzzle_notifications" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_color" />
+
+        <!-- Google Ads -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5764510017766009~4174542513"/>
+
+        <!-- Firebase Messaging Service -->
+        <service
+            android:name="com.kreativekoala.riddleverse.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Activities -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.RiddleVerse"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="https"
+                    android:host="puzzleverseai.com"
+                    android:pathPrefix="/open-riddle"/>
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.WelcomeActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.PuzzleLeaderboardActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.PuzzleGroupActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.DailyCompletionActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.StartPuzzleActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.TierProgressDashboardActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.PreferredTopicsActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.AuthActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.HomeActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:launchMode="singleTop"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="riddleverse" android:host="game-complete" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.TutorialVideoActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.BadgeCollectionActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.WelcomeOnboardingActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.LeaderboardActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.CreatePuzzleActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:exported="true" />
+
+        <activity
+            android:name="com.kreativekoala.riddleverse.PuzzleActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="true" />
+    </application>
+</manifest>

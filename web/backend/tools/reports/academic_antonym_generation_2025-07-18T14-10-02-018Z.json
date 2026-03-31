@@ -1,0 +1,375 @@
+{
+  "reportType": "academic_antonym_generation",
+  "generatedAt": "2025-07-18T14:10:02.018Z",
+  "summary": {
+    "totalWordsProcessed": 200,
+    "antonymPairsGenerated": 19,
+    "strategies": {
+      "ai_conceptual": 13,
+      "ai_contextual": 12,
+      "academic_patterns": 0
+    },
+    "generatedPairs": [
+      {
+        "word1": "relations",
+        "word2": "isolation",
+        "confidence": 0.9,
+        "reasoning": "Relations implies connections and interactions while isolation implies a lack of connection or interaction",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "personality",
+        "word2": "uniformity",
+        "confidence": 0.9,
+        "reasoning": "Personality refers to unique individual traits, while uniformity refers to sameness or lack of variation among individuals or groups",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relationship",
+        "word2": "estrangement",
+        "confidence": 0.9,
+        "reasoning": "Relationship implies a connection or bond between people, while estrangement implies a lack of connection or a severing of bonds",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relation",
+        "word2": "separation",
+        "confidence": 0.9,
+        "reasoning": "Relation implies a connection or bond between entities or parts, while separation implies a lack of connection or a breaking apart",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "switzerland",
+        "word2": "australia",
+        "confidence": 0.9,
+        "reasoning": "Switzerland is a small, landlocked country in central Europe, while Australia is a large, island country in the Southern Hemisphere",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "declaration",
+        "word2": "question",
+        "confidence": 0.9,
+        "reasoning": "A declaration is a clear, explicit statement, while a question seeks information and is not a clear, explicit statement",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "observation",
+        "word2": "neglect",
+        "confidence": 0.9,
+        "reasoning": "Observation implies active attention and recording of data, while neglect implies a lack of attention or disregard",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "celebration",
+        "word2": "mourning",
+        "confidence": 0.9,
+        "reasoning": "Celebration is a joyful occasion, while mourning is a sorrowful occasion",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "exploration",
+        "word2": "inhabitation",
+        "confidence": 0.9,
+        "reasoning": "Exploration implies searching or discovering new places, while inhabitation implies settling in a known place",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "resolution",
+        "word2": "conflict",
+        "confidence": 0.9,
+        "reasoning": "Resolution implies reaching a decision or agreement, while conflict implies disagreement or dispute",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relocation",
+        "word2": "settlement",
+        "confidence": 0.9,
+        "reasoning": "Relocation implies moving to a new place, while settlement implies staying or settling in a place",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "revelation",
+        "word2": "concealment",
+        "confidence": 0.9,
+        "reasoning": "Revelation implies making something known or evident, while concealment implies hiding or keeping something secret",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relaxation",
+        "word2": "tension",
+        "confidence": 0.9,
+        "reasoning": "Relaxation implies the release or lessening of tension or stress, while tension implies the buildup or increase of stress or strain",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "declaration",
+        "word2": "retraction",
+        "confidence": 0.9,
+        "context": "communication",
+        "reasoning": "A declaration asserts a statement; a retraction withdraws a statement",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "exploration",
+        "word2": "settlement",
+        "confidence": 0.85,
+        "context": "travel",
+        "reasoning": "Exploration involves moving and discovering new places, while settlement involves staying in one place",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "relation",
+        "word2": "disassociation",
+        "confidence": 0.8,
+        "context": "conceptual",
+        "reasoning": "Relation implies connection; disassociation implies lack of connection",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "observation",
+        "word2": "ignorance",
+        "confidence": 0.8,
+        "context": "science",
+        "reasoning": "Observation implies gaining knowledge; ignorance implies lack of knowledge",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "relocation",
+        "word2": "stability",
+        "confidence": 0.8,
+        "context": "living conditions",
+        "reasoning": "Relocation involves moving to a new place, while stability involves staying in the same place",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "switzerland",
+        "word2": "maldives",
+        "confidence": 0.7,
+        "context": "geography",
+        "reasoning": "Switzerland is a landlocked country in Europe; Maldives is an island country in the Indian Ocean",
+        "source": "ai_contextual",
+        "category": "contextual"
+      }
+    ],
+    "errors": [],
+    "executionTime": 101331
+  },
+  "academicWordsSample": [
+    {
+      "word": "relations",
+      "part_of_speech": "n",
+      "crossword_score": 23.650514997832
+    },
+    {
+      "word": "personality",
+      "part_of_speech": "n",
+      "crossword_score": 23.650514997832
+    },
+    {
+      "word": "relationship",
+      "part_of_speech": "n",
+      "crossword_score": 22.070514997832
+    },
+    {
+      "word": "relation",
+      "part_of_speech": "n",
+      "crossword_score": 21.650514997832
+    },
+    {
+      "word": "switzerland",
+      "part_of_speech": "n",
+      "crossword_score": 21.650514997832
+    },
+    {
+      "word": "journalist",
+      "part_of_speech": "n",
+      "crossword_score": 21.650514997832
+    },
+    {
+      "word": "declaration",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "observation",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "celebration",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "exploration",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "resolution",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "relocation",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "revelation",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "relaxation",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "operations",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "stationery",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "revolutionary",
+      "part_of_speech": "n",
+      "crossword_score": 21.500514997832
+    },
+    {
+      "word": "investigator",
+      "part_of_speech": "n",
+      "crossword_score": 21.480514997832
+    },
+    {
+      "word": "conservative",
+      "part_of_speech": "n",
+      "crossword_score": 21.480514997832
+    },
+    {
+      "word": "conservation",
+      "part_of_speech": "n",
+      "crossword_score": 21.480514997832
+    }
+  ],
+  "generatedPairsSample": [
+    {
+      "word1": "relations",
+      "word2": "isolation",
+      "confidence": 0.9,
+      "reasoning": "Relations implies connections and interactions while isolation implies a lack of connection or interaction",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "personality",
+      "word2": "uniformity",
+      "confidence": 0.9,
+      "reasoning": "Personality refers to unique individual traits, while uniformity refers to sameness or lack of variation among individuals or groups",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "relationship",
+      "word2": "estrangement",
+      "confidence": 0.9,
+      "reasoning": "Relationship implies a connection or bond between people, while estrangement implies a lack of connection or a severing of bonds",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "relation",
+      "word2": "separation",
+      "confidence": 0.9,
+      "reasoning": "Relation implies a connection or bond between entities or parts, while separation implies a lack of connection or a breaking apart",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "switzerland",
+      "word2": "australia",
+      "confidence": 0.9,
+      "reasoning": "Switzerland is a small, landlocked country in central Europe, while Australia is a large, island country in the Southern Hemisphere",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "declaration",
+      "word2": "question",
+      "confidence": 0.9,
+      "reasoning": "A declaration is a clear, explicit statement, while a question seeks information and is not a clear, explicit statement",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "observation",
+      "word2": "neglect",
+      "confidence": 0.9,
+      "reasoning": "Observation implies active attention and recording of data, while neglect implies a lack of attention or disregard",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "celebration",
+      "word2": "mourning",
+      "confidence": 0.9,
+      "reasoning": "Celebration is a joyful occasion, while mourning is a sorrowful occasion",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "exploration",
+      "word2": "inhabitation",
+      "confidence": 0.9,
+      "reasoning": "Exploration implies searching or discovering new places, while inhabitation implies settling in a known place",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "resolution",
+      "word2": "conflict",
+      "confidence": 0.9,
+      "reasoning": "Resolution implies reaching a decision or agreement, while conflict implies disagreement or dispute",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    }
+  ],
+  "thresholds": {
+    "minCrosswordScore": 15,
+    "batchSize": 8,
+    "targetPairs": 25,
+    "maxRetries": 3
+  },
+  "recommendations": [
+    {
+      "priority": "info",
+      "message": "Successfully generated 19 academic antonym pairs"
+    },
+    {
+      "priority": "info",
+      "message": "Conceptual antonyms more successful - academic vocabulary works well with concept-based opposites"
+    }
+  ]
+}

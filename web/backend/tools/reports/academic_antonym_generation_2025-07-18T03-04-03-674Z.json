@@ -1,0 +1,429 @@
+{
+  "reportType": "academic_antonym_generation",
+  "generatedAt": "2025-07-18T03:04:03.674Z",
+  "summary": {
+    "totalWordsProcessed": 200,
+    "antonymPairsGenerated": 25,
+    "strategies": {
+      "ai_conceptual": 13,
+      "ai_contextual": 12,
+      "academic_patterns": 0
+    },
+    "generatedPairs": [
+      {
+        "word1": "relations",
+        "word2": "isolation",
+        "confidence": 0.8,
+        "reasoning": "While 'relations' implies a connection or interaction between entities, 'isolation' implies a lack of such connections or interactions.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "personality",
+        "word2": "uniformity",
+        "confidence": 0.75,
+        "reasoning": "'Personality' suggests individuality and distinct characteristics, while 'uniformity' suggests sameness and lack of differentiation.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relationship",
+        "word2": "estrangement",
+        "confidence": 0.8,
+        "reasoning": "'Relationship' implies a connection or bond between entities, while 'estrangement' implies a separation or alienation.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relation",
+        "word2": "disconnection",
+        "confidence": 0.8,
+        "reasoning": "'Relation' implies a link or association between entities, while 'disconnection' implies a lack of such link or association.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "journalist",
+        "word2": "subject",
+        "confidence": 0.7,
+        "reasoning": "A 'journalist' is the person reporting or telling a story, while the 'subject' is the person or thing being reported on.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "declaration",
+        "word2": "withholding",
+        "confidence": 0.8,
+        "reasoning": "'Declaration' implies the act of making something known, while 'withholding' implies keeping something concealed.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "observation",
+        "word2": "ignorance",
+        "confidence": 0.7,
+        "reasoning": "'Observation' implies the act of watching or noticing something, while 'ignorance' implies a lack of knowledge or awareness.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "celebration",
+        "word2": "mourning",
+        "confidence": 0.9,
+        "reasoning": "Celebration is a joyful recognition of a significant event, while mourning is a display of deep sorrow, often for a loss. They represent opposing emotional reactions.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "exploration",
+        "word2": "ignorance",
+        "confidence": 0.8,
+        "reasoning": "Exploration involves seeking knowledge or experience, whereas ignorance involves lack of knowledge or awareness.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "resolution",
+        "word2": "conflict",
+        "confidence": 0.9,
+        "reasoning": "Resolution signals the end or solution to a problem or conflict, while conflict represents the existence of a problem or disagreement.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relocation",
+        "word2": "stagnation",
+        "confidence": 0.7,
+        "reasoning": "Relocation implies movement or change in position, while stagnation implies no movement or change.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "revelation",
+        "word2": "concealment",
+        "confidence": 0.9,
+        "reasoning": "Revelation involves uncovering or making known, whereas concealment involves hiding or keeping unknown.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relaxation",
+        "word2": "tension",
+        "confidence": 0.9,
+        "reasoning": "Relaxation is a state of rest or ease, whereas tension is a state of mental or emotional strain.",
+        "source": "ai_conceptual",
+        "category": "conceptual"
+      },
+      {
+        "word1": "relations",
+        "word2": "isolation",
+        "confidence": 0.9,
+        "context": "relationship opposites",
+        "reasoning": "In a social or professional context, 'relations' implies connections or interactions, while 'isolation' suggests a lack of such interactions",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "personality",
+        "word2": "uniformity",
+        "confidence": 0.7,
+        "context": "quality-based opposites",
+        "reasoning": "'Personality' denotes unique attributes of an individual, while 'uniformity' implies an absence of uniqueness or individuality",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "relationship",
+        "word2": "estrangement",
+        "confidence": 0.8,
+        "context": "relationship opposites",
+        "reasoning": "'Relationship' denotes a connection between people, while 'estrangement' denotes a separation or disconnection",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "relation",
+        "word2": "disparity",
+        "confidence": 0.7,
+        "context": "relationship opposites",
+        "reasoning": "'Relation' implies a connection or similarity between two entities, while 'disparity' implies a difference or disconnection",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "Switzerland",
+        "word2": "Australia",
+        "confidence": 0.6,
+        "context": "geographical opposites",
+        "reasoning": "'Switzerland' is a landlocked country in Europe, while 'Australia' is an island country in Oceania",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "journalist",
+        "word2": "subject",
+        "confidence": 0.8,
+        "context": "role-based opposites",
+        "reasoning": "In a journalistic context, a 'journalist' is the one who reports or writes the news, while the 'subject' is the one being reported on",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "declaration",
+        "word2": "retraction",
+        "confidence": 0.9,
+        "context": "process opposites",
+        "reasoning": "'Declaration' implies making a statement, while 'retraction' implies withdrawing a statement",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "observation",
+        "word2": "overlook",
+        "confidence": 0.7,
+        "context": "action opposites",
+        "reasoning": "'Observation' implies making and recording a measurement or noticing something, while 'overlook' implies missing or failing to notice something",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "celebration",
+        "word2": "mourning",
+        "confidence": 0.9,
+        "context": "emotional response",
+        "reasoning": "Celebration is a joyful occasion, mourning is a sorrowful one",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "exploration",
+        "word2": "settlement",
+        "confidence": 0.8,
+        "context": "process opposites",
+        "reasoning": "Exploration involves discovery and movement, settlement involves staying in one place",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "resolution",
+        "word2": "dispute",
+        "confidence": 0.9,
+        "context": "process opposites",
+        "reasoning": "Resolution is an agreement or decision reached, dispute is a disagreement or argument",
+        "source": "ai_contextual",
+        "category": "contextual"
+      },
+      {
+        "word1": "relocation",
+        "word2": "stagnation",
+        "confidence": 0.7,
+        "context": "process opposites",
+        "reasoning": "Relocation involves movement and change, stagnation involves lack of movement or change",
+        "source": "ai_contextual",
+        "category": "contextual"
+      }
+    ],
+    "errors": [],
+    "executionTime": 92417
+  },
+  "academicWordsSample": [
+    {
+      "word": "relations",
+      "part_of_speech": "n",
+      "crossword_score": 23.650514997832
+    },
+    {
+      "word": "personality",
+      "part_of_speech": "n",
+      "crossword_score": 23.650514997832
+    },
+    {
+      "word": "relationship",
+      "part_of_speech": "n",
+      "crossword_score": 22.070514997832
+    },
+    {
+      "word": "relation",
+      "part_of_speech": "n",
+      "crossword_score": 21.650514997832
+    },
+    {
+      "word": "switzerland",
+      "part_of_speech": "n",
+      "crossword_score": 21.650514997832
+    },
+    {
+      "word": "journalist",
+      "part_of_speech": "n",
+      "crossword_score": 21.650514997832
+    },
+    {
+      "word": "declaration",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "observation",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "celebration",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "exploration",
+      "part_of_speech": "n",
+      "crossword_score": 21.560514997832
+    },
+    {
+      "word": "resolution",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "relocation",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "revelation",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "relaxation",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "operations",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "stationery",
+      "part_of_speech": "n",
+      "crossword_score": 21.550514997832
+    },
+    {
+      "word": "revolutionary",
+      "part_of_speech": "n",
+      "crossword_score": 21.500514997832
+    },
+    {
+      "word": "investigator",
+      "part_of_speech": "n",
+      "crossword_score": 21.480514997832
+    },
+    {
+      "word": "conservative",
+      "part_of_speech": "n",
+      "crossword_score": 21.480514997832
+    },
+    {
+      "word": "conservation",
+      "part_of_speech": "n",
+      "crossword_score": 21.480514997832
+    }
+  ],
+  "generatedPairsSample": [
+    {
+      "word1": "relations",
+      "word2": "isolation",
+      "confidence": 0.8,
+      "reasoning": "While 'relations' implies a connection or interaction between entities, 'isolation' implies a lack of such connections or interactions.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "personality",
+      "word2": "uniformity",
+      "confidence": 0.75,
+      "reasoning": "'Personality' suggests individuality and distinct characteristics, while 'uniformity' suggests sameness and lack of differentiation.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "relationship",
+      "word2": "estrangement",
+      "confidence": 0.8,
+      "reasoning": "'Relationship' implies a connection or bond between entities, while 'estrangement' implies a separation or alienation.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "relation",
+      "word2": "disconnection",
+      "confidence": 0.8,
+      "reasoning": "'Relation' implies a link or association between entities, while 'disconnection' implies a lack of such link or association.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "journalist",
+      "word2": "subject",
+      "confidence": 0.7,
+      "reasoning": "A 'journalist' is the person reporting or telling a story, while the 'subject' is the person or thing being reported on.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "declaration",
+      "word2": "withholding",
+      "confidence": 0.8,
+      "reasoning": "'Declaration' implies the act of making something known, while 'withholding' implies keeping something concealed.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "observation",
+      "word2": "ignorance",
+      "confidence": 0.7,
+      "reasoning": "'Observation' implies the act of watching or noticing something, while 'ignorance' implies a lack of knowledge or awareness.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "celebration",
+      "word2": "mourning",
+      "confidence": 0.9,
+      "reasoning": "Celebration is a joyful recognition of a significant event, while mourning is a display of deep sorrow, often for a loss. They represent opposing emotional reactions.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "exploration",
+      "word2": "ignorance",
+      "confidence": 0.8,
+      "reasoning": "Exploration involves seeking knowledge or experience, whereas ignorance involves lack of knowledge or awareness.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    },
+    {
+      "word1": "resolution",
+      "word2": "conflict",
+      "confidence": 0.9,
+      "reasoning": "Resolution signals the end or solution to a problem or conflict, while conflict represents the existence of a problem or disagreement.",
+      "source": "ai_conceptual",
+      "category": "conceptual"
+    }
+  ],
+  "thresholds": {
+    "minCrosswordScore": 15,
+    "batchSize": 8,
+    "targetPairs": 25,
+    "maxRetries": 3
+  },
+  "recommendations": [
+    {
+      "priority": "info",
+      "message": "Successfully generated 25 academic antonym pairs"
+    },
+    {
+      "priority": "info",
+      "message": "Conceptual antonyms more successful - academic vocabulary works well with concept-based opposites"
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "reportType": "adaptive_antonym_population",
+  "generatedAt": "2025-07-18T01:48:45.926Z",
+  "summary": {
+    "totalWordsProcessed": 50,
+    "antonymPairsFound": 0,
+    "sourceBreakdown": {
+      "datamuse": 0,
+      "morphological_adaptive": 0
+    },
+    "errors": [],
+    "executionTime": 13897
+  },
+  "wordSample": [
+    "personality",
+    "relations",
+    "relationship",
+    "switzerland",
+    "journalist",
+    "relation",
+    "exploration",
+    "celebration",
+    "observation",
+    "declaration",
+    "relaxation",
+    "operations",
+    "revelation",
+    "resolution",
+    "stationery",
+    "relocation",
+    "revolutionary",
+    "conversation",
+    "preservation",
+    "conservative"
+  ],
+  "thresholds": {
+    "minCrosswordScore": 5,
+    "minConfidenceScore": 0.5,
+    "maxWords": 500
+  },
+  "recommendations": [
+    {
+      "priority": "high",
+      "message": "No antonym pairs found - your word database may have very specialized vocabulary"
+    }
+  ]
+}

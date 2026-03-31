@@ -1,0 +1,150 @@
+{
+  "project_info": {
+    "project_number": "719851629523",
+    "project_id": "aipuzzle-3122c",
+    "storage_bucket": "aipuzzle-3122c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719851629523:android:6ad511b3215083a3129d26",
+        "android_client_info": {
+          "package_name": "com.kreativekoala.puzzleplay"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw75w1ADCn8sxfNyJ8b40Vc7KTU89f1DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719851629523-sp525mhg3iatrupiumhu075g1l9l9pom.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kreativekoala.riddlebot"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719851629523:android:c6b85547f518cf17129d26",
+        "android_client_info": {
+          "package_name": "com.kreativekoala.puzzleverse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719851629523-bttl47tdcuhdcf92679l2pamoa31rikg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kreativekoala.puzzleverse",
+            "certificate_hash": "1d3f246ed32a7a8c2d02c15f1c908fc9e66fd200"
+          }
+        },
+        {
+          "client_id": "719851629523-vs87bcmlhe3s040n55tlk1anc9qtkhbl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kreativekoala.puzzleverse",
+            "certificate_hash": "f19ed66c0e8f4606cd94bce288e5bedac421b87d"
+          }
+        },
+        {
+          "client_id": "719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw75w1ADCn8sxfNyJ8b40Vc7KTU89f1DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719851629523-sp525mhg3iatrupiumhu075g1l9l9pom.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kreativekoala.riddlebot"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:719851629523:android:98f219f563848388129d26",
+        "android_client_info": {
+          "package_name": "com.kreativekoala.riddlebot"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "719851629523-0oofpnjr66k127laj9hnc8dllokl9548.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kreativekoala.riddlebot",
+            "certificate_hash": "1d3f246ed32a7a8c2d02c15f1c908fc9e66fd200"
+          }
+        },
+        {
+          "client_id": "719851629523-1oinoeg0rntnon480k4jddirq4tnsr48.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kreativekoala.riddlebot",
+            "certificate_hash": "f19ed66c0e8f4606cd94bce288e5bedac421b87d"
+          }
+        },
+        {
+          "client_id": "719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCw75w1ADCn8sxfNyJ8b40Vc7KTU89f1DY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "719851629523-sp525mhg3iatrupiumhu075g1l9l9pom.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kreativekoala.riddlebot"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
