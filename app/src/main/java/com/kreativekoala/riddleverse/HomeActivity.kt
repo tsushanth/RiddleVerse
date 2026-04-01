@@ -43,6 +43,10 @@ import okio.IOException
 import org.json.JSONObject
 import com.google.gson.Gson
 import androidx.compose.ui.platform.LocalContext
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -158,14 +162,40 @@ object RecentPuzzlesManager {
         return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
     }
 
+    /**
+     * Undiscovered puzzle types that get very few plays.
+     * Rotate one into every daily quick actions set so users discover them.
+     */
+    private val undiscoveredPuzzleTypes = listOf(
+        "crossword",
+        "musicidentification",
+        "fill_in_the_blank",
+        "numbersequence",
+        "geography_countries"
+    )
+
     private fun generateDailyActions(context: Context): List<RecentPuzzleType> {
         val recentPuzzles = getRecentPuzzleTypes(context)
         val fallback = getSmartFallbackRecentPuzzles()
 
-        return if (recentPuzzles.size >= 3) {
-            recentPuzzles.take(3)
+        // Pick one undiscovered type that the user hasn't recently played
+        val recentTypeNames = recentPuzzles.map { it.puzzleType }.toSet()
+        val discoveryCandidate = undiscoveredPuzzleTypes
+            .filter { it !in recentTypeNames }
+            .shuffled()
+            .firstOrNull()
+
+        val basePicks = if (recentPuzzles.size >= 2) {
+            recentPuzzles.take(2)
         } else {
-            (recentPuzzles + fallback.map { RecentPuzzleType(it, 0) }).take(3)
+            (recentPuzzles + fallback.map { RecentPuzzleType(it, 0) }).take(2)
+        }
+
+        // Always surface one undiscovered type as the 3rd quick action
+        return if (discoveryCandidate != null) {
+            (basePicks + RecentPuzzleType(discoveryCandidate, 0)).take(3)
+        } else {
+            (basePicks + fallback.map { RecentPuzzleType(it, 0) }).take(3)
         }
     }
 
@@ -195,6 +225,98 @@ object RecentPuzzlesManager {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val types = prefs.getStringSet(KEY_RECENT_TYPES, emptySet()) ?: emptySet()
         return types.map { RecentPuzzleType(it, 0) } // Simplified timestamp for now
+    }
+}
+
+/**
+ * Centralized Firebase Analytics tracker for LEVEL_START and LEVEL_END events.
+ * Mirrors the iOS Analytics.logEvent(AnalyticsEventLevelEnd, ...) behavior.
+ */
+object FirebaseAnalyticsTracker {
+
+    fun logLevelStart(puzzleType: String, difficulty: String = "Easy") {
+        try {
+            Firebase.analytics.logEvent(FirebaseAnalytics.Event.LEVEL_START) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, puzzleType)
+                param(FirebaseAnalytics.Param.ITEM_CATEGORY, puzzleType)
+            }
+            Log.d("FirebaseAnalytics", "LEVEL_START logged for puzzleType=$puzzleType")
+        } catch (e: Exception) {
+            Log.e("FirebaseAnalytics", "Failed to log LEVEL_START", e)
+        }
+    }
+
+    fun logLevelEnd(puzzleType: String, isCorrect: Boolean, score: Int) {
+        try {
+            Firebase.analytics.logEvent(FirebaseAnalytics.Event.LEVEL_END) {
+                param(FirebaseAnalytics.Param.LEVEL_NAME, puzzleType)
+                param(FirebaseAnalytics.Param.SUCCESS, if (isCorrect) 1L else 0L)
+                param(FirebaseAnalytics.Param.SCORE, score.toLong())
+                param(FirebaseAnalytics.Param.ITEM_CATEGORY, puzzleType)
+            }
+            Log.d("FirebaseAnalytics", "LEVEL_END logged for puzzleType=$puzzleType, correct=$isCorrect, score=$score")
+        } catch (e: Exception) {
+            Log.e("FirebaseAnalytics", "Failed to log LEVEL_END", e)
+        }
+    }
+}
+
+/**
+ * Horizontal row that surfaces undiscovered puzzle types.
+ * Shows 3 shuffled types per session to encourage exploration.
+ */
+@Composable
+fun DiscoverNewGamesRow(onPuzzleTypeSelected: (String) -> Unit) {
+    data class DiscoverItem(val type: String, val label: String, val color: Color)
+
+    val discoverItems = remember {
+        listOf(
+            DiscoverItem("crossword", "Crossword", Color(0xFF6B73FF)),
+            DiscoverItem("musicidentification", "Music ID", Color(0xFFE91E63)),
+            DiscoverItem("fill_in_the_blank", "Fill in the Blank", Color(0xFF00BCD4)),
+            DiscoverItem("numbersequence", "Number Sequence", Color(0xFFFF9800)),
+            DiscoverItem("geography_countries", "Geography", Color(0xFF4CAF50))
+        ).shuffled().take(3)
+    }
+
+    Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+        Text(
+            text = "Discover New Games",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = Color(0xFF2E2E2E)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            discoverItems.forEach { item ->
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onPuzzleTypeSelected(item.type) },
+                    colors = CardDefaults.cardColors(containerColor = item.color),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = item.label,
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -234,6 +356,9 @@ fun HomeScreen(navController: NavHostController,
                 "context" to "featured_or_recent"
             )
         )
+
+        // Firebase Analytics LEVEL_START event (matches iOS AnalyticsEventLevelStart)
+        FirebaseAnalyticsTracker.logLevelStart(puzzleType)
 
         // Navigate to puzzle
         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
@@ -344,17 +469,22 @@ fun HomeScreen(navController: NavHostController,
                 .fillMaxWidth()
         ) {
             when (selectedTab) {
-                TabSelection.FOR_YOU -> ForYouTab(
-                    onPuzzleTypeSelected = handlePuzzleTypeSelected,
-                    onRefresh = {
-                        Log.d("HomeScreen", "Manual refresh triggered")
-                        // Refresh will be handled in ForYouTab itself
-                    },
-                    onNavigateToCreate = {
-                        gameCreationInitialTab = 0
-                        selectedTab = TabSelection.CREATE_GAME
-                    }
-                )
+                TabSelection.FOR_YOU -> Column(modifier = Modifier.fillMaxSize()) {
+                    // "Discover New Games" rotating banner for undiscovered puzzle types
+                    DiscoverNewGamesRow(onPuzzleTypeSelected = handlePuzzleTypeSelected)
+
+                    ForYouTab(
+                        onPuzzleTypeSelected = handlePuzzleTypeSelected,
+                        onRefresh = {
+                            Log.d("HomeScreen", "Manual refresh triggered")
+                            // Refresh will be handled in ForYouTab itself
+                        },
+                        onNavigateToCreate = {
+                            gameCreationInitialTab = 0
+                            selectedTab = TabSelection.CREATE_GAME
+                        }
+                    )
+                }
                 TabSelection.CATEGORIES -> CategoriesTab(
                     topics = topics,
                     onCategorySelected = { category ->

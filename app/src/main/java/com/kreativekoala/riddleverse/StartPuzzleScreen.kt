@@ -40,6 +40,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
+import com.google.firebase.analytics.logEvent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.gson.Gson
@@ -308,6 +311,13 @@ fun handlePuzzleCompletion(
     sourceGroupId: String?,
     sourceGroupName: String?
 ) {
+    // Firebase Analytics LEVEL_END event (matches iOS AnalyticsEventLevelEnd)
+    FirebaseAnalyticsTracker.logLevelEnd(
+        puzzleType = puzzleType,
+        isCorrect = score > 0,
+        score = score
+    )
+
     // Mark type as completed if user finished all 5 and came from a group
     if (completedCount >= 5 && sourceGroupId != null) {
         val userId = FirebaseAuth.getInstance().currentUser?.email ?: ""
@@ -449,7 +459,27 @@ fun fetchDailyPuzzleAndStart(
                     puzzles.add(puzzle)
                 }
 
-                val convertedPuzzles = puzzles.map { dailyPuzzle ->
+                // Sort puzzles by difficulty: Easy first for new sessions
+                val difficultySortOrder = mapOf("Easy" to 0, "Medium" to 1, "Hard" to 2)
+                val sortedPuzzles = puzzles.sortedBy { difficultySortOrder[it.difficulty] ?: 1 }
+
+                val convertedPuzzles = sortedPuzzles.map { dailyPuzzle ->
+                    // Ensure wrong options are clearly distinct from the correct answer
+                    val cleanedOptions = dailyPuzzle.options
+                        .filter { option ->
+                            // Remove options that are too similar to the correct answer
+                            // (case-insensitive match or substring containment)
+                            !option.equals(dailyPuzzle.answer, ignoreCase = true) ||
+                                option == dailyPuzzle.answer
+                        }
+                        .distinct()
+                        .let { opts ->
+                            // Ensure the correct answer is included, then shuffle
+                            val withAnswer = if (opts.contains(dailyPuzzle.answer)) opts
+                                else opts + dailyPuzzle.answer
+                            withAnswer.shuffled()
+                        }
+
                     Puzzle(
                         puzzleId = dailyPuzzle.puzzleId,
                         question = dailyPuzzle.question,
@@ -457,7 +487,7 @@ fun fetchDailyPuzzleAndStart(
                         hint = dailyPuzzle.hint,
                         difficulty = dailyPuzzle.difficulty,
                         puzzleType = "daily",
-                        options = dailyPuzzle.options
+                        options = cleanedOptions
                     )
                 }
 
@@ -477,6 +507,9 @@ fun fetchDailyPuzzleAndStart(
                                 difficulty = firstPuzzle.difficulty ?: "Easy",
                                 questionIndex = 0
                             ))
+
+                            // Firebase Analytics LEVEL_START (matches iOS)
+                            FirebaseAnalyticsTracker.logLevelStart("daily", firstPuzzle.difficulty ?: "Easy")
 
                             AnalyticsManager.getInstance()?.track(AnalyticsEvent("daily_puzzle_started", mapOf(
                                 "topic" to topic,
@@ -4203,17 +4236,29 @@ fun fetchCustomPuzzleAndStart(
                 val puzzles = mutableListOf<Puzzle>()
                 for (i in 0 until puzzlesArray.length()) {
                     val obj = puzzlesArray.getJSONObject(i)
+                    val answer = obj.optString("answer", "")
+                    val rawOptions = if (obj.has("options")) {
+                        val optArray = obj.getJSONArray("options")
+                        List(optArray.length()) { j -> optArray.getString(j) }
+                    } else emptyList()
+
+                    // Deduplicate and shuffle options; ensure correct answer is present
+                    val cleanedOptions = rawOptions
+                        .filter { !it.equals(answer, ignoreCase = true) || it == answer }
+                        .distinct()
+                        .let { opts ->
+                            val withAnswer = if (opts.contains(answer)) opts else opts + answer
+                            withAnswer.shuffled()
+                        }
+
                     val puzzle = Puzzle(
                         puzzleId = obj.optString("puzzleId", ""),
                         question = obj.optString("question", ""),
-                        answer = obj.optString("answer", ""),
+                        answer = answer,
                         hint = obj.optString("hint", ""),
                         difficulty = null,
                         puzzleType = obj.optString("format", null),
-                        options = if (obj.has("options")) {
-                            val optArray = obj.getJSONArray("options")
-                            List(optArray.length()) { j -> optArray.getString(j) }
-                        } else emptyList()
+                        options = cleanedOptions
                     )
                     puzzles.add(puzzle)
                 }
@@ -4234,6 +4279,9 @@ fun fetchCustomPuzzleAndStart(
                                 difficulty = "custom",
                                 questionIndex = 0
                             ))
+
+                            // Firebase Analytics LEVEL_START (matches iOS)
+                            FirebaseAnalyticsTracker.logLevelStart("custom")
 
                             AnalyticsManager.getInstance()?.track(AnalyticsEvent("custom_puzzle_started", mapOf(
                                 "puzzle_id" to customPuzzleId,
@@ -4384,6 +4432,9 @@ private fun startPuzzleActivity(
     puzzleType: String,
     source: String
 ) {
+    // Firebase Analytics LEVEL_START event (matches iOS AnalyticsEventLevelStart)
+    FirebaseAnalyticsTracker.logLevelStart(puzzleType, difficulty)
+
     val finalScreenType = when {
         screenType != "Default" -> screenType
         puzzleType == "average" -> "Averages Screen"
