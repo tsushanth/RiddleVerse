@@ -165,6 +165,20 @@ struct PuzzleForgeApp: App {
                 setupNotificationsOnAppear()
             }
             .onOpenURL { url in
+                // Handle riddleverse://game/{gameId} deep links
+                if url.scheme == "riddleverse" && url.host == "game" {
+                    let gameId = url.pathComponents.dropFirst().first ?? url.queryItems?["gameId"]
+                    if let gameId = gameId, !gameId.isEmpty {
+                        let userId = Auth.auth().currentUser?.uid
+                        let playUrl = "https://puzzleverseai.com/play/\(gameId)" + (userId.map { "?userId=\($0)" } ?? "")
+                        if let openUrl = URL(string: playUrl) {
+                            UIApplication.shared.open(openUrl)
+                        }
+                        return
+                    }
+                }
+
+                // Handle other URLs (Facebook, etc.)
                 ApplicationDelegate.shared.application(
                     UIApplication.shared,
                     open: url,
@@ -293,6 +307,19 @@ struct PuzzleForgeApp: App {
         
         AppEvents.shared.activateApp()
         print("Facebook: App activation tracked")
+    }
+}
+
+// MARK: - URL Query Items Helper
+extension URL {
+    var queryItems: [String: String]? {
+        guard let components = URLComponents(url: self, resolvingAgainstBaseURL: false),
+              let items = components.queryItems else { return nil }
+        var dict = [String: String]()
+        for item in items {
+            dict[item.name] = item.value
+        }
+        return dict
     }
 }
 

@@ -10,7 +10,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>fb683240914470617</string>
-				<string></string>
+				<string>riddleverse</string>
 				<string>com.googleusercontent.apps.719851629523-vqof4ramsjqronhpfpit89up6n1d0d6u</string>
 			</array>
 		</dict>
@@ -63,6 +63,8 @@
 	<array>
 		<string>googlechrome</string>
 		<string>com.googleusercontent.apps.719851629523-vqof4ramsjqronhpfpit89up6n1d0d6u</string>
+		<string>tg</string>
+		<string>telegram</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
