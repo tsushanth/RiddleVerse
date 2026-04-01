@@ -152,6 +152,7 @@ It behaves exactly like a normal webpage — no special client-side processing o
 - Use standard CSS units: \`vh\`, \`vw\`, \`%\`, \`px\` — all work natively
 - The viewport is always portrait mobile, roughly 390×844 (varies by device)
 - Do NOT assume the game will be resized or rotated
+- **Multiple choice / Q&A answer buttons**: NEVER use absolute positioning or fixed heights for answer option containers. Use a scrollable flex column so 4+ options are always reachable on small screens (iPhone SE: 375×667). Each button: min-height:52px, width:100%, white-space:normal. Pattern: `.options { display:flex; flex-direction:column; gap:10px; overflow-y:auto; max-height:55vh; } .option-btn { min-height:52px; width:100%; padding:12px 16px; white-space:normal; border-radius:10px; }`
 
 ## Required in index.html
 1. \`<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\`
