@@ -90,6 +90,19 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // Handle deep link to open specific game (riddleverse://game/{gameId})
+        if (intent?.data?.scheme == "riddleverse" && intent?.data?.host == "game") {
+            val pathSegments = intent.data?.pathSegments
+            val gameId = pathSegments?.firstOrNull() ?: intent.data?.getQueryParameter("gameId")
+            if (!gameId.isNullOrBlank()) {
+                Log.d("MainActivity", "Deep link to game: $gameId")
+                val userId = FirebaseAuth.getInstance().currentUser?.uid
+                ChromeGameLauncher.launchGame(this, gameId, userId)
+                finish()
+                return
+            }
+        }
+
         // Handle magic link auth from Telegram/WhatsApp bot
         val magicLinkToken = if (intent?.data?.scheme == "riddleverse" && intent?.data?.host == "auth") {
             intent?.data?.getQueryParameter("token")
