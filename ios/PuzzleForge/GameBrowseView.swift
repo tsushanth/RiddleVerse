@@ -112,11 +112,21 @@ struct GameBrowseView: View {
                                 onEdit: { tweakGame = game },
                                 onDelete: game.creatorId == currentUserId ? { deleteGame(game) } : nil,
                                 onShare: {
-                                    let text = "Play '\(game.title)' on RiddleVerse! 🎮 Created by \(game.creatorName) — they earn real cash when you play!"
-                                    let activityVC = UIActivityViewController(activityItems: [text], applicationActivities: nil)
-                                    if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                                       let rootVC = windowScene.windows.first?.rootViewController {
-                                        rootVC.present(activityVC, animated: true)
+                                    let gameUrl = "https://puzzleverseai.com/api/game-creation/\(game.id)"
+                                    let shareText = "Let's play \(game.title) on RiddleVerse! \(gameUrl)"
+
+                                    // Try Telegram deep link first
+                                    if let encoded = shareText.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
+                                       let tgUrl = URL(string: "tg://msg?text=\(encoded)"),
+                                       UIApplication.shared.canOpenURL(tgUrl) {
+                                        UIApplication.shared.open(tgUrl)
+                                    } else {
+                                        // Fallback: iOS share sheet
+                                        let activityVC = UIActivityViewController(activityItems: [shareText], applicationActivities: nil)
+                                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                                           let rootVC = windowScene.windows.first?.rootViewController {
+                                            rootVC.present(activityVC, animated: true)
+                                        }
                                     }
                                 }
                             )
