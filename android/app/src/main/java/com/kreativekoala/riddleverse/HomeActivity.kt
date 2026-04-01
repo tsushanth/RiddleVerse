@@ -81,7 +81,6 @@ import java.util.Locale
 import androidx.navigation.compose.rememberNavController
 import com.kreativekoala.riddleverse.QuizCategories.getAllAvailablePuzzleTypes
 import java.util.TimeZone
-import java.util.UUID
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -92,10 +91,6 @@ import com.kreativekoala.riddleverse.QuizCategories.isPuzzleTypeNew
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import com.kreativekoala.paywallkit.view.PaywallView
-import com.kreativekoala.paywallkit.models.PaywallProduct
-import com.kreativekoala.paywallkit.models.PaywallFeature
-import com.kreativekoala.paywallkit.manager.ExperimentManager
 
 
 enum class PuzzleSort(val displayName: String) {
@@ -228,18 +223,6 @@ fun HomeScreen(navController: NavHostController,
     val ratingManager = remember { AppRatingManager(context) }
     var showRatingDialog by remember { mutableStateOf(false) }
 
-    // Fullscreen game preview — renders above the entire scaffold (no tab bar, no header)
-    if (gameGenerationVM.showPreview && gameGenerationVM.bundleDirPath != null && gameGenerationVM.bundleBase64 != null) {
-        GamePreviewScreen(
-            bundleDir = gameGenerationVM.bundleDirPath!!,
-            bundleBase64 = gameGenerationVM.bundleBase64!!,
-            prompt = gameGenerationVM.currentPrompt,
-            gameId = gameGenerationVM.resultGameId,
-            onClose = { gameGenerationVM.showPreview = false }
-        )
-        return
-    }
-
     val handlePuzzleTypeSelected: (String) -> Unit = { puzzleType ->
         // Track as recent puzzle
         RecentPuzzlesManager.addRecentPuzzle(context, puzzleType)
@@ -350,6 +333,9 @@ fun HomeScreen(navController: NavHostController,
     ) {
         // Header with greeting and user info
         HeaderSection()
+
+        // Web/iOS promo banner (dismissable)
+        WebPromoBanner()
 
         // Main Content Area
         Box(
@@ -1668,79 +1654,7 @@ fun SettingsTab(
                     onSignUp = onSignUp
                 )
             }
-
-            // Debug paywall previews (debug builds only)
-            if (BuildConfig.DEBUG) {
-                item {
-                    DebugPaywallSection()
-                }
-            }
         }
-    }
-}
-
-@Composable
-fun DebugPaywallSection() {
-    var showHardPaywall by remember { mutableStateOf(false) }
-    var showSubscriptionDialog by remember { mutableStateOf(false) }
-    var showCoinStore by remember { mutableStateOf(false) }
-    var showRateLimitUpsell by remember { mutableStateOf(false) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2A1A1A)),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Debug: Paywall Previews", fontWeight = FontWeight.Bold, color = Color(0xFFFF6B6B), fontSize = 16.sp)
-
-            Button(
-                onClick = { showHardPaywall = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF21BF63)),
-                shape = RoundedCornerShape(10.dp)
-            ) { Text("Hard Paywall (app open gate)") }
-
-            Button(
-                onClick = { showSubscriptionDialog = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9C27B0)),
-                shape = RoundedCornerShape(10.dp)
-            ) { Text("Subscription Upgrade Dialog") }
-
-            Button(
-                onClick = { showCoinStore = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFFD700)),
-                shape = RoundedCornerShape(10.dp)
-            ) { Text("Coin Store", color = Color.Black) }
-
-            Button(
-                onClick = { showRateLimitUpsell = true },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8C00)),
-                shape = RoundedCornerShape(10.dp)
-            ) { Text("Rate Limit Upsell") }
-        }
-    }
-
-    if (showHardPaywall) {
-        HardPaywallGate(
-            onSubscribed = { showHardPaywall = false },
-            onDismiss = { showHardPaywall = false }
-        )
-    }
-
-    if (showSubscriptionDialog) {
-        SubscriptionUpgradeDialog(
-            paywallContext = "debug_preview",
-            onDismiss = { showSubscriptionDialog = false },
-            onUpgrade = { _ -> showSubscriptionDialog = false }
-        )
-    }
-
-    if (showCoinStore) {
-        CoinStoreDialog(onDismiss = { showCoinStore = false })
     }
 }
 
@@ -2749,63 +2663,11 @@ fun BottomTabBar(
 }
 
 class HomeActivity : AppCompatActivity() {
+    // In your main activity where the tab switching code is
 
-    /** Observable state so Compose can react to game-complete deep links */
-    private var _pendingGameResult = mutableStateOf<ChromeGameLauncher.GameCompleteResult?>(null)
-
-    override fun onNewIntent(intent: Intent) {
-        super.onNewIntent(intent)
-        handleGameCompleteDeepLink(intent)
-    }
-
-    private fun handleGameCompleteDeepLink(intent: Intent) {
-        val uri = intent.data ?: return
-        val result = ChromeGameLauncher.parseGameCompleteDeepLink(uri) ?: return
-        Log.d("HomeActivity", "Game complete deep link: gameId=${result.gameId}, score=${result.score}")
-
-        // Refresh balance so coin count is up-to-date
-        CoinManager.shared.fetchBalance()
-
-        // If Play Again was tapped in browser, charge coins and relaunch immediately
-        if (result.action == "playAgain") {
-            val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-            val creatorId = result.creatorId?.takeIf { it.isNotBlank() && it != currentUserId }
-            if (!CoinManager.shared.canContinue) {
-                Toast.makeText(this, "Not enough coins! You need ${CoinManager.CONTINUE_COST} coins.", Toast.LENGTH_SHORT).show()
-                _pendingGameResult.value = result // fall back to dialog
-                return
-            }
-            CoinManager.shared.spendForContinue(result.gameId, creatorId) { success ->
-                if (success) {
-                    ChromeGameLauncher.launchGame(this, result.gameId, currentUserId)
-                } else {
-                    Toast.makeText(this, "Failed to spend coins. Try again.", Toast.LENGTH_SHORT).show()
-                    _pendingGameResult.value = result // fall back to dialog
-                }
-            }
-            return
-        }
-
-        // Surface result to Compose UI (for "Back to Home" deep link)
-        _pendingGameResult.value = result
-
-        // Verify score was recorded on backend
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val client = OkHttpClient()
-                val request = Request.Builder()
-                    .url("https://puzzleverseai.com/api/game-score/${result.gameId}/status?userId=$userId")
-                    .build()
-                client.newCall(request).execute().use { /* confirming score was recorded */ }
-            } catch (_: Exception) {}
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handleGameCompleteDeepLink(intent)
-
         val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         var dailyStreakReward: StreakReward? = null
         activityScope.launch {
@@ -2823,13 +2685,6 @@ class HomeActivity : AppCompatActivity() {
         val ratingManager = AppRatingManager(this)
         ratingManager.incrementLaunchCount()
 
-        // Track app open count for soft paywall (once per cold-start session)
-        val sessionId = java.util.UUID.randomUUID().toString()
-        val appOpenCount = PaywallConstants.incrementAppOpenCount(this, sessionId)
-        val subscriptionManager = SubscriptionManager.getInstance(this)
-        val shouldShowPaywall = appOpenCount > PaywallConstants.FREE_OPEN_LIMIT
-                && !subscriptionManager.hasActiveSubscription()
-
         val tutorialPrefs = TutorialPreferences(this)
         val shouldShowOnboarding = !tutorialPrefs.hasCompletedOnboarding()
 
@@ -2839,74 +2694,8 @@ class HomeActivity : AppCompatActivity() {
                 val navController = rememberNavController()
                 var showStreakDialog by remember { mutableStateOf(dailyStreakReward != null) }
                 val streakReward by remember { mutableStateOf(dailyStreakReward) }
-                var showPaywall by remember { mutableStateOf(shouldShowPaywall) }
 
-                // Re-check subscription status reactively (e.g. if restored in background)
-                val subManager = remember { SubscriptionManager.getInstance(this@HomeActivity) }
-                val isPremium = subManager.currentTier != SubscriptionTier.FREE
-                LaunchedEffect(isPremium) {
-                    if (isPremium) {
-                        showPaywall = false
-                    }
-                }
-
-                // Only show subscription packages in PaywallKit — coins stay with RevenueCat
-                val subPackageIds = setOf("\$rc_annual", "\$rc_monthly", "\$rc_weekly", "\$rc_six_month", "\$rc_three_month", "\$rc_lifetime")
-                val paywallProducts = remember(subManager.availablePackages) {
-                    subManager.availablePackages
-                        .filter { it.identifier in subPackageIds }
-                        .mapNotNull { pkg ->
-                            val product = pkg.product
-                            val period = when (pkg.identifier) {
-                                "\$rc_annual" -> PaywallProduct.Period.YEARLY
-                                "\$rc_monthly" -> PaywallProduct.Period.MONTHLY
-                                "\$rc_weekly" -> PaywallProduct.Period.WEEKLY
-                                else -> return@mapNotNull null
-                            }
-                            PaywallProduct(
-                                id = product.id,
-                                localizedPrice = product.price.formatted,
-                                price = product.price.amountMicros / 1_000_000.0,
-                                currencyCode = product.price.currencyCode,
-                                trialDays = 7,
-                                period = period
-                            )
-                        }
-                }
-
-                val paywallFeatures = remember {
-                    listOf(
-                        PaywallFeature("\uD83E\uDDE9", "Unlimited Puzzles", "Play without limits"),
-                        PaywallFeature("\uD83D\uDCA1", "Hints", "Get helpful hints"),
-                        PaywallFeature("\uD83C\uDFC6", "All Categories", "Access every puzzle pack"),
-                        PaywallFeature("\uD83D\uDEAB", "No Ads", "Ad-free experience"),
-                        PaywallFeature("\u2B50", "Premium Content", "Exclusive puzzles")
-                    )
-                }
-
-                if (showPaywall && paywallProducts.isNotEmpty()) {
-                    PaywallView(
-                        appId = "riddleverse",
-                        appName = "RiddleVerse",
-                        features = paywallFeatures,
-                        products = paywallProducts,
-                        isDismissible = ExperimentManager.isDismissible(),
-                        onPurchase = { productId ->
-                            val pkg = subManager.availablePackages.find { it.product.id == productId }
-                            if (pkg != null) {
-                                subManager.purchasePackage(this@HomeActivity, pkg)
-                            }
-                            showPaywall = false
-                        },
-                        onRestore = {
-                            subManager.restorePurchases()
-                            showPaywall = false
-                        },
-                        onDismiss = {
-                            showPaywall = false
-                        }
-                    )
-                } else if (showOnboarding) {
+                if (showOnboarding) {
                     // Show onboarding tutorial for first-time users
                     OnboardingScreen(
                         onComplete = {
@@ -2918,12 +2707,13 @@ class HomeActivity : AppCompatActivity() {
                     // Show normal home screen
                     LaunchedEffect(Unit) {
                         GroupCompletionManager.registerObserver { groupId, userId ->
-                            Log.d("HomeActivity", "Group completion changed for $groupId")
+                            Log.d("HomeActivity", "🔄 Group completion changed for $groupId")
                             // This will trigger refresh of ForYou data
                         }
                     }
                     LaunchedEffect(Unit) {
-                        subManager.loadProducts() // This triggers billing client usage
+                        val subscriptionManager = SubscriptionManager.getInstance(this@HomeActivity)
+                        subscriptionManager.loadProducts() // This triggers billing client usage
                     }
 
                     HomeScreen(
@@ -2934,32 +2724,6 @@ class HomeActivity : AppCompatActivity() {
                         DailyStreakGiftDialog(
                             streakReward = streakReward!!,
                             onDismiss = { showStreakDialog = false }
-                        )
-                    }
-
-                    // Game complete dialog from Chrome deep link
-                    val gameResult by _pendingGameResult
-                    gameResult?.let { result ->
-                        GameCompleteDialog(
-                            result = result,
-                            onPlayAgain = { gr ->
-                                val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
-                                val creatorId = gr.creatorId?.takeIf { it != currentUserId }
-                                if (!CoinManager.shared.canContinue) {
-                                    // Not enough coins — dismiss dialog, coin store will be shown elsewhere
-                                    Toast.makeText(this@HomeActivity, "Not enough coins! You need ${CoinManager.CONTINUE_COST} coins.", Toast.LENGTH_SHORT).show()
-                                    return@GameCompleteDialog
-                                }
-                                CoinManager.shared.spendForContinue(gr.gameId, creatorId) { success ->
-                                    if (success) {
-                                        _pendingGameResult.value = null
-                                        ChromeGameLauncher.launchGame(this@HomeActivity, gr.gameId, currentUserId)
-                                    } else {
-                                        Toast.makeText(this@HomeActivity, "Failed to spend coins. Try again.", Toast.LENGTH_SHORT).show()
-                                    }
-                                }
-                            },
-                            onDismiss = { _pendingGameResult.value = null }
                         )
                     }
                 }

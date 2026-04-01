@@ -266,7 +266,15 @@ class SubscriptionManager private constructor(
     }
 
     fun hasActiveSubscription(): Boolean {
-        return currentTier != SubscriptionTier.FREE
+        return currentTier != SubscriptionTier.FREE || isMagicLinkPremium()
+    }
+
+    /**
+     * Returns true if the current user authenticated via a magic link (Telegram/WhatsApp bot),
+     * which grants premium-equivalent access.
+     */
+    fun isMagicLinkPremium(): Boolean {
+        return MagicLinkAuthManager.isMagicLinkSession(context)
     }
 
     fun resetPurchaseState() {
@@ -279,7 +287,7 @@ class SubscriptionManager private constructor(
     }
 
     fun shouldShowAds(): Boolean {
-        return currentTier == SubscriptionTier.FREE
+        return currentTier == SubscriptionTier.FREE && !isMagicLinkPremium()
     }
 
     fun clearLimitsAfterUpgrade() {

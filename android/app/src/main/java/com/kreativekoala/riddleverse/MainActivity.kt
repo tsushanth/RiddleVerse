@@ -90,6 +90,48 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // Handle magic link auth from Telegram/WhatsApp bot
+        val magicLinkToken = if (intent?.data?.scheme == "riddleverse" && intent?.data?.host == "auth") {
+            intent?.data?.getQueryParameter("token")
+        } else null
+
+        if (!magicLinkToken.isNullOrBlank()) {
+            Log.d("MainActivity", "Magic link auth token received")
+            setContent {
+                RiddleVerseTheme {
+                    DeepLinkLoadingScreen()
+                }
+            }
+            CoroutineScope(Dispatchers.Main).launch {
+                val success = MagicLinkAuthManager.signInWithToken(this@MainActivity, magicLinkToken)
+                if (success) {
+                    val user = FirebaseAuth.getInstance().currentUser
+                    if (user != null) {
+                        Purchases.sharedInstance.logIn(
+                            user.uid,
+                            object : com.revenuecat.purchases.interfaces.LogInCallback {
+                                override fun onReceived(customerInfo: com.revenuecat.purchases.CustomerInfo, created: Boolean) {
+                                    setRevenueCatAttributes(user)
+                                }
+                                override fun onError(error: com.revenuecat.purchases.PurchasesError) {
+                                    Log.e("MainActivity", "RevenueCat logIn error after magic link: ${error.message}")
+                                }
+                            }
+                        )
+                    }
+                    Toast.makeText(this@MainActivity, "Signed in successfully!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@MainActivity, HomeActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                    finish()
+                } else {
+                    Toast.makeText(this@MainActivity, "Sign-in failed. Please try again.", Toast.LENGTH_LONG).show()
+                    navigateToDefaultScreen()
+                }
+            }
+            return
+        }
+
         val puzzleId = intent?.data?.getQueryParameter("puzzleId")
         Log.d("MainActivity", "Received puzzleId: $puzzleId")
 

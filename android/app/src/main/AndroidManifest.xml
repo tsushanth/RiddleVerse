@@ -89,6 +89,15 @@
                     android:host="puzzleverseai.com"
                     android:pathPrefix="/open-riddle"/>
             </intent-filter>
+            <!-- Magic link auth from Telegram/WhatsApp bots -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:scheme="riddleverse"
+                    android:host="auth"/>
+            </intent-filter>
         </activity>
 
         <activity
@@ -134,15 +143,7 @@
         <activity
             android:name="com.kreativekoala.riddleverse.HomeActivity"
             android:theme="@style/Theme.RiddleVerse"
-            android:launchMode="singleTop"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="riddleverse" android:host="game-complete" />
-            </intent-filter>
-        </activity>
+            android:exported="true" />
 
         <activity
             android:name="com.kreativekoala.riddleverse.TutorialVideoActivity"
