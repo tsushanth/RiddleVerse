@@ -27,6 +27,9 @@ android {
         versionCode = 162
         versionName = "162.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // API base URL for sharing games
+        buildConfigField("String", "API_BASE_URL", "\"https://puzzleverseai.com\"")
     }
 
     compileOptions {

@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse
 
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
@@ -22,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -461,6 +464,26 @@ fun GameBrowseContent(context: android.content.Context) {
     }
 }
 
+// Share game to Telegram (or fallback to share sheet)
+private fun shareGameToTelegram(context: android.content.Context, game: BrowseGameData) {
+    val gameUrl = "${BuildConfig.API_BASE_URL}/api/game-creation/${game.id}"
+    val shareText = "Let's play ${game.title} on RiddleVerse! $gameUrl"
+    val encodedText = Uri.encode(shareText)
+
+    // Try Telegram deep link first
+    val tgIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tg://msg?text=$encodedText"))
+    try {
+        context.startActivity(tgIntent)
+    } catch (e: Exception) {
+        // Fallback: standard Android share sheet
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, shareText)
+        }
+        context.startActivity(Intent.createChooser(shareIntent, "Share game"))
+    }
+}
+
 @Composable
 private fun BrowseGameCard(
     game: BrowseGameData,
@@ -471,6 +494,7 @@ private fun BrowseGameCard(
     onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null
 ) {
+    val context = LocalContext.current
     var promptExpanded by remember { mutableStateOf(false) }
 
     Card(
@@ -634,6 +658,16 @@ private fun BrowseGameCard(
                             Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
                         }
                     }
+                }
+
+                // Share to Telegram button
+                IconButton(
+                    onClick = { shareGameToTelegram(context, game) },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(Color(0xFF0088CC).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                ) {
+                    Icon(Icons.Default.Share, contentDescription = "Share to Telegram", tint = Color(0xFF0088CC), modifier = Modifier.size(18.dp))
                 }
             }
         }
