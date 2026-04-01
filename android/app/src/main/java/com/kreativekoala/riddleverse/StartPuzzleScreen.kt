@@ -600,6 +600,7 @@ fun StartPuzzleScreen(
     val limitManager = remember { RegenerationLimitManager.getInstance(context) }
     var showLimitCard by remember { mutableStateOf(false) }
     var currentLimitInfo by remember { mutableStateOf<RegenerationLimitManager.LimitInfo?>(null) }
+    var showBotUpsell by remember { mutableStateOf(false) }
 
     var prefetchedPuzzle by remember { mutableStateOf<Puzzle?>(null) }
     var prefetchedCustomPuzzle by remember { mutableStateOf<List<Puzzle>?>(null) }
@@ -1681,18 +1682,18 @@ fun StartPuzzleScreen(
                         limitManager.clearLimitInfo(type)
                     },
                     onUpgrade = {
-                        // Handle upgrade navigation
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://puzzleverseai.com/upgrade"))
-                            context.startActivity(intent)
-                        } catch (e: Exception) {
-                            Toast.makeText(context, "Visit puzzleverseai.com to upgrade", Toast.LENGTH_LONG).show()
-                        }
+                        // Show bot upsell for free users hitting limits
+                        showBotUpsell = true
                     }
                 )
             }
 
             Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Bot upsell dialog for free users hitting daily limits
+        if (showBotUpsell) {
+            BotUpsellSheet(onDismiss = { showBotUpsell = false })
         }
 
         fun executeOriginalLogic() {
