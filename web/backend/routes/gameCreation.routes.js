@@ -1,11 +1,14 @@
 import express from 'express';
 import crypto from 'crypto';
+import zlib from 'zlib';
 import { supabase } from '../config/database.js';
 import { callAI } from '../utils/aiClient.js';
 import { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import { DIFFICULTY_COSTS, MAX_DIFFICULTY_LEVEL, getDifficultyCost } from '../services/difficultyService.js';
 
 const router = express.Router();
+
+const API_BASE_URL = process.env.API_BASE_URL || '';
 
 const GAME_WORKER_URL = process.env.GAME_WORKER_URL || 'http://localhost:3456';
 const GAME_WORKER_SECRET = process.env.GAME_WORKER_SECRET || 'game-worker-secret-2024';
@@ -2088,11 +2091,133 @@ Requirements:
     }
 });
 
+// Helper: Extract HTML from base64 content (may be raw HTML or zip)
+function extractHtmlFromBundle(base64Content) {
+    try {
+        const buffer = Buffer.from(base64Content, 'base64');
+        const str = buffer.toString('utf-8');
+
+        // Check if it's raw HTML
+        if (str.trim().startsWith('<!DOCTYPE') || str.trim().startsWith('<html') || str.trim().startsWith('<HTML')) {
+            return str;
+        }
+
+        // Try to unzip - look for index.html in the zip
+        // Simple zip parsing (local file headers)
+        const files = {};
+        let offset = 0;
+
+        while (offset < buffer.length - 30) {
+            // Local file header signature
+            if (buffer.readUInt32LE(offset) !== 0x04034b50) break;
+
+            const compMethod = buffer.readUInt16LE(offset + 8);
+            const compSize = buffer.readUInt32LE(offset + 18);
+            const uncompSize = buffer.readUInt32LE(offset + 22);
+            const nameLen = buffer.readUInt16LE(offset + 26);
+            const extraLen = buffer.readUInt16LE(offset + 28);
+            const fileName = buffer.slice(offset + 30, offset + 30 + nameLen).toString('utf-8');
+            const dataStart = offset + 30 + nameLen + extraLen;
+            const compData = buffer.slice(dataStart, dataStart + compSize);
+
+            if (!fileName.endsWith('/')) {
+                let fileData;
+                if (compMethod === 8) {
+                    // Deflate
+                    try {
+                        fileData = zlib.inflateRawSync(compData);
+                    } catch {
+                        fileData = compData;
+                    }
+                } else {
+                    fileData = compData;
+                }
+
+                // Normalize filename (strip common folder prefix)
+                const normalizedName = fileName.replace(/^[^\/]+\//, '');
+                if (normalizedName) {
+                    files[normalizedName] = fileData.toString('utf-8');
+                }
+            }
+
+            offset = dataStart + compSize;
+        }
+
+        // Look for index.html
+        if (files['index.html']) return files['index.html'];
+
+        // Try original filename
+        const indexKey = Object.keys(files).find(k => k.endsWith('index.html'));
+        if (indexKey) return files[indexKey];
+
+        // Fallback: return the raw string if it looks like HTML
+        if (str.includes('<body') || str.includes('<div')) return str;
+
+        return null;
+    } catch (err) {
+        console.error('[extractHtml] Error:', err.message);
+        return null;
+    }
+}
+
+// Generate the leaderboard snippet to inject
+function generateLeaderboardSnippet(gameId, chatId, apiBase) {
+    return `
+<script>
+(function() {
+  var GAME_ID = '${gameId}';
+  var CHAT_ID = '${chatId}';
+  var API_BASE = '${apiBase}';
+  var tgUser = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
+  var userId = tgUser ? String(tgUser.id) : ('guest_' + Math.random().toString(36).substr(2,8));
+  var username = tgUser ? (tgUser.first_name || tgUser.username || 'Player') : 'Player';
+  window.RV = {
+    submitScore: function(score) {
+      fetch(API_BASE + '/api/chat-scores', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({gameId:GAME_ID,chatId:CHAT_ID,platform:'telegram',userId:userId,username:username,score:score})
+      }).then(function(r){return r.json()}).then(function(d){
+        if(d.leaderboard) window.RV._render(d.leaderboard);
+      }).catch(function(){});
+    },
+    _render: function(scores) {
+      var el = document.getElementById('rv-lb-list');
+      if(!el) return;
+      el.innerHTML = scores.map(function(s,i){
+        return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.1)">'
+          +'<span style="width:18px;font-weight:bold;color:'+(i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'#aaa')+'">'+(i+1)+'.</span>'
+          +'<span style="flex:1">'+(s.username||'Player')+(s.userId===userId?' <b>(you)</b>':'')+'</span>'
+          +'<span style="font-weight:bold">'+s.score+'</span></div>';
+      }).join('');
+    },
+    _poll: function() {
+      fetch(API_BASE+'/api/chat-scores/'+GAME_ID+'/'+CHAT_ID)
+        .then(function(r){return r.json()})
+        .then(function(d){if(d.scores)window.RV._render(d.scores)})
+        .catch(function(){});
+    }
+  };
+  document.addEventListener('DOMContentLoaded', function() {
+    var lb = document.createElement('div');
+    lb.id = 'rv-leaderboard';
+    lb.style.cssText = 'position:fixed;top:10px;right:10px;background:rgba(20,20,30,0.92);backdrop-filter:blur(10px);color:white;border-radius:12px;padding:12px 16px;width:210px;font-family:system-ui,sans-serif;font-size:12px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5)';
+    lb.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:bold;font-size:13px">\\u{1F3C6} Group</span><button onclick="document.getElementById(\\'rv-leaderboard\\').style.display=\\'none\\'" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;padding:0">\\u00D7</button></div><div id="rv-lb-list"><div style="color:#aaa;text-align:center;padding:8px 0">Be the first to score!</div></div>';
+    document.body.appendChild(lb);
+    window.RV._poll();
+    setInterval(window.RV._poll, 15000);
+  });
+})();
+</script>`;
+}
+
 // GET /api/game-creation/:gameId
 // Returns game metadata + base64 bundle for play
+// When chatId and platform query params are present, serves HTML directly with leaderboard injected
 router.get('/:gameId', async (req, res) => {
     try {
         const { gameId } = req.params;
+        const { chatId, platform } = req.query;
 
         const { data, error } = await supabase
             .from('custom_games')
@@ -2109,6 +2234,32 @@ router.get('/:gameId', async (req, res) => {
             .update({ play_count: (data.play_count || 0) + 1 })
             .eq('id', gameId);
 
+        // If chatId and platform are provided, serve HTML directly with leaderboard
+        if (chatId && platform) {
+            const html = extractHtmlFromBundle(data.html_content);
+
+            if (!html) {
+                return res.status(500).send('<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui"><h1>Could not load game</h1></body></html>');
+            }
+
+            // Inject leaderboard snippet before </body>
+            const snippet = generateLeaderboardSnippet(gameId, chatId, API_BASE_URL);
+            let modifiedHtml = html;
+
+            if (html.includes('</body>')) {
+                modifiedHtml = html.replace('</body>', snippet + '</body>');
+            } else if (html.includes('</html>')) {
+                modifiedHtml = html.replace('</html>', snippet + '</html>');
+            } else {
+                modifiedHtml = html + snippet;
+            }
+
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            res.setHeader('Cache-Control', 'no-cache');
+            return res.send(modifiedHtml);
+        }
+
+        // Standard JSON response
         res.json({
             success: true,
             game: {
