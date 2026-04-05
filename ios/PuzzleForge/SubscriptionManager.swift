@@ -27,7 +27,7 @@ enum SubscriptionTier: String, CaseIterable, Codable {
 
     var dailyLimit: Int {
         switch self {
-        case .free: return 10
+        case .free: return 3  // Effectively unused; lifetime limit governs free tier
         case .premium: return 50
         case .unlimited: return -1 // Unlimited
         }
@@ -35,7 +35,7 @@ enum SubscriptionTier: String, CaseIterable, Codable {
 
     var monthlyLimit: Int {
         switch self {
-        case .free: return 100
+        case .free: return 3  // Effectively unused; lifetime limit governs free tier
         case .premium: return 500
         case .unlimited: return -1 // Unlimited
         }
@@ -81,7 +81,7 @@ enum SubscriptionTier: String, CaseIterable, Codable {
         case .free:
             return [
                 "Access to all puzzle types",
-                "10 puzzle generations per day",
+                "3 free puzzles to try",
                 "Ad-supported experience",
                 "Earn coins through gameplay"
             ]
@@ -151,6 +151,25 @@ class SubscriptionManager: ObservableObject {
             await loadProducts()
             await refreshCustomerInfo()
         }
+    }
+
+    // MARK: - Lifetime Free Puzzle Limit (Hard Paywall)
+
+    static let freeLifetimeLimit = 3
+
+    func canPlayFreePuzzle() -> Bool {
+        guard !hasActiveSubscription() else { return true }
+        let played = UserDefaults.standard.integer(forKey: "com.riddleverse.totalFreePuzzles")
+        return played < Self.freeLifetimeLimit
+    }
+
+    func recordFreePuzzlePlayed() {
+        let count = UserDefaults.standard.integer(forKey: "com.riddleverse.totalFreePuzzles") + 1
+        UserDefaults.standard.set(count, forKey: "com.riddleverse.totalFreePuzzles")
+    }
+
+    func totalFreePuzzlesPlayed() -> Int {
+        return UserDefaults.standard.integer(forKey: "com.riddleverse.totalFreePuzzles")
     }
 
     // MARK: - Puzzle Limit Management

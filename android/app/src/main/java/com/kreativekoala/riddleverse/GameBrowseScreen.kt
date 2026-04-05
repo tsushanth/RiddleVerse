@@ -42,6 +42,9 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.UUID
 import java.util.zip.ZipInputStream
+import coil.compose.AsyncImage
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 
 data class BrowseGameData(
     val id: String,
@@ -51,7 +54,8 @@ data class BrowseGameData(
     val playCount: Int,
     val initialPrompt: String,
     val createdAt: String,
-    val status: String = "published"
+    val status: String = "published",
+    val thumbnailUrl: String? = null
 )
 
 @Composable
@@ -134,7 +138,8 @@ fun GameBrowseContent(context: android.content.Context) {
                                         playCount = g.optInt("play_count", 0),
                                         initialPrompt = g.optString("description", ""),
                                         createdAt = g.optString("created_at", ""),
-                                        status = g.optString("status", "published")
+                                        status = g.optString("status", "published"),
+                                        thumbnailUrl = g.optString("initial_screenshot_url", "").ifEmpty { null }
                                     )
                                 )
                             }
@@ -505,24 +510,57 @@ private fun BrowseGameCard(
             brush = Brush.linearGradient(listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.05f)))
         )
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.Top) {
-                // Game icon
+        Column {
+            // Thumbnail preview
+            if (game.thumbnailUrl != null) {
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
-                        .background(Color(0xFFFF8C00).copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
-                    contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                 ) {
-                    Icon(
-                        Icons.Default.SportsEsports,
-                        contentDescription = null,
-                        tint = Color(0xFFFF8C00),
-                        modifier = Modifier.size(24.dp)
+                    AsyncImage(
+                        model = game.thumbnailUrl,
+                        contentDescription = game.title,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
+                    // Play overlay
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.PlayCircle,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.8f),
+                            modifier = Modifier.size(48.dp)
+                        )
+                    }
                 }
+            }
 
-                Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                // Game icon (shown only when no thumbnail)
+                if (game.thumbnailUrl == null) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(Color(0xFFFF8C00).copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            Icons.Default.SportsEsports,
+                            contentDescription = null,
+                            tint = Color(0xFFFF8C00),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                }
 
                 Column(modifier = Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -670,6 +708,7 @@ private fun BrowseGameCard(
                     Icon(Icons.Default.Share, contentDescription = "Share to Telegram", tint = Color(0xFF0088CC), modifier = Modifier.size(18.dp))
                 }
             }
+        }
         }
     }
 }

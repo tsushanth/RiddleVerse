@@ -582,6 +582,8 @@ struct HomeView: View {
     @State var currentGroupId: String?
     @State private var showUpdateDialog = false
     @State private var updateResponse: AppVersionResponse?
+    @State var showFreeLimitPaywall = false
+    @State private var showAppOpenPaywall = false
 
     // Add this property for destinations to access
     @State var currentScore = 0
@@ -597,6 +599,33 @@ struct HomeView: View {
     }
     
     
+    // MARK: - App-Open Paywall
+    private func checkAppOpenPaywall() {
+        guard !subscriptionManager.hasActiveSubscription() else { return }
+        let key = "com.riddleverse.appOpenCount"
+        let count = UserDefaults.standard.integer(forKey: key) + 1
+        UserDefaults.standard.set(count, forKey: key)
+
+        // Show paywall on opens 1, 3, 5, then every 3rd open
+        let shouldShow: Bool
+        switch count {
+        case 1, 3, 5:
+            shouldShow = true
+        default:
+            shouldShow = count > 5 && (count - 5) % 3 == 0
+        }
+
+        if shouldShow {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                showAppOpenPaywall = true
+
+                AnalyticsManager.shared.trackSafely(AnalyticsEvent("app_open_paywall_shown", parameters: [
+                    "open_count": count
+                ]))
+            }
+        }
+    }
+
     private func checkAppVersion() {
         // Don't check if already shown for this version (unless forced)
         if SimpleVersionManager.shared.hasShownUpdateForCurrentVersion() {
@@ -4195,6 +4224,32 @@ struct HomeView: View {
                 onDismiss: { showRatingDialog = false },
                 onCompleted: { showRatingDialog = false }
             )
+        }.fullScreenCover(isPresented: $showFreeLimitPaywall) {
+            RemotePaywallView(
+                context: .limitReached,
+                targetTier: .premium,
+                onSuccess: {
+                    showFreeLimitPaywall = false
+                    // Retry the puzzle fetch after subscribing
+                    if let category = selectedCategory {
+                        fetchPuzzle(for: category, for: selectedDifficulty)
+                    }
+                },
+                onCancel: {
+                    showFreeLimitPaywall = false
+                }
+            )
+        }.fullScreenCover(isPresented: $showAppOpenPaywall) {
+            RemotePaywallView(
+                context: .default,
+                targetTier: .premium,
+                onSuccess: {
+                    showAppOpenPaywall = false
+                },
+                onCancel: {
+                    showAppOpenPaywall = false
+                }
+            )
         }.sheet(isPresented: $showPuzzleGroupDetail) {
             if let group = selectedPuzzleGroup {
                 PuzzleGroupDetailView(group: group) { puzzleType, groupId in
@@ -4230,6 +4285,8 @@ struct HomeView: View {
                 checkAndShowRatingPromptImmediately()
                 hasShownRatingThisSession = true
             }
+            // App-open paywall for non-premium users
+            checkAppOpenPaywall()
         }.onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("CoinEarned"))) { notification in
             if let amount = notification.userInfo?["amount"] as? Int {
                 lastCoinAmount = amount
@@ -4242,6 +4299,7 @@ struct HomeView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
             AnalyticsSessionManager.shared.logAppOpenIfNeeded()
+            checkAppOpenPaywall()
         }.navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $authStateManager.showSignInPrompt) {
             SignInPromptSheet()

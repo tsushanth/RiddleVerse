@@ -58,6 +58,8 @@ ENV STRIPE_SECRET_KEY=sk_live_51Rj2XTKFBTQTkmztfpRoqgvzO7V58kfRzIvJ0b4x981BdwwpO
 ENV STRIPE_WEBHOOK_SECRET=whsec_DWlr328iFRourWiEc6Fu7XvZCwDJ7zmQ
 # FORGE_WORKER_URL should be set via GCP Cloud Run environment variables
 # ENV FORGE_WORKER_URL=https://claude-forge-worker.fly.dev
+ENV SCREENSHOT_SERVICE_URL=http://178.156.231.255:3465
+ENV PLAY_BASE_URL=https://quiz-web-frontend-917362189743.us-central1.run.app
 
 # Create supervisor configuration for running Redis + Node.js
 RUN echo '[supervisord]' > /etc/supervisor/conf.d/supervisord.conf && \

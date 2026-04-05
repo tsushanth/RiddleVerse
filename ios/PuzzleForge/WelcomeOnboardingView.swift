@@ -31,7 +31,8 @@ struct WelcomeOnboardingView: View {
     
     private func skipTutorial() {
         AnalyticsManager.shared.track(.tutorialSkip(step: currentPage + 1))
-        onSkip()
+        // Instead of skipping past the paywall, show the paywall
+        showOnboardingPaywall = true
     }
     
     var body: some View {
@@ -124,6 +125,8 @@ struct WelcomeOnboardingView: View {
                     onComplete()
                 },
                 onCancel: {
+                    // Paywall dismissed without purchase — still allow entry
+                    // but they will hit the 3-puzzle hard paywall quickly
                     showOnboardingPaywall = false
                     onComplete()
                 }
@@ -454,6 +457,8 @@ extension View {
                     onComplete()
                 },
                 onSkip: {
+                    // Skip now goes through the paywall (handled inside WelcomeOnboardingView)
+                    // so this callback fires after the paywall is dismissed
                     UserDefaults.standard.set(true, forKey: "onboarding_completed")
                     UserDefaults.standard.set(true, forKey: "onboarding_skipped")
                     showOnboarding.wrappedValue = false

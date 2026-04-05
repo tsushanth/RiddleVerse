@@ -16,6 +16,8 @@ struct GameCreationView: View {
     @StateObject private var coinManager = CoinManager.shared
     @State private var showCoinStore = false
     @State private var showSubscriptionUpgrade = false
+    @State private var showCreationPaywall = false
+    @StateObject private var subscriptionManagerRef = SubscriptionManager.shared
 
     // Fallback suggestions in case API is unreachable
     private static let fallbackSuggestions: [(label: String, prompt: String)] = [
@@ -150,6 +152,21 @@ struct GameCreationView: View {
                 targetTier: .premium,
                 onSuccess: { showSubscriptionUpgrade = false },
                 onCancel: { showSubscriptionUpgrade = false }
+            )
+        }
+        .fullScreenCover(isPresented: $showCreationPaywall) {
+            RemotePaywallView(
+                context: .gameCreation,
+                targetTier: .premium,
+                onSuccess: {
+                    showCreationPaywall = false
+                    // After subscribing, proceed with generation
+                    notifyConfirmed = false
+                    generationManager.startGeneration(prompt: promptText, imageBase64: selectedImageBase64)
+                },
+                onCancel: {
+                    showCreationPaywall = false
+                }
             )
         }
     }
@@ -597,6 +614,18 @@ struct GameCreationView: View {
 
     private func generateGame() {
         guard canGenerate else { return }
+
+        // Free users: show paywall on first game creation attempt (limit = 1)
+        if !subscriptionManagerRef.hasActiveSubscription() {
+            let creationsUsed = UserDefaults.standard.integer(forKey: "com.riddleverse.freeGameCreations")
+            if creationsUsed >= 1 {
+                showCreationPaywall = true
+                return
+            }
+            // Record this free creation
+            UserDefaults.standard.set(creationsUsed + 1, forKey: "com.riddleverse.freeGameCreations")
+        }
+
         notifyConfirmed = false
         generationManager.startGeneration(prompt: promptText, imageBase64: selectedImageBase64)
     }

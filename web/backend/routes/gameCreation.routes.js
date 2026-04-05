@@ -13,6 +13,50 @@ const API_BASE_URL = process.env.API_BASE_URL || '';
 const GAME_WORKER_URL = process.env.GAME_WORKER_URL || 'http://localhost:3456';
 const GAME_WORKER_SECRET = process.env.GAME_WORKER_SECRET || 'game-worker-secret-2024';
 const GAME_BUNDLES_BUCKET = 'game-bundles';
+const SCREENSHOT_SERVICE_URL = process.env.SCREENSHOT_SERVICE_URL || 'http://178.156.231.255:3465';
+const PLAY_BASE_URL = process.env.PLAY_BASE_URL || 'https://quiz-web-frontend-917362189743.us-central1.run.app';
+
+// ============================================
+// Auto-thumbnail: screenshot game after save
+// ============================================
+async function captureGameThumbnail(gameId) {
+    try {
+        const playUrl = `${PLAY_BASE_URL}/play/${gameId}`;
+        console.log(`[thumbnail] Capturing: ${playUrl}`);
+
+        const res = await fetch(
+            `${SCREENSHOT_SERVICE_URL}/screenshot?url=${encodeURIComponent(playUrl)}&width=390&height=700`,
+            { signal: AbortSignal.timeout(45000) }
+        );
+        if (!res.ok) throw new Error(`Screenshot service returned ${res.status}`);
+
+        const buffer = Buffer.from(await res.arrayBuffer());
+        const filename = `thumbnails/${gameId}.jpg`;
+
+        const { error: uploadError } = await supabase.storage
+            .from('game-bundles')
+            .upload(filename, buffer, { contentType: 'image/jpeg', upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+            .from('game-bundles')
+            .getPublicUrl(filename);
+
+        const thumbnailUrl = urlData.publicUrl;
+
+        await supabase
+            .from('custom_games')
+            .update({ initial_screenshot_url: thumbnailUrl })
+            .eq('id', gameId);
+
+        console.log(`[thumbnail] Saved for ${gameId}: ${thumbnailUrl}`);
+        return thumbnailUrl;
+    } catch (err) {
+        console.error(`[thumbnail] Failed for ${gameId}:`, err.message);
+        return null;
+    }
+}
 
 // Rate limit tracking (in-memory)
 const generationLimits = new Map();
@@ -96,13 +140,13 @@ async function refreshBrowseCache() {
         // Build queries — add status filter only if column exists
         let newestQuery = supabase
             .from('custom_games')
-            .select('id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at', { count: 'exact' })
+            .select('id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url', { count: 'exact' })
             .eq('game_type', 'ai_generated')
             .eq('platform_type', 'webview');
 
         let popularQuery = supabase
             .from('custom_games')
-            .select('id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at')
+            .select('id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url')
             .eq('game_type', 'ai_generated')
             .eq('platform_type', 'webview');
 
@@ -504,6 +548,10 @@ router.post('/generate', async (req, res) => {
                                 } else {
                                     console.log(`[generate] Saved: ${gameId} ("${gameTitle}")`);
                                     refreshBrowseCache();
+                                    // Auto-capture thumbnail (fire-and-forget)
+                                    captureGameThumbnail(gameId)
+                                        .then(() => refreshBrowseCache())
+                                        .catch(err => console.error('[thumbnail] Background error:', err.message));
                                 }
 
                                 res.write(`data: ${JSON.stringify({
@@ -609,6 +657,11 @@ router.post('/save', async (req, res) => {
         // Refresh browse cache so the new game appears
         refreshBrowseCache();
 
+        // Auto-capture thumbnail (fire-and-forget — does not block response)
+        captureGameThumbnail(gameId)
+            .then(() => refreshBrowseCache()) // Refresh again after thumbnail is ready
+            .catch(err => console.error('[thumbnail] Background capture error:', err.message));
+
         // Mark suggestion as used and replenish (fire-and-forget, does not block response)
         if (initialPrompt) {
             markSuggestionAsUsed(initialPrompt)
@@ -644,8 +697,8 @@ router.get('/browse', async (req, res) => {
         if (creatorId) {
             const hasStatus = await checkStatusColumn();
             const selectFields = hasStatus
-                ? 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, status'
-                : 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at';
+                ? 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, status, initial_screenshot_url'
+                : 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url';
             const query = supabase
                 .from('custom_games')
                 .select(selectFields, { count: 'exact' })

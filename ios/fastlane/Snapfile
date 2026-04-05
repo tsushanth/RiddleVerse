@@ -1,0 +1,15 @@
+devices([
+  "iPhone 16 Pro Max"
+])
+
+languages([
+  "en-US",
+  "de-DE",
+  "es-ES",
+  "fr-FR",
+  "ja",
+  "ko",
+  "pt-BR",
+  "zh-Hans"
+])
+

@@ -16,6 +16,12 @@ extension HomeView {
         print("🔵 isPuzzleLoading: \(isPuzzleLoading)")
         print("🔵 isInActiveSession: \(isInActiveSession)")
 
+        // Hard paywall: check lifetime free puzzle limit first
+        if !subscriptionManager.canPlayFreePuzzle() {
+            self.showFreeLimitPaywall = true
+            return
+        }
+
         // Check client-side limits before fetching
         if !subscriptionManager.canFetchPuzzle(type: category) {
             if let limitInfo = subscriptionManager.getLimitInfo(for: category) {
@@ -194,6 +200,7 @@ extension HomeView {
             
             self.isPuzzleLoading = false
             self.keepCurrentViewWhileFetchingNext = false
+            self.subscriptionManager.recordFreePuzzlePlayed()
             print("✅ LOCAL: Generated \(category) puzzle successfully")
         }
     }
@@ -557,6 +564,7 @@ extension HomeView {
 
                 // Record the fetch for limit tracking
                 self.subscriptionManager.recordPuzzleFetch(for: category)
+                self.subscriptionManager.recordFreePuzzlePlayed()
 
                 let finalNavState = self.determineNavigationType(for: category, options: finalPuzzle.options)
                 if self.navigationState == .none {
