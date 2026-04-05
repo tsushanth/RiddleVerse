@@ -41,7 +41,7 @@ struct RemotePaywallView: View {
             theme: PaywallTheme(accent: Color(red: 0.39, green: 0.4, blue: 0.95), accent2: Color(red: 0.55, green: 0.36, blue: 0.96)),
             showWinback: true,
             onPurchase: { productId in
-                await purchaseProduct(productId: productId)
+                return await purchaseProduct(productId: productId)
             },
             onRestore: {
                 await restorePurchases()
@@ -112,12 +112,12 @@ struct RemotePaywallView: View {
 
     // MARK: - Purchase
 
-    private func purchaseProduct(productId: String) async {
+    private func purchaseProduct(productId: String) async -> Bool {
         guard let package = subscriptionManager.availablePackages.first(where: {
             $0.storeProduct.productIdentifier == productId
         }) else {
             print("[RiddleVersePaywall] No package found for \(productId)")
-            return
+            return false
         }
 
         await subscriptionManager.purchasePackage(package)
@@ -127,7 +127,9 @@ struct RemotePaywallView: View {
                 onSuccess()
                 dismiss()
             }
+            return true
         }
+        return false
     }
 
     // MARK: - Restore

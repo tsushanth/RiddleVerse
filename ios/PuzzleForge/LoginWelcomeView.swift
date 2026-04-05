@@ -13,6 +13,7 @@ struct LoginWelcomeView: View {
     @State private var hasRequestedTracking = false
     @StateObject private var viewModel = QAPuzzleViewModel()
     @EnvironmentObject var authStateManager: AuthStateManager
+    @State private var showGuestPaywall = false
 
     var body: some View {
         ZStack {
@@ -76,9 +77,13 @@ struct LoginWelcomeView: View {
                 }
                 .font(.subheadline)
 
-                // ✅ Continue as Guest
+                // ✅ Continue as Guest — show paywall immediately
                 Button(action: {
                     authStateManager.enterGuestMode()
+                    // Show paywall immediately after entering guest mode
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        showGuestPaywall = true
+                    }
                 }) {
                     Text("Continue as Guest")
                         .foregroundColor(.white.opacity(0.8))
@@ -102,6 +107,17 @@ struct LoginWelcomeView: View {
         }
         .onAppear {
             checkUserSignInStatus()
+        }
+        .fullScreenCover(isPresented: $showGuestPaywall) {
+            RemotePaywallView(
+                context: .onboarding,
+                onSuccess: {
+                    showGuestPaywall = false
+                },
+                onCancel: {
+                    showGuestPaywall = false
+                }
+            )
         }
     }
     

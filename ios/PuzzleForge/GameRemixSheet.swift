@@ -433,7 +433,8 @@ struct GameRemixSheet: View {
                     playCount: 0,
                     initialPrompt: remixDescription,
                     createdAt: "",
-                    status: "published"
+                    status: "published",
+                    thumbnailUrl: nil
                 )
                 GamePlayView(game: game, bundleDirectory: dir)
             }

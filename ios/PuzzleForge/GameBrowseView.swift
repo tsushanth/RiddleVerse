@@ -10,6 +10,7 @@ struct BrowseGame: Identifiable {
     let initialPrompt: String
     let createdAt: String
     let status: String
+    let thumbnailUrl: String?
 }
 
 struct GameBrowseView: View {
@@ -231,7 +232,8 @@ struct GameBrowseView: View {
                         playCount: g["play_count"] as? Int ?? 0,
                         initialPrompt: g["description"] as? String ?? "",
                         createdAt: g["created_at"] as? String ?? "",
-                        status: g["status"] as? String ?? "published"
+                        status: g["status"] as? String ?? "published",
+                        thumbnailUrl: g["initial_screenshot_url"] as? String
                     )
                 }
 
@@ -354,15 +356,49 @@ struct GameBrowseCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 0) {
+            // Thumbnail preview
+            if let thumbnailUrl = game.thumbnailUrl, let url = URL(string: thumbnailUrl) {
+                ZStack {
+                    AsyncImage(url: url) { phase in
+                        switch phase {
+                        case .success(let image):
+                            image
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        case .failure:
+                            Color.white.opacity(0.05)
+                        case .empty:
+                            Color.white.opacity(0.05)
+                                .overlay(ProgressView().tint(.white.opacity(0.3)))
+                        @unknown default:
+                            Color.white.opacity(0.05)
+                        }
+                    }
+                    .frame(height: 180)
+                    .clipped()
+
+                    // Play overlay
+                    Color.black.opacity(0.2)
+                    Image(systemName: "play.circle.fill")
+                        .font(.system(size: 44))
+                        .foregroundColor(.white.opacity(0.8))
+                }
+                .frame(height: 180)
+                .clipped()
+            }
+
+            VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top) {
-                // Game icon
-                Image(systemName: "gamecontroller.fill")
-                    .font(.title2)
-                    .foregroundColor(.orange)
-                    .frame(width: 44, height: 44)
-                    .background(Color.orange.opacity(0.15))
-                    .cornerRadius(10)
+                // Game icon (only when no thumbnail)
+                if game.thumbnailUrl == nil {
+                    Image(systemName: "gamecontroller.fill")
+                        .font(.title2)
+                        .foregroundColor(.orange)
+                        .frame(width: 44, height: 44)
+                        .background(Color.orange.opacity(0.15))
+                        .cornerRadius(10)
+                }
 
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 6) {
@@ -506,12 +542,14 @@ struct GameBrowseCard: View {
                     .disabled(isDeleting)
                 }
             }
+            }
+            .padding(16)
         }
-        .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.white.opacity(0.06))
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay(
             RoundedRectangle(cornerRadius: 16)
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
