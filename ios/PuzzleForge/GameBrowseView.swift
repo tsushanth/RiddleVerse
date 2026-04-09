@@ -1,6 +1,12 @@
 import SwiftUI
 import FirebaseAuth
 
+struct GamePlayItem: Identifiable {
+    let id: String
+    let game: BrowseGame
+    let bundleDir: URL
+}
+
 struct BrowseGame: Identifiable {
     let id: String
     let title: String
@@ -22,11 +28,9 @@ struct GameBrowseView: View {
     @State private var showMyGames = false
     @State private var hasMore = false
     @State private var currentOffset = 0
-    @State private var selectedGame: BrowseGame?
-    @State private var bundleDir: URL?
     @State private var isDownloading = false
     @State private var downloadingId: String?
-    @State private var showGamePlay = false
+    @State private var activeGamePlay: GamePlayItem?
     @State private var tweakGame: BrowseGame?
     @State private var errorMessage: String?
     @State private var deletingIds: Set<String> = []
@@ -181,10 +185,8 @@ struct GameBrowseView: View {
         .onAppear { fetchGames() }
         .onChange(of: sortBy) { _ in fetchGames() }
         .onChange(of: showMyGames) { _ in fetchGames() }
-        .fullScreenCover(isPresented: $showGamePlay) {
-            if let game = selectedGame, let dir = bundleDir {
-                GamePlayView(game: game, bundleDirectory: dir)
-            }
+        .fullScreenCover(item: $activeGamePlay) { item in
+            GamePlayView(game: item.game, bundleDirectory: item.bundleDir)
         }
         .fullScreenCover(item: $tweakGame) { game in
             GameTweakView(game: game)
@@ -238,9 +240,11 @@ struct GameBrowseView: View {
                 }
 
                 if loadMore {
-                    games += parsed
+                    let existingIds = Set(games.map(\.id))
+                    games += parsed.filter { !existingIds.contains($0.id) }
                 } else {
-                    games = parsed
+                    var seen = Set<String>()
+                    games = parsed.filter { seen.insert($0.id).inserted }
                 }
                 hasMore = serverHasMore
                 currentOffset = offset + parsed.count
@@ -249,7 +253,7 @@ struct GameBrowseView: View {
     }
 
     private func downloadAndPlay(_ game: BrowseGame) {
-        guard !isDownloading else { return }
+        guard downloadingId == nil else { return }
 
         isDownloading = true
         downloadingId = game.id
@@ -274,11 +278,9 @@ struct GameBrowseView: View {
                 let dir = try ZipExtractor.extractBundle(base64: base64Bundle)
 
                 await MainActor.run {
-                    selectedGame = game
-                    bundleDir = dir
                     isDownloading = false
                     downloadingId = nil
-                    showGamePlay = true
+                    activeGamePlay = GamePlayItem(id: game.id, game: game, bundleDir: dir)
                 }
             } catch {
                 await MainActor.run {

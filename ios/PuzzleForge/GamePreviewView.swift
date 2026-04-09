@@ -69,6 +69,8 @@ struct GamePreviewView: View {
 
                     // Publish button
                     Button(action: {
+                        guard !isPublishing && !isPublished else { return }
+                        isPublishing = true
                         Task { await publishAndShare() }
                     }) {
                         Group {
@@ -215,6 +217,8 @@ struct GamePreviewView: View {
         }
         .confirmationDialog("Publish before you go! 💰", isPresented: $showCloseDialog, titleVisibility: .visible) {
             Button("Publish & Earn 💰") {
+                guard !isPublishing && !isPublished else { return }
+                isPublishing = true
                 Task { await publishAndShare() }
             }
             Button("Leave without saving", role: .destructive) {
@@ -399,7 +403,7 @@ struct GamePreviewView: View {
     }
 
     private func publishAndShare() async {
-        isPublishing = true
+        guard !isPublished else { return }
         publishError = nil
 
         let bundle = activeBundleBase64.isEmpty ? bundleBase64 : activeBundleBase64
