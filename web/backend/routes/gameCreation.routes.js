@@ -163,8 +163,17 @@ async function refreshBrowseCache() {
         if (newestResult.error) throw newestResult.error;
         if (popularResult.error) throw popularResult.error;
 
-        browseCache.newest = newestResult.data || [];
-        browseCache.popular = popularResult.data || [];
+        // Deduplicate by (creator_id, title) — keep newest entry per creator+title pair
+        const dedup = (rows) => {
+            const seen = new Map();
+            for (const row of rows) {
+                const key = `${row.creator_id}::${row.title}`;
+                if (!seen.has(key)) seen.set(key, row);
+            }
+            return Array.from(seen.values());
+        };
+        browseCache.newest = dedup(newestResult.data || []);
+        browseCache.popular = dedup(popularResult.data || []);
         browseCache.totalCount = newestResult.count || browseCache.newest.length;
         browseCache.lastRefreshed = Date.now();
 
@@ -612,8 +621,25 @@ router.post('/save', async (req, res) => {
             return res.status(400).json({ error: 'title, bundle, and creatorId are required' });
         }
 
-        const gameId = crypto.randomUUID();
         const bundleSizeKB = (Buffer.from(bundle, 'base64').length / 1024).toFixed(1);
+
+        // Dedup: if creator already published same title in last 5 minutes, return existing
+        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { data: existing } = await supabase
+            .from('custom_games')
+            .select('id')
+            .eq('creator_id', creatorId)
+            .eq('title', title)
+            .gte('created_at', fiveMinutesAgo)
+            .limit(1)
+            .single();
+
+        if (existing) {
+            console.log(`[save] Duplicate save prevented for "${title}" by ${creatorId}, returning existing ${existing.id}`);
+            return res.json({ success: true, gameId: existing.id });
+        }
+
+        const gameId = crypto.randomUUID();
 
         const { data, error: dbError } = await supabase
             .from('custom_games')
