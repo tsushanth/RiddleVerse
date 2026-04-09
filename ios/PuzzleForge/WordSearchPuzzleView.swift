@@ -215,12 +215,17 @@ struct WordSearchGridContent: View {
     var body: some View {
         let availableWidth = geometry.size.width
         let availableHeight = geometry.size.height
-        
+
         let maxCellSizeForWidth = (availableWidth - CGFloat(puzzleData.width - 1)) / CGFloat(puzzleData.width)
         let maxCellSizeForHeight = (availableHeight - CGFloat(puzzleData.height - 1)) / CGFloat(puzzleData.height)
-        let optimalCellSize = min(maxCellSizeForWidth, maxCellSizeForHeight, 60)
-        
-        VStack(spacing: 1) {
+        let minCellSize: CGFloat = 28
+        let optimalCellSize = max(min(maxCellSizeForWidth, maxCellSizeForHeight, 60), minCellSize)
+
+        let gridWidth = optimalCellSize * CGFloat(puzzleData.width) + CGFloat(puzzleData.width - 1)
+        let gridHeight = optimalCellSize * CGFloat(puzzleData.height) + CGFloat(puzzleData.height - 1)
+        let needsScroll = gridWidth > availableWidth || gridHeight > availableHeight
+
+        let gridContent = VStack(spacing: 1) {
             ForEach(grid.indices, id: \.self) { row in
                 GridRowView(
                     rowIndex: row,
@@ -234,7 +239,17 @@ struct WordSearchGridContent: View {
                 )
             }
         }
-        .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+
+        if needsScroll {
+            ScrollView([.horizontal, .vertical], showsIndicators: false) {
+                gridContent
+                    .frame(width: gridWidth, height: gridHeight)
+            }
+            .frame(width: availableWidth, height: availableHeight)
+        } else {
+            gridContent
+                .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+        }
     }
 }
 
