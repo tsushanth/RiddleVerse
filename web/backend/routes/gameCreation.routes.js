@@ -163,11 +163,12 @@ async function refreshBrowseCache() {
         if (newestResult.error) throw newestResult.error;
         if (popularResult.error) throw popularResult.error;
 
-        // Deduplicate by (creator_id, title) — keep newest entry per creator+title pair
+        // Deduplicate by (creator_id, title-prefix) — keep newest entry per creator+prompt pair
+        // Titles may be truncated at different lengths by different clients, so match on first 50 chars
         const dedup = (rows) => {
             const seen = new Map();
             for (const row of rows) {
-                const key = `${row.creator_id}::${row.title}`;
+                const key = `${row.creator_id}::${(row.title || '').slice(0, 50)}`;
                 if (!seen.has(key)) seen.set(key, row);
             }
             return Array.from(seen.values());
@@ -629,7 +630,7 @@ router.post('/save', async (req, res) => {
             .from('custom_games')
             .select('id')
             .eq('creator_id', creatorId)
-            .eq('title', title)
+            .like('title', `${title.slice(0, 50)}%`)
             .gte('created_at', fiveMinutesAgo)
             .limit(1)
             .single();
