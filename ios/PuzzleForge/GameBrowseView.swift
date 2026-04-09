@@ -240,7 +240,7 @@ struct GameBrowseView: View {
                     var seenIds = Set<String>()
                     var seenTitles = Set<String>()
                     games = parsed.filter { game in
-                        let titleKey = "\(game.creatorId)::\(game.title)"
+                        let titleKey = "\(game.creatorId)::\(game.title.prefix(50))"
                         guard seenIds.insert(game.id).inserted else { return false }
                         return seenTitles.insert(titleKey).inserted
                     }
