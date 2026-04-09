@@ -243,8 +243,13 @@ struct GameBrowseView: View {
                     let existingIds = Set(games.map(\.id))
                     games += parsed.filter { !existingIds.contains($0.id) }
                 } else {
-                    var seen = Set<String>()
-                    games = parsed.filter { seen.insert($0.id).inserted }
+                    var seenIds = Set<String>()
+                    var seenTitles = Set<String>()
+                    games = parsed.filter { game in
+                        let titleKey = "\(game.creatorId)::\(game.title)"
+                        guard seenIds.insert(game.id).inserted else { return false }
+                        return seenTitles.insert(titleKey).inserted
+                    }
                 }
                 hasMore = serverHasMore
                 currentOffset = offset + parsed.count
@@ -361,33 +366,43 @@ struct GameBrowseCard: View {
         VStack(alignment: .leading, spacing: 0) {
             // Thumbnail preview
             if let thumbnailUrl = game.thumbnailUrl, let url = URL(string: thumbnailUrl) {
-                ZStack {
-                    AsyncImage(url: url) { phase in
-                        switch phase {
-                        case .success(let image):
-                            image
-                                .resizable()
-                                .aspectRatio(contentMode: .fill)
-                        case .failure:
-                            Color.white.opacity(0.05)
-                        case .empty:
-                            Color.white.opacity(0.05)
-                                .overlay(ProgressView().tint(.white.opacity(0.3)))
-                        @unknown default:
-                            Color.white.opacity(0.05)
+                Button(action: onPlay) {
+                    ZStack {
+                        AsyncImage(url: url) { phase in
+                            switch phase {
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                            case .failure:
+                                Color.white.opacity(0.08)
+                                    .overlay(
+                                        Image(systemName: "gamecontroller.fill")
+                                            .font(.system(size: 32))
+                                            .foregroundColor(.white.opacity(0.2))
+                                    )
+                            case .empty:
+                                Color.white.opacity(0.08)
+                                    .overlay(ProgressView().tint(.white.opacity(0.3)))
+                            @unknown default:
+                                Color.white.opacity(0.08)
+                            }
                         }
-                    }
-                    .frame(height: 180)
-                    .clipped()
+                        .frame(maxWidth: .infinity, maxHeight: 180)
+                        .clipped()
 
-                    // Play overlay
-                    Color.black.opacity(0.2)
-                    Image(systemName: "play.circle.fill")
-                        .font(.system(size: 44))
-                        .foregroundColor(.white.opacity(0.8))
+                        // Play overlay
+                        Color.black.opacity(0.2)
+                        Image(systemName: "play.circle.fill")
+                            .font(.system(size: 44))
+                            .foregroundColor(.white.opacity(0.85))
+                            .shadow(radius: 4)
+                    }
+                    .frame(maxWidth: .infinity, height: 180)
+                    .clipped()
                 }
-                .frame(height: 180)
-                .clipped()
+                .buttonStyle(.plain)
+                .disabled(isDownloading)
             }
 
             VStack(alignment: .leading, spacing: 12) {
