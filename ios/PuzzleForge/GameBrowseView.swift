@@ -1,11 +1,6 @@
 import SwiftUI
+import SafariServices
 import FirebaseAuth
-
-struct GamePlayItem: Identifiable {
-    let id: String
-    let game: BrowseGame
-    let bundleDir: URL
-}
 
 struct BrowseGame: Identifiable {
     let id: String
@@ -28,9 +23,7 @@ struct GameBrowseView: View {
     @State private var showMyGames = false
     @State private var hasMore = false
     @State private var currentOffset = 0
-    @State private var isDownloading = false
-    @State private var downloadingId: String?
-    @State private var activeGamePlay: GamePlayItem?
+    @State private var safariURL: URL?
     @State private var tweakGame: BrowseGame?
     @State private var errorMessage: String?
     @State private var deletingIds: Set<String> = []
@@ -110,10 +103,10 @@ struct GameBrowseView: View {
                         ForEach(games) { game in
                             GameBrowseCard(
                                 game: game,
-                                isDownloading: downloadingId == game.id,
+                                isDownloading: false,
                                 isDeleting: deletingIds.contains(game.id),
                                 isOwner: game.creatorId == currentUserId,
-                                onPlay: { downloadAndPlay(game) },
+                                onPlay: { openGame(game) },
                                 onEdit: { tweakGame = game },
                                 onDelete: game.creatorId == currentUserId ? { deleteGame(game) } : nil,
                                 onShare: {
@@ -185,8 +178,9 @@ struct GameBrowseView: View {
         .onAppear { fetchGames() }
         .onChange(of: sortBy) { _ in fetchGames() }
         .onChange(of: showMyGames) { _ in fetchGames() }
-        .fullScreenCover(item: $activeGamePlay) { item in
-            GamePlayView(game: item.game, bundleDirectory: item.bundleDir)
+        .sheet(item: $safariURL) { url in
+            SafariView(url: url)
+                .ignoresSafeArea()
         }
         .fullScreenCover(item: $tweakGame) { game in
             GameTweakView(game: game)
@@ -257,44 +251,11 @@ struct GameBrowseView: View {
         }.resume()
     }
 
-    private func downloadAndPlay(_ game: BrowseGame) {
-        guard downloadingId == nil else { return }
-
-        isDownloading = true
-        downloadingId = game.id
-        errorMessage = nil
-
-        Task {
-            do {
-                // Fetch game details + bundle from API
-                guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(game.id)") else {
-                    throw URLError(.badURL)
-                }
-
-                let (data, _) = try await URLSession.shared.data(from: url)
-
-                guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-                      let gameData = json["game"] as? [String: Any],
-                      let base64Bundle = gameData["bundle"] as? String else {
-                    throw NSError(domain: "GameBrowse", code: 0,
-                                  userInfo: [NSLocalizedDescriptionKey: "Game bundle not available"])
-                }
-
-                let dir = try ZipExtractor.extractBundle(base64: base64Bundle)
-
-                await MainActor.run {
-                    isDownloading = false
-                    downloadingId = nil
-                    activeGamePlay = GamePlayItem(id: game.id, game: game, bundleDir: dir)
-                }
-            } catch {
-                await MainActor.run {
-                    errorMessage = "Failed to load game: \(error.localizedDescription)"
-                    isDownloading = false
-                    downloadingId = nil
-                }
-            }
-        }
+    private func openGame(_ game: BrowseGame) {
+        let userId = Auth.auth().currentUser?.uid ?? ""
+        let urlString = "https://puzzleverseai.com/play/\(game.id)?userId=\(userId)"
+        guard let url = URL(string: urlString) else { return }
+        safariURL = url
     }
 
     private func deleteGame(_ game: BrowseGame) {
@@ -572,4 +533,25 @@ struct GameBrowseCard: View {
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
     }
+}
+
+// MARK: - Safari View
+
+extension URL: @retroactive Identifiable {
+    public var id: String { absoluteString }
+}
+
+struct SafariView: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> SFSafariViewController {
+        let config = SFSafariViewController.Configuration()
+        config.entersReaderIfAvailable = false
+        let vc = SFSafariViewController(url: url, configuration: config)
+        vc.preferredBarTintColor = UIColor(red: 0.1, green: 0.1, blue: 0.18, alpha: 1)
+        vc.preferredControlTintColor = .orange
+        return vc
+    }
+
+    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
 }
