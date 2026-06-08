@@ -55,6 +55,9 @@ struct PuzzleForgeApp: App {
         // Track app install on first launch with enhanced attribution
         trackAppInstallWithAttribution()
 
+        // Register Apple Search Ads attribution token with Apple (once per install)
+        AttributionService.shared.trackAttribution()
+
         // Request ATT on every launch if not yet determined
         requestTrackingPermission()
 
