@@ -49,11 +49,13 @@
 		88C842692DECEEE1008819E6 /* FirebaseVertexAI in Frameworks */ = {isa = PBXBuildFile; productRef = 88C842682DECEEE1008819E6 /* FirebaseVertexAI */; };
 		TT0000000000000000000001 /* TikTokBusinessSDK in Frameworks */ = {isa = PBXBuildFile; productRef = TT0000000000000000000002 /* TikTokBusinessSDK */; };
 		PKR000000000003 /* PaywallKit in Frameworks */ = {isa = PBXBuildFile; productRef = PKR000000000002 /* PaywallKit */; };
+		ADS000000000000000000001 /* AdServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADS000000000000000000002 /* AdServices.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		88B87A722E9020D0002D6D06 /* Products.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Products.storekit; sourceTree = "<group>"; };
 		88C840E82DE0FD97008819E6 /* RiddleVerse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RiddleVerse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		ADS000000000000000000002 /* AdServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdServices.framework; path = System/Library/Frameworks/AdServices.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -139,6 +141,7 @@
 				88C8423A2DECEDB7008819E6 /* GoogleSignIn in Frameworks */,
 				TT0000000000000000000001 /* TikTokBusinessSDK in Frameworks */,
 				PKR000000000003 /* PaywallKit in Frameworks */,
+				ADS000000000000000000001 /* AdServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -151,7 +154,16 @@
 				88B87A722E9020D0002D6D06 /* Products.storekit */,
 				88C840EA2DE0FD97008819E6 /* PuzzleForge */,
 				88C840E92DE0FD97008819E6 /* Products */,
+				ADS000000000000000000003 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		ADS000000000000000000003 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ADS000000000000000000002 /* AdServices.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		88C840E92DE0FD97008819E6 /* Products */ = {
