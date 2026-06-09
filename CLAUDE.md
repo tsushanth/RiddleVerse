@@ -8,7 +8,8 @@ This repo is part of a portfolio shared between Sushanth (`t.sushanth@gmail.com`
 
 | Fly app | Location in repo |
 |---------|------------------|
-
+| `claude-forge-worker` | `claude-forge-worker/` |
+| `quiz-web-frontend` | `web/` |
 
 Authoritative deploy steps (run from inside the Fly app's subdir, where the `fly.toml` lives):
 
