@@ -9,7 +9,8 @@ import { URL } from 'url';
 class EnhancedPixabayPuzzleSystem {
     constructor(config = {}) {
         this.pixabayKey = process.env.PIXABAY_API_KEY;
-        this.openaiKey = process.env.OPENAI_API_KEY;
+        this.openaiKey = process.env.OPENAI_API_KEY; // kept for DALL-E image generation
+        this.anthropicKey = process.env.ANTHROPIC_API_KEY;
         this.debugMode = config.debug || false;
         this.puzzleCache = new Map();
         this.duplicateHashes = new Set();
@@ -34,8 +35,8 @@ class EnhancedPixabayPuzzleSystem {
         if (!this.pixabayKey) {
             throw new Error('PIXABAY_API_KEY required');
         }
-        if (!this.openaiKey) {
-            console.warn('OPENAI_API_KEY not set - AI fallback disabled');
+        if (!this.anthropicKey) {
+            console.warn('ANTHROPIC_API_KEY not set - AI text/vision fallback disabled');
             this.useAIFallback = false;
         }
         this.log('API keys validated');
@@ -332,7 +333,7 @@ Be creative but factually accurate!`;
 
     async generateAIImage(prompt) {
         if (!this.useAIFallback || !this.openaiKey) {
-            return null;
+            return null; // DALL-E requires OpenAI key
         }
 
         try {
@@ -826,28 +827,28 @@ Return JSON only:
         }
     }
 
-    async queryLLM(prompt, model = 'gpt-3.5-turbo') {
+    async queryLLM(prompt, model = 'claude-haiku-4-5-20251001') {
         try {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.openaiKey}`,
-                    'Content-Type': 'application/json'
+                    'x-api-key': this.anthropicKey,
+                    'Content-Type': 'application/json',
+                    'anthropic-version': '2023-06-01'
                 },
                 body: JSON.stringify({
                     model: model,
-                    messages: [{ role: 'user', content: prompt }],
-                    temperature: 0.7,
-                    max_tokens: 2000
+                    max_tokens: 2000,
+                    messages: [{ role: 'user', content: prompt }]
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`OpenAI API error: ${response.status}`);
+                throw new Error(`Anthropic API error: ${response.status}`);
             }
 
             const data = await response.json();
-            return data.choices[0].message.content;
+            return data.content[0]?.type === 'text' ? data.content[0].text : '';
 
         } catch (error) {
             throw new Error(`LLM query failed: ${error.message}`);
@@ -856,38 +857,39 @@ Return JSON only:
 
     async queryLLMWithVision(prompt, base64Image) {
         try {
-            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            const response = await fetch('https://api.anthropic.com/v1/messages', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${this.openaiKey}`,
-                    'Content-Type': 'application/json'
+                    'x-api-key': this.anthropicKey,
+                    'Content-Type': 'application/json',
+                    'anthropic-version': '2023-06-01'
                 },
                 body: JSON.stringify({
-                    model: "gpt-4o",
+                    model: "claude-sonnet-4-6",
+                    max_tokens: 500,
                     messages: [{
                         role: "user",
                         content: [
                             { type: "text", text: prompt },
-                            { 
-                                type: "image_url", 
-                                image_url: { 
-                                    url: `data:image/jpeg;base64,${base64Image}`,
-                                    detail: "high"
+                            {
+                                type: "image",
+                                source: {
+                                    type: "base64",
+                                    media_type: "image/jpeg",
+                                    data: base64Image
                                 }
                             }
                         ]
-                    }],
-                    max_tokens: 500,
-                    temperature: 0.1
+                    }]
                 })
             });
 
             if (!response.ok) {
-                throw new Error(`OpenAI Vision API error: ${response.status}`);
+                throw new Error(`Anthropic Vision API error: ${response.status}`);
             }
 
             const data = await response.json();
-            return data.choices[0].message.content;
+            return data.content[0]?.type === 'text' ? data.content[0].text : '';
 
         } catch (error) {
             throw new Error(`Vision LLM query failed: ${error.message}`);

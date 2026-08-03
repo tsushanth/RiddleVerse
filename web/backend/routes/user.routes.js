@@ -22,9 +22,9 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// OpenAI configuration
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+// Anthropic configuration
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
 // Save user preferences
 router.post('/preferences', async (req, res) => {
@@ -310,20 +310,32 @@ router.post('/call-llm', async (req, res) => {
             return res.status(400).json({ error: "Invalid request. 'conversation' must be an array." });
         }
         
-        const response = await axios.post(OPENAI_API_URL, {
-            model: "gpt-3.5-turbo",
-            messages: conversation,
-        }, {
+        // Extract system messages
+        const systemMsgs = conversation.filter(m => m.role === 'system');
+        const nonSystemMsgs = conversation.filter(m => m.role !== 'system');
+        const systemText = systemMsgs.map(m => typeof m.content === 'string' ? m.content : '').join('\n\n');
+
+        const reqBody = {
+            model: "claude-haiku-4-5-20251001",
+            max_tokens: 2048,
+            messages: nonSystemMsgs
+        };
+        if (systemText) {
+            reqBody.system = systemText;
+        }
+
+        const response = await axios.post(ANTHROPIC_API_URL, reqBody, {
             headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
+                'x-api-key': ANTHROPIC_API_KEY,
+                'Content-Type': 'application/json',
+                'anthropic-version': '2023-06-01'
             }
         });
-        
-        res.json({ message: response.data.choices?.[0]?.message?.content?.trim() || "Call to OpenAI failed." });
+
+        res.json({ message: (response.data.content?.[0]?.type === 'text' ? response.data.content[0].text.trim() : "") || "Call to Anthropic failed." });
     } catch (error) {
-        console.error("Error calling OpenAI API:", error.response ? error.response.data : error.message);
-        res.status(500).json({ error: "Failed to fetch response from OpenAI API." });
+        console.error("Error calling Anthropic API:", error.response ? error.response.data : error.message);
+        res.status(500).json({ error: "Failed to fetch response from AI API." });
     }
 });
 

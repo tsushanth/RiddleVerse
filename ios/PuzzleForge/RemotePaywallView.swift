@@ -1,6 +1,7 @@
 import SwiftUI
 import RevenueCat
 import PaywallKit
+import RatingKit
 
 // MARK: - Paywall Context
 
@@ -39,7 +40,7 @@ struct RemotePaywallView: View {
             ],
             products: paywallProducts,
             theme: PaywallTheme(accent: Color(red: 0.39, green: 0.4, blue: 0.95), accent2: Color(red: 0.55, green: 0.36, blue: 0.96)),
-            showWinback: true,
+            showWinback: false,
             onPurchase: { productId in
                 return await purchaseProduct(productId: productId)
             },
@@ -47,6 +48,8 @@ struct RemotePaywallView: View {
                 await restorePurchases()
             },
             onDismiss: {
+                PaywallCoordinator.shared.trackDismiss()
+                PaywallCoordinator.shared.checkWinbackEligibility()
                 onCancel()
                 dismiss()
             }
@@ -124,6 +127,7 @@ struct RemotePaywallView: View {
 
         if subscriptionManager.hasActiveSubscription() {
             await MainActor.run {
+                RatingKit.shared.trackPurchase()
                 onSuccess()
                 dismiss()
             }

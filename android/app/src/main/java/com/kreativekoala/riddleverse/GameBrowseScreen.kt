@@ -43,6 +43,7 @@ import java.io.File
 import java.util.UUID
 import java.util.zip.ZipInputStream
 import coil.compose.AsyncImage
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 
@@ -55,7 +56,12 @@ data class BrowseGameData(
     val initialPrompt: String,
     val createdAt: String,
     val status: String = "published",
-    val thumbnailUrl: String? = null
+    val thumbnailUrl: String? = null,
+    // Feature A / C additions — defaulted so pre-migration server responses still parse.
+    val seriesId: String? = null,
+    val levelIndex: Int = 1,
+    val levelCount: Int = 1,
+    val trendingScore: Double = 0.0
 )
 
 @Composable
@@ -65,7 +71,8 @@ fun GameBrowseContent(context: android.content.Context) {
     var games by remember { mutableStateOf<List<BrowseGameData>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var isLoadingMore by remember { mutableStateOf(false) }
-    var sortBy by remember { mutableStateOf("newest") }
+    var sortBy by remember { mutableStateOf("trending") }   // Feature C: default flipped from "newest"
+    var newReleases by remember { mutableStateOf<List<BrowseGameData>>(emptyList()) }   // Feature C: carousel above main grid
     var showMyGames by remember { mutableStateOf(false) }
     var hasMore by remember { mutableStateOf(false) }
     var currentOffset by remember { mutableIntStateOf(0) }
@@ -78,6 +85,11 @@ fun GameBrowseContent(context: android.content.Context) {
     var showTweakEditor by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
+    var coinGateGame by remember { mutableStateOf<BrowseGameData?>(null) }
+    var isCoinGateSpending by remember { mutableStateOf(false) }
+    val coinManager = CoinManager.shared
+    val playCountPrefs = remember { context.getSharedPreferences("riddleverse_play_counts", android.content.Context.MODE_PRIVATE) }
+    val FREE_PLAYS_PER_GAME = 3
 
     // Full screen tweak editor
     if (showTweakEditor && selectedGame != null) {
@@ -139,7 +151,11 @@ fun GameBrowseContent(context: android.content.Context) {
                                         initialPrompt = g.optString("description", ""),
                                         createdAt = g.optString("created_at", ""),
                                         status = g.optString("status", "published"),
-                                        thumbnailUrl = g.optString("initial_screenshot_url", "").ifEmpty { null }
+                                        thumbnailUrl = g.optString("initial_screenshot_url", "").ifEmpty { null },
+                                        seriesId = g.optString("series_id", "").ifEmpty { null },
+                                        levelIndex = g.optInt("level_index", 1),
+                                        levelCount = g.optInt("level_count", 1),
+                                        trendingScore = g.optDouble("trending_score", 0.0)
                                     )
                                 )
                             }
@@ -178,8 +194,32 @@ fun GameBrowseContent(context: android.content.Context) {
     fun downloadAndPlay(game: BrowseGameData) {
         if (downloadingId != null) return
 
-        // Launch game in Chrome Custom Tab — hosted at puzzleverseai.com
+        val isOwner = game.creatorId == currentUserId
         val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
+
+        if (!isOwner) {
+            val playCount = playCountPrefs.getInt("plays_${game.id}", 0)
+            if (playCount >= FREE_PLAYS_PER_GAME) {
+                // Free plays exhausted — need coins
+                if (!coinManager.canContinue) {
+                    coinGateGame = game
+                    return
+                }
+                val creatorId = game.creatorId.takeIf { it.isNotEmpty() }
+                coinManager.spendForContinue(game.id, creatorId) { success ->
+                    if (success) {
+                        ChromeGameLauncher.launchGame(context, game.id, userId)
+                    } else {
+                        coinGateGame = game
+                    }
+                }
+                return
+            }
+            // Free play — increment counter
+            playCountPrefs.edit().putInt("plays_${game.id}", playCount + 1).apply()
+        }
+
+        // Launch game in Chrome Custom Tab — hosted at puzzleverseai.com
         ChromeGameLauncher.launchGame(context, game.id, userId)
         return
 
@@ -293,9 +333,57 @@ fun GameBrowseContent(context: android.content.Context) {
         }
     }
 
+    // Feature C: pull the carousel data once on first composition
+    fun fetchNewReleases() {
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val request = Request.Builder()
+                        .url("https://puzzleverseai.com/api/game-creation/browse?sort=newest&limit=10&offset=0")
+                        .get()
+                        .build()
+                    val response = HttpClientProvider.client.newCall(request).execute()
+                    val body = response.body?.string()
+                    response.close()
+                    if (body != null) {
+                        val json = JSONObject(body)
+                        val arr = json.optJSONArray("games") ?: return@withContext
+                        val parsed = mutableListOf<BrowseGameData>()
+                        for (i in 0 until arr.length()) {
+                            val g = arr.getJSONObject(i)
+                            parsed.add(
+                                BrowseGameData(
+                                    id = g.optString("id", ""),
+                                    title = g.optString("title", "Untitled"),
+                                    creatorId = g.optString("creator_id", ""),
+                                    creatorName = g.optString("creator_name", "Anonymous"),
+                                    playCount = g.optInt("play_count", 0),
+                                    initialPrompt = g.optString("description", ""),
+                                    createdAt = g.optString("created_at", ""),
+                                    status = g.optString("status", "published"),
+                                    thumbnailUrl = g.optString("initial_screenshot_url", "").ifEmpty { null },
+                                    seriesId = g.optString("series_id", "").ifEmpty { null },
+                                    levelIndex = g.optInt("level_index", 1),
+                                    levelCount = g.optInt("level_count", 1),
+                                    trendingScore = g.optDouble("trending_score", 0.0)
+                                )
+                            )
+                        }
+                        withContext(Dispatchers.Main) { newReleases = parsed }
+                    }
+                } catch (e: Exception) {
+                    Log.e(TAG, "fetchNewReleases error", e)
+                }
+            }
+        }
+    }
+
     LaunchedEffect(sortBy, showMyGames) {
         fetchGames()
+        coinManager.fetchBalance()
+        coinManager.loadCoinProducts()
     }
+    LaunchedEffect(Unit) { fetchNewReleases() }
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Header with sort
@@ -350,7 +438,11 @@ fun GameBrowseContent(context: android.content.Context) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = if (sortBy == "newest") stringResource(R.string.newest) else stringResource(R.string.most_played),
+                            text = when (sortBy) {
+                                "trending" -> "Trending"
+                                "popular"  -> stringResource(R.string.most_played)
+                                else       -> stringResource(R.string.newest)
+                            },
                             fontSize = 12.sp,
                             color = Color(0xFFFF8C00),
                             maxLines = 1,
@@ -363,10 +455,10 @@ fun GameBrowseContent(context: android.content.Context) {
                     onDismissRequest = { showSortMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text(stringResource(R.string.newest)) },
-                        onClick = { sortBy = "newest"; showSortMenu = false },
+                        text = { Text("Trending") },
+                        onClick = { sortBy = "trending"; showSortMenu = false },
                         leadingIcon = {
-                            if (sortBy == "newest") Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                            if (sortBy == "trending") Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                         }
                     )
                     DropdownMenuItem(
@@ -374,6 +466,13 @@ fun GameBrowseContent(context: android.content.Context) {
                         onClick = { sortBy = "popular"; showSortMenu = false },
                         leadingIcon = {
                             if (sortBy == "popular") Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
+                        }
+                    )
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.newest)) },
+                        onClick = { sortBy = "newest"; showSortMenu = false },
+                        leadingIcon = {
+                            if (sortBy == "newest") Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
                         }
                     )
                 }
@@ -406,6 +505,68 @@ fun GameBrowseContent(context: android.content.Context) {
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // Feature C: New Releases carousel — only on default Trending view of community feed
+                if (sortBy == "trending" && !showMyGames && newReleases.isNotEmpty()) {
+                    item(key = "new_releases_carousel") {
+                        Column {
+                            Text(
+                                text = "New Releases",
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(bottom = 8.dp)
+                            )
+                            androidx.compose.foundation.lazy.LazyRow(
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                items(newReleases, key = { "carousel-${it.id}" }) { rel ->
+                                    Column(
+                                        modifier = Modifier
+                                            .width(140.dp)
+                                            .clickable { downloadAndPlay(rel) }
+                                    ) {
+                                        if (rel.thumbnailUrl != null) {
+                                            AsyncImage(
+                                                model = rel.thumbnailUrl,
+                                                contentDescription = rel.title,
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(100.dp)
+                                                    .clip(RoundedCornerShape(8.dp))
+                                            )
+                                        } else {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .height(100.dp)
+                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .background(Color.White.copy(alpha = 0.08f)),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.SportsEsports,
+                                                    contentDescription = null,
+                                                    tint = Color.White.copy(alpha = 0.4f)
+                                                )
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = rel.title,
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color.White,
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
                 items(games, key = { it.id }) { game ->
                     val isOwner = game.creatorId == currentUserId
                     BrowseGameCard(
@@ -443,6 +604,110 @@ fun GameBrowseContent(context: android.content.Context) {
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(stringResource(R.string.load_more), fontSize = 13.sp)
                                 }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // Coin gate dialog — shown when free plays are exhausted
+        if (coinGateGame != null) {
+            val game = coinGateGame!!
+            Dialog(
+                onDismissRequest = { if (!isCoinGateSpending) coinGateGame = null },
+                properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.7f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .padding(horizontal = 32.dp)
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(24.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text("\uD83C\uDFAE", fontSize = 40.sp)
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = "Free Plays Used Up",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "You've used your $FREE_PLAYS_PER_GAME free plays for \"${game.title}\". Spend coins to keep playing!",
+                                fontSize = 14.sp,
+                                color = Color.White.copy(alpha = 0.7f),
+                                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            // Coin balance
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .background(Color.Yellow.copy(alpha = 0.12f), RoundedCornerShape(20.dp))
+                                    .padding(horizontal = 16.dp, vertical = 6.dp)
+                            ) {
+                                Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("${coinManager.balance} coins", color = Color.Yellow, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                            }
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Button(
+                                onClick = {
+                                    if (!coinManager.canContinue) return@Button
+                                    isCoinGateSpending = true
+                                    val uid = FirebaseAuth.getInstance().currentUser?.uid
+                                    val creatorId = game.creatorId.takeIf { it.isNotEmpty() }
+                                    coinManager.spendForContinue(game.id, creatorId) { success ->
+                                        isCoinGateSpending = false
+                                        if (success) {
+                                            coinGateGame = null
+                                            ChromeGameLauncher.launchGame(context, game.id, uid)
+                                        }
+                                    }
+                                },
+                                enabled = coinManager.canContinue && !isCoinGateSpending,
+                                modifier = Modifier.fillMaxWidth().height(52.dp),
+                                shape = RoundedCornerShape(14.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (coinManager.canContinue) Color(0xFF6C63FF) else Color.Gray.copy(alpha = 0.5f)
+                                )
+                            ) {
+                                if (isCoinGateSpending) {
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                                } else {
+                                    Text(
+                                        text = "\uD83D\uDD04  Play — \uD83E\uDE99 ${CoinManager.CONTINUE_COST} coins",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White
+                                    )
+                                }
+                            }
+                            if (!coinManager.canContinue) {
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = "Not enough coins — need ${CoinManager.CONTINUE_COST}",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFFFF6B6B),
+                                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            TextButton(onClick = { coinGateGame = null }, enabled = !isCoinGateSpending) {
+                                Text("Maybe Later", color = Color.White.copy(alpha = 0.5f))
                             }
                         }
                     }
@@ -518,6 +783,7 @@ private fun BrowseGameCard(
                         .fillMaxWidth()
                         .height(180.dp)
                         .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                        .clickable { onPlay() }
                 ) {
                     AsyncImage(
                         model = game.thumbnailUrl,
@@ -538,6 +804,24 @@ private fun BrowseGameCard(
                             tint = Color.White.copy(alpha = 0.8f),
                             modifier = Modifier.size(48.dp)
                         )
+                    }
+                    // Feature A: "X levels" series badge (top-right)
+                    if (game.levelCount > 1) {
+                        Surface(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(8.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            color = Color.Black.copy(alpha = 0.65f)
+                        ) {
+                            Text(
+                                text = "${game.levelCount} levels",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -623,8 +907,17 @@ private fun BrowseGameCard(
                 }
             }
 
-            // Prompt preview — tap to expand
-            if (game.initialPrompt.isNotEmpty()) {
+            // Prompt preview — tap to expand. Hide if description duplicates the title
+            // (server falls back to title=prompt.substring(0,100), description=prompt.substring(0,500),
+            // so title is always a prefix of description when no explicit title is set).
+            val showDescription = run {
+                val d = game.initialPrompt.trim()
+                if (d.isEmpty()) return@run false
+                val t = game.title.trim().removeSuffix("…").removeSuffix("...").trim()
+                if (t.isEmpty()) return@run true
+                !(d.equals(t, ignoreCase = true) || d.startsWith(t, ignoreCase = true))
+            }
+            if (showDescription) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = game.initialPrompt,
@@ -638,77 +931,352 @@ private fun BrowseGameCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Action buttons row
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                // Play button
-                Button(
-                    onClick = onPlay,
-                    enabled = !isDownloading,
-                    modifier = Modifier.weight(1f).height(40.dp),
-                    shape = RoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF8C00),
-                        disabledContainerColor = Color(0xFFFF8C00).copy(alpha = 0.5f)
-                    )
-                ) {
-                    if (isDownloading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.loading), color = Color.White, fontSize = 14.sp)
-                    } else {
-                        Icon(Icons.Default.PlayCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.play), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    }
-                }
-
-                // Edit button (only for game creator)
-                if (isOwner && onEdit != null) {
+            // Action row: Play (if no thumbnail) + owner/share controls right-aligned
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Play button — shown only when no thumbnail (thumbnail itself is clickable)
+                if (game.thumbnailUrl == null) {
                     Button(
-                        onClick = onEdit,
+                        onClick = onPlay,
+                        enabled = !isDownloading,
                         modifier = Modifier.height(40.dp),
                         shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7B2FBE)),
-                        contentPadding = PaddingValues(horizontal = 16.dp)
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFFFF8C00),
+                            disabledContainerColor = Color(0xFFFF8C00).copy(alpha = 0.5f)
+                        )
                     ) {
-                        Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(stringResource(R.string.edit), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                    }
-                }
-
-                // Delete button (only for game creator)
-                if (isOwner && onDelete != null) {
-                    IconButton(
-                        onClick = onDelete,
-                        enabled = !isDeleting,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(Color(0xFFE53935).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
-                    ) {
-                        if (isDeleting) {
-                            CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color(0xFFE53935), strokeWidth = 2.dp)
+                        if (isDownloading) {
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(stringResource(R.string.loading), color = Color.White, fontSize = 14.sp)
                         } else {
-                            Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.PlayCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(stringResource(R.string.play), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                         }
                     }
+                } else {
+                    Spacer(modifier = Modifier.width(0.dp))
                 }
 
-                // Share to Telegram button
-                IconButton(
-                    onClick = { shareGameToTelegram(context, game) },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(Color(0xFF0088CC).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
-                ) {
-                    Icon(Icons.Default.Share, contentDescription = "Share to Telegram", tint = Color(0xFF0088CC), modifier = Modifier.size(18.dp))
+                // Right-side controls: consistent icon-only buttons
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    // Edit (owner only)
+                    if (isOwner && onEdit != null) {
+                        IconButton(
+                            onClick = onEdit,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color(0xFF7B2FBE).copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                        ) {
+                            Icon(Icons.Default.AutoAwesome, contentDescription = "Edit", tint = Color(0xFFCE93D8), modifier = Modifier.size(18.dp))
+                        }
+                    }
+
+                    // Delete (owner only)
+                    if (isOwner && onDelete != null) {
+                        IconButton(
+                            onClick = onDelete,
+                            enabled = !isDeleting,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .background(Color(0xFFE53935).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                        ) {
+                            if (isDeleting) {
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color(0xFFE53935), strokeWidth = 2.dp)
+                            } else {
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    }
+
+                    // Share
+                    IconButton(
+                        onClick = { shareGameToTelegram(context, game) },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color(0xFF0088CC).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                    ) {
+                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color(0xFF0088CC), modifier = Modifier.size(18.dp))
+                    }
+                }
+            }
+
+            // Leaderboard section
+            GameCardLeaderboard(gameId = game.id)
+
+            // Edit history section
+            GameCardEdits(gameId = game.id)
+        }
+        }
+    }
+}
+
+@Composable
+fun GameCardLeaderboard(gameId: String) {
+    var expanded by remember { mutableStateOf(false) }
+    var entries by remember { mutableStateOf<List<GameScoreEntry>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    val currentUserId = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: "" }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun load() {
+        if (loading) return
+        loading = true
+        coroutineScope.launch {
+            withContext(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    val url = "https://puzzleverseai.com/api/chat-scores/$gameId/_app_?platform=app"
+                    val req = Request.Builder().url(url).get().build()
+                    val resp = HttpClientProvider.client.newCall(req).execute()
+                    val body = resp.body?.string(); resp.close()
+                    if (body != null) {
+                        val json = org.json.JSONObject(body)
+                        val arr = json.optJSONArray("scores") ?: org.json.JSONArray()
+                        entries = (0 until arr.length()).map { i ->
+                            val s = arr.getJSONObject(i)
+                            GameScoreEntry(s.optString("username","Player"), s.optInt("score",0), s.optString("userId",""))
+                        }
+                    }
+                } catch (_: Exception) {}
+                loading = false
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                expanded = !expanded
+                if (expanded && entries.isEmpty()) load()
+            }
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("🏆 Leaderboard", fontSize = 13.sp, color = Color(0xFFFFD700), fontWeight = FontWeight.SemiBold)
+            androidx.compose.material3.Icon(
+                if (expanded) androidx.compose.material.icons.Icons.Default.KeyboardArrowUp
+                else androidx.compose.material.icons.Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        if (expanded) {
+            Spacer(Modifier.height(8.dp))
+            if (loading) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    modifier = Modifier.size(18.dp).align(Alignment.CenterHorizontally),
+                    color = Color(0xFFFF8C00), strokeWidth = 2.dp
+                )
+            } else if (entries.isEmpty()) {
+                Text("No scores yet — be the first!", fontSize = 12.sp, color = Color.White.copy(alpha = 0.4f))
+            } else {
+                val medals = listOf("🥇","🥈","🥉")
+                entries.take(5).forEachIndexed { i, e ->
+                    val isMe = e.userId == currentUserId
+                    Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Text(medals.getOrElse(i){"${i+1}."}, fontSize = 13.sp, modifier = Modifier.width(24.dp))
+                        Text(e.username, fontSize = 12.sp, color = if(isMe) Color(0xFFFF8C00) else Color.White.copy(alpha=0.85f),
+                            fontWeight = if(isMe) FontWeight.Bold else FontWeight.Normal,
+                            modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text("${e.score}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
+                    }
                 }
             }
         }
+    }
+}
+
+data class GameEditVersion(
+    val sha: String,
+    val shortSha: String,
+    val message: String,
+    val date: String,
+    val author: String
+) {
+    val isInitial: Boolean get() = message == "Initial game creation"
+    val displayMessage: String get() = if (message.startsWith("Tweak: ")) message.removePrefix("Tweak: ") else message
+}
+
+private fun relativeTimeFromIso(isoDate: String): String {
+    if (isoDate.isEmpty()) return ""
+    return try {
+        val instant = java.time.OffsetDateTime.parse(isoDate).toInstant()
+        val seconds = java.time.Duration.between(instant, java.time.Instant.now()).seconds
+        when {
+            seconds < 60 -> "just now"
+            seconds < 3600 -> "${seconds / 60}m ago"
+            seconds < 86400 -> "${seconds / 3600}h ago"
+            else -> "${seconds / 86400}d ago"
+        }
+    } catch (_: Exception) {
+        ""
+    }
+}
+
+@Composable
+fun GameCardEdits(gameId: String) {
+    var expanded by remember { mutableStateOf(false) }
+    var versions by remember { mutableStateOf<List<GameEditVersion>>(emptyList()) }
+    var loading by remember { mutableStateOf(false) }
+    var fetched by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun load() {
+        if (loading) return
+        loading = true
+        coroutineScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val url = "https://puzzleverseai.com/api/game-creation/$gameId/versions"
+                    val req = Request.Builder().url(url).get().build()
+                    val resp = HttpClientProvider.client.newCall(req).execute()
+                    val body = resp.body?.string(); resp.close()
+                    if (body != null) {
+                        val json = JSONObject(body)
+                        val arr = json.optJSONArray("versions")
+                        val parsed = mutableListOf<GameEditVersion>()
+                        if (arr != null) {
+                            for (i in 0 until arr.length()) {
+                                val v = arr.getJSONObject(i)
+                                val sha = v.optString("sha", "")
+                                parsed.add(
+                                    GameEditVersion(
+                                        sha = sha,
+                                        shortSha = v.optString("shortSha", sha.take(7)),
+                                        message = v.optString("message", ""),
+                                        date = v.optString("date", ""),
+                                        author = v.optString("author", "")
+                                    )
+                                )
+                            }
+                        }
+                        versions = parsed
+                    }
+                } catch (_: Exception) {}
+                loading = false
+                fetched = true
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                expanded = !expanded
+                if (expanded && !fetched) load()
+            }
+            .padding(horizontal = 16.dp, vertical = 10.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("✨ Edits", fontSize = 13.sp, color = Color(0xFFCE93D8), fontWeight = FontWeight.SemiBold)
+                if (fetched && versions.isNotEmpty()) {
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        "(${versions.count { !it.isInitial }})",
+                        fontSize = 11.sp,
+                        color = Color.White.copy(alpha = 0.4f)
+                    )
+                }
+            }
+            Icon(
+                if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.5f),
+                modifier = Modifier.size(18.dp)
+            )
+        }
+        if (expanded) {
+            Spacer(Modifier.height(8.dp))
+            when {
+                loading -> CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(18.dp)
+                        .align(Alignment.CenterHorizontally),
+                    color = Color(0xFFCE93D8),
+                    strokeWidth = 2.dp
+                )
+                versions.isEmpty() -> Text(
+                    "No edits yet",
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = 0.4f)
+                )
+                else -> versions.forEach { v ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .padding(top = 5.dp)
+                                .size(8.dp)
+                                .background(
+                                    if (v.isInitial) Color(0xFF66BB6A) else Color(0xFFCE93D8),
+                                    CircleShape
+                                )
+                        )
+                        Spacer(Modifier.width(10.dp))
+                        Column(Modifier.weight(1f)) {
+                            Text(
+                                v.displayMessage,
+                                fontSize = 12.sp,
+                                color = Color.White.copy(alpha = 0.85f),
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Spacer(Modifier.height(2.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                if (v.shortSha.isNotEmpty()) {
+                                    Text(
+                                        v.shortSha,
+                                        fontSize = 10.sp,
+                                        color = Color.White.copy(alpha = 0.3f),
+                                        fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
+                                    )
+                                }
+                                val ago = relativeTimeFromIso(v.date)
+                                if (ago.isNotEmpty()) {
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(ago, fontSize = 10.sp, color = Color.White.copy(alpha = 0.3f))
+                                }
+                                if (v.isInitial) {
+                                    Spacer(Modifier.width(8.dp))
+                                    Surface(
+                                        shape = RoundedCornerShape(4.dp),
+                                        color = Color(0xFF66BB6A).copy(alpha = 0.15f)
+                                    ) {
+                                        Text(
+                                            "Original",
+                                            fontSize = 9.sp,
+                                            color = Color(0xFF66BB6A),
+                                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

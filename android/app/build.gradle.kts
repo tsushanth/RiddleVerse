@@ -24,8 +24,8 @@ android {
         applicationId = "com.kreativekoala.riddleverse"
         minSdk = 26
         targetSdk = 35
-        versionCode = 162
-        versionName = "162.0"
+        versionCode = 168
+        versionName = "168.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL for sharing games
@@ -167,6 +167,8 @@ dependencies {
     implementation("com.revenuecat.purchases:purchases:8.13.0")
     implementation("com.revenuecat.purchases:purchases-ui:8.13.0")
     implementation(project(":paywallkit"))
+    implementation(project(":crosspromokit"))
+    implementation(project(":ratingkit"))
     implementation("com.github.tiktok:tiktok-business-android-sdk:1.6.0")
     implementation(libs.play.services.fido)
     implementation(libs.mediation.test.suite)

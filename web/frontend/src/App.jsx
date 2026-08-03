@@ -13,6 +13,7 @@ import DailyChallengePage from './pages/DailyChallengePage'
 import BadgesPage from './pages/BadgesPage'
 import GameLeaderboardPage from './pages/GameLeaderboardPage'
 import CoinShopPage from './pages/CoinShopPage'
+import GameSessionPage from './pages/GameSessionPage'
 import LoadingSpinner from './components/LoadingSpinner'
 
 // Protected route wrapper
@@ -116,6 +117,9 @@ export default function App() {
           </ProtectedRoute>
         } />
       </Route>
+
+      {/* Game session wrapper — no layout chrome, no auth required */}
+      <Route path="/play" element={<GameSessionPage />} />
 
       {/* Catch all - redirect to home or welcome */}
       <Route path="*" element={<Navigate to="/" replace />} />

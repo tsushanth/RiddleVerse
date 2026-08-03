@@ -40,6 +40,7 @@ const CRITICAL_MODULES = [
 
 // Mock environment for testing
 const mockEnvironment = {
+  ANTHROPIC_API_KEY: 'test-key',
   OPENAI_API_KEY: 'test-key',
   DEEPSEEK_API_KEY: 'test-key',
   ALERT_EMAIL: 'test@example.com',
@@ -266,7 +267,7 @@ class SmokeTestRunner {
     
     try {
       const requiredEnvVars = [
-        'OPENAI_API_KEY',
+        'ANTHROPIC_API_KEY',
         'DEEPSEEK_API_KEY', 
         'ALERT_EMAIL',
         'PORT'

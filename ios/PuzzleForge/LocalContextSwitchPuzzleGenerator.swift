@@ -24,7 +24,7 @@ class LocalContextSwitchPuzzleGenerator {
         // Technology
         "programming_languages": ["Python", "JavaScript", "Java", "Kotlin", "Swift", "C++", "Go", "Rust", "TypeScript", "PHP", "Ruby", "Scala", "Dart", "C#", "Objective-C"],
         "tech_companies": ["Google", "Apple", "Microsoft", "Amazon", "Meta", "Tesla", "Netflix", "Adobe", "Spotify", "Airbnb", "Uber", "Twitter", "Intel", "Samsung", "Sony"],
-        "operating_systems": ["Windows", "macOS", "Linux", "Android", "iOS", "Ubuntu", "Chrome OS", "FreeBSD", "Unix", "Fedora", "Debian", "CentOS", "Red Hat", "SUSE", "Mint"],
+        "operating_systems": ["Windows", "macOS", "Linux", "HarmonyOS", "iOS", "Ubuntu", "Chrome OS", "FreeBSD", "Unix", "Fedora", "Debian", "CentOS", "Red Hat", "SUSE", "Mint"],
         
         // Nature & Animals
         "dog_breeds": ["Labrador", "Golden Retriever", "Bulldog", "Beagle", "Poodle", "Rottweiler", "Yorkshire", "Boxer", "Husky", "Dachshund", "Shepherd", "Chihuahua", "Collie", "Mastiff", "Spaniel"],

@@ -25,3 +25,8 @@ include(":app", ":zipline-api", ":game-guest")
 include(":game-guest:kotlin")
 include(":paywallkit")
 project(":paywallkit").projectDir = file("../../PaywallKit-Android/paywallkit")
+include(":ratingkit")
+project(":ratingkit").projectDir = file("/Users/sushanthtiruvaipati/Documents/GitHub/RatingKit-Android/ratingkit")
+
+include(":crosspromokit")
+project(":crosspromokit").projectDir = file("/Users/sushanthtiruvaipati/Documents/GitHub/CrossPromoKit-Android/crosspromokit")

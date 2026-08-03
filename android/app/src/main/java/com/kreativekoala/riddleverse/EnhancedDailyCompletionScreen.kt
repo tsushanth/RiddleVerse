@@ -741,8 +741,8 @@ fun EnhancedSuccessContentWithRanking(
     val totalUserScore = remember { UserScoreStore.load(context) }
 
     val recommendations = remember(puzzleType) {
-        val recs = PuzzleRecommendations.getRecommendationDisplayData(puzzleType)
-        Log.d("Recommendations", "Loaded ${recs.size} recommendations for $puzzleType")
+        val recs = PuzzleRecommendations.getRecommendationDisplayData(puzzleType, context)
+        Log.d("Recommendations", "Loaded ${recs.size} recommendations for $puzzleType (neverPlayed: ${recs.count { it.neverPlayed }})")
         recs
     }
 
@@ -1174,7 +1174,22 @@ fun PuzzleRecommendationItem(
                         fontSize = 16.sp
                     )
 
-                    if (recommendation.isNew) {
+                    if (recommendation.neverPlayed) {
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Surface(
+                            color = Color(0xFF7C4DFF),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "✨ New to You",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                fontSize = 10.sp
+                            )
+                        }
+                    } else if (recommendation.isNew) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
                             color = Color(0xFFFF6B35),

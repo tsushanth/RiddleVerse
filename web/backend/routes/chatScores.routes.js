@@ -3,8 +3,31 @@ import { supabase } from '../config/database.js';
 
 const router = express.Router();
 
-// Optional webhook URL for score notifications (e.g., Telegram bot)
-const SCORE_WEBHOOK_URL = process.env.SCORE_WEBHOOK_URL || '';
+const TELEGRAM_BOT_TOKEN = process.env.RIDDLEVERSE_BOT_TOKEN || '';
+const MEDALS = ['🥇', '🥈', '🥉'];
+
+async function sendTelegramLeaderboard(chatId, gameName, leaderboard) {
+    if (!TELEGRAM_BOT_TOKEN || !chatId) return;
+    try {
+        const lines = [`🏆 *${gameName} — Leaderboard*\n`];
+        leaderboard.forEach((s, i) => {
+            const medal = MEDALS[i] || `${i + 1}.`;
+            const name = (s.username || 'Player').replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
+            lines.push(`${medal} ${name} — *${s.score}*`);
+        });
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: lines.join('\n'),
+                parse_mode: 'MarkdownV2'
+            })
+        });
+    } catch (err) {
+        console.warn('[chat-scores] Telegram notify failed:', err.message);
+    }
+}
 
 // POST /api/chat-scores
 // Body: { gameId, chatId, platform, userId, username, score, avatarUrl? }
@@ -84,9 +107,8 @@ router.post('/', async (req, res) => {
 
         if (lbError) throw lbError;
 
-        // Fire-and-forget webhook notification
-        if (SCORE_WEBHOOK_URL) {
-            // Get game name for the notification
+        // Fire-and-forget: send leaderboard to Telegram chat
+        if (platform === 'telegram' && chatId) {
             let gameName = 'Game';
             try {
                 const { data: game } = await supabase
@@ -94,25 +116,12 @@ router.post('/', async (req, res) => {
                     .select('title')
                     .eq('id', gameId)
                     .single();
-                if (game?.title) gameName = game.title;
+                if (game?.title) gameName = game.title.split('\n')[0].trim().slice(0, 50);
             } catch {}
-
-            fetch(`${SCORE_WEBHOOK_URL}/score-update`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    gameId,
-                    chatId,
-                    platform,
-                    leaderboard: leaderboard.map(s => ({
-                        userId: s.user_id,
-                        username: s.username,
-                        score: s.score,
-                        avatarUrl: s.avatar_url
-                    })),
-                    gameName
-                })
-            }).catch(err => console.warn('[chat-scores] Webhook failed:', err.message));
+            sendTelegramLeaderboard(chatId, gameName, leaderboard.map(s => ({
+                username: s.username,
+                score: s.score
+            })));
         }
 
         res.json({
@@ -133,21 +142,30 @@ router.post('/', async (req, res) => {
 });
 
 // GET /api/chat-scores/:gameId/:chatId
-// Optional query: ?platform=telegram (defaults to telegram)
-// Returns: { scores: [...top 10 sorted by score desc] }
+// Optional query: ?platform=telegram|app
+// telegram: scoped to chatId — group leaderboard
+// app: global leaderboard across all players for this game
 router.get('/:gameId/:chatId', async (req, res) => {
     try {
         const { gameId, chatId } = req.params;
         const { platform = 'telegram' } = req.query;
 
-        const { data: scores, error } = await supabase
+        let query = supabase
             .from('chat_scores')
             .select('user_id, username, score, avatar_url, updated_at')
             .eq('game_id', gameId)
-            .eq('chat_id', chatId)
-            .eq('platform', platform)
             .order('score', { ascending: false })
             .limit(10);
+
+        if (platform === 'app') {
+            // Global leaderboard — all platforms, all chats
+            query = query.eq('platform', 'app');
+        } else {
+            // Chat-scoped leaderboard
+            query = query.eq('chat_id', chatId).eq('platform', platform);
+        }
+
+        const { data: scores, error } = await query;
 
         if (error) throw error;
 

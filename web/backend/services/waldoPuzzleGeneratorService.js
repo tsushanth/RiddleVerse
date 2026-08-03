@@ -5,7 +5,8 @@ import axios from 'axios';
 export class WaldoPuzzleGenerator {
     constructor() {
         this.debugMode = false;
-        this.apiKey = process.env.OPENAI_API_KEY;
+        this.apiKey = process.env.OPENAI_API_KEY; // kept for DALL-E
+        this.anthropicKey = process.env.ANTHROPIC_API_KEY;
         
         // Grid configuration optimized for phone screens
         this.gridConfig = {
@@ -617,7 +618,7 @@ export class WaldoPuzzleGenerator {
             
             try {
                 if (!this.apiKey) {
-                    throw new Error('OPENAI_API_KEY environment variable not set');
+                    throw new Error('OPENAI_API_KEY environment variable not set (needed for DALL-E)');
                 }
 
                 // Select scene and objects based on difficulty
@@ -890,35 +891,36 @@ Please analyze the image now and report your findings for each object.`;
 
             this.debugLog('👁️ Sending image to Vision API for enhanced detection...');
 
-            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-                model: "gpt-4o",
+            const response = await axios.post('https://api.anthropic.com/v1/messages', {
+                model: "claude-sonnet-4-6",
+                max_tokens: 2500,
                 messages: [{
                     role: "user",
                     content: [
                         {
-                            type: "text",
-                            text: detectionPrompt
+                            type: "image",
+                            source: {
+                                type: "base64",
+                                media_type: "image/jpeg",
+                                data: imageBase64
+                            }
                         },
                         {
-                            type: "image_url",
-                            image_url: {
-                                url: `data:image/jpeg;base64,${imageBase64}`,
-                                detail: "high"  // Request high detail analysis
-                            }
+                            type: "text",
+                            text: detectionPrompt
                         }
                     ]
-                }],
-                max_tokens: 2500,
-                temperature: 0.1
+                }]
             }, {
                 headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
+                    'x-api-key': this.anthropicKey,
+                    'Content-Type': 'application/json',
+                    'anthropic-version': '2023-06-01'
                 },
                 timeout: 90000
             });
 
-            const content = response.data.choices[0].message.content;
+            const content = response.data.content?.[0]?.type === 'text' ? response.data.content[0].text : '';
             this.debugLog(`👁️ Vision response preview: ${content.substring(0, 200)}...`);
 
             // Parse the response to extract object locations

@@ -44,7 +44,6 @@ COPY local_all-MiniLM-L6-v2 /backend/model-cache/Xenova/all-MiniLM-L6-v2
 COPY local_all-MiniLM-L6-v2 /backend/node_modules/@xenova/transformers/models/Xenova/all-MiniLM-L6-v2
 
 # Set environment variables
-ENV OPENAI_API_KEY="REDACTED_SECRET"
 ENV DEEPSEEK_API_KEY="REDACTED_SECRET"
 ENV PIXABAY_API_KEY="REDACTED_SECRET"
 ENV UNSPLASH_ACCESS_KEY="REDACTED_SECRET"

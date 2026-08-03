@@ -45,6 +45,7 @@ import chatScoresRoutes from './routes/chatScores.routes.js';
 import leaderboardRoutes from './routes/leaderboard.routes.js';
 import coinsRoutes from './routes/coins.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
+import sessionRoutes from './routes/sessions.routes.js';
 import { handleStripeWebhook } from './services/payoutService.js';
 
 // Service imports
@@ -232,6 +233,7 @@ app.use('/api/chat-scores', chatScoresRoutes);
 app.use('/api/coins', coinsRoutes);
 app.use('/api/payouts', payoutRoutes);
 app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/sessions', sessionRoutes);
 app.use('/api', userConfigRoutes);
 app.use('/', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
@@ -275,7 +277,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));
-app.use(cors({ origin: "https://quiz-web-frontend-917362189743.us-central1.run.app" }));
+app.use(cors({ origin: "https://quiz-web-frontend.fly.dev" }));
 
 app.get('/download', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'download.html'));

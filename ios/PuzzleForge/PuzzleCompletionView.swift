@@ -368,6 +368,7 @@ struct RecommendedPuzzleCardOriginal: View {
     let icon: String
     let description: String
     let difficulty: String
+    var neverPlayed: Bool = false
     let onTap: () -> Void
     
     @State private var isNavigating = false
@@ -403,24 +404,33 @@ struct RecommendedPuzzleCardOriginal: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(getPuzzleDisplayName(puzzleType))
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .foregroundColor(.white)
-                        
+                        HStack(spacing: 6) {
+                            Text(getPuzzleDisplayName(puzzleType))
+                                .font(.headline)
+                                .fontWeight(.bold)
+                                .foregroundColor(.white)
+                            if neverPlayed {
+                                Text("✨ New to You")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 3)
+                                    .background(Capsule().fill(Color(red: 0.49, green: 0.30, blue: 1.0)))
+                            }
+                        }
                         Text(difficulty.capitalized)
                             .font(.caption)
                             .foregroundColor(.gray)
                     }
-                    
+
                     Spacer()
-                    
+
                     Image(systemName: "arrow.right.circle.fill")
                         .font(.title2)
                         .foregroundColor(.white.opacity(0.8))
                 }
-                
-                Text(description)
+
+                Text(neverPlayed ? "You've never tried this — give it a go!" : description)
                     .font(.subheadline)
                     .foregroundColor(.white.opacity(0.8))
                     .lineLimit(2)
@@ -768,11 +778,13 @@ struct PuzzleCompletionView: View {
             
             VStack(spacing: 12) {
                 ForEach(getRecommendedPuzzles(), id: \.type) { recommendation in
+                    let neverPlayed = statsManager.getPuzzleStats(puzzleType: recommendation.type).totalPlays == 0
                     RecommendedPuzzleCardOriginal(
                         puzzleType: recommendation.type,
                         icon: recommendation.icon,
                         description: recommendation.description,
                         difficulty: recommendation.difficulty,
+                        neverPlayed: neverPlayed,
                         onTap: {
                             onStartPuzzle(recommendation.type, recommendation.difficulty)
                         }
@@ -1014,11 +1026,18 @@ struct PuzzleCompletionView: View {
             ]
         ]
         
-        // Return recommendations for current type, or default recommendations
-        return recommendations[currentType] ?? [
+        let candidates = recommendations[currentType] ?? [
             PuzzleRecommendation(type: "trivia", icon: "questionmark.circle.fill", description: "Test your general knowledge", difficulty: "medium"),
             PuzzleRecommendation(type: "math", icon: "function", description: "Sharpen your calculation skills", difficulty: "medium")
         ]
+
+        // Sort: never-played types bubble to the top
+        return candidates.sorted { a, b in
+            let aPlayed = statsManager.getPuzzleStats(puzzleType: a.type).totalPlays > 0
+            let bPlayed = statsManager.getPuzzleStats(puzzleType: b.type).totalPlays > 0
+            if aPlayed == bPlayed { return false }
+            return !aPlayed // never-played first
+        }
     }
     
     // MARK: - No Puzzles Content

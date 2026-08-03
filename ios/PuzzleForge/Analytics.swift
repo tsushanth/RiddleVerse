@@ -8,6 +8,7 @@
 import SwiftUI
 import FirebaseAnalytics
 import FirebaseAuth
+import RatingKit
 import Foundation
 
 // MARK: - Analytics Events Configuration
@@ -323,6 +324,7 @@ class AnalyticsManager: ObservableObject {
             await MainActor.run {
                 sessionPuzzlesSolved += 1
                 sessionTotalScore += score
+                RatingKit.shared.trackAction()
             }
         }
     }

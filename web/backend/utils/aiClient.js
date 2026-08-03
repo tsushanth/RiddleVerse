@@ -10,9 +10,8 @@ import usageTracker, { USAGE_CATEGORIES } from './usageTracker.js';
 // Model rotation state
 let currentModelIndex = 0;
 const availableModels = [
-    'gpt-3.5-turbo',
-    'deepseek',
     'claude-3-sonnet',
+    'deepseek',
     'gemini-pro'];
 
 
@@ -47,7 +46,7 @@ function getApiConfig(modelName) {
         case 'claude-3-sonnet':
             return {
                 url: "https://api.anthropic.com/v1/messages",
-                model: "claude-3-5-sonnet-20241022",
+                model: "claude-haiku-4-5-20251001",
                 isAnthropic: true
             };
         
@@ -60,9 +59,11 @@ function getApiConfig(modelName) {
             };
         
         default:
+            // Default to Claude instead of OpenAI
             return {
-                url: "https://api.openai.com/v1/chat/completions",
-                model: modelName // gpt-4, gpt-4-turbo, gpt-3.5-turbo
+                url: "https://api.anthropic.com/v1/messages",
+                model: "claude-haiku-4-5-20251001",
+                isAnthropic: true
             };
     }
 }
@@ -449,7 +450,7 @@ function cleanAIResponse(response) {
 // Add this to your aiClient.js file
 
 /**
- * Generate image using OpenAI DALL-E with same error handling as callAI
+ * Generate image using Pollinations (free, no API key needed)
  * @param {string} prompt - The image prompt
  * @param {object} options - Generation options
  * @returns {Promise<Buffer>} - Image buffer
@@ -460,88 +461,56 @@ export async function generateImage(prompt, options = {}) {
     }
 
     const {
-        model = "dall-e-3",
         size = "1024x1024",
-        quality = "hd",
-        style = "natural",
         category = USAGE_CATEGORIES.IMAGE_GENERATION || 'image_generation',
         puzzleType = null
     } = options;
 
     const startTime = Date.now();
-    console.log(`🖼️ Generating image with ${model}...`);
+    console.log(`🖼️ Generating image with Pollinations...`);
     console.log(`📝 Prompt: ${prompt.substring(0, 100)}...`);
 
     let lastError;
     const maxRetries = 3;
+    const [width, height] = size.split('x').map(Number);
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-            const apiKey = getApiKey('openai');
-            if (!apiKey) {
-                throw new Error('OpenAI API key not found');
-            }
-
             console.log(`🎨 Image generation attempt ${attempt}/${maxRetries}...`);
 
-            // ✅ FIXED: Correct endpoint URL
-            const response = await axios.post(
-                'https://api.openai.com/v1/images/generations',  // Fixed: added 's'
-                {
-                    model: model,
-                    prompt: prompt,
-                    size: size,
-                    quality: quality,
-                    response_format: "b64_json",
-                    style: style
-                }, 
-                {
-                    headers: {
-                        'Authorization': `Bearer ${apiKey}`,
-                        'Content-Type': 'application/json'
-                    },
-                    timeout: 120000 // 2 minutes for image generation
-                }
-            );
+            const encoded = encodeURIComponent(prompt);
+            const seed = Math.floor(Math.random() * 99999);
+            const url = `https://image.pollinations.ai/prompt/${encoded}?width=${width || 1024}&height=${height || 1024}&nologo=true&seed=${seed}`;
 
-            if (!response.data?.data?.[0]?.b64_json) {
-                throw new Error('Invalid response format from OpenAI Images API');
-            }
+            const response = await axios.get(url, {
+                responseType: 'arraybuffer',
+                timeout: 120000
+            });
 
-            const imageBuffer = Buffer.from(response.data.data[0].b64_json, 'base64');
+            const imageBuffer = Buffer.from(response.data);
             const generationTime = Date.now() - startTime;
-            
+
             console.log(`✅ Image generated successfully in ${generationTime}ms (${imageBuffer.length} bytes)`);
 
-            // Track successful usage
             await usageTracker.trackRequest({
-                modelName: model,
+                modelName: 'pollinations',
                 category: category,
                 prompt: prompt,
                 response: `Image generated (${imageBuffer.length} bytes)`,
                 success: true,
                 puzzleType: puzzleType,
                 tokens: 0,
-                cost: model === 'dall-e-3' ? (size === '1024x1024' && quality === 'hd' ? 0.080 : 0.040) : 0.020
+                cost: 0
             });
 
-            console.log(`💰 Image generation cost: $${model === 'dall-e-3' ? (quality === 'hd' ? '0.080' : '0.040') : '0.020'}`);
-            
             return imageBuffer;
 
         } catch (error) {
             lastError = error;
             console.error(`❌ Image generation attempt ${attempt}/${maxRetries} failed:`, error.message);
-            
-            // Enhanced error logging
-            if (error.response) {
-                console.error(`📊 Response status: ${error.response.status}`);
-                console.error(`📊 Response data:`, JSON.stringify(error.response.data, null, 2));
-            }
 
-            // Track failed attempt
             await usageTracker.trackRequest({
-                modelName: model,
+                modelName: 'pollinations',
                 category: category,
                 prompt: prompt,
                 response: '',
@@ -549,46 +518,13 @@ export async function generateImage(prompt, options = {}) {
                 puzzleType: puzzleType
             });
 
-            // Handle different error types
-            if (error.response?.status === 400) {
-                console.error(`🚫 Bad request: ${error.response.data?.error?.message}`);
-                // Don't retry policy violations
-                break;
-            } else if (error.response?.status === 404) {
-                console.error(`🚫 Endpoint not found - check API URL`);
-                break;
-            } else if (error.response?.status === 429) {
-                console.warn(`⏰ Rate limit exceeded, retrying with backoff...`);
-                if (attempt < maxRetries) {
-                    const delay = Math.pow(2, attempt) * 2000;
-                    console.log(`⏳ Waiting ${delay}ms before retry...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            } else if (error.response?.status === 401) {
-                console.error(`🔐 Authentication failed - check OpenAI API key`);
-                console.error(`Key preview: ${apiKey.substring(0, 10)}...${apiKey.substring(apiKey.length - 4)}`);
-                break;
-            } else if (error.response?.status >= 500) {
-                console.warn(`🔧 Server error, retrying...`);
-                if (attempt < maxRetries) {
-                    const delay = 1000 * attempt;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                }
-            } else if (error.code === 'ECONNABORTED') {
-                console.warn(`⏰ Timeout, retrying...`);
-                if (attempt < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, 2000));
-                }
-            } else {
-                console.error(`🚨 Unexpected error: ${error.message}`);
-                if (attempt < maxRetries) {
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                }
+            if (attempt < maxRetries) {
+                const delay = 1000 * attempt;
+                await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
     }
 
-    // All attempts failed
     console.error(`💀 Image generation failed after ${maxRetries} attempts`);
     throw new Error(`Image generation failed: ${lastError?.message || 'Unknown error'}`);
 }
@@ -828,8 +764,20 @@ function cleanTextForTTS(text) {
     return cleanText
   }
 
+// Kokoro voice IDs mapped from legacy names
+const kokoroVoiceMap = {
+    'nova': 'af_nicole',
+    'shimmer': 'af_sarah',
+    'alloy': 'am_adam',
+    'echo': 'am_michael',
+    'fable': 'am_adam',
+    'onyx': 'am_michael',
+};
+
+const KOKORO_TTS_URL = process.env.SELFHOSTED_TTS_URL || 'https://listenai-tts-worker.fly.dev';
+
 /**
- * Generate TTS Audio using OpenAI, cycling through voices
+ * Generate TTS Audio using self-hosted Kokoro, cycling through voices
  * @param {string} text - Text to convert to speech
  * @returns {Promise<object>} - Result with audioBuffer or error
  */
@@ -837,32 +785,31 @@ export async function generateTTSAudio(text, voice1 = null) {
     const startTime = Date.now();
     text = cleanTextForTTS(text);
     const voice = getNextVoice();
+    const kokoroVoice = kokoroVoiceMap[voice] || 'af_nicole';
 
     try {
-        const response = await axios.post("https://api.openai.com/v1/audio/speech", {
-            model: "tts-1",
-            input: text,
-            voice: voice,
-            response_format: "mp3",
-            speed: 0.9
+        const response = await axios.post(`${KOKORO_TTS_URL}/synthesize`, {
+            text: text,
+            voice_id: kokoroVoice,
+            speed: 0.9,
+            model: 'kokoro',
+            language: 'en',
         }, {
-            headers: {
-                'Authorization': `Bearer ${getApiKey('openai')}`,
-                'Content-Type': 'application/json'
-            },
-            responseType: 'arraybuffer'
+            headers: { 'Content-Type': 'application/json' },
+            responseType: 'arraybuffer',
+            timeout: 120000
         });
 
-        // Track successful TTS usage
-        const trackingData = await usageTracker.trackRequest({
-            modelName: 'tts-1',
+        await usageTracker.trackRequest({
+            modelName: 'kokoro-tts',
             category: USAGE_CATEGORIES.TTS_GENERATION,
             prompt: text,
             response: `Audio generated (${response.data.byteLength} bytes)`,
-            success: true
+            success: true,
+            cost: 0
         });
 
-        console.log(`🔊 TTS Cost: ${trackingData.cost.toFixed(4)}, Voice: ${voice}`);
+        console.log(`🔊 TTS generated (free, Kokoro), Voice: ${voice} -> ${kokoroVoice}`);
 
         return {
             success: true,
@@ -871,16 +818,15 @@ export async function generateTTSAudio(text, voice1 = null) {
         };
 
     } catch (error) {
-        // Track failed TTS usage
         await usageTracker.trackRequest({
-            modelName: 'tts-1',
+            modelName: 'kokoro-tts',
             category: USAGE_CATEGORIES.TTS_GENERATION,
             prompt: text,
             response: '',
             success: false
         });
 
-        console.error(`OpenAI TTS error (voice: ${voice}):`, error);
+        console.error(`Kokoro TTS error (voice: ${voice}):`, error.message);
         return {
             success: false,
             error: error.message,
@@ -963,7 +909,7 @@ export function validateAIResponse(response, expectedType = 'json') {
  * @param {number} maxRetries - Maximum number of retries
  * @returns {Promise<string>} - AI response
  */
-export async function callAIWithRetry(prompt, modelName = 'gpt-3.5-turbo', maxRetries = 3) {
+export async function callAIWithRetry(prompt, modelName = 'claude-3-sonnet', maxRetries = 3) {
     let lastError;
     
     for (let attempt = 1; attempt <= maxRetries; attempt++) {

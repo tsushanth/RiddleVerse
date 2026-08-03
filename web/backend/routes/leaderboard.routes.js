@@ -181,7 +181,7 @@ router.get('/puzzle/:puzzleId', async (req, res) => {
 router.post('/puzzle/:puzzleId', async (req, res) => {
     try {
         const { puzzleId } = req.params;
-        const { userId, timeTaken, score } = req.body;
+        const { userId, timeTaken, score, eventId } = req.body;
 
         if (!userId || timeTaken === undefined || score === undefined) {
             return res.status(400).json({ 
@@ -190,8 +190,15 @@ router.post('/puzzle/:puzzleId', async (req, res) => {
             });
         }
 
-        // Validate puzzleId format (riddle-timestamp or UUID for AI games)
-        const validPuzzleIdPattern = /^(riddle-\d+|[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$/i;
+        // Validate puzzleId format. Accepts every format the puzzle generators
+        // currently produce: `riddle-<digits>`, UUIDs (custom games via
+        // crypto.randomUUID()), and prefixed formats from per-type generators
+        // (`waldo_`, `music_puzzle_`, `ws_`, `flow_`, `img_puzzle_`,
+        // `which_is_real_`, `find_object_`, `method3_diff_`, etc.). The single
+        // permissive rule that covers all of them — and still rejects path
+        // traversal / injection attempts — is "alphanumeric + dash/underscore,
+        // starts with a letter, ≤128 chars".
+        const validPuzzleIdPattern = /^[A-Za-z][A-Za-z0-9_-]{2,127}$/;
         if (!validPuzzleIdPattern.test(puzzleId)) {
             return res.status(400).json({
                 success: false,
@@ -204,16 +211,68 @@ router.post('/puzzle/:puzzleId', async (req, res) => {
         const result = await updatePuzzleLeaderboard(puzzleId, userId, timeTaken, score);
 
         if (!result.success) {
-            return res.status(500).json({ 
+            return res.status(500).json({
                 success: false,
                 error: "Failed to update leaderboard",
-                message: result.error 
+                message: result.error
             });
         }
 
-        return res.json({ 
+        // Feature C: record/complete a play event for trending-score ranking.
+        // If iOS passed an eventId from /play-events/start, UPDATE that row so
+        // we get an honest completion_rate. Otherwise INSERT a new completed row
+        // (legacy/non-iOS clients). UUID-gated to skip non-custom puzzleIds.
+        const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        if (uuidPattern.test(puzzleId)) {
+            (async () => {
+                try {
+                    const ms = Number.isFinite(timeTaken) ? Math.max(0, Math.round(timeTaken)) : null;
+                    const nowIso = new Date().toISOString();
+
+                    if (eventId && uuidPattern.test(eventId)) {
+                        const { error: updErr } = await supabase
+                            .from('game_play_events')
+                            .update({
+                                ended_at: nowIso,
+                                completed: true,
+                                score: Number.isFinite(score) ? score : 0,
+                                ms_played: ms
+                            })
+                            .eq('id', eventId)
+                            .eq('user_id', userId);
+                        if (updErr) {
+                            console.error('[play_event update] non-fatal:', updErr.message);
+                            return;
+                        }
+                        return;
+                    }
+
+                    // Legacy fallback — no event_id from client. Insert a fresh completed row.
+                    const { data: cg } = await supabase
+                        .from('custom_games')
+                        .select('id, series_id')
+                        .eq('id', puzzleId)
+                        .maybeSingle();
+                    if (!cg) return;
+                    await supabase.from('game_play_events').insert({
+                        game_id: cg.id,
+                        series_id: cg.series_id,
+                        user_id: userId,
+                        started_at: ms ? new Date(Date.now() - ms).toISOString() : nowIso,
+                        ended_at: nowIso,
+                        completed: true,
+                        score: Number.isFinite(score) ? score : 0,
+                        ms_played: ms
+                    });
+                } catch (e) {
+                    console.error('[play_event tracking] non-fatal:', e.message);
+                }
+            })();
+        }
+
+        return res.json({
             success: true,
-            message: "Leaderboard updated successfully", 
+            message: "Leaderboard updated successfully",
             leaderboard: result.leaderboard,
             userStats: result.userStats,
             leaderboardStats: result.leaderboardStats,

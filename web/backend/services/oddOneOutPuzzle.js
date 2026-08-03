@@ -10,7 +10,7 @@ import { callAI, callAIWithRetry } from '../utils/aiClient.js';
 class OddOneOutPuzzleSystem {
     constructor(config = {}) {
         this.pixabayKey = process.env.PIXABAY_API_KEY;
-        this.openaiKey = process.env.OPENAI_API_KEY;
+        this.anthropicKey = process.env.ANTHROPIC_API_KEY;
         this.debugMode = config.debug || false;
         this.puzzleCache = new Map();
         this.duplicateHashes = new Set();
@@ -69,8 +69,8 @@ class OddOneOutPuzzleSystem {
         if (!this.pixabayKey) {
             throw new Error('PIXABAY_API_KEY environment variable required');
         }
-        if (!this.openaiKey) {
-            console.warn('OPENAI_API_KEY not set - AI fallback disabled');
+        if (!this.anthropicKey) {
+            console.warn('ANTHROPIC_API_KEY not set - AI fallback disabled');
             this.useAIFallback = false;
         }
         this.log('Enhanced API keys validated', 'success');

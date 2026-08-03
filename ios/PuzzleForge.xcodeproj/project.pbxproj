@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		880E2F672E3EE14D007D8D4D /* SVGView in Frameworks */ = {isa = PBXBuildFile; productRef = 880E2F662E3EE14D007D8D4D /* SVGView */; };
 		8813D2F32DEE1412000BB8A0 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = 8813D2F22DEE1412000BB8A0 /* GoogleMobileAds */; };
+		88234CD12F87D4770087BF33 /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 88D100022E850000000AA002 /* RevenueCat */; };
+		88234CD22F87D4770087BF33 /* RevenueCatUI in Frameworks */ = {isa = PBXBuildFile; productRef = 88D100032E850000000AA003 /* RevenueCatUI */; };
 		885F672C2E082CAF00DE0C85 /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = 88ABDED02E0600180063C11B /* FacebookAEM */; };
 		885F672D2E082CAF00DE0C85 /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = 88ABDED22E0600180063C11B /* FacebookBasics */; };
 		885F672E2E082CAF00DE0C85 /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = 88ABDED42E0600180063C11B /* FacebookCore */; };
@@ -47,8 +49,10 @@
 		88C842652DECEEE1008819E6 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 88C842642DECEEE1008819E6 /* FirebaseStorage */; };
 		88C842672DECEEE1008819E6 /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 88C842662DECEEE1008819E6 /* FirebaseStorageCombine-Community */; };
 		88C842692DECEEE1008819E6 /* FirebaseVertexAI in Frameworks */ = {isa = PBXBuildFile; productRef = 88C842682DECEEE1008819E6 /* FirebaseVertexAI */; };
-		TT0000000000000000000001 /* TikTokBusinessSDK in Frameworks */ = {isa = PBXBuildFile; productRef = TT0000000000000000000002 /* TikTokBusinessSDK */; };
 		PKR000000000003 /* PaywallKit in Frameworks */ = {isa = PBXBuildFile; productRef = PKR000000000002 /* PaywallKit */; };
+		POK000000000003 /* PromoOfferKit in Frameworks */ = {isa = PBXBuildFile; productRef = POK000000000002 /* PromoOfferKit */; };
+		99ADA6F482E3A5A6E7AC745D /* RatingKit in Frameworks */ = {isa = PBXBuildFile; productRef = CB376A7C04396BC31F4B916F /* RatingKit */; };
+		TT0000000000000000000001 /* TikTokBusinessSDK in Frameworks */ = {isa = PBXBuildFile; productRef = TT0000000000000000000002 /* TikTokBusinessSDK */; };
 		ADS000000000000000000001 /* AdServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = ADS000000000000000000002 /* AdServices.framework */; };
 /* End PBXBuildFile section */
 
@@ -100,6 +104,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				88234CD22F87D4770087BF33 /* RevenueCatUI in Frameworks */,
+				88234CD12F87D4770087BF33 /* RevenueCat in Frameworks */,
 				885F67302E082CAF00DE0C85 /* FacebookLogin in Frameworks */,
 				885F672E2E082CAF00DE0C85 /* FacebookCore in Frameworks */,
 				885F672D2E082CAF00DE0C85 /* FacebookBasics in Frameworks */,
@@ -141,6 +147,8 @@
 				88C8423A2DECEDB7008819E6 /* GoogleSignIn in Frameworks */,
 				TT0000000000000000000001 /* TikTokBusinessSDK in Frameworks */,
 				PKR000000000003 /* PaywallKit in Frameworks */,
+				POK000000000003 /* PromoOfferKit in Frameworks */,
+				99ADA6F482E3A5A6E7AC745D /* RatingKit in Frameworks */,
 				ADS000000000000000000001 /* AdServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -237,6 +245,8 @@
 				88D100032E850000000AA003 /* RevenueCatUI */,
 				TT0000000000000000000002 /* TikTokBusinessSDK */,
 				PKR000000000002 /* PaywallKit */,
+				POK000000000002 /* PromoOfferKit */,
+				CB376A7C04396BC31F4B916F /* RatingKit */,
 			);
 			productName = PuzzleForge;
 			productReference = 88C840E82DE0FD97008819E6 /* RiddleVerse.app */;
@@ -263,6 +273,15 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
+				es,
+				"pt-BR",
+				it,
+				hi,
+				ja,
+				de,
+				ko,
+				fr,
 			);
 			mainGroup = 88C840DF2DE0FD97008819E6;
 			minimizedProjectReferenceProxies = 1;
@@ -275,7 +294,9 @@
 				880E2F652E3EE14D007D8D4D /* XCRemoteSwiftPackageReference "SVGView" */,
 				88D100012E850000000AA001 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 				TT0000000000000000000003 /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */,
-				PKR000000000001 /* XCLocalSwiftPackageReference "PaywallKit" */,
+				PKR000000000001 /* XCLocalSwiftPackageReference "../../PaywallKit" */,
+				BC2E6A80B4455888151E0E32 /* XCRemoteSwiftPackageReference "RatingKit" */,
+				POK000000000001 /* XCRemoteSwiftPackageReference "PromoOfferKit" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 88C840E92DE0FD97008819E6 /* Products */;
@@ -435,7 +456,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PuzzleForge/PuzzleForge.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 99;
 				DEVELOPMENT_ASSET_PATHS = "\"PuzzleForge/Preview Content\"";
 				DEVELOPMENT_TEAM = 7RS696YC75;
 				ENABLE_PREVIEWS = YES;
@@ -449,12 +470,12 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
-				IPHONEOS_DEPLOYMENT_TARGET = 16;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 80.1;
+				MARKETING_VERSION = 80.4.6;
 				PRODUCT_BUNDLE_IDENTIFIER = KreativeKoala.PuzzleForge;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -470,7 +491,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = PuzzleForge/PuzzleForge.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 86;
+				CURRENT_PROJECT_VERSION = 99;
 				DEVELOPMENT_ASSET_PATHS = "\"PuzzleForge/Preview Content\"";
 				DEVELOPMENT_TEAM = 7RS696YC75;
 				ENABLE_PREVIEWS = YES;
@@ -484,12 +505,12 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
-				IPHONEOS_DEPLOYMENT_TARGET = 16;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 80.1;
+				MARKETING_VERSION = 80.4.6;
 				PRODUCT_BUNDLE_IDENTIFIER = KreativeKoala.PuzzleForge;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -522,7 +543,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		PKR000000000001 /* XCLocalSwiftPackageReference "PaywallKit" */ = {
+		PKR000000000001 /* XCLocalSwiftPackageReference "../../PaywallKit" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../PaywallKit;
 		};
@@ -591,6 +612,22 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.4.0;
+			};
+		};
+		BC2E6A80B4455888151E0E32 /* XCRemoteSwiftPackageReference "RatingKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tsushanth/RatingKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = "2.0.1";
+			};
+		};
+		POK000000000001 /* XCRemoteSwiftPackageReference "PromoOfferKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tsushanth/PromoOfferKit.git";
+			requirement = {
+				kind = exactVersion;
+				version = "1.0.0";
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -801,15 +838,25 @@
 			package = 88D100012E850000000AA001 /* XCRemoteSwiftPackageReference "purchases-ios" */;
 			productName = RevenueCatUI;
 		};
+		PKR000000000002 /* PaywallKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = PKR000000000001 /* XCLocalSwiftPackageReference "../../PaywallKit" */;
+			productName = PaywallKit;
+		};
 		TT0000000000000000000002 /* TikTokBusinessSDK */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = TT0000000000000000000003 /* XCRemoteSwiftPackageReference "tiktok-business-ios-sdk" */;
 			productName = TikTokBusinessSDK;
 		};
-		PKR000000000002 /* PaywallKit */ = {
+		CB376A7C04396BC31F4B916F /* RatingKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = PKR000000000001 /* XCLocalSwiftPackageReference "PaywallKit" */;
-			productName = PaywallKit;
+			package = BC2E6A80B4455888151E0E32 /* XCRemoteSwiftPackageReference "RatingKit" */;
+			productName = RatingKit;
+		};
+		POK000000000002 /* PromoOfferKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = POK000000000001 /* XCRemoteSwiftPackageReference "PromoOfferKit" */;
+			productName = PromoOfferKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

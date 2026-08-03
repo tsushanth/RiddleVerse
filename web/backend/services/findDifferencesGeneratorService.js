@@ -12,7 +12,8 @@ import axios from 'axios';
 export class FindDifferencesGeneratorService {
     constructor() {
         this.debugMode = true;
-        this.apiKey = process.env.OPENAI_API_KEY;
+        this.apiKey = process.env.OPENAI_API_KEY; // kept for DALL-E
+        this.anthropicKey = process.env.ANTHROPIC_API_KEY;
         
         // Enhanced difficulty configuration for Method 3
         this.difficultyConfig = {
@@ -231,34 +232,35 @@ Return ONLY a JSON array like this:
   {"description": "Orange apple added to fruit bowl", "x": 60.3, "y": 45.8, "confidence": 0.8}
 ]`;
 
-            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-                model: "gpt-4o",
+            const response = await axios.post('https://api.anthropic.com/v1/messages', {
+                model: "claude-sonnet-4-6",
+                max_tokens: 1000,
                 messages: [
                     {
                         role: "user",
                         content: [
-                            { type: "text", text: enhancedVisionPrompt },
                             {
-                                type: "image_url",
-                                image_url: {
-                                    url: `data:image/jpeg;base64,${base64Image}`,
-                                    detail: "high"
+                                type: "image",
+                                source: {
+                                    type: "base64",
+                                    media_type: "image/jpeg",
+                                    data: base64Image
                                 }
-                            }
+                            },
+                            { type: "text", text: enhancedVisionPrompt + "\n\nRespond with ONLY valid JSON." }
                         ]
                     }
-                ],
-                max_tokens: 1000,
-                temperature: 0.1
+                ]
             }, {
                 headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
+                    'x-api-key': this.anthropicKey,
+                    'Content-Type': 'application/json',
+                    'anthropic-version': '2023-06-01'
                 },
                 timeout: 60000
             });
 
-            const visionAnalysis = response.data.choices[0].message.content;
+            const visionAnalysis = response.data.content?.[0]?.type === 'text' ? response.data.content[0].text : '';
             this.debugLog(`📝 Vision API response received (${visionAnalysis.length} chars)`);
             
             // Try to extract JSON from response

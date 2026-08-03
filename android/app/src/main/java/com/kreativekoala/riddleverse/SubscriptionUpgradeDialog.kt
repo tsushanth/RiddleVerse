@@ -1,6 +1,8 @@
 package com.kreativekoala.riddleverse
 
 import android.app.Activity
+import android.content.Intent
+import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -28,9 +30,13 @@ import com.revenuecat.purchases.models.StoreTransaction
 import com.revenuecat.purchases.ui.revenuecatui.PaywallDialog
 import com.revenuecat.purchases.ui.revenuecatui.PaywallDialogOptions
 import com.revenuecat.purchases.ui.revenuecatui.PaywallListener
+import com.kreativekoala.paywallkit.models.PaywallFeature
+import com.kreativekoala.paywallkit.models.PaywallProduct
+import com.kreativekoala.paywallkit.models.PaywallTheme
+import com.kreativekoala.paywallkit.view.PaywallView
 import com.revenuecat.purchases.ui.revenuecatui.customercenter.CustomerCenter
 
-// MARK: - Main Subscription Upgrade Dialog (RevenueCatUI Paywall)
+// MARK: - Main Subscription Upgrade Dialog (PaywallKit)
 @Composable
 fun SubscriptionUpgradeDialog(
     targetTier: SubscriptionTier = SubscriptionTier.PREMIUM,
@@ -42,31 +48,14 @@ fun SubscriptionUpgradeDialog(
     subscriptionManager: SubscriptionManager = SubscriptionManager.getInstance(LocalContext.current)
 ) {
     val analyticsManager = AnalyticsManager.getInstance()
-    var subscriptionOffering by remember { mutableStateOf<Offering?>(null) }
-    var offeringFetchDone by remember { mutableStateOf(false) }
-    val mainHandler = remember { Handler(Looper.getMainLooper()) }
+    val context = LocalContext.current
+    val activity = context as? Activity
+    val packages = subscriptionManager.availablePackages
+    val purchaseState = subscriptionManager.purchaseState
 
     LaunchedEffect(Unit) {
-        // Load the default offering by key so we don't rely on a potentially empty cache
-        Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
-            override fun onReceived(offerings: com.revenuecat.purchases.Offerings) {
-                Log.d("SubscriptionDialog", "All offering keys: ${offerings.all.keys}")
-                Log.d("SubscriptionDialog", "Current offering: ${offerings.current?.identifier}")
-                val offering = offerings.all["default"] ?: offerings.current
-                Log.d("SubscriptionDialog", "Selected offering: ${offering?.identifier}")
-                mainHandler.post {
-                    subscriptionOffering = offering
-                    offeringFetchDone = true
-                }
-            }
-            override fun onError(error: com.revenuecat.purchases.PurchasesError) {
-                Log.e("SubscriptionDialog", "Offerings error: ${error.message}")
-                mainHandler.post { offeringFetchDone = true }
-            }
-        })
-
         // Tag subscriber with paywall context for RC targeting/analytics
-        com.revenuecat.purchases.Purchases.sharedInstance.setAttributes(
+        Purchases.sharedInstance.setAttributes(
             mapOf(
                 "last_paywall_source" to paywallContext,
                 "last_paywall_date" to java.text.SimpleDateFormat(
@@ -75,7 +64,6 @@ fun SubscriptionUpgradeDialog(
                     .format(java.util.Date())
             )
         )
-
         analyticsManager?.track(
             AnalyticsEvent.subscriptionDialogOpen(
                 targetTier = targetTier.value,
@@ -89,9 +77,15 @@ fun SubscriptionUpgradeDialog(
         )
     }
 
-    // Don't render PaywallDialog until offering fetch completes — rendering with null causes
-    // RevenueCatUI to error and auto-dismiss before the fetch completes
-    if (!offeringFetchDone) {
+    // Detect purchase success
+    LaunchedEffect(purchaseState) {
+        if (purchaseState is PurchaseState.Success) {
+            subscriptionManager.clearLimitsAfterUpgrade()
+            onUpgrade(subscriptionManager.currentTier)
+        }
+    }
+
+    if (packages.isEmpty()) {
         androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
@@ -105,78 +99,58 @@ fun SubscriptionUpgradeDialog(
         return
     }
 
-    // If fetch completed but offering is null (network error / not configured), show fallback
-    if (subscriptionOffering == null) {
-        androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
-            Box(
-                modifier = Modifier
-                    .background(Color(0xFF1A1A2E), RoundedCornerShape(16.dp))
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Unable to load subscription options.", color = Color.White, fontSize = 15.sp)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF21BF63))
-                    ) { Text("Close") }
-                }
+    val paywallProducts = packages.map { pkg ->
+        PaywallProduct(
+            id = pkg.product.id,
+            localizedPrice = pkg.product.price.formatted,
+            price = pkg.product.price.amountMicros / 1_000_000.0,
+            currencyCode = pkg.product.price.currencyCode,
+            trialDays = pkg.product.subscriptionOptions?.freeTrial?.let { 3 },
+            period = when (pkg.packageType) {
+                com.revenuecat.purchases.PackageType.WEEKLY -> PaywallProduct.Period.WEEKLY
+                com.revenuecat.purchases.PackageType.MONTHLY -> PaywallProduct.Period.MONTHLY
+                com.revenuecat.purchases.PackageType.ANNUAL -> PaywallProduct.Period.YEARLY
+                else -> PaywallProduct.Period.MONTHLY
             }
-        }
-        return
+        )
     }
 
-    PaywallDialog(
-        PaywallDialogOptions.Builder()
-            .setOffering(subscriptionOffering)
-            .setDismissRequest {
-                analyticsManager?.track(
-                    AnalyticsEvent.subscriptionDialogDismissed(
-                        targetTier = targetTier.value,
-                        dismissReason = "user_close",
-                        timeOnDialog = 0L
-                    )
-                )
-                onDismiss()
+    PaywallView(
+        appId = "riddleverse",
+        appName = "RiddleVerse",
+        features = listOf(
+            PaywallFeature("\u2728", "Unlimited Games", "Create without limits"),
+            PaywallFeature("\uD83C\uDFAF", "Play All Games", "Access every community game"),
+            PaywallFeature("\u26A1", "Priority Speed", "Faster game generation"),
+            PaywallFeature("\uD83D\uDCB0", "Earn Rewards", "Get paid for your creations"),
+            PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
+        ),
+        products = paywallProducts,
+        theme = PaywallTheme(accent = Color(0xFF21BF63), accent2 = Color(0xFF2196F3)),
+        showWinback = true,
+        isDismissible = true,
+        onPurchase = { productId ->
+            val pkg = packages.firstOrNull { it.product.id == productId }
+            if (pkg != null && activity != null) {
+                subscriptionManager.purchasePackage(activity, pkg)
             }
-            .setListener(object : PaywallListener {
-                override fun onPurchaseCompleted(
-                    customerInfo: CustomerInfo,
-                    storeTransaction: StoreTransaction
-                ) {
-                    Log.d("SubscriptionDialog", "Purchase completed: ${storeTransaction.productIds}")
-
-                    // Update tier from customer info
-                    subscriptionManager.updateTierFromCustomerInfo(customerInfo)
-
-                    // Notify backend for coin granting
-                    subscriptionManager.notifyBackendOfPurchase(storeTransaction)
-
-                    // Clear limits after upgrade
-                    subscriptionManager.clearLimitsAfterUpgrade()
-
-                    onUpgrade(subscriptionManager.currentTier)
-                }
-
-                override fun onRestoreCompleted(customerInfo: CustomerInfo) {
-                    Log.d("SubscriptionDialog", "Purchases restored")
-                    subscriptionManager.updateTierFromCustomerInfo(customerInfo)
-                }
-
-                override fun onPurchaseError(error: com.revenuecat.purchases.PurchasesError) {
-                    Log.e("SubscriptionDialog", "Purchase error: ${error.message}")
-                }
-
-                override fun onPurchaseCancelled() {
-                    Log.d("SubscriptionDialog", "Purchase cancelled")
-                }
-
-                override fun onRestoreError(error: com.revenuecat.purchases.PurchasesError) {
-                    Log.e("SubscriptionDialog", "Restore error: ${error.message}")
-                }
-            })
-            .build()
+        },
+        onRestore = { subscriptionManager.restorePurchases() },
+        onRedeemCode = {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/redeem?code=promo-1month-free"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try { activity?.startActivity(intent) } catch (_: Exception) {}
+        },
+        onDismiss = {
+            analyticsManager?.track(
+                AnalyticsEvent.subscriptionDialogDismissed(
+                    targetTier = targetTier.value,
+                    dismissReason = "user_close",
+                    timeOnDialog = 0L
+                )
+            )
+            onDismiss()
+        }
     )
 }
 
@@ -448,8 +422,8 @@ object PaywallConstants {
 }
 
 /**
- * Hard paywall — custom UI with RevenueCat offerings.
- * Full control over dismiss behavior and layout.
+ * Hard paywall — PaywallKit UI.
+ * isDismissible = true when onDismiss is provided, false otherwise.
  */
 @Composable
 fun HardPaywallGate(
@@ -459,226 +433,72 @@ fun HardPaywallGate(
 ) {
     val context = LocalContext.current
     val activity = context as? Activity
-    var packages by remember { mutableStateOf<List<com.revenuecat.purchases.Package>>(emptyList()) }
-    var isLoading by remember { mutableStateOf(true) }
-    var isPurchasing by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    var selectedPackage by remember { mutableStateOf<com.revenuecat.purchases.Package?>(null) }
+    val packages = subscriptionManager.availablePackages
+    val purchaseState = subscriptionManager.purchaseState
 
-    LaunchedEffect(Unit) {
-        Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
-            override fun onReceived(offerings: com.revenuecat.purchases.Offerings) {
-                val offering = offerings.all["default"] ?: offerings.current
-                packages = offering?.availablePackages ?: emptyList()
-                selectedPackage = packages.firstOrNull { it.packageType == com.revenuecat.purchases.PackageType.ANNUAL }
-                    ?: packages.firstOrNull()
-                isLoading = false
-            }
-            override fun onError(error: com.revenuecat.purchases.PurchasesError) {
-                Log.e("HardPaywall", "Offerings error: ${error.message}")
-                errorMessage = "Unable to load options. Please restart."
-                isLoading = false
-            }
-        })
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF0D0D1A), Color(0xFF1A1A2E), Color(0xFF0D0D1A))
-                )
-            )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .padding(horizontal = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(48.dp))
-
-            // Header
-            Text("🎮", fontSize = 56.sp)
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                "Unlock RiddleVerse",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                "Create unlimited games, play without limits",
-                fontSize = 16.sp,
-                color = Color.White.copy(alpha = 0.6f)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Features
-            val features = listOf(
-                "✨" to "Unlimited game creation",
-                "🎯" to "Play all community games",
-                "⚡" to "Priority generation speed",
-                "💰" to "Earn from games you create"
-            )
-            features.forEach { (emoji, text) ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(emoji, fontSize = 20.sp)
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(text, fontSize = 16.sp, color = Color.White)
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            if (isLoading) {
-                CircularProgressIndicator(color = Color(0xFF21BF63))
-            } else if (packages.isEmpty()) {
-                Text(errorMessage ?: "No plans available", color = Color.Gray, fontSize = 14.sp)
-            } else {
-                // Package selection
-                packages.forEach { pkg ->
-                    val isSelected = pkg == selectedPackage
-                    val period = when (pkg.packageType) {
-                        com.revenuecat.purchases.PackageType.ANNUAL -> "Yearly"
-                        com.revenuecat.purchases.PackageType.MONTHLY -> "Monthly"
-                        com.revenuecat.purchases.PackageType.WEEKLY -> "Weekly"
-                        else -> pkg.identifier
-                    }
-                    val trial = pkg.product.subscriptionOptions?.freeTrial
-                    val trialText = if (trial != null) " • Free trial" else ""
-
-                    Surface(
-                        onClick = { selectedPackage = pkg },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        shape = RoundedCornerShape(14.dp),
-                        color = if (isSelected) Color(0xFF21BF63).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.05f),
-                        border = if (isSelected) androidx.compose.foundation.BorderStroke(2.dp, Color(0xFF21BF63)) else null
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(period, fontWeight = FontWeight.Bold, color = Color.White, fontSize = 16.sp)
-                                if (trialText.isNotEmpty()) {
-                                    Text("Free trial included", color = Color(0xFF21BF63), fontSize = 12.sp)
-                                }
-                            }
-                            Text(
-                                pkg.product.price.formatted,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isSelected) Color(0xFF21BF63) else Color.White,
-                                fontSize = 18.sp
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Subscribe button
-                Button(
-                    onClick = {
-                        val pkg = selectedPackage ?: return@Button
-                        if (activity == null) return@Button
-                        isPurchasing = true
-                        errorMessage = null
-                        Purchases.sharedInstance.purchase(
-                            com.revenuecat.purchases.PurchaseParams.Builder(activity, pkg).build(),
-                            object : com.revenuecat.purchases.interfaces.PurchaseCallback {
-                                override fun onCompleted(storeTransaction: StoreTransaction, customerInfo: CustomerInfo) {
-                                    Log.d("HardPaywall", "Purchase completed: ${storeTransaction.productIds}")
-                                    isPurchasing = false
-                                    subscriptionManager.updateTierFromCustomerInfo(customerInfo)
-                                    subscriptionManager.notifyBackendOfPurchase(storeTransaction)
-                                    subscriptionManager.clearLimitsAfterUpgrade()
-                                    onSubscribed()
-                                }
-                                override fun onError(error: com.revenuecat.purchases.PurchasesError, userCancelled: Boolean) {
-                                    isPurchasing = false
-                                    if (!userCancelled) {
-                                        errorMessage = "Purchase failed: ${error.message}"
-                                        Log.e("HardPaywall", "Purchase error: ${error.message}")
-                                    }
-                                }
-                            }
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF21BF63)),
-                    enabled = !isPurchasing && selectedPackage != null
-                ) {
-                    if (isPurchasing) {
-                        CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
-                    } else {
-                        Text("Subscribe", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-
-                if (errorMessage != null) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(errorMessage!!, color = Color.Red, fontSize = 13.sp)
-                }
-
-                // Restore purchases
-                TextButton(onClick = {
-                    isPurchasing = true
-                    Purchases.sharedInstance.restorePurchases(object : com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback {
-                        override fun onReceived(customerInfo: CustomerInfo) {
-                            isPurchasing = false
-                            subscriptionManager.updateTierFromCustomerInfo(customerInfo)
-                            if (subscriptionManager.hasActiveSubscription()) {
-                                onSubscribed()
-                            } else {
-                                errorMessage = "No active subscription found"
-                            }
-                        }
-                        override fun onError(error: com.revenuecat.purchases.PurchasesError) {
-                            isPurchasing = false
-                            errorMessage = "Restore failed: ${error.message}"
-                        }
-                    })
-                }) {
-                    Text("Restore Purchases", color = Color.White.copy(alpha = 0.5f), fontSize = 14.sp)
-                }
-
-                // Dismiss option
-                if (onDismiss != null) {
-                    TextButton(onClick = onDismiss) {
-                        Text("Continue with limits", color = Color.White.copy(alpha = 0.4f), fontSize = 13.sp)
-                    }
-                }
-
-                // Fine print
-                Text(
-                    "Payment charged to your Google Play account. Auto-renews unless cancelled 24 hours before period ends.",
-                    fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.3f),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
+    LaunchedEffect(purchaseState) {
+        if (purchaseState is PurchaseState.Success) {
+            subscriptionManager.clearLimitsAfterUpgrade()
+            onSubscribed()
         }
     }
+
+    if (packages.isEmpty()) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0F)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = Color(0xFF21BF63))
+        }
+        return
+    }
+
+    val paywallProducts = packages.map { pkg ->
+        PaywallProduct(
+            id = pkg.product.id,
+            localizedPrice = pkg.product.price.formatted,
+            price = pkg.product.price.amountMicros / 1_000_000.0,
+            currencyCode = pkg.product.price.currencyCode,
+            trialDays = pkg.product.subscriptionOptions?.freeTrial?.let { 3 },
+            period = when (pkg.packageType) {
+                com.revenuecat.purchases.PackageType.WEEKLY -> PaywallProduct.Period.WEEKLY
+                com.revenuecat.purchases.PackageType.MONTHLY -> PaywallProduct.Period.MONTHLY
+                com.revenuecat.purchases.PackageType.ANNUAL -> PaywallProduct.Period.YEARLY
+                else -> PaywallProduct.Period.MONTHLY
+            }
+        )
+    }
+
+    PaywallView(
+        appId = "riddleverse",
+        appName = "RiddleVerse",
+        features = listOf(
+            PaywallFeature("\u2728", "Unlimited Games", "Create without limits"),
+            PaywallFeature("\uD83C\uDFAF", "Play All Games", "Access every community game"),
+            PaywallFeature("\u26A1", "Priority Speed", "Faster game generation"),
+            PaywallFeature("\uD83D\uDCB0", "Earn Rewards", "Get paid for your creations"),
+            PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
+        ),
+        products = paywallProducts,
+        theme = PaywallTheme(accent = Color(0xFF21BF63), accent2 = Color(0xFF2196F3)),
+        showWinback = false,
+        isDismissible = onDismiss != null,
+        onPurchase = { productId ->
+            val pkg = packages.firstOrNull { it.product.id == productId }
+            if (pkg != null && activity != null) {
+                subscriptionManager.purchasePackage(activity, pkg)
+            }
+        },
+        onRestore = { subscriptionManager.restorePurchases() },
+        onRedeemCode = {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/redeem?code=promo-1month-free"))
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            try { activity?.startActivity(intent) } catch (_: Exception) {}
+        },
+        onDismiss = { onDismiss?.invoke() }
+    )
 }
+
 
 // MARK: - Customer Center (Subscription Management & Win-Back)
 @Composable

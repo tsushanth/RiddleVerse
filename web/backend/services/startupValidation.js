@@ -10,8 +10,8 @@ const REQUIRED_ENV_VARS = [
 ];
 
 const OPTIONAL_BUT_RECOMMENDED = [
-    { name: 'OPENAI_API_KEY', description: 'OpenAI API key for puzzle generation' },
-    { name: 'ANTHROPIC_API_KEY', description: 'Anthropic API key for AI features' },
+    { name: 'ANTHROPIC_API_KEY', description: 'Anthropic API key for AI text/vision features' },
+    { name: 'OPENAI_API_KEY', description: 'OpenAI API key for DALL-E image generation and TTS' },
     { name: 'DEEPSEEK_API_KEY', description: 'DeepSeek API key' },
     { name: 'EMAIL_USER', description: 'Email for sending notifications' },
     { name: 'EMAIL_PASSWORD', description: 'Email password/app password' },

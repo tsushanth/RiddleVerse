@@ -20,6 +20,7 @@ import com.google.firebase.messaging.FirebaseMessaging
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
 import com.kreativekoala.paywallkit.manager.ExperimentManager
+import com.kreativekoala.ratingkit.RatingKit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,6 +42,9 @@ class MyApplication : Application() {
 
         // Initialize PaywallKit experiment manager
         ExperimentManager.init(this)
+
+        // Initialize RatingKit
+        RatingKit.init(this, appId = "riddleverse")
 
         // Initialize TikTok Events SDK
         TikTokHelper.initialize(this)

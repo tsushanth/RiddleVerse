@@ -5,7 +5,8 @@ import axios from 'axios';
 export class FindObjectGenerator {
     constructor() {
         this.debugMode = false;
-        this.apiKey = process.env.OPENAI_API_KEY;
+        this.apiKey = process.env.OPENAI_API_KEY; // kept for DALL-E image generation
+        this.anthropicKey = process.env.ANTHROPIC_API_KEY;
         
         // Grid configuration for mobile-friendly object detection
         this.gridConfig = {
@@ -309,7 +310,10 @@ Each cell is ${(100/this.gridConfig.cols).toFixed(1)}% wide and ${(100/this.grid
             
             try {
                 if (!this.apiKey) {
-                    throw new Error('OPENAI_API_KEY environment variable not set');
+                    throw new Error('OPENAI_API_KEY environment variable not set (needed for DALL-E)');
+                }
+                if (!this.anthropicKey) {
+                    throw new Error('ANTHROPIC_API_KEY environment variable not set (needed for vision analysis)');
                 }
 
                 // Select random scene template
@@ -498,7 +502,7 @@ Style: Clean, bright, minimalist cartoon illustration. Think "children's book il
                 return { success: false, error: 'Request timeout - try again' };
             }
             if (error.response?.status === 502) {
-                return { success: false, error: 'OpenAI servers temporarily unavailable - try again in a few minutes' };
+                return { success: false, error: 'AI servers temporarily unavailable - try again in a few minutes' };
             }
             this.debugLog(`❌ Error generating simplified puzzle: ${error.message}`, 'error');
             return { success: false, error: error.message };
@@ -519,38 +523,47 @@ Style: Clean, bright, minimalist cartoon illustration. Think "children's book il
                 
                 const base64Image = imageBuffer.toString('base64');
      
-                const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-                    model: "gpt-4o",
+                const response = await axios.post('https://api.anthropic.com/v1/messages', {
+                    model: "claude-sonnet-4-6",
+                    max_tokens: 2000,
                     messages: [
                         {
                             role: "user",
                             content: [
                                 {
+                                    type: "image",
+                                    source: {
+                                        type: "base64",
+                                        media_type: "image/jpeg",
+                                        data: base64Image
+                                    }
+                                },
+                                {
                                     type: "text",
                                     text: `Analyze this SIMPLIFIED ${template.theme.toLowerCase()} scene and locate the specific objects for a "find the hidden object" game.
-     
+
      ${this.generateGridDescription()}
-     
+
      SIMPLIFIED SCENE ANALYSIS:
      This image was designed to be SIMPLE and CLEAN with minimal clutter. You should expect to find:
      EXPECTED OBJECTS: ${expectedObjects.join(', ')}
-     
+
      DISCOVERY RULES FOR SIMPLIFIED SCENES:
-     ✅ LOOK FOR these specific objects that should be clearly visible:
+     Look for these specific objects that should be clearly visible:
      ${expectedObjects.map(obj => `   - ${obj} (should be clearly recognizable and well-spaced)`).join('\n')}
-     
-     🎯 SIMPLIFIED DETECTION CRITERIA:
+
+     SIMPLIFIED DETECTION CRITERIA:
      - Objects should be clearly visible and well-separated
      - Each object should be medium to large size
      - Objects should have clear contrast against the background
      - No overlapping or hidden objects in this simplified scene
      - Focus on the EXACT objects from the expected list
-     
+
      POSITIONING REQUIREMENTS:
      - Objects should be in the central 80% of the image (avoid edges)
      - Each object should have clear space around it
      - Look for traditional/classic versions of each object type
-     
+
      For each object you can clearly identify, provide:
      - Object name (matching expected objects list exactly)
      - X,Y coordinates as percentages
@@ -581,24 +594,18 @@ Style: Clean, bright, minimalist cartoon illustration. Think "children's book il
      "expected_objects_found": ["spoon", "bowl", "cup"],
      "missing_objects": ["knife", "bottle"],
      "scene_simplicity": "high"
-     }`
-                                },
-                                {
-                                    type: "image_url",
-                                    image_url: {
-                                        url: `data:image/jpeg;base64,${base64Image}`,
-                                        detail: "high"
-                                    }
+     }
+
+Respond with ONLY valid JSON.`
                                 }
                             ]
                         }
-                    ],
-                    max_tokens: 2000,
-                    temperature: 0.1
+                    ]
                 }, {
                     headers: {
-                        'Authorization': `Bearer ${this.apiKey}`,
-                        'Content-Type': 'application/json'
+                        'x-api-key': this.anthropicKey,
+                        'Content-Type': 'application/json',
+                        'anthropic-version': '2023-06-01'
                     },
                     timeout: 180000,
                     validateStatus: function (status) {
@@ -607,10 +614,10 @@ Style: Clean, bright, minimalist cartoon illustration. Think "children's book il
                 });
      
                 if (response.status === 502) {
-                    throw new Error('OpenAI server temporarily unavailable (502)');
+                    throw new Error('API server temporarily unavailable (502)');
                 }
-     
-                const content = response.data.choices[0].message.content;
+
+                const content = response.data.content?.[0]?.type === 'text' ? response.data.content[0].text : '';
                 this.debugLog(`📝 Simplified discovery response preview: ${content.substring(0, 200)}...`);
      
                 // Parse JSON response

@@ -43,7 +43,7 @@ fun WebPromoBanner() {
                 .fillMaxWidth()
                 .background(Color(0xFF7C4DFF).copy(alpha = 0.15f))
                 .clickable {
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://riddleverse.com"))
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://puzzleverseai.com"))
                     context.startActivity(intent)
                 }
                 .padding(horizontal = 16.dp, vertical = 10.dp),
@@ -51,7 +51,7 @@ fun WebPromoBanner() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Also available on iOS & Web \u2192 riddleverse.com",
+                text = "Also available on iOS & Web \u2192 puzzleverseai.com",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFFB388FF),
