@@ -348,11 +348,24 @@ export class ImageQuestionGenerator {
   constructor(options = {}) {
     this.options = { ...DEFAULT_OPTIONS, ...options };
     this.debugMode = !!this.options.debug;
-    this.apiKey = process.env.OPENAI_API_KEY;
-    if (!this.apiKey) throw new Error('OPENAI_API_KEY not set');
-    this.http = axios.create({
+    this.openaiKey = process.env.OPENAI_API_KEY;
+    this.anthropicKey = process.env.ANTHROPIC_API_KEY;
+    if (!this.openaiKey) throw new Error('OPENAI_API_KEY not set (needed for DALL-E)');
+    if (!this.anthropicKey) throw new Error('ANTHROPIC_API_KEY not set (needed for vision analysis)');
+    // OpenAI client kept for DALL-E image generation only
+    this.openaiHttp = axios.create({
       baseURL: 'https://api.openai.com/v1',
-      headers: { Authorization: `Bearer ${this.apiKey}`, 'Content-Type': 'application/json' },
+      headers: { Authorization: `Bearer ${this.openaiKey}`, 'Content-Type': 'application/json' },
+      timeout: 120000
+    });
+    // Anthropic client for vision/text analysis
+    this.anthropicHttp = axios.create({
+      baseURL: 'https://api.anthropic.com/v1',
+      headers: {
+        'x-api-key': this.anthropicKey,
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01'
+      },
       timeout: 120000
     });
   }
@@ -437,7 +450,7 @@ export class ImageQuestionGenerator {
   }
 
   async generateImage(prompt) {
-    const res = await this.http.post('/images/generations', {
+    const res = await this.openaiHttp.post('/images/generations', {
       model: 'dall-e-3',
       prompt,
       n: 1,
@@ -490,21 +503,20 @@ Return ONLY valid JSON and keep the EXACT same array length & order as in the sk
 Skeleton:
 ${JSON.stringify(skeleton, null, 2)}`;
 
-    const res = await this.http.post('/chat/completions', {
-      model: 'gpt-4o',
-      response_format: { type: 'json_object' },
-      temperature: 0,
+    const res = await this.anthropicHttp.post('/messages', {
+      model: 'claude-sonnet-4-6',
       max_tokens: 1800,
       messages: [{
         role: 'user',
         content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: `data:image/png;base64,${base64}`, detail: 'high' } }
+          { type: 'image', source: { type: 'base64', media_type: 'image/png', data: base64 } },
+          { type: 'text', text: prompt + '\n\nRespond with ONLY valid JSON.' }
         ]
       }]
     });
 
-    const json = JSON.parse(res.data.choices[0].message.content || '{}');
+    const rawText = res.data.content?.[0]?.type === 'text' ? res.data.content[0].text : '{}';
+    const json = JSON.parse(rawText);
     let list = Array.isArray(json.objects_analysis) ? json.objects_analysis : [];
     if (list.length !== skeleton.objects_analysis.length) list = skeleton.objects_analysis;
     else list = list.map((o,i)=>({ ...o, object_type: skeleton.objects_analysis[i].object_type }));
@@ -524,21 +536,20 @@ Return ONLY JSON. Identify items that best match: ${expectedTypes.join(', ')}.
 For each type, estimate count and instances (bbox, dominant_hex, color_label, visibility).
 Include scene_assessment (overall_clarity, object_separation, total_objects_visible).`;
 
-    const res = await this.http.post('/chat/completions', {
-      model: 'gpt-4o',
-      response_format: { type: 'json_object' },
-      temperature: 0.2,
+    const res = await this.anthropicHttp.post('/messages', {
+      model: 'claude-sonnet-4-6',
       max_tokens: 1800,
       messages: [{
         role: 'user',
         content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: `data:image/png;base64,${base64}`, detail: 'high' } }
+          { type: 'image', source: { type: 'base64', media_type: 'image/png', data: base64 } },
+          { type: 'text', text: prompt + '\n\nRespond with ONLY valid JSON.' }
         ]
       }]
     });
 
-    const json = JSON.parse(res.data.choices[0].message.content || '{}');
+    const rawText2 = res.data.content?.[0]?.type === 'text' ? res.data.content[0].text : '{}';
+    const json = JSON.parse(rawText2);
 
     const grouped = new Map(expectedTypes.map(t=>[t.toLowerCase(), {
       object_type:t, instances:[], actual_count:0, count_certainty:0, color_uniformity:0, matches_expectation:false
@@ -578,20 +589,19 @@ Return ONLY JSON:
     }
   }
 }`;
-    const res = await this.http.post('/chat/completions', {
-      model: 'gpt-4o',
-      response_format: { type: 'json_object' },
-      temperature: 0,
+    const res = await this.anthropicHttp.post('/messages', {
+      model: 'claude-sonnet-4-6',
       max_tokens: 1600,
       messages: [{
         role: 'user',
         content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: `data:image/png;base64,${base64}`, detail: 'high' } }
+          { type: 'image', source: { type: 'base64', media_type: 'image/png', data: base64 } },
+          { type: 'text', text: prompt + '\n\nRespond with ONLY valid JSON.' }
         ]
       }]
     });
-    const j = JSON.parse(res.data.choices[0].message.content || '{}');
+    const gridRaw = res.data.content?.[0]?.type === 'text' ? res.data.content[0].text : '{}';
+    const j = JSON.parse(gridRaw);
     return j?.per_type || {};
   }
 
@@ -614,21 +624,20 @@ Return ONLY JSON:
   },
   "instances": { "<type>": [ { "bbox":[...], "color_label":"...", "visibility":"..." } ] }
 }`;
-    const res = await this.http.post('/chat/completions', {
-      model: 'gpt-4o',
-      response_format: { type: 'json_object' },
-      temperature: 0,
+    const res = await this.anthropicHttp.post('/messages', {
+      model: 'claude-sonnet-4-6',
       max_tokens: 1600,
       messages: [{
         role: 'user',
         content: [
-          { type: 'text', text: prompt },
-          { type: 'image_url', image_url: { url: `data:image/png;base64,${base64}`, detail: 'high' } }
+          { type: 'image', source: { type: 'base64', media_type: 'image/png', data: base64 } },
+          { type: 'text', text: prompt + '\n\nRespond with ONLY valid JSON.' }
         ]
       }]
     });
-    const j = JSON.parse(res.data.choices[0].message.content || '{}');
-    return j;
+    const containerRaw = res.data.content?.[0]?.type === 'text' ? res.data.content[0].text : '{}';
+    const j2 = JSON.parse(containerRaw);
+    return j2;
   }
 
   async refineConsensus(imageBuffer, template, analysis) {

@@ -5,9 +5,8 @@ ISSUER_ID   = "17f51aa8-305f-48b3-acbe-fd8ed3dd5fb6"
 KEY_PATH    = File.expand_path("~/private_keys/AuthKey_3WHS49Y787.p8")
 
 platform :ios do
-  desc "Upload metadata and screenshots to App Store Connect"
-  desc "Submit already-uploaded build for review"
-  lane :submit_for_review do
+  desc "Build and submit to App Store for review"
+  lane :build_and_submit do
     api_key = app_store_connect_api_key(
       key_id: KEY_ID,
       issuer_id: ISSUER_ID,
@@ -16,9 +15,27 @@ platform :ios do
       in_house: false
     )
 
+    gym(
+      project: "PuzzleForge.xcodeproj",
+      scheme: "PuzzleForge",
+      configuration: "Release",
+      export_method: "app-store",
+      export_options: {
+        method: "app-store-connect",
+        teamID: "7RS696YC75",
+        signingStyle: "automatic",
+        destination: "upload"
+      },
+      xcargs: "-allowProvisioningUpdates -authenticationKeyPath #{KEY_PATH} -authenticationKeyID #{KEY_ID} -authenticationKeyIssuerID #{ISSUER_ID}",
+      output_directory: "/tmp/riddleverse_build",
+      output_name: "PuzzleForge.ipa",
+      clean: true
+    )
+
     deliver(
       api_key: api_key,
-      app_version: "80.0",
+      app_identifier: "KreativeKoala.PuzzleForge",
+      app_version: "80.4.2",
       skip_binary_upload: true,
       submit_for_review: true,
       automatic_release: false,
@@ -34,7 +51,7 @@ platform :ios do
     )
   end
 
-  lane :upload_metadata do
+  lane :submit_for_review do
     api_key = app_store_connect_api_key(
       key_id: KEY_ID,
       issuer_id: ISSUER_ID,
@@ -45,15 +62,20 @@ platform :ios do
 
     deliver(
       api_key: api_key,
-      app_version: "80.0",
+      app_identifier: "KreativeKoala.PuzzleForge",
+      app_version: "80.4.2",
       skip_binary_upload: true,
-      force: true,
-      submit_for_review: false,
+      submit_for_review: true,
       automatic_release: false,
-      overwrite_screenshots: true,
-      screenshots_path: "./fastlane/screenshots",
-      metadata_path: "./fastlane/metadata",
-      run_precheck_before_submit: false
+      force: true,
+      skip_screenshots: true,
+      skip_metadata: true,
+      run_precheck_before_submit: false,
+      submission_information: {
+        add_id_info_uses_idfa: false,
+        export_compliance_uses_encryption: false,
+        export_compliance_is_exempt: false
+      }
     )
   end
 end

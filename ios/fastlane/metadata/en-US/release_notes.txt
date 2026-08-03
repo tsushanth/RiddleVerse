@@ -1,5 +1,3 @@
-• Create games with AI and publish them to earn real cash — 55% revenue share
-• Publish button moved to top bar in game preview for easier access
-• Fixed: games now properly save when created
-• Delete your own games from the Explore tab
-• Share button now works in game preview
+• Play RiddleVerse on Telegram — new @Riddleverse_bot banner links directly to the bot
+• Play browser games inline — new /games command opens games within Telegram
+• Bug fixes and performance improvements

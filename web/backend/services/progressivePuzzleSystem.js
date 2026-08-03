@@ -821,28 +821,36 @@ JSON only:
   "reasoning": "why this score"
 }`;
 
+            const anthropicKey = process.env.ANTHROPIC_API_KEY;
             const requestBody = JSON.stringify({
-                model: "gpt-4o-mini",
+                model: "claude-haiku-4-5-20251001",
+                max_tokens: 300,
                 messages: [{
                     role: "user",
                     content: [
-                        { type: "text", text: prompt },
-                        { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Image}` }}
+                        {
+                            type: "image",
+                            source: {
+                                type: "base64",
+                                media_type: "image/jpeg",
+                                data: base64Image
+                            }
+                        },
+                        { type: "text", text: prompt + "\n\nRespond with ONLY valid JSON." }
                     ]
-                }],
-                max_tokens: 300,
-                temperature: 0.1
+                }]
             });
 
             return new Promise((resolve, reject) => {
                 const options = {
-                    hostname: 'api.openai.com',
+                    hostname: 'api.anthropic.com',
                     port: 443,
-                    path: '/v1/chat/completions',
+                    path: '/v1/messages',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.openaiKey}`,
+                        'x-api-key': anthropicKey,
+                        'anthropic-version': '2023-06-01',
                         'Content-Length': Buffer.byteLength(requestBody)
                     }
                 };
@@ -854,10 +862,10 @@ JSON only:
                         try {
                             const response = JSON.parse(data);
                             if (response.error) {
-                                reject(new Error(`OpenAI error: ${response.error.message}`));
+                                reject(new Error(`Anthropic error: ${response.error.message}`));
                                 return;
                             }
-                            let content = response.choices[0].message.content.trim();
+                            let content = (response.content?.[0]?.type === 'text' ? response.content[0].text : '').trim();
                             if (content.includes('```json')) {
                                 content = content.replace(/```json\s*/g, '').replace(/\s*```/g, '');
                             }

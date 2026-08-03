@@ -44,7 +44,6 @@ COPY local_all-MiniLM-L6-v2 /backend/model-cache/Xenova/all-MiniLM-L6-v2
 COPY local_all-MiniLM-L6-v2 /backend/node_modules/@xenova/transformers/models/Xenova/all-MiniLM-L6-v2
 
 # Set environment variables
-ENV OPENAI_API_KEY="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"
 ENV DEEPSEEK_API_KEY="sk-a55f9f944f82446984142489e47d3e17"
 ENV PIXABAY_API_KEY="51870401-10c08576f17e1cb89793c39c7"
 ENV UNSPLASH_ACCESS_KEY="sfI8La5IhBt5IfV5y6HQrRI47JnmrLPwlunHrYofd2Y"

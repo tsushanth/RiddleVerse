@@ -152,7 +152,7 @@ It behaves exactly like a normal webpage — no special client-side processing o
 - Use standard CSS units: \`vh\`, \`vw\`, \`%\`, \`px\` — all work natively
 - The viewport is always portrait mobile, roughly 390×844 (varies by device)
 - Do NOT assume the game will be resized or rotated
-- **Multiple choice / Q&A answer buttons**: NEVER use absolute positioning or fixed heights for answer option containers. Use a scrollable flex column so 4+ options are always reachable on small screens (iPhone SE: 375×667). Each button: min-height:52px, width:100%, white-space:normal. Pattern: `.options { display:flex; flex-direction:column; gap:10px; overflow-y:auto; max-height:55vh; } .option-btn { min-height:52px; width:100%; padding:12px 16px; white-space:normal; border-radius:10px; }`
+- **Multiple choice / Q&A answer buttons**: NEVER use absolute positioning or fixed heights for answer option containers. Use a scrollable flex column so 4+ options are always reachable on small screens (iPhone SE: 375×667). Each button: min-height:52px, width:100%, white-space:normal. Pattern: \`.options { display:flex; flex-direction:column; gap:10px; overflow-y:auto; max-height:55vh; } .option-btn { min-height:52px; width:100%; padding:12px 16px; white-space:normal; border-radius:10px; }\`
 
 ## Required in index.html
 1. \`<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">\`
@@ -1545,6 +1545,240 @@ Make any small fixes needed. Don't rewrite — just polish.`;
     } catch (error) {
         console.error(`[${requestId}] Error:`, error.message);
         sendError('Internal worker error during difficulty generation.');
+    } finally {
+        activeGenerations--;
+        if (projectDir) {
+            setTimeout(() => cleanupProjectFolder(projectDir), 120000);
+        }
+    }
+});
+
+// ============================================
+// Next-Level Generation (sequential series progression)
+// Mirrors /generate-harder structure but: (a) treats the parent bundle as
+// previous-level reference rather than a base to mutate, (b) demands new
+// content/mechanics not just difficulty tuning, (c) returns a suggestedTitle.
+// ============================================
+
+const NEXT_LEVEL_CLAUDE_MD_APPEND = `
+
+## Next-Level Generation Rules
+You are writing the NEXT LEVEL of an existing game series.
+The previous level's code lives in ./previous-level/ — read it first.
+
+REQUIREMENTS:
+- Keep the core gameplay loop, controls, visual style, and audio feel of the previous level.
+- Introduce NEW content: new enemies, obstacles, mechanics, scenes, objectives, or twists.
+- DO NOT just speed up the previous level or change constants — that's a separate "harder" feature.
+- Scale challenge up modestly compared to the previous level; the player just beat it.
+- Stay self-contained: a single HTML bundle at the project root with index.html as entry.
+- Keep the same reportScore bridge function exactly as in the previous level.
+- The <title> tag of index.html MUST be a short evocative title for THIS level (3-8 words).
+  iOS reads this title to show the user what they just generated.
+- DO NOT put files in ./previous-level/ — that's read-only reference.
+`;
+
+app.post('/generate-next-level', authMiddleware, async (req, res) => {
+    const { parentBundle, seriesTitle, seriesDescription, parentLevelIndex, nextLevelIndex, userId, stream } = req.body;
+
+    if (!parentBundle || typeof parentBundle !== 'string') {
+        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)' });
+    }
+    if (!nextLevelIndex || nextLevelIndex < 2) {
+        return res.status(400).json({ error: 'nextLevelIndex must be >= 2' });
+    }
+    if (activeGenerations >= MAX_CONCURRENT) {
+        return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
+    }
+    if (quotaExhausted) {
+        return res.status(503).json({
+            error: getQuotaErrorMessage(),
+            quotaExhausted: true,
+            resetTime: quotaResetTime
+        });
+    }
+
+    activeGenerations++;
+    const startTime = Date.now();
+    const requestId = `nextlvl-${nextLevelIndex}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
+    let projectDir = null;
+
+    const isSSE = stream === true;
+    let heartbeatInterval = null;
+    if (isSSE) {
+        res.setHeader('Content-Type', 'text/event-stream');
+        res.setHeader('Cache-Control', 'no-cache');
+        res.setHeader('Connection', 'keep-alive');
+        res.flushHeaders();
+        heartbeatInterval = setInterval(() => {
+            try { res.write(':heartbeat\n\n'); } catch {}
+        }, 15000);
+        res.on('close', () => { if (heartbeatInterval) clearInterval(heartbeatInterval); });
+    }
+
+    function sendStatus(phase, message, detail, extras = {}) {
+        const progress = PHASE_PROGRESS[phase] || { startPct: 0, endPct: 0, typicalSeconds: 0 };
+        const currentIndex = PHASE_ORDER.indexOf(phase);
+        let estimatedRemaining = 0;
+        for (let i = currentIndex; i < PHASE_ORDER.length; i++) {
+            const p = PHASE_PROGRESS[PHASE_ORDER[i]];
+            if (p) estimatedRemaining += p.typicalSeconds;
+        }
+        console.log(`[${requestId}] [${phase}] ${message}${detail ? ': ' + detail : ''}`);
+        if (isSSE) {
+            res.write(`data: ${JSON.stringify({
+                type: 'status', phase, message, detail,
+                progressPercent: progress.startPct,
+                progressEndPct: progress.endPct,
+                phaseDurationSeconds: progress.typicalSeconds,
+                estimatedSecondsRemaining: estimatedRemaining,
+                ...extras
+            })}\n\n`);
+        }
+    }
+    function sendError(error) {
+        if (isSSE) {
+            res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+            res.end();
+        } else {
+            res.status(503).json({ error });
+        }
+    }
+    function sendResult(data) {
+        if (isSSE) {
+            res.write(`data: ${JSON.stringify({ type: 'result', ...data })}\n\n`);
+            res.end();
+        } else {
+            res.json(data);
+        }
+    }
+
+    console.log(`[${requestId}] Generating level ${nextLevelIndex} of "${seriesTitle}" for ${userId}`);
+
+    try {
+        const claudePath = findClaudeCLI();
+
+        // Send an early provisional title so iOS can display it on the progress screen
+        sendStatus('generate', `Generating Level ${nextLevelIndex}`, `Reading previous level to extend "${seriesTitle}"`, {
+            suggestedTitle: `${seriesTitle} — Level ${nextLevelIndex}`
+        });
+
+        projectDir = setupProjectFolder(requestId);
+
+        // Unpack parent into ./previous-level/ as reference; project root stays empty for new files
+        const prevDir = path.join(projectDir, 'previous-level');
+        fs.mkdirSync(prevDir, { recursive: true });
+        unzipBundle(parentBundle, prevDir);
+
+        // Write CLAUDE.md at root with base rules + next-level rules
+        fs.writeFileSync(path.join(projectDir, 'CLAUDE.md'), CLAUDE_MD + NEXT_LEVEL_CLAUDE_MD_APPEND);
+
+        const generatePrompt = `Series: "${seriesTitle}"
+Series description: "${seriesDescription || '(none provided)'}"
+You are writing Level ${nextLevelIndex}. The player just beat Level ${parentLevelIndex}.
+
+STEPS:
+1. Read ./CLAUDE.md fully.
+2. Read every file in ./previous-level/ to understand the mechanics, art style, and code structure.
+3. Plan what makes Level ${nextLevelIndex} feel like a fresh challenge — new content, not just harder numbers.
+4. Write the new game at the project root (NOT inside ./previous-level/).
+
+The <title> tag in your index.html must be a short evocative name for THIS level (3-8 words).
+DO NOT modify any file under ./previous-level/.
+
+Build the game now.`;
+
+        const genResult = await runClaudeCommand(claudePath, generatePrompt, projectDir, requestId, 20);
+
+        if (!genResult.success) {
+            activeGenerations--;
+            if (genResult.quotaError) {
+                quotaExhausted = true;
+                if (genResult.resetTime) quotaResetTime = genResult.resetTime;
+                setTimeout(() => { quotaExhausted = false; quotaResetTime = null; }, 3600000);
+                return sendError(getQuotaErrorMessage());
+            }
+            return sendError('Failed to generate next level. Please try again.');
+        }
+
+        // Phase 2: Validate (validates project root, ignoring ./previous-level/)
+        sendStatus('validate', 'Checking new level', 'Running automated quality checks');
+        const validation1 = fullValidation(projectDir);
+        console.log(`[${requestId}] Validation: ${validation1.critical.length} critical, ${validation1.warnings.length} warnings`);
+
+        // Phase 3: Fix
+        if (validation1.allIssues.length > 0) {
+            const issueList = validation1.allIssues
+                .map((i, idx) => `${idx + 1}. [${i.severity.toUpperCase()}] ${i.issue}`)
+                .join('\n');
+            sendStatus('fix', 'Fixing issues', `Found ${validation1.allIssues.length} issue(s) to resolve`);
+            const fixPrompt = `Automated checks found these issues in the new Level ${nextLevelIndex}:
+
+${issueList}
+
+Fix ALL critical issues. Do NOT add TODO comments — implement actual fixes.
+Ensure the reportScore bridge is present and called correctly.
+DO NOT modify ./previous-level/.`;
+            await runClaudeCommand(claudePath, fixPrompt, projectDir, requestId, 10);
+        } else {
+            sendStatus('fix', 'No issues found', 'New level passed all quality checks');
+        }
+
+        // Phase 4: Polish
+        sendStatus('polish', 'Final polish', `Ensuring Level ${nextLevelIndex} feels distinct from Level ${parentLevelIndex}`);
+        const validation2 = fullValidation(projectDir);
+        if (validation2.critical.length === 0) {
+            const polishPrompt = `Quick review of the new Level ${nextLevelIndex}:
+1. Does it feel meaningfully DIFFERENT from Level ${parentLevelIndex} (new content, not just faster)?
+2. Is the visual style consistent with the previous level?
+3. Is the <title> tag a short evocative name for this level (3-8 words)?
+4. Is the game still playable (not broken)?
+5. Does reportScore work correctly?
+
+Make any small fixes needed. Don't rewrite — just polish. DO NOT modify ./previous-level/.`;
+            await runClaudeCommand(claudePath, polishPrompt, projectDir, requestId, 5);
+        }
+
+        // Phase 5: Verify
+        sendStatus('verify', 'Final verification', 'Ensuring everything works');
+        const finalValidation = fullValidation(projectDir);
+
+        // Remove the reference dir before zipping so it doesn't end up in the bundle
+        try { fs.rmSync(prevDir, { recursive: true, force: true }); } catch (e) {
+            console.warn(`[${requestId}] Could not remove previous-level dir: ${e.message}`);
+        }
+
+        const files = listProjectFiles(projectDir);
+        console.log(`[${requestId}] Final: ${files.length} files, ${finalValidation.critical.length} critical, ${finalValidation.warnings.length} warnings`);
+
+        // Package
+        sendStatus('package', 'Packaging level', 'Creating downloadable bundle');
+        const zip = await zipProjectFolder(projectDir);
+        const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+        // Pull the title from the bundle's <title> tag for the suggestedTitle in the result
+        const finalTitle = extractGameTitleFromBundle ? extractGameTitleFromBundle(zip.base64) : null;
+
+        console.log(`[${requestId}] Level ${nextLevelIndex} complete in ${elapsed}s (${(zip.sizeBytes / 1024).toFixed(1)}KB, title="${finalTitle}")`);
+
+        sendResult({
+            success: true,
+            bundle: zip.base64,
+            bundleSize: zip.sizeBytes,
+            files,
+            generationTime: elapsed,
+            nextLevelIndex,
+            suggestedTitle: finalTitle || `${seriesTitle} — Level ${nextLevelIndex}`,
+            suggestedDescription: `Level ${nextLevelIndex} of ${seriesTitle}`,
+            quality: {
+                criticalIssues: finalValidation.critical.length,
+                warnings: finalValidation.warnings.length,
+            }
+        });
+
+    } catch (error) {
+        console.error(`[${requestId}] Error:`, error.message);
+        sendError('Internal worker error during next-level generation.');
     } finally {
         activeGenerations--;
         if (projectDir) {

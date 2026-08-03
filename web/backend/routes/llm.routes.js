@@ -6,8 +6,8 @@ import { extractTopicFromPrompt, determineCategory } from '../utils/puzzleUtils.
 
 const router = express.Router();
 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY;
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
 
 // Rate limiting configuration
 const RATE_LIMIT_CONFIG = {
@@ -220,22 +220,33 @@ DO NOT use local file references. DO NOT make up image URLs.`
             .map(msg => `${msg.role}: ${typeof msg.content === 'string' ? msg.content : '[multimodal content]'}`)
             .join('\n');
 
-        const model = hasImage ? "gpt-4o" : "gpt-3.5-turbo";
+        const model = hasImage ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
+
+        // Extract system messages from conversation
+        const systemMessages = enhancedConversation.filter(m => m.role === 'system');
+        const nonSystemMessages = enhancedConversation.filter(m => m.role !== 'system');
+        const systemText = systemMessages.map(m => typeof m.content === 'string' ? m.content : '').join('\n\n');
 
         res.write(`data: ${JSON.stringify({
             status: 'generating',
             message: 'AI is thinking...'
         })}\n\n`);
 
-        const response = await axios.post(OPENAI_API_URL, {
+        const requestBody = {
             model: model,
-            messages: enhancedConversation,
-            max_tokens: hasImage ? 4096 : undefined,
-            stream: true
-        }, {
+            max_tokens: hasImage ? 4096 : 2048,
+            stream: true,
+            messages: nonSystemMessages
+        };
+        if (systemText) {
+            requestBody.system = systemText;
+        }
+
+        const response = await axios.post(ANTHROPIC_API_URL, requestBody, {
             headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
+                'x-api-key': ANTHROPIC_API_KEY,
+                'Content-Type': 'application/json',
+                'anthropic-version': '2023-06-01'
             },
             responseType: 'stream'
         });
@@ -250,16 +261,16 @@ DO NOT use local file references. DO NOT make up image URLs.`
                 if (line.startsWith('data: ')) {
                     const data = line.slice(6);
 
-                    if (data === '[DONE]') return;
-
                     try {
                         const parsed = JSON.parse(data);
-                        const content = parsed.choices?.[0]?.delta?.content;
 
-                        if (content) {
-                            fullResponse += content;
-                            chunkCount++;
-                            res.write(`data: ${JSON.stringify({ chunk: content, done: false })}\n\n`);
+                        if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
+                            const content = parsed.delta.text;
+                            if (content) {
+                                fullResponse += content;
+                                chunkCount++;
+                                res.write(`data: ${JSON.stringify({ chunk: content, done: false })}\n\n`);
+                            }
                         }
                     } catch (e) { }
                 }
@@ -405,20 +416,31 @@ DO NOT use local file references. DO NOT make up image URLs.`
             .map(msg => `${msg.role}: ${typeof msg.content === 'string' ? msg.content : '[multimodal content]'}`)
             .join('\n');
 
-        const model = hasImage ? "gpt-4o" : "gpt-3.5-turbo";
+        const model = hasImage ? "claude-sonnet-4-6" : "claude-haiku-4-5-20251001";
 
-        const response = await axios.post(OPENAI_API_URL, {
+        // Extract system messages from conversation
+        const systemMsgs = enhancedConversation.filter(m => m.role === 'system');
+        const nonSystemMsgs = enhancedConversation.filter(m => m.role !== 'system');
+        const sysText = systemMsgs.map(m => typeof m.content === 'string' ? m.content : '').join('\n\n');
+
+        const reqBody = {
             model: model,
-            messages: enhancedConversation,
-            max_tokens: hasImage ? 4096 : undefined
-        }, {
+            max_tokens: hasImage ? 4096 : 2048,
+            messages: nonSystemMsgs
+        };
+        if (sysText) {
+            reqBody.system = sysText;
+        }
+
+        const response = await axios.post(ANTHROPIC_API_URL, reqBody, {
             headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
+                'x-api-key': ANTHROPIC_API_KEY,
+                'Content-Type': 'application/json',
+                'anthropic-version': '2023-06-01'
             }
         });
 
-        const aiResponse = response.data.choices?.[0]?.message?.content?.trim() || "Call to OpenAI failed.";
+        const aiResponse = (response.data.content?.[0]?.type === 'text' ? response.data.content[0].text.trim() : "") || "Call to Anthropic failed.";
 
         await usageTracker.trackRequest({
             modelName: model,
@@ -439,17 +461,17 @@ DO NOT use local file references. DO NOT make up image URLs.`
         });
 
     } catch (error) {
-        console.error("Error calling OpenAI API:", error.response ? error.response.data : error.message);
+        console.error("Error calling Anthropic API:", error.response ? error.response.data : error.message);
 
         if (error.response && error.response.status === 429) {
             return res.status(429).json({
-                error: "OpenAI API rate limit exceeded. Please try again later.",
+                error: "API rate limit exceeded. Please try again later.",
                 message: "The AI service is temporarily busy. Please wait a moment and try again."
             });
         }
 
         res.status(500).json({
-            error: "Failed to fetch response from OpenAI API.",
+            error: "Failed to fetch response from AI API.",
             message: "Sorry, there was a technical issue. Please try again."
         });
     }

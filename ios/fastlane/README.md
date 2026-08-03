@@ -15,20 +15,18 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
+### ios build_and_submit
+
+```sh
+[bundle exec] fastlane ios build_and_submit
+```
+
+Build and submit to App Store for review
+
 ### ios submit_for_review
 
 ```sh
 [bundle exec] fastlane ios submit_for_review
-```
-
-Upload metadata and screenshots to App Store Connect
-
-Submit already-uploaded build for review
-
-### ios upload_metadata
-
-```sh
-[bundle exec] fastlane ios upload_metadata
 ```
 
 

@@ -25,10 +25,10 @@ export const generationLimiter = rateLimit({
 
 // Very strict for admin/dangerous operations
 export const adminLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour  
-    max: 100, // relaxed for development
-    message: { 
-        error: "Too many admin requests. Limit: 5 per hour.",
+    windowMs: 60 * 60 * 1000, // 1 hour
+    max: 1000,
+    message: {
+        error: "Too many admin requests. Please try again later.",
         retryAfter: "1 hour"
     }
 });
@@ -55,11 +55,12 @@ export const sendNotificationLimiter = rateLimit({
 // Rate limiting for RiddleVerse app endpoints
 export const riddleVerseRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Increased from 20 - app makes burst requests on startup
+    max: 500,
     skip: (req) => {
-        // Skip rate limiting for authenticated users
+        // Skip rate limiting for authenticated users and Telegram bot
         const { userId, email } = req.query;
-        return userId && email && userId !== "" && email !== "";
+        const ua = req.get('User-Agent') || '';
+        return (userId && email && userId !== "" && email !== "") || ua.includes('TelegramBot');
     },
     keyGenerator: (req) => {
         // Use IP + User-Agent for more granular rate limiting
@@ -94,7 +95,7 @@ export const batchFetchLimiter = rateLimit({
 // CORS configuration
 export const corsOptions = {
     origin: [
-        "https://quiz-web-frontend-917362189743.us-central1.run.app",
+        "https://quiz-web-frontend.fly.dev",
         "http://localhost:3000", // for development
         "https://puzzleverseai.com"
     ],

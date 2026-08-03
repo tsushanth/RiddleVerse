@@ -711,6 +711,7 @@ struct HomeView: View {
     @State var selectedTab: TabSelection = .forYou
     @StateObject private var gameGenerationManager = GameGenerationManager.shared
     @State private var showEarnBanner: Bool = !UserDefaults.standard.bool(forKey: "earn_banner_dismissed")
+    @State private var showTelegramBanner: Bool = false  // gated by Remote Config; default false for App Store review
     @State private var gameTabSection: Int = 1
     
 
@@ -1179,6 +1180,14 @@ struct HomeView: View {
             if viewModel.customPuzzles.isEmpty {
                 viewModel.fetchCustomPuzzles()
             }
+            // Fetch Remote Config to gate the Telegram banner server-side
+            RemoteConfigManager.shared.fetchAndActivate {
+                let shouldShow = RemoteConfigManager.shared.showTelegramBanner
+                    && !UserDefaults.standard.bool(forKey: "telegram_banner_dismissed")
+                DispatchQueue.main.async {
+                    showTelegramBanner = shouldShow
+                }
+            }
         }
     }
     
@@ -1188,6 +1197,16 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 20) {
             ScrollView {
                 LazyVStack(spacing: 24) {
+                    // Telegram bot banner
+                    if showTelegramBanner {
+                        TelegramBotBanner(onDismiss: {
+                            withAnimation(.easeOut(duration: 0.3)) { showTelegramBanner = false }
+                            UserDefaults.standard.set(true, forKey: "telegram_banner_dismissed")
+                        })
+                        .padding(.horizontal)
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+
                     // Earn money banner
                     if showEarnBanner {
                         EarnMoneyBanner(

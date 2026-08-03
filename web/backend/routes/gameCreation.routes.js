@@ -8,25 +8,117 @@ import { DIFFICULTY_COSTS, MAX_DIFFICULTY_LEVEL, getDifficultyCost } from '../se
 
 const router = express.Router();
 
+// ============================================
+// Engagement instrumentation
+// ============================================
+// All three writes below are fire-and-forget. They must not block or fail the
+// user-facing request — a metric drop is acceptable, a 500 is not. Catches log
+// once and swallow.
+//
+// What we record now (vs. before — when the only signal was a lifetime
+// play_count counter and analytics_events covered ~4 lifecycle event types):
+//   - forge_sessions: one row per generate attempt with status transitions
+//     so we can see the AI Forge funnel (started → completed | failed)
+//   - game_plays: one row per game serve with player_id so we can split
+//     unique humans from raw serve counts
+//   - analytics_events: structured event mirror so the existing
+//     /api/analytics/events dashboard surfaces these without DB-level changes
+
+// analytics_events.user_id is a uuid column; Firebase UIDs (alphanumeric
+// strings) get rejected with a 22P02. Pre-validate and stash non-uuid IDs
+// inside event_parameters so we still attribute them, just not via the FK.
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+async function recordAnalyticsEvent(eventName, userId, params = {}) {
+    try {
+        const isUuidUser = typeof userId === 'string' && UUID_RE.test(userId);
+        const enrichedParams = isUuidUser
+            ? params
+            : { ...params, raw_user_id: userId || null };
+        await supabase.from('analytics_events').insert({
+            user_id: isUuidUser ? userId : null,
+            event_name: eventName,
+            event_parameters: enrichedParams,
+            session_id: params.session_id || null,
+        });
+    } catch (e) {
+        console.warn(`[analytics_events] ${eventName} non-fatal:`, e?.message || e);
+    }
+}
+
+async function startForgeSession(userId, prompt) {
+    // forge_sessions.user_id is text (firebase UID), status enum: created/generating/completed/failed
+    try {
+        const { data, error } = await supabase
+            .from('forge_sessions')
+            .insert({
+                user_id: userId || null,
+                type: 'game',
+                status: 'generating',
+                messages: prompt ? [{ role: 'user', content: prompt.substring(0, 1000) }] : [],
+            })
+            .select('id')
+            .single();
+        if (error) {
+            console.warn('[forge_sessions] start non-fatal:', error.message);
+            return null;
+        }
+        return data?.id || null;
+    } catch (e) {
+        console.warn('[forge_sessions] start threw non-fatal:', e?.message || e);
+        return null;
+    }
+}
+
+async function finishForgeSession(sessionId, status, savedGameId = null) {
+    if (!sessionId) return;
+    try {
+        const payload = { status, updated_at: new Date().toISOString() };
+        if (savedGameId) payload.saved_game_id = savedGameId;
+        const { error } = await supabase
+            .from('forge_sessions')
+            .update(payload)
+            .eq('id', sessionId);
+        if (error) console.warn(`[forge_sessions] finish(${status}) non-fatal:`, error.message);
+    } catch (e) {
+        console.warn(`[forge_sessions] finish(${status}) threw non-fatal:`, e?.message || e);
+    }
+}
+
+async function recordGamePlay(gameId, playerId) {
+    // game_plays.player_id is varchar (firebase UID). Score + completion_time
+    // arrive later via leaderboard/complete callbacks; we record the serve here.
+    if (!gameId) return;
+    try {
+        await supabase.from('game_plays').insert({
+            game_id: gameId,
+            player_id: playerId || null,
+            played_at: new Date().toISOString(),
+        });
+    } catch (e) {
+        console.warn('[game_plays] insert non-fatal:', e?.message || e);
+    }
+}
+
 const API_BASE_URL = process.env.API_BASE_URL || '';
 
 const GAME_WORKER_URL = process.env.GAME_WORKER_URL || 'http://localhost:3456';
 const GAME_WORKER_SECRET = process.env.GAME_WORKER_SECRET || 'game-worker-secret-2024';
 const GAME_BUNDLES_BUCKET = 'game-bundles';
 const SCREENSHOT_SERVICE_URL = process.env.SCREENSHOT_SERVICE_URL || 'http://178.156.231.255:3465';
-const PLAY_BASE_URL = process.env.PLAY_BASE_URL || 'https://quiz-web-frontend-917362189743.us-central1.run.app';
+const PLAY_BASE_URL = process.env.PLAY_BASE_URL || 'https://quiz-web-frontend.fly.dev';
 
 // ============================================
 // Auto-thumbnail: screenshot game after save
 // ============================================
 async function captureGameThumbnail(gameId) {
     try {
-        const playUrl = `${PLAY_BASE_URL}/play/${gameId}`;
+        const playUrl = `https://puzzleverseai.com/api/game-creation/${gameId}?platform=web&chatId=preview`;
         console.log(`[thumbnail] Capturing: ${playUrl}`);
 
         const res = await fetch(
-            `${SCREENSHOT_SERVICE_URL}/screenshot?url=${encodeURIComponent(playUrl)}&width=390&height=700`,
-            { signal: AbortSignal.timeout(45000) }
+            `${SCREENSHOT_SERVICE_URL}/screenshot?url=${encodeURIComponent(playUrl)}&width=390&height=700&delay=4000`,
+            { signal: AbortSignal.timeout(60000) }
         );
         if (!res.ok) throw new Error(`Screenshot service returned ${res.status}`);
 
@@ -102,8 +194,9 @@ async function getLifetimeGenerations(userId) {
 
 const CACHE_REFRESH_INTERVAL = 60 * 1000; // 60 seconds
 let browseCache = {
-    newest: [],   // sorted by created_at desc
-    popular: [],  // sorted by play_count desc
+    newest: [],    // sorted by created_at desc
+    popular: [],   // sorted by play_count desc (legacy lifetime counter)
+    trending: [],  // sorted by trending_score desc, falls back to created_at — Feature C primary
     totalCount: 0,
     lastRefreshed: 0,
     isRefreshing: false,
@@ -137,31 +230,54 @@ async function refreshBrowseCache() {
     try {
         const hasStatus = await checkStatusColumn();
 
-        // Build queries — add status filter only if column exists
-        let newestQuery = supabase
-            .from('custom_games')
-            .select('id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url', { count: 'exact' })
-            .eq('game_type', 'ai_generated')
-            .eq('platform_type', 'webview');
+        // Build queries — add status filter only if column exists.
+        // series_id/level_index/trending_score are Feature A+C additions; if the migrations
+        // haven't been applied yet the columns won't exist and we fall back to the legacy fields.
+        // Embedded game_series:series_id(level_count) gives us the "X levels" badge data
+        // via PostgREST relation embedding (relies on the FK declared in game_series.sql).
+        const baseSelect = 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url, series_id, level_index, trending_score, game_series:series_id(level_count)';
 
-        let popularQuery = supabase
-            .from('custom_games')
-            .select('id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url')
-            .eq('game_type', 'ai_generated')
-            .eq('platform_type', 'webview');
+        // Only show level 1 of each series in the browse listing — higher levels are
+        // surfaced via the Game Over CTA, not as separate browse entries. Apply the
+        // filter as `level_index = 1 OR level_index IS NULL` so pre-migration rows
+        // still appear during the rollout window.
+        const applyLevelFilter = (q) => q.or('level_index.eq.1,level_index.is.null');
+
+        let newestQuery   = applyLevelFilter(supabase.from('custom_games').select(baseSelect, { count: 'exact' }).eq('game_type', 'ai_generated').eq('platform_type', 'webview'));
+        let popularQuery  = applyLevelFilter(supabase.from('custom_games').select(baseSelect).eq('game_type', 'ai_generated').eq('platform_type', 'webview'));
+        let trendingQuery = applyLevelFilter(supabase.from('custom_games').select(baseSelect).eq('game_type', 'ai_generated').eq('platform_type', 'webview'));
 
         if (hasStatus) {
-            newestQuery = newestQuery.eq('status', 'published');
-            popularQuery = popularQuery.eq('status', 'published');
+            newestQuery   = newestQuery.eq('status', 'published');
+            popularQuery  = popularQuery.eq('status', 'published');
+            trendingQuery = trendingQuery.eq('status', 'published');
         }
 
-        const [newestResult, popularResult] = await Promise.all([
+        const [newestResult, popularResult, trendingResult] = await Promise.all([
             newestQuery.order('created_at', { ascending: false }).limit(200),
             popularQuery.order('play_count', { ascending: false }).limit(200),
+            // trending_score DESC primary, created_at DESC tiebreaker (covers cold-start
+            // when all trending_scores are still 0 — they sort by recency naturally)
+            trendingQuery
+                .order('trending_score', { ascending: false, nullsFirst: false })
+                .order('created_at',     { ascending: false })
+                .limit(200),
         ]);
 
-        if (newestResult.error) throw newestResult.error;
-        if (popularResult.error) throw popularResult.error;
+        if (newestResult.error)   throw newestResult.error;
+        if (popularResult.error)  throw popularResult.error;
+        if (trendingResult.error) throw trendingResult.error;
+
+        // Flatten embedded game_series.level_count into top-level `level_count`
+        // so the iOS client doesn't need to unwrap nested objects.
+        const flatten = (rows) => (rows || []).map(r => ({
+            ...r,
+            level_count: r.game_series?.level_count ?? 1,
+            game_series: undefined,
+        }));
+        newestResult.data   = flatten(newestResult.data);
+        popularResult.data  = flatten(popularResult.data);
+        trendingResult.data = flatten(trendingResult.data);
 
         // Deduplicate by (creator_id, title-prefix) — keep newest entry per creator+prompt pair
         // Titles may be truncated at different lengths by different clients, so match on first 50 chars
@@ -173,8 +289,9 @@ async function refreshBrowseCache() {
             }
             return Array.from(seen.values());
         };
-        browseCache.newest = dedup(newestResult.data || []);
-        browseCache.popular = dedup(popularResult.data || []);
+        browseCache.newest   = dedup(newestResult.data || []);
+        browseCache.popular  = dedup(popularResult.data || []);
+        browseCache.trending = dedup(trendingResult.data || []);
         browseCache.totalCount = newestResult.count || browseCache.newest.length;
         browseCache.lastRefreshed = Date.now();
 
@@ -373,6 +490,9 @@ function recordGeneration(userId) {
 // Client sees: status updates ("Building your game", "Fixing issues", "Polishing")
 // then the final result with the zip bundle
 router.post('/generate', async (req, res) => {
+    // Declared at function scope so the outer catch can reference it on
+    // failure paths (a `const` inside the try block isn't visible in catch).
+    let forgeSessionId = null;
     try {
         const { prompt, userId, userName, title, referenceImage } = req.body;
 
@@ -431,6 +551,17 @@ router.post('/generate', async (req, res) => {
         }
 
         console.log(`[generate] User ${userId}: "${prompt}"${referenceImage ? ' (with reference image)' : ''}`);
+
+        // Open a forge session so the creation funnel becomes visible. Result
+        // ID is hoisted above so the outer catch can mark it 'failed' — on
+        // success the streaming branch below flips it to 'completed' and
+        // links to the resulting custom_games.id.
+        forgeSessionId = await startForgeSession(userId, prompt);
+        recordAnalyticsEvent('forge_session_started', userId, {
+            session_id: forgeSessionId,
+            has_reference_image: !!referenceImage,
+            prompt_length: prompt.length,
+        });
 
         // Set up SSE to stream progress to the client
         res.setHeader('Content-Type', 'text/event-stream');
@@ -533,35 +664,78 @@ router.post('/generate', async (req, res) => {
 
                                 // Auto-save the generated game (unified with remix flow)
                                 const gameId = crypto.randomUUID();
-                                const gameTitle = (title && title.trim()) || prompt.trim().substring(0, 100);
+                                // Prefer the catchy title Claude wrote into the bundle's <title> tag;
+                                // fall back to the client-provided title; finally to a prompt substring
+                                // (which is what made title==description on every old card).
+                                const extractedTitle = extractGameTitleFromBundle(parsed.bundle);
+                                const gameTitle = (title && title.trim()) || extractedTitle || prompt.trim().substring(0, 100);
                                 const creatorName = userName || 'Player';
                                 const criticalCount = parsed.quality?.criticalIssues ?? 0;
+
+                                // Feature A: wrap every new game in a series-of-one so the
+                                // "Generate Next Level" path can extend it later. Best-effort —
+                                // if the game_series table doesn't exist yet (migration not run)
+                                // we proceed without it.
+                                let newSeriesId = null;
+                                try {
+                                    const { data: seriesRow, error: seriesErr } = await supabase
+                                        .from('game_series')
+                                        .insert({
+                                            creator_id: userId,
+                                            title: gameTitle,
+                                            description: prompt.trim().substring(0, 500),
+                                            level_count: 1
+                                        })
+                                        .select('id')
+                                        .single();
+                                    if (!seriesErr && seriesRow) newSeriesId = seriesRow.id;
+                                } catch (e) {
+                                    console.warn('[generate] series insert skipped:', e.message);
+                                }
+
+                                const insertPayload = {
+                                    id: gameId,
+                                    title: gameTitle,
+                                    description: prompt.trim().substring(0, 500),
+                                    html_content: parsed.bundle,
+                                    creator_id: userId,
+                                    creator_name: creatorName,
+                                    game_type: 'ai_generated',
+                                    platform_type: 'webview',
+                                    initial_prompt: prompt.substring(0, 2000),
+                                    play_count: 0,
+                                    rating: 0,
+                                    critical_issues: criticalCount
+                                };
+                                if (newSeriesId) {
+                                    insertPayload.series_id = newSeriesId;
+                                    insertPayload.level_index = 1;
+                                }
+
                                 const { error: dbError } = await supabase
                                     .from('custom_games')
-                                    .insert({
-                                        id: gameId,
-                                        title: gameTitle,
-                                        description: prompt.trim().substring(0, 500),
-                                        html_content: parsed.bundle,
-                                        creator_id: userId,
-                                        creator_name: creatorName,
-                                        game_type: 'ai_generated',
-                                        platform_type: 'webview',
-                                        initial_prompt: prompt.substring(0, 2000),
-                                        play_count: 0,
-                                        rating: 0,
-                                        critical_issues: criticalCount
-                                    });
+                                    .insert(insertPayload);
 
                                 if (dbError) {
                                     console.error(`[generate] DB save error:`, dbError.message);
+                                    finishForgeSession(forgeSessionId, 'failed');
+                                    recordAnalyticsEvent('forge_session_failed', userId, {
+                                        session_id: forgeSessionId,
+                                        reason: 'db_save_error',
+                                    });
                                 } else {
-                                    console.log(`[generate] Saved: ${gameId} ("${gameTitle}")`);
+                                    console.log(`[generate] Saved: ${gameId} ("${gameTitle}")${newSeriesId ? ` series=${newSeriesId.slice(0,8)}` : ''}`);
                                     refreshBrowseCache();
                                     // Auto-capture thumbnail (fire-and-forget)
                                     captureGameThumbnail(gameId)
                                         .then(() => refreshBrowseCache())
                                         .catch(err => console.error('[thumbnail] Background error:', err.message));
+                                    finishForgeSession(forgeSessionId, 'completed', gameId);
+                                    recordAnalyticsEvent('forge_session_completed', userId, {
+                                        session_id: forgeSessionId,
+                                        game_id: gameId,
+                                        game_title: gameTitle,
+                                    });
                                 }
 
                                 res.write(`data: ${JSON.stringify({
@@ -597,6 +771,14 @@ router.post('/generate', async (req, res) => {
 
     } catch (error) {
         console.error('[generate] Error:', error.message);
+        if (forgeSessionId) {
+            finishForgeSession(forgeSessionId, 'failed');
+            recordAnalyticsEvent('forge_session_failed', null, {
+                session_id: forgeSessionId,
+                reason: error.name === 'TimeoutError' ? 'timeout' : 'server_error',
+                error_message: error.message?.substring(0, 200),
+            });
+        }
 
         // If headers already sent (SSE mode), send error event
         if (res.headersSent) {
@@ -642,12 +824,22 @@ router.post('/save', async (req, res) => {
 
         const gameId = crypto.randomUUID();
 
+        // Prefer the bundle's <title> if the client-provided title looks prompt-derived
+        // (>=80 chars or equal to / startsWith of initialPrompt). Keeps catchy explicit
+        // titles intact while replacing the prompt-substring fallback callers usually send.
+        const extractedTitle = extractGameTitleFromBundle(bundle);
+        const provided = (title || '').trim();
+        const promptish = initialPrompt && provided && (provided.length >= 80 ||
+            provided.toLowerCase() === initialPrompt.trim().toLowerCase() ||
+            initialPrompt.trim().toLowerCase().startsWith(provided.toLowerCase()));
+        const finalTitle = (extractedTitle && (promptish || !provided)) ? extractedTitle : provided || extractedTitle || 'Untitled Game';
+
         const { data, error: dbError } = await supabase
             .from('custom_games')
             .insert({
                 id: gameId,
-                title,
-                description: initialPrompt || `AI-generated game: ${title}`,
+                title: finalTitle,
+                description: initialPrompt || `AI-generated game: ${finalTitle}`,
                 html_content: bundle, // base64 zip stored in existing column
                 creator_id: creatorId,
                 creator_name: creatorName || 'Anonymous',
@@ -716,7 +908,9 @@ router.post('/save', async (req, res) => {
 // Supports pagination: ?limit=20&offset=0&sort=newest|popular
 router.get('/browse', async (req, res) => {
     try {
-        const { limit = 20, offset = 0, sort = 'newest', creatorId } = req.query;
+        // Default flips from 'newest' → 'trending' (Feature C).
+        // Clients sending sort=newest/popular explicitly still get the old behaviour.
+        const { limit = 20, offset = 0, sort = 'trending', creatorId } = req.query;
         const parsedLimit = Math.min(parseInt(limit) || 20, 50);
         const parsedOffset = parseInt(offset) || 0;
 
@@ -724,18 +918,26 @@ router.get('/browse', async (req, res) => {
         if (creatorId) {
             const hasStatus = await checkStatusColumn();
             const selectFields = hasStatus
-                ? 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, status, initial_screenshot_url'
-                : 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url';
-            const query = supabase
+                ? 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, status, initial_screenshot_url, series_id, level_index, trending_score'
+                : 'id, title, description, creator_id, creator_name, game_type, play_count, rating, created_at, initial_screenshot_url, series_id, level_index, trending_score';
+
+            let query = supabase
                 .from('custom_games')
                 .select(selectFields, { count: 'exact' })
                 .eq('game_type', 'ai_generated')
                 .eq('platform_type', 'webview')
-                .eq('creator_id', creatorId)
-                .order(sort === 'popular' ? 'play_count' : 'created_at', { ascending: false })
-                .range(parsedOffset, parsedOffset + parsedLimit - 1);
+                .eq('creator_id', creatorId);
 
-            const { data, count, error } = await query;
+            if (sort === 'popular') {
+                query = query.order('play_count', { ascending: false });
+            } else if (sort === 'trending') {
+                query = query.order('trending_score', { ascending: false, nullsFirst: false })
+                             .order('created_at',     { ascending: false });
+            } else {
+                query = query.order('created_at', { ascending: false });
+            }
+
+            const { data, count, error } = await query.range(parsedOffset, parsedOffset + parsedLimit - 1);
             if (error) throw error;
 
             return res.json({
@@ -747,7 +949,9 @@ router.get('/browse', async (req, res) => {
         }
 
         // Default: serve from cache (only published games)
-        const source = sort === 'popular' ? browseCache.popular : browseCache.newest;
+        const source = sort === 'popular'  ? browseCache.popular
+                     : sort === 'newest'   ? browseCache.newest
+                                           : browseCache.trending;
         const page = source.slice(parsedOffset, parsedOffset + parsedLimit);
         const totalCount = source.length;
 
@@ -813,6 +1017,7 @@ router.get('/:gameId/difficulty-info', async (req, res) => {
 router.get('/:gameId/difficulty/:level', async (req, res) => {
     try {
         const { gameId, level } = req.params;
+        const { userId: variantUserId } = req.query;
         const parsedLevel = parseInt(level);
 
         if (isNaN(parsedLevel) || parsedLevel < 2 || parsedLevel > MAX_DIFFICULTY_LEVEL) {
@@ -851,11 +1056,20 @@ router.get('/:gameId/difficulty/:level', async (req, res) => {
         }
 
         // status === 'ready' — serve the bundle
-        // Increment play count
+        // Increment lifetime play_count AND record a per-player game_plays row
+        // so this variant's serves are visible in the same way as the parent
+        // game's. variants share custom_games.id as parent — we still attribute
+        // the play to the parent so it shows up in /api/analytics/events.
         await supabase
             .from('game_difficulty_variants')
             .update({ play_count: (data.play_count || 0) + 1 })
             .eq('id', data.id);
+        recordGamePlay(gameId, variantUserId);
+        recordAnalyticsEvent('custom_game_variant_served', variantUserId, {
+            game_id: gameId,
+            variant_id: data.id,
+            difficulty_level: parsedLevel,
+        });
 
         res.json({
             success: true,
@@ -2223,73 +2437,772 @@ function extractHtmlFromBundle(base64Content) {
             offset = dataStart + compSize;
         }
 
-        // Look for index.html
-        if (files['index.html']) return files['index.html'];
+        // Find index.html
+        let html = files['index.html'];
+        if (!html) {
+            const indexKey = Object.keys(files).find(k => k.endsWith('index.html'));
+            if (indexKey) html = files[indexKey];
+        }
+        if (!html) {
+            if (str.includes('<body') || str.includes('<div')) return str;
+            return null;
+        }
 
-        // Try original filename
-        const indexKey = Object.keys(files).find(k => k.endsWith('index.html'));
-        if (indexKey) return files[indexKey];
+        // Helper: look up a file by path, trying full path and basename
+        const findFile = (ref) => {
+            const key = ref.replace(/^\.\//, '').replace(/^\//, '');
+            const basename = key.split('/').pop();
+            return files[key] || files[basename] || null;
+        };
 
-        // Fallback: return the raw string if it looks like HTML
-        if (str.includes('<body') || str.includes('<div')) return str;
+        // Inline external CSS files
+        html = html.replace(/<link[^>]+href=["']([^"']+\.css)["'][^>]*\/?>/gi, (tag, href) => {
+            const css = findFile(href);
+            return css ? `<style>${css}</style>` : tag;
+        });
 
-        return null;
+        // Inline external JS files
+        html = html.replace(/<script[^>]+src=["']([^"']+\.js)["'][^>]*><\/script>/gi, (tag, src) => {
+            const js = findFile(src);
+            return js ? `<script>${js}</script>` : tag;
+        });
+
+        return html;
     } catch (err) {
         console.error('[extractHtml] Error:', err.message);
         return null;
     }
 }
 
-// Generate the leaderboard snippet to inject
-function generateLeaderboardSnippet(gameId, chatId, apiBase) {
+// Extract the <title> tag from a game's HTML bundle. Used so the catchy title
+// Claude wrote into the game's <head> overrides the prompt-derived fallback
+// title that otherwise duplicates the description on browse cards.
+// Returns the title trimmed, or null if missing / unusable.
+function extractGameTitleFromBundle(base64Content) {
+    try {
+        const html = extractHtmlFromBundle(base64Content);
+        if (!html) return null;
+        const match = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+        if (!match) return null;
+        const raw = match[1]
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g, "'")
+            .replace(/\s+/g, ' ')
+            .trim();
+        if (!raw || raw.length < 2 || raw.length > 100) return null;
+        const lower = raw.toLowerCase();
+        // Skip default/placeholder titles Claude sometimes leaves in
+        const blacklist = ['document', 'untitled', 'game', 'index', 'title', 'html', 'page', 'default'];
+        if (blacklist.includes(lower)) return null;
+        return raw;
+    } catch {
+        return null;
+    }
+}
+
+// Generate GAME_EVENT postMessage bridge for session wrapper (/play?session_id=)
+// Intercepts the two native bridges that AI-generated games call on game-over,
+// and forwards them as { type: 'GAME_EVENT', event: 'score'|'end', value, finalScore }
+// to window.parent so GameSessionPage.jsx can track and close the session.
+function generateSessionBridgeSnippet() {
     return `
 <script>
 (function() {
-  var GAME_ID = '${gameId}';
-  var CHAT_ID = '${chatId}';
-  var API_BASE = '${apiBase}';
-  var tgUser = window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user;
-  var userId = tgUser ? String(tgUser.id) : ('guest_' + Math.random().toString(36).substr(2,8));
-  var username = tgUser ? (tgUser.first_name || tgUser.username || 'Player') : 'Player';
-  window.RV = {
-    submitScore: function(score) {
-      fetch(API_BASE + '/api/chat-scores', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({gameId:GAME_ID,chatId:CHAT_ID,platform:'telegram',userId:userId,username:username,score:score})
-      }).then(function(r){return r.json()}).then(function(d){
-        if(d.leaderboard) window.RV._render(d.leaderboard);
-      }).catch(function(){});
-    },
-    _render: function(scores) {
-      var el = document.getElementById('rv-lb-list');
-      if(!el) return;
-      el.innerHTML = scores.map(function(s,i){
-        return '<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.1)">'
-          +'<span style="width:18px;font-weight:bold;color:'+(i===0?'#FFD700':i===1?'#C0C0C0':i===2?'#CD7F32':'#aaa')+'">'+(i+1)+'.</span>'
-          +'<span style="flex:1">'+(s.username||'Player')+(s.userId===userId?' <b>(you)</b>':'')+'</span>'
-          +'<span style="font-weight:bold">'+s.score+'</span></div>';
-      }).join('');
-    },
-    _poll: function() {
-      fetch(API_BASE+'/api/chat-scores/'+GAME_ID+'/'+CHAT_ID)
-        .then(function(r){return r.json()})
-        .then(function(d){if(d.scores)window.RV._render(d.scores)})
-        .catch(function(){});
+  function sendEvent(event, value, finalScore) {
+    try {
+      window.parent.postMessage(
+        { type: 'GAME_EVENT', event: event, value: value, finalScore: finalScore },
+        '*'
+      );
+    } catch(e) {}
+  }
+
+  // Intercept score updates during play
+  function onScore(score) {
+    sendEvent('score', score);
+  }
+
+  // Intercept game-over (terminal event)
+  function onEnd(finalScore) {
+    sendEvent('end', finalScore, finalScore);
+  }
+
+  // Override webkit bridge
+  window.webkit = window.webkit || {};
+  window.webkit.messageHandlers = window.webkit.messageHandlers || {};
+  window.webkit.messageHandlers.gameHandler = {
+    postMessage: function(data) {
+      try {
+        var parsed = typeof data === 'string' ? JSON.parse(data) : data;
+        if (!parsed) return;
+        if (parsed.type === 'gameOver' || parsed.type === 'game_over') {
+          onEnd(Number(parsed.score) || 0);
+        } else if (parsed.type === 'score') {
+          onScore(Number(parsed.score) || 0);
+        }
+      } catch(e) {}
     }
   };
+
+  // Override Android bridge
+  window.AndroidBridge = {
+    gameOver: function(score) { onEnd(Number(score) || 0); },
+    submitScore: function(score) { onScore(Number(score) || 0); }
+  };
+
+  // Override common global score patterns games might call directly
+  window.__rvReportScore = onScore;
+  window.__rvGameOver = onEnd;
+
+  // Auto-detect game over from DOM mutations — most AI-generated games
+  // don't call any of the native bridges above, they just toggle a
+  // "gameover" overlay's class/style. Mirror the leaderboard snippet's
+  // approach: when an obvious gameover container becomes visible, sample
+  // the final score (with retries to handle textContent updates that
+  // happen in the same JS turn) and fire the postMessage(end) bridge.
   document.addEventListener('DOMContentLoaded', function() {
-    var lb = document.createElement('div');
-    lb.id = 'rv-leaderboard';
-    lb.style.cssText = 'position:fixed;top:10px;right:10px;background:rgba(20,20,30,0.92);backdrop-filter:blur(10px);color:white;border-radius:12px;padding:12px 16px;width:210px;font-family:system-ui,sans-serif;font-size:12px;z-index:99999;box-shadow:0 4px 20px rgba(0,0,0,0.5)';
-    lb.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span style="font-weight:bold;font-size:13px">\\u{1F3C6} Group</span><button onclick="document.getElementById(\\'rv-leaderboard\\').style.display=\\'none\\'" style="background:none;border:none;color:#aaa;font-size:16px;cursor:pointer;padding:0">\\u00D7</button></div><div id="rv-lb-list"><div style="color:#aaa;text-align:center;padding:8px 0">Be the first to score!</div></div>';
-    document.body.appendChild(lb);
-    window.RV._poll();
-    setInterval(window.RV._poll, 15000);
+    var fired = false;
+    var SCORE_SELECTORS = [
+      '#finalScore','#final-score','#stat-score','#game-score',
+      '.final-score','.stat-score','.game-score',
+      '#score','.score-value','.score','.points',
+      '[id*="final"][id*="core"]','[class*="final"][class*="core"]',
+      '[id*="score"]','[class*="score"]'
+    ];
+    function readBestScore(node) {
+      for (var i = 0; i < SCORE_SELECTORS.length; i++) {
+        var el = node.querySelector(SCORE_SELECTORS[i]) || document.querySelector(SCORE_SELECTORS[i]);
+        if (el) {
+          var n = parseInt((el.textContent || '').replace(/[^0-9]/g, ''));
+          if (!isNaN(n)) return n;
+        }
+      }
+      var nums = (node.textContent || '').match(/\\d+/g);
+      if (nums) return Math.max.apply(null, nums.map(Number));
+      return null;
+    }
+    function isReallyVisible(node) {
+      if (!node || node.nodeType !== 1) return false;
+      // Hidden via attribute / "hidden"-like class — bail. Many AI games use
+      // an opacity-only .hidden rule (no display:none) which would otherwise
+      // pass a naive display check.
+      if (node.hidden) return false;
+      var clsLower = (typeof node.className === 'string' ? node.className : '').toLowerCase();
+      if (clsLower.split(/\\s+/).some(function(c) {
+        return c === 'hidden' || c === 'invisible' || c === 'is-hidden' || c === 'd-none' || c === 'sr-only';
+      })) return false;
+      if (node.style && node.style.display === 'none') return false;
+      var cs = getComputedStyle(node);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+      var op = parseFloat(cs.opacity);
+      if (!isNaN(op) && op < 0.05) return false;
+      var rect = node.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return false;
+      return true;
+    }
+    function tryAuto(node) {
+      if (fired) return;
+      var id = (node.id || '').toLowerCase();
+      var cls = (typeof node.className === 'string' ? node.className : '').toLowerCase();
+      var isGameOver = id.includes('gameover') || id.includes('game-over') || id.includes('game_over')
+        || id.includes('result') || id.includes('endscreen') || id.includes('end-screen')
+        || cls.includes('gameover') || cls.includes('game-over') || cls.includes('result')
+        || cls.includes('endscreen') || cls.includes('end-screen');
+      if (!isGameOver) return;
+      if (!isReallyVisible(node)) return;
+      var attempt = 0;
+      function sample() {
+        if (fired) return;
+        // Re-check visibility on every retry — if the game closed the
+        // overlay (e.g. user tapped Restart), abort the submit.
+        if (!isReallyVisible(node)) return;
+        var s = readBestScore(node);
+        if (s !== null && s > 0) {
+          fired = true;
+          onEnd(s);
+          return;
+        }
+        attempt++;
+        if (attempt < 6) {
+          setTimeout(sample, 300);
+        } else if (s !== null && s >= 0 && isReallyVisible(node)) {
+          // Last-resort: even a 0 is a real result if overlay's still up.
+          fired = true;
+          onEnd(s);
+        }
+      }
+      setTimeout(sample, 50);
+    }
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        m.addedNodes && m.addedNodes.forEach(function(n) { if (n.nodeType===1) tryAuto(n); });
+        if (m.type==='attributes' && m.target && m.target.nodeType===1) tryAuto(m.target);
+      });
+    });
+    observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class','style']});
+
+    // Live-score scraper. Most AI-generated games don't call any native
+    // bridge during play — they just update a DOM element. Without this,
+    // when the user taps the wrapper's "Finish" button the parent has no
+    // reportedScore and falls back to deriveScore (=< 30 pts for short
+    // play). Poll every 1.5s and pick the FIRST visible current-score
+    // element in priority order, skipping high-score/record/best elements.
+    var lastReportedScore = null;
+    var HIGH_SCORE_RX = /\b(high|best|top|record|hi[-_]?score)\b/i;
+    function elIsHighScore(el) {
+      var id = el.id || '';
+      var cls = typeof el.className === 'string' ? el.className : '';
+      if (HIGH_SCORE_RX.test(id) || HIGH_SCORE_RX.test(cls)) return true;
+      // Also check the previous sibling / parent label text — markup like
+      // <span>High Score</span><span class="score">1340</span> would
+      // otherwise leak through.
+      var prev = el.previousElementSibling;
+      if (prev && HIGH_SCORE_RX.test(prev.textContent || '')) return true;
+      var p = el.parentElement;
+      if (p) {
+        var pid = p.id || '';
+        var pcls = typeof p.className === 'string' ? p.className : '';
+        if (HIGH_SCORE_RX.test(pid) || HIGH_SCORE_RX.test(pcls)) return true;
+      }
+      return false;
+    }
+    function scrapeLiveScore() {
+      if (fired) return;
+      for (var i = 0; i < SCORE_SELECTORS.length; i++) {
+        var nodes = document.querySelectorAll(SCORE_SELECTORS[i]);
+        for (var j = 0; j < nodes.length; j++) {
+          var el = nodes[j];
+          if (!isReallyVisible(el)) continue;
+          if (elIsHighScore(el)) continue;
+          var p = el.parentElement, inGameOver = false, depth = 0;
+          while (p && depth < 8) {
+            var pid = (p.id || '').toLowerCase();
+            var pcls = (typeof p.className === 'string' ? p.className : '').toLowerCase();
+            if (pid.includes('gameover') || pid.includes('game-over') || pid.includes('endscreen') ||
+                pcls.includes('gameover') || pcls.includes('game-over') || pcls.includes('endscreen')) {
+              inGameOver = true; break;
+            }
+            p = p.parentElement; depth++;
+          }
+          if (inGameOver) continue;
+          var n = parseInt((el.textContent || '').replace(/[^0-9-]/g, ''));
+          if (!isNaN(n)) {
+            if (n !== lastReportedScore) {
+              lastReportedScore = n;
+              onScore(n);
+            }
+            return; // first visible non-high-score match wins
+          }
+        }
+      }
+    }
+    setInterval(scrapeLiveScore, 1500);
   });
 })();
 </script>`;
 }
+
+// Generate the leaderboard snippet to inject
+function generateLeaderboardSnippet(gameId, chatId, apiBase, platform, urlUserId) {
+    return `
+<script>
+(function() {
+  var GAME_ID = '${gameId}';
+  var CHAT_ID = '${chatId || ''}';
+  var PLATFORM = '${platform || 'telegram'}';
+  var URL_USER_ID = '${urlUserId || ''}';
+  var API_BASE = '${apiBase}';
+  var isTelegram = PLATFORM === 'telegram';
+  var isApp = PLATFORM === 'app';
+
+  // For app: use userId from URL. For telegram: use stored guest ID or prompt.
+  var userId, username;
+  if (isApp && URL_USER_ID) {
+    userId = URL_USER_ID;
+    username = 'Player';
+  } else {
+    // Telegram: use a stable guest ID stored in localStorage per chat
+    var storageKey = 'rv_guest_' + CHAT_ID;
+    var stored = null;
+    try { stored = JSON.parse(localStorage.getItem(storageKey)); } catch(e) {}
+    if (stored && stored.userId && stored.username) {
+      userId = stored.userId;
+      username = stored.username;
+    } else {
+      userId = 'guest_' + Math.random().toString(36).substr(2,8);
+      username = null; // Will prompt before first score submit
+    }
+  }
+
+  // Native bridge intercepts
+  window.webkit = window.webkit || {};
+  window.webkit.messageHandlers = window.webkit.messageHandlers || {};
+  window.webkit.messageHandlers.gameHandler = {
+    postMessage: function(data) {
+      try {
+        var parsed = typeof data === 'string' ? JSON.parse(data) : data;
+        if (parsed && parsed.type === 'gameOver' && parsed.score != null) {
+          window.RV.submitScore(Number(parsed.score));
+        }
+      } catch(e) {}
+    }
+  };
+  window.AndroidBridge = {
+    gameOver: function(score) { window.RV.submitScore(Number(score)); }
+  };
+
+  function doSubmit(score, resolvedUsername) {
+    fetch(API_BASE + '/api/chat-scores', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({gameId:GAME_ID, chatId:CHAT_ID, platform:PLATFORM, userId:userId, username:resolvedUsername, score:score})
+    }).then(function(r){return r.json()}).then(function(d){
+      if (d.leaderboard) window.RV._render(d.leaderboard);
+    }).catch(function(){});
+  }
+
+  window.RV = {
+    submitScore: function(score) {
+      if (isApp) {
+        doSubmit(score, username);
+        return;
+      }
+      // Telegram: if we already have a name, submit directly
+      if (username) {
+        doSubmit(score, username);
+        return;
+      }
+      // First time — show name prompt overlay
+      window.RV._promptName(function(name) {
+        username = name;
+        try { localStorage.setItem('rv_guest_' + CHAT_ID, JSON.stringify({userId:userId, username:username})); } catch(e) {}
+        doSubmit(score, username);
+      });
+    },
+    _promptName: function(cb) {
+      var overlay = document.createElement('div');
+      overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999999;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif';
+      overlay.innerHTML =
+        '<div style="background:#1a1a2e;border-radius:16px;padding:24px;width:280px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5)">' +
+        '<div style="font-size:28px;margin-bottom:8px">\\uD83C\\uDFC6</div>' +
+        '<div style="color:#fff;font-size:16px;font-weight:bold;margin-bottom:4px">Submit your score!</div>' +
+        '<div style="color:#aaa;font-size:13px;margin-bottom:16px">Enter your name for the leaderboard</div>' +
+        '<input id="rv-name-input" type="text" placeholder="Your name" maxlength="20" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:#0d0d1a;color:#fff;font-size:15px;outline:none;margin-bottom:12px">' +
+        '<button id="rv-name-submit" style="width:100%;padding:10px;border-radius:8px;border:none;background:#FF8C00;color:#fff;font-size:15px;font-weight:bold;cursor:pointer">Submit Score</button>' +
+        '</div>';
+      document.body.appendChild(overlay);
+      var input = overlay.querySelector('#rv-name-input');
+      var btn = overlay.querySelector('#rv-name-submit');
+      input.focus();
+      function submit() {
+        var name = (input.value || '').trim().slice(0, 20) || 'Player';
+        document.body.removeChild(overlay);
+        cb(name);
+      }
+      btn.addEventListener('click', submit);
+      input.addEventListener('keydown', function(e) { if (e.key === 'Enter') submit(); });
+    },
+    _render: function(scores) {
+      var el = document.getElementById('rv-lb-list');
+      if (!el) return;
+      if (!scores || !scores.length) {
+        el.innerHTML = '<div style="color:#aaa;text-align:center;padding:8px 0">No scores yet!</div>';
+        return;
+      }
+      var medals = ['\\uD83E\\uDD47','\\uD83E\\uDD48','\\uD83E\\uDD49'];
+      el.innerHTML = scores.map(function(s,i){
+        var isMe = s.userId === userId;
+        return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.08)">'
+          +'<span style="width:20px;text-align:center;font-size:13px">'+(medals[i]||(i+1)+'.')+'</span>'
+          +'<span style="flex:1;color:'+(isMe?'#FF8C00':'#fff')+';font-weight:'+(isMe?'bold':'normal')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(s.username||'Player')+'</span>'
+          +'<span style="font-weight:bold;color:#FFD700">'+s.score+'</span></div>';
+      }).join('');
+    },
+    _poll: function() {
+      if (!CHAT_ID) return;
+      fetch(API_BASE+'/api/chat-scores/'+GAME_ID+'/'+CHAT_ID+'?platform='+PLATFORM)
+        .then(function(r){return r.json()})
+        .then(function(d){if(d.scores) window.RV._render(d.scores);})
+        .catch(function(){});
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-detect game over and submit score.
+    // Order is important: prefer "final" patterns (set after game ends) over
+    // "current" patterns (HUD score, may be stale or 0). Read with a small
+    // defer so pending textContent updates from the same JS turn are applied
+    // before we sample. Also re-scan after the score lands to catch the case
+    // where the gameover container is shown FIRST and the final score text
+    // is set a tick later.
+    var scoreSubmitted = false;
+    // Final-score selectors first so we don't grab a HUD that's still showing 0.
+    var SCORE_SELECTORS = [
+      '#finalScore','#final-score','#stat-score','#game-score',
+      '.final-score','.stat-score','.game-score',
+      '#score','.score-value','.score','.points',
+      '[id*="final"][id*="core"]','[class*="final"][class*="core"]',
+      '[id*="score"]','[class*="score"]'
+    ];
+    function readBestScore(node) {
+      for (var i = 0; i < SCORE_SELECTORS.length; i++) {
+        var el = node.querySelector(SCORE_SELECTORS[i]) || document.querySelector(SCORE_SELECTORS[i]);
+        if (el) {
+          var n = parseInt((el.textContent || '').replace(/[^0-9]/g, ''));
+          if (!isNaN(n)) return n;
+        }
+      }
+      var nums = (node.textContent || '').match(/\\d+/g);
+      if (nums) return Math.max.apply(null, nums.map(Number));
+      return null;
+    }
+    function isReallyVisible(node) {
+      if (!node || node.nodeType !== 1) return false;
+      if (node.hidden) return false;
+      var clsLower = (typeof node.className === 'string' ? node.className : '').toLowerCase();
+      if (clsLower.split(/\\s+/).some(function(c) {
+        return c === 'hidden' || c === 'invisible' || c === 'is-hidden' || c === 'd-none' || c === 'sr-only';
+      })) return false;
+      if (node.style && node.style.display === 'none') return false;
+      var cs = getComputedStyle(node);
+      if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+      var op = parseFloat(cs.opacity);
+      if (!isNaN(op) && op < 0.05) return false;
+      var rect = node.getBoundingClientRect();
+      if (rect.width < 1 || rect.height < 1) return false;
+      return true;
+    }
+    function tryAutoSubmit(node) {
+      if (scoreSubmitted) return;
+      var id = (node.id || '').toLowerCase();
+      var cls = (typeof node.className === 'string' ? node.className : '').toLowerCase();
+      var isGameOver = id.includes('gameover') || id.includes('game-over') || id.includes('game_over')
+        || id.includes('result') || id.includes('endscreen') || id.includes('end-screen')
+        || cls.includes('gameover') || cls.includes('game-over') || cls.includes('result')
+        || cls.includes('endscreen') || cls.includes('end-screen');
+      if (!isGameOver) return;
+      if (!isReallyVisible(node)) return;
+      // Defer the read so any same-turn textContent updates settle. Re-sample
+      // up to 3 times if we initially see 0 (covers games that show the
+      // overlay first and animate the score in, or reveal it after a delay).
+      var attempt = 0;
+      function sample() {
+        if (scoreSubmitted) return;
+        var scoreVal = readBestScore(node);
+        if (scoreVal !== null && scoreVal > 0) {
+          scoreSubmitted = true;
+          window.RV.submitScore(scoreVal);
+          return;
+        }
+        attempt++;
+        if (attempt < 6) {
+          setTimeout(sample, 300);
+        } else if (scoreVal !== null && scoreVal >= 0) {
+          // Last-resort: even a 0 is a real result if nothing changed in 1.8s.
+          scoreSubmitted = true;
+          window.RV.submitScore(scoreVal);
+        }
+      }
+      setTimeout(sample, 50);
+    }
+    var observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(m) {
+        m.addedNodes && m.addedNodes.forEach(function(n) { if (n.nodeType===1) tryAutoSubmit(n); });
+        if (m.type==='attributes' && m.target && m.target.nodeType===1) tryAutoSubmit(m.target);
+      });
+    });
+    observer.observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class','style']});
+  });
+})();
+</script>`;
+}
+
+// POST /api/game-creation/:gameId/play-event/start
+// Records the START of a play session. iOS calls this on game load.
+// Returns the event_id which the iOS client then forwards to the leaderboard
+// endpoint on game-over so the SAME row gets flipped to completed=true.
+//
+// completion_rate = completed_count / (completed_count + starts_with_no_completion)
+// — so honest start tracking is required for the trending function to weight
+// engaging games correctly.
+router.post('/:gameId/play-event/start', async (req, res) => {
+    try {
+        const { gameId } = req.params;
+        const { userId } = req.body || {};
+        if (!userId) return res.status(400).json({ error: 'userId is required' });
+
+        const { data: game } = await supabase
+            .from('custom_games')
+            .select('id, series_id')
+            .eq('id', gameId)
+            .maybeSingle();
+        if (!game) return res.status(404).json({ error: 'Game not found' });
+
+        const { data, error } = await supabase
+            .from('game_play_events')
+            .insert({
+                game_id: game.id,
+                series_id: game.series_id,
+                user_id: userId,
+                started_at: new Date().toISOString(),
+                completed: false
+            })
+            .select('id')
+            .single();
+        if (error) throw error;
+        res.json({ success: true, eventId: data.id });
+    } catch (error) {
+        console.error('[play-event/start] Error:', error.message);
+        res.status(500).json({ error: 'Failed to record play event' });
+    }
+});
+
+// GET /api/game-creation/:gameId/next-level
+// Does a level N+1 already exist for this game's series?
+//   200 { exists: true,  game: { id, title, ... } }   → iOS shows "Play Level N+1"
+//   200 { exists: false, seriesId, nextLevelIndex }   → iOS shows "Generate Level N+1"
+router.get('/:gameId/next-level', async (req, res) => {
+    try {
+        const { gameId } = req.params;
+
+        const { data: parent, error: parentErr } = await supabase
+            .from('custom_games')
+            .select('id, series_id, level_index')
+            .eq('id', gameId)
+            .single();
+
+        if (parentErr || !parent) return res.status(404).json({ error: 'Game not found' });
+        if (!parent.series_id || parent.level_index == null) {
+            // Pre-backfill or standalone — treat as series of one starting at level 1
+            return res.json({ exists: false, seriesId: null, nextLevelIndex: 2, parentLevelIndex: parent.level_index || 1 });
+        }
+
+        const nextIdx = parent.level_index + 1;
+        const { data: next, error: nextErr } = await supabase
+            .from('custom_games')
+            .select('id, title, description, creator_name, play_count, rating, created_at, level_index')
+            .eq('series_id', parent.series_id)
+            .eq('level_index', nextIdx)
+            .maybeSingle();
+
+        if (nextErr) throw nextErr;
+        if (next) {
+            return res.json({
+                exists: true,
+                game: {
+                    id: next.id,
+                    title: next.title,
+                    description: next.description,
+                    creatorName: next.creator_name,
+                    playCount: next.play_count,
+                    rating: next.rating,
+                    createdAt: next.created_at,
+                    levelIndex: next.level_index
+                }
+            });
+        }
+        return res.json({ exists: false, seriesId: parent.series_id, nextLevelIndex: nextIdx, parentLevelIndex: parent.level_index });
+    } catch (error) {
+        console.error('[next-level lookup] Error:', error.message);
+        res.status(500).json({ error: 'Failed to look up next level' });
+    }
+});
+
+// POST /api/game-creation/:gameId/next-level/generate
+// SSE-proxies the worker to extend the series with level N+1.
+// Coins are NOT spent here — iOS spends coins after a successful result event
+// (mirrors the existing harder-challenge flow: pay only on success).
+router.post('/:gameId/next-level/generate', async (req, res) => {
+    const { gameId } = req.params;
+    const { userId } = req.body || {};
+
+    if (!userId) return res.status(400).json({ error: 'userId is required' });
+
+    // Resolve parent + series
+    const { data: parent, error: parentErr } = await supabase
+        .from('custom_games')
+        .select('id, title, description, html_content, series_id, level_index, creator_id')
+        .eq('id', gameId)
+        .single();
+
+    if (parentErr || !parent) return res.status(404).json({ error: 'Parent game not found' });
+    if (!parent.series_id || parent.level_index == null) {
+        return res.status(409).json({ error: 'Parent game has not been migrated into a series. Run the game_series migration first.' });
+    }
+
+    const nextIdx = parent.level_index + 1;
+
+    // Race check — if level N+1 already exists, short-circuit and return its id
+    const { data: existing } = await supabase
+        .from('custom_games')
+        .select('id')
+        .eq('series_id', parent.series_id)
+        .eq('level_index', nextIdx)
+        .maybeSingle();
+
+    if (existing) {
+        return res.json({ alreadyExists: true, gameId: existing.id });
+    }
+
+    // Resolve series title/description for prompt context
+    const { data: series } = await supabase
+        .from('game_series')
+        .select('title, description')
+        .eq('id', parent.series_id)
+        .single();
+
+    console.log(`[next-level] User ${userId} generating L${nextIdx} of series "${series?.title || parent.title}"`);
+
+    // SSE plumbing
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    const heartbeatInterval = setInterval(() => {
+        try { res.write(':heartbeat\n\n'); } catch {}
+    }, 15000);
+    res.on('close', () => clearInterval(heartbeatInterval));
+
+    const workerBody = {
+        userId,
+        stream: true,
+        parentBundle: parent.html_content,
+        seriesTitle: series?.title || parent.title,
+        seriesDescription: series?.description || parent.description || '',
+        parentLevelIndex: parent.level_index,
+        nextLevelIndex: nextIdx
+    };
+
+    let workerResponse;
+    try {
+        workerResponse = await fetch(`${GAME_WORKER_URL}/generate-next-level`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'x-worker-secret': GAME_WORKER_SECRET },
+            body: JSON.stringify(workerBody),
+            signal: AbortSignal.timeout(600000)
+        });
+    } catch (fetchErr) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server unreachable' })}\n\n`);
+        return res.end();
+    }
+
+    if (!workerResponse.ok || !workerResponse.body) {
+        res.write(`data: ${JSON.stringify({ type: 'error', error: `Build server error (${workerResponse.status})` })}\n\n`);
+        return res.end();
+    }
+
+    const reader = workerResponse.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+            for (const line of lines) {
+                if (!line.startsWith('data: ')) continue;
+                let parsed;
+                try { parsed = JSON.parse(line.substring(6)); } catch { continue; }
+
+                if (parsed.type === 'status') {
+                    res.write(`data: ${JSON.stringify({
+                        type: 'status',
+                        phase: parsed.phase,
+                        message: parsed.message,
+                        detail: parsed.detail,
+                        suggestedTitle: parsed.suggestedTitle,
+                        suggestedDescription: parsed.suggestedDescription,
+                        progressPercent: parsed.progressPercent,
+                        progressEndPct: parsed.progressEndPct,
+                        phaseDurationSeconds: parsed.phaseDurationSeconds,
+                        estimatedSecondsRemaining: parsed.estimatedSecondsRemaining
+                    })}\n\n`);
+                } else if (parsed.type === 'result') {
+                    const newGameId = crypto.randomUUID();
+                    const title = parsed.suggestedTitle || extractGameTitleFromBundle(parsed.bundle) || `${series?.title || parent.title} — Level ${nextIdx}`;
+                    const description = (parsed.suggestedDescription || `Level ${nextIdx} of ${series?.title || parent.title}`).substring(0, 500);
+                    const creatorName = req.body.userName || 'Player';
+
+                    const { error: dbError } = await supabase
+                        .from('custom_games')
+                        .insert({
+                            id: newGameId,
+                            title,
+                            description,
+                            html_content: parsed.bundle,
+                            creator_id: userId,
+                            creator_name: creatorName,
+                            game_type: 'ai_generated',
+                            platform_type: 'webview',
+                            initial_prompt: `(level ${nextIdx} of series "${series?.title || parent.title}")`,
+                            play_count: 0,
+                            rating: 0,
+                            critical_issues: parsed.quality?.criticalIssues ?? 0,
+                            series_id: parent.series_id,
+                            level_index: nextIdx,
+                            parent_level_id: parent.id
+                        });
+
+                    if (dbError) {
+                        // UNIQUE(series_id, level_index) collision = somebody won the race
+                        if (dbError.code === '23505') {
+                            const { data: winner } = await supabase
+                                .from('custom_games')
+                                .select('id')
+                                .eq('series_id', parent.series_id)
+                                .eq('level_index', nextIdx)
+                                .maybeSingle();
+                            res.write(`data: ${JSON.stringify({
+                                type: 'result',
+                                success: false,
+                                alreadyExists: true,
+                                gameId: winner?.id,
+                                message: `Level ${nextIdx} was generated by another player`
+                            })}\n\n`);
+                        } else {
+                            console.error('[next-level] DB insert error:', dbError);
+                            res.write(`data: ${JSON.stringify({ type: 'result', success: false, error: 'Database save failed' })}\n\n`);
+                        }
+                    } else {
+                        await supabase
+                            .from('game_series')
+                            .update({ level_count: nextIdx })
+                            .eq('id', parent.series_id)
+                            .lt('level_count', nextIdx);
+
+                        refreshBrowseCache();
+                        captureGameThumbnail(newGameId)
+                            .then(() => refreshBrowseCache())
+                            .catch(err => console.error('[thumbnail] Background error:', err.message));
+
+                        res.write(`data: ${JSON.stringify({
+                            type: 'result',
+                            success: true,
+                            gameId: newGameId,
+                            bundle: parsed.bundle,
+                            title,
+                            levelIndex: nextIdx
+                        })}\n\n`);
+                    }
+                } else if (parsed.type === 'error') {
+                    res.write(`data: ${JSON.stringify({ type: 'error', error: parsed.error })}\n\n`);
+                }
+            }
+        }
+    } catch (streamErr) {
+        console.error('[next-level] Stream error:', streamErr.message);
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Stream interrupted' })}\n\n`);
+    }
+    res.end();
+});
 
 // GET /api/game-creation/:gameId
 // Returns game metadata + base64 bundle for play
@@ -2297,7 +3210,7 @@ function generateLeaderboardSnippet(gameId, chatId, apiBase) {
 router.get('/:gameId', async (req, res) => {
     try {
         const { gameId } = req.params;
-        const { chatId, platform } = req.query;
+        const { chatId, platform, userId: urlUserId } = req.query;
 
         const { data, error } = await supabase
             .from('custom_games')
@@ -2308,25 +3221,53 @@ router.get('/:gameId', async (req, res) => {
         if (error) throw error;
         if (!data) return res.status(404).json({ error: 'Game not found' });
 
-        // Increment play count
+        // Increment play count (lifetime serve counter) AND record a
+        // game_plays row with player_id so we can split unique humans from
+        // raw serves downstream. Both are fire-and-forget; a failure here
+        // must not break the play response.
         await supabase
             .from('custom_games')
             .update({ play_count: (data.play_count || 0) + 1 })
             .eq('id', gameId);
+        recordGamePlay(gameId, urlUserId);
+        recordAnalyticsEvent('custom_game_served', urlUserId, {
+            game_id: gameId,
+            platform: platform || 'json',
+        });
 
-        // If chatId and platform are provided, serve HTML directly with leaderboard
-        if (chatId && platform) {
+        // Serve HTML when platform is provided (telegram needs chatId, app/session just need platform)
+        if (platform) {
             const html = extractHtmlFromBundle(data.html_content);
 
             if (!html) {
                 return res.status(500).send('<html><body style="background:#1a1a2e;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui"><h1>Could not load game</h1></body></html>');
             }
 
-            // Inject leaderboard snippet before </body>
-            const snippet = generateLeaderboardSnippet(gameId, chatId, API_BASE_URL);
+            // ios + app: serve clean HTML — native WKScriptMessageHandlers / Android
+            // bridges handle gameOver directly. Injecting JS that reassigns
+            // window.webkit.messageHandlers.gameHandler shadows the native callback
+            // and breaks the in-app result overlay + GameSessionManager.endSession path.
+            // session: inject postMessage bridge for GameSessionPage wrapper.
+            // telegram (and any future platform with chatId): inject leaderboard snippet.
             let modifiedHtml = html;
+            if (platform === 'ios' || platform === 'app') {
+                res.setHeader('Content-Type', 'text/html; charset=utf-8');
+                res.setHeader('Cache-Control', 'no-cache');
+                return res.send(html);
+            }
 
-            if (html.includes('</body>')) {
+            // App platform has no Telegram chat — fall back to the same '_app_'
+            // sentinel the native clients use so leaderboard POSTs validate
+            // (chatScores route requires non-empty chatId).
+            const effectiveChatId = chatId || (platform === 'app' ? '_app_' : '');
+            const snippet = platform === 'session'
+                ? generateSessionBridgeSnippet()
+                : generateLeaderboardSnippet(gameId, effectiveChatId, API_BASE_URL, platform, urlUserId || '');
+
+            if (html.includes('</head>') && platform === 'session') {
+                // Inject bridge early so it's ready before game code runs
+                modifiedHtml = html.replace('</head>', snippet + '</head>');
+            } else if (html.includes('</body>')) {
                 modifiedHtml = html.replace('</body>', snippet + '</body>');
             } else if (html.includes('</html>')) {
                 modifiedHtml = html.replace('</html>', snippet + '</html>');
@@ -2336,6 +3277,7 @@ router.get('/:gameId', async (req, res) => {
 
             res.setHeader('Content-Type', 'text/html; charset=utf-8');
             res.setHeader('Cache-Control', 'no-cache');
+            res.setHeader('X-Frame-Options', 'ALLOWALL'); // allow iframe from GameSessionPage
             return res.send(modifiedHtml);
         }
 

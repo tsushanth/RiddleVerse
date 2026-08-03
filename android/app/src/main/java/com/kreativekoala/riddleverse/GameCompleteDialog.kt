@@ -3,6 +3,8 @@ package com.kreativekoala.riddleverse
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,10 +17,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import okhttp3.Request
+import org.json.JSONObject
+
+private const val API_BASE = "https://puzzleverseai.com"
+
+data class GameScoreEntry(val username: String, val score: Int, val userId: String)
 
 /**
  * Shown when a Chrome Custom Tab game completes and deep links back.
@@ -32,6 +44,38 @@ fun GameCompleteDialog(
 ) {
     val coinBalance = CoinManager.shared.balance
     val canAfford = coinBalance >= CoinManager.CONTINUE_COST
+    val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    var leaderboard by remember { mutableStateOf<List<GameScoreEntry>>(emptyList()) }
+    var leaderboardLoading by remember { mutableStateOf(true) }
+
+    LaunchedEffect(result.gameId) {
+        withContext(Dispatchers.IO) {
+            try {
+                val url = "$API_BASE/api/chat-scores/${result.gameId}/_app_?platform=app"
+                val request = Request.Builder().url(url).get().build()
+                val response = HttpClientProvider.client.newCall(request).execute()
+                val body = response.body?.string()
+                response.close()
+                if (body != null) {
+                    val json = JSONObject(body)
+                    val scores = json.optJSONArray("scores") ?: org.json.JSONArray()
+                    val entries = (0 until scores.length()).map { i ->
+                        val s = scores.getJSONObject(i)
+                        GameScoreEntry(
+                            username = s.optString("username", "Player"),
+                            score = s.optInt("score", 0),
+                            userId = s.optString("userId", "")
+                        )
+                    }
+                    leaderboard = entries
+                }
+            } catch (e: Exception) {
+                // Silently ignore — leaderboard is optional
+            } finally {
+                leaderboardLoading = false
+            }
+        }
+    }
 
     val scoreScale by animateFloatAsState(
         targetValue = 1f,
@@ -125,7 +169,73 @@ fun GameCompleteDialog(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Leaderboard section
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.White.copy(alpha = 0.05f))
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = "🏆 Leaderboard",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFFFFD700),
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+                        if (leaderboardLoading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(20.dp).align(Alignment.CenterHorizontally),
+                                color = Color(0xFFFF8C00),
+                                strokeWidth = 2.dp
+                            )
+                        } else if (leaderboard.isEmpty()) {
+                            Text(
+                                text = "Be the first on the leaderboard!",
+                                fontSize = 12.sp,
+                                color = Color.White.copy(alpha = 0.5f),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        } else {
+                            val medals = listOf("🥇", "🥈", "🥉")
+                            leaderboard.take(5).forEachIndexed { i, entry ->
+                                val isMe = entry.userId == currentUserId
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 3.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = medals.getOrElse(i) { "${i + 1}." },
+                                        fontSize = 14.sp,
+                                        modifier = Modifier.width(28.dp)
+                                    )
+                                    Text(
+                                        text = entry.username,
+                                        fontSize = 13.sp,
+                                        color = if (isMe) Color(0xFFFF8C00) else Color.White,
+                                        fontWeight = if (isMe) FontWeight.Bold else FontWeight.Normal,
+                                        modifier = Modifier.weight(1f),
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = "${entry.score}",
+                                        fontSize = 13.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFFFFD700)
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     // Play Again button
                     Button(

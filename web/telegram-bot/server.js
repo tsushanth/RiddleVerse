@@ -83,8 +83,27 @@ async function editMessage(chatId, messageId, text, options = {}) {
     }
 }
 
-// Build game URL for play button
-function getGameUrl(gameId, chatId) {
+// Build game URL via session system (host-controlled lifecycle)
+async function getGameUrl(gameId, chatId, userId) {
+    try {
+        const resp = await fetch(`${RIDDLEVERSE_API_URL}/api/sessions/start`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                game_id: gameId,
+                user_id: `tg-${userId}`,
+                source: 'telegram',
+                chat_id: String(chatId),
+            }),
+        });
+        if (resp.ok) {
+            const { wrapper_url } = await resp.json();
+            return wrapper_url;
+        }
+    } catch (e) {
+        console.warn('[getGameUrl] session start failed, falling back:', e.message);
+    }
+    // Fallback: direct URL (no session tracking)
     return `${RIDDLEVERSE_API_URL}/api/game-creation/${gameId}?chatId=${encodeURIComponent(chatId)}&platform=telegram`;
 }
 
@@ -223,7 +242,7 @@ async function handleCreate(chatId, from, description) {
         sessions.set(String(chatId), { lastGameId: gameId });
 
         // Update message with play button
-        const gameUrl = getGameUrl(gameId, chatId);
+        const gameUrl = await getGameUrl(gameId, chatId, from.id);
         const successText = `✅ <b>Game Ready!</b>
 
 🎮 <b>${gameTitle}</b>
@@ -264,7 +283,7 @@ Tap below to play. Scores will be tracked in this chat!`;
 }
 
 // Handle /play command
-async function handlePlay(chatId, gameIdArg) {
+async function handlePlay(chatId, gameIdArg, from = {}) {
     // Use provided gameId or last game from session
     const session = sessions.get(String(chatId)) || {};
     const gameId = gameIdArg?.trim() || session.lastGameId;
@@ -274,7 +293,7 @@ async function handlePlay(chatId, gameIdArg) {
         return;
     }
 
-    const gameUrl = getGameUrl(gameId, chatId);
+    const gameUrl = await getGameUrl(gameId, chatId, from.id || 'unknown');
 
     await sendMessage(chatId, '🎮 <b>Ready to play!</b>\n\nTap below to start:', {
         reply_markup: {
@@ -286,7 +305,7 @@ async function handlePlay(chatId, gameIdArg) {
 }
 
 // Handle /leaderboard command
-async function handleLeaderboard(chatId, gameIdArg) {
+async function handleLeaderboard(chatId, gameIdArg, from = {}) {
     const session = sessions.get(String(chatId)) || {};
     const gameId = gameIdArg?.trim() || session.lastGameId;
 
@@ -306,7 +325,7 @@ async function handleLeaderboard(chatId, gameIdArg) {
         const data = await res.json();
         const text = formatLeaderboard(data.scores || [], 'Game');
 
-        const gameUrl = getGameUrl(gameId, chatId);
+        const gameUrl = await getGameUrl(gameId, chatId, from.id || 'unknown');
 
         await sendMessage(chatId, text, {
             reply_markup: {
@@ -343,10 +362,10 @@ async function processUpdate(update) {
         await handleCreate(chatId, from, description);
     } else if (text.startsWith('/play')) {
         const gameId = text.replace(/^\/play\s*/i, '');
-        await handlePlay(chatId, gameId);
+        await handlePlay(chatId, gameId, from);
     } else if (text.startsWith('/leaderboard')) {
         const gameId = text.replace(/^\/leaderboard\s*/i, '');
-        await handleLeaderboard(chatId, gameId);
+        await handleLeaderboard(chatId, gameId, from);
     } else if (/^(build|create)\s+/i.test(text)) {
         // Natural language create
         const description = text.replace(/^(build|create)\s+/i, '');
@@ -403,7 +422,7 @@ app.post('/score-update', async (req, res) => {
 
         // Format and send leaderboard update
         const text = formatLeaderboard(leaderboard, gameName || 'Game');
-        const gameUrl = getGameUrl(gameId, chatId);
+        const gameUrl = await getGameUrl(gameId, chatId, 'group');
 
         await sendMessage(chatId, text, {
             reply_markup: {

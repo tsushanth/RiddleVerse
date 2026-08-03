@@ -18,3 +18,4 @@ backend/public/
 .DS_Store
 Thumbs.db
 node_modules
+.fly-secrets.sh

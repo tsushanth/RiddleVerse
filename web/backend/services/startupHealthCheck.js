@@ -119,13 +119,13 @@ async function checkAIServices(result) {
     try {
         const testPrompt = 'Respond with just "OK" if you can understand this message.';
         
-        // Test OpenAI
+        // Test Anthropic (Claude)
         let openaiWorking = false;
         try {
-            const openaiResponse = await callAI(testPrompt, 'gpt-3.5-turbo');
-            openaiWorking = openaiResponse && openaiResponse.toLowerCase().includes('ok');
+            const anthropicResponse = await callAI(testPrompt, 'claude-3-sonnet');
+            openaiWorking = anthropicResponse && anthropicResponse.toLowerCase().includes('ok');
         } catch (error) {
-            console.warn('⚠️ OpenAI test failed:', error.message);
+            console.warn('⚠️ Anthropic test failed:', error.message);
         }
 
         // Test DeepSeek  
@@ -141,7 +141,7 @@ async function checkAIServices(result) {
             result.checks.aiServices = {
                 status: 'passed',
                 message: 'AI services working',
-                openai: openaiWorking ? 'working' : 'failed',
+                anthropic: openaiWorking ? 'working' : 'failed',
                 deepseek: deepseekWorking ? 'working' : 'failed'
             };
             result.summary.passed++;
@@ -181,7 +181,7 @@ async function checkConfiguration(result) {
         }
 
         // Check environment variables
-        if (!process.env.OPENAI_API_KEY && !process.env.DEEPSEEK_API_KEY) {
+        if (!process.env.ANTHROPIC_API_KEY && !process.env.DEEPSEEK_API_KEY) {
             issues.push('No AI API keys configured in environment');
         }
 

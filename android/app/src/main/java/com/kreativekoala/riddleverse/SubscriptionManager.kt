@@ -19,6 +19,7 @@ import com.revenuecat.purchases.interfaces.ReceiveCustomerInfoCallback
 import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback
 import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.purchases.models.StoreTransaction
+import com.kreativekoala.ratingkit.RatingKit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -210,6 +211,8 @@ class SubscriptionManager private constructor(
                     val productId = storeTransaction.productIds.firstOrNull() ?: ""
                     AnalyticsManager.getInstance()?.track(AnalyticsEvent.subscriptionPurchase(currentTier.name, 0.0, "USD"))
                     TikTokHelper.trackEvent("purchase_success", mapOf("product_id" to productId))
+
+                    RatingKit.trackPurchase(activity)
 
                     notifyBackendOfPurchase(storeTransaction)
                 }

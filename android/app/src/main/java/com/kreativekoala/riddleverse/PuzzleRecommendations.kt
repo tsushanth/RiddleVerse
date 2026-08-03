@@ -114,16 +114,34 @@ object PuzzleRecommendations {
     }
 
     /**
-     * Get display names for recommended puzzles
+     * Get display names for recommended puzzles, prioritising ones the user has never played.
+     * Requires a context to read UserStatsManager stats.
      */
-    fun getRecommendationDisplayData(puzzleType: String): List<RecommendationData> {
-        return getRecommendationsFor(puzzleType).map { recommendedType ->
+    fun getRecommendationDisplayData(
+        puzzleType: String,
+        context: android.content.Context? = null
+    ): List<RecommendationData> {
+        val candidates = getRecommendationsFor(puzzleType)
+
+        // Sort: never-played types first, then played ones
+        val statsManager = if (context != null) UserStatsManager.getInstance(context) else null
+        val sorted = if (statsManager != null) {
+            candidates.sortedBy { type ->
+                if (statsManager.getPuzzleStats(type).totalPlays == 0) 0 else 1
+            }
+        } else {
+            candidates
+        }
+
+        return sorted.map { recommendedType ->
             val category = QuizCategories.getQuizCategoryForType(recommendedType)
+            val neverPlayed = statsManager?.getPuzzleStats(recommendedType)?.totalPlays == 0
             RecommendationData(
                 puzzleType = recommendedType,
                 displayName = category?.title ?: recommendedType.replaceFirstChar { it.uppercase() },
-                subtitle = category?.subtitle ?: "Brain Challenge",
-                isNew = QuizCategories.isPuzzleTypeNew(recommendedType)
+                subtitle = if (neverPlayed) "You've never tried this!" else (category?.subtitle ?: "Brain Challenge"),
+                isNew = neverPlayed || QuizCategories.isPuzzleTypeNew(recommendedType),
+                neverPlayed = neverPlayed
             )
         }
     }
@@ -136,5 +154,6 @@ data class RecommendationData(
     val puzzleType: String,
     val displayName: String,
     val subtitle: String,
-    val isNew: Boolean = false
+    val isNew: Boolean = false,
+    val neverPlayed: Boolean = false
 )

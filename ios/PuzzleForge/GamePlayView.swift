@@ -3,7 +3,7 @@ import RevenueCat
 import FirebaseAuth
 
 struct GamePlayView: View {
-    let game: BrowseGame
+    @State private var game: BrowseGame   // @State so we can swap to the next level in-place
     let bundleDirectory: URL
     @Environment(\.dismiss) private var dismiss
     @StateObject private var coinManager = CoinManager.shared
@@ -33,11 +33,24 @@ struct GamePlayView: View {
     @State private var isGeneratingHarder = false
     @State private var generationPhase = ""
     @State private var generationProgress: Double = 0
-    // Customize state
-    @State private var showCustomizeSheet = false
-    @State private var isCustomizing = false
-    @State private var customizePhase = ""
-    @State private var customizeProgress: Double = 0
+    // Next-level (sequential series progression)
+    @State private var nextLevelCheckDone = false       // false until /next-level lookup returns
+    @State private var nextLevelExistingGameId: String? = nil
+    @State private var nextLevelExistingTitle: String? = nil
+    @State private var nextLevelIndex: Int = 2          // updated from lookup response
+    @State private var isGeneratingNextLevel = false
+    @State private var nextLevelPhase = ""
+    @State private var nextLevelProgress: Double = 0
+    @State private var nextLevelSuggestedTitle: String? = nil
+    // Feature C: play_event tracking. Each load gets a fresh event_id which we
+    // forward to the leaderboard endpoint on game over so the same row flips
+    // from completed=false to completed=true.
+    @State private var currentPlayEventId: String? = nil
+
+    init(game: BrowseGame, bundleDirectory: URL) {
+        self._game = State(initialValue: game)
+        self.bundleDirectory = bundleDirectory
+    }
 
     struct LeaderboardPlayer: Identifiable {
         let id = UUID()
@@ -133,6 +146,7 @@ struct GamePlayView: View {
                         gameOver = true
                         submitScore(finalScore)
                         UserDefaults.standard.set(true, forKey: "played_\(game.id)")
+                        checkNextLevel()
                     },
                     onGameError: { error in
                         if !gameErrors.contains(error) {
@@ -141,6 +155,8 @@ struct GamePlayView: View {
                     }
                 )
                 .id(webViewKey)
+                .onAppear { startPlayEvent() }
+                .onChange(of: webViewKey) { _ in startPlayEvent() }
             }
 
             // Replay gate — shown when user reopens a game they've already played
@@ -182,8 +198,8 @@ struct GamePlayView: View {
                 .padding(32)
             }
 
-            // Game over overlay (hidden when generating harder variant)
-            if gameOver && !isGeneratingHarder && !isCustomizing {
+            // Game over overlay (hidden when generating harder variant or next level)
+            if gameOver && !isGeneratingHarder && !isGeneratingNextLevel {
                 Color.black.opacity(0.7)
                     .ignoresSafeArea()
                     .onTapGesture {} // Prevent taps from reaching WebView
@@ -268,32 +284,54 @@ struct GamePlayView: View {
                             }
                         }
 
-                        // Customize button
-                        Button(action: {
-                            if !coinManager.canAffordCustomize {
-                                showCoinStore = true
+                        // Next-level: Play if it exists, Generate if not. Hidden until lookup completes.
+                        if nextLevelCheckDone {
+                            if let _ = nextLevelExistingGameId {
+                                // Level N+1 already exists — primary CTA to play it
+                                Button(action: { handlePlayNextLevel() }) {
+                                    HStack {
+                                        Image(systemName: "arrow.right.circle.fill")
+                                        Text(nextLevelExistingTitle.map { "Play \($0)" } ?? "Play Level \(nextLevelIndex)")
+                                            .lineLimit(1)
+                                        Spacer()
+                                    }
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(
+                                        LinearGradient(
+                                            colors: [Color(red: 0.2, green: 0.7, blue: 0.4), Color(red: 0.1, green: 0.55, blue: 0.3)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .cornerRadius(12)
+                                }
                             } else {
-                                showCustomizeSheet = true
+                                // No next level yet — primary CTA to generate one (same coin cost as harder variant)
+                                let nextLvlCost = CoinManager.difficultyCost(2)
+                                Button(action: { handleGenerateNextLevel() }) {
+                                    HStack {
+                                        Image(systemName: "sparkles")
+                                        Text("Generate Level \(nextLevelIndex)")
+                                        Spacer()
+                                        CoinCostBadge(cost: nextLvlCost, balance: coinManager.balance)
+                                    }
+                                    .font(.headline)
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(
+                                        LinearGradient(
+                                            colors: [Color(red: 0.61, green: 0.15, blue: 0.69), Color(red: 0.42, green: 0.11, blue: 0.5)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .cornerRadius(12)
+                                }
                             }
-                        }) {
-                            HStack {
-                                Image(systemName: "wand.and.stars")
-                                Text("Customize")
-                                Spacer()
-                                CoinCostBadge(cost: CoinManager.customizeCost, balance: coinManager.balance)
-                            }
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(
-                                LinearGradient(
-                                    colors: [Color(red: 0.61, green: 0.15, blue: 0.69), Color(red: 0.42, green: 0.11, blue: 0.5)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(12)
                         }
 
                         // Get coins button (if can't afford any action)
@@ -341,6 +379,42 @@ struct GamePlayView: View {
                     .padding(.horizontal, 40)
                     .padding(.bottom, 60)
                 }
+            }
+
+            // Next-level generation overlay
+            if isGeneratingNextLevel {
+                Color.black.opacity(0.85)
+                    .ignoresSafeArea()
+                    .onTapGesture {}
+
+                VStack(spacing: 24) {
+                    Spacer()
+
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 48))
+                        .foregroundColor(Color(red: 0.85, green: 0.5, blue: 1.0))
+
+                    Text(nextLevelSuggestedTitle ?? "Generating Level \(nextLevelIndex)")
+                        .font(.title2.weight(.bold))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+
+                    ProgressView(value: nextLevelProgress, total: 100)
+                        .tint(Color(red: 0.85, green: 0.5, blue: 1.0))
+                        .frame(maxWidth: 250)
+
+                    Text(nextLevelPhase)
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.7))
+
+                    Text("This may take a couple minutes...")
+                        .font(.caption)
+                        .foregroundColor(.white.opacity(0.4))
+
+                    Spacer()
+                }
+                .padding(40)
             }
 
             // Harder challenge generation overlay
@@ -406,48 +480,6 @@ struct GamePlayView: View {
                 .padding(40)
             }
 
-            // Customization progress overlay
-            if isCustomizing {
-                Color.black.opacity(0.85)
-                    .ignoresSafeArea()
-                    .onTapGesture {}
-
-                VStack(spacing: 24) {
-                    Spacer()
-
-                    Image(systemName: "wand.and.stars")
-                        .font(.system(size: 48))
-                        .foregroundColor(.purple)
-
-                    Text("Customizing Game")
-                        .font(.title2.weight(.bold))
-                        .foregroundColor(.white)
-
-                    ProgressView(value: customizeProgress, total: 100)
-                        .tint(.purple)
-                        .frame(maxWidth: 250)
-
-                    Text(customizePhase)
-                        .font(.subheadline)
-                        .foregroundColor(.white.opacity(0.7))
-
-                    Text("This may take 2-5 minutes...")
-                        .font(.caption)
-                        .foregroundColor(.white.opacity(0.4))
-
-                    Spacer()
-                }
-                .padding(40)
-            }
-        }
-        .sheet(isPresented: $showCustomizeSheet) {
-            CustomizeGameSheet(
-                gameTitle: game.title,
-                onSubmit: { description, newTitle in
-                    showCustomizeSheet = false
-                    handleCustomize(description: description, newTitle: newTitle)
-                }
-            )
         }
         .sheet(isPresented: $showLeaderboard) {
             GameLeaderboardSheet(
@@ -643,127 +675,6 @@ struct GamePlayView: View {
         checkAndPlayDifficulty(level: nextLevel)
     }
 
-    private func handleCustomize(description: String, newTitle: String) {
-        guard let userId = Auth.auth().currentUser?.uid else { return }
-
-        if !coinManager.canAffordCustomize {
-            showCoinStore = true
-            return
-        }
-
-        isCustomizing = true
-        customizePhase = "Preparing customization..."
-        customizeProgress = 0
-
-        guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(game.id)/customize") else {
-            isCustomizing = false
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
-        request.timeoutInterval = 600
-
-        let body: [String: Any] = [
-            "userId": userId,
-            "customizeDescription": description,
-            "newTitle": newTitle.isEmpty ? "My \(game.title)" : newTitle
-        ]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
-
-        let session = URLSession(configuration: .default)
-        let task = session.dataTask(with: request) { data, _, error in
-            guard let data = data else {
-                DispatchQueue.main.async {
-                    isCustomizing = false
-                    gameOver = true
-                }
-                return
-            }
-
-            let responseStr = String(data: data, encoding: .utf8) ?? ""
-            let lines = responseStr.components(separatedBy: "\n")
-
-            var gotResult = false
-            var resultBundle: String?
-
-            for line in lines {
-                if line.hasPrefix(":") { continue } // heartbeat
-                guard line.hasPrefix("data: ") else { continue }
-                let eventData = String(line.dropFirst(6))
-                guard let eventJson = try? JSONSerialization.jsonObject(with: Data(eventData.utf8)) as? [String: Any],
-                      let type = eventJson["type"] as? String else { continue }
-
-                if type == "status" {
-                    let message = eventJson["message"] as? String ?? ""
-                    let pct = eventJson["progressPercent"] as? Double ?? 0
-                    DispatchQueue.main.async {
-                        customizePhase = message
-                        customizeProgress = pct
-                    }
-                } else if type == "result" {
-                    gotResult = true
-                    resultBundle = eventJson["bundle"] as? String
-                } else if type == "error" {
-                    let errorMsg = eventJson["error"] as? String ?? "Customization failed"
-                    DispatchQueue.main.async {
-                        isCustomizing = false
-                        gameOver = true
-                        NSLog("[Customize] Error: %@", errorMsg)
-                    }
-                    return
-                }
-            }
-
-            if gotResult, let bundle = resultBundle, !bundle.isEmpty {
-                // Spend coins after success
-                DispatchQueue.main.async {
-                    customizePhase = "Spending \(CoinManager.customizeCost) coins..."
-                }
-
-                let currentUserId = Auth.auth().currentUser?.uid
-                let customizeCreatorId = (game.creatorId != currentUserId) ? game.creatorId : nil
-                coinManager.spendForCustomize(gameId: game.id, creatorId: customizeCreatorId) { success in
-                    if success {
-                        // Extract and play the customized game
-                        do {
-                            let dir = try ZipExtractor.extractBundle(base64: bundle)
-                            DispatchQueue.main.async {
-                                currentBundleDirectory = dir
-                                currentDifficultyLevel = 1
-                                gameOver = false
-                                scoreSubmitted = false
-                                isCustomizing = false
-                                webViewKey = UUID()
-                            }
-                        } catch {
-                            DispatchQueue.main.async {
-                                isCustomizing = false
-                                gameOver = true
-                                NSLog("[Customize] Extract error: %@", error.localizedDescription)
-                            }
-                        }
-                    } else {
-                        DispatchQueue.main.async {
-                            isCustomizing = false
-                            gameOver = true
-                            NSLog("[Customize] Payment failed")
-                        }
-                    }
-                }
-            } else if !gotResult {
-                DispatchQueue.main.async {
-                    isCustomizing = false
-                    gameOver = true
-                    NSLog("[Customize] No result received")
-                }
-            }
-        }
-        task.resume()
-    }
-
     private func checkAndPlayDifficulty(level: Int) {
         guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(game.id)/difficulty/\(level)") else { return }
 
@@ -911,6 +822,237 @@ struct GamePlayView: View {
         }
     }
 
+    // MARK: - Next Level (sequential series progression)
+
+    private func checkNextLevel() {
+        nextLevelCheckDone = false
+        nextLevelExistingGameId = nil
+        nextLevelExistingTitle = nil
+
+        guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(game.id)/next-level") else {
+            nextLevelCheckDone = true
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+                DispatchQueue.main.async {
+                    nextLevelIndex = 2
+                    nextLevelCheckDone = true
+                }
+                return
+            }
+
+            let exists = (json["exists"] as? Bool) ?? false
+            DispatchQueue.main.async {
+                if exists, let g = json["game"] as? [String: Any] {
+                    nextLevelExistingGameId = g["id"] as? String
+                    nextLevelExistingTitle = g["title"] as? String
+                    nextLevelIndex = (g["levelIndex"] as? Int) ?? 2
+                } else {
+                    nextLevelExistingGameId = nil
+                    nextLevelExistingTitle = nil
+                    nextLevelIndex = (json["nextLevelIndex"] as? Int) ?? 2
+                }
+                nextLevelCheckDone = true
+            }
+        }.resume()
+    }
+
+    private func handlePlayNextLevel() {
+        guard let nextGameId = nextLevelExistingGameId else { return }
+        isGeneratingNextLevel = true
+        nextLevelPhase = "Loading level..."
+        nextLevelProgress = 50
+        nextLevelSuggestedTitle = nextLevelExistingTitle
+
+        guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(nextGameId)") else {
+            isGeneratingNextLevel = false
+            return
+        }
+
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let gameJson = json["game"] as? [String: Any],
+                  let bundle = gameJson["bundle"] as? String else {
+                DispatchQueue.main.async {
+                    isGeneratingNextLevel = false
+                    gameOver = true
+                }
+                return
+            }
+
+            DispatchQueue.main.async {
+                applyNextLevel(
+                    newGameId: nextGameId,
+                    newTitle: (gameJson["title"] as? String) ?? nextLevelExistingTitle ?? "Level \(nextLevelIndex)",
+                    newDescription: (gameJson["description"] as? String) ?? "",
+                    newCreatorName: (gameJson["creatorName"] as? String) ?? game.creatorName,
+                    bundleBase64: bundle
+                )
+            }
+        }.resume()
+    }
+
+    private func handleGenerateNextLevel() {
+        let cost = CoinManager.difficultyCost(2)
+        if !coinManager.canAffordDifficulty(2) {
+            showCoinStore = true
+            return
+        }
+
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(game.id)/next-level/generate") else { return }
+
+        isGeneratingNextLevel = true
+        nextLevelPhase = "Preparing next level..."
+        nextLevelProgress = 0
+        nextLevelSuggestedTitle = nil
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("text/event-stream", forHTTPHeaderField: "Accept")
+        request.timeoutInterval = 600
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["userId": userId])
+
+        let task = URLSession(configuration: .default).dataTask(with: request) { data, _, error in
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    isGeneratingNextLevel = false
+                    gameOver = true
+                }
+                return
+            }
+
+            let responseStr = String(data: data, encoding: .utf8) ?? ""
+            var gotResult = false
+
+            for line in responseStr.components(separatedBy: "\n") {
+                if line.hasPrefix(":") { continue } // heartbeat
+                guard line.hasPrefix("data: ") else { continue }
+                let payload = String(line.dropFirst(6))
+                guard let json = try? JSONSerialization.jsonObject(with: Data(payload.utf8)) as? [String: Any],
+                      let type = json["type"] as? String else { continue }
+
+                if type == "status" {
+                    let message = json["message"] as? String ?? ""
+                    let pct = json["progressPercent"] as? Double ?? 0
+                    let suggested = json["suggestedTitle"] as? String
+                    DispatchQueue.main.async {
+                        nextLevelPhase = message
+                        nextLevelProgress = pct
+                        if let s = suggested { nextLevelSuggestedTitle = s }
+                    }
+                } else if type == "result" {
+                    gotResult = true
+                    let success = (json["success"] as? Bool) ?? false
+                    let alreadyExists = (json["alreadyExists"] as? Bool) ?? false
+
+                    if alreadyExists, let winnerId = json["gameId"] as? String {
+                        // Race lost — fetch & play the winning level instead, no coin spend
+                        DispatchQueue.main.async {
+                            nextLevelExistingGameId = winnerId
+                            handlePlayNextLevel()
+                        }
+                        return
+                    }
+
+                    guard success, let bundle = json["bundle"] as? String, let newGameId = json["gameId"] as? String else {
+                        DispatchQueue.main.async {
+                            isGeneratingNextLevel = false
+                            gameOver = true
+                            NSLog("[NextLevel] Generation failed")
+                        }
+                        return
+                    }
+
+                    let newTitle = (json["title"] as? String) ?? "Level \(nextLevelIndex)"
+
+                    DispatchQueue.main.async {
+                        nextLevelPhase = "Spending \(cost) coins..."
+                    }
+
+                    let currentUserId = Auth.auth().currentUser?.uid
+                    let creatorIdForRev = (game.creatorId != currentUserId) ? game.creatorId : nil
+                    coinManager.spendForHarderChallenge(gameId: game.id, difficultyLevel: 2, creatorId: creatorIdForRev) { paid in
+                        DispatchQueue.main.async {
+                            if paid {
+                                applyNextLevel(
+                                    newGameId: newGameId,
+                                    newTitle: newTitle,
+                                    newDescription: "",
+                                    newCreatorName: game.creatorName,
+                                    bundleBase64: bundle
+                                )
+                            } else {
+                                isGeneratingNextLevel = false
+                                gameOver = true
+                                NSLog("[NextLevel] Payment failed after successful generation")
+                            }
+                        }
+                    }
+                    return
+                } else if type == "error" {
+                    let msg = json["error"] as? String ?? "Generation failed"
+                    NSLog("[NextLevel] Worker error: %@", msg)
+                    DispatchQueue.main.async {
+                        isGeneratingNextLevel = false
+                        gameOver = true
+                    }
+                    return
+                }
+            }
+
+            if !gotResult {
+                DispatchQueue.main.async {
+                    isGeneratingNextLevel = false
+                    gameOver = true
+                }
+            }
+        }
+        task.resume()
+    }
+
+    /// Swap the view's `game` to the next level and play. Called after either
+    /// fetching an existing next level or freshly generating one.
+    private func applyNextLevel(newGameId: String, newTitle: String, newDescription: String, newCreatorName: String, bundleBase64: String) {
+        do {
+            let dir = try ZipExtractor.extractBundle(base64: bundleBase64)
+            // Rebuild the BrowseGame so top-bar title etc. update
+            game = BrowseGame(
+                id: newGameId,
+                title: newTitle,
+                creatorId: game.creatorId,
+                creatorName: newCreatorName,
+                playCount: 0,
+                initialPrompt: game.initialPrompt,
+                createdAt: ISO8601DateFormatter().string(from: Date()),
+                status: game.status,
+                thumbnailUrl: nil
+            )
+            currentBundleDirectory = dir
+            currentDifficultyLevel = 1   // Each level is its own game; difficulty variant resets
+            currentScore = 0
+            gameOver = false
+            scoreSubmitted = false
+            isGeneratingNextLevel = false
+            playStartTime = Date()
+            webViewKey = UUID()
+            // Reset next-level lookup state — will re-check when this new level ends
+            nextLevelCheckDone = false
+            nextLevelExistingGameId = nil
+            nextLevelExistingTitle = nil
+            nextLevelSuggestedTitle = nil
+        } catch {
+            NSLog("[NextLevel] Failed to extract bundle: %@", error.localizedDescription)
+            isGeneratingNextLevel = false
+            gameOver = true
+        }
+    }
+
     private func submitScore(_ score: Int) {
         guard let userId = Auth.auth().currentUser?.uid else { return }
         guard score > 0 else { return }
@@ -923,11 +1065,16 @@ struct GamePlayView: View {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let body: [String: Any] = [
+        var body: [String: Any] = [
             "userId": userId,
             "timeTaken": timeTaken,
             "score": score
         ]
+        // Feature C: forward the play_event id from startPlayEvent so the
+        // backend updates the existing row (completed=true) instead of inserting
+        // a duplicate. Falls back gracefully if the id wasn't captured.
+        if let eid = currentPlayEventId { body["eventId"] = eid }
+
         request.httpBody = try? JSONSerialization.data(withJSONObject: body)
 
         URLSession.shared.dataTask(with: request) { _, response, _ in
@@ -936,6 +1083,30 @@ struct GamePlayView: View {
                     scoreSubmitted = true
                 }
             }
+        }.resume()
+    }
+
+    // Feature C: emit a play-event start row when the WebView loads or reloads.
+    // Fires for: initial open, Play Again, harder-variant swap, next-level swap —
+    // anywhere the webViewKey changes. Fire-and-forget: server failures must not
+    // affect gameplay.
+    private func startPlayEvent() {
+        guard let userId = Auth.auth().currentUser?.uid else { return }
+        guard let url = URL(string: "https://puzzleverseai.com/api/game-creation/\(game.id)/play-event/start") else { return }
+
+        currentPlayEventId = nil
+        playStartTime = Date()
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try? JSONSerialization.data(withJSONObject: ["userId": userId])
+
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            guard let data = data,
+                  let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+                  let eventId = json["eventId"] as? String else { return }
+            DispatchQueue.main.async { currentPlayEventId = eventId }
         }.resume()
     }
 
@@ -1244,128 +1415,6 @@ struct GameLeaderboardSheet: View {
         case 2: return "\u{1F948}"
         case 3: return "\u{1F949}"
         default: return "#\(rank)"
-        }
-    }
-}
-
-// MARK: - Customize Game Sheet
-
-struct CustomizeGameSheet: View {
-    let gameTitle: String
-    let onSubmit: (String, String) -> Void
-    @Environment(\.dismiss) private var dismiss
-    @State private var description = ""
-    @State private var newTitle = ""
-
-    var body: some View {
-        NavigationView {
-            ZStack {
-                Color(red: 0.1, green: 0.1, blue: 0.18)
-                    .ignoresSafeArea()
-
-                ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
-                        Text("Describe what you'd like to change. A new game will be created under your name.")
-                            .font(.subheadline)
-                            .foregroundColor(.white.opacity(0.5))
-
-                        // Game name
-                        Text("Game Name")
-                            .font(.caption.weight(.medium))
-                            .foregroundColor(.white.opacity(0.7))
-
-                        TextField("My \(gameTitle)", text: $newTitle)
-                            .textFieldStyle(.plain)
-                            .foregroundColor(.white)
-                            .padding(12)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color.white.opacity(0.08))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(Color.purple.opacity(0.3), lineWidth: 1)
-                            )
-
-                        // Description
-                        Text("What would you like to change?")
-                            .font(.caption.weight(.medium))
-                            .foregroundColor(.white.opacity(0.7))
-
-                        ZStack(alignment: .topLeading) {
-                            TextEditor(text: $description)
-                                .foregroundColor(.white)
-                                .scrollContentBackground(.hidden)
-                                .padding(8)
-                                .frame(minHeight: 120)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .fill(Color.white.opacity(0.08))
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 10)
-                                        .stroke(Color.purple.opacity(0.3), lineWidth: 1)
-                                )
-                                .onChange(of: description) { newVal in
-                                    if newVal.count > 500 {
-                                        description = String(newVal.prefix(500))
-                                    }
-                                }
-
-                            if description.isEmpty {
-                                Text("e.g., Make it space-themed with asteroids instead of blocks...")
-                                    .foregroundColor(.white.opacity(0.3))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 16)
-                                    .allowsHitTesting(false)
-                            }
-                        }
-
-                        HStack {
-                            Spacer()
-                            Text("\(description.count)/500")
-                                .font(.caption2)
-                                .foregroundColor(.white.opacity(0.3))
-                        }
-
-                        // Submit button
-                        Button(action: {
-                            onSubmit(description, newTitle.isEmpty ? "My \(gameTitle)" : newTitle)
-                        }) {
-                            HStack {
-                                Image(systemName: "wand.and.stars")
-                                Text("Create Customized Game")
-                                    .fontWeight(.bold)
-                                Spacer()
-                                CoinCostBadge(cost: CoinManager.customizeCost, balance: CoinManager.shared.balance)
-                            }
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(
-                                LinearGradient(
-                                    colors: [Color(red: 0.61, green: 0.15, blue: 0.69), Color(red: 0.42, green: 0.11, blue: 0.5)],
-                                    startPoint: .leading,
-                                    endPoint: .trailing
-                                )
-                            )
-                            .cornerRadius(12)
-                        }
-                        .disabled(description.trimmingCharacters(in: .whitespaces).isEmpty)
-                        .opacity(description.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
-                    }
-                    .padding()
-                }
-            }
-            .navigationTitle("Customize This Game")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") { dismiss() }
-                        .foregroundColor(.white)
-                }
-            }
         }
     }
 }

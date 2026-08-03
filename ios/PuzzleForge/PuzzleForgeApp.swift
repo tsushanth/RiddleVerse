@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import RatingKit
+import PromoOfferKit
 import Firebase
 import GoogleMobileAds
 import FBSDKCoreKit
@@ -21,6 +23,7 @@ struct PuzzleForgeApp: App {
     @StateObject private var notificationManager = NotificationManager.shared
     @StateObject private var authStateManager = AuthStateManager()
     @StateObject private var subscriptionManager = SubscriptionManager.shared
+    @StateObject private var paywallCoordinator = PaywallCoordinator.shared
     
     @UIApplicationDelegateAdaptor(AppDelegate.self) var delegate
     
@@ -67,6 +70,25 @@ struct PuzzleForgeApp: App {
                 //await PuzzleQueueManager.shared.initializeQueues()
             }
         }
+    
+        // Server-driven rating prompts (variant testing + analytics).
+        // Currently in simple mode — uses native SKStoreReviewController, no UI overlay.
+        RatingKit.configure(appId: "riddleverse", apiUrl: "https://paywallkit-api.fly.dev")
+        RatingKit.shared.trackAppOpen()
+
+        // Cancel-flow retention: present Apple Promotional Offer to lapsed subscribers
+        PromoOfferKit.configure(
+            bundleId: "KreativeKoala.PuzzleForge",
+            apiBaseUrl: URL(string: "https://paywallkit-api.fly.dev")!,
+            productIdToOfferCode: [
+                "com.puzzleforge.premium.yearly":    "h82035",
+                "com.puzzleforge.premium.monthly":   "half_3mo",
+                "com.puzzleforge.unlimited.monthly": "h14961",
+            ],
+            isSubscribedProvider: { SubscriptionManager.shared.currentTier != .free },
+            onPurchased: { Task { await SubscriptionManager.shared.checkSubscriptionStatus() } },
+            headline: "Come back at half price"
+        )
     }
     
     private func configureCampaignTracking() {
@@ -161,6 +183,8 @@ struct PuzzleForgeApp: App {
                     WelcomeView()
                 }
             }
+            .ratingPrompt()
+            .promoOffer()
             .environmentObject(notificationManager)
             .environmentObject(authStateManager)
             .environmentObject(subscriptionManager)
@@ -193,11 +217,21 @@ struct PuzzleForgeApp: App {
                 // Track app activation each time app becomes active
                 AppEvents.shared.activateApp()
                 trackSessionStart()
-                
+
                 // SAFE ANALYTICS TRACKING
                 AnalyticsManager.shared.trackSafely(.appOpen())
-                
+
                 notificationManager.getFCMToken()
+
+                // Check winback eligibility when app becomes active
+                if subscriptionManager.currentTier == .free {
+                    Task { @MainActor in
+                        PaywallCoordinator.shared.checkWinbackEligibility()
+                    }
+                }
+            }
+            .fullScreenCover(isPresented: $paywallCoordinator.showWinbackOffer) {
+                WinbackOfferView()
             }
             .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("NavigateToDailyPuzzles"))) { notification in
                 handleDailyPuzzleNavigation(notification: notification)

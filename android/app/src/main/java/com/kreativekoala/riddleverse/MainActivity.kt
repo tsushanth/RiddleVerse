@@ -52,6 +52,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
+import com.kreativekoala.ratingkit.RatingKit
 import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        RatingKit.trackAppOpen(this)
 
         // Defer FCM setup to background thread - not critical for startup
         CoroutineScope(Dispatchers.IO).launch {

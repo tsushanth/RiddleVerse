@@ -209,6 +209,11 @@ fun ForYouTab(
                 }
             }
         } else {
+            // Telegram bot banner
+            item {
+                TelegramBotBanner()
+            }
+
             // Earn money banner
             if (showEarnBanner) {
                 item {

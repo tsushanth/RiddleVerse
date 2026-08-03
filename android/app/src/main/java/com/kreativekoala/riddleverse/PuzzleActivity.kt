@@ -98,6 +98,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
 import okio.IOException
 import org.json.JSONObject
+import com.kreativekoala.ratingkit.RatingKit
 
 
 
@@ -279,6 +280,8 @@ class PuzzleActivity : AppCompatActivity() {
                             val sourceGroupId = getIntent().getStringExtra("sourceGroupId")
                             val currentPuzzleNumber = getIntent().getIntExtra("currentPuzzleNumber", 0)
                             Log.d("PuzzleActivity", "🎉 Puzzle completed, showing completion screen, source group id: $sourceGroupId puzzle count $currentPuzzleNumber")
+
+                            RatingKit.trackAction(this@PuzzleActivity)
 
                             if (sourceGroupId != null && currentPuzzleNumber >= 5) {
                                 Log.d("PuzzleActivity", "🎯 Group puzzle completed: $currentPuzzleNumber/5 puzzles done")
