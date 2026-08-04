@@ -1142,20 +1142,31 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
     const puzzleKey = `${puzzleType}_${normalizedDifficulty}`;
 
     try {
-        // Initialize Firebase user document if it doesn't exist
+        // Initialize Firebase user document if it doesn't exist.
+        // Guarded 2026-08-04: this was throwing uncaught under Firestore
+        // quota exhaustion, which killed puzzle serving entirely even
+        // though the actual puzzle data is Supabase-backed and was fine
+        // the whole time. Falling back to userData={} degrades gracefully
+        // to "no tracked progress" (same as a brand-new user) instead of
+        // failing the request — it also naturally skips the downstream
+        // progress-validation branch below, which does its own Firestore
+        // writes only when currentProgressId is present.
         const userRef = db.collection("users").doc(userId);
-        const userDoc = await userRef.get();
-
         let userData = {};
-        if (!userDoc.exists) {
-            await userRef.set({
-                lastPuzzleProgress: {},
-                lastPuzzleTimestamps: {},
-                resetCounts: {},
-                totalResets: 0
-            });
-        } else {
-            userData = userDoc.data() || {};
+        try {
+            const userDoc = await userRef.get();
+            if (!userDoc.exists) {
+                await userRef.set({
+                    lastPuzzleProgress: {},
+                    lastPuzzleTimestamps: {},
+                    resetCounts: {},
+                    totalResets: 0
+                });
+            } else {
+                userData = userDoc.data() || {};
+            }
+        } catch (firestoreError) {
+            console.error(`Firestore user doc read/init failed for ${userId} (non-fatal, degrading to fresh progress):`, firestoreError.message);
         }
 
         const lastPuzzleProgress = userData.lastPuzzleProgress || {};
@@ -1178,9 +1189,13 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
             if (currentPuzzleError || !currentPuzzleData?.[0]) {
                 progressWasReset = true;
                 lastPuzzleProgress[progressKey] = null;
-                await userRef.update({
-                    [`lastPuzzleProgress.${progressKey}`]: null
-                });
+                try {
+                    await userRef.update({
+                        [`lastPuzzleProgress.${progressKey}`]: null
+                    });
+                } catch (updateError) {
+                    console.error(`Firestore progress-reset update failed for ${userId} (non-fatal):`, updateError.message);
+                }
 
                 await trackPuzzleReset(userId, puzzleType, normalizedDifficulty, 'validation_failed');
             } else {

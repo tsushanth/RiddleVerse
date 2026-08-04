@@ -109,18 +109,30 @@ router.get("/fetch-next-puzzle-ios/:puzzleType", authenticateRiddleVerse, riddle
 
         // ---- Fallback: legacy per-user Firebase path ----
         if (!userId || !email || userId === "" || email === "") {
-            const anonUserRef = db.collection("users").doc(ANONYMOUS_USER_ID);
-            let anonUserDoc = await anonUserRef.get();
+            // This doc is just bookkeeping (attempt/solve counters) — not
+            // needed to actually serve a puzzle. Under Firestore quota
+            // exhaustion this get/set was throwing uncaught, which blocked
+            // the whole request from ever reaching fetchRandomPuzzle()
+            // below (Supabase-backed, unaffected by Firestore's outage).
+            // That was the real cause of Find Object's "Failed to load
+            // puzzle" error for anonymous users (2026-08-04) — puzzles
+            // existed and were reachable the whole time.
+            try {
+                const anonUserRef = db.collection("users").doc(ANONYMOUS_USER_ID);
+                const anonUserDoc = await anonUserRef.get();
 
-            if (!anonUserDoc.exists) {
-                await anonUserRef.set({
-                    email: "anonymous@sequential.user",
-                    lastPuzzleTimestamp: null,
-                    puzzlesAttempted: 0,
-                    puzzlesSolved: 0,
-                    lastPuzzleTimestamps: {},
-                    puzzleProgress: {}
-                });
+                if (!anonUserDoc.exists) {
+                    await anonUserRef.set({
+                        email: "anonymous@sequential.user",
+                        lastPuzzleTimestamp: null,
+                        puzzlesAttempted: 0,
+                        puzzlesSolved: 0,
+                        lastPuzzleTimestamps: {},
+                        puzzleProgress: {}
+                    });
+                }
+            } catch (bookkeepingError) {
+                console.error('Anonymous user bookkeeping failed (non-fatal):', bookkeepingError.message);
             }
 
             const result = await fetchRandomPuzzle(puzzleType, difficulty);
@@ -130,18 +142,24 @@ router.get("/fetch-next-puzzle-ios/:puzzleType", authenticateRiddleVerse, riddle
             return res.json(result);
         }
 
-        const userRef = db.collection("users").doc(userId);
-        let userDoc = await userRef.get();
+        // Same non-fatal bookkeeping guard as the anonymous branch above —
+        // this doc is attempt/solve counters, not required to serve a puzzle.
+        try {
+            const userRef = db.collection("users").doc(userId);
+            const userDoc = await userRef.get();
 
-        if (!userDoc.exists) {
-            await userRef.set({
-                email,
-                lastPuzzleTimestamp: null,
-                puzzlesAttempted: 0,
-                puzzlesSolved: 0,
-                lastPuzzleTimestamps: {},
-                puzzleProgress: {}
-            });
+            if (!userDoc.exists) {
+                await userRef.set({
+                    email,
+                    lastPuzzleTimestamp: null,
+                    puzzlesAttempted: 0,
+                    puzzlesSolved: 0,
+                    lastPuzzleTimestamps: {},
+                    puzzleProgress: {}
+                });
+            }
+        } catch (bookkeepingError) {
+            console.error('User bookkeeping failed (non-fatal):', bookkeepingError.message);
         }
 
         const result = await fetchNextPuzzle(userId, puzzleType, difficulty);
