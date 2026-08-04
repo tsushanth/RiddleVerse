@@ -1,11 +1,14 @@
 // routes/scoring.routes.js - Score and leaderboard endpoints
 import express from 'express';
-import { db } from '../config/firebaseAdmin.js';
+import { supabase } from '../config/database.js';
 
 const router = express.Router();
 
 /**
  * Update user score
+ * Migrated off Firestore 2026-08-04 — see leaderboard.routes.js for why.
+ * Same `leaderboard` table, this route duplicates that one under a
+ * different path prefix for backward compat with older clients.
  */
 router.post('/update-score', async (req, res) => {
     const { userId, name, score } = req.body;
@@ -15,38 +18,36 @@ router.post('/update-score', async (req, res) => {
     }
 
     try {
-        const userRef = db.collection('leaderboard').doc(userId);
-        const userDoc = await userRef.get();
+        const { data: existing, error: fetchError } = await supabase
+            .from('leaderboard')
+            .select('score')
+            .eq('user_id', userId)
+            .maybeSingle();
 
-        if (userDoc.exists) {
-            const existingData = userDoc.data();
-            const previousScore = existingData?.score || 0;
-            const newTotalScore = previousScore + score;
+        if (fetchError) throw fetchError;
 
-            await userRef.update({
+        const previousScore = existing?.score || 0;
+        const newTotalScore = previousScore + score;
+
+        const { error: upsertError } = await supabase
+            .from('leaderboard')
+            .upsert({
+                user_id: userId,
                 name,
                 score: newTotalScore,
-                lastUpdated: new Date()
+                last_updated: new Date().toISOString()
             });
-            res.json({
-                message: `✅ Score added. Previous: ${previousScore}, Added: ${score}, New total: ${newTotalScore}`,
-                previousScore: previousScore,
-                addedScore: score,
-                newTotal: newTotalScore
-            });
-        } else {
-            await userRef.set({
-                name,
-                score,
-                lastUpdated: new Date()
-            });
-            res.json({
-                message: `🏁 New score recorded: ${score}`,
-                previousScore: 0,
-                addedScore: score,
-                newTotal: score
-            });
-        }
+
+        if (upsertError) throw upsertError;
+
+        res.json({
+            message: existing
+                ? `✅ Score added. Previous: ${previousScore}, Added: ${score}, New total: ${newTotalScore}`
+                : `🏁 New score recorded: ${score}`,
+            previousScore: previousScore,
+            addedScore: score,
+            newTotal: newTotalScore
+        });
     } catch (error) {
         console.error('❌ Error updating score:', error);
         res.status(500).json({ error: 'Failed to update score' });
@@ -64,19 +65,22 @@ router.get('/get-score', async (req, res) => {
     }
 
     try {
-        const userRef = db.collection('leaderboard').doc(userId);
-        const userDoc = await userRef.get();
+        const { data, error } = await supabase
+            .from('leaderboard')
+            .select('name, score, last_updated')
+            .eq('user_id', userId)
+            .maybeSingle();
 
-        if (!userDoc.exists) {
+        if (error) throw error;
+        if (!data) {
             return res.status(404).json({ message: 'User not found in leaderboard' });
         }
 
-        const userData = userDoc.data();
         res.json({
             userId: userId,
-            name: userData.name,
-            score: userData.score,
-            lastUpdated: userData.lastUpdated
+            name: data.name,
+            score: data.score,
+            lastUpdated: data.last_updated
         });
     } catch (error) {
         console.error('❌ Error fetching score:', error);
@@ -95,16 +99,22 @@ router.post('/delete-score', async (req, res) => {
     }
 
     try {
-        const leaderboardRef = db.collection('leaderboard');
-        const querySnapshot = await leaderboardRef.where('name', '==', name).get();
+        const { data: existing, error: fetchError } = await supabase
+            .from('leaderboard')
+            .select('user_id')
+            .eq('name', name);
 
-        if (querySnapshot.empty) {
+        if (fetchError) throw fetchError;
+        if (!existing || existing.length === 0) {
             return res.status(404).json({ error: "User not found in leaderboard." });
         }
 
-        querySnapshot.forEach(async (doc) => {
-            await doc.ref.delete();
-        });
+        const { error: deleteError } = await supabase
+            .from('leaderboard')
+            .delete()
+            .eq('name', name);
+
+        if (deleteError) throw deleteError;
 
         res.json({ message: `✅ User ${name} removed from leaderboard.` });
 
@@ -119,12 +129,20 @@ router.post('/delete-score', async (req, res) => {
  */
 router.get('/leaderboard', async (req, res) => {
     try {
-        const snapshot = await db.collection('leaderboard')
-            .orderBy('score', 'desc')
-            .limit(10)
-            .get();
+        const { data, error } = await supabase
+            .from('leaderboard')
+            .select('user_id, name, score, last_updated')
+            .order('score', { ascending: false })
+            .limit(10);
 
-        const leaderboard = snapshot.docs.map(doc => doc.data());
+        if (error) throw error;
+
+        const leaderboard = data.map(row => ({
+            userId: row.user_id,
+            name: row.name,
+            score: row.score,
+            lastUpdated: row.last_updated
+        }));
         res.json({ success: true, leaderboard });
     } catch (error) {
         console.error('Error fetching leaderboard:', error);
