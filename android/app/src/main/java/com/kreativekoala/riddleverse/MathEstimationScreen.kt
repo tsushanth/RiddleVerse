@@ -5,7 +5,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -226,7 +228,9 @@ fun EstimationPuzzleScreen(
             .background(Color(0xFFF5F5F5))
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             // Top Bar with live timer and enhanced info
             EnhancedEstimationTopGameBar(
@@ -454,7 +458,13 @@ fun EstimationPuzzleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.weight(1f))
+            // Was Spacer(Modifier.weight(1f)) — incompatible with the
+            // verticalScroll now on this Column (weight() requires bounded
+            // height, scroll wants unbounded). This screen's real bug was
+            // the Submit button getting pushed off-screen with no way to
+            // scroll to it on short screens; a trailing bottom-padding
+            // spacer serves the same cosmetic purpose without that conflict.
+            Spacer(modifier = Modifier.height(24.dp))
         }
 
         EnhancedUniversalFeedback(feedbackManager)
