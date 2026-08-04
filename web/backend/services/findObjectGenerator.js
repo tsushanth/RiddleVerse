@@ -1,11 +1,11 @@
 // services/findObjectGenerator.js - Simplified Natural Discovery Approach
 
 import axios from 'axios';
+import { generateImage } from '../utils/aiClient.js';
 
 export class FindObjectGenerator {
     constructor() {
         this.debugMode = false;
-        this.apiKey = process.env.OPENAI_API_KEY; // kept for DALL-E image generation
         this.anthropicKey = process.env.ANTHROPIC_API_KEY;
         
         // Grid configuration for mobile-friendly object detection
@@ -309,9 +309,6 @@ Each cell is ${(100/this.gridConfig.cols).toFixed(1)}% wide and ${(100/this.grid
             this.debugLog(`🔄 Attempt ${attempt}/${maxRetries}`);
             
             try {
-                if (!this.apiKey) {
-                    throw new Error('OPENAI_API_KEY environment variable not set (needed for DALL-E)');
-                }
                 if (!this.anthropicKey) {
                     throw new Error('ANTHROPIC_API_KEY environment variable not set (needed for vision analysis)');
                 }
@@ -406,34 +403,18 @@ SCENE STYLE:
 Style: Clean, bright, minimalist cartoon illustration. Think "children's book illustration" - simple, clear, and easy to understand. Each object should stand out clearly against the background.`;
 
         try {
-            // Generate simplified scene image
-            this.debugLog('🎨 Generating simplified scene with DALL-E...');
-            const imageResponse = await axios.post('https://api.openai.com/v1/images/generations', {
-                model: "dall-e-3",
-                prompt: imagePrompt,
-                n: 1,
+            // Generate simplified scene image. Was DALL-E (OPENAI_API_KEY),
+            // which was never actually configured on this Fly app — every
+            // generation failed immediately, which was the root cause of
+            // Find Object's blank-screen bug (2026-08-04). Switched to the
+            // same generateImage() (Pollinations, no API key needed)
+            // already used by other puzzle generators in this codebase
+            // (e.g. generateSplitScreenImage for find-differences).
+            this.debugLog('🎨 Generating simplified scene...');
+            const imageBuffer = await generateImage(imagePrompt, {
                 size: "1024x1024",
-                response_format: "b64_json"
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                timeout: 180000,
-                validateStatus: function (status) {
-                    return status < 500; // Resolve only if status is less than 500
-                }
+                puzzleType: 'find_object'
             });
-
-            if (imageResponse.status === 502) {
-                throw new Error('OpenAI server temporarily unavailable (502)');
-            }
-
-            if (!imageResponse.data?.data?.[0]?.b64_json) {
-                throw new Error('No image data received from DALL-E');
-            }
-
-            const imageBuffer = Buffer.from(imageResponse.data.data[0].b64_json, 'base64');
             this.debugLog(`📦 Generated simplified image: ${imageBuffer.length} bytes`);
 
             // Upload image to storage
