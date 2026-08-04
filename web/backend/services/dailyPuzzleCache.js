@@ -1,7 +1,6 @@
 // dailyPuzzleCache.js
 import Redis from 'ioredis';
 import { supabase } from '../config/database.js';
-import { db } from '../config/firebaseAdmin.js';
 
 class DailyPuzzleCache {
   constructor() {
@@ -295,42 +294,44 @@ class DailyPuzzleCache {
   }
 
   /**
-   * Get current global path position from Firebase
+   * Get current global path position.
+   * Migrated off Firestore 2026-08-04: this ran a Firestore transaction
+   * (updateGlobalPath below) awaited synchronously inside buildDailyCache,
+   * *after* puzzles were already successfully fetched from Supabase —
+   * under Firestore quota exhaustion the transaction retries internally
+   * for 60-90+ seconds before failing, hanging the entire puzzle-fetch
+   * response even though the actual puzzle data was ready. This is simple
+   * key-value state (a position pointer + cycle count); Redis, already the
+   * primary fast-path store in this file, doesn't need Firestore's
+   * transactional guarantees for a single-writer incrementing pointer.
    */
   async getGlobalPath(puzzleType, difficulty) {
-    const pathKey = `${puzzleType}_${difficulty}`;
-    
+    const pathKey = `${this.prefixes.globalPath}${puzzleType}_${difficulty}`;
+
     try {
-      const doc = await db.collection(this.config.globalPathCollection).doc(pathKey).get();
-      
-      if (doc.exists) {
-        const data = doc.data();
-        return {
-          currentPuzzleId: data.currentPuzzleId,
-          lastUpdated: data.lastUpdated,
-          totalPuzzles: data.totalPuzzles || 0,
-          cycleCount: data.cycleCount || 0
-        };
-      } else {
-        // Initialize new global path
-        console.log(`Initializing new global path for ${puzzleType}/${difficulty}`);
-        
-        const firstPuzzle = await this.getFirstPuzzle(puzzleType, difficulty);
-        const totalCount = await this.getTotalPuzzleCount(puzzleType, difficulty);
-        
-        const initialPath = {
-          currentPuzzleId: firstPuzzle?.puzzleid || null,
-          lastUpdated: new Date().toISOString(),
-          totalPuzzles: totalCount,
-          cycleCount: 0,
-          puzzleType,
-          difficulty
-        };
-        
-        await db.collection(this.config.globalPathCollection).doc(pathKey).set(initialPath);
-        
-        return initialPath;
+      const cached = await this.redis.get(pathKey);
+      if (cached) {
+        return JSON.parse(cached);
       }
+
+      // Initialize new global path
+      console.log(`Initializing new global path for ${puzzleType}/${difficulty}`);
+
+      const firstPuzzle = await this.getFirstPuzzle(puzzleType, difficulty);
+      const totalCount = await this.getTotalPuzzleCount(puzzleType, difficulty);
+
+      const initialPath = {
+        currentPuzzleId: firstPuzzle?.puzzleid || null,
+        lastUpdated: new Date().toISOString(),
+        totalPuzzles: totalCount,
+        cycleCount: 0,
+        puzzleType,
+        difficulty
+      };
+
+      await this.redis.set(pathKey, JSON.stringify(initialPath));
+
+      return initialPath;
     } catch (error) {
       console.error(`Error getting global path for ${puzzleType}/${difficulty}:`, error);
       throw error;
@@ -338,50 +339,47 @@ class DailyPuzzleCache {
   }
 
   /**
-   * Update global path position in Firebase
+   * Update global path position. See getGlobalPath above for why this
+   * moved off Firestore. Redis SET is atomic per-key, which is sufficient
+   * here — there's no multi-document consistency requirement, just a
+   * single pointer being advanced by whichever request currently holds it.
    */
   async updateGlobalPath(puzzleType, difficulty, nextPuzzleId) {
-    const pathKey = `${puzzleType}_${difficulty}`;
-    
+    const pathKey = `${this.prefixes.globalPath}${puzzleType}_${difficulty}`;
+
     try {
-      // Prepare update data outside of transaction
       let updateData = {
         currentPuzzleId: nextPuzzleId,
         lastUpdated: new Date().toISOString()
       };
-      
+
       // If nextPuzzleId is null, we've wrapped around - use start ID
       if (!nextPuzzleId) {
         const startId = await this.getCacheStartId(puzzleType, difficulty);
         updateData.currentPuzzleId = startId;
       }
-      
-      // Use Firebase transaction for atomic update
-      await db.runTransaction(async (transaction) => {
-        const pathRef = db.collection(this.config.globalPathCollection).doc(pathKey);
-        const pathDoc = await transaction.get(pathRef);
-        
-        // Handle cycle count increment for wrap-around
-        if (!nextPuzzleId) {
-          updateData.cycleCount = (pathDoc.data()?.cycleCount || 0) + 1;
-          console.log(`Global path wrapped around for ${puzzleType}/${difficulty}, starting cycle ${updateData.cycleCount} from ${updateData.currentPuzzleId}`);
-        }
-        
-        if (pathDoc.exists) {
-          transaction.update(pathRef, updateData);
-        } else {
-          transaction.set(pathRef, {
-            ...updateData,
-            puzzleType,
-            difficulty,
-            totalPuzzles: await this.getTotalPuzzleCount(puzzleType, difficulty),
-            cycleCount: updateData.cycleCount || 0
-          });
-        }
-      });
-      
+
+      const existingRaw = await this.redis.get(pathKey);
+      const existing = existingRaw ? JSON.parse(existingRaw) : null;
+
+      if (!nextPuzzleId) {
+        updateData.cycleCount = (existing?.cycleCount || 0) + 1;
+        console.log(`Global path wrapped around for ${puzzleType}/${difficulty}, starting cycle ${updateData.cycleCount} from ${updateData.currentPuzzleId}`);
+      } else {
+        updateData.cycleCount = existing?.cycleCount || 0;
+      }
+
+      const newPath = {
+        ...updateData,
+        puzzleType,
+        difficulty,
+        totalPuzzles: existing?.totalPuzzles ?? await this.getTotalPuzzleCount(puzzleType, difficulty)
+      };
+
+      await this.redis.set(pathKey, JSON.stringify(newPath));
+
       console.log(`Updated global path for ${puzzleType}/${difficulty} to puzzle ${updateData.currentPuzzleId}`);
-      
+
     } catch (error) {
       console.error(`Error updating global path for ${puzzleType}/${difficulty}:`, error);
       throw error;
@@ -619,30 +617,22 @@ class DailyPuzzleCache {
    */
   async getCacheSize(puzzleType, difficulty) {
     const configKey = `${this.prefixes.config}${puzzleType}_${difficulty}`;
-    
+
     try {
       const cachedSize = await this.redis.get(configKey);
       if (cachedSize) {
         return parseInt(cachedSize, 10);
       }
-      
-      // Check Firebase for custom configuration
-      const configDoc = await db.collection('puzzle_config').doc(`${puzzleType}_${difficulty}`).get();
-      
-      if (configDoc.exists) {
-        const config = configDoc.data();
-        const size = config.cacheSize || this.config.defaultCacheSize;
-        
-        // Cache the configuration
-        await this.redis.setex(configKey, 24 * 60 * 60, size.toString());
-        
-        return size;
-      }
-      
-      // Use default and cache it
+
+      // Removed 2026-08-04: this used to check a Firestore 'puzzle_config'
+      // collection for a per-type override. It was already gracefully
+      // caught and defaulted on failure, but still spent a Firestore read
+      // (and contributed to quota exhaustion / added latency) on every
+      // cache miss for a feature nothing appears to actually configure.
+      // Straight to default now.
       await this.redis.setex(configKey, 24 * 60 * 60, this.config.defaultCacheSize.toString());
       return this.config.defaultCacheSize;
-      
+
     } catch (error) {
       console.error(`Error getting cache size for ${puzzleType}/${difficulty}:`, error);
       return this.config.defaultCacheSize;
