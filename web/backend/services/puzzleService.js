@@ -1137,41 +1137,53 @@ async function trackPuzzleReset(userId, puzzleType, difficulty, resetReason = 'c
     }
 }
 
+/**
+ * Per-user sequential puzzle-position tracking (Supabase, puzzle_progress
+ * table). Replaces Firestore's users/{userId}.lastPuzzleProgress for
+ * fetchNextPuzzle() specifically — see migration
+ * 20260804201500_create_puzzle_progress.sql for why (Firestore quota
+ * exhaustion was making sequential progress always "reset" silently,
+ * repeating the same puzzle instead of advancing).
+ */
+async function getPuzzleProgress(userId, puzzleType, difficulty) {
+    const { data, error } = await supabase
+        .from('puzzle_progress')
+        .select('current_puzzle_id')
+        .eq('user_id', userId)
+        .eq('puzzle_type', puzzleType)
+        .eq('difficulty', difficulty)
+        .maybeSingle();
+
+    if (error) {
+        console.error(`Error reading puzzle_progress for ${userId}/${puzzleType}/${difficulty}:`, error.message);
+        return null;
+    }
+    return data?.current_puzzle_id ?? null;
+}
+
+async function setPuzzleProgress(userId, puzzleType, difficulty, puzzleId) {
+    const { error } = await supabase
+        .from('puzzle_progress')
+        .upsert({
+            user_id: userId,
+            puzzle_type: puzzleType,
+            difficulty,
+            current_puzzle_id: puzzleId,
+            updated_at: new Date().toISOString()
+        });
+
+    if (error) {
+        console.error(`Error writing puzzle_progress for ${userId}/${puzzleType}/${difficulty}:`, error.message);
+    }
+}
+
 export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
     let normalizedDifficulty = difficulty.toLowerCase();
     const puzzleKey = `${puzzleType}_${normalizedDifficulty}`;
 
     try {
-        // Initialize Firebase user document if it doesn't exist.
-        // Guarded 2026-08-04: this was throwing uncaught under Firestore
-        // quota exhaustion, which killed puzzle serving entirely even
-        // though the actual puzzle data is Supabase-backed and was fine
-        // the whole time. Falling back to userData={} degrades gracefully
-        // to "no tracked progress" (same as a brand-new user) instead of
-        // failing the request — it also naturally skips the downstream
-        // progress-validation branch below, which does its own Firestore
-        // writes only when currentProgressId is present.
-        const userRef = db.collection("users").doc(userId);
-        let userData = {};
-        try {
-            const userDoc = await userRef.get();
-            if (!userDoc.exists) {
-                await userRef.set({
-                    lastPuzzleProgress: {},
-                    lastPuzzleTimestamps: {},
-                    resetCounts: {},
-                    totalResets: 0
-                });
-            } else {
-                userData = userDoc.data() || {};
-            }
-        } catch (firestoreError) {
-            console.error(`Firestore user doc read/init failed for ${userId} (non-fatal, degrading to fresh progress):`, firestoreError.message);
-        }
-
-        const lastPuzzleProgress = userData.lastPuzzleProgress || {};
         const progressKey = puzzleKey;
-        const currentProgressId = lastPuzzleProgress[progressKey];
+        const currentProgressId = await getPuzzleProgress(userId, puzzleType, normalizedDifficulty);
 
         // Enhanced puzzle validation and reset
         let currentPuzzle = null;
@@ -1188,14 +1200,7 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
 
             if (currentPuzzleError || !currentPuzzleData?.[0]) {
                 progressWasReset = true;
-                lastPuzzleProgress[progressKey] = null;
-                try {
-                    await userRef.update({
-                        [`lastPuzzleProgress.${progressKey}`]: null
-                    });
-                } catch (updateError) {
-                    console.error(`Firestore progress-reset update failed for ${userId} (non-fatal):`, updateError.message);
-                }
+                await setPuzzleProgress(userId, puzzleType, normalizedDifficulty, null);
 
                 await trackPuzzleReset(userId, puzzleType, normalizedDifficulty, 'validation_failed');
             } else {
@@ -1255,9 +1260,7 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
             const resetTrackingResult = await trackPuzzleReset(userId, puzzleType, normalizedDifficulty, 'completion');
 
             // Reset current user to the beginning
-            await userRef.update({
-                [`lastPuzzleProgress.${progressKey}`]: null
-            });
+            await setPuzzleProgress(userId, puzzleType, normalizedDifficulty, null);
 
             // Try cache lookup first, then validate it exists
             const firstPuzzleId = await getFirstPuzzleIdFast(puzzleType, normalizedDifficulty);
@@ -1270,9 +1273,7 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
                     .single();
 
                 if (firstPuzzle) {
-                    await userRef.update({
-                        [`lastPuzzleProgress.${progressKey}`]: firstPuzzle.puzzleid
-                    });
+                    await setPuzzleProgress(userId, puzzleType, normalizedDifficulty, firstPuzzle.puzzleid);
 
                     return {
                         success: true,
@@ -1301,9 +1302,7 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
             if (firstPuzzleData?.[0]) {
                 const puzzle = firstPuzzleData[0];
 
-                await userRef.update({
-                    [`lastPuzzleProgress.${progressKey}`]: puzzle.puzzleid
-                });
+                await setPuzzleProgress(userId, puzzleType, normalizedDifficulty, puzzle.puzzleid);
 
                 return {
                     success: true,
@@ -1327,11 +1326,11 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
         // Find next puzzle
         let nextPuzzleId = null;
 
-        if (lastPuzzleProgress[progressKey] && currentPuzzle && !progressWasReset) {
+        if (currentProgressId && currentPuzzle && !progressWasReset) {
             const { data: pathData, error: pathError } = await supabase
                 .from('puzzle_path')
                 .select('nextpuzzleid')
-                .eq('puzzleid', lastPuzzleProgress[progressKey])
+                .eq('puzzleid', currentProgressId)
                 .limit(1);
 
             if (pathData?.[0]?.nextpuzzleid) {
@@ -1430,9 +1429,7 @@ export async function fetchNextPuzzle(userId, puzzleType, difficulty = "easy") {
         const puzzle = nextPuzzleData[0];
 
         // Update progress
-        await userRef.update({
-            [`lastPuzzleProgress.${progressKey}`]: puzzle.puzzleid
-        });
+        await setPuzzleProgress(userId, puzzleType, normalizedDifficulty, puzzle.puzzleid);
 
         return {
             success: true,
