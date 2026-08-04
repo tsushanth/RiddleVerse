@@ -7,10 +7,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -287,7 +287,9 @@ fun PriceOrderingPuzzleScreen(
             )
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
         ) {
             // Top Bar - pass current hearts and formatted timer
             EnhancedDiscountTopGameBar(
@@ -345,13 +347,15 @@ fun PriceOrderingPuzzleScreen(
                 }
             }
 
-            // Items grid
+            // Items grid — no longer weight(1f): the screen now scrolls as
+            // a whole (see root Column above), so this sizes to its own
+            // content instead of claiming "remaining space" in a layout
+            // that no longer has a fixed remaining-space budget.
             ItemsGrid(
                 items = gameItems,
                 onItemClick = ::selectItem,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
                     .padding(horizontal = 20.dp)
             )
 
@@ -514,14 +518,20 @@ fun ItemsGrid(
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    // Plain Column, not LazyColumn (2026-08-04): item counts here are small
+    // (chunked into rows of 2, no virtualization needed), and LazyColumn
+    // can't be nested inside the outer screen's verticalScroll — Compose
+    // requires bounded height for lazy layouts, which conflicts with an
+    // unbounded scrollable parent. See DiscountPriceOrderingPuzzleScreen's
+    // root Column for the matching scroll-safety fix.
+    Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(20.dp),
-        contentPadding = PaddingValues(vertical = 20.dp)
+        verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        Spacer(modifier = Modifier.height(20.dp))
         // Group items into rows of 2
         val chunkedItems = items.chunked(2)
-        items(chunkedItems) { rowItems ->
+        chunkedItems.forEach { rowItems ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -540,6 +550,7 @@ fun ItemsGrid(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 

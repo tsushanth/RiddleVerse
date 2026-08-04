@@ -4,6 +4,8 @@ package com.kreativekoala.riddleverse
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -331,12 +333,35 @@ fun <T> AdaptivePuzzleScaffold(
         }
     }
 
-    Box(
+    // Scroll-safety net (2026-08-04): most puzzle screens build `content`
+    // as a plain Column(fillMaxSize()) mixing fixed-height chrome (top
+    // bar, instructions, score/streak text, progress bar) with a single
+    // weight(1f) game-content region and no scroll fallback anywhere. On
+    // screens where the fixed chrome adds up to more height than
+    // available (smaller devices, larger system font scale, extra inset
+    // space), the weighted region gets squeezed and whatever renders
+    // after it — often the primary action button — gets pushed past the
+    // bottom of the viewport with no way to reach it (Column doesn't
+    // clip/auto-scroll). BoxWithConstraints + heightIn(min = maxHeight)
+    // is the standard Compose pattern here: content still fills/behaves
+    // exactly as before in the normal case, but can now grow taller and
+    // scroll instead of silently clipping when it needs to. This fixes
+    // it centrally for every screen built on this scaffold (~30 files)
+    // without requiring each one to change its own layout.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.Black)
     ) {
-        content(state, feedbackManager)
+        val minHeight = maxHeight
+        Box(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .heightIn(min = minHeight)
+                .fillMaxWidth()
+        ) {
+            content(state, feedbackManager)
+        }
         EnhancedUniversalFeedback(feedbackManager)
     }
 }
