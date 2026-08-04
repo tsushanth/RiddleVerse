@@ -6,7 +6,7 @@ platform :android do
     upload_to_play_store(
       track: "production",
       aab: "app/build/outputs/bundle/release/app-release.aab",
-      json_key: "/Users/sushanthtiruvaipati/Downloads/summaryai-483115-a27fc5121150.json",
+      json_key: "/Users/sushanthtiruvaipati/Documents/apple_dev/cloud_credentials/summaryai-483115-a27fc5121150.json",
       package_name: "com.kreativekoala.riddleverse",
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
@@ -20,7 +20,7 @@ platform :android do
     upload_to_play_store(
       track: "beta",
       aab: "app/build/outputs/bundle/release/app-release.aab",
-      json_key: "/Users/sushanthtiruvaipati/Downloads/summaryai-483115-a27fc5121150.json",
+      json_key: "/Users/sushanthtiruvaipati/Documents/apple_dev/cloud_credentials/summaryai-483115-a27fc5121150.json",
       package_name: "com.kreativekoala.riddleverse",
       skip_upload_metadata: true,
       skip_upload_images: true,
