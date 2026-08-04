@@ -28,3 +28,9 @@ SourcePackages/
 DerivedData/
 *.aab
 *.apk
+
+# Contains RELEASE_STORE_PASSWORD / RELEASE_KEY_PASSWORD for the shared
+# signing keystore — was tracked in git since 2026-03-31, untracked
+# 2026-08-03. Local file stays untouched so builds keep working; ask
+# before recreating it as tracked.
+gradle.properties

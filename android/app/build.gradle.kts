@@ -9,7 +9,7 @@ plugins {
 
 android {
     namespace = "com.kreativekoala.riddleverse"
-    compileSdk = 35
+    compileSdk = 36
 
     signingConfigs {
         create("release") {
@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId = "com.kreativekoala.riddleverse"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 168
         versionName = "168.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -35,10 +35,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = "17"
     }
 
     buildFeatures {
@@ -80,6 +76,14 @@ android {
                 useVersion(libs.versions.coroutines.get())
             }
         }
+    }
+}
+
+// Replaces the deprecated android { kotlinOptions { jvmTarget = "17" } }
+// block — hard compile error under AGP 9's Kotlin DSL script compilation.
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
