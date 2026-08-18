@@ -25,7 +25,6 @@ navigationComposeJvmstubs = "2.9.0"
 storage = "1.5.0"
 media3CommonKtx = "1.7.1"
 media3Exoplayer = "1.7.1"
-billing = "7.1.1"
 media3Ui = "1.7.1"
 playServicesMeasurementApi = "22.4.0"
 animationCoreAndroid = "1.6.6"
@@ -48,7 +47,6 @@ material = "1.13.0"
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 unity-ads-mediation = { module = "com.google.ads.mediation:unity", version.ref = "unity-ads-mediation" }
-billing-client = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
