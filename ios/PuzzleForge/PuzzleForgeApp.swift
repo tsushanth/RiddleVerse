@@ -34,6 +34,14 @@ struct PuzzleForgeApp: App {
         // Configure RevenueCat
         Purchases.configure(withAPIKey: "appl_tZKpnerYPqsLVwlYzmvgIywpjnP")
 
+        // Link attribution IDs so RevenueCat can report subscriber LTV back to
+        // Facebook Ads and Firebase/Google Ads for campaign optimization
+        Purchases.shared.attribution.collectDeviceIdentifiers()
+        Purchases.shared.attribution.setFBAnonymousID(AppEvents.shared.anonymousID)
+        if let firebaseAppInstanceID = Analytics.appInstanceID() {
+            Purchases.shared.attribution.setFirebaseAppInstanceID(firebaseAppInstanceID)
+        }
+
         // Configure Firebase Analytics for campaign measurement
         configureCampaignTracking()
         
