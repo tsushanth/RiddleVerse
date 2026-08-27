@@ -14,6 +14,7 @@
 import SwiftUI
 import FirebaseAuth
 import PaywallKit
+import StoreKit
 
 // MARK: - Profile Section
 struct ProfileSectionView: View {
@@ -66,7 +67,7 @@ struct AppFeaturesSectionView: View {
                 SettingsRowView(icon: "star.fill", title: "Rate RiddleVerse", action: onRateApp, iconColor: .orange)
                 Divider()
                 SettingsRowView(icon: "tag.fill", title: "Redeem Promo Code", action: {
-                    OfferCodeManager.shared.presentRedemptionSheet()
+                    SKPaymentQueue.default().presentCodeRedemptionSheet()
                 }, iconColor: .green)
             }
             .background(Color(.systemGray6))
