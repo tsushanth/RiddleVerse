@@ -130,16 +130,3 @@ struct SubscriptionUpgradeView: View {
     }
 }
 
-// MARK: - Safari View for Legal Pages
-import SafariServices
-
-struct SafariView: UIViewControllerRepresentable {
-    let url: URL
-    
-    func makeUIViewController(context: Context) -> SFSafariViewController {
-        return SFSafariViewController(url: url)
-    }
-    
-    func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}
-}
-
