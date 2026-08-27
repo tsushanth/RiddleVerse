@@ -359,7 +359,8 @@ struct GameBrowseCard: View {
                             .foregroundColor(.white.opacity(0.85))
                             .shadow(radius: 4)
                     }
-                    .frame(maxWidth: .infinity, height: 180)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 180)
                     .clipped()
                 }
                 .buttonStyle(.plain)
