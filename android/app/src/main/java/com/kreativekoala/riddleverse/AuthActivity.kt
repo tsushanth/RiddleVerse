@@ -387,6 +387,7 @@ class AuthActivity : AppCompatActivity() {
 
     fun signOut() {
         auth.signOut()
+        Purchases.sharedInstance.logOut()
         googleSignInClient.signOut().addOnCompleteListener(this) {
             // Restart auth activity
             val intent = Intent(this, AuthActivity::class.java)

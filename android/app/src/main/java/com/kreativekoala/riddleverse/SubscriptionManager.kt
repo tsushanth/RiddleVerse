@@ -206,9 +206,11 @@ class SubscriptionManager private constructor(
                     updateTierFromCustomerInfo(customerInfo)
                     purchaseState = PurchaseState.Success
 
-                    // Track purchase events for ad attribution
+                    // Track purchase events for ad attribution and LTV reporting
                     val productId = storeTransaction.productIds.firstOrNull() ?: ""
-                    AnalyticsManager.getInstance()?.track(AnalyticsEvent.subscriptionPurchase(currentTier.name, 0.0, "USD"))
+                    val price = pkg.product.price.amountMicros / 1_000_000.0
+                    val currencyCode = pkg.product.price.currencyCode
+                    AnalyticsManager.getInstance()?.track(AnalyticsEvent.subscriptionPurchase(currentTier.name, price, currencyCode))
                     TikTokHelper.trackEvent("purchase_success", mapOf("product_id" to productId))
 
                     notifyBackendOfPurchase(storeTransaction)
