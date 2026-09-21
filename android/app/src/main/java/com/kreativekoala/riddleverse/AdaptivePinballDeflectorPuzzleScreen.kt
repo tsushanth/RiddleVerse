@@ -1,6 +1,7 @@
 // AdaptivePinballDeflectorPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -17,6 +18,11 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.RvMintEdge
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -208,7 +214,7 @@ fun AdaptivePinballDeflectorPuzzleScreen(
                 adaptationInfo = config
                 if (config.confidenceScore > 0.5f) {
                     currentDifficultyLevel = config.level
-                    showAdaptationNotification = true
+                    showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                 }
             }
 
@@ -263,7 +269,7 @@ fun AdaptivePinballDeflectorPuzzleScreen(
                 adaptationInfo = config
                 if (config.confidenceScore > 0.5f) {
                     currentDifficultyLevel = config.level
-                    showAdaptationNotification = true
+                    showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                 }
             }
 
@@ -444,145 +450,176 @@ fun AdaptivePinballDeflectorPuzzleScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF1E1E1E))
-                .padding(16.dp)
+                .background(RvCanvas)
         ) {
-            // Enhanced header with adaptive difficulty info
-            AdaptivePinballTopBar(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                totalScore = totalScore,
-                attempts = attempts,
-                onBack = onBack,
-                modifier = Modifier.fillMaxWidth()
-            )
+            val compact = maxHeight < 600.dp
+            val pad = if (compact) 8.dp else 16.dp
+            val wide = maxWidth > maxHeight && maxWidth >= 480.dp
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Adaptive difficulty notification
-            AnimatedVisibility(
-                visible = showAdaptationNotification,
-                enter = slideInVertically() + fadeIn(),
-                exit = slideOutVertically() + fadeOut()
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
-                    )
+            val header: @Composable () -> Unit = {
+                AdaptivePinballTopBar(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    totalScore = totalScore,
+                    attempts = attempts,
+                    onBack = onBack,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            val notice: @Composable () -> Unit = {
+                AnimatedVisibility(
+                    visible = showAdaptationNotification,
+                    enter = slideInVertically() + fadeIn(),
+                    exit = slideOutVertically() + fadeOut()
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.TrendingUp,
-                            contentDescription = "Difficulty adjusted",
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Physics Challenge Adapted!",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                text = adaptationInfo?.adjustmentReason ?: "",
-                                fontSize = 10.sp,
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        }
-                        IconButton(
-                            onClick = { showAdaptationNotification = false },
-                            modifier = Modifier.size(20.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
-                                Icons.Default.Close,
-                                contentDescription = "Dismiss",
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp)
+                                Icons.Default.TrendingUp,
+                                contentDescription = "Difficulty adjusted",
+                                tint = RvInk,
+                                modifier = Modifier.size(20.dp)
                             )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "Physics Challenge Adapted!",
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = RvInk
+                                )
+                                Text(
+                                    text = adaptationInfo?.adjustmentReason ?: "",
+                                    fontSize = 10.sp,
+                                    color = RvInkSoft.copy(alpha = 0.9f)
+                                )
+                            }
+                            IconButton(
+                                onClick = { showAdaptationNotification = false },
+                                modifier = Modifier.size(20.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Dismiss",
+                                    tint = RvInk,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
                         }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Game state indicator with difficulty info
-            when (gameState) {
-                PinballGameState.MEMORIZING -> {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+            val status: @Composable () -> Unit = {
+                when (gameState) {
+                    PinballGameState.MEMORIZING -> {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Memorize deflector positions: ${timeLeft}s",
+                                color = RvInk,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = "${currentDifficultyLevel.name} • ${puzzleData.matrixSize}x${puzzleData.matrixSize} • ${puzzleData.deflectors.size} deflectors",
+                                color = RvSkyEdge,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                    PinballGameState.GUESSING -> {
                         Text(
-                            text = "Memorize deflector positions: ${timeLeft}s",
-                            color = Color.Yellow,
+                            text = "Select where the ball will end up",
+                            color = RvInk,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
+                    }
+                    PinballGameState.SHOWING_RESULT -> {
                         Text(
-                            text = "${currentDifficultyLevel.name} • ${puzzleData.matrixSize}x${puzzleData.matrixSize} • ${puzzleData.deflectors.size} deflectors",
-                            color = Color.Cyan,
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
+                            text = if (isCorrect) "Correct! 🎉" else "Incorrect ❌",
+                            color = if (isCorrect) RvMintEdge else RvCoralEdge,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
                     }
                 }
-                PinballGameState.GUESSING -> {
-                    Text(
-                        text = "Select where the ball will end up",
-                        color = Color.Cyan,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                PinballGameState.SHOWING_RESULT -> {
-                    Text(
-                        text = if (isCorrect) "Correct! 🎉" else "Incorrect ❌",
-                        color = if (isCorrect) Color.Green else Color.Red,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
+            }
+            val board: @Composable (Modifier) -> Unit = { m ->
+                PinballGameBoard(
+                    matrixSize = puzzleData.matrixSize,
+                    startPosition = puzzleData.startPosition,
+                    startDirection = puzzleData.startDirection,
+                    deflectors = puzzleData.deflectors,
+                    selectedEndPosition = selectedEndPosition,
+                    correctEndPosition = correctEndPosition,
+                    ballPath = ballPath,
+                    trajectoryProgress = trajectoryProgress,
+                    gameState = gameState,
+                    onCellClick = ::handleCellSelection,
+                    modifier = m
+                )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Game board
-            PinballGameBoard(
-                matrixSize = puzzleData.matrixSize,
-                startPosition = puzzleData.startPosition,
-                startDirection = puzzleData.startDirection,
-                deflectors = puzzleData.deflectors,
-                selectedEndPosition = selectedEndPosition,
-                correctEndPosition = correctEndPosition,
-                ballPath = ballPath,
-                trajectoryProgress = trajectoryProgress,
-                gameState = gameState,
-                onCellClick = ::handleCellSelection,
-                modifier = Modifier.weight(1f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+            if (wide) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(pad),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    board(Modifier.weight(1f).fillMaxHeight())
+                    Column(
+                        modifier = Modifier.weight(0.7f).widthIn(max = 360.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+                    ) {
+                        header()
+                        notice()
+                        status()
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(pad),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    header()
+                    notice()
+                    Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+                    status()
+                    Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+                    board(Modifier.weight(1f).fillMaxWidth())
+                }
+            }
         }
 
         // Universal Feedback Overlay
@@ -606,7 +643,7 @@ fun AdaptivePinballTopBar(
         Row(
             modifier = modifier,
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
                 onClick = onBack,
@@ -614,24 +651,24 @@ fun AdaptivePinballTopBar(
                     .size(48.dp)
                     .background(Color(0xFF444444), CircleShape)
             ) {
-                Text("←", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                Text("←", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Adaptive Pinball Deflector",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = "Level ${level.level}",
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     fontSize = 14.sp
                 )
                 Text(
                     text = currentDifficulty.name,
-                    color = Color.Cyan,
+                    color = RvSkyEdge,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -641,9 +678,9 @@ fun AdaptivePinballTopBar(
                 Text(
                     text = timer,
                     color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
-                        Color.Red
+                        RvCoralEdge
                     } else {
-                        Color.White
+                        RvInk
                     },
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -666,7 +703,7 @@ fun AdaptivePinballTopBar(
 
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -680,7 +717,7 @@ fun AdaptivePinballTopBar(
                     if (totalScore > 0) {
                         Text(
                             text = "${stringResource(R.string.score_label)}: $totalScore",
-                            color = Color.White,
+                            color = RvInk,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -688,7 +725,7 @@ fun AdaptivePinballTopBar(
 
                     Text(
                         text = currentDifficulty.name.uppercase(),
-                        color = Color.Yellow,
+                        color = RvSunEdge,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -696,7 +733,7 @@ fun AdaptivePinballTopBar(
                     if (attempts > 0) {
                         Text(
                             text = "Attempt: $attempts",
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft.copy(alpha = 0.8f),
                             fontSize = 12.sp
                         )
                     }

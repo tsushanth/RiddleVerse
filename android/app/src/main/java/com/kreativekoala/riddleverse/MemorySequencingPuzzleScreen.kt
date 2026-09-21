@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.animation.*
@@ -9,6 +10,13 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -377,15 +385,7 @@ fun SequencingPuzzleScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
-                    )
-                )
-            )
+            .background(RvCanvas)
     ) {
         when (currentPhase) {
             SequencingPhase.AUDIO_INTRO -> {
@@ -627,7 +627,7 @@ fun SequencingPuzzleScreen(
     }
 }
 
-// Enhanced Sequencing Screen with score display
+// Enhanced Sequencing Screen: fit-to-screen (HUD on top, list fills the middle, Submit pinned)
 @Composable
 private fun EnhancedSequencingScreen(
     title: String,
@@ -647,161 +647,158 @@ private fun EnhancedSequencingScreen(
     onSubmit: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        val compact = maxHeight < 600.dp
+        val wide = maxWidth > maxHeight && maxWidth >= 560.dp
 
-        // Top bar with live timer and current hearts
-        EnhancedSequencingTopBar(
-            level = level,
-            streakInfo = streakInfo,
-            timer = timer,
-            lives = hearts,
-            onBack = onBack,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        // Score display (if any score accumulated)
-        if (totalScore > 0 || phaseScores.isNotEmpty()) {
-            Card(
+        val listContent: @Composable (Modifier) -> Unit = { listModifier ->
+            SequenceItemList(
+                items = items,
+                modifier = listModifier,
+                draggedItemIndex = draggedItemIndex,
+                dragOffset = dragOffset,
+                onItemDrag = onItemDrag,
+                onItemDrop = onItemDrop
+            )
+        }
+        val submitButton: @Composable () -> Unit = {
+            Button(
+                onClick = onSubmit,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
-                ),
-                shape = RoundedCornerShape(12.dp)
+                    .heightIn(min = 56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
+                shape = RoundedCornerShape(28.dp)
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Total Score: $totalScore",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-
-                        Text(
-                            text = currentPhase,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
-
-                    // Show phase breakdown if available
-                    if (phaseScores.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            phaseScores.forEach { (phase, score) ->
-                                Text(
-                                    text = "${phase.capitalize()}: +$score",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color(0xFF4CAF50)
-                                )
-                            }
-                        }
-                    }
-                }
+                Text(
+                    text = stringResource(R.string.submit),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone
+                )
             }
-
-            Spacer(modifier = Modifier.height(8.dp))
-        } else {
-            Spacer(modifier = Modifier.height(20.dp))
+        }
+        val headings: @Composable () -> Unit = {
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                text = subtitle,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvInkSoft,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+            if (totalScore > 0) {
+                Text(
+                    text = "Total Score: $totalScore  ·  $currentPhase",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
 
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = subtitle,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Text(
-            text = "DRAG TO REORDER",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.5f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Draggable items list
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 720.dp)
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = if (compact) 8.dp else 16.dp)
         ) {
-            itemsIndexed(items) { index, item ->
+            EnhancedSequencingTopBar(
+                level = level,
+                streakInfo = streakInfo,
+                timer = timer,
+                lives = hearts,
+                onBack = onBack,
+                modifier = Modifier
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+
+            if (wide) {
+                Row(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    listContent(Modifier.weight(1.4f).fillMaxHeight())
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                    ) {
+                        headings()
+                        Spacer(Modifier.height(8.dp))
+                        submitButton()
+                    }
+                }
+            } else {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) { headings() }
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
+                listContent(Modifier.weight(1f).fillMaxWidth())
+                Spacer(modifier = Modifier.height(if (compact) 8.dp else 12.dp))
+                submitButton()
+            }
+        }
+    }
+}
+
+/**
+ * Reorderable list sized so all items fit the available height (items shrink between 48 and 84dp).
+ * The vertical scroll is only an invisible last-resort net for very many items on tiny screens.
+ */
+@Composable
+private fun SequenceItemList(
+    items: List<SequenceItem>,
+    modifier: Modifier,
+    draggedItemIndex: Int,
+    dragOffset: Offset,
+    onItemDrag: (Int, Offset) -> Unit,
+    onItemDrop: (Int, Int) -> Unit
+) {
+    BoxWithConstraints(modifier = modifier.testTag("sequence_list")) {
+        val gap = 8.dp
+        val n = items.size.coerceAtLeast(1)
+        val itemHeight = ((maxHeight - gap * (n - 1)) / n).coerceIn(48.dp, 84.dp)
+        Column(
+            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(gap, Alignment.CenterVertically)
+        ) {
+            items.forEachIndexed { index, item ->
                 DraggableSequenceItem(
                     item = item,
                     index = index,
                     isDragged = draggedItemIndex == index,
                     dragOffset = if (draggedItemIndex == index) dragOffset else Offset.Zero,
                     onDrag = { offset -> onItemDrag(index, offset) },
-                    onDrop = { toIndex -> onItemDrop(index, toIndex) }
+                    onDrop = { toIndex -> onItemDrop(index, toIndex) },
+                    itemHeight = itemHeight,
+                    slotHeight = itemHeight + gap
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Submit button
-        Button(
-            onClick = onSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4)
-            ),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.submit),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-
-        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
-// Enhanced top bar with current hearts and live timer
+// Compact single-row HUD: back, level, lives, timer
 @Composable
 private fun EnhancedSequencingTopBar(
     level: UserLevel,
@@ -812,47 +809,37 @@ private fun EnhancedSequencingTopBar(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.statusBarsPadding().fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().heightIn(min = 48.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left side: Back button and level
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.weight(1f),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
                 onClick = onBack,
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(24.dp)
                 )
             }
-
-            Column {
-                Text(
-                    text = "Level ${level.level}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                // Level progress bar
-                LevelProgressBar(
-                    level = level,
-                    modifier = Modifier.width(120.dp)
-                )
-            }
+            Text(
+                text = "Level ${level.level}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                maxLines = 1
+            )
         }
 
-        // Center: Lives display with enhanced styling
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             repeat(5) { index ->
                 Text(
@@ -862,29 +849,19 @@ private fun EnhancedSequencingTopBar(
             }
         }
 
-        // Right side: Timer with color coding and streak
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
-            Text(
-                text = timer,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
-                    Color.Red // Red when ≤30 seconds
-                } else {
-                    Color.White
-                }
-            )
-
-            // Streak display
-            if (streakInfo.currentStreak > 0) {
-                StreakDisplay(
-                    streakInfo = streakInfo,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+        Text(
+            text = timer,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f),
+            color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
+                RvCoralEdge // Red when ≤30 seconds
+            } else {
+                RvInk
             }
-        }
+        )
     }
 }
 
@@ -894,135 +871,135 @@ private fun AudioIntroScreen(
     onBegin: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        // Back button
-        Row(
+        val compact = maxHeight < 600.dp
+        Column(
             modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 640.dp)
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Start
+                .statusBarsPadding()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = if (compact) 8.dp else 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color.White
-                )
+            // Back button
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvInk
+                    )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = "THIS GAME REQUIRES AUDIO",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        // Audio icon with pulsing animation
-        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-        val scale by infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 1.2f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "scale"
-        )
-
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(
-                    Color.White.copy(alpha = 0.1f),
-                    CircleShape
-                )
-                .scale(scale),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.VolumeUp,
-                contentDescription = "Audio",
-                tint = Color.White,
-                modifier = Modifier.size(60.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Text(
-            text = "LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            lineHeight = 24.sp
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Scoring information
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.1f)
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
             Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 24.dp, Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "💯 Scoring Guide",
-                    fontSize = 14.sp,
+                    text = "THIS GAME REQUIRES AUDIO",
+                    fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                // Audio icon with pulsing animation
+                val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                val scale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1000),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "scale"
+                )
+
+                Box(
+                    modifier = Modifier
+                        .size(if (compact) 64.dp else 120.dp)
+                        .scale(scale)
+                        .background(RvViolet, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VolumeUp,
+                        contentDescription = "Audio",
+                        tint = RvOnTone,
+                        modifier = Modifier.size(if (compact) 32.dp else 60.dp)
+                    )
+                }
 
                 Text(
-                    text = "• Memory Bonus: Quick sequencing\n• Complexity Bonus: Final phase\n• Sequence Accuracy: Correct order\n• Hearts Lost: Wrong sequences",
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    text = "LISTEN TO TWO PARTS AND\nSEQUENCE THE EVENTS",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
-                    lineHeight = 16.sp
+                    lineHeight = 24.sp
+                )
+
+                // Scoring information (dropped on short screens)
+                if (!compact) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = RvSurface),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "💯 Scoring Guide",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = RvInk
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = "• Memory Bonus: Quick sequencing\n• Complexity Bonus: Final phase\n• Sequence Accuracy: Correct order\n• Hearts Lost: Wrong sequences",
+                                fontSize = 14.sp,
+                                color = RvInkSoft,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 20.sp
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Button(
+                onClick = onBegin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.begin),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone
                 )
             }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onBegin,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4)
-            ),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.begin),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
         }
     }
 }
@@ -1190,112 +1167,111 @@ private fun AudioListeningScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Top bar
-        EnhancedSequencingTopBar(
-            level = level,
-            streakInfo = streakInfo,
-            timer = timer,
-            lives = hearts,
-            onBack = onBack,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = subtitle,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Audio wave visualization
-        Canvas(
+        val compact = maxHeight < 600.dp
+        Column(
             modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 640.dp)
                 .fillMaxWidth()
-                .height(120.dp)
-                .padding(horizontal = 40.dp)
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp)
         ) {
-            drawAudioWaves(audioWaves, isPlaying)
-        }
+            // Top bar
+            EnhancedSequencingTopBar(
+                level = level,
+                streakInfo = streakInfo,
+                timer = timer,
+                lives = hearts,
+                onBack = onBack,
+                modifier = Modifier
+            )
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            text = if (isPlaying) "LISTENING..." else "LISTEN CAREFULLY",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // IMPROVED: Add skip option for accessibility
-        if (showSkipOption && isPlaying) {
-            Spacer(modifier = Modifier.height(20.dp))
-
-            TextButton(
-                onClick = {
-                    Log.d("SequencingPuzzle", "🏃 User chose to skip audio")
-                    onAudioCompleted()
-                },
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp, Alignment.CenterVertically)
             ) {
                 Text(
-                    text = "Skip Audio →",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.7f)
+                    text = title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
+
+                Text(
+                    text = subtitle,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Audio wave visualization (shrinks on short screens)
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(if (compact) 48.dp else 120.dp)
+                        .padding(horizontal = 24.dp)
+                ) {
+                    drawAudioWaves(audioWaves, isPlaying)
+                }
+
+                Text(
+                    text = if (isPlaying) "LISTENING..." else "LISTEN CAREFULLY",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (isPlaying) RvSkyEdge else RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Skip option for accessibility
+                if (showSkipOption && isPlaying) {
+                    TextButton(
+                        onClick = { onAudioCompleted() },
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    ) {
+                        Text(
+                            text = "Skip Audio →",
+                            fontSize = 14.sp,
+                            color = RvInk
+                        )
+                    }
+                }
+
+                // Description card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = RvSurface),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text(
+                        text = description,
+                        fontSize = 14.sp,
+                        color = RvInkSoft,
+                        textAlign = TextAlign.Center,
+                        maxLines = if (compact) 3 else 6,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(if (compact) 8.dp else 16.dp),
+                        lineHeight = 18.sp
+                    )
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Description card
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.1f)
-            ),
-            shape = RoundedCornerShape(12.dp)
-        ) {
-            Text(
-                text = description,
-                fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.8f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(16.dp),
-                lineHeight = 18.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 }
 
-// Draggable item, feedback screen, and helper functions remain the same...
+// Draggable item (height is supplied by the fitting list; slotHeight = item + gap, used for drop maths)
 @Composable
 private fun DraggableSequenceItem(
     item: SequenceItem,
@@ -1303,7 +1279,9 @@ private fun DraggableSequenceItem(
     isDragged: Boolean,
     dragOffset: Offset,
     onDrag: (Offset) -> Unit,
-    onDrop: (Int) -> Unit
+    onDrop: (Int) -> Unit,
+    itemHeight: androidx.compose.ui.unit.Dp = 80.dp,
+    slotHeight: androidx.compose.ui.unit.Dp = 80.dp
 ) {
     val haptics = LocalHapticFeedback.current
     var dragState by remember { mutableStateOf(Offset.Zero) }
@@ -1311,12 +1289,13 @@ private fun DraggableSequenceItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(itemHeight)
             .offset {
                 if (isDragged) IntOffset(dragState.x.roundToInt(), dragState.y.roundToInt())
                 else IntOffset.Zero
             }
             .zIndex(if (isDragged) 1f else 0f)
-            .pointerInput(Unit) {
+            .pointerInput(slotHeight) {
                 detectDragGestures(
                     onDragStart = { offset ->
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -1329,42 +1308,44 @@ private fun DraggableSequenceItem(
                     },
                     onDragEnd = {
                         // Calculate drop position based on drag offset
-                        val itemHeight = 80.dp.toPx()
-                        val offsetItems = (dragState.y / itemHeight).roundToInt()
+                        val itemHeightPx = slotHeight.toPx()
+                        val offsetItems = (dragState.y / itemHeightPx).roundToInt()
                         val newIndex = (index + offsetItems).coerceIn(0, Int.MAX_VALUE)
                         onDrop(newIndex)
                         dragState = Offset.Zero
                     }
                 )
-            }
-            .let { modifier ->
-                when {
-                    item.isCorrect -> modifier.border(2.dp, Color.Green, RoundedCornerShape(12.dp))
-                    item.isIncorrect -> modifier.border(2.dp, Color.Red, RoundedCornerShape(12.dp))
-                    else -> modifier
-                }
             },
+        border = BorderStroke(
+            if (item.isCorrect || item.isIncorrect || isDragged) 2.dp else 1.dp,
+            when {
+                item.isCorrect -> RvSuccessEdge
+                item.isIncorrect -> RvErrorEdge
+                isDragged -> RvSkyEdge
+                else -> RvOutline
+            }
+        ),
         colors = CardDefaults.cardColors(
             containerColor = when {
-                item.isCorrect -> Color.Green.copy(alpha = 0.2f)
-                item.isIncorrect -> Color.Red.copy(alpha = 0.2f)
-                isDragged -> Color(0xFF00BCD4).copy(alpha = 0.3f)
-                else -> Color.White.copy(alpha = 0.1f)
+                item.isCorrect -> RvSuccess.copy(alpha = 0.2f)
+                item.isIncorrect -> RvError.copy(alpha = 0.2f)
+                isDragged -> RvSky.copy(alpha = 0.3f)
+                else -> RvSurfaceRaised
             }
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.DragHandle,
                 contentDescription = "Drag",
-                tint = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.size(20.dp)
+                tint = RvInkSoft,
+                modifier = Modifier.size(24.dp)
             )
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -1373,8 +1354,8 @@ private fun DraggableSequenceItem(
                 text = "${index + 1}.",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.width(24.dp)
+                color = RvInkSoft,
+                modifier = Modifier.width(28.dp)
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -1383,10 +1364,18 @@ private fun DraggableSequenceItem(
                 text = item.text,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.weight(1f),
-                lineHeight = 20.sp
+                lineHeight = 20.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
+
+            if (item.isCorrect) {
+                Icon(Icons.Default.Check, contentDescription = null, tint = RvSuccessEdge, modifier = Modifier.size(24.dp))
+            } else if (item.isIncorrect) {
+                Icon(Icons.Default.Close, contentDescription = null, tint = RvErrorEdge, modifier = Modifier.size(24.dp))
+            }
         }
     }
 }
@@ -1397,85 +1386,101 @@ private fun FeedbackScreen(
     items: List<SequenceItem>,
     onContinue: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Text(
-            text = title,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        // Show correct order
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        val compact = maxHeight < 600.dp
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 640.dp)
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(top = if (compact) 8.dp else 24.dp, bottom = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            itemsIndexed(items) { index, item ->
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.Green.copy(alpha = 0.2f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
+            Text(
+                text = title,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(modifier = Modifier.height(if (compact) 8.dp else 16.dp))
+
+            // Show correct order (items shrink to fit; scroll is a last-resort net only)
+            BoxWithConstraints(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                val gap = 8.dp
+                val n = items.size.coerceAtLeast(1)
+                val itemHeight = ((maxHeight - gap * (n - 1)) / n).coerceIn(48.dp, 72.dp)
+                Column(
+                    modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(gap, Alignment.CenterVertically)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "${index + 1}.",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Green,
-                            modifier = Modifier.width(24.dp)
-                        )
+                    items.forEachIndexed { index, item ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth().height(itemHeight),
+                            border = BorderStroke(2.dp, RvSuccessEdge),
+                            colors = CardDefaults.cardColors(
+                                containerColor = RvSuccess.copy(alpha = 0.2f)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "${index + 1}.",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = RvInk,
+                                    modifier = Modifier.width(28.dp)
+                                )
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
 
-                        Text(
-                            text = item.text,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White,
-                            modifier = Modifier.weight(1f),
-                            lineHeight = 20.sp
-                        )
+                                Text(
+                                    text = item.text,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = RvInk,
+                                    modifier = Modifier.weight(1f),
+                                    lineHeight = 20.sp,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Icon(Icons.Default.Check, contentDescription = null, tint = RvSuccessEdge, modifier = Modifier.size(24.dp))
+                            }
+                        }
                     }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Button(
-            onClick = onContinue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4)
-            ),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.continue_label_caps),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            Button(
+                onClick = onContinue,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.continue_label_caps),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone
+                )
+            }
         }
     }
 }
@@ -1485,92 +1490,103 @@ private fun PartTwoIntroScreen(
     topic: String,
     onContinue: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = topic.uppercase(),
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "PART TWO OF TWO",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        // Animated decorative elements
-        val infiniteTransition = rememberInfiniteTransition(label = "decoration")
-        val rotation by infiniteTransition.animateFloat(
-            initialValue = 0f,
-            targetValue = 360f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(3000),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "rotation"
-        )
-
-        Box(
-            modifier = Modifier.size(100.dp),
-            contentAlignment = Alignment.Center
+        val compact = maxHeight < 600.dp
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 640.dp)
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Canvas(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { rotationZ = rotation }
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 20.dp, Alignment.CenterVertically)
             ) {
-                val center = Offset(size.width / 2, size.height / 2)
-                val radius = size.minDimension / 4
-
-                drawCircle(
-                    color = Color(0xFF00BCD4).copy(alpha = 0.3f),
-                    radius = radius,
-                    center = center,
-                    style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3.dp.toPx())
+                Text(
+                    text = topic.uppercase(),
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                drawCircle(
-                    color = Color(0xFF00BCD4).copy(alpha = 0.5f),
-                    radius = radius / 2,
-                    center = center
+                Text(
+                    text = "PART TWO OF TWO",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center
+                )
+
+                // Animated decorative element (dropped on short screens)
+                if (!compact) {
+                    val infiniteTransition = rememberInfiniteTransition(label = "decoration")
+                    val rotation by infiniteTransition.animateFloat(
+                        initialValue = 0f,
+                        targetValue = 360f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(3000),
+                            repeatMode = RepeatMode.Restart
+                        ),
+                        label = "rotation"
+                    )
+
+                    Box(
+                        modifier = Modifier.size(100.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Canvas(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer { rotationZ = rotation }
+                        ) {
+                            val center = Offset(size.width / 2, size.height / 2)
+                            val radius = size.minDimension / 4
+
+                            drawCircle(
+                                color = RvSky.copy(alpha = 0.3f),
+                                radius = radius,
+                                center = center,
+                                style = androidx.compose.ui.graphics.drawscope.Stroke(width = 3.dp.toPx())
+                            )
+
+                            drawCircle(
+                                color = RvSky.copy(alpha = 0.5f),
+                                radius = radius / 2,
+                                center = center
+                            )
+                        }
+                    }
+                }
+            }
+
+            Button(
+                onClick = onContinue,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                Text(
+                    text = "Continue to Part Two",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone,
+                    maxLines = 2,
+                    textAlign = TextAlign.Center
                 )
             }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onContinue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4)
-            ),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Text(
-                text = "Continue to Part Two",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
         }
     }
 }
@@ -1657,7 +1673,7 @@ private fun generateAnimatedWaves(): List<Float> {
 }
 
 private fun DrawScope.drawAudioWaves(waves: List<Float>, isPlaying: Boolean) {
-    val waveColor = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.3f)
+    val waveColor = if (isPlaying) RvSky else RvInkSoft
     val barWidth = size.width / waves.size
     val centerY = size.height / 2
 

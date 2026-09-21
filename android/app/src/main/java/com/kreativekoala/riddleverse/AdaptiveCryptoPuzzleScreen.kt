@@ -1,6 +1,7 @@
 // AdaptiveCryptoPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -28,6 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -213,7 +218,7 @@ fun AdaptiveCryptoWordScreenWithTimer(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -281,122 +286,163 @@ fun AdaptiveCryptoWordScreenWithTimer(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().padding(top = 24.dp)) {
-        // ✅ REPLACE: Use unified header instead of AdaptiveCryptoPuzzleHeader
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = timer,
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = finalScore,
-            puzzleType = "cryptoPuzzle",
-            competitiveInsight = competitiveInsight,
-            onBack = onBack,
-            onHint = {
-                showHint = !showHint
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            }
-        )
+    // Fit-to-screen: HUD on top, puzzle text taking the remaining space (cells are sized to fit),
+    // letter keyboard pinned at the bottom. Landscape/wide: puzzle left, keyboard right.
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val wide = maxWidth > maxHeight
+        val compact = wide || maxHeight < 720.dp
 
-        // ✅ REPLACE: Use unified adaptation notification
-        UnifiedAdaptationNotification(
-            adaptationInfo = adaptationInfo,
-            puzzleType = "cryptoPuzzle",
-            visible = showAdaptationNotification,
-            onDismiss = { showAdaptationNotification = false }
-        )
-
-        // Wrong answer feedback
-        if (showWrongFeedback) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFFCDD2))
-            ) {
-                Row(
-                    modifier = Modifier.padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "❌ Wrong letter! Try again.",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = Color(0xFFD32F2F),
-                        textAlign = TextAlign.Center
+        val hud: @Composable () -> Unit = {
+            if (compact) {
+                CryptoCompactHud(
+                    timer = timer,
+                    hearts = currentHearts,
+                    onBack = onBack,
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                )
+            } else {
+                Column(modifier = Modifier.padding(top = 24.dp)) {
+                    AdaptiveUnifiedHeader(
+                        level = currentLevel,
+                        streakInfo = streakInfo,
+                        timer = timer,
+                        lives = currentHearts,
+                        currentDifficulty = currentDifficultyLevel,
+                        score = finalScore,
+                        puzzleType = "cryptoPuzzle",
+                        competitiveInsight = competitiveInsight,
+                        onBack = onBack,
+                        onHint = {
+                            showHint = !showHint
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
                     )
                 }
             }
         }
 
-        // Success message
-        if (isComplete) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Text(
-                    text = "🎉 Puzzle Solved! Score: $finalScore",
-                    modifier = Modifier.padding(12.dp),
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        // Main puzzle area
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-        ) {
-            AdaptiveCryptoPuzzleDisplay(
-                originalText = adaptivePuzzleData.originalText,
-                numberMapping = adaptivePuzzleData.numberMapping,
-                userMapping = userMapping,
-                selectedNumber = selectedNumber,
-                lockedPositions = currentlyLockedPositions,
-                onNumberSelected = { selectedNumber = if (selectedNumber == it) null else it },
-                cryptoLetters = adaptivePuzzleData.numberMapping.keys
+        val status: @Composable () -> Unit = {
+            UnifiedAdaptationNotification(
+                adaptationInfo = adaptationInfo,
+                puzzleType = "cryptoPuzzle",
+                visible = showAdaptationNotification,
+                onDismiss = { showAdaptationNotification = false }
             )
-        }
 
-        // Enhanced keyboard with adaptive features
-        AdaptiveLetterSelectionKeyboard(
-            selectedNumber = selectedNumber,
-            userMapping = userMapping,
-            numberMapping = adaptivePuzzleData.numberMapping,
-            adaptiveConfig = adaptiveConfig,
-            onLetterSelected = { letter ->
-                selectedNumber?.let { number ->
-                    totalAnswers++
-                    if (placeLetter(number, letter)) {
-                        // Correct answer
-                        selectedNumber = null
-                        currentStreak++
-                        correctAnswers++
-                    } else {
-                        // Wrong answer
-                        showWrongFeedback = true
-                        currentHearts = maxOf(0, currentHearts - 1)
-                        currentStreak = 0
-                        selectedNumber = null
-
-                        recordAdaptivePerformance(
-                            isCorrect = false,
-                            timeSpent = System.currentTimeMillis() - startTime,
-                            streak = 0,
-                            livesRemaining = currentHearts
+            if (showWrongFeedback) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFFFCDD2))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "❌ Wrong letter! Try again.",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = Color(0xFFB71C1C),
+                            textAlign = TextAlign.Center,
+                            maxLines = 2
                         )
                     }
                 }
             }
-        )
+
+            if (isComplete) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                ) {
+                    Text(
+                        text = "🎉 Puzzle Solved! Score: $finalScore",
+                        modifier = Modifier.padding(8.dp).fillMaxWidth(),
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
+                    )
+                }
+            }
+        }
+
+        val puzzle: @Composable (Modifier) -> Unit = { m ->
+            Box(modifier = m.padding(horizontal = 8.dp, vertical = 4.dp).testTag("crypto_puzzle")) {
+                AdaptiveCryptoPuzzleDisplay(
+                    originalText = adaptivePuzzleData.originalText,
+                    numberMapping = adaptivePuzzleData.numberMapping,
+                    userMapping = userMapping,
+                    selectedNumber = selectedNumber,
+                    lockedPositions = currentlyLockedPositions,
+                    onNumberSelected = { selectedNumber = if (selectedNumber == it) null else it },
+                    cryptoLetters = adaptivePuzzleData.numberMapping.keys
+                )
+            }
+        }
+
+        val keyboard: @Composable (Modifier) -> Unit = { m ->
+            AdaptiveLetterSelectionKeyboard(
+                modifier = m.testTag("crypto_keyboard"),
+                selectedNumber = selectedNumber,
+                userMapping = userMapping,
+                numberMapping = adaptivePuzzleData.numberMapping,
+                adaptiveConfig = adaptiveConfig,
+                onLetterSelected = { letter ->
+                    selectedNumber?.let { number ->
+                        totalAnswers++
+                        if (placeLetter(number, letter)) {
+                            // Correct answer
+                            selectedNumber = null
+                            currentStreak++
+                            correctAnswers++
+                        } else {
+                            // Wrong answer
+                            showWrongFeedback = true
+                            currentHearts = maxOf(0, currentHearts - 1)
+                            currentStreak = 0
+                            selectedNumber = null
+
+                            recordAdaptivePerformance(
+                                isCorrect = false,
+                                timeSpent = System.currentTimeMillis() - startTime,
+                                streak = 0,
+                                livesRemaining = currentHearts
+                            )
+                        }
+                    }
+                }
+            )
+        }
+
+        if (wide) {
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter).widthIn(max = 1100.dp).fillMaxSize()
+            ) {
+                hud()
+                Row(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                    Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        status()
+                        puzzle(Modifier.weight(1f).fillMaxWidth())
+                    }
+                    Box(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        contentAlignment = Alignment.BottomCenter
+                    ) { keyboard(Modifier.widthIn(max = 520.dp)) }
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier.align(Alignment.TopCenter).widthIn(max = 640.dp).fillMaxSize()
+            ) {
+                hud()
+                status()
+                puzzle(Modifier.weight(1f).fillMaxWidth())
+                keyboard(Modifier)
+            }
+        }
     }
 
     // Hint dialog
@@ -511,7 +557,7 @@ private fun AdaptiveCryptoPuzzleHeader(
                 text = adaptiveConfig.name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF2196F3)
+                color = RvSky
             )
             Text(
                 text = timer,
@@ -521,8 +567,8 @@ private fun AdaptiveCryptoPuzzleHeader(
             if (!adaptiveConfig.autoRevealAllInstances || adaptiveConfig.lockedPositionsRatio > 0) {
                 Text(
                     text = if (adaptiveConfig.autoRevealAllInstances) "🔒 Locked Letters" else "🎯 Single Reveal",
-                    fontSize = 10.sp,
-                    color = Color(0xFFFF6B35)
+                    fontSize = 12.sp,
+                    color = RvFlame
                 )
             }
         }
@@ -541,8 +587,8 @@ private fun AdaptiveCryptoPuzzleHeader(
             if (streakInfo.currentStreak > 0) {
                 Text(
                     text = "🔥 ${streakInfo.currentStreak}",
-                    fontSize = 10.sp,
-                    color = Color(0xFFFF6B35)
+                    fontSize = 12.sp,
+                    color = RvFlame
                 )
             }
         }
@@ -563,49 +609,86 @@ fun AdaptiveCryptoPuzzleDisplay(
     onNumberSelected: (Int) -> Unit,
     cryptoLetters: Set<Char> = numberMapping.keys
 ) {
-    val words = originalText.split(" ")
+    val words = originalText.split(" ").filter { it.isNotEmpty() }
 
-    val wordRows = mutableListOf<List<String>>()
-    var currentRow = mutableListOf<String>()
-    var currentRowLength = 0
+    BoxWithConstraints(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        val availW = maxWidth
+        val availH = if (constraints.hasBoundedHeight) maxHeight else 100000.dp
 
-    words.forEach { word ->
-        val estimatedLength = currentRowLength + word.length + if (currentRow.isNotEmpty()) 1 else 0
+        // Pick the biggest cell size (36dp down to 20dp) whose word-wrapped rows fit the area.
+        fun pack(cell: Dp): List<List<String>> {
+            val letterW = cell + 4.dp
+            val gap = cell / 2
+            val rows = mutableListOf<List<String>>()
+            var cur = mutableListOf<String>()
+            var curW = 0.dp
+            words.forEach { w ->
+                val ww = letterW * w.count { it.isLetter() }
+                if (cur.isEmpty()) { cur.add(w); curW = ww }
+                else if (curW + gap + ww <= availW) { cur.add(w); curW += gap + ww }
+                else { rows.add(cur.toList()); cur = mutableListOf(w); curW = ww }
+            }
+            if (cur.isNotEmpty()) rows.add(cur)
+            return rows
+        }
+        fun rowsHeight(cell: Dp, rows: Int) = (cell * 2 + 6.dp) * rows + 12.dp * (rows - 1).coerceAtLeast(0)
 
-        if (currentRow.isEmpty() || (estimatedLength <= 12 && currentRow.size < 3)) {
-            currentRow.add(word)
-            currentRowLength = estimatedLength
-        } else {
-            wordRows.add(currentRow.toList())
-            currentRow = mutableListOf(word)
-            currentRowLength = word.length
+        var cell = 36.dp
+        var wordRows = pack(cell)
+        while (cell > 20.dp && rowsHeight(cell, wordRows.size) > availH) {
+            cell -= 2.dp
+            wordRows = pack(cell)
+        }
+        val needsScroll = rowsHeight(cell, wordRows.size) > availH   // last-resort safety net only
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(if (needsScroll) Modifier.verticalScroll(rememberScrollState()) else Modifier),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            var currentPosition = 0
+            wordRows.forEach { rowWords ->
+                AdaptiveMultiWordRowDisplay(
+                    words = rowWords,
+                    numberMapping = numberMapping,
+                    userMapping = userMapping,
+                    selectedNumber = selectedNumber,
+                    lockedPositions = lockedPositions,
+                    startPosition = currentPosition,
+                    onNumberSelected = onNumberSelected,
+                    cryptoLetters = cryptoLetters,
+                    cell = cell
+                )
+                currentPosition += rowWords.sumOf { it.length + 1 } // +1 for space
+            }
         }
     }
+}
 
-    if (currentRow.isNotEmpty()) {
-        wordRows.add(currentRow)
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+@Composable
+private fun CryptoCompactHud(
+    timer: String,
+    hearts: Int,
+    onBack: () -> Unit,
+    onHint: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        var currentPosition = 0
-        wordRows.forEach { rowWords ->
-            AdaptiveMultiWordRowDisplay(
-                words = rowWords,
-                numberMapping = numberMapping,
-                userMapping = userMapping,
-                selectedNumber = selectedNumber,
-                lockedPositions = lockedPositions,
-                startPosition = currentPosition,
-                onNumberSelected = onNumberSelected,
-                cryptoLetters = cryptoLetters
-            )
-            currentPosition += rowWords.sumOf { it.length + 1 } // +1 for space
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+            Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
+        }
+        Text(text = timer, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvInk, maxLines = 1)
+        Spacer(Modifier.weight(1f))
+        Row {
+            repeat(hearts.coerceIn(0, 5)) { Text(text = "❤️", fontSize = 16.sp, maxLines = 1) }
+        }
+        IconButton(onClick = onHint, modifier = Modifier.size(48.dp)) {
+            Icon(Icons.Default.Help, contentDescription = stringResource(R.string.hint), tint = RvInk)
         }
     }
 }
@@ -620,147 +703,122 @@ private fun AdaptiveMultiWordRowDisplay(
     startPosition: Int,
     onNumberSelected: (Int) -> Unit,
     cryptoLetters: Set<Char>,
+    cell: Dp,
     modifier: Modifier = Modifier
 ) {
+    val fontScale = LocalDensity.current.fontScale
+    // Sizes are set in dp-derived sp so a large system font scale cannot break the fit.
+    val letterSp = (cell.value * 0.7f / fontScale).sp
+    val numberSp = (cell.value * 0.45f / fontScale).sp
+    val wordGap = cell / 2
+
+    @Composable
+    fun WordsRow(content: @Composable (word: String, startPos: Int) -> Unit) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            var pos = startPosition
+            words.forEachIndexed { wordIndex, word ->
+                if (wordIndex > 0) {
+                    Spacer(modifier = Modifier.width(wordGap))
+                    pos++ // Account for space
+                }
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) { content(word, pos) }
+                pos += word.count { it.isLetter() }
+            }
+        }
+    }
+
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         // Letters row
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            var currentPos = startPosition
-            words.forEachIndexed { wordIndex, word ->
-                if (wordIndex > 0) {
-                    Spacer(modifier = Modifier.width(16.dp))
-                    currentPos++ // Account for space
-                }
+        WordsRow { word, startPos ->
+            var currentPos = startPos
+            word.forEach { char ->
+                if (char.isLetter()) {
+                    val upperChar = char.uppercaseChar()
+                    val isCryptoLetter = cryptoLetters.contains(upperChar)
+                    val isLocked = currentPos in lockedPositions
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    word.forEach { char ->
-                        if (char.isLetter()) {
-                            val upperChar = char.uppercaseChar()
-                            val isCryptoLetter = cryptoLetters.contains(upperChar)
-                            val isLocked = currentPos in lockedPositions
-
-                            val displayText = when {
-                                isLocked -> "🔒"
-                                isCryptoLetter -> {
-                                    val number = numberMapping[upperChar]
-                                    number?.let { userMapping[it] }?.toString() ?: "_"
-                                }
-                                else -> upperChar.toString()
-                            }
-
-                            Text(
-                                text = displayText,
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = when {
-                                    isLocked -> Color(0xFFFF6B35)
-                                    isCryptoLetter && userMapping.containsKey(numberMapping[upperChar]) -> Color(0xFF4CAF50)
-                                    else -> Color.Black
-                                },
-                                modifier = Modifier.width(28.dp),
-                                textAlign = TextAlign.Center
-                            )
-                            currentPos++
+                    val displayText = when {
+                        isLocked -> "🔒"
+                        isCryptoLetter -> {
+                            val number = numberMapping[upperChar]
+                            number?.let { userMapping[it] }?.toString() ?: "_"
                         }
+                        else -> upperChar.toString()
                     }
+
+                    Text(
+                        text = displayText,
+                        fontSize = letterSp,
+                        fontWeight = FontWeight.Bold,
+                        color = when {
+                            isLocked -> RvFlame
+                            isCryptoLetter && userMapping.containsKey(numberMapping[upperChar]) -> GameSuccessText
+                            else -> RvInk
+                        },
+                        modifier = Modifier.width(cell),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1
+                    )
+                    currentPos++
                 }
             }
         }
 
         // Numbers row
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            var currentPos = startPosition
-            words.forEachIndexed { wordIndex, word ->
-                if (wordIndex > 0) {
-                    Spacer(modifier = Modifier.width(16.dp))
-                    currentPos++
-                }
+        WordsRow { word, startPos ->
+            var currentPos = startPos
+            word.forEach { char ->
+                if (char.isLetter()) {
+                    val upperChar = char.uppercaseChar()
+                    val isCryptoLetter = cryptoLetters.contains(upperChar)
+                    val isLocked = currentPos in lockedPositions
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    word.forEach { char ->
-                        if (char.isLetter()) {
-                            val upperChar = char.uppercaseChar()
-                            val isCryptoLetter = cryptoLetters.contains(upperChar)
-                            val isLocked = currentPos in lockedPositions
-
-                            if (isCryptoLetter && !isLocked) {
-                                val number = numberMapping[upperChar]
-                                Box(
-                                    modifier = Modifier
-                                        .width(28.dp)
-                                        .height(32.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(32.dp)
-                                            .background(
-                                                color = if (selectedNumber == number)
-                                                    Color(0xFF4CAF50)
-                                                else
-                                                    MaterialTheme.colorScheme.surface,
-                                                shape = RoundedCornerShape(6.dp)
-                                            )
-                                            .border(
-                                                1.5.dp,
-                                                if (selectedNumber == number)
-                                                    Color(0xFF4CAF50)
-                                                else
-                                                    MaterialTheme.colorScheme.outline,
-                                                RoundedCornerShape(6.dp)
-                                            )
-                                            .clickable {
-                                                number?.let { onNumberSelected(it) }
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = number?.toString() ?: "",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (selectedNumber == number)
-                                                Color.White
-                                            else
-                                                MaterialTheme.colorScheme.onSurface
-                                        )
-                                    }
-                                }
-                            } else if (isLocked) {
-                                Box(
-                                    modifier = Modifier
-                                        .width(28.dp)
-                                        .height(32.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Icon(
-                                        Icons.Default.Lock,
-                                        contentDescription = "Locked",
-                                        tint = Color(0xFFFF6B35),
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            } else {
-                                Spacer(modifier = Modifier.width(28.dp))
-                            }
-                            currentPos++
+                    if (isCryptoLetter && !isLocked) {
+                        val number = numberMapping[upperChar]
+                        val selected = selectedNumber == number
+                        Box(
+                            modifier = Modifier
+                                .size(cell)
+                                .background(
+                                    color = if (selected) GameSuccessText else MaterialTheme.colorScheme.surface,
+                                    shape = RoundedCornerShape(6.dp)
+                                )
+                                .border(
+                                    if (selected) 3.dp else 1.5.dp,
+                                    if (selected) GameSuccessText else MaterialTheme.colorScheme.outline,
+                                    RoundedCornerShape(6.dp)
+                                )
+                                .clickable { number?.let { onNumberSelected(it) } },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = number?.toString() ?: "",
+                                fontSize = numberSp,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface
+                            )
                         }
+                    } else if (isLocked) {
+                        Box(modifier = Modifier.size(cell), contentAlignment = Alignment.Center) {
+                            Icon(
+                                Icons.Default.Lock,
+                                contentDescription = "Locked",
+                                tint = RvFlame,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.size(cell))
                     }
+                    currentPos++
                 }
             }
         }
@@ -789,34 +847,33 @@ fun AdaptiveLetterSelectionKeyboard(
                 MaterialTheme.colorScheme.surface,
                 RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
             )
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        Text(
+            text = if (selectedNumber != null) "Choose a letter." else "Select a number first",
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        if (!adaptiveConfig.autoRevealAllInstances) {
             Text(
-                text = if (selectedNumber != null) "Choose a letter." else "Select a number first",
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center
+                text = "🎯 Advanced mode: Only reveals single instances",
+                fontSize = 12.sp,
+                color = RvSkyEdge,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            if (!adaptiveConfig.autoRevealAllInstances) {
-                Text(
-                    text = "🎯 Advanced mode: Only reveals single instances",
-                    fontSize = 10.sp,
-                    color = Color(0xFF2196F3),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
-            }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         letters.forEach { row ->
             Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.padding(vertical = 4.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                modifier = Modifier.widthIn(max = 480.dp).fillMaxWidth().padding(vertical = 2.dp)
             ) {
                 row.forEach { letter ->
                     val isUsed = if (adaptiveConfig.autoRevealAllInstances) {
@@ -830,13 +887,12 @@ fun AdaptiveLetterSelectionKeyboard(
                     Button(
                         onClick = { onLetterSelected(letter) },
                         enabled = selectedNumber != null && (!isUsed || isCorrectMapping),
-                        modifier = Modifier
-                            .padding(horizontal = 3.dp)
-                            .size(width = 32.dp, height = 48.dp),
+                        // 10 keys share the width (a fixed 32dp key overflowed 320-360dp phones).
+                        modifier = Modifier.weight(1f).height(48.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = when {
-                                !isUsed && selectedNumber != null -> Color(0xFF1976D2)
-                                isUsed -> Color(0xFF4CAF50)
+                                !isUsed && selectedNumber != null -> RvSkyEdge
+                                isUsed -> GameSuccessText
                                 else -> Color(0xFF424242)
                             },
                             disabledContainerColor = Color(0xFF757575)
@@ -851,12 +907,8 @@ fun AdaptiveLetterSelectionKeyboard(
                             text = letter.toString(),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = when {
-                                !isUsed && selectedNumber != null -> Color.White
-                                isUsed -> Color.White
-                                selectedNumber == null -> Color(0xFFBDBDBD)
-                                else -> Color.White
-                            }
+                            maxLines = 1,
+                            color = Color.White
                         )
                     }
                 }
@@ -888,14 +940,14 @@ private fun AdaptiveQuoteRevealDialog(
                 onClick = onContinue,
                 modifier = Modifier.padding(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = RvSuccess
                 )
             ) {
                 Text(
                     text = "Continue",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
             }
         },
@@ -919,14 +971,14 @@ private fun AdaptiveQuoteRevealDialog(
                 Text(
                     text = "Score: $finalScore points",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF4CAF50),
+                    color = RvSuccess,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(top = 4.dp)
                 )
                 Text(
                     text = adaptiveConfig.name,
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color(0xFF2196F3),
+                    color = RvSky,
                     modifier = Modifier.padding(top = 2.dp)
                 )
             }
@@ -974,20 +1026,20 @@ private fun AdaptiveQuoteRevealDialog(
                             modifier = Modifier
                                 .width(30.dp)
                                 .height(1.dp)
-                                .background(Color(0xFFBDBDBD))
+                                .background(RvDisabled)
                         )
                         Text(
                             text = "  $author  ",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium,
-                            color = Color(0xFF666666),
+                            color = RvInkSoft,
                             fontStyle = FontStyle.Italic
                         )
                         Box(
                             modifier = Modifier
                                 .width(30.dp)
                                 .height(1.dp)
-                                .background(Color(0xFFBDBDBD))
+                                .background(RvDisabled)
                         )
                     }
                 }

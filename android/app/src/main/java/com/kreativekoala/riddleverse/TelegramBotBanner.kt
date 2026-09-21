@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -68,12 +69,12 @@ fun TelegramBotBanner() {
                         text = "Play RiddleVerse on Telegram!",
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        color = Color.White
+                        color = RvOnTone
                     )
                     Text(
                         text = "Quiz your group chat • @Riddleverse_bot",
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.85f),
+                        color = RvOnTone.copy(alpha = 0.9f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -89,7 +90,7 @@ fun TelegramBotBanner() {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Dismiss",
-                        tint = Color.White.copy(alpha = 0.8f),
+                        tint = RvOnTone.copy(alpha = 0.9f),
                         modifier = Modifier.size(16.dp)
                     )
                 }

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.drawscope.withTransform
 import kotlinx.coroutines.delay
@@ -114,13 +115,13 @@ private fun ScoreCounterUp(
         ) {
             Text(
                 "$title:",
-                color = Color.White.copy(alpha = 0.8f),
+                color = RvInkSoft.copy(alpha = 0.8f),
                 fontSize = 16.sp,
                 modifier = Modifier.padding(end = 8.dp)
             )
             Text(
                 "$value",
-                color = Color.White,
+                color = RvInk,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -142,13 +143,13 @@ private fun StreakMeterFill(
         label = "streakFrac"
     )
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(label, color = Color.White.copy(alpha = 0.9f), fontSize = 14.sp)
+        Text(label, color = RvInkSoft.copy(alpha = 0.9f), fontSize = 14.sp)
         Spacer(Modifier.height(8.dp))
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.82f)
                 .height(16.dp)
-                .background(Color(0xFF0F172A), RoundedCornerShape(999.dp))
+                .background(RvCanvas, RoundedCornerShape(999.dp))
         ) {
             val brush = Brush.linearGradient(
                 listOf(Color(0xFFFFA700), Color(0xFFFFDD55))
@@ -200,13 +201,13 @@ private fun CardFlipRewardReveal(
         if (flip.value <= 90f) {
             Surface(
                 shape = RoundedCornerShape(18.dp),
-                color = Color(0xFF1F2937),
+                color = RvInk,
                 modifier = Modifier.fillMaxSize()
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
                         "Tap to Reveal",
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = RvInkSoft.copy(alpha = 0.7f),
                         fontSize = 18.sp
                     )
                 }
@@ -225,9 +226,9 @@ private fun CardFlipRewardReveal(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    Text(title, color = Color.White, fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    Text(title, color = RvInk, fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     Spacer(Modifier.height(6.dp))
-                    Text(subtitle, color = Color.White, fontSize = 16.sp)
+                    Text(subtitle, color = RvInk, fontSize = 16.sp)
                 }
             }
         }
@@ -256,7 +257,7 @@ private fun RibbonSweepBackground() {
         }) {
             drawRoundRect(
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFF34D399), Color(0xFF10B981)),
+                    colors = listOf(Color(0xFF34D399), RvSuccess),
                     start = Offset.Zero, end = Offset(w, 0f)
                 ),
                 topLeft = Offset(x - bandW / 2, -bandW),
@@ -402,7 +403,7 @@ private fun FireworksCorners() {
                 )
                 // little dot at the tip
                 drawCircle(
-                    color = Color.White.copy(alpha = 1f - t),
+                    color = RvInkSoft.copy(alpha = 1f - t),
                     radius = 2.5f,
                     center = end
                 )

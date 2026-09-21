@@ -16,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -89,11 +90,11 @@ fun SubscriptionUpgradeDialog(
         androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(Color(0xFF1A1A2E), RoundedCornerShape(16.dp))
+                    .background(RvCanvas, RoundedCornerShape(24.dp))
                     .padding(48.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color(0xFF21BF63))
+                CircularProgressIndicator(color = RvViolet)
             }
         }
         return
@@ -126,7 +127,7 @@ fun SubscriptionUpgradeDialog(
             PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
         ),
         products = paywallProducts,
-        theme = PaywallTheme(accent = Color(0xFF21BF63), accent2 = Color(0xFF2196F3)),
+        theme = PaywallTheme(accent = RvViolet, accent2 = RvSky),
         showWinback = true,
         isDismissible = true,
         onPurchase = { productId ->
@@ -166,7 +167,7 @@ fun SubscriptionStatusBar(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF4CAF50).copy(alpha = 0.1f)
+                containerColor = RvMint.copy(alpha = 0.1f)
             )
         ) {
             Row(
@@ -181,19 +182,19 @@ fun SubscriptionStatusBar(
                         text = stringResource(R.string.enjoying_app),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
-                        color = Color.White
+                        color = RvInk
                     )
                     Text(
                         text = stringResource(R.string.upgrade_for_unlimited),
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                 }
 
                 Button(
                     onClick = onUpgradeClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
+                        containerColor = RvMint
                     )
                 ) {
                     Text(stringResource(R.string.upgrade), fontSize = 12.sp)
@@ -282,11 +283,11 @@ fun CoinStoreDialog(onDismiss: () -> Unit) {
         androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(Color(0xFF1A1A2E), RoundedCornerShape(16.dp))
+                    .background(RvCanvas, RoundedCornerShape(24.dp))
                     .padding(48.dp),
                 contentAlignment = Alignment.Center
             ) {
-                CircularProgressIndicator(color = Color(0xFF21BF63))
+                CircularProgressIndicator(color = RvViolet)
             }
         }
         return
@@ -297,16 +298,16 @@ fun CoinStoreDialog(onDismiss: () -> Unit) {
         androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
-                    .background(Color(0xFF1A1A2E), RoundedCornerShape(16.dp))
+                    .background(RvCanvas, RoundedCornerShape(24.dp))
                     .padding(32.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Unable to load coin packages.", color = Color.White, fontSize = 15.sp)
+                    Text("Unable to load coin packages.", color = RvInk, fontSize = 15.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = onDismiss,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF21BF63))
+                        colors = ButtonDefaults.buttonColors(containerColor = RvViolet)
                     ) { Text("Close") }
                 }
             }
@@ -348,8 +349,9 @@ fun CoinPurchaseSection() {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A2A1A)),
-        shape = RoundedCornerShape(12.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(
@@ -361,13 +363,13 @@ fun CoinPurchaseSection() {
                     Text("💰", fontSize = 24.sp)
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
-                        Text("Coins", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                        Text("Balance: ${coinManager.balance} coins", fontSize = 14.sp, color = Color(0xFFFFD700))
+                        Text("Coins", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
+                        Text("Balance: ${coinManager.balance} coins", fontSize = 14.sp, color = RvSunEdge)
                     }
                 }
                 Button(
                     onClick = { showCoinStore = true },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF21BF63)),
+                    colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
                     shape = RoundedCornerShape(20.dp)
                 ) {
                     Text("Buy Coins", fontSize = 12.sp)
@@ -376,7 +378,7 @@ fun CoinPurchaseSection() {
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 "Spend coins to create games, unlock harder challenges, and more.",
-                fontSize = 12.sp, color = Color.Gray
+                fontSize = 12.sp, color = RvInkSoft
             )
         }
     }
@@ -445,10 +447,10 @@ fun HardPaywallGate(
 
     if (packages.isEmpty()) {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color(0xFF0A0A0F)),
+            modifier = Modifier.fillMaxSize().background(RvCanvas),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = Color(0xFF21BF63))
+            CircularProgressIndicator(color = RvViolet)
         }
         return
     }
@@ -480,7 +482,7 @@ fun HardPaywallGate(
             PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
         ),
         products = paywallProducts,
-        theme = PaywallTheme(accent = Color(0xFF21BF63), accent2 = Color(0xFF2196F3)),
+        theme = PaywallTheme(accent = RvViolet, accent2 = RvSky),
         showWinback = false,
         isDismissible = onDismiss != null,
         onPurchase = { productId ->

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,6 +21,10 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
@@ -286,39 +291,34 @@ fun CrosswordPuzzleScreen(
         )
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF00BCD4)) // Cyan background
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize().statusBarsPadding()
-        ) {
+    // Slots are defined once and arranged for portrait or for a two-pane landscape layout.
+    val topBar: @Composable () -> Unit = {
             // Enhanced Top Bar with live timer
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
                     onClick = onBack,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
 
                 Text(
                     text = displayTimer, // Use live countdown timer
-                    fontSize = 20.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (timeRemaining <= 60) Color.Red else Color.White // Red when ≤60s
+                    maxLines = 1,
+                    color = if (timeRemaining <= 60) Color(0xFF9F1212) else RvInk // Dark red when ≤60s (contrast on sky blue)
                 )
 
                 IconButton(
@@ -326,33 +326,35 @@ fun CrosswordPuzzleScreen(
                         showHintsDialog = true
                         // Don't increment hint counter here - only when actual hints are used
                     },
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Help,
                         contentDescription = stringResource(R.string.hint),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
             }
 
+    }
+    val scoreStrip: @Composable () -> Unit = {
             // Score and progress display
             if (totalScore > 0 || wordsCompleted > 0 || hintsUsed > 0 || revealsUsed > 0) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp),
+                        .padding(bottom = 4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.9f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(12.dp),
+                            .padding(horizontal = 12.dp, vertical = 6.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -361,37 +363,40 @@ fun CrosswordPuzzleScreen(
                                 text = "Score: $totalScore",
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF00BCD4)
+                                color = RvVioletEdge
                             )
                         }
 
                         Text(
                             text = "Words: $wordsCompleted/${words.size}",
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color.Black
+                            maxLines = 1,
+                            color = RvInk
                         )
 
                         if (hintsUsed > 0 || revealsUsed > 0) {
                             Text(
                                 text = "H:$hintsUsed R:$revealsUsed",
                                 fontSize = 12.sp,
-                                color = Color.Gray
+                                color = RvInkSoft
                             )
                         }
                     }
                 }
             }
 
+    }
+    val hintCard: @Composable () -> Unit = {
             // Current Hint Display
             if (currentHint.isNotEmpty()) {
                 currentWord?.let { word ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                            .padding(horizontal = 16.dp, vertical = 4.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White.copy(alpha = 0.9f)
+                            containerColor = RvSurface
                         ),
                         shape = RoundedCornerShape(8.dp)
                     ) {
@@ -407,7 +412,7 @@ fun CrosswordPuzzleScreen(
                                     text = "${word.number} ${if (currentDirection == Direction.HORIZONTAL) "Across" else "Down"}",
                                     fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF00BCD4)
+                                    color = RvVioletEdge
                                 )
 
                                 val currentHintState = hintStates[word.number] ?: HintState(word.number)
@@ -416,8 +421,10 @@ fun CrosswordPuzzleScreen(
                                 Text(
                                     text = displayHint,
                                     fontSize = 14.sp,
-                                    color = Color.Black,
-                                    lineHeight = 16.sp
+                                    color = RvInk,
+                                    lineHeight = 18.sp,
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis
                                 )
                             }
 
@@ -443,12 +450,12 @@ fun CrosswordPuzzleScreen(
                                             completed = false
                                         )
                                     },
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(48.dp)
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ArrowForward,
                                         contentDescription = "More hint",
-                                        tint = Color(0xFF00BCD4),
+                                        tint = RvVioletEdge,
                                         modifier = Modifier.size(20.dp)
                                     )
                                 }
@@ -458,39 +465,13 @@ fun CrosswordPuzzleScreen(
                 }
             }
 
-            // Crossword Grid - Centered and larger
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(0.5f),
-                contentAlignment = Alignment.Center
-            ) {
-                CrosswordGrid(
-                    grid = grid,
-                    words = words,
-                    gridWidth = gridWidth,
-                    gridHeight = gridHeight,
-                    onCellClick = { x, y ->
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-
-                        if (selectedCell == Pair(x, y)) {
-                            currentDirection = if (currentDirection == Direction.HORIZONTAL) {
-                                Direction.VERTICAL
-                            } else {
-                                Direction.HORIZONTAL
-                            }
-                        } else {
-                            selectedCell = Pair(x, y)
-                        }
-                    }
-                )
-            }
-
+    }
+    val actionRow: @Composable () -> Unit = {
             // Bottom action buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 // Enhanced REVEAL button with scoring
@@ -565,11 +546,11 @@ fun CrosswordPuzzleScreen(
                             }
                         }
                     },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                    border = BorderStroke(2.dp, Color.White)
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp).testTag("crossword_reveal"),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = RvInk),
+                    border = BorderStroke(2.dp, RvInk)
                 ) {
-                    Text("REVEAL", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text("REVEAL", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -590,16 +571,26 @@ fun CrosswordPuzzleScreen(
                         totalScore = 0
                         gameStartTime = System.currentTimeMillis()
                     },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.White
+                        contentColor = RvInk
                     ),
-                    border = BorderStroke(2.dp, Color.White)
+                    border = BorderStroke(2.dp, RvInk)
                 ) {
-                    Text("CLEAR", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text("CLEAR", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
             }
 
+    }
+
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RvSky) // Cyan background
+    ) {
+        val wide = maxWidth > maxHeight
+        val compact = wide || maxHeight < 700.dp
+        val keyboardSlot: @Composable () -> Unit = {
             // Enhanced keyboard with word completion tracking
             CrosswordKeyboard(
                 onLetterClick = { letter ->
@@ -685,8 +676,52 @@ fun CrosswordPuzzleScreen(
                         recompositionTrigger += 1
                     }
                 },
-                modifier = Modifier.weight(0.3f)
+                keyHeight = if (compact) 44.dp else 48.dp,
+                modifier = Modifier.testTag("crossword_keyboard")
             )
+        }
+        if (wide) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 1200.dp)
+                    .fillMaxSize()
+                    .statusBarsPadding()
+            ) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight().padding(12.dp), contentAlignment = Alignment.Center) {
+                    CrosswordGridSlot(grid, words, gridWidth, gridHeight, haptics, selectedCell, currentDirection, recompositionTrigger,
+                        onSelect = { selectedCell = it }, onToggleDirection = { currentDirection = it })
+                }
+                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    topBar()
+                    scoreStrip()
+                    hintCard()
+                    Spacer(Modifier.weight(1f))
+                    actionRow()
+                    keyboardSlot()
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 720.dp)
+                    .fillMaxSize()
+                    .statusBarsPadding()
+            ) {
+                topBar()
+                scoreStrip()
+                hintCard()
+                Box(
+                    modifier = Modifier.fillMaxWidth().weight(1f).padding(horizontal = 12.dp, vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CrosswordGridSlot(grid, words, gridWidth, gridHeight, haptics, selectedCell, currentDirection, recompositionTrigger,
+                        onSelect = { selectedCell = it }, onToggleDirection = { currentDirection = it })
+                }
+                actionRow()
+                keyboardSlot()
+            }
         }
 
         // Universal Feedback Overlay
@@ -748,7 +783,7 @@ fun EnhancedCompletionDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF00BCD4)),
+            colors = CardDefaults.cardColors(containerColor = RvSky),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -764,7 +799,7 @@ fun EnhancedCompletionDialog(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.close),
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -774,7 +809,7 @@ fun EnhancedCompletionDialog(
                     text = "${stringResource(R.string.puzzle_complete)} 🎉",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -782,7 +817,7 @@ fun EnhancedCompletionDialog(
                 Text(
                     text = "Solved in $time",
                     fontSize = 16.sp,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -790,7 +825,7 @@ fun EnhancedCompletionDialog(
                 // Score display
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.9f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
@@ -805,7 +840,7 @@ fun EnhancedCompletionDialog(
                             text = "Final Score: $totalScore",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF00BCD4)
+                            color = RvSky
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -834,7 +869,7 @@ fun EnhancedCompletionDialog(
                 Text(
                     text = "\"Eureka!\"",
                     fontSize = 16.sp,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
@@ -848,7 +883,7 @@ fun EnhancedCompletionDialog(
                         onClick = onShare,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
+                            contentColor = RvInk
                         ),
                         border = BorderStroke(2.dp, Color.White)
                     ) {
@@ -867,7 +902,7 @@ fun EnhancedCompletionDialog(
                         onClick = onReset,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
+                            contentColor = RvInk
                         ),
                         border = BorderStroke(2.dp, Color.White)
                     ) {
@@ -888,10 +923,10 @@ fun EnhancedCompletionDialog(
                     onClick = onNext,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White
+                        containerColor = RvSurfaceRaised
                     )
                 ) {
-                    Text(stringResource(R.string.next_puzzle), color = Color(0xFF00BCD4))
+                    Text(stringResource(R.string.next_puzzle), color = RvSky)
                 }
             }
         }
@@ -908,7 +943,7 @@ fun IncorrectAnswersDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -919,7 +954,7 @@ fun IncorrectAnswersDialog(
                     text = stringResource(R.string.some_answers_incorrect),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -936,7 +971,7 @@ fun IncorrectAnswersDialog(
                     onClick = onTryAgain,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00BCD4)
+                        containerColor = RvSky
                     )
                 ) {
                     Text(stringResource(R.string.try_again), color = Color.White)
@@ -951,7 +986,8 @@ fun CrosswordKeyboard(
     onLetterClick: (String) -> Unit,
     onBackspaceClick: () -> Unit,
     recompositionTrigger: Int = 0,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    keyHeight: Dp = 48.dp
 ) {
     val keyboardRows = listOf(
         listOf("Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"),
@@ -980,7 +1016,8 @@ fun CrosswordKeyboard(
                     KeyboardButton(
                         text = letter,
                         onClick = { onLetterClick(letter) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        height = keyHeight
                     )
                 }
 
@@ -990,7 +1027,8 @@ fun CrosswordKeyboard(
                         text = "⌫",
                         onClick = onBackspaceClick,
                         modifier = Modifier.weight(1.2f),
-                        backgroundColor = Color(0xFF5F9EA0)
+                        backgroundColor = Color(0xFF5F9EA0),
+                        height = keyHeight
                     )
                 }
             }
@@ -1003,13 +1041,14 @@ fun KeyboardButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = Color.White
+    backgroundColor: Color = Color.White,
+    height: Dp = 48.dp
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .padding(horizontal = 2.dp)
-            .height(48.dp),
+            .height(height),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor
         ),
@@ -1020,7 +1059,7 @@ fun KeyboardButton(
             text = text,
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = RvInk
         )
     }
 }
@@ -1031,6 +1070,10 @@ fun CrosswordCell(
     size: Dp,
     onClick: () -> Unit
 ) {
+    // Text sizes are derived from the cell (in dp) so letters fit at any cell size / font scale.
+    val fontScale = LocalDensity.current.fontScale
+    val letterSp = (size.value * 0.5f).coerceIn(14f, 32f) / fontScale
+    val numberSp = (size.value * 0.22f).coerceIn(11f, 13f) / fontScale
     Box(
         modifier = Modifier
             .size(size)
@@ -1038,15 +1081,24 @@ fun CrosswordCell(
             .background(
                 color = when {
                     cell.isBlocked -> Color.Transparent
-                    cell.isError -> Color.Red.copy(alpha = 0.3f)
-                    cell.isSelected -> Color(0xFF4CAF50)
-                    cell.isHighlighted -> Color(0xFF81C784)
+                    cell.isError -> Color(0xFFFFCDD2)
+                    cell.isSelected -> RvSuccess
+                    cell.isHighlighted -> RvSuccess.copy(alpha = 0.55f)
                     else -> Color.White
                 }
             )
             .border(
-                width = 1.dp,
-                color = Color.Gray.copy(alpha = 0.5f)
+                width = when {
+                    cell.isBlocked -> 1.dp
+                    cell.isSelected || cell.isError -> 3.dp
+                    else -> 1.dp
+                },
+                color = when {
+                    cell.isBlocked -> Color.Gray.copy(alpha = 0.5f)
+                    cell.isSelected -> RvInk
+                    cell.isError -> RvErrorEdge
+                    else -> Color.Gray.copy(alpha = 0.5f)
+                }
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -1055,23 +1107,34 @@ fun CrosswordCell(
             cell.number?.let { number ->
                 Text(
                     text = number.toString(),
-                    fontSize = 10.sp,
+                    fontSize = numberSp.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = RvInk,
+                    maxLines = 1,
                     modifier = Modifier
                         .align(Alignment.TopStart)
                         .padding(2.dp)
                 )
             }
 
-            // Letter display
+            // Letter display (an error also shows a cross so colour is not the only signal)
             Text(
                 text = cell.userInput,
-                fontSize = 24.sp,
+                fontSize = letterSp.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                textAlign = TextAlign.Center
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
+            if (cell.isError) {
+                Text(
+                    text = "✗",
+                    fontSize = numberSp.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvErrorEdge,
+                    modifier = Modifier.align(Alignment.BottomEnd).padding(2.dp)
+                )
+            }
         }
     }
 }
@@ -1084,28 +1147,69 @@ fun CrosswordGrid(
     gridHeight: Int,
     onCellClick: (Int, Int) -> Unit
 ) {
-    // Fixed cell size for 5x5 grid
-    val cellSize = 64.dp
-
-    // Simple grid layout without scrolling
-    Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+    // Cell size is derived from the space the parent gives the board (never scrolls).
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        for (y in 0 until gridHeight) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                for (x in 0 until gridWidth) {
-                    val cell = grid[y][x]
-                    CrosswordCell(
-                        cell = cell,
-                        size = cellSize,
-                        onClick = { onCellClick(x, y) }
-                    )
+        val gap = 2.dp
+        val cellSize = minOf(
+            (maxWidth - gap * (gridWidth - 1)) / gridWidth.coerceAtLeast(1),
+            (maxHeight - gap * (gridHeight - 1)) / gridHeight.coerceAtLeast(1)
+        ).coerceIn(24.dp, 76.dp)
+
+        Column(
+            modifier = Modifier.testTag("crossword_grid"),
+            verticalArrangement = Arrangement.spacedBy(gap),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            for (y in 0 until gridHeight) {
+                Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                    for (x in 0 until gridWidth) {
+                        val cell = grid[y][x]
+                        CrosswordCell(
+                            cell = cell,
+                            size = cellSize,
+                            onClick = { onCellClick(x, y) }
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun CrosswordGridSlot(
+    grid: List<List<CrosswordCell>>,
+    words: List<CrosswordWord>,
+    gridWidth: Int,
+    gridHeight: Int,
+    haptics: HapticFeedback,
+    selectedCell: Pair<Int, Int>?,
+    currentDirection: Direction,
+    recompositionTrigger: Int,
+    onSelect: (Pair<Int, Int>) -> Unit,
+    onToggleDirection: (Direction) -> Unit
+) {
+    // The cells are plain mutable objects; re-key on the trigger so letters/highlights redraw.
+    key(recompositionTrigger, selectedCell, currentDirection) {
+        CrosswordGrid(
+            grid = grid,
+            words = words,
+            gridWidth = gridWidth,
+            gridHeight = gridHeight,
+            onCellClick = { x, y ->
+                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                if (selectedCell == Pair(x, y)) {
+                    onToggleDirection(
+                        if (currentDirection == Direction.HORIZONTAL) Direction.VERTICAL else Direction.HORIZONTAL
+                    )
+                } else {
+                    onSelect(Pair(x, y))
+                }
+            }
+        )
     }
 }
 
@@ -1305,7 +1409,7 @@ fun HintsDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -1315,7 +1419,7 @@ fun HintsDialog(
                     text = stringResource(R.string.all_hints),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = RvInk,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -1326,7 +1430,7 @@ fun HintsDialog(
                     words.forEach { word ->
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFF5F5F5)
+                                containerColor = RvSurface
                             )
                         ) {
                             Row(
@@ -1341,7 +1445,7 @@ fun HintsDialog(
                                         text = "${word.number} ${if (word.direction == "horizontal") "Across" else "Down"}",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFF00BCD4)
+                                        color = RvSky
                                     )
 
                                     val currentLevel = hintStates[word.number]?.level ?: 0
@@ -1350,7 +1454,7 @@ fun HintsDialog(
                                     Text(
                                         text = displayHint,
                                         fontSize = 14.sp,
-                                        color = Color.Black
+                                        color = RvInk
                                     )
                                 }
 
@@ -1365,7 +1469,7 @@ fun HintsDialog(
                                         Icon(
                                             imageVector = Icons.Default.ArrowForward,
                                             contentDescription = "More hint",
-                                            tint = Color(0xFF00BCD4),
+                                            tint = RvSky,
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
@@ -1381,7 +1485,7 @@ fun HintsDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00BCD4)
+                        containerColor = RvSky
                     )
                 ) {
                     Text(stringResource(R.string.close))

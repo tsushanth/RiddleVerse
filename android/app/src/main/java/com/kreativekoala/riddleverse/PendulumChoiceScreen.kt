@@ -1,5 +1,11 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -75,25 +81,23 @@ fun PendulumChoiceScreen(
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.radialGradient(
-                    colors = listOf(
-                        Color(0xFF6A1B9A),
-                        Color(0xFF4A148C),
-                        Color(0xFF2E0851)
-                    ),
-                    radius = 1000f
-                )
-            )
+            .background(RvCanvas),
+        contentAlignment = Alignment.TopCenter
     ) {
+        val compact = maxHeight < 600.dp
+        val circleSize = ((maxWidth - 32.dp) / options.size.coerceAtLeast(1) - 8.dp)
+            .coerceIn(56.dp, 88.dp)
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxHeight()
+                .widthIn(max = 640.dp)
+                .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = if (compact) 8.dp else 16.dp)
         ) {
             // Top Bar
             Row(
@@ -107,13 +111,13 @@ fun PendulumChoiceScreen(
                         Icon(
                             Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = Color(0xFFE91E63),
+                            tint = RvInk,
                             modifier = Modifier.size(24.dp)
                         )
                     }
                     Text(
                         "$gameScore",
-                        color = Color(0xFFE91E63),
+                        color = RvInk,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -122,33 +126,38 @@ fun PendulumChoiceScreen(
                 // Timer
                 Text(
                     String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
-                    color = Color(0xFFE91E63),
+                    color = RvInk,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
 
-            Spacer(Modifier.height(60.dp))
+            Spacer(Modifier.height(if (compact) 4.dp else 24.dp))
 
-            // Question
+            // Question (dominant element, scaled down on small screens)
             Text(
                 text = question,
-                fontSize = 48.sp,
+                fontSize = if (compact) 32.sp else 48.sp,
+                lineHeight = if (compact) 36.sp else 52.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 32.dp)
+                    .padding(horizontal = 16.dp)
             )
 
-            Spacer(Modifier.height(80.dp))
+            Spacer(Modifier.height(if (compact) 4.dp else 16.dp))
 
-            // Pendulum Canvas
+            // Pendulum play area takes the remaining space
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp),
+                    .weight(1f)
+                    .heightIn(max = 340.dp)
+                    .align(Alignment.CenterHorizontally),
                 contentAlignment = Alignment.TopCenter
             ) {
                 Canvas(
@@ -159,7 +168,8 @@ fun PendulumChoiceScreen(
                         angle = pendulumAngle,
                         selectedOption = selectedAnswer,
                         correctAnswer = if (showResult) correctAnswer else null,
-                        showResult = showResult
+                        showResult = showResult,
+                        bottomReserve = circleSize / 2 + 8.dp
                     )
                 }
 
@@ -173,6 +183,7 @@ fun PendulumChoiceScreen(
                     options.forEachIndexed { index, option ->
                         OptionPendulumCircle(
                             option = option,
+                            size = circleSize,
                             isSelected = selectedAnswer == option,
                             isCorrect = option == correctAnswer,
                             showResult = showResult,
@@ -199,56 +210,58 @@ fun PendulumChoiceScreen(
                 }
             }
 
-            Spacer(Modifier.weight(1f))
+            Spacer(Modifier.height(8.dp))
 
             // Result Display
             if (showResult) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 32.dp),
+                        .padding(horizontal = 16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFE57373)
+                        containerColor = if (isCorrect) RvSuccess else RvError
                     )
                 ) {
                     Text(
                         text = if (isCorrect) "🎉 Correct!" else "❌ Wrong! Answer: $correctAnswer",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(16.dp)
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(12.dp)
                     )
                 }
+                Spacer(Modifier.height(8.dp))
             }
 
-            Spacer(Modifier.height(32.dp))
-
-            // Instructions
-            Text(
-                text = "TAP THE MATCHING VERB",
-                fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.6f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            )
-
-            Spacer(Modifier.height(16.dp))
+            // Instructions (dropped in compact mode)
+            if (!compact) {
+                Text(
+                    text = "TAP THE MATCHING VERB",
+                    fontSize = 14.sp,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                Spacer(Modifier.height(8.dp))
+            }
 
             // Hint Button
             OutlinedButton(
                 onClick = onHint,
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.White
+                    contentColor = RvInk
                 ),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.6f)),
-                modifier = Modifier.align(Alignment.CenterHorizontally),
+                border = androidx.compose.foundation.BorderStroke(1.dp, RvOutline),
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .heightIn(min = 48.dp),
                 enabled = !showResult
             ) {
                 Text("💡 Hint", fontSize = 14.sp)
             }
-
-            Spacer(Modifier.height(24.dp))
         }
     }
 }
@@ -258,15 +271,16 @@ private fun DrawScope.drawPendulumLines(
     angle: Float,
     selectedOption: String?,
     correctAnswer: String?,
-    showResult: Boolean
+    showResult: Boolean,
+    bottomReserve: androidx.compose.ui.unit.Dp = 40.dp
 ) {
     val centerX = size.width / 2f
-    val topY = 50.dp.toPx()
-    val lineLength = 200.dp.toPx()
+    val topY = 24.dp.toPx()
+    val lineLength = (size.height - topY - bottomReserve.toPx()).coerceIn(60.dp.toPx(), 220.dp.toPx())
 
     // Draw pendulum anchor point
     drawCircle(
-        color = Color.White,
+        color = RvInk,
         radius = 12.dp.toPx(),
         center = Offset(centerX, topY)
     )
@@ -284,8 +298,8 @@ private fun DrawScope.drawPendulumLines(
 
         // Determine line color based on state
         val lineColor = when {
-            showResult && option == correctAnswer -> Color(0xFF4CAF50)
-            showResult && option == selectedOption && option != correctAnswer -> Color(0xFFE57373)
+            showResult && option == correctAnswer -> RvSuccess
+            showResult && option == selectedOption && option != correctAnswer -> RvError
             option == selectedOption -> Color(0xFFE91E63)
             else -> Color(0xFFE91E63).copy(alpha = 0.7f)
         }
@@ -304,14 +318,15 @@ private fun DrawScope.drawPendulumLines(
 @Composable
 fun OptionPendulumCircle(
     option: String,
+    size: androidx.compose.ui.unit.Dp = 80.dp,
     isSelected: Boolean,
     isCorrect: Boolean,
     showResult: Boolean,
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
-        showResult && isCorrect -> Color(0xFF4CAF50)
-        showResult && isSelected && !isCorrect -> Color(0xFFE57373)
+        showResult && isCorrect -> RvSuccess
+        showResult && isSelected && !isCorrect -> RvError
         isSelected -> Color(0xFFE91E63)
         else -> Color(0xFFE91E63).copy(alpha = 0.8f)
     }
@@ -327,7 +342,7 @@ fun OptionPendulumCircle(
 
     Box(
         modifier = Modifier
-            .size(80.dp)
+            .size(size)
             .clip(CircleShape)
             .background(backgroundColor)
             .clickable { onClick() },
@@ -335,11 +350,13 @@ fun OptionPendulumCircle(
     ) {
         Text(
             text = option,
-            color = Color.White,
+            color = RvInk,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(8.dp)
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(4.dp)
         )
     }
 }

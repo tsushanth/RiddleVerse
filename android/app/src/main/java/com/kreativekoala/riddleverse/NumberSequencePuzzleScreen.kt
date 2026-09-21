@@ -4,6 +4,7 @@ package com.kreativekoala.riddleverse
 // Add this to your PuzzleScreenType enum:
 // NUMBER_SEQUENCE_SCREEN("Number Sequence Screen"),
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -12,6 +13,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
@@ -80,7 +87,7 @@ fun NumberSequencePuzzleScreen(
     var gameStarted by remember { mutableStateOf(false) }
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
-    var feedbackColor by remember { mutableStateOf(Color.Red) }
+    var feedbackColor by remember { mutableStateOf(RvError) }
 
     // Game state
     var currentRoundNumbers by remember { mutableStateOf(emptyList<Int>()) }
@@ -124,17 +131,17 @@ fun NumberSequencePuzzleScreen(
     // Generate positions for current round numbers
     fun generatePositions() {
         val colors = listOf(
-            Color(0xFF2196F3), // Blue
-            Color(0xFF4CAF50), // Green
+            RvSky, // Blue
+            RvSuccess, // Green
             Color(0xFFE91E63), // Pink
-            Color(0xFFFF9800), // Orange
-            Color(0xFF9C27B0), // Purple
-            Color(0xFF00BCD4), // Cyan
-            Color(0xFFFF5722), // Deep Orange
+            RvSun, // Orange
+            RvGrape, // Purple
+            RvSky, // Cyan
+            RvFlame, // Deep Orange
             Color(0xFF795548), // Brown
-            Color(0xFF607D8B), // Blue Grey
+            RvInkSoft, // Blue Grey
             Color(0xFF8BC34A), // Light Green
-            Color(0xFFFF6B35), // Red Orange
+            RvFlame, // Red Orange
             Color(0xFF6C5CE7)  // Purple Blue
         )
 
@@ -210,7 +217,7 @@ fun NumberSequencePuzzleScreen(
             totalScore += (config.numberCount * 10) + (timeLeft * 2) // Bonus for time remaining
 
             feedbackMessage = "🎉 Round $currentRound Complete! +${(config.numberCount * 10) + (timeLeft * 2)} points"
-            feedbackColor = Color(0xFF4CAF50)
+            feedbackColor = RvSuccess
             showFeedback = true
 
             delay(1500)
@@ -231,246 +238,258 @@ fun NumberSequencePuzzleScreen(
         if (currentHearts == 0 && gameStarted && !gameCompleted) {
             gameCompleted = true
             feedbackMessage = "💔 Game Over! Final Score: $totalScore"
-            feedbackColor = Color.Red
+            feedbackColor = RvError
             showFeedback = true
             delay(2000)
             onGameComplete(false, 10)
         }
     }
 
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1B5E20))
-            .statusBarsPadding()
+            .background(RvCanvas)
     ) {
-        // Header
-        Card(
+        val compact = groupEIsCompact(maxWidth, maxHeight)
+        val timerText = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60)
+
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+                .align(Alignment.TopCenter)
+                .widthIn(max = 720.dp)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {
-                        gameCompleted = true
-                        onBack()
-                    }
+            // HUD: one compact row (timer, score, lives, back, pause).
+            GroupECompactHud(
+                timer = timerText,
+                onBack = {
+                    gameCompleted = true
+                    onBack()
+                },
+                subtitle = "${config.name} \u2022 Round $currentRound \u2022 ${stringResource(R.string.score_label)} $totalScore",
+                lives = currentHearts,
+                urgent = timeLeft <= 30,
+                onPause = { isPaused = !isPaused }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (!gameStarted) {
+                // Instructions: may scroll as a last-resort safety net; Start is pinned below.
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "${config.name} • Round $currentRound",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (timeLeft <= 30) Color.Red else Color.Black
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Score: $totalScore",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        repeat(currentHearts) {
-                            Text("❤️", fontSize = 16.sp)
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
+                        colors = CardDefaults.cardColors(containerColor = RvSurface),
+                        shape = RoundedCornerShape(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "\uD83D\uDD22 Number Sequence",
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = RvInk,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = stringResource(R.string.tap_ascending_order),
+                                fontSize = 16.sp,
+                                color = RvInk,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(
+                                text = "Range: ${config.numberRange.first}-${config.numberRange.last} \u2022 ${config.numberCount} numbers per round",
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center,
+                                color = RvInkSoft
+                            )
                         }
                     }
                 }
-
-                IconButton(onClick = { isPaused = !isPaused }) {
-                    Icon(Icons.Default.Pause, contentDescription = "Pause")
-                }
-            }
-        }
-
-        // Instructions
-        if (!gameStarted) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Spacer(modifier = Modifier.height(8.dp))
+                GroupEPrimaryButton(
+                    text = stringResource(R.string.start).uppercase(),
+                    onClick = { gameStarted = true },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else if (!gameCompleted) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .testTag("seq_area")
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(RvSurface)
                 ) {
-                    Text(
-                        text = "🔢 Number Sequence",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(R.string.tap_ascending_order),
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Range: ${config.numberRange.first}-${config.numberRange.last} • ${config.numberCount} numbers per round",
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.Gray
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = { gameStarted = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    Canvas(modifier = Modifier.fillMaxSize()) {
+                        val gridSize = 40.dp.toPx()
+                        val gridColor = RvOutline
+
+                        for (x in 0 until (size.width / gridSize).toInt()) {
+                            drawLine(
+                                color = gridColor,
+                                start = Offset(x * gridSize, 0f),
+                                end = Offset(x * gridSize, size.height),
+                                strokeWidth = 1.dp.toPx()
+                            )
+                        }
+
+                        for (y in 0 until (size.height / gridSize).toInt()) {
+                            drawLine(
+                                color = gridColor,
+                                start = Offset(0f, y * gridSize),
+                                end = Offset(size.width, y * gridSize),
+                                strokeWidth = 1.dp.toPx()
+                            )
+                        }
+                    }
+
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .alpha(if (isPaused) 0.35f else 1f)
                     ) {
-                        Text(stringResource(R.string.start).uppercase(), fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
-        }
+                        val fieldW = maxWidth
+                        val fieldH = maxHeight
+                        val pad = 8.dp
+                        val numberSize = minOf(60.dp, minOf(fieldW, fieldH) * 0.2f).coerceAtLeast(48.dp)
 
-        // Game Area
-        if (gameStarted && !gameCompleted) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(16.dp)
-            ) {
-                // Game background
-                Canvas(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    // Draw subtle grid pattern
-                    val gridSize = 40.dp.toPx()
-                    val gridColor = Color.White.copy(alpha = 0.1f)
+                        numberPositions.forEach { position ->
+                            val isVisible = numbersVisible[position.number] ?: false
 
-                    for (x in 0 until (size.width / gridSize).toInt()) {
-                        drawLine(
-                            color = gridColor,
-                            start = Offset(x * gridSize, 0f),
-                            end = Offset(x * gridSize, size.height),
-                            strokeWidth = 1.dp.toPx()
-                        )
-                    }
+                            if (isVisible) {
+                                // Map the normalised slot (0.15..0.85, 0.2..0.8) onto the field minus the circle size.
+                                val fx = ((position.x - 0.15f) / 0.7f).coerceIn(0f, 1f)
+                                val fy = ((position.y - 0.2f) / 0.6f).coerceIn(0f, 1f)
+                                val xPos = pad + (fieldW - numberSize - pad * 2) * fx
+                                val yPos = pad + (fieldH - numberSize - pad * 2) * fy
 
-                    for (y in 0 until (size.height / gridSize).toInt()) {
-                        drawLine(
-                            color = gridColor,
-                            start = Offset(0f, y * gridSize),
-                            end = Offset(size.width, y * gridSize),
-                            strokeWidth = 1.dp.toPx()
-                        )
-                    }
-                }
+                                Box(
+                                    modifier = Modifier
+                                        .offset(x = xPos, y = yPos)
+                                        .size(numberSize)
+                                        .testTag("seq_number")
+                                        .clip(CircleShape)
+                                        .background(position.color)
+                                        .clickable {
+                                            if (!isPaused) {
+                                                val expectedNumber = sortedTargetNumbers.getOrNull(nextExpectedIndex)
 
-                // Numbers
-                BoxWithConstraints {
-                    val screenWidth = maxWidth
-                    val screenHeight = maxHeight
+                                                if (position.number == expectedNumber) {
+                                                    // Correct number tapped
+                                                    numbersVisible = numbersVisible.toMutableMap().apply {
+                                                        this[position.number] = false
+                                                    }
+                                                    nextExpectedIndex++
+                                                } else {
+                                                    // Wrong number tapped
+                                                    wrongFeedbackPosition = Offset(xPos.value, yPos.value)
+                                                    showWrongFeedback = true
+                                                    currentHearts = maxOf(0, currentHearts - 1)
+                                                }
+                                            }
+                                        }
+                                        .animateContentSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    // Fixed-size target: number text does not follow the system font scale.
+                                    GroupEFontCap(max = 1f) {
+                                        Text(
+                                            text = position.number.toString(),
+                                            color = groupEOn(position.color),
+                                            fontSize = (numberSize.value * 0.42f).coerceAtLeast(20f).sp,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1
+                                        )
+                                    }
+                                }
+                            }
+                        }
 
-                    numberPositions.forEach { position ->
-                        val isVisible = numbersVisible[position.number] ?: false
-
-                        if (isVisible) {
-                            val xPos = (screenWidth * position.x)
-                            val yPos = (screenHeight * position.y)
+                        // Wrong feedback
+                        if (showWrongFeedback) {
+                            val scale by animateFloatAsState(
+                                targetValue = if (showWrongFeedback) 1.5f else 1f,
+                                animationSpec = tween(300)
+                            )
 
                             Box(
                                 modifier = Modifier
-                                    .offset(x = xPos, y = yPos)
-                                    .size(60.dp)
-                                    .clip(CircleShape)
-                                    .background(position.color)
-                                    .clickable {
-                                        if (!isPaused) {
-                                            val expectedNumber = sortedTargetNumbers.getOrNull(nextExpectedIndex)
-
-                                            if (position.number == expectedNumber) {
-                                                // Correct number tapped
-                                                numbersVisible = numbersVisible.toMutableMap().apply {
-                                                    this[position.number] = false
-                                                }
-                                                nextExpectedIndex++
-                                            } else {
-                                                // Wrong number tapped
-                                                wrongFeedbackPosition = Offset(xPos.value, yPos.value)
-                                                showWrongFeedback = true
-                                                currentHearts = maxOf(0, currentHearts - 1)
-                                            }
-                                        }
-                                    }
-                                    .animateContentSize(),
-                                contentAlignment = Alignment.Center
+                                    .offset(
+                                        x = wrongFeedbackPosition.x.dp,
+                                        y = wrongFeedbackPosition.y.dp
+                                    )
+                                    .scale(scale)
                             ) {
-                                Text(
-                                    text = position.number.toString(),
-                                    color = Color.White,
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = stringResource(R.string.wrong),
+                                    tint = RvError,
+                                    modifier = Modifier.size(40.dp)
                                 )
                             }
                         }
                     }
 
-                    // Wrong feedback
-                    if (showWrongFeedback) {
-                        val scale by animateFloatAsState(
-                            targetValue = if (showWrongFeedback) 1.5f else 1f,
-                            animationSpec = tween(300)
-                        )
-
-                        Box(
+                    // Feedback banner overlays the field instead of pushing it around.
+                    if (showFeedback) {
+                        Card(
                             modifier = Modifier
-                                .offset(
-                                    x = wrongFeedbackPosition.x.dp,
-                                    y = wrongFeedbackPosition.y.dp
-                                )
-                                .scale(scale)
+                                .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+                            border = androidx.compose.foundation.BorderStroke(2.dp, feedbackColor)
                         ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = stringResource(R.string.wrong),
-                                tint = Color.Red,
-                                modifier = Modifier.size(40.dp)
+                            Text(
+                                text = feedbackMessage,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                color = RvInk,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
                 }
-            }
-        }
-
-        // Feedback overlay
-        if (showFeedback) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = feedbackColor.copy(alpha = 0.9f))
-            ) {
-                Text(
-                    text = feedbackMessage,
+            } else if (showFeedback) {
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
+                        .padding(vertical = 8.dp),
+                    colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, feedbackColor)
+                ) {
+                    Text(
+                        text = feedbackMessage,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        color = RvInk,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }

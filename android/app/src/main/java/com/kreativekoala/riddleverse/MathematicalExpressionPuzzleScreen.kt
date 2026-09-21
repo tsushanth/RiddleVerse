@@ -1,10 +1,14 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -63,15 +67,15 @@ data class DraggableItem(
 
 // Puzzle colors
 object PuzzleColors {
-    val Background = Color(0xFF2D5D4F)
-    val ExpressionBg = Color(0xFF4A7C59)
-    val NumberTile = Color(0xFF52C178)
-    val OperatorTile = Color(0xFF52C178)
-    val MissingSlot = Color(0xFF1A3D2E)
-    val CorrectFeedback = Color(0xFF4CAF50)
-    val IncorrectFeedback = Color(0xFFFF5252)
-    val DragTileNumber = Color(0xFF26A69A)
-    val DragTileOperator = Color(0xFFFF9800)
+    val Background = RvCanvas
+    val ExpressionBg = RvSurface
+    val NumberTile = RvSuccess
+    val OperatorTile = RvSuccess
+    val MissingSlot = RvOutline
+    val CorrectFeedback = RvSuccess
+    val IncorrectFeedback = RvError
+    val DragTileNumber = RvSky
+    val DragTileOperator = RvSun
 }
 
 enum class GameState {
@@ -354,66 +358,106 @@ fun MathExpressionPuzzleScreen(
                 .fillMaxSize()
                 .background(PuzzleColors.Background)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Spacer(modifier = Modifier.height(32.dp))
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val wide = maxWidth > maxHeight
 
-                // Enhanced Header with Score
-                EnhancedMathExpressionTopBar(
-                    level = currentUserLevel,
-                    streakInfo = streakInfo,
-                    timer = displayTimer,
-                    totalScore = totalScore,
-                    correctAnswers = correctAnswers,
-                    totalAttempts = totalAttempts,
-                    streak = streak,
-                    onBack = onBack,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                )
-
-                // Game area
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    // Moving expressions
-                    expressions.forEachIndexed { index, expression ->
-                        if (expression.yPosition > -100f) {// Only show if in visible area
-                            ExpressionView(
-                                expression = expression,
-                                modifier = Modifier.offset(
-                                    x = 0.dp,
-                                    y = with(density) { expression.yPosition.toDp() }
-                                ),
-                                isSelected = selectedExpressionId == expression.id,
-                                onDropZoneClick = {
-                                    if (!expression.isCompleted) {
-                                        selectedExpressionId = if (selectedExpressionId == expression.id) null else expression.id
+                // Play area: falling equations. Clipped so they never draw over the HUD or the keypad.
+                val playArea: @Composable (Modifier) -> Unit = { m ->
+                    Box(
+                        modifier = m
+                            .testTag("math_play_area")
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(2.dp, RvOutline, RoundedCornerShape(16.dp))
+                            .padding(8.dp)
+                    ) {
+                        // Moving expressions
+                        expressions.forEachIndexed { index, expression ->
+                            if (expression.yPosition > -100f) {// Only show if in visible area
+                                ExpressionView(
+                                    expression = expression,
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .offset(
+                                            x = 0.dp,
+                                            y = with(density) { expression.yPosition.toDp() }
+                                        ),
+                                    isSelected = selectedExpressionId == expression.id,
+                                    onDropZoneClick = {
+                                        if (!expression.isCompleted) {
+                                            selectedExpressionId = if (selectedExpressionId == expression.id) null else expression.id
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
-                    }
 
-                    // Clean up expressions that have moved off screen
-                    LaunchedEffect(expressions) {
-                        expressions = expressions.filter { it.yPosition > -200f }
+                        // Clean up expressions that have moved off screen
+                        LaunchedEffect(expressions) {
+                            expressions = expressions.filter { it.yPosition > -200f }
+                        }
                     }
                 }
 
-                // Selection items area
-                SelectionItemsArea(
-                    items = draggableItems,
-                    selectedExpressionId = selectedExpressionId,
-                    onItemSelected = { selectedValue ->
-                        handleAnswerSelection(selectedValue)
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .widthIn(max = 900.dp)
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 8.dp)
+                ) {
+                    GroupECompactHud(
+                        timer = displayTimer,
+                        onBack = onBack,
+                        subtitle = "${stringResource(R.string.score_label)} $totalScore \u2022 $correctAnswers/10" +
+                            (if (streak > 1) " \u2022 \uD83D\uDD25$streak" else ""),
+                        urgent = timeRemaining <= 30
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (wide) {
+                        // Two panes: equations left, keypad right.
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            playArea(Modifier.weight(1f).fillMaxHeight())
+                            Box(
+                                modifier = Modifier
+                                    // 42% of the actual row width, capped to 380dp - not 42% of
+                                    // an already-380dp-capped constraint (that starved the keypad
+                                    // to ~160dp and pushed its 4th column off-screen).
+                                    .fillMaxWidth(0.42f)
+                                    .widthIn(max = 380.dp)
+                                    .fillMaxHeight(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                SelectionItemsArea(
+                                    items = draggableItems,
+                                    selectedExpressionId = selectedExpressionId,
+                                    onItemSelected = { selectedValue ->
+                                        handleAnswerSelection(selectedValue)
+                                    }
+                                )
+                            }
+                        }
+                    } else {
+                        playArea(Modifier.weight(1f).fillMaxWidth())
+                        Spacer(modifier = Modifier.height(8.dp))
+                        // Selection items area (pinned at the bottom, thumb reach)
+                        SelectionItemsArea(
+                            items = draggableItems,
+                            selectedExpressionId = selectedExpressionId,
+                            onItemSelected = { selectedValue ->
+                                handleAnswerSelection(selectedValue)
+                            }
+                        )
                     }
-                )
+                }
             }
 
             // Game over overlay
@@ -499,7 +543,7 @@ private fun EnhancedMathExpressionTopBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -509,7 +553,7 @@ private fun EnhancedMathExpressionTopBar(
                         text = "Level ${level.level}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     LevelProgressBar(
@@ -530,7 +574,7 @@ private fun EnhancedMathExpressionTopBar(
                     text = timer,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color(0xFFFFEB3B)
+                    color = if (isUrgent) RvError else RvSunEdge
                 )
 
                 if (streakInfo.currentStreak > 0) {
@@ -550,14 +594,14 @@ private fun EnhancedMathExpressionTopBar(
                         text = "🔥 $streak",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6B00)
+                        color = RvFlame
                     )
                 }
 
                 Text(
                     text = "Goal: 10",
                     fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = RvInkSoft.copy(alpha = 0.7f)
                 )
             }
         }
@@ -573,7 +617,7 @@ private fun EnhancedMathExpressionTopBar(
                 if (totalScore > 0) {
                     Text(
                         text = "${stringResource(R.string.score_label)}: $totalScore",
-                        color = Color(0xFFFFEB3B),
+                        color = RvSunEdge,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -581,14 +625,14 @@ private fun EnhancedMathExpressionTopBar(
 
                 Text(
                     text = "📊 Math Expressions",
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft.copy(alpha = 0.8f),
                     fontSize = 12.sp
                 )
 
                 if (totalAttempts > 0) {
                     Text(
                         text = "$correctAnswers solved",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
                 }
@@ -616,8 +660,8 @@ fun ExpressionView(
                 backgroundColor,
                 RoundedCornerShape(12.dp)
             )
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left number
@@ -657,12 +701,14 @@ fun ExpressionView(
         }
 
         // Equals sign
-        Text(
-            text = "=",
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = "=",
+                color = RvInk,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         // Result
         if (expression.missingType == MissingType.RESULT) {
@@ -686,12 +732,15 @@ fun NumberTile(text: String) {
             .background(PuzzleColors.NumberTile, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = text,
+                color = RvInk,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+        }
     }
 }
 
@@ -703,12 +752,14 @@ fun OperatorTile(operator: String) {
             .background(PuzzleColors.OperatorTile, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = operator,
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = operator,
+                color = RvInk,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -724,7 +775,7 @@ fun ClickableDropZone(
             .size(48.dp)
             .background(
                 when {
-                    isSelected -> Color(0xFFFFEB3B) // Yellow when selected
+                    isSelected -> RvSun // Yellow when selected
                     !isEmpty -> PuzzleColors.NumberTile
                     else -> PuzzleColors.MissingSlot
                 },
@@ -732,26 +783,29 @@ fun ClickableDropZone(
             )
             .border(
                 width = if (isSelected) 3.dp else 2.dp,
-                color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
+                color = if (isSelected) RvInk else RvInkSoft,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        if (droppedValue != null) {
-            Text(
-                text = droppedValue,
-                color = if (isSelected) Color.Black else Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
-        } else {
-            Text(
-                text = "?",
-                color = if (isSelected) Color.Black else Color.White.copy(alpha = 0.5f),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
-            )
+        GroupEFontCap(max = 1f) {
+            if (droppedValue != null) {
+                Text(
+                    text = droppedValue,
+                    color = RvInk,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+            } else {
+                Text(
+                    text = "?",
+                    color = if (isSelected) RvInk else RvInkSoft,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 }
@@ -762,90 +816,92 @@ fun SelectionItemsArea(
     selectedExpressionId: Int?,
     onItemSelected: (String) -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF1E4A3A))
-            .padding(16.dp)
-    ) {
-        // Show instruction text
-        if (selectedExpressionId != null) {
-            Text(
-                text = "Tap an answer to complete the equation:",
-                color = Color(0xFFFFEB3B),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-        } else {
-            Text(
-                text = "Tap a missing square (?) in an equation above:",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 16.sp,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-        }
+    val numbers = items.filter { it.isNumber }
+    val operators = items.filter { !it.isNumber }
+    val enabled = selectedExpressionId != null
 
-        // Numbers grid: 2x4 layout for digits 2-9
-        val numbers = items.filter { it.isNumber }
-        val operators = items.filter { !it.isNumber }
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val inner = maxWidth - 24.dp
+        // 6 columns (2 rows) when keys stay >= 48dp wide, otherwise 4 columns (3 rows).
+        val six = (inner - 8.dp * 5) / 6 >= 48.dp
+        val cols = if (six) 6 else 4
+        val key = ((inner - 8.dp * (cols - 1)) / cols).coerceIn(48.dp, 72.dp)
+        val keys = numbers + operators
 
         Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(RvSurface)
+                .padding(12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // First row: 2, 3, 4, 5 + first two operators
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // First 4 numbers (2, 3, 4, 5)
-                numbers.take(4).forEach { item ->
-                    SelectableItem(
-                        item = item,
-                        isEnabled = selectedExpressionId != null,
-                        onClick = { onItemSelected(item.value) }
-                    )
-                }
-
-                // Add spacing between numbers and operators
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // First two operators (+ and -)
-                operators.take(2).forEach { item ->
-                    SelectableItem(
-                        item = item,
-                        isEnabled = selectedExpressionId != null,
-                        onClick = { onItemSelected(item.value) }
-                    )
-                }
+            // State hint (what to do next). Font scale capped so it cannot push the keys off screen.
+            GroupEFontCap {
+                Text(
+                    text = if (enabled) "Tap an answer to complete the equation:" else "Tap a missing square (?) in an equation above:",
+                    color = if (enabled) RvInk else RvInkSoft,
+                    fontSize = 14.sp,
+                    fontWeight = if (enabled) FontWeight.Bold else FontWeight.Normal,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
 
-            // Second row: 6, 7, 8, 9 + last two operators
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Last 4 numbers (6, 7, 8, 9)
-                numbers.drop(4).forEach { item ->
-                    SelectableItem(
-                        item = item,
-                        isEnabled = selectedExpressionId != null,
-                        onClick = { onItemSelected(item.value) }
-                    )
-                }
-
-                // Add spacing between numbers and operators
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Last two operators (× and ÷)
-                operators.drop(2).forEach { item ->
-                    SelectableItem(
-                        item = item,
-                        isEnabled = selectedExpressionId != null,
-                        onClick = { onItemSelected(item.value) }
-                    )
+            keys.chunked(cols).forEach { rowItems ->
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    rowItems.forEach { item ->
+                        GroupEKeypadKey(
+                            text = item.value,
+                            tag = "key_${item.value}",
+                            enabled = enabled,
+                            isNumber = item.isNumber,
+                            width = key,
+                            height = 52.dp,
+                            onClick = { onItemSelected(item.value) }
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+/** One keypad key: >= 48dp, colour by kind (number/operator), dimmed when disabled. Shared by both Math screens. */
+@Composable
+internal fun GroupEKeypadKey(
+    text: String,
+    tag: String,
+    enabled: Boolean,
+    isNumber: Boolean,
+    width: Dp,
+    height: Dp,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    fill: Color? = null,
+    content: Color = RvInk
+) {
+    val base = fill ?: if (isNumber) PuzzleColors.DragTileNumber else PuzzleColors.DragTileOperator
+    val shape = RoundedCornerShape(if (isNumber) 12.dp else 24.dp)
+    Box(
+        modifier = modifier
+            .size(width = width, height = height)
+            .testTag(tag)
+            .clip(shape)
+            .background(if (enabled) base else base.copy(alpha = 0.35f), shape)
+            .then(if (enabled) Modifier.clickable { onClick() } else Modifier),
+        contentAlignment = Alignment.Center
+    ) {
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = text,
+                color = if (enabled) content else RvInkSoft,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
         }
     }
 }
@@ -877,7 +933,7 @@ fun SelectableItem(
     ) {
         Text(
             text = item.value,
-            color = if (isEnabled) Color.White else Color.White.copy(alpha = 0.5f),
+            color = if (isEnabled) RvInk else RvInkSoft,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
@@ -896,7 +952,7 @@ fun GameOverOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f)),
+            .background(RvSurface),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -917,7 +973,7 @@ fun GameOverOverlay(
                     },
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2D5D4F)
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -929,13 +985,13 @@ fun GameOverOverlay(
                         text = "${stringResource(R.string.score_label)}: $totalScore",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                        color = RvSuccess
                     )
 
                     Text(
                         text = "$correctAnswers expressions solved",
                         fontSize = 16.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
 
                     if (totalAttempts > 0) {
@@ -943,7 +999,7 @@ fun GameOverOverlay(
                         Text(
                             text = "${stringResource(R.string.accuracy)}: $accuracy%",
                             fontSize = 14.sp,
-                            color = Color(0xFF666666)
+                            color = RvInkSoft
                         )
                     }
                 }
@@ -964,7 +1020,7 @@ fun GameOverOverlay(
                         onClick = onContinue,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF52C178)
+                            containerColor = RvSuccess
                         )
                     ) {
                         Text(stringResource(R.string.continue_label))

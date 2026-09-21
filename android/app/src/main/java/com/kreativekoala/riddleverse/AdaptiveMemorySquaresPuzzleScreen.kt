@@ -1,6 +1,7 @@
 // AdaptiveMemorySquaresPuzzleScreen.kt - Enhanced with adaptive difficulty
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -194,7 +196,7 @@ fun AdaptiveMemorySquaresPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -351,271 +353,131 @@ fun AdaptiveMemorySquaresPuzzleScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF8D6E63))
-            .padding(16.dp)
-    ) {
-        // ✅ REPLACE: Use unified header instead of custom header
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = displayTimer,
-            lives = currentLives,
-            currentDifficulty = currentDifficultyLevel,
-            score = totalScore,
-            puzzleType = "memorysquares",
-            competitiveInsight = competitiveInsight,
-            onBack = onBack,
-            onHint = {
-                showHint = !showHint
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ REPLACE: Use unified adaptation notification
-        UnifiedAdaptationNotification(
-            adaptationInfo = adaptationInfo,
-            puzzleType = "memorysquares",
-            visible = showAdaptationNotification,
-            onDismiss = { showAdaptationNotification = false }
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Enhanced game info with performance metrics
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(12.dp))
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("LEVEL $level", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                if (currentStreak > 0) {
-                    Text("🔥 $currentStreak", fontSize = 8.sp, color = Color(0xFFFF6F00))
-                }
-            }
-
-            if (totalScore > 0) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("SCORE", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                    Text("$totalScore", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF4CAF50))
-                }
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(currentDifficultyLevel.name.uppercase(), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = Color.Black)
-                Text("${gridSize}×${gridSize} • $targetCount", fontSize = 8.sp, color = Color.Gray)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Phase indicator
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when (gamePhase) {
-                MemoryGamePhase.COUNTDOWN -> {
-                    Text(
-                        text = stringResource(R.string.get_ready),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Memorize $targetCount squares in ${memorizeTimeLimit}s",
-                        fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.8f),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                MemoryGamePhase.MEMORIZE -> {
-                    Text(
-                        text = stringResource(R.string.memorize_the_pattern),
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "${memorizeTime}s remaining",
-                        fontSize = 16.sp,
-                        color = if (memorizeTime <= 1) Color.Red else Color.White.copy(alpha = 0.8f)
-                    )
-                }
-                MemoryGamePhase.RECALL -> {
-                    Text(
-                        text = stringResource(R.string.click_squares_you_remember),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Found: ${selectedCells.intersect(targetPositions).size}/$targetCount",
-                        fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f)
-                    )
-                }
-                else -> {
-                    Text(
-                        text = if (isCorrect) "Perfect!" else "Try Again!",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (isCorrect) Color.Green else Color.Red
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Memory squares grid
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-            contentAlignment = Alignment.Center
-        ) {
-            val gridSizeDp = 280.dp
-            val cellSize = (gridSizeDp.value - 8 * 2 - (gridSize - 1) * 4) / gridSize
-
-            Box(
-                modifier = Modifier
-                    .size(gridSizeDp)
-                    .background(Color.Black.copy(alpha = 0.8f), RoundedCornerShape(12.dp))
-                    .padding(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    for (row in 0 until gridSize) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth().weight(1f),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            for (col in 0 until gridSize) {
-                                val cellPosition = Pair(row, col)
-                                val isTarget = targetPositions.contains(cellPosition)
-                                val isSelected = selectedCells.contains(cellPosition)
-                                val isIncorrect = incorrectSelections.contains(cellPosition)
-                                val showHighlight = gamePhase == MemoryGamePhase.MEMORIZE && isTarget
-
-                                Box(
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight()
-                                        .background(
-                                            when {
-                                                showHighlight -> Color(0xFF00BCD4)
-                                                isSelected && isTarget -> Color(0xFF4CAF50)
-                                                isIncorrect -> Color(0xFFF44336)
-                                                gamePhase == MemoryGamePhase.FEEDBACK && isTarget -> Color(0xFF00BCD4)
-                                                else -> Color(0xFF6D4C41)
-                                            },
-                                            RoundedCornerShape(4.dp)
-                                        )
-                                        .clickable { onCellClick(row, col) }
-                                        .border(1.dp, Color.Black.copy(alpha = 0.2f), RoundedCornerShape(4.dp)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    when {
-                                        isSelected && isTarget -> {
-                                            Text("✓", color = Color.White, fontSize = (cellSize * 0.4f).sp, fontWeight = FontWeight.Bold)
-                                        }
-                                        isIncorrect -> {
-                                            Text("✗", color = Color.White, fontSize = (cellSize * 0.4f).sp, fontWeight = FontWeight.Bold)
-                                        }
-                                        gamePhase == MemoryGamePhase.FEEDBACK && isTarget && !isSelected -> {
-                                            Text("?", color = Color.White, fontSize = (cellSize * 0.4f).sp, fontWeight = FontWeight.Bold)
-                                        }
-                                    }
-                                }
-                            }
-                        }
+    MemorySquaresFitLayout(
+        modifier = Modifier.background(Color(0xFF8D6E63)),
+        hud = { compact ->
+            if (compact) {
+                GameCompactHud(
+                    timer = displayTimer,
+                    lives = currentLives,
+                    maxLives = livesAllowed,
+                    score = totalScore,
+                    onBack = onBack
+                )
+            } else {
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentLives,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "memorysquares",
+                    competitiveInsight = competitiveInsight,
+                    onBack = onBack,
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
-                }
-            }
-
-            // Countdown overlay
-            if (gamePhase == MemoryGamePhase.COUNTDOWN) {
-                Box(
-                    modifier = Modifier
-                        .size(gridSizeDp)
-                        .background(Color.Black.copy(alpha = 0.9f), RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = if (countdownTime > 0) countdownTime.toString() else "GO!",
-                            fontSize = 72.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Cyan
-                        )
-                        if (countdownTime > 0) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = "Remember $targetCount squares",
-                                fontSize = 16.sp,
-                                color = Color.White.copy(alpha = 0.8f),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Lives indicator (dynamic based on difficulty)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            repeat(livesAllowed) { index ->
-                Icon(
-                    Icons.Default.Favorite,
-                    contentDescription = "Life",
-                    tint = if (index < currentLives) Color.Red else Color.Gray,
-                    modifier = Modifier.size(24.dp).padding(horizontal = 4.dp)
                 )
             }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Action buttons during recall phase
-        if (gamePhase == MemoryGamePhase.RECALL) {
+        },
+        info = {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(RvNight, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
-                    onClick = {
+                Text("LEVEL $level" + if (currentStreak > 0) "  🔥 $currentStreak" else "", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
+                Text(currentDifficultyLevel.name.uppercase() + " • ${gridSize}×${gridSize} • $targetCount", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            }
+        },
+        phase = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                when (gamePhase) {
+                    MemoryGamePhase.COUNTDOWN -> {
+                        Text(
+                            text = stringResource(R.string.get_ready),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvOnTone,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Memorize ${targetCount} squares in ${memorizeTimeLimit}s",
+                            fontSize = 16.sp,
+                            color = RvOnTone,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    MemoryGamePhase.MEMORIZE -> {
+                        Text(
+                            text = stringResource(R.string.memorize_the_pattern),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvOnTone,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "${memorizeTime}s remaining",
+                            fontSize = 16.sp,
+                            fontWeight = if (memorizeTime <= 1) FontWeight.Bold else FontWeight.Normal,
+                            color = if (memorizeTime <= 1) Color(0xFFFFEB3B) else RvOnTone,
+                            maxLines = 1
+                        )
+                    }
+                    MemoryGamePhase.RECALL -> {
+                        Text(
+                            text = stringResource(R.string.click_squares_you_remember),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvOnTone,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "Found: ${selectedCells.intersect(targetPositions).size}/$targetCount" +
+                                if (correctSelections > 0 || wrongSelections > 0) "   ✅ $correctSelections   ❌ $wrongSelections" else "",
+                            fontSize = 14.sp,
+                            color = RvOnTone,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    else -> {
+                        Text(
+                            text = if (isCorrect) "✓ Perfect!" else "✗ Try Again!",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isCorrect) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
+                            maxLines = 1
+                        )
+                    }
+                }
+            }
+        },
+        actions = {
+            if (gamePhase == MemoryGamePhase.RECALL) {
+                MemorySquaresActionBar(
+                    onClear = {
                         selectedCells = emptySet()
                         incorrectSelections = emptySet()
                         correctSelections = 0
                         wrongSelections = 0
                     },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
-                ) {
-                    Text(stringResource(R.string.clear))
-                }
-
-                Button(
-                    onClick = {
+                    onSubmit = {
                         val correctCount = selectedCells.intersect(targetPositions).size
                         val incorrectCount = selectedCells.size - correctCount
                         val timeSpent = System.currentTimeMillis() - gameStartTime
@@ -638,14 +500,28 @@ fun AdaptiveMemorySquaresPuzzleScreen(
                         gamePhase = MemoryGamePhase.FEEDBACK
                         showFeedback = true
                     },
-                    modifier = Modifier.weight(1f),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4FC3F7))
-                ) {
-                    Text(stringResource(R.string.submit))
-                }
+                    submitColor = Color(0xFF4FC3F7)
+                )
             }
+        },
+        board = { size ->
+            MemorySquaresBoard(
+                size = size,
+                gridSize = gridSize,
+                targetCount = targetCount,
+                targetPositions = targetPositions,
+                selectedCells = selectedCells,
+                incorrectSelections = incorrectSelections,
+                gamePhase = gamePhase,
+                countdownTime = countdownTime,
+                highlightColor = Color(0xFF00BCD4),
+                correctColor = Color(0xFF4CAF50),
+                wrongColor = Color(0xFFF44336),
+                frameColor = Color.Black.copy(alpha = 0.8f),
+                onCellClick = ::onCellClick
+            )
         }
-    }
+    )
 
     // Enhanced feedback dialog with adaptation info
     if (showFeedback && !gameCompleted) {
@@ -697,7 +573,7 @@ fun AdaptiveMemorySquaresPuzzleScreen(
 
                     // Show adaptation info if available
                     adaptationInfo?.let { info ->
-                        if (info.confidenceScore > 0.5f) {
+                        if (SHOW_ADAPTATION_NOTICES && info.confidenceScore > 0.5f) {
                             Spacer(modifier = Modifier.height(8.dp))
                             Card(
                                 colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
@@ -713,7 +589,7 @@ fun AdaptiveMemorySquaresPuzzleScreen(
                                     )
                                     Text(
                                         text = "Next: ${info.level.name}",
-                                        fontSize = 10.sp
+                                        fontSize = 12.sp
                                     )
                                 }
                             }

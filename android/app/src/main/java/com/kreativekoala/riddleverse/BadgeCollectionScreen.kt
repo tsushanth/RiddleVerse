@@ -27,7 +27,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.ui.res.stringResource
-import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
+import com.kreativekoala.riddleverse.ui.theme.*
 
 class BadgeCollectionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,7 +89,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
                 Text(
                     "${unlockedAchievements.size}/${achievements.size} unlocked",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
 
@@ -101,14 +101,14 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
             Box(
                 modifier = Modifier
                     .background(
-                        Color(0xFF7B1FA2),
+                        RvViolet,
                         RoundedCornerShape(12.dp)
                     )
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
                     "$completionPercentage%",
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -147,7 +147,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
                         "✨ Recently Unlocked",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF7B1FA2),
+                        color = RvViolet,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -171,7 +171,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
                         "🎯 In Progress",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFFFF9800),
+                        color = RvWarning,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -193,7 +193,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
                         "🏆 Unlocked",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF4CAF50),
+                        color = RvSuccess,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -215,7 +215,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
                         "🔒 Locked",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.Gray,
+                        color = RvInkSoft,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
@@ -237,10 +237,11 @@ fun EnhancedProgressSummaryCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = RvViolet
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Box(
             modifier = Modifier.fillMaxWidth()
@@ -250,14 +251,8 @@ fun EnhancedProgressSummaryCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        brush = Brush.linearGradient(
-                            listOf(
-                                Color(0xFF7B1FA2),
-                                Color(0xFF9C27B0),
-                                Color(0xFFE91E63)
-                            )
-                        ),
-                        shape = RoundedCornerShape(16.dp)
+                        brush = Brush.linearGradient(listOf(RvViolet, RvViolet)),
+                        shape = RoundedCornerShape(24.dp)
                     )
             )
 
@@ -276,12 +271,12 @@ fun EnhancedProgressSummaryCard(
                             "${getTierEmoji(tierInfo.currentTier)} ${tierInfo.currentTier}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvOnTone
                         )
                         Text(
                             "Level ${level.level}",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.9f)
+                            color = RvOnTone.copy(alpha = 0.9f)
                         )
                     }
 
@@ -290,12 +285,12 @@ fun EnhancedProgressSummaryCard(
                             "${level.totalXP} XP",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvOnTone
                         )
                         Text(
                             "Total Earned",
                             fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = RvOnTone.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -337,7 +332,7 @@ fun EnhancedProgressSummaryCard(
                         Text(
                             "Next Level Progress",
                             fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = RvOnTone.copy(alpha = 0.8f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         LinearProgressIndicator(
@@ -346,14 +341,14 @@ fun EnhancedProgressSummaryCard(
                                 .fillMaxWidth()
                                 .height(6.dp)
                                 .clip(RoundedCornerShape(3.dp)),
-                            color = Color.White,
-                            trackColor = Color.White.copy(alpha = 0.3f)
+                            color = RvOnTone,
+                            trackColor = RvOnTone.copy(alpha = 0.3f)
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             "${level.currentXP}/${level.xpToNextLevel} XP to Level ${level.level + 1}",
                             fontSize = 10.sp,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = RvOnTone.copy(alpha = 0.7f)
                         )
                     }
                 }
@@ -368,10 +363,10 @@ fun CollectionStatsRow(total: Int, unlocked: Int, inProgress: Int) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        StatCard("Total", total.toString(), Color(0xFF2196F3), "🏅")
-        StatCard("Unlocked", unlocked.toString(), Color(0xFF4CAF50), "✅")
-        StatCard("In Progress", inProgress.toString(), Color(0xFFFF9800), "⏳")
-        StatCard("Locked", (total - unlocked).toString(), Color.Gray, "🔒")
+        StatCard("Total", total.toString(), RvSky, "🏅")
+        StatCard("Unlocked", unlocked.toString(), RvSuccess, "✅")
+        StatCard("In Progress", inProgress.toString(), RvWarning, "⏳")
+        StatCard("Locked", (total - unlocked).toString(), RvInkSoft, "🔒")
     }
 }
 
@@ -416,12 +411,12 @@ fun EnhancedStatItem(label: String, value: String, emoji: String) {
             value,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = RvOnTone
         )
         Text(
             label,
             fontSize = 10.sp,
-            color = Color.White.copy(alpha = 0.8f),
+            color = RvOnTone.copy(alpha = 0.8f),
             textAlign = TextAlign.Center
         )
     }
@@ -433,17 +428,17 @@ fun EnhancedAchievementBadgeItem(
     isHighlighted: Boolean = false
 ) {
     val backgroundColor = when {
-        isHighlighted -> Color(0xFFFFD700).copy(alpha = 0.4f)
-        achievement.isUnlocked -> Color(0xFF4CAF50).copy(alpha = 0.2f)
-        achievement.progress > 0 -> Color(0xFFFF9800).copy(alpha = 0.2f)
-        else -> Color.LightGray.copy(alpha = 0.2f)
+        isHighlighted -> RvSun.copy(alpha = 0.4f)
+        achievement.isUnlocked -> RvSuccess.copy(alpha = 0.2f)
+        achievement.progress > 0 -> RvWarning.copy(alpha = 0.2f)
+        else -> RvSurface.copy(alpha = 0.2f)
     }
 
     val borderColor = when {
-        isHighlighted -> Color(0xFFFFD700)
-        achievement.isUnlocked -> Color(0xFF4CAF50)
-        achievement.progress > 0 -> Color(0xFFFF9800)
-        else -> Color.Gray
+        isHighlighted -> RvSun
+        achievement.isUnlocked -> RvSuccess
+        achievement.progress > 0 -> RvWarning
+        else -> RvDisabled
     }
 
     Column(
@@ -474,7 +469,7 @@ fun EnhancedAchievementBadgeItem(
                         modifier = Modifier
                             .size(20.dp)
                             .offset(x = 25.dp, y = (-25).dp)
-                            .background(Color(0xFFFFD700), CircleShape),
+                            .background(RvSun, CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Text("✨", fontSize = 10.sp)
@@ -484,7 +479,7 @@ fun EnhancedAchievementBadgeItem(
                 Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "Locked",
-                    tint = Color.Gray,
+                    tint = RvInkSoft,
                     modifier = Modifier.size(if (isHighlighted) 36.dp else 28.dp)
                 )
             }
@@ -498,7 +493,7 @@ fun EnhancedAchievementBadgeItem(
             fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.Medium,
             maxLines = 2,
             textAlign = TextAlign.Center,
-            color = if (isHighlighted) Color(0xFFFF6F00) else Color.Black
+            color = if (isHighlighted) RvSunEdge else RvInk
         )
 
         // Progress for incomplete achievements
@@ -511,12 +506,12 @@ fun EnhancedAchievementBadgeItem(
                     .height(3.dp)
                     .clip(RoundedCornerShape(1.5.dp)),
                 color = borderColor,
-                trackColor = Color.Gray.copy(alpha = 0.3f)
+                trackColor = RvInkSoft.copy(alpha = 0.3f)
             )
             Text(
                 "${achievement.progress}/${achievement.maxProgress}",
                 fontSize = 9.sp,
-                color = Color.Gray,
+                color = RvInkSoft,
                 fontWeight = FontWeight.Medium
             )
         }

@@ -21,10 +21,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvMint
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 // Data class for subscription puzzles
 data class SubscriptionPuzzle(
@@ -278,7 +286,7 @@ fun AdaptiveSubscriptionPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -323,176 +331,81 @@ fun AdaptiveSubscriptionPuzzleScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF0A0A2E),
-                        Color(0xFF1A1A4A),
-                        Color(0xFF2D2D5F)
-                    )
+    SubscriptionFitLayout(
+        payment = currentPuzzle.payment.toInt(),
+        frequency = currentPuzzle.frequency,
+        hud = { tall ->
+            if (tall) {
+                // Unified header
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "subscription",
+                    competitiveInsight = competitiveInsight,
+                    challengeNumber = attempts + 1,
+                    totalChallenges = 10, // Or whatever makes sense for subscription puzzles
+                    onBack = onBack,
+                    onPause = {
+                        // Pause functionality could be implemented if needed
+                        Log.d(TAG, "Pause requested")
+                    },
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
                 )
-            )
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // ✅ REPLACE: Use unified header instead of AdaptiveSubscriptionTopGameBar
-            AdaptiveUnifiedHeader(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                score = totalScore,
-                puzzleType = "subscription",
-                competitiveInsight = competitiveInsight,
-                challengeNumber = attempts + 1,
-                totalChallenges = 10, // Or whatever makes sense for subscription puzzles
-                onBack = onBack,
-                onPause = {
-                    // Pause functionality could be implemented if needed
-                    Log.d(TAG, "Pause requested")
-                },
-                onHint = {
-                    showHint = !showHint
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
-            )
-
-            // ✅ REPLACE: Use unified adaptation notification
+            } else {
+                AdaptiveCompactHud(
+                    level = currentLevel,
+                    timer = displayTimer.let { if (it.indexOf(':') == 1) "0$it" else it },
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    difficultyName = currentDifficultyLevel.name,
+                    challengeText = null,
+                    onBack = onBack,
+                    onPause = null
+                )
+            }
+        },
+        status = {
+            // Unified adaptation notification (banner intentionally off via SHOW_ADAPTATION_NOTICES)
             UnifiedAdaptationNotification(
                 adaptationInfo = adaptationInfo,
                 puzzleType = "subscription",
                 visible = showAdaptationNotification,
                 onDismiss = { showAdaptationNotification = false }
             )
-
-            // Score display
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "${stringResource(R.string.score_label)}: $totalScore",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4ECDC4)
-                            )
-                        }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentDifficultyLevel.name.uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Cyan
-                            )
-                            Text(
-                                text = "${currentPuzzle.frequency.capitalize()} → Annual",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-
-                        if (attempts > 0) {
-                            Text(
-                                text = "Attempt: $attempts",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            } else {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-
-            // Game type icons
-            GameTypeIconsRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-            )
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            // Tickets icon
-            TicketsIcon(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Payment display
-            PriceDisplay(
-                price = currentPuzzle.payment.toInt(),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Calculation prompt
-            CalculationPrompt(
-                frequency = currentPuzzle.frequency.uppercase(),
-                period = "A YEAR",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            AnimatedVisibility(
-                visible = showHint,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                AdaptiveSubscriptionHintBubble(
-                    frequency = currentPuzzle.frequency,
-                    difficulty = currentDifficultyLevel.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                Text(
+                    text = "${currentDifficultyLevel.name} • ${currentPuzzle.frequency.capitalize()} → Annual",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
+                if (attempts > 0) {
+                    Text(
+                        text = "Attempt: $attempts",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = RvInkSoft,
+                        maxLines = 1
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = "ANNUALLY IS:",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4ECDC4),
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
-            // Answer options grid
+        },
+        options = { m ->
             AnswerOptionsGrid(
                 options = currentPuzzle.options,
                 selectedAnswer = selectedAnswer,
@@ -549,39 +462,23 @@ fun AdaptiveSubscriptionPuzzleScreen(
                         )
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                modifier = m
             )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Progress bar
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp, vertical = 30.dp)
-                    .height(6.dp)
-                    .background(
-                        Color.White.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(3.dp)
-                    )
+        },
+        hint = {
+            AnimatedVisibility(
+                visible = showHint,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
             ) {
-                if (selectedAnswer != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .fillMaxHeight()
-                            .background(
-                                Color(0xFF4ECDC4),
-                                shape = RoundedCornerShape(3.dp)
-                            )
-                    )
-                }
+                AdaptiveSubscriptionHintBubble(
+                    frequency = currentPuzzle.frequency,
+                    difficulty = currentDifficultyLevel.name,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
-        }
-
-        // ✅ NEW: Session completion handling
+        },
+        overlay = {
         if (currentHearts <= 0) {
             UnifiedSessionCompletionHandler(
                 puzzleType = "subscription",
@@ -605,8 +502,9 @@ fun AdaptiveSubscriptionPuzzleScreen(
             }
         }
 
-        EnhancedUniversalFeedback(feedbackManager)
-    }
+            EnhancedUniversalFeedback(feedbackManager)
+        }
+    )
 }
 
 @Composable
@@ -637,7 +535,7 @@ fun AdaptiveSubscriptionTopGameBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color(0xFF4ECDC4),
+                    tint = RvMint,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -657,7 +555,7 @@ fun AdaptiveSubscriptionTopGameBar(
                     text = "${stringResource(R.string.level_label)} ${level.level}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4ECDC4)
+                    color = RvMint
                 )
 
                 // Adaptive difficulty indicator
@@ -665,7 +563,7 @@ fun AdaptiveSubscriptionTopGameBar(
                     text = currentDifficulty.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Cyan
+                    color = RvSkyEdge
                 )
 
                 LevelProgressBar(
@@ -699,7 +597,7 @@ fun AdaptiveSubscriptionTopGameBar(
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
                     Color.Red
                 } else {
-                    Color(0xFF4ECDC4)
+                    RvMint
                 }
             )
 
@@ -722,7 +620,7 @@ fun AdaptiveSubscriptionHintBubble(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = RvSurfaceRaised
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -743,7 +641,7 @@ fun AdaptiveSubscriptionHintBubble(
                     text = "Payment Frequency Multipliers",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
             }
 
@@ -755,7 +653,7 @@ fun AdaptiveSubscriptionHintBubble(
                         Spacer(modifier = Modifier.height(4.dp))
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF4ECDC4).copy(alpha = 0.2f)
+                                containerColor = RvMint.copy(alpha = 0.2f)
                             ),
                             shape = RoundedCornerShape(8.dp)
                         ) {
@@ -763,7 +661,7 @@ fun AdaptiveSubscriptionHintBubble(
                                 text = "💡 Your frequency: Monthly = 12 payments per year",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF2D2D5F),
+                                color = RvInk,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
@@ -782,8 +680,8 @@ fun AdaptiveSubscriptionHintBubble(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "⚠️ Using hints reduces your final score",
-                fontSize = 10.sp,
-                color = Color(0xFF999999),
+                fontSize = 12.sp,
+                color = RvInkSoft,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )

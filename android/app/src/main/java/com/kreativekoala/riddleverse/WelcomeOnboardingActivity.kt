@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -126,7 +127,7 @@ fun WelcomeOnboardingScreen(
                     }) {
                         Text(
                             stringResource(R.string.skip),
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft.copy(alpha = 0.8f),
                             fontSize = 16.sp
                         )
                     }
@@ -217,7 +218,7 @@ fun ValuePropPage1() {
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -226,7 +227,7 @@ fun ValuePropPage1() {
                 "Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills",
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 lineHeight = 24.sp
             )
 
@@ -236,7 +237,7 @@ fun ValuePropPage1() {
             FeatureRow(
                 icon = "🔢",
                 text = "Math & Logic Puzzles",
-                color = Color.White.copy(alpha = 0.8f)
+                color = RvInkSoft.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -244,7 +245,7 @@ fun ValuePropPage1() {
             FeatureRow(
                 icon = "📝",
                 text = "Word & Language Games",
-                color = Color.White.copy(alpha = 0.8f)
+                color = RvInkSoft.copy(alpha = 0.8f)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -252,7 +253,7 @@ fun ValuePropPage1() {
             FeatureRow(
                 icon = "⚡",
                 text = "Quick Daily Challenges",
-                color = Color.White.copy(alpha = 0.8f)
+                color = RvInkSoft.copy(alpha = 0.8f)
             )
         }
     }
@@ -290,7 +291,7 @@ fun ValuePropPage2() {
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -299,7 +300,7 @@ fun ValuePropPage2() {
                 "Level up, earn badges, and see your improvement over time with detailed analytics",
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 lineHeight = 24.sp
             )
 
@@ -343,7 +344,7 @@ fun ValuePropPage3() {
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -352,7 +353,7 @@ fun ValuePropPage3() {
                 "Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type",
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 lineHeight = 24.sp
             )
 
@@ -396,7 +397,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = Color.White
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -405,7 +406,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
                 "Join thousands of puzzle enthusiasts and start your brain training journey today!",
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 lineHeight = 24.sp
             )
 
@@ -417,7 +418,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
+                    containerColor = RvSurfaceRaised,
                     contentColor = Color(0xFF667EEA)
                 ),
                 shape = RoundedCornerShape(28.dp)
@@ -434,7 +435,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
             Text(
                 "Free to play • No ads during puzzles",
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.7f),
+                color = RvInkSoft.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
             )
         }
@@ -482,8 +483,8 @@ fun OnboardingBottomBar(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White.copy(alpha = 0.2f),
-                    contentColor = Color.White
+                    containerColor = RvSurface,
+                    contentColor = RvInk
                 ),
                 shape = RoundedCornerShape(28.dp)
             ) {
@@ -535,7 +536,7 @@ fun ProgressVisualizationCard() {
             .fillMaxWidth()
             .height(120.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.1f)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -551,13 +552,13 @@ fun ProgressVisualizationCard() {
             ) {
                 Text(
                     "Level 5",
-                    color = Color.White,
+                    color = RvInk,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Text(
                     "⭐ 1,250 XP",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 14.sp
                 )
             }
@@ -568,16 +569,16 @@ fun ProgressVisualizationCard() {
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
-                color = Color(0xFFFFD700),
-                trackColor = Color.White.copy(alpha = 0.3f)
+                color = RvSun,
+                trackColor = RvOutline
             )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("🔥 5 day streak", color = Color.White, fontSize = 12.sp)
-                Text("65% to Level 6", color = Color.White, fontSize = 12.sp)
+                Text("🔥 5 day streak", color = RvInk, fontSize = 12.sp)
+                Text("65% to Level 6", color = RvInk, fontSize = 12.sp)
             }
         }
     }
@@ -601,7 +602,7 @@ fun AchievementShowcase() {
                     .width(140.dp)
                     .height(120.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -619,14 +620,14 @@ fun AchievementShowcase() {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         achievements[index].second,
-                        color = Color.White,
+                        color = RvInk,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center
                     )
                     Text(
                         achievements[index].third,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         fontSize = 10.sp,
                         textAlign = TextAlign.Center
                     )

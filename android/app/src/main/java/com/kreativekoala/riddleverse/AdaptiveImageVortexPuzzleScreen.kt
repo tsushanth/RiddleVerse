@@ -1,7 +1,10 @@
 // AdaptiveImageVortexPuzzleScreen.kt - FIXED VERSION
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.Icons
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -20,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -161,7 +165,7 @@ fun AdaptiveImageVortexPuzzleScreen(
             val nextDifficulty = getNextDifficulty(currentDifficultyLevel)
             if (nextDifficulty != currentDifficultyLevel.name) {
                 saveUserImageVortexDifficulty(nextDifficulty)
-                showDifficultyChanged = true
+                showDifficultyChanged = SHOW_ADAPTATION_NOTICES
                 Log.d(TAG, "📈 Difficulty advanced to: $nextDifficulty")
             }
         }
@@ -380,12 +384,15 @@ fun AdaptiveImageVortexPuzzleScreen(
 
 
     // UI
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvSurface)) {
+        val compact = maxHeight < 600.dp
+        CompositionLocalProvider(LocalIvCompact provides compact) {
         Column(
             modifier = Modifier
+                .widthIn(max = 720.dp)
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
-                .padding(16.dp)
+                .align(Alignment.TopCenter)
+                .padding(horizontal = if (compact) 12.dp else 16.dp, vertical = if (compact) 8.dp else 16.dp)
         ) {
             // Header
             ProperImageVortexHeader(
@@ -398,7 +405,7 @@ fun AdaptiveImageVortexPuzzleScreen(
                 onBack = onBack
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
 
             // Phase indicator
             PhaseIndicatorCard(
@@ -411,7 +418,7 @@ fun AdaptiveImageVortexPuzzleScreen(
                 totalNewImages = currentImages.count { it.isNew }
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
             // Images display area
             Box(
@@ -432,7 +439,7 @@ fun AdaptiveImageVortexPuzzleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
             // Progress
             ProgressCard(
@@ -442,6 +449,7 @@ fun AdaptiveImageVortexPuzzleScreen(
                 totalAttempts = totalAttempts,
                 bestStreak = bestStreak
             )
+        }
         }
 
         // Feedback overlay
@@ -672,6 +680,9 @@ fun ivFormatTime(seconds: Int): String {
 
 // UI Components (you'll need to implement these based on your existing UI patterns)
 
+/** True on short viewports (small phones, landscape, split-screen): HUD collapses to single rows. */
+private val LocalIvCompact = compositionLocalOf { false }
+
 @Composable
 fun ProperImageVortexHeader(
     difficulty: String,
@@ -682,50 +693,60 @@ fun ProperImageVortexHeader(
     streak: Int,
     onBack: () -> Unit
 ) {
-    // Implement based on your existing header pattern
+    val compact = LocalIvCompact.current
+    // Single compact HUD row: back, difficulty/level, lives, score, timer
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(onClick = onBack) {
-            Text("← Back")
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = RvInk
+            )
         }
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = difficulty.uppercase(),
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
             Text(
-                text = "${stringResource(R.string.level_label)} $level",
-                fontSize = 12.sp
+                text = "${stringResource(R.string.level_label)} $level" + if (streak > 1) "  🔥 $streak" else "",
+                fontSize = 14.sp,
+                color = RvInkSoft,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
-            if (streak > 1) {
-                Text(
-                    text = "🔥 $streak",
-                    fontSize = 10.sp,
-                    color = Color.Red
-                )
-            }
         }
 
         Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = timer,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = "❤️ $hearts",
-                fontSize = 12.sp
-            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "❤️ $hearts",
+                    fontSize = 14.sp,
+                    color = RvInk,
+                    maxLines = 1
+                )
+                Text(
+                    text = timer,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1
+                )
+            }
             Text(
                 text = "${stringResource(R.string.score_label)}: $score",
-                fontSize = 10.sp
+                fontSize = 14.sp,
+                color = RvInkSoft,
+                maxLines = 1
             )
         }
     }
@@ -753,7 +774,9 @@ fun PhaseIndicatorCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = if (LocalIvCompact.current) 6.dp else 10.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             val (title, subtitle, timeText, timeColor) = when (gamePhase) {
@@ -781,34 +804,81 @@ fun PhaseIndicatorCard(
                 }
             }
 
-            Text(
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
+            val compact = LocalIvCompact.current
+            // Timer colours darkened for contrast on the light card; wording is unchanged.
+            val readableTimeColor = when (timeColor) {
+                Color.Red -> Color(0xFFB3261E)
+                Color.Cyan -> Color(0xFF00696B)
+                Color.Green -> Color(0xFF15803D)
+                Color.Blue -> Color(0xFF1565C0)
+                else -> timeColor
+            }
+            if (compact) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = title,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = subtitle,
+                            fontSize = 14.sp,
+                            color = RvInkSoft,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                        )
+                    }
+                    Text(
+                        text = timeText,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = readableTimeColor,
+                        maxLines = 1
+                    )
+                }
+            } else {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
 
-            Text(
-                text = subtitle,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                color = Color.Gray
-            )
+                Text(
+                    text = subtitle,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    color = RvInkSoft,
+                    maxLines = 2,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = timeText,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = readableTimeColor
+                )
+            }
 
             if (gamePhase == IVGamePhase.WAITING_FOR_ANSWER && selectedCount > 0) {
                 Text(
                     text = "Selected: $selectedCount / $totalNewImages",
-                    fontSize = 12.sp,
-                    color = Color.Blue
+                    fontSize = 14.sp,
+                    color = Color(0xFF1565C0)
                 )
             }
-
-            Text(
-                text = timeText,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = timeColor
-            )
         }
     }
 }
@@ -851,7 +921,8 @@ fun ProperPositionedEmoji(
         modifier = Modifier.fillMaxSize()
     ) {
         // FIXED: Ensure valid coerceIn range
-        val emojiSize = 70.dp
+        val emojiSize = if (LocalIvCompact.current) 56.dp else 70.dp
+        val emojiSp = with(LocalDensity.current) { (emojiSize - 22.dp).toSp() } // glyph stays same size at any font scale
         val safeMaxWidth = maxOf(emojiSize, maxWidth)
         val safeMaxHeight = maxOf(emojiSize, maxHeight)
 
@@ -884,7 +955,7 @@ fun ProperPositionedEmoji(
             // Main emoji
             Text(
                 text = imageItem.emoji,
-                fontSize = 48.sp,
+                fontSize = emojiSp,
                 modifier = Modifier.graphicsLayer(alpha = alpha)
             )
 
@@ -917,29 +988,34 @@ fun ProgressCard(
     totalAttempts: Int,
     bestStreak: Int
 ) {
+    val compact = LocalIvCompact.current
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White)
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = if (compact) 6.dp else 10.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = "Level: $currentLevel / $totalLevels",
-                    fontSize = 14.sp
+                    fontSize = 14.sp,
+                    color = RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = "${stringResource(R.string.best_streak)}: $bestStreak",
                     fontSize = 12.sp,
-                    color = Color.Red
+                    color = Color(0xFFB3261E),
+                    maxLines = 1
                 )
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             LinearProgressIndicator(
                 progress = currentLevel.toFloat() / totalLevels.toFloat(),
@@ -947,32 +1023,38 @@ fun ProgressCard(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = Color.Blue,
+                color = Color(0xFF1565C0),
                 trackColor = Color.Gray.copy(alpha = 0.3f)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Secondary stats are dropped on short screens to keep the play area large.
+            if (!compact) {
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Correct: $correctAnswers",
-                    fontSize = 12.sp,
-                    color = Color.Green
-                )
-                Text(
-                    text = "Total: $totalAttempts",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                if (totalAttempts > 0) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
-                        text = "${(correctAnswers * 100 / totalAttempts)}% accuracy",
+                        text = "Correct: $correctAnswers",
                         fontSize = 12.sp,
-                        color = Color.Blue
+                        color = Color(0xFF15803D),
+                        maxLines = 1
                     )
+                    Text(
+                        text = "Total: $totalAttempts",
+                        fontSize = 12.sp,
+                        color = RvInkSoft,
+                        maxLines = 1
+                    )
+                    if (totalAttempts > 0) {
+                        Text(
+                            text = "${(correctAnswers * 100 / totalAttempts)}% accuracy",
+                            fontSize = 12.sp,
+                            color = Color(0xFF1565C0),
+                            maxLines = 1
+                        )
+                    }
                 }
             }
         }
@@ -1008,13 +1090,13 @@ fun FeedbackOverlay(
                     text = if (isCorrect) "Excellent!" else "Try Again!",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Text(
                     text = message,
                     fontSize = 16.sp,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -1022,7 +1104,7 @@ fun FeedbackOverlay(
                     Text(
                         text = "🔥 Streak: $streak",
                         fontSize = 14.sp,
-                        color = Color.White,
+                        color = RvInk,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -1057,13 +1139,13 @@ fun DifficultyAdvancementOverlay(
                     text = stringResource(R.string.difficulty_advanced),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Text(
                     text = "You're now playing at $newDifficulty level!",
                     fontSize = 16.sp,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -1071,7 +1153,7 @@ fun DifficultyAdvancementOverlay(
 
                 Button(
                     onClick = onDismiss,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                    colors = ButtonDefaults.buttonColors(containerColor = RvSurfaceRaised)
                 ) {
                     Text(
                         text = stringResource(R.string.continue_label),

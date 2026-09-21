@@ -22,6 +22,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kreativekoala.riddleverse.ui.theme.*
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import androidx.compose.ui.res.stringResource
@@ -124,8 +125,9 @@ fun RealDataTierProgressDashboard(onBackClick: () -> Unit) {
 fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = getTierColor(tierInfo.currentTier)),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, getTierColor(tierInfo.currentTier)),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(
@@ -138,12 +140,12 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                         "${getTierEmoji(tierInfo.currentTier)} ${tierInfo.currentTier}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Text(
                         "Level ${tierInfo.currentLevel}",
                         fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = RvInkSoft
                     )
                 }
 
@@ -152,13 +154,13 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                         "${tierInfo.totalXP} XP",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     if (tierInfo.currentTier != tierInfo.nextTier) {
                         Text(
                             "${tierInfo.pointsToNextTier - tierInfo.pointsInTier} to ${tierInfo.nextTier}",
                             fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = RvInkSoft
                         )
                     }
                 }
@@ -174,8 +176,8 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                         .fillMaxWidth()
                         .height(8.dp)
                         .clip(RoundedCornerShape(4.dp)),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.3f)
+                    color = getTierColor(tierInfo.currentTier),
+                    trackColor = RvOutline
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -184,7 +186,7 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                     "Next Tier Rewards:",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 LazyRow(
@@ -200,7 +202,7 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                     "🎉 Maximum tier achieved! You're a puzzle master!",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -223,9 +225,10 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (challenge.isCompleted) Color(0xFF4CAF50) else Color(0xFFE8F5E8)
+            containerColor = if (challenge.isCompleted) RvSuccess else RvSurface
         ),
-        shape = RoundedCornerShape(16.dp)
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Row(
@@ -236,13 +239,13 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
                     if (challenge.isCompleted) "🏆 Weekly Challenge Complete!" else "🎯 Weekly Challenge",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (challenge.isCompleted) Color.White else Color(0xFF2E7D32)
+                    color = if (challenge.isCompleted) RvOnTone else RvMintEdge
                 )
                 Text(
                     formatTimeLeft(timeLeft),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFFFF6F00)
+                    color = RvFlame
                 )
             }
 
@@ -251,7 +254,7 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
             Text(
                 "Complete ${challenge.weeklyGoal} puzzles this week",
                 fontSize = 16.sp,
-                color = if (challenge.isCompleted) Color.White else Color.Black
+                color = if (challenge.isCompleted) RvOnTone else RvInk
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -262,8 +265,8 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
-                color = if (challenge.isCompleted) Color.White else Color(0xFF4CAF50),
-                trackColor = (if (challenge.isCompleted) Color.White else Color.Gray).copy(alpha = 0.3f)
+                color = if (challenge.isCompleted) RvOnTone else RvSuccess,
+                trackColor = (if (challenge.isCompleted) RvOnTone else RvInkSoft).copy(alpha = 0.3f)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -275,13 +278,13 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
                 Text(
                     "${challenge.weeklyProgress}/${challenge.weeklyGoal} completed",
                     fontSize = 14.sp,
-                    color = if (challenge.isCompleted) Color.White else Color.Black
+                    color = if (challenge.isCompleted) RvOnTone else RvInk
                 )
                 Text(
                     if (challenge.isCompleted) "✅ ${challenge.weeklyReward} XP earned!" else "Reward: ${challenge.weeklyReward} XP",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = if (challenge.isCompleted) Color.White else Color(0xFF2E7D32)
+                    color = if (challenge.isCompleted) RvOnTone else RvMintEdge
                 )
             }
         }
@@ -293,16 +296,17 @@ fun RealSeasonalEventCard(event: SeasonalEventInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (event.isCompleted) Color(0xFFFF6F00) else Color(0xFFFFE0B2)
+            containerColor = if (event.isCompleted) RvFlame else RvSurface
         ),
-        shape = RoundedCornerShape(16.dp)
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 "${event.theme} ${event.eventName}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (event.isCompleted) Color.White else Color(0xFFE65100)
+                color = if (event.isCompleted) RvOnTone else RvSunEdge
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -310,7 +314,7 @@ fun RealSeasonalEventCard(event: SeasonalEventInfo) {
             Text(
                 event.description,
                 fontSize = 14.sp,
-                color = if (event.isCompleted) Color.White.copy(alpha = 0.9f) else Color(0xFF424242)
+                color = if (event.isCompleted) RvOnTone.copy(alpha = 0.9f) else RvInkSoft
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -321,8 +325,8 @@ fun RealSeasonalEventCard(event: SeasonalEventInfo) {
                     .fillMaxWidth()
                     .height(8.dp)
                     .clip(RoundedCornerShape(4.dp)),
-                color = if (event.isCompleted) Color.White else Color(0xFFFF9800),
-                trackColor = (if (event.isCompleted) Color.White else Color.Gray).copy(alpha = 0.3f)
+                color = if (event.isCompleted) RvOnTone else RvWarning,
+                trackColor = (if (event.isCompleted) RvOnTone else RvInkSoft).copy(alpha = 0.3f)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -334,12 +338,12 @@ fun RealSeasonalEventCard(event: SeasonalEventInfo) {
                 Text(
                     if (event.isCompleted) "🎉 Event Complete!" else "${event.progress}/${event.maxProgress}",
                     fontSize = 14.sp,
-                    color = if (event.isCompleted) Color.White else Color.Black
+                    color = if (event.isCompleted) RvOnTone else RvInk
                 )
                 Text(
                     "Ends ${formatEventTime(event.endTime)}",
                     fontSize = 12.sp,
-                    color = if (event.isCompleted) Color.White.copy(alpha = 0.8f) else Color.Gray
+                    color = if (event.isCompleted) RvOnTone.copy(alpha = 0.8f) else RvInkSoft
                 )
             }
         }
@@ -350,15 +354,16 @@ fun RealSeasonalEventCard(event: SeasonalEventInfo) {
 fun RealStatisticsOverviewCard(globalStats: GlobalStatsInfo, streakInfo: StreakDisplayInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF3E5F5)),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 "📊 Your Statistics",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF7B1FA2)
+                color = RvGrapeEdge
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -394,15 +399,16 @@ fun RealStatisticsOverviewCard(globalStats: GlobalStatsInfo, streakInfo: StreakD
 fun RealPuzzleTypePerformanceCard(puzzleStats: List<PuzzlePerformanceInfo>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE1F5FE)),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 "🎮 Puzzle Performance",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF0277BD)
+                color = RvSkyEdge
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -416,7 +422,7 @@ fun RealPuzzleTypePerformanceCard(puzzleStats: List<PuzzlePerformanceInfo>) {
                 Text(
                     "Complete some puzzles to see your performance stats!",
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -441,14 +447,14 @@ fun RealPuzzleStatRow(stat: PuzzlePerformanceInfo) {
             Text(
                 "${stat.totalSolved} solved • ${(stat.accuracy * 100).toInt()}% accuracy • High: ${stat.highScore}",
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = RvInkSoft
             )
         }
 
         Text(
             "${stat.averageTime.toInt()}s avg",
             fontSize = 12.sp,
-            color = Color(0xFF0277BD),
+            color = RvSkyEdge,
             fontWeight = FontWeight.Medium
         )
     }
@@ -459,16 +465,17 @@ fun RealDailyStreakCard(streakInfo: StreakDisplayInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (streakInfo.streakActive) Color(0xFFFF5722) else Color(0xFFFFEBEE)
+            containerColor = if (streakInfo.streakActive) RvCoral else RvSurface
         ),
-        shape = RoundedCornerShape(16.dp)
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 "🔥 Daily Streak",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (streakInfo.streakActive) Color.White else Color(0xFFD32F2F)
+                color = if (streakInfo.streakActive) RvOnTone else RvCoralEdge
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -481,19 +488,19 @@ fun RealDailyStreakCard(streakInfo: StreakDisplayInfo) {
                     "Current",
                     streakInfo.currentDailyStreak.toString(),
                     "🔥",
-                    textColor = if (streakInfo.streakActive) Color.White else Color.Black
+                    textColor = if (streakInfo.streakActive) RvOnTone else RvInk
                 )
                 DashboardStatItem(
                     "Best Ever",
                     streakInfo.longestDailyStreak.toString(),
                     "🏆",
-                    textColor = if (streakInfo.streakActive) Color.White else Color.Black
+                    textColor = if (streakInfo.streakActive) RvOnTone else RvInk
                 )
                 DashboardStatItem(
                     "Status",
                     if (streakInfo.hasPlayedToday) "Active" else "Inactive",
                     "✅",
-                    textColor = if (streakInfo.streakActive) Color.White else Color.Black
+                    textColor = if (streakInfo.streakActive) RvOnTone else RvInk
                 )
             }
 
@@ -503,7 +510,7 @@ fun RealDailyStreakCard(streakInfo: StreakDisplayInfo) {
                 streakInfo.streakMessage,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
-                color = if (streakInfo.streakActive) Color.White else Color(0xFF666666),
+                color = if (streakInfo.streakActive) RvOnTone else RvInkSoft,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -514,15 +521,16 @@ fun RealDailyStreakCard(streakInfo: StreakDisplayInfo) {
 fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<PuzzlePerformanceInfo>) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F4C3)),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
                 "⏱️ Time Analytics",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF689F38)
+                color = RvMintEdge
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -565,7 +573,7 @@ fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<Puzzle
                     "🎯 You've spent ${if (days > 0) "${days} days and " else ""}${hours} hours sharpening your mind!",
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,
-                    color = Color(0xFF388E3C),
+                    color = RvMintEdge,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -577,8 +585,9 @@ fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<Puzzle
 fun WelcomeNewUserCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFE8F5E8)),
-        shape = RoundedCornerShape(16.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(24.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
@@ -588,7 +597,7 @@ fun WelcomeNewUserCard() {
                 "🎉 Welcome to Puzzle Universe!",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E7D32),
+                color = RvMintEdge,
                 textAlign = TextAlign.Center
             )
 
@@ -597,7 +606,7 @@ fun WelcomeNewUserCard() {
             Text(
                 "Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!",
                 fontSize = 14.sp,
-                color = Color(0xFF424242),
+                color = RvInkSoft,
                 textAlign = TextAlign.Center
             )
 
@@ -606,7 +615,7 @@ fun WelcomeNewUserCard() {
             Text(
                 "🎯 Complete your first puzzle to begin your journey!",
                 fontSize = 12.sp,
-                color = Color(0xFF689F38),
+                color = RvMintEdge,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium
             )
@@ -620,7 +629,7 @@ fun DashboardStatItem(
     label: String,
     value: String,
     emoji: String,
-    textColor: Color = Color.Black
+    textColor: Color = RvInk
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(emoji, fontSize = 20.sp)
@@ -641,14 +650,14 @@ fun DashboardStatItem(
 @Composable
 fun RewardChip(reward: String) {
     Surface(
-        color = Color.White.copy(alpha = 0.8f),
+        color = RvSurfaceRaised.copy(alpha = 0.8f),
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(
             reward,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             fontSize = 12.sp,
-            color = Color.Black
+            color = RvInk
         )
     }
 }
@@ -658,11 +667,11 @@ fun getTierColor(tier: String): Color {
     return when (tier) {
         "Bronze" -> Color(0xFFD2691E)
         "Silver" -> Color(0xFFC0C0C0)
-        "Gold" -> Color(0xFFFFD700)
+        "Gold" -> RvSun
         "Platinum" -> Color(0xFF98D8E8)
         "Diamond" -> Color(0xFFB9F2FF)
-        "Master" -> Color(0xFF9C27B0)
-        else -> Color.Gray
+        "Master" -> RvGrape
+        else -> RvInkSoft
     }
 }
 

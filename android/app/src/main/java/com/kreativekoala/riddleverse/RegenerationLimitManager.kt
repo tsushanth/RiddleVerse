@@ -59,6 +59,8 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
 
 class RegenerationLimitManager private constructor(context: Context) {
 
@@ -208,7 +210,7 @@ fun RegenerationLimitCard(
                 },
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvOnTone
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -312,7 +314,7 @@ fun UsageProgressBar(
             Text(
                 text = "$used/$total",
                 fontSize = 12.sp,
-                color = Color.White,
+                color = RvInk,
                 fontWeight = FontWeight.Medium
             )
         }

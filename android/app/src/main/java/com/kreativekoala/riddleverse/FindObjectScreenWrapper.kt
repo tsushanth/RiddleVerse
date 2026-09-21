@@ -1,6 +1,7 @@
 // FindObjectScreenWrapper.kt - Updated for Natural Discovery Approach
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Image
@@ -468,7 +469,7 @@ fun FindObjectPuzzleScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(RvCanvas)
     ) {
         // Header with natural discovery info
         NaturalFindObjectHeader(
@@ -579,7 +580,10 @@ fun FindObjectPuzzleScreen(
                         )
                     },
                     showHint = showHint,
-                    foundObjects = foundObjects
+                    foundObjects = foundObjects,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
             }
 
@@ -601,39 +605,34 @@ fun FindObjectPuzzleScreen(
             }
         }
 
-        // Enhanced progress and status
-        Column(
-            modifier = Modifier.padding(16.dp)
+        // Compact progress and status (single row)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(
+                text = "Found: ${foundObjects.size}/${puzzleData.totalObjects}",
+                color = RvInk,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
             LinearProgressIndicator(
                 progress = foundObjects.size.toFloat() / puzzleData.totalObjects,
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.Green,
-                trackColor = Color.Gray
+                modifier = Modifier.weight(1f),
+                color = RvSuccess,
+                trackColor = RvOutline
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Found: ${foundObjects.size}/${puzzleData.totalObjects}",
-                    color = Color.White,
-                    fontSize = 12.sp
-                )
-                Text(
-                    text = "Wrong: $wrongClicks/${puzzleData.gameSettings.maxWrongClicks}",
-                    color = if (wrongClicks >= puzzleData.gameSettings.maxWrongClicks * 0.8) Color.Red else Color.White,
-                    fontSize = 12.sp
-                )
-                Text(
-                    text = puzzleData.discoveryMethod.replace("_", " ").replaceFirstChar { it.uppercase() },
-                    color = Color.Cyan,
-                    fontSize = 10.sp
-                )
-            }
+            Text(
+                text = "Wrong: $wrongClicks/${puzzleData.gameSettings.maxWrongClicks}",
+                color = if (wrongClicks >= puzzleData.gameSettings.maxWrongClicks * 0.8) RvCoralEdge else RvInk,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
         }
     }
 }
@@ -655,53 +654,9 @@ fun NaturalFindObjectHeader(
     canUseHint: Boolean,
     gridConfig: GridConfig
 ) {
-    Column(modifier = Modifier.statusBarsPadding()) {
-        // Top row with basic controls
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = difficulty.uppercase(),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = round,
-                    color = Color.White,
-                    fontSize = 10.sp
-                )
-                Text(
-                    text = "Natural Discovery",
-                    color = Color.Cyan,
-                    fontSize = 8.sp
-                )
-            }
-
-            Text(
-                text = formatObjectTime(timeRemaining),
-                color = if (timeRemaining < 30) Color.Red else Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        // View mode selector
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+    BoxWithConstraints(modifier = Modifier.statusBarsPadding()) {
+        val wide = maxWidth >= 560.dp
+        val modeButtons: @Composable () -> Unit = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ObjectViewModeButton(
                     icon = Icons.Default.Landscape,
@@ -722,16 +677,79 @@ fun NaturalFindObjectHeader(
                     onClick = { onViewModeChange(ObjectViewMode.OBJECTS_LIST) }
                 )
             }
-
+        }
+        val hintButton: @Composable () -> Unit = {
             IconButton(
                 onClick = onHint,
-                enabled = canUseHint
+                enabled = canUseHint,
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     Icons.Default.Lightbulb,
-                    "Hint",
-                    tint = if (canUseHint) Color.Yellow else Color.Gray
+                    stringResource(R.string.hint),
+                    tint = if (canUseHint) RvSunEdge else RvInkSoft
                 )
+            }
+        }
+        Column {
+            // Single compact HUD row: back, title, timer (+ mode buttons and hint when there is room)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = RvInk)
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = difficulty.uppercase(),
+                        color = RvInk,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = round,
+                        color = RvInkSoft,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
+                }
+
+                Text(
+                    text = formatObjectTime(timeRemaining),
+                    color = if (timeRemaining < 30) RvCoralEdge else RvInk,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                if (wide) {
+
+                    modeButtons()
+                    hintButton()
+                } else {
+                    hintButton()
+                }
+            }
+
+            if (!wide) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    modeButtons()
+
+                }
             }
         }
     }
@@ -747,9 +765,9 @@ fun ObjectViewModeButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.Blue else Color.Gray
+            containerColor = if (isSelected) RvViolet else RvSurface
         ),
-        modifier = Modifier.size(width = 70.dp, height = 36.dp),
+        modifier = Modifier.defaultMinSize(minWidth = 72.dp).heightIn(min = 48.dp),
         contentPadding = PaddingValues(4.dp)
     ) {
         Column(
@@ -759,13 +777,13 @@ fun ObjectViewModeButton(
             Icon(
                 icon,
                 contentDescription = label,
-                modifier = Modifier.size(16.dp),
-                tint = Color.White
+                modifier = Modifier.size(20.dp),
+                tint = if (isSelected) RvOnTone else RvInk
             )
             Text(
                 text = label,
-                fontSize = 8.sp,
-                color = Color.White
+                fontSize = 12.sp,
+                color = if (isSelected) RvOnTone else RvInk
             )
         }
     }
@@ -781,7 +799,8 @@ private fun ZoomableImage(
     onTapAdjusted: (Float, Float, IntSize) -> Unit,
     // overlays
     showHint: DiscoveredObject? = null,
-    foundObjects: List<FoundObject> = emptyList()
+    foundObjects: List<FoundObject> = emptyList(),
+    modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
     var imgSize by remember { mutableStateOf(IntSize.Zero) }
@@ -807,7 +826,7 @@ private fun ZoomableImage(
     }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .clip(RoundedCornerShape(8.dp))
             .padding(8.dp)
@@ -846,7 +865,7 @@ private fun ZoomableImage(
                 Icon(
                     Icons.Default.Check,
                     contentDescription = stringResource(R.string.found),
-                    tint = Color.White,
+                    tint = RvOnTone,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -892,7 +911,7 @@ private fun ZoomableImage(
                     Icon(
                         Icons.Default.Lightbulb,
                         contentDescription = stringResource(R.string.hint),
-                        tint = Color.Black,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -913,7 +932,7 @@ private fun ZoomableImage(
                                     y = with(density) { tooltipY.toDp() }
                                 )
                                 .background(
-                                    Color.Black.copy(alpha = 0.9f),
+                                    RvInk.copy(alpha = 0.9f),
                                     RoundedCornerShape(8.dp)
                                 )
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
@@ -931,7 +950,7 @@ private fun ZoomableImage(
 
                                 Text(
                                     text = hint.description,
-                                    color = Color.White,
+                                    color = RvInk,
                                     fontSize = 10.sp,
                                     maxLines = 3,
                                     lineHeight = 12.sp
@@ -963,7 +982,7 @@ private fun ZoomableImage(
                                 y = with(density) { nameY.toDp() }
                             )
                             .background(
-                                Color.Black.copy(alpha = 0.8f),
+                                RvInk.copy(alpha = 0.8f),
                                 RoundedCornerShape(6.dp)
                             )
                             .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -1008,14 +1027,14 @@ private fun ZoomableImage(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .background(
-                        Color.Black.copy(alpha = 0.7f),
+                        RvInk.copy(alpha = 0.7f),
                         RoundedCornerShape(8.dp)
                     )
                     .padding(8.dp)
             ) {
                 Text(
                     text = "Pinch to zoom • Drag to pan • Tap objects found by AI vision",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 10.sp,
                     textAlign = TextAlign.Center
                 )
@@ -1076,7 +1095,7 @@ fun NaturalObjectLandscapeView(
                 Icon(
                     Icons.Default.Check,
                     "Found",
-                    tint = Color.White,
+                    tint = RvOnTone,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -1121,7 +1140,7 @@ fun NaturalObjectLandscapeView(
                     Icon(
                         Icons.Default.Lightbulb,
                         "Hint",
-                        tint = Color.Black,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -1152,7 +1171,7 @@ fun NaturalObjectsListView(
         item {
             Text(
                 text = "Objects to Find",
-                color = Color.White,
+                color = RvInk,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1166,7 +1185,7 @@ fun NaturalObjectsListView(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = analysis,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     fontSize = 10.sp,
                     maxLines = 2
                 )
@@ -1205,7 +1224,7 @@ fun NaturalObjectCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (isFound) Color.Green.copy(alpha = 0.3f) else Color.Gray.copy(alpha = 0.2f)
+            containerColor = if (isFound) Color.Green.copy(alpha = 0.3f) else RvInkSoft.copy(alpha = 0.2f)
         )
     ) {
         Column(
@@ -1219,7 +1238,7 @@ fun NaturalObjectCard(
                 Column {
                     Text(
                         text = discoveredObject.name.replaceFirstChar { it.uppercase() },
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -1233,8 +1252,8 @@ fun NaturalObjectCard(
                             color = when (discoveredObject.confidence) {
                                 "excellent" -> Color.Green
                                 "good" -> Color.Yellow
-                                "fair" -> Color(0xFFFF9800) // Orange
-                                else -> Color.Gray
+                                "fair" -> RvSun // Orange
+                                else -> RvInkSoft
                             },
                             fontSize = 10.sp
                         )
@@ -1256,14 +1275,14 @@ fun NaturalObjectCard(
                     ) {
                         Text(
                             text = "Grid: ${discoveredObject.gridIndex} (${discoveredObject.gridRow}, ${discoveredObject.gridCol})",
-                            color = Color.Gray,
+                            color = RvInkSoft,
                             fontSize = 10.sp
                         )
 
                         if (discoveredObject.totalInstancesOfType > 1) {
                             Text(
                                 text = "${discoveredObject.totalInstancesOfType} instances available",
-                                color = Color(0xFFFF9800), // Orange
+                                color = RvSun, // Orange
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -1284,7 +1303,7 @@ fun NaturalObjectCard(
                             "easy" -> Color.Green
                             "medium" -> Color.Yellow
                             "hard" -> Color.Red
-                            else -> Color.White
+                            else -> RvInk
                         },
                         fontSize = 12.sp
                     )
@@ -1295,7 +1314,7 @@ fun NaturalObjectCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = discoveredObject.description,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     fontSize = 12.sp
                 )
             }
@@ -1317,11 +1336,11 @@ fun NaturalObjectCard(
                         Icon(
                             Icons.Default.Lightbulb,
                             "Hint",
-                            tint = Color.Black
+                            tint = RvInk
                         )
                         Text(
                             "Show Hint",
-                            color = Color.Black
+                            color = RvInk
                         )
                     }
                 }
@@ -1339,7 +1358,7 @@ fun FoErrorScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(RvCanvas),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -1355,7 +1374,7 @@ fun FoErrorScreen(
 
             Text(
                 text = message,
-                color = Color.White,
+                color = RvInk,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
@@ -1369,7 +1388,7 @@ fun FoErrorScreen(
 
                 Button(
                     onClick = onSkip,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    colors = ButtonDefaults.buttonColors(containerColor = RvInkSoft)
                 ) {
                     Text("Skip")
                 }

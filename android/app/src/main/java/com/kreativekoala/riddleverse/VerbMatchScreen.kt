@@ -1,6 +1,16 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -79,250 +89,268 @@ fun MatchScreen(
         }
     }
 
-    Column(
+    // Selecting an option submits it straight away (same behaviour as before, shared by every layout).
+    val selectOption: (String) -> Unit = { option ->
+        if (!isAnswered) {
+            currentSelectedOption = option
+            onOptionSelected(option)
+
+            // Auto-submit after selection
+            isAnswered = true
+            isCorrect = option == correctAnswer
+            showResult = true
+
+            if (isCorrect) {
+                onCorrectAnswer(remainingTime > 0)
+            }
+
+            // Auto-continue after 2 seconds
+            Handler(Looper.getMainLooper()).postDelayed({
+                onContinue(option)
+            }, 2000)
+        }
+    }
+
+    val submitSelection: () -> Unit = {
+        if (currentSelectedOption != null) {
+            isAnswered = true
+            isCorrect = currentSelectedOption == correctAnswer
+            showResult = true
+
+            if (isCorrect) {
+                onCorrectAnswer(remainingTime > 0)
+            }
+
+            Handler(Looper.getMainLooper()).postDelayed({
+                onContinue(currentSelectedOption)
+            }, 2000)
+        }
+    }
+
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2C003E)) // Dark purple background
-            .statusBarsPadding()
-            .padding(16.dp)
-            .verticalScroll(rememberScrollState())
+            .background(RvCanvas)
     ) {
-        // Top Bar
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color(0xFFE57373),
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
 
-            // Progress indicator
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    "Question $questionNumber of $totalQuestions",
-                    color = Color(0xFFE57373),
-                    fontSize = 14.sp
-                )
-                Text(
-                    difficulty,
-                    color = Color(0xFFE57373).copy(alpha = 0.7f),
-                    fontSize = 12.sp
-                )
-            }
-
-            // Timer
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    Icons.Default.Timer,
-                    contentDescription = "Timer",
-                    tint = Color(0xFFE57373),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(Modifier.width(4.dp))
-                Text(
-                    text = String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
-                    color = Color(0xFFE57373),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
-        Spacer(Modifier.height(32.dp))
-
-        // Question Section
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color(0xFF4A148C)) // Darker purple for question
-                .padding(24.dp)
-        ) {
-            Column {
-                Text(
-                    text = "Match the Answer",
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 14.sp,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.height(12.dp))
-                Text(
-                    text = question,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
-        }
-
-        Spacer(Modifier.height(40.dp))
-
-        // Options Section
-        if (options.isNotEmpty()) {
-            // Arrange options in a grid if more than 3, otherwise in a row
-            if (options.size <= 3) {
-                // Single row for 3 or fewer options
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+        // Question card: the dominant element. Its header line doubles as the result banner.
+        val questionCard: @Composable (Modifier) -> Unit = { m ->
+            GroupEFontCap {
+                Box(
+                    modifier = m
+                        .testTag("match_question")
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(RvSurface)
+                        .border(2.dp, RvOutline, RoundedCornerShape(16.dp))
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    options.forEach { option ->
-                        OptionCircle(
-                            option = option,
-                            isSelected = currentSelectedOption == option,
-                            isCorrect = option == correctAnswer,
-                            showResult = showResult,
-                            onSelect = {
-                                if (!isAnswered) {
-                                    currentSelectedOption = option
-                                    onOptionSelected(option)
-
-                                    // Auto-submit after selection
-                                    isAnswered = true
-                                    isCorrect = option == correctAnswer
-                                    showResult = true
-
-                                    if (isCorrect) {
-                                        onCorrectAnswer(remainingTime > 0)
-                                    }
-
-                                    // Auto-continue after 2 seconds
-                                    Handler(Looper.getMainLooper()).postDelayed({
-                                        onContinue(option)
-                                    }, 2000)
-                                }
-                            }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = when {
+                                showResult && isCorrect -> "\uD83C\uDF89 Correct!"
+                                showResult -> "\u274C Wrong! Answer: $correctAnswer"
+                                else -> "Match the Answer"
+                            },
+                            color = when {
+                                showResult && isCorrect -> RvInk
+                                showResult -> RvErrorEdge
+                                else -> RvInkSoft
+                            },
+                            fontSize = 16.sp,
+                            fontWeight = if (showResult) FontWeight.Bold else FontWeight.Normal,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = question,
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            textAlign = TextAlign.Center,
+                            maxLines = 4,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
-            } else {
-                // Grid layout for more than 3 options
-                val chunkedOptions = options.chunked(2) // 2 options per row
-                chunkedOptions.forEach { rowOptions ->
+            }
+        }
+
+        // Options: one column for <= 3, two columns otherwise. Rows share the height, each >= 56dp.
+        val optionsArea: @Composable (Modifier) -> Unit = { m ->
+            val columns = if (options.size <= 3) 1 else 2
+            val rows = options.chunked(columns)
+            Column(modifier = m, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                rows.forEach { rowOptions ->
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .heightIn(min = 56.dp, max = 96.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         rowOptions.forEach { option ->
-                            OptionCircle(
+                            GroupEVerbOption(
                                 option = option,
                                 isSelected = currentSelectedOption == option,
                                 isCorrect = option == correctAnswer,
                                 showResult = showResult,
-                                onSelect = {
-                                    if (!isAnswered) {
-                                        currentSelectedOption = option
-                                        onOptionSelected(option)
-
-                                        isAnswered = true
-                                        isCorrect = option == correctAnswer
-                                        showResult = true
-
-                                        if (isCorrect) {
-                                            onCorrectAnswer(remainingTime > 0)
-                                        }
-
-                                        Handler(Looper.getMainLooper()).postDelayed({
-                                            onContinue(option)
-                                        }, 2000)
-                                    }
-                                }
+                                onSelect = { selectOption(option) },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
                             )
                         }
-                        // Add spacer if odd number of options in last row
-                        if (rowOptions.size == 1) {
-                            Spacer(Modifier.weight(1f))
-                        }
+                        if (rowOptions.size < columns) Spacer(Modifier.weight(1f))
                     }
-                    Spacer(Modifier.height(16.dp))
                 }
             }
         }
 
-        Spacer(Modifier.weight(1f))
-
-        // Result display
-        if (showResult) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+        // Action bar: one primary action (Submit) + secondary Hint, pinned at the bottom.
+        val actionBar: @Composable (Modifier) -> Unit = { m ->
+            Row(
+                modifier = m,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = if (isCorrect) "🎉 Correct!" else "❌ Wrong! Answer: $correctAnswer",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFE57373),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        // Bottom Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(
-                onClick = onHint,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF9575CD)),
-                shape = RoundedCornerShape(25.dp),
-                enabled = !isAnswered
-            ) {
-                Text("💡 Hint", color = Color.White)
-            }
-
-            if (!showResult) {
-                Button(
-                    onClick = {
-                        if (currentSelectedOption != null) {
-                            isAnswered = true
-                            isCorrect = currentSelectedOption == correctAnswer
-                            showResult = true
-
-                            if (isCorrect) {
-                                onCorrectAnswer(remainingTime > 0)
-                            }
-
-                            Handler(Looper.getMainLooper()).postDelayed({
-                                onContinue(currentSelectedOption)
-                            }, 2000)
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF64B5F6)),
-                    shape = RoundedCornerShape(25.dp),
-                    enabled = currentSelectedOption != null && !isAnswered
+                OutlinedButton(
+                    onClick = onHint,
+                    enabled = !isAnswered,
+                    modifier = Modifier
+                        .heightIn(min = 56.dp)
+                        .weight(if (showResult) 1f else 0.6f),
+                    shape = RoundedCornerShape(18.dp),
+                    border = BorderStroke(2.dp, if (isAnswered) RvDisabled else RvViolet),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = RvVioletEdge,
+                        disabledContentColor = RvInkSoft
+                    )
                 ) {
-                    Text(stringResource(R.string.submit), color = Color.White)
+                    Text("\uD83D\uDCA1 Hint", fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+
+                if (!showResult) {
+                    GroupEPrimaryButton(
+                        text = stringResource(R.string.submit),
+                        onClick = submitSelection,
+                        enabled = currentSelectedOption != null && !isAnswered,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
             }
         }
 
-        Spacer(Modifier.height(16.dp))
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 840.dp)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp)
+        ) {
+            GroupECompactHud(
+                timer = String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
+                onBack = onBack,
+                subtitle = "Question $questionNumber of $totalQuestions \u2022 $difficulty",
+                urgent = remainingTime <= 10
+            )
 
-        // Instruction text
-        Text(
-            text = "TAP TO SELECT YOUR ANSWER",
-            fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.5f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+            Spacer(Modifier.height(8.dp))
 
-        Spacer(Modifier.height(16.dp))
+            if (wide) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    questionCard(Modifier.weight(1f).fillMaxHeight())
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        if (options.isNotEmpty()) optionsArea(Modifier.weight(1f).fillMaxWidth())
+                        actionBar(Modifier.fillMaxWidth())
+                    }
+                }
+            } else {
+                questionCard(Modifier.fillMaxWidth())
+                Spacer(Modifier.height(12.dp))
+                if (options.isNotEmpty()) optionsArea(Modifier.weight(1f).fillMaxWidth()) else Spacer(Modifier.weight(1f))
+                Spacer(Modifier.height(8.dp))
+                actionBar(Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
+/**
+ * Answer option: rounded button (>= 56dp), text wraps, selected / correct / wrong each get their own
+ * outline weight and a mark (dot, check, cross), so state is never colour-only.
+ */
+@Composable
+private fun GroupEVerbOption(
+    option: String,
+    isSelected: Boolean,
+    isCorrect: Boolean,
+    showResult: Boolean,
+    onSelect: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(16.dp)
+    val correctShown = showResult && isCorrect
+    val wrongShown = showResult && isSelected && !isCorrect
+    val border = when {
+        correctShown -> RvSuccessEdge
+        wrongShown -> RvErrorEdge
+        isSelected -> RvViolet
+        else -> RvOutline
+    }
+    val fill = when {
+        correctShown -> RvSuccess.copy(alpha = 0.25f)
+        wrongShown -> RvError.copy(alpha = 0.2f)
+        isSelected -> RvViolet.copy(alpha = 0.12f)
+        else -> RvSurfaceRaised
+    }
+    val mark = when {
+        correctShown -> "\u2713"
+        wrongShown -> "\u2717"
+        isSelected -> "\u25CF"
+        else -> ""
+    }
+    GroupEFontCap(max = 1.5f) {
+        Row(
+            modifier = modifier
+                .testTag("match_option")
+                .clip(shape)
+                .background(fill, shape)
+                .border(if (isSelected || correctShown) 3.dp else 2.dp, border, shape)
+                .clickable { onSelect() }
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (mark.isNotEmpty()) {
+                Text(text = mark, color = RvInk, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.width(8.dp))
+            }
+            Text(
+                text = option,
+                color = RvInk,
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
 
@@ -344,10 +372,10 @@ fun OptionCircle(
                 .clip(CircleShape)
                 .background(
                     when {
-                        showResult && isCorrect -> Color(0xFF4CAF50)
-                        showResult && isSelected && !isCorrect -> Color(0xFFE57373)
-                        isSelected -> Color(0xFF81C784)
-                        else -> Color(0xFFE57373)
+                        showResult && isCorrect -> RvSuccess
+                        showResult && isSelected && !isCorrect -> RvError
+                        isSelected -> RvSuccess
+                        else -> RvError
                     }
                 )
                 .clickable { onSelect() },
@@ -355,7 +383,7 @@ fun OptionCircle(
         ) {
             Text(
                 text = option,
-                color = Color.White,
+                color = RvInk,
                 fontWeight = FontWeight.Bold,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
@@ -368,10 +396,10 @@ fun OptionCircle(
                 .height(20.dp)
                 .background(
                     when {
-                        showResult && isCorrect -> Color(0xFF4CAF50)
-                        showResult && isSelected && !isCorrect -> Color(0xFFE57373)
-                        isSelected -> Color(0xFF81C784)
-                        else -> Color(0xFFE57373)
+                        showResult && isCorrect -> RvSuccess
+                        showResult && isSelected && !isCorrect -> RvError
+                        isSelected -> RvSuccess
+                        else -> RvError
                     }
                 )
         )

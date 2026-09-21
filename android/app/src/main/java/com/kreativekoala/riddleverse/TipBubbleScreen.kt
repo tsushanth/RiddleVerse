@@ -35,6 +35,14 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import androidx.compose.ui.res.stringResource
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 
 data class TipBubble(
     val id: String = UUID.randomUUID().toString(),
@@ -231,7 +239,7 @@ fun TipBubblePuzzleScreen(
                 adaptationInfo = config
                 if (config.confidenceScore > 0.5f) {
                     currentDifficultyLevel = config.level
-                    showAdaptationNotification = true
+                    showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                 }
             }
 
@@ -320,9 +328,9 @@ fun TipBubblePuzzleScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
+                        RvCanvas,
+                        RvSurface,
+                        RvCanvas
                     )
                 )
             )
@@ -368,7 +376,7 @@ fun TipBubblePuzzleScreen(
                         Icon(
                             Icons.Default.TrendingUp,
                             contentDescription = "Difficulty adjusted",
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -377,12 +385,12 @@ fun TipBubblePuzzleScreen(
                                 text = "Difficulty Adapted!",
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = RvOnTone
                             )
                             Text(
                                 text = adaptationInfo?.adjustmentReason ?: "",
                                 fontSize = 10.sp,
-                                color = Color.White.copy(alpha = 0.9f)
+                                color = RvOnTone.copy(alpha = 0.9f)
                             )
                         }
                         IconButton(
@@ -392,7 +400,7 @@ fun TipBubblePuzzleScreen(
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = "Dismiss",
-                                tint = Color.White,
+                                tint = RvOnTone,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -407,7 +415,7 @@ fun TipBubblePuzzleScreen(
                 text = "TAP THE CORRECT TIP",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -420,7 +428,7 @@ fun TipBubblePuzzleScreen(
                     .fillMaxWidth()
                     .padding(horizontal = 40.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -436,13 +444,13 @@ fun TipBubblePuzzleScreen(
                         Text(
                             text = "Bill Amount",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = RvInkSoft
                         )
                         Text(
                             text = currentDifficultyLevel.name.uppercase(),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Yellow.copy(alpha = 0.8f)
+                            color = RvSunEdge.copy(alpha = 0.8f)
                         )
                     }
 
@@ -450,7 +458,7 @@ fun TipBubblePuzzleScreen(
                         text = "$${String.format("%.2f", currentTipCalculation.billAmount)}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -476,7 +484,7 @@ fun TipBubblePuzzleScreen(
                 Text(
                     text = "Tap the bubble with the correct tip amount!",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center
                 )
 
@@ -484,7 +492,7 @@ fun TipBubblePuzzleScreen(
                     Text(
                         text = "⚡ Quick reactions earn bonus points!",
                         fontSize = 12.sp,
-                        color = Color.Yellow.copy(alpha = 0.7f),
+                        color = RvSunEdge.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -550,7 +558,7 @@ fun TipBubblePuzzleScreen(
                                 adaptationInfo = config
                                 if (config.confidenceScore > 0.5f) {
                                     currentDifficultyLevel = config.level
-                                    showAdaptationNotification = true
+                                    showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                                 }
                             }
 
@@ -621,9 +629,9 @@ fun TipBubbleComponent(
         colors = CardDefaults.cardColors(
             // Show green only when selected AND correct, red when selected AND incorrect
             containerColor = when {
-                isSelected && bubble.isCorrect -> Color(0xFF4CAF50).copy(alpha = 0.9f)
+                isSelected && bubble.isCorrect -> RvSuccess.copy(alpha = 0.9f)
                 isSelected && !bubble.isCorrect -> Color(0xFFE53E3E).copy(alpha = 0.9f)
-                else -> Color.White.copy(alpha = 0.9f)
+                else -> RvOnTone.copy(alpha = 0.9f)
             }
         ),
         border = BorderStroke(
@@ -645,14 +653,14 @@ fun TipBubbleComponent(
                 Text(
                     text = "$",
                     fontSize = 16.sp,
-                    color = if (isSelected) Color.White else Color.Black,
+                    color = if (isSelected) RvInk else RvInk,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = String.format("%.2f", bubble.tipAmount),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isSelected) Color.White else Color.Black,
+                    color = if (isSelected) RvInk else RvInk,
                     textAlign = TextAlign.Center
                 )
             }
@@ -693,7 +701,7 @@ fun AdaptiveTipBubbleTopGameBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -703,7 +711,7 @@ fun AdaptiveTipBubbleTopGameBar(
                         text = "${stringResource(R.string.level_label)} ${level.level}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     // Adaptive difficulty indicator
@@ -711,7 +719,7 @@ fun AdaptiveTipBubbleTopGameBar(
                         text = currentDifficulty.name,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color.Cyan
+                        color = RvSkyEdge
                     )
 
                     // Level progress bar
@@ -746,7 +754,7 @@ fun AdaptiveTipBubbleTopGameBar(
                     text = timer,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
+                    color = if (isUrgent) Color.Red else RvInk
                 )
 
                 // Streak display
@@ -765,7 +773,7 @@ fun AdaptiveTipBubbleTopGameBar(
 
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -779,7 +787,7 @@ fun AdaptiveTipBubbleTopGameBar(
                     if (totalScore > 0) {
                         Text(
                             text = "${stringResource(R.string.score_label)}: $totalScore",
-                            color = Color.White,
+                            color = RvInk,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -788,14 +796,14 @@ fun AdaptiveTipBubbleTopGameBar(
                     if (attempts > 0) {
                         Text(
                             text = "Attempts: $attempts",
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft,
                             fontSize = 12.sp
                         )
                     }
 
                     Text(
                         text = "💡 Mental Math",
-                        color = Color.Yellow.copy(alpha = 0.8f),
+                        color = RvSunEdge.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
                 }

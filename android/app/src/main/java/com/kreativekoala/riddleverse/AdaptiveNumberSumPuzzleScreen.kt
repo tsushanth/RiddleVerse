@@ -5,6 +5,15 @@ import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Pause
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -30,6 +39,9 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -146,7 +158,7 @@ fun AdaptiveNumberSumPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -388,120 +400,173 @@ fun AdaptiveNumberSumPuzzleScreen(
         }
     }
 
-    Column(
+    // Fit-to-screen: HUD fixed on top, target + tile grid take the remaining space, no scrolling.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1B5E20))
+            .background(RvSurface)
     ) {
-        // Use unified header
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = totalScore,
-            puzzleType = "numberSum",
-            competitiveInsight = competitiveInsight,
-            challengeNumber = correctAttempts + 1,
-            totalChallenges = maxRounds,
-            onBack = {
-                gameCompleted = true
-                onBack()
-            },
-            onPause = { isPaused = !isPaused },
-            onHint = {
-                showHint = !showHint
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val compact = maxHeight < 600.dp
+        val pad = if (compact) 8.dp else 16.dp
+
+        val tallHeader = !wide && maxHeight >= 700.dp
+        val header: @Composable () -> Unit = {
+            if (tallHeader) {
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "numberSum",
+                    competitiveInsight = competitiveInsight,
+                    challengeNumber = correctAttempts + 1,
+                    totalChallenges = maxRounds,
+                    onBack = {
+                        gameCompleted = true
+                        onBack()
+                    },
+                    onPause = { isPaused = !isPaused },
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                )
+            } else {
+                AdaptiveCompactHud(
+                    level = currentLevel,
+                    timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    difficultyName = currentDifficultyLevel.name,
+                    challengeText = "${correctAttempts + 1}/$maxRounds",
+                    onBack = {
+                        gameCompleted = true
+                        onBack()
+                    },
+                    onPause = { isPaused = !isPaused }
+                )
             }
-        )
+        }
 
-        // Use unified adaptation notification
-        UnifiedAdaptationNotification(
-            adaptationInfo = adaptationInfo,
-            puzzleType = "numberSum",
-            visible = showAdaptationNotification,
-            onDismiss = { showAdaptationNotification = false }
-        )
-
-        // Game Area
-        if (!gameCompleted) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Target Sum Display with difficulty info
+        val targetCard: @Composable (Modifier) -> Unit = { m ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2E7D32))
+                modifier = m.testTag("numsum_target"),
+                colors = CardDefaults.cardColors(containerColor = RvSuccess)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = if (compact) 8.dp else 16.dp, horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Target",
                         fontSize = 16.sp,
-                        color = Color.White,
+                        color = RvInk,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = currentConfig.targetSum.toString(),
-                        fontSize = 48.sp,
-                        color = Color(0xFF4CAF50),
-                        fontWeight = FontWeight.Bold
+                        fontSize = if (compact) 40.sp else 48.sp,
+                        color = RvInk,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
+                    // Always reserve the line so the layout does not jump when a tile is picked.
+                    Text(
+                        text = if (currentSum > 0) "Current: $currentSum" else "${currentDifficultyLevel.name} • ${currentConfig.correctNumbers.size} numbers",
+                        fontSize = 14.sp,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+
+        // Tile grid sized from the space it is given.
+        val tileGrid: @Composable (Modifier) -> Unit = { m ->
+            BoxWithConstraints(modifier = m, contentAlignment = Alignment.Center) {
+                val n = numberTiles.size.coerceAtLeast(1)
+                val cols = if (n <= 4) 2 else 3
+                val rows = (n + cols - 1) / cols
+                val gap = if (compact) 8.dp else 16.dp
+                val byW = (maxWidth - gap * (cols - 1)) / cols
+                val byH = (maxHeight - gap * (rows - 1)) / rows
+                val tileSize = minOf(byW, byH).coerceIn(48.dp, 96.dp)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(gap),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    numberTiles.chunked(cols).forEach { rowTiles ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                            rowTiles.forEach { tile ->
+                                Box(Modifier.size(tileSize), contentAlignment = Alignment.Center) {
+                                    AdaptiveNumberTileComponent(
+                                        tile = tile,
+                                        onClick = { onNumberClick(tile.id, tile.number, tile.isCorrect) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(if (tallHeader) 0.dp else pad)
+                .widthIn(max = 720.dp)
+                .align(Alignment.TopCenter),
+            verticalArrangement = Arrangement.spacedBy(pad)
+        ) {
+            header()
+
+            if (!gameCompleted) {
+                if (wide) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(pad),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (currentSum > 0) {
-                            Text(
-                                text = "Current: $currentSum",
-                                fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        }
+                        targetCard(Modifier.weight(1f))
+                        tileGrid(Modifier.weight(1f).fillMaxHeight())
+                    }
+                } else {
+                    targetCard(Modifier.fillMaxWidth())
+                    tileGrid(Modifier.fillMaxWidth().weight(1f))
+                }
+            }
+
+            // Completion message overlay
+            if (showCompletionMessage) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Card(
+                        modifier = Modifier.padding(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = RvSuccess)
+                    ) {
                         Text(
-                            text = "${currentDifficultyLevel.name} • ${currentConfig.correctNumbers.size} numbers",
-                            fontSize = 12.sp,
-                            color = Color.Cyan,
-                            fontWeight = FontWeight.Medium
+                            text = completionMessage,
+                            modifier = Modifier.padding(16.dp),
+                            color = RvInk,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Number Grid
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(numberTiles) { tile ->
-                    AdaptiveNumberTileComponent(
-                        tile = tile,
-                        onClick = { onNumberClick(tile.id, tile.number, tile.isCorrect) }
-                    )
-                }
-            }
         }
-
-    }
-
-    // Enhanced Universal Feedback - needs to be in BoxScope
-    if (!gameCompleted) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        if (!gameCompleted) {
             EnhancedUniversalFeedback(feedbackManager)
         }
     }
 }
-
 
 @Composable
 fun AdaptiveNumberTileComponent(
@@ -514,23 +579,25 @@ fun AdaptiveNumberTileComponent(
     )
 
     val backgroundColor = when {
-        tile.isSelected -> Color(0xFF4CAF50)
+        tile.isSelected -> RvSuccess
         tile.showFeedback && tile.feedbackType == FeedbackType.WRONG -> Color.Red
-        else -> Color.White
+        else -> RvOnTone
     }
 
     val textColor = when {
-        tile.isSelected -> Color.White
-        tile.showFeedback && tile.feedbackType == FeedbackType.WRONG -> Color.White
+        tile.isSelected -> RvInk
+        tile.showFeedback && tile.feedbackType == FeedbackType.WRONG -> RvInk
         else -> Color.Black
     }
 
     Box(
         modifier = Modifier
+            .testTag("numtile")
             .size(80.dp)
             .scale(scale)
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
+            .then(if (tile.isSelected) Modifier.border(3.dp, RvInk, RoundedCornerShape(12.dp)) else Modifier)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -538,7 +605,7 @@ fun AdaptiveNumberTileComponent(
             Icon(
                 Icons.Default.Close,
                 contentDescription = stringResource(R.string.wrong),
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(32.dp)
             )
         } else {
@@ -650,5 +717,79 @@ fun createAdaptiveNumberTiles(config: AdaptiveNumberSumConfig): List<NumberTile>
             number = number,
             isCorrect = config.correctNumbers.contains(number)
         )
+    }
+}
+
+/**
+ * Single-row HUD used by the adaptive game screens of group A when the tall shared header
+ * (AdaptiveUnifiedHeader, ~150dp) would eat the play area: small phones, landscape, tablets.
+ * Back / pause >= 48dp, timer + lives + score always visible, text shrinks with ellipsis.
+ */
+@Composable
+internal fun AdaptiveCompactHud(
+    level: UserLevel,
+    timer: String,
+    lives: Int,
+    maxLives: Int,
+    score: Int,
+    difficultyName: String,
+    challengeText: String?,
+    onBack: () -> Unit,
+    onPause: (() -> Unit)?,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth().statusBarsPadding(),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
+            }
+            if (onPause != null) {
+                IconButton(onClick = onPause, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.Pause, contentDescription = null, tint = RvInk)
+                }
+            }
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "${stringResource(R.string.level_label)} ${level.level}",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = timer,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = if (timer.startsWith("00:") && (timer.substring(3).toIntOrNull() ?: 99) <= 30) RvCoralEdge else RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.testTag("hud_timer")
+                )
+            }
+            Column(horizontalAlignment = Alignment.End) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    repeat(maxLives.coerceIn(0, 6)) { index ->
+                        Text(text = if (index < lives) "❤️" else "🤍", fontSize = 14.sp)
+                    }
+                }
+                Text(
+                    text = "${stringResource(R.string.score_label)}: $score",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.testTag("hud_score")
+                )
+            }
+        }
     }
 }

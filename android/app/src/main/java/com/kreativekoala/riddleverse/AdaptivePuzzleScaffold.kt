@@ -94,7 +94,7 @@ class AdaptivePuzzleState<T>(
             if (config.confidenceScore > 0.5f) {
                 val oldLevel = currentDifficultyLevel.name
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                 DebugLogger.adaptive(TAG, puzzleType, oldLevel, config.level.name, config.adjustmentReason)
             }
         }

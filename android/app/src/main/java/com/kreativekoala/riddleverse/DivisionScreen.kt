@@ -30,10 +30,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 
 data class ValueButton(
     val value: Int,
@@ -274,7 +278,7 @@ fun DivisionPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
 
@@ -309,157 +313,52 @@ fun DivisionPuzzleScreen(
         )
     }
 
-    Box(
+    // Fit-to-screen: HUD on top, problem + steppers in the middle, total + SUBMIT pinned at the
+    // bottom. Landscape / wide: problem and submit on the left, steppers on the right.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(RvSurface)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val tall = !wide && maxHeight >= 700.dp
+        val compact = !tall
+        val pad = if (compact) 8.dp else 16.dp
 
-            // Enhanced Top Bar with adaptive difficulty info
-            AdaptiveDivisionTopGameBar(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                totalScore = totalScore,
-                onBack = onBack,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Adaptive difficulty notification
-            AnimatedVisibility(
-                visible = showAdaptationNotification,
-                enter = slideInVertically() + fadeIn(),
-                exit = slideOutVertically() + fadeOut()
-            ) {
-                Card(
+        val hud: @Composable () -> Unit = {
+            if (tall) {
+                AdaptiveDivisionTopGameBar(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    totalScore = totalScore,
+                    onBack = onBack,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.TrendingUp,
-                            contentDescription = stringResource(R.string.difficulty_advanced),
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.difficulty_advanced),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                text = adaptationInfo?.adjustmentReason ?: "",
-                                fontSize = 10.sp,
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        }
-                        IconButton(
-                            onClick = { showAdaptationNotification = false },
-                            modifier = Modifier.size(20.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = stringResource(R.string.close),
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
+                )
+            } else {
+                AdaptiveCompactHud(
+                    level = currentLevel,
+                    timer = displayTimer.let { if (it.indexOf(':') == 1) "0$it" else it },
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    difficultyName = currentDifficultyLevel.name,
+                    challengeText = null,
+                    onBack = onBack,
+                    onPause = null
+                )
             }
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            // Division problem display
+        }
+        val problem: @Composable () -> Unit = {
             AdaptiveDivisionProblemDisplay(
                 puzzle = currentPuzzle,
                 difficultyLevel = currentDifficultyLevel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
+                modifier = Modifier.fillMaxWidth().testTag("division_problem")
             )
-
-            Spacer(modifier = Modifier.height(80.dp))
-
-            // Answer circle with current total
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(screenHeight * 0.22f),
-                contentAlignment = Alignment.Center
-            ) {
-                // 3D Shadow effect
-                Box(
-                    modifier = Modifier
-                        .size(180.dp)
-                        .offset(x = 8.dp, y = 8.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFD4AC0D).copy(alpha = 0.3f))
-                )
-
-                // Main circle
-                Box(
-                    modifier = Modifier
-                        .size(180.dp)
-                        .clip(CircleShape)
-                        .background(
-                            Brush.radialGradient(
-                                colors = listOf(
-                                    Color(0xFFFFD700),
-                                    Color(0xFFD4AC0D)
-                                )
-                            )
-                        )
-                        .shadow(8.dp, CircleShape)
-                        .clickable {
-                            if (!isAnswered && !feedbackManager.isShowingFeedback) {
-                                submitAnswer()
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "$currentTotal",
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-
-                        Text(
-                            text = "SUBMIT",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            letterSpacing = 1.sp
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
+        }
+        val steppers: @Composable (Modifier) -> Unit = { m ->
             // Value input section
             AdaptiveValueInputSection(
                 valueButtons = valueButtons,
@@ -481,15 +380,95 @@ fun DivisionPuzzleScreen(
                     }
                 },
                 isDisabled = feedbackManager.isShowingFeedback,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 40.dp)
+                modifier = m
             )
+        }
+        val actionBar: @Composable () -> Unit = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Current total (tapping it also submits, as before)
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .heightIn(min = 56.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(RvSun)
+                        .testTag("division_total"),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "$currentTotal",
+                        fontSize = aCapSp(32f, 1.3f),
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                }
+                Button(
+                    onClick = {
+                        if (!isAnswered && !feedbackManager.isShowingFeedback) {
+                            submitAnswer()
+                        }
+                    },
+                    enabled = !isAnswered,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = RvViolet,
+                        contentColor = RvOnTone,
+                        disabledContainerColor = RvDisabled,
+                        disabledContentColor = RvInk
+                    ),
+                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1.3f).heightIn(min = 56.dp)
+                ) {
+                    Text(
+                        text = "SUBMIT",
+                        fontSize = aCapSp(18f, 1.3f),
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(pad),
+                horizontalArrangement = Arrangement.spacedBy(pad)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(pad)
+                ) {
+                    hud()
+                    Spacer(Modifier.weight(1f))
+                    problem()
+                    Spacer(Modifier.weight(1f))
+                    actionBar()
+                }
+                steppers(Modifier.weight(1f).fillMaxHeight().widthIn(max = 480.dp))
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(pad)
+                    .widthIn(max = 640.dp)
+                    .align(Alignment.TopCenter),
+                verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp)
+            ) {
+                hud()
+                problem()
+                steppers(Modifier.fillMaxWidth().weight(1f))
+                actionBar()
+            }
         }
 
         EnhancedUniversalFeedback(feedbackManager)
     }
-
 
 
     // Timer countdown effect
@@ -515,21 +494,23 @@ fun AdaptiveDivisionProblemDisplay(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
             text = puzzle.dividend.toString(),
-            fontSize = 64.sp,
+            fontSize = aCapSp(56f, 1.2f),
             fontWeight = FontWeight.Bold,
-            color = Color.Gray
+            color = RvInk,
+            maxLines = 1
         )
 
         Text(
             text = "DIVIDED BY ${puzzle.divisor}",
-            fontSize = 18.sp,
+            fontSize = aCapSp(18f, 1.3f),
             fontWeight = FontWeight.Medium,
-            color = Color.Gray,
-            letterSpacing = 1.sp
+            color = RvInkSoft,
+            letterSpacing = 1.sp,
+            maxLines = 1
         )
 
         // Difficulty indicator
@@ -537,7 +518,8 @@ fun AdaptiveDivisionProblemDisplay(
             text = difficultyLevel.name.uppercase(),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFFD4AC0D)
+            color = RvInkSoft,
+            maxLines = 1
         )
     }
 }
@@ -550,16 +532,13 @@ fun AdaptiveValueInputSection(
     isDisabled: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
+    // Each denomination gets an equal column (label, +, count, -); the parent decides the height.
+    Row(
+        modifier = modifier.testTag("division_steppers"),
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
     ) {
-        // Value buttons row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            valueButtons.forEachIndexed { index, button ->
+        valueButtons.forEachIndexed { index, button ->
+            Box(modifier = Modifier.weight(1f).widthIn(max = 96.dp).fillMaxHeight()) {
                 AdaptiveValueInputButton(
                     value = button.value,
                     count = button.count,
@@ -567,23 +546,6 @@ fun AdaptiveValueInputSection(
                     onIncrement = { onIncrement(index) },
                     onDecrement = { onDecrement(index) },
                     isDisabled = isDisabled
-                )
-            }
-        }
-
-        // Value labels row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            valueButtons.forEach { button ->
-                Text(
-                    text = button.value.toString(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.width(60.dp)
                 )
             }
         }
@@ -599,70 +561,80 @@ fun AdaptiveValueInputButton(
     onDecrement: () -> Unit,
     isDisabled: Boolean
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        // Increment button (top)
-        Button(
-            onClick = onIncrement,
-            enabled = count < maxCount && !isDisabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (count < maxCount) Color(0xFFD4AC0D) else Color.Gray.copy(alpha = 0.3f),
-                disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
-            ),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.size(width = 60.dp, height = 30.dp),
-            contentPadding = PaddingValues(0.dp)
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        // Height available for the three controls (label takes ~28dp, gaps 3 x 6dp).
+        val avail = if (constraints.hasBoundedHeight) maxHeight else 180.dp
+        val ctlH = ((avail - 28.dp - 18.dp) / 3).coerceIn(48.dp, 72.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
         ) {
             Text(
-                text = "+",
-                fontSize = 20.sp,
+                text = value.toString(),
+                fontSize = aCapSp(18f, 1.3f),
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
-        }
 
-        // Count display
-        Card(
-            modifier = Modifier.size(width = 60.dp, height = 40.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (count > 0) Color(0xFFD4AC0D).copy(alpha = 0.2f) else Color.Transparent
-            ),
-            border = BorderStroke(2.dp, Color(0xFFD4AC0D)),
-            shape = RoundedCornerShape(4.dp)
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+            // Increment button (top)
+            Button(
+                onClick = onIncrement,
+                enabled = count < maxCount && !isDisabled,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = RvSun,
+                    contentColor = RvInk,
+                    disabledContainerColor = RvDisabled,
+                    disabledContentColor = RvInkSoft
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(ctlH),
+                contentPadding = PaddingValues(0.dp)
             ) {
-                Text(
-                    text = count.toString(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray
-                )
+                Text(text = "+", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
-        }
 
-        // Decrement button (bottom)
-        Button(
-            onClick = onDecrement,
-            enabled = count > 0 && !isDisabled,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = if (count > 0) Color(0xFFD4AC0D) else Color.Gray.copy(alpha = 0.3f),
-                disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
-            ),
-            shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.size(width = 60.dp, height = 30.dp),
-            contentPadding = PaddingValues(0.dp)
-        ) {
-            Text(
-                text = "−",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            // Count display
+            Card(
+                modifier = Modifier.fillMaxWidth().height(ctlH),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (count > 0) RvSun.copy(alpha = 0.25f) else RvSurfaceRaised
+                ),
+                border = BorderStroke(if (count > 0) 3.dp else 2.dp, if (count > 0) RvSunEdge else RvInkSoft),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = count.toString(),
+                        fontSize = aCapSp(20f, 1.3f),
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                }
+            }
+
+            // Decrement button (bottom)
+            Button(
+                onClick = onDecrement,
+                enabled = count > 0 && !isDisabled,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = RvSun,
+                    contentColor = RvInk,
+                    disabledContainerColor = RvDisabled,
+                    disabledContentColor = RvInkSoft
+                ),
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth().height(ctlH),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Text(text = "−", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
@@ -691,29 +663,22 @@ fun AdaptiveDivisionTopGameBar(
             ) {
                 IconButton(
                     onClick = onBack,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.Gray,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
-
-                Icon(
-                    imageVector = Icons.Default.Pause,
-                    contentDescription = null,
-                    tint = Color.Gray,
-                    modifier = Modifier.size(24.dp)
-                )
 
                 Column {
                     Text(
                         text = "Level ${level.level}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Gray
+                        color = RvInk
                     )
 
                     // Adaptive difficulty indicator
@@ -721,7 +686,7 @@ fun AdaptiveDivisionTopGameBar(
                         text = currentDifficulty.name,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFFD4AC0D)
+                        color = RvInkSoft
                     )
 
                     // Level progress bar
@@ -768,7 +733,7 @@ fun AdaptiveDivisionTopGameBar(
                     color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
                         Color.Red
                     } else {
-                        Color.Gray
+                        RvInk
                     }
                 )
 
@@ -777,7 +742,7 @@ fun AdaptiveDivisionTopGameBar(
                         text = "Score: $totalScore",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Gray,
+                        color = RvInk,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }

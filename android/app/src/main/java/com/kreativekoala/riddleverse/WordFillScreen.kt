@@ -23,6 +23,10 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 
 @Composable
 fun WordFillScreen(
@@ -136,7 +140,7 @@ fun WordFillScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF00BCD4), shape = RoundedCornerShape(12.dp))
+                    .background(RvSky, shape = RoundedCornerShape(12.dp))
                     .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
@@ -148,7 +152,7 @@ fun WordFillScreen(
 
                 Text(
                     text = displaySentence,
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 20.sp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Medium
@@ -203,16 +207,16 @@ fun EnhancedWordFillTopBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White
+                        tint = RvInk
                     )
                 }
 
-                Icon(Icons.Default.Pause, contentDescription = "Pause", tint = Color.White)
+                Icon(Icons.Default.Pause, contentDescription = "Pause", tint = RvInk)
 
                 Column {
                     Text(
                         text = "${stringResource(R.string.level_label)} ${level.level}",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -229,7 +233,7 @@ fun EnhancedWordFillTopBar(
                     Icon(
                         Icons.Default.Favorite,
                         contentDescription = "Heart",
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -239,7 +243,7 @@ fun EnhancedWordFillTopBar(
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = timer,
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -269,7 +273,7 @@ fun OptionBox(
             .clip(RoundedCornerShape(8.dp))
             .background(
                 when {
-                    isSelected -> Color(0xFF4CAF50) // Green when selected
+                    isSelected -> RvSuccess // Green when selected
                     isEnabled -> Color(0xFF26C6DA) // Default cyan
                     else -> Color(0xFF26C6DA).copy(alpha = 0.5f) // Disabled state
                 }
@@ -280,7 +284,7 @@ fun OptionBox(
     ) {
         Text(
             text = option,
-            color = Color.White,
+            color = RvOnTone,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center

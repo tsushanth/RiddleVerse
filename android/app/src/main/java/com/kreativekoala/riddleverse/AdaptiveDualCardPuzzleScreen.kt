@@ -20,10 +20,29 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvGrapeEdge
+import com.kreativekoala.riddleverse.ui.theme.RvMintEdge
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvFlame
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvWarning
 
 
 
@@ -140,7 +159,7 @@ fun AdaptiveDualCardPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -275,265 +294,246 @@ fun AdaptiveDualCardPuzzleScreen(
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF8B4B6B))
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
+    // Fit-to-screen layout: HUD on top, cards in the middle taking the remaining space,
+    // NO / YES pinned at the bottom. Landscape / wide screens use two panes.
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvSurface)) {
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val compact = maxHeight < 700.dp
+        val pad = if (compact) 8.dp else 16.dp
+        val gap = if (compact) 8.dp else 16.dp
 
-            // ✅ REPLACE: Use unified header instead of AdaptiveDualCardTopBar
-            AdaptiveUnifiedHeader(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                score = totalScore,
-                puzzleType = "dualCardTask",
-                challengeNumber = currentRound,
-                totalChallenges = adaptiveConfig.totalRounds,
-                competitiveInsight = competitiveInsight,
-                onBack = {
-                    gameCompleted = true
-                    onBack()
-                },
-                onPause = { isPaused = !isPaused },
-                onHint = {
-                    showHint = !showHint
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        val tallHeader = !wide && maxHeight >= 780.dp
+        val hud: @Composable (Modifier) -> Unit = { m ->
+            Box(modifier = m) {
+                if (tallHeader) {
+                    AdaptiveUnifiedHeader(
+                        level = currentLevel,
+                        streakInfo = streakInfo,
+                        timer = displayTimer,
+                        lives = currentHearts,
+                        currentDifficulty = currentDifficultyLevel,
+                        score = totalScore,
+                        puzzleType = "dualCardTask",
+                        challengeNumber = currentRound,
+                        totalChallenges = adaptiveConfig.totalRounds,
+                        competitiveInsight = competitiveInsight,
+                        onBack = {
+                            gameCompleted = true
+                            onBack()
+                        },
+                        onPause = { isPaused = !isPaused },
+                        onHint = {
+                            showHint = !showHint
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                    )
+                } else {
+                    AdaptiveCompactHud(
+                        level = currentLevel,
+                        timer = displayTimer,
+                        lives = currentHearts,
+                        maxLives = currentDifficultyLevel.livesAllowed,
+                        score = totalScore,
+                        difficultyName = currentDifficultyLevel.name,
+                        challengeText = null,
+                        onBack = {
+                            gameCompleted = true
+                            onBack()
+                        },
+                        onPause = { isPaused = !isPaused }
+                    )
                 }
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // ✅ REPLACE: Use unified adaptation notification
-            UnifiedAdaptationNotification(
-                adaptationInfo = adaptationInfo,
-                puzzleType = "dualCardTask",
-                visible = showAdaptationNotification,
-                onDismiss = { showAdaptationNotification = false }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Enhanced task indicator with adaptive switching info
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            }
+        }
+        val taskInfo: @Composable () -> Unit = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = "Round $currentRound of ${adaptiveConfig.totalRounds}",
+                    color = RvInk,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Text(
                     text = if (isCheckingTopCard) "Check if number is EVEN" else "Check if letter is VOWEL",
-                    color = Color(0xFFFFD700),
+                    color = RvGrapeEdge,
                     fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                Text(
-                    text = "Switching pattern: ${adaptiveConfig.switchingPattern}",
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 12.sp
-                )
-
-                if (taskSwitchCount > 0) {
+                if (!compact) {
+                    Text(
+                        text = "Switching pattern: ${adaptiveConfig.switchingPattern}",
+                        color = RvInkSoft,
+                        fontSize = 12.sp
+                    )
+                }
+                if (taskSwitchCount > 0 && !compact) {
                     Text(
                         text = "⚡ Task switches: $taskSwitchCount",
-                        color = Color.White.copy(alpha = 0.7f),
+                        color = RvInkSoft,
                         fontSize = 12.sp
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Top Card - Number Even Check
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (isCheckingTopCard) Color.White else Color(0xFFBBBBBB)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Is the number even?",
-                        color = if (isCheckingTopCard) Color.Black else Color(0xFF666666),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (isCheckingTopCard) {
-                        Text(
-                            text = if (currentCardData.isLetterFirst) "${currentCardData.letter}${currentCardData.digit}" else "${currentCardData.digit}${currentCardData.letter}",
-                            color = currentCardData.textColor,
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier.height(48.dp),
-                            contentAlignment = Alignment.Center
+        }
+        val cardText = if (currentCardData.isLetterFirst) "${currentCardData.letter}${currentCardData.digit}" else "${currentCardData.digit}${currentCardData.letter}"
+        val cardsContent: @Composable (Modifier) -> Unit = { m ->
+            Column(modifier = m, verticalArrangement = Arrangement.spacedBy(gap)) {
+                listOf(true, false).forEach { isTop ->
+                    val active = isCheckingTopCard == isTop
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .heightIn(min = 72.dp, max = 140.dp)
+                            .testTag(if (isTop) "dualcard_top" else "dualcard_bottom"),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (active) RvSurfaceRaised else RvSurface
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(
+                            if (active) 3.dp else 1.dp,
+                            if (active) RvViolet else RvOutline
+                        ),
+                        elevation = CardDefaults.cardElevation(defaultElevation = if (active) 8.dp else 0.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                text = "—",
-                                color = Color(0xFF666666),
-                                fontSize = 24.sp
+                                text = if (isTop) "Is the number even?" else "Is the letter a vowel?",
+                                color = if (active) RvInk else RvInkSoft,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
                             )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            if (active) {
+                                Text(
+                                    text = cardText,
+                                    color = currentCardData.textColor,
+                                    fontSize = if (compact) 36.sp else 48.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 1
+                                )
+                            } else {
+                                Text(text = "—", color = RvInkSoft, fontSize = 24.sp)
+                            }
                         }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Bottom Card - Vowel Check
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (!isCheckingTopCard) Color.White else Color(0xFFBBBBBB)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Is the letter a vowel?",
-                        color = if (!isCheckingTopCard) Color.Black else Color(0xFF666666),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    if (!isCheckingTopCard) {
-                        Text(
-                            text = if (currentCardData.isLetterFirst) "${currentCardData.letter}${currentCardData.digit}" else "${currentCardData.digit}${currentCardData.letter}",
-                            color = currentCardData.textColor,
-                            fontSize = 48.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    } else {
-                        Box(
-                            modifier = Modifier.height(48.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = "—",
-                                color = Color(0xFF666666),
-                                fontSize = 24.sp
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Feedback display
-            if (showFeedback) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+        }
+        val actions: @Composable () -> Unit = {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (showFeedback) {
                     Text(
                         text = if (isCorrectAnswer) "Correct! ✓" else "Wrong! ✗",
-                        color = if (isCorrectAnswer) Color(0xFF4CAF50) else Color(0xFFFF5722),
+                        color = if (isCorrectAnswer) RvMintEdge else RvCoralEdge,
                         fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.testTag("dualcard_feedback")
                     )
-
-                    if (isCorrectAnswer && reactionTimes.isNotEmpty()) {
-                        val reactionTime = reactionTimes.last() / 1000.0
+                    if (isCorrectAnswer && reactionTimes.isNotEmpty() && !compact) {
                         Text(
-                            text = "⚡ ${String.format("%.1f", reactionTime)}s",
-                            color = Color.White,
+                            text = "⚡ ${String.format("%.1f", reactionTimes.last() / 1000.0)}s",
+                            color = RvInk,
                             fontSize = 16.sp
                         )
                     }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Answer buttons
-            if (!gameCompleted && !showFeedback) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    Button(
-                        onClick = { handleAnswer(false) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                        shape = RoundedCornerShape(28.dp)
+                if (!gameCompleted && !showFeedback) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text(
-                            text = "NO",
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Button(
-                        onClick = { handleAnswer(true) },
-                        modifier = Modifier
-                            .weight(1f)
-                            .height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-                        shape = RoundedCornerShape(28.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.yes),
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Button(
+                            onClick = { handleAnswer(false) },
+                            modifier = Modifier.weight(1f).height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = RvSkyEdge),
+                            shape = RoundedCornerShape(28.dp)
+                        ) {
+                            Text(text = "NO", color = RvOnTone, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Button(
+                            onClick = { handleAnswer(true) },
+                            modifier = Modifier.weight(1f).height(56.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = RvSkyEdge),
+                            shape = RoundedCornerShape(28.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.yes),
+                                color = RvOnTone,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                 }
-            }
-
-            if (gameCompleted) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                if (gameCompleted) {
                     Text(
-                        text = "${stringResource(R.string.game_complete)}",
-                        color = Color(0xFFFFD700),
+                        text = stringResource(R.string.game_complete),
+                        color = RvInk,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "${stringResource(R.string.final_score)}: $totalScore",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 18.sp
                     )
-
-                    if (taskSwitchAccuracy.isNotEmpty()) {
-                        val evenAcc = taskSwitchAccuracy["even"] ?: 0
-                        val vowelAcc = taskSwitchAccuracy["vowel"] ?: 0
+                    if (taskSwitchAccuracy.isNotEmpty() && !compact) {
                         Text(
-                            text = "Even: $evenAcc • Vowel: $vowelAcc",
-                            color = Color.White.copy(alpha = 0.8f),
+                            text = "Even: ${taskSwitchAccuracy["even"] ?: 0} • Vowel: ${taskSwitchAccuracy["vowel"] ?: 0}",
+                            color = RvInkSoft,
                             fontSize = 14.sp
                         )
                     }
                 }
+            }
+        }
+
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(pad),
+                horizontalArrangement = Arrangement.spacedBy(pad)
+            ) {
+                Box(Modifier.weight(1f).fillMaxHeight()) {
+                    cardsContent(Modifier.fillMaxSize().widthIn(max = 640.dp).align(Alignment.Center))
+                }
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    hud(Modifier.fillMaxWidth())
+                    taskInfo()
+                    Spacer(Modifier.weight(1f))
+                    actions()
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(pad)
+                    .widthIn(max = 640.dp)
+                    .align(Alignment.TopCenter),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(gap)
+            ) {
+                hud(Modifier.fillMaxWidth())
+                taskInfo()
+                cardsContent(Modifier.fillMaxWidth().weight(1f))
+                actions()
             }
         }
 
@@ -603,7 +603,7 @@ private fun AdaptiveDualCardTopBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -613,7 +613,7 @@ private fun AdaptiveDualCardTopBar(
                         text = "Level ${level.level}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     LevelProgressBar(
@@ -634,7 +634,7 @@ private fun AdaptiveDualCardTopBar(
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = null,
-                            tint = if (index < lives) Color(0xFFFFD700) else Color(0xFF666666),
+                            tint = if (index < lives) Color(0xFFFFD700) else RvInkSoft,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -647,7 +647,7 @@ private fun AdaptiveDualCardTopBar(
                     text = timer,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
+                    color = if (isUrgent) Color.Red else RvInk
                 )
             }
 
@@ -658,7 +658,7 @@ private fun AdaptiveDualCardTopBar(
                 Text(
                     text = "$currentRound/$totalRounds",
                     fontSize = 14.sp,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 if (currentStreak > 1) {
@@ -666,7 +666,7 @@ private fun AdaptiveDualCardTopBar(
                         text = "🔥 $currentStreak",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6B00)
+                        color = RvFlame
                     )
                 }
             }
@@ -691,14 +691,14 @@ private fun AdaptiveDualCardTopBar(
 
                 Text(
                     text = "🧠 ${currentDifficulty.name}",
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft,
                     fontSize = 12.sp
                 )
 
                 if (totalAttempts > 0) {
                     Text(
                         text = "$correctAnswers/$totalAttempts",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft,
                         fontSize = 12.sp
                     )
                 }
@@ -798,8 +798,8 @@ fun generateAdaptiveCardData(config: AdaptiveDualCardConfig): AdaptiveCardData {
         3 -> listOf(Color.Black, Color.Blue, Color.Red) // Three colors
         4 -> listOf(Color.Black, Color.Blue, Color.Red, Color.Green) // Four colors
         5 -> listOf( // Full color variety
-            Color(0xFFE91E63), Color(0xFF2196F3), Color(0xFF4CAF50),
-            Color(0xFFFF9800), Color(0xFF9C27B0), Color(0xFFFF5722),
+            Color(0xFFE91E63), RvSky, RvSuccess,
+            RvWarning, RvGrape, RvFlame,
             Color.Black
         )
         else -> listOf(Color.Black)

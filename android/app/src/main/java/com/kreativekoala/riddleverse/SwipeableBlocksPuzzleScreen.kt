@@ -35,6 +35,14 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 data class WeightBlock(
     val id: Int,
@@ -44,6 +52,22 @@ data class WeightBlock(
     var offsetY: Float = 0f,
     var isDragging: Boolean = false
 )
+
+/**
+ * Puzzle labels can arrive from the server with raw conversion output like "0.02334449 hr".
+ * Players don't care about that precision: whole numbers from 100 up, one decimal from 1 up,
+ * two significant digits below 1.
+ */
+fun friendlyConversionLabel(label: String): String =
+    Regex("""\d+\.\d{2,}""").replace(label) { match ->
+        val value = match.value.toBigDecimal()
+        val rounded = when {
+            value >= java.math.BigDecimal(100) -> value.setScale(0, java.math.RoundingMode.HALF_UP)
+            value >= java.math.BigDecimal.ONE -> value.setScale(1, java.math.RoundingMode.HALF_UP)
+            else -> value.round(java.math.MathContext(2, java.math.RoundingMode.HALF_UP))
+        }
+        rounded.stripTrailingZeros().toPlainString()
+    }
 
 enum class ComparisonResult {
     LEFT_HEAVIER,    // Left block should be higher
@@ -436,9 +460,9 @@ fun ConversionPuzzleScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
+                        RvCanvas,
+                        RvSurface,
+                        RvCanvas
                     )
                 )
             )
@@ -472,7 +496,7 @@ fun ConversionPuzzleScreen(
                 text = "COMPARE ${conversionType.displayName.uppercase()}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -487,7 +511,7 @@ fun ConversionPuzzleScreen(
                 Text(
                     text = "Drag the blocks to show which ${conversionType.displayName.lowercase()} is greater",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center
                 )
 
@@ -495,7 +519,7 @@ fun ConversionPuzzleScreen(
                     Text(
                         text = "⚡ Quick decisions and fewer drags earn bonus points!",
                         fontSize = 12.sp,
-                        color = Color.Yellow.copy(alpha = 0.7f),
+                        color = RvSunEdge.copy(alpha = 0.7f),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 4.dp)
                     )
@@ -619,13 +643,13 @@ fun ConversionPuzzleScreen(
                             puzzleType = "unitConversion",
                             isCorrect = isCorrect,
                             userAnswer = when (userAnswer) {
-                                ComparisonResult.LEFT_HEAVIER -> "${leftBlock.label} is ${getComparisonWord(conversionType, true)}"
-                                ComparisonResult.RIGHT_HEAVIER -> "${rightBlock.label} is ${getComparisonWord(conversionType, true)}"
+                                ComparisonResult.LEFT_HEAVIER -> "${friendlyConversionLabel(leftBlock.label)} is ${getComparisonWord(conversionType, true)}"
+                                ComparisonResult.RIGHT_HEAVIER -> "${friendlyConversionLabel(rightBlock.label)} is ${getComparisonWord(conversionType, true)}"
                                 ComparisonResult.EQUAL -> "Both ${conversionType.displayName.lowercase()}s are equal"
                             },
                             correctAnswer = when (correctAnswer) {
-                                ComparisonResult.LEFT_HEAVIER -> "${leftBlock.label} is ${getComparisonWord(conversionType, true)}"
-                                ComparisonResult.RIGHT_HEAVIER -> "${rightBlock.label} is ${getComparisonWord(conversionType, true)}"
+                                ComparisonResult.LEFT_HEAVIER -> "${friendlyConversionLabel(leftBlock.label)} is ${getComparisonWord(conversionType, true)}"
+                                ComparisonResult.RIGHT_HEAVIER -> "${friendlyConversionLabel(rightBlock.label)} is ${getComparisonWord(conversionType, true)}"
                                 ComparisonResult.EQUAL -> "Both ${conversionType.displayName.lowercase()}s are equal"
                             },
                             timeSpent = timeSpent,
@@ -689,7 +713,7 @@ fun EnhancedConversionTopGameBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(28.dp)
                     )
                 }
@@ -710,7 +734,7 @@ fun EnhancedConversionTopGameBar(
                         text = "${stringResource(R.string.level_label)} ${level.level}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     // Level progress bar
@@ -732,7 +756,7 @@ fun EnhancedConversionTopGameBar(
                     text = timer,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
+                    color = if (isUrgent) Color.Red else RvInk
                 )
 
                 // Streak display
@@ -763,7 +787,7 @@ fun EnhancedConversionTopGameBar(
                 Text(
                     text = roundLevel,
                     fontSize = 16.sp,
-                    color = Color.White,
+                    color = RvInk,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
@@ -775,7 +799,7 @@ fun EnhancedConversionTopGameBar(
 
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -789,7 +813,7 @@ fun EnhancedConversionTopGameBar(
                     if (totalScore > 0) {
                         Text(
                             text = "${stringResource(R.string.score_label)}: $totalScore",
-                            color = Color.White,
+                            color = RvInk,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -797,14 +821,14 @@ fun EnhancedConversionTopGameBar(
 
                     Text(
                         text = "${conversionType.icon} ${conversionType.displayName}",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft,
                         fontSize = 12.sp
                     )
 
                     if (attempts > 0) {
                         Text(
                             text = "Attempts: $attempts",
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft,
                             fontSize = 12.sp
                         )
                     }
@@ -854,7 +878,7 @@ fun UniversalScale(
                             else -> "GREATER"
                         },
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.7f)
+                        color = RvInkSoft
                     )
                 }
 
@@ -869,7 +893,7 @@ fun UniversalScale(
                                     colors = listOf(Color.Red, Color.Yellow, Color.Blue)
                                 )
                                 ConversionType.WEIGHT -> Brush.verticalGradient(
-                                    colors = listOf(Color.Gray, Color.LightGray, Color.White)
+                                    colors = listOf(Color.Gray, Color.LightGray, RvOnTone)
                                 )
                                 else -> Brush.verticalGradient(
                                     colors = listOf(Color.Green, Color.Yellow, Color.Red)
@@ -885,7 +909,7 @@ fun UniversalScale(
                             else -> Icons.Default.Add
                         },
                         contentDescription = "Scale",
-                        tint = Color.White.copy(alpha = 0.5f),
+                        tint = RvOnTone.copy(alpha = 0.5f),
                         modifier = Modifier
                             .align(Alignment.Center)
                             .size(16.dp)
@@ -915,7 +939,7 @@ fun UniversalScale(
                             else -> "SMALLER"
                         },
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.7f)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -955,10 +979,10 @@ fun DraggableConversionBlock(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = block.label,
+                text = friendlyConversionLabel(block.label),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
         }
@@ -988,7 +1012,7 @@ fun ContinueButton(
         onClick = onClick,
         modifier = modifier.height(56.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF4CAF50)
+            containerColor = RvSuccess
         ),
         shape = RoundedCornerShape(28.dp)
     ) {
@@ -996,7 +1020,7 @@ fun ContinueButton(
             text = stringResource(R.string.continue_label_caps),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = RvOnTone
         )
     }
 }
@@ -1011,7 +1035,7 @@ fun ConversionHintBubble(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = RvSurfaceRaised
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -1032,7 +1056,7 @@ fun ConversionHintBubble(
                     text = "${conversionType.displayName} Conversions",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
                 Text(
                     text = "⚠️ Using hints reduces score",
@@ -1082,7 +1106,7 @@ fun ConversionHintBubble(
                     Text(
                         text = "Compare the values to determine which is greater",
                         fontSize = 12.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -1105,23 +1129,23 @@ fun ConversionHintRow(
         Text(
             text = left,
             fontSize = 12.sp,
-            color = Color(0xFF666666)
+            color = RvInkSoft
         )
         Text(
             text = "=",
             fontSize = 12.sp,
-            color = Color(0xFF999999)
+            color = RvInkSoft
         )
         Text(
             text = right,
             fontSize = 12.sp,
-            color = Color(0xFF666666)
+            color = RvInkSoft
         )
         if (note.isNotEmpty()) {
             Text(
                 text = note,
                 fontSize = 10.sp,
-                color = Color(0xFF999999),
+                color = RvInkSoft,
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.End
             )

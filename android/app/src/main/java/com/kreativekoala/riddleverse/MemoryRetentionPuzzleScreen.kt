@@ -3,6 +3,9 @@ package com.kreativekoala.riddleverse
 import android.content.ContentValues.TAG
 import android.media.MediaPlayer
 import android.util.Log
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -40,6 +43,13 @@ import org.json.JSONObject
 import androidx.compose.ui.res.stringResource
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 enum class MemoryRetentionPhase {
     AUDIO_INTRO,
@@ -383,9 +393,9 @@ fun MemoryRetentionPuzzleScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
+                        RvCanvas,
+                        RvSurface,
+                        RvCanvas
                     )
                 )
             )
@@ -537,108 +547,117 @@ private fun AudioIntroScreen(
     onBegin: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Row(
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val compact = maxHeight < 600.dp
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Start
+                .widthIn(max = 640.dp)
+                .fillMaxSize()
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(horizontal = if (compact) 16.dp else 32.dp, vertical = if (compact) 4.dp else 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color.White
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvInk
+                    )
+                }
+            }
+
+            // Middle content fills the space above the pinned Begin button. The scroll is an
+            // invisible last-resort safety net (extreme font scale on tiny screens) only.
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 24.dp, Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = "MEMORY RETENTION",
+                    fontSize = if (compact) 20.sp else 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
+
+                Text(
+                    text = "REQUIRES AUDIO",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+
+                val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                val scale by infiniteTransition.animateFloat(
+                    initialValue = 1f,
+                    targetValue = 1.2f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(1000),
+                        repeatMode = RepeatMode.Reverse
+                    ),
+                    label = "scale"
+                )
+
+                val badge = if (compact) 72.dp else 120.dp
+                Box(
+                    modifier = Modifier
+                        .padding(if (compact) 8.dp else 16.dp)
+                        .size(badge)
+                        .scale(scale)
+                        .background(
+                            RvOutline,
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VolumeUp,
+                        contentDescription = "Audio",
+                        tint = RvInk,
+                        modifier = Modifier.size(badge / 2)
+                    )
+                }
+
+                Text(
+                    text = "LISTEN TO THE ESSAY AND\nDRAG FACTS TO SUBJECTS",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 22.sp
                 )
             }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = "MEMORY RETENTION",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = "REQUIRES AUDIO",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.6f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        val infiniteTransition = rememberInfiniteTransition(label = "pulse")
-        val scale by infiniteTransition.animateFloat(
-            initialValue = 1f,
-            targetValue = 1.2f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1000),
-                repeatMode = RepeatMode.Reverse
-            ),
-            label = "scale"
-        )
-
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(
-                    Color.White.copy(alpha = 0.1f),
-                    CircleShape
+            Button(
+                onClick = onBegin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = if (compact) 4.dp else 16.dp)
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = RvViolet
+                ),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.begin),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone
                 )
-                .scale(scale),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.VolumeUp,
-                contentDescription = "Audio",
-                tint = Color.White,
-                modifier = Modifier.size(60.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Text(
-            text = "LISTEN TO THE ESSAY AND\nDRAG FACTS TO SUBJECTS",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            lineHeight = 24.sp
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onBegin,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4)
-            ),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.begin),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            }
         }
     }
 }
@@ -750,154 +769,171 @@ private fun EnhancedMemoryRetentionGameScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        // Fit-to-screen (drag game, never scrolls): HUD, topic, audio bar, play area (rest), status line.
+        val compact = maxHeight < 600.dp
+        val gutter = if (compact) 12.dp else 16.dp
+        val listeningColor = Color(0xFF00696B)
 
-        // Enhanced top bar with score
-        EnhancedRetentionTopBar(
-            level = level,
-            streakInfo = streakInfo,
-            timer = timer,
-            lives = hearts,
-            totalScore = totalScore,
-            correctAnswers = correctAnswers,
-            totalAnswered = totalAnswered,
-            onBack = onBack,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = topic,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "DRAG FACTS TO SUBJECTS",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Audio progress bar
-        AudioProgressBar(
-            progress = if (estimatedDuration > 0) audioProgress.toFloat() / estimatedDuration else 0f,
-            isPlaying = isAudioPlaying,
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        // Main game area with drop zone detection
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(horizontal = 16.dp)
+                .widthIn(max = 720.dp)
+                .fillMaxSize()
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp)
         ) {
-            // Subject zones with individual feedback states
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            BCompactHud(
+                level = level,
+                difficultyName = "",
+                timer = timer,
+                lives = hearts,
+                maxLives = hearts,
+                score = totalScore,
+                streak = streakInfo.currentStreak,
+                onBack = onBack
+            )
+
+            Spacer(modifier = Modifier.height(if (compact) 2.dp else 8.dp))
+
+            Text(
+                text = topic,
+                fontSize = if (compact) 18.sp else 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (!compact) {
+                Text(
+                    text = "DRAG FACTS TO SUBJECTS",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth().padding(top = 4.dp)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
+
+            // Audio progress bar
+            AudioProgressBar(
+                progress = if (estimatedDuration > 0) audioProgress.toFloat() / estimatedDuration else 0f,
+                isPlaying = isAudioPlaying,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
+
+            // Main game area with drop zone detection
+            BoxWithConstraints(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
             ) {
-                subjects.forEachIndexed { index, subject ->
-                    var subjectFeedback by remember { mutableStateOf<String?>(null) }
+                val areaW = maxWidth
+                // Drop zones: square-ish, never taller than about half the play area, never huge on tablets
+                val zoneH = minOf(160.dp, maxHeight * 0.5f, areaW / subjects.size.coerceAtLeast(1))
 
-                    SubjectZoneWithFeedback(
-                        subject = subject,
-                        feedbackState = subjectFeedback,
-                        isDraggedOver = draggedOverSubjectId == subject.id,
-                        modifier = Modifier.weight(1f),
-                        onFactDropped = { factId ->
-                            val fact = facts.find { it.id == factId }
-                            if (fact != null) {
-                                val isCorrect = fact.correctSubject == subject.id
-                                subjectFeedback = if (isCorrect) "correct" else "incorrect"
+                // Subject zones with individual feedback states
+                Row(
+                    modifier = Modifier.fillMaxWidth().height(zoneH),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    subjects.forEachIndexed { index, subject ->
+                        var subjectFeedback by remember { mutableStateOf<String?>(null) }
 
-                                coroutineScope.launch {
-                                    delay(1000)
-                                    subjectFeedback = null
+                        SubjectZoneWithFeedback(
+                            subject = subject,
+                            feedbackState = subjectFeedback,
+                            isDraggedOver = draggedOverSubjectId == subject.id,
+                            compact = compact || zoneH < 110.dp,
+                            modifier = Modifier.weight(1f).fillMaxHeight(),
+                            onFactDropped = { factId ->
+                                val fact = facts.find { it.id == factId }
+                                if (fact != null) {
+                                    val isCorrect = fact.correctSubject == subject.id
+                                    subjectFeedback = if (isCorrect) "correct" else "incorrect"
+
+                                    coroutineScope.launch {
+                                        delay(1000)
+                                        subjectFeedback = null
+                                    }
+
+                                    onFactDrop(factId, subject.id)
                                 }
-
-                                onFactDrop(factId, subject.id)
                             }
-                        }
+                        )
+                    }
+                }
+
+                // Floating facts that appear at timed intervals
+                facts.filter { it.isVisible && !it.isAnswered }.forEach { fact ->
+                    val dragState = factDragStates[fact.id] ?: FactDragState(fact.id)
+
+                    FloatingFactWithDropDetection(
+                        fact = fact,
+                        dragState = dragState,
+                        subjects = subjects,
+                        cardWidth = minOf(280.dp, areaW - 16.dp),
+                        onDrag = { offset -> onFactDrag(fact.id, offset) },
+                        onDrop = { droppedSubjectId ->
+                            draggedOverSubjectId = null
+                            if (droppedSubjectId != null) {
+                                onFactDrop(fact.id, droppedSubjectId)
+                            } else {
+                                onFactDrag(fact.id, Offset.Zero)
+                            }
+                        },
+                        onDragOver = { subjectId ->
+                            draggedOverSubjectId = subjectId
+                        },
+                        modifier = Modifier
+                            .offset {
+                                IntOffset(
+                                    dragState.offset.x.roundToInt(),
+                                    dragState.offset.y.roundToInt()
+                                )
+                            }
+                            .zIndex(if (dragState.isDragging) 1f else 0f)
                     )
                 }
             }
 
-            // Floating facts that appear at timed intervals
-            facts.filter { it.isVisible && !it.isAnswered }.forEach { fact ->
-                val dragState = factDragStates[fact.id] ?: FactDragState(fact.id)
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-                FloatingFactWithDropDetection(
-                    fact = fact,
-                    dragState = dragState,
-                    subjects = subjects,
-                    onDrag = { offset -> onFactDrag(fact.id, offset) },
-                    onDrop = { droppedSubjectId ->
-                        draggedOverSubjectId = null
-                        if (droppedSubjectId != null) {
-                            onFactDrop(fact.id, droppedSubjectId)
-                        } else {
-                            onFactDrag(fact.id, Offset.Zero)
-                        }
-                    },
-                    onDragOver = { subjectId ->
-                        draggedOverSubjectId = subjectId
-                    },
-                    modifier = Modifier
-                        .offset {
-                            IntOffset(
-                                dragState.offset.x.roundToInt(),
-                                dragState.offset.y.roundToInt()
-                            )
-                        }
-                        .zIndex(if (dragState.isDragging) 1f else 0f)
+            // Status info
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = if (isAudioPlaying) "Listening..." else "Audio complete",
+                    fontSize = 14.sp,
+                    color = if (isAudioPlaying) listeningColor else RvInkSoft,
+                    maxLines = 1
+                )
+
+                val answeredCount = facts.count { it.isAnswered }
+                val totalVisible = facts.count { it.isVisible }
+                Text(
+                    text = "$answeredCount/$totalVisible facts",
+                    fontSize = 14.sp,
+                    color = RvInkSoft,
+                    maxLines = 1
                 )
             }
+
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Status info
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = if (isAudioPlaying) "Listening..." else "Audio complete",
-                fontSize = 14.sp,
-                color = if (isAudioPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.5f)
-            )
-
-            val answeredCount = facts.count { it.isAnswered }
-            val totalVisible = facts.count { it.isVisible }
-            Text(
-                text = "$answeredCount/$totalVisible facts",
-                fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.7f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -906,6 +942,7 @@ private fun SubjectZoneWithFeedback(
     subject: RetentionSubject,
     feedbackState: String?,
     isDraggedOver: Boolean = false,
+    compact: Boolean = false,
     modifier: Modifier = Modifier,
     onFactDropped: (String) -> Unit
 ) {
@@ -913,15 +950,14 @@ private fun SubjectZoneWithFeedback(
 
     Card(
         modifier = modifier
-            .aspectRatio(1f)
-            .padding(8.dp)
+            .padding(if (compact) 4.dp else 8.dp)
             .border(
                 width = if (isHighlighted || isDraggedOver) 3.dp else 1.dp,
                 color = when {
                     feedbackState == "correct" -> Color.Green
                     feedbackState == "incorrect" -> Color.Red
                     isDraggedOver -> Color.Yellow
-                    isHighlighted -> Color.White
+                    isHighlighted -> RvInk
                     else -> subject.color.copy(alpha = 0.5f)
                 },
                 shape = RoundedCornerShape(16.dp)
@@ -954,7 +990,7 @@ private fun SubjectZoneWithFeedback(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(if (compact) 4.dp else 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -962,29 +998,31 @@ private fun SubjectZoneWithFeedback(
                 text = subject.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            if (!compact) {
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
-                text = subject.description,
-                fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+                Text(
+                    text = subject.description,
+                    fontSize = 12.sp,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
             if (feedbackState != null) {
-                Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = if (feedbackState == "correct") "✓" else "✗",
                     fontSize = 24.sp,
-                    color = if (feedbackState == "correct") Color.Green else Color.Red
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk
                 )
             }
         }
@@ -996,6 +1034,7 @@ private fun FloatingFactWithDropDetection(
     fact: RetentionFact,
     dragState: FactDragState,
     subjects: List<RetentionSubject>,
+    cardWidth: androidx.compose.ui.unit.Dp,
     onDrag: (Offset) -> Unit,
     onDrop: (String?) -> Unit,
     onDragOver: (String?) -> Unit,
@@ -1015,7 +1054,7 @@ private fun FloatingFactWithDropDetection(
 
     Card(
         modifier = modifier
-            .width(280.dp)
+            .width(cardWidth)
             .offset {
                 IntOffset(
                     (initialPosition.x + localOffset.x).roundToInt(),
@@ -1062,7 +1101,7 @@ private fun FloatingFactWithDropDetection(
                 shadowElevation = if (isDragging) 16.dp.toPx() else 8.dp.toPx()
             },
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = if (isDragging) 0.9f else 0.95f)
+            containerColor = RvSurfaceRaised.copy(alpha = if (isDragging) 0.9f else 0.95f)
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(
@@ -1127,140 +1166,9 @@ private fun AudioProgressBar(
     LinearProgressIndicator(
         progress = progress.coerceIn(0f, 1f),
         modifier = modifier.height(4.dp),
-        color = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.3f),
-        trackColor = Color.White.copy(alpha = 0.1f)
+        color = if (isPlaying) Color(0xFF00838F) else RvOutline,
+        trackColor = RvOutline
     )
-}
-
-@Composable
-private fun EnhancedRetentionTopBar(
-    level: UserLevel,
-    streakInfo: StreakInfo,
-    timer: String,
-    lives: Int,
-    totalScore: Int,
-    correctAnswers: Int,
-    totalAnswered: Int,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.statusBarsPadding()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            // Left side: Back button and level
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = "Level ${level.level}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-
-                    LevelProgressBar(
-                        level = level,
-                        modifier = Modifier.width(120.dp)
-                    )
-                }
-            }
-
-            // Center: Lives display
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                repeat(lives) {
-                    Text(
-                        text = "❤️",
-                        fontSize = 16.sp
-                    )
-                }
-            }
-
-            // Right side: Timer and streak
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                val timeValue = timer.substringAfter(":").toIntOrNull() ?: 0
-                val isUrgent = timer.startsWith("0:") && timeValue <= 30
-
-                Text(
-                    text = timer,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
-                )
-
-                if (streakInfo.currentStreak > 0) {
-                    StreakDisplay(
-                        streakInfo = streakInfo,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-            }
-        }
-
-        // Score and progress display
-        if (totalScore > 0 || totalAnswered > 0) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (totalScore > 0) {
-                        Text(
-                            text = "Score: $totalScore",
-                            color = Color(0xFF4CAF50),
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    Text(
-                        text = "🧠 Retention Memory",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 12.sp
-                    )
-
-                    if (totalAnswered > 0) {
-                        Text(
-                            text = "$correctAnswers/$totalAnswered facts",
-                            color = Color.White.copy(alpha = 0.8f),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-            }
-        }
-    }
 }
 
 private fun generateSubjectColor(): Color {

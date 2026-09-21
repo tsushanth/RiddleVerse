@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.os.Handler
 import android.os.Looper
 import com.google.firebase.auth.FirebaseAuth
@@ -18,6 +19,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -429,31 +432,64 @@ fun AntonymBalloonPuzzleScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator(color = Color(0xFF8A4DFF))
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Loading antonym puzzle...", color = Color.Black)
+                    Text("Loading antonym puzzle...", color = RvInk)
                 }
             }
         } else {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .statusBarsPadding()
+            BoxWithConstraints(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.TopCenter
             ) {
-                // Enhanced top bar with live timer and current hearts
+              val compact = maxHeight < 600.dp
+              Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 720.dp)
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+              ) {
+                // Single-row HUD: back, timer, difficulty, hearts, level
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.Black)
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
+                    }
+
+                    // Timer with color coding
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .background(RvSurface, RoundedCornerShape(20.dp))
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Timer,
+                            contentDescription = "Timer",
+                            tint = if (timeRemaining <= 30) RvCoralEdge else RvGrapeEdge
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = displayTimer,
+                            color = if (timeRemaining <= 30) RvCoralEdge else RvInk,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
                     }
 
                     Text(
                         text = difficulty.uppercase(),
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        fontSize = 14.sp,
+                        color = RvInk,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
                     )
 
                     // Hearts with current state
@@ -462,144 +498,138 @@ fun AntonymBalloonPuzzleScreen(
                             Icon(
                                 Icons.Default.Favorite,
                                 contentDescription = "Heart",
-                                tint = if (index < currentHearts) Color.Red else Color.Gray.copy(alpha = 0.4f),
+                                tint = if (index < currentHearts) RvCoralEdge else RvInkSoft.copy(alpha = 0.4f),
                                 modifier = Modifier.size(20.dp)
                             )
                         }
                     }
+
+                    Text(
+                        text = level,
+                        color = RvInk,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-                // Enhanced timer and level display
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Timer with color coding
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(20.dp))
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Timer,
-                            contentDescription = "Timer",
-                            tint = if (timeRemaining <= 30) Color.Red else Color(0xFF8A4DFF)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = displayTimer,
-                            color = if (timeRemaining <= 30) Color.Red else Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-
-                    // Level with progress bar
-                    Column(horizontalAlignment = Alignment.End) {
-                        Text(
-                            text = level,
-                            color = Color.Black,
-                            fontWeight = FontWeight.Bold
-                        )
-                        LevelProgressBar(
-                            level = currentLevel,
-                            modifier = Modifier.width(80.dp)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Enhanced game instructions with score info
+                // Instructions + progress (single slim card; text dropped in compact mode)
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                    colors = CardDefaults.cardColors(containerColor = RvSurface)
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = if (compact) 8.dp else 12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(
-                            text = "🎈 Match Antonym Pairs 🎈",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF8A4DFF)
-                        )
+                        if (!compact) {
+                            Text(
+                                text = "🎈 Match Antonym Pairs 🎈",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = RvGrapeEdge,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = "Tap balloons to match opposite words",
+                                fontSize = 14.sp,
+                                color = RvInkSoft,
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
 
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Text(
-                            text = "Tap balloons to match opposite words",
-                            fontSize = 14.sp,
-                            color = Color.Gray,
-                            textAlign = TextAlign.Center
-                        )
-
-                        // Enhanced progress and score display
+                        // Progress and score display
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 8.dp),
+                                .padding(top = if (compact) 0.dp else 4.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = "${stringResource(R.string.progress)}: $matchedPairs / $totalPairs",
-                                fontSize = 12.sp,
-                                color = Color.Gray
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = RvInk,
+                                maxLines = 1
                             )
 
                             if (totalScore > 0) {
                                 Text(
                                     text = "${stringResource(R.string.score_label)}: $totalScore",
-                                    fontSize = 12.sp,
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4CAF50)
+                                    color = RvInk,
+                                    maxLines = 1
                                 )
                             }
 
                             if (matchStreak > 1) {
                                 Text(
                                     text = "🔥$matchStreak",
-                                    fontSize = 12.sp,
+                                    fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF9800)
+                                    color = RvInk,
+                                    maxLines = 1
                                 )
                             }
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(8.dp))
 
-                // Balloons area
-                Box(
+                // Balloons area: balloons are laid out on a grid that always fits the area
+                BoxWithConstraints(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .testTag("balloon_area")
                 ) {
-                    balloons.forEach { balloon ->
+                    val n = balloons.size.coerceAtLeast(1)
+                    var bestCols = 1
+                    var bestDiameter = 0f
+                    for (c in 1..n) {
+                        val r = (n + c - 1) / c
+                        val d = minOf(maxWidth.value / c - 8f, maxHeight.value / r - 36f)
+                        if (d > bestDiameter) { bestDiameter = d; bestCols = c }
+                    }
+                    val cols = bestCols
+                    val rows = (n + cols - 1) / cols
+                    val diameter = bestDiameter.coerceIn(56f, 110f).dp
+                    val cellW = maxWidth / cols
+                    val cellH = maxHeight / rows
+                    balloons.forEachIndexed { index, balloon ->
+                        val col = index % cols
+                        val row = index / cols
                         key(balloon.id + balloon.isSelected) {
                             androidx.compose.animation.AnimatedVisibility(
                                 visible = !balloon.isBurst,
                                 exit = scaleOut(animationSpec = tween(300)) + fadeOut(),
-                                modifier = Modifier.offset(balloon.x.dp, balloon.y.dp)
+                                modifier = Modifier.offset(
+                                    x = cellW * col + (cellW - diameter) / 2,
+                                    y = cellH * row + (cellH - diameter - 30.dp).coerceAtLeast(0.dp) / 2
+                                )
                             ) {
                                 BalloonView(
                                     balloon = balloon,
+                                    size = diameter,
                                     onClick = { handleBalloonClick(balloon) }
                                 )
                             }
                         }
                     }
                 }
+              }
             }
         }
 
@@ -610,11 +640,11 @@ fun AntonymBalloonPuzzleScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.7f)),
+                    .background(RvSurface),
                 contentAlignment = Alignment.Center
             ) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                     modifier = Modifier.padding(32.dp)
                 ) {
                     Column(
@@ -627,7 +657,7 @@ fun AntonymBalloonPuzzleScreen(
                             text = if (success) "🎉 Puzzle Complete!" else "💔 Game Over",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (success) Color(0xFF4CAF50) else Color(0xFFF44336)
+                            color = if (success) RvSuccess else RvError
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -638,7 +668,7 @@ fun AntonymBalloonPuzzleScreen(
                                 text = "${stringResource(R.string.final_score)}: $totalScore",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF2196F3)
+                                color = RvSky
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -651,7 +681,7 @@ fun AntonymBalloonPuzzleScreen(
                                 else -> "Time's up!"
                             },
                             fontSize = 16.sp,
-                            color = Color.Gray,
+                            color = RvInkSoft,
                             textAlign = TextAlign.Center
                         )
 
@@ -661,7 +691,7 @@ fun AntonymBalloonPuzzleScreen(
 
                             Card(
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Color(0xFFF5F5F5)
+                                    containerColor = RvSurface
                                 ),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
@@ -676,12 +706,12 @@ fun AntonymBalloonPuzzleScreen(
                                         Text(
                                             text = "Matches: $matchedPairs",
                                             fontSize = 12.sp,
-                                            color = Color.Gray
+                                            color = RvInkSoft
                                         )
                                         Text(
                                             text = "Mistakes: $wrongAttempts",
                                             fontSize = 12.sp,
-                                            color = Color.Gray
+                                            color = RvInkSoft
                                         )
                                     }
 
@@ -690,7 +720,7 @@ fun AntonymBalloonPuzzleScreen(
                                         Text(
                                             text = "${stringResource(R.string.accuracy)}: $accuracy%",
                                             fontSize = 12.sp,
-                                            color = Color.Gray,
+                                            color = RvInkSoft,
                                             modifier = Modifier.padding(top = 4.dp)
                                         )
                                     }
@@ -708,7 +738,7 @@ fun AntonymBalloonPuzzleScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8A4DFF))
                         ) {
-                            Text("Continue", color = Color.White)
+                            Text("Continue", color = RvOnTone)
                         }
                     }
                 }
@@ -721,7 +751,8 @@ fun AntonymBalloonPuzzleScreen(
 @Composable
 fun BalloonView(
     balloon: BalloonItem,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    size: androidx.compose.ui.unit.Dp = 80.dp
 ) {
     val scale by animateFloatAsState(
         targetValue = if (balloon.isSelected) 1.1f else 1f,
@@ -745,23 +776,26 @@ fun BalloonView(
         // Balloon
         Box(
             modifier = Modifier
-                .size(80.dp)
+                .size(size)
                 .scale(scale)
                 .offset(y = floatOffset.dp)
                 .background(balloon.color, CircleShape)
                 .border(
                     width = if (balloon.isSelected) 4.dp else 2.dp,
-                    color = if (balloon.isSelected) Color.White else Color.Black.copy(alpha = 0.3f),
+                    color = if (balloon.isSelected) RvInk else RvInk.copy(alpha = 0.3f),
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = balloon.word,
-                color = Color.Black,
-                fontSize = 12.sp,
+                color = RvInk,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.padding(horizontal = 4.dp)
             )
         }
 
@@ -770,7 +804,7 @@ fun BalloonView(
             modifier = Modifier
                 .width(2.dp)
                 .height(20.dp)
-                .background(Color.Black.copy(alpha = 0.6f))
+                .background(RvSurface)
         )
     }
 }
@@ -785,13 +819,13 @@ private fun setupBalloons(
 ) {
     val balloonColors = listOf(
         Color(0xFFE91E63), // Pink
-        Color(0xFF2196F3), // Blue
-        Color(0xFF4CAF50), // Green
-        Color(0xFFFF9800), // Orange
-        Color(0xFF9C27B0), // Purple
-        Color(0xFF00BCD4), // Cyan
+        RvSky, // Blue
+        RvSuccess, // Green
+        RvSun, // Orange
+        RvGrape, // Purple
+        RvSky, // Cyan
         Color(0xFFFFEB3B), // Yellow
-        Color(0xFFF44336)  // Red
+        RvError  // Red
     )
 
     val allWords = mutableListOf<String>()
