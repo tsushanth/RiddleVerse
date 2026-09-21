@@ -29,4 +29,21 @@ platform :android do
       release_status: "completed"
     )
   end
+
+  desc "Push current AAB to Production at a staged rollout percentage (default 20%). Pass rollout:'0.5' etc to override. Increase later with `fastlane run upload_to_play_store track:production rollout:'1.0'` (no new aab needed) once ready for 100%."
+  lane :upload_staged_production do |options|
+    rollout = options[:rollout] || "0.2"
+    upload_to_play_store(
+      track: "production",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      json_key: "/Users/sushanthtiruvaipati/Documents/apple_dev/cloud_credentials/summaryai-483115-a27fc5121150.json",
+      package_name: "com.kreativekoala.riddleverse",
+      skip_upload_metadata: true,
+      skip_upload_changelogs: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      release_status: "inProgress",
+      rollout: rollout
+    )
+  end
 end
