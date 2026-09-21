@@ -171,8 +171,18 @@ dependencies {
     implementation(libs.androidx.foundation.android)
     implementation(libs.transport.api)
     implementation(libs.unity.ads.mediation)
-    implementation("com.revenuecat.purchases:purchases:8.13.0")
-    implementation("com.revenuecat.purchases:purchases-ui:8.13.0")
+    // Bumped from 8.13.0: Play rejects uploads on Play Billing Library < 8.0.0
+    // (8.13.0 pulled in billing:7.1.1; the whole 8.x RevenueCat line still does).
+    // RevenueCat only moves to Billing Library 8.3.0 in their 10.0.0 release, so
+    // this is a RevenueCat major-version bump, not just a patch bump. Pinned to
+    // exactly 10.0.0 (not latest 10.22.1) to take only the change that's needed.
+    // RevenueCat's own 10.0.0 breaking-change notes: minSdk 21->23 (no-op here,
+    // this app's minSdk is already 26) and a workaround for restoring CONSUMED
+    // one-time products was removed - only a risk for products misconfigured as
+    // consumable that should be non-consumable. Not verified against the actual
+    // Play Console / RevenueCat dashboard product configuration from here.
+    implementation("com.revenuecat.purchases:purchases:10.0.0")
+    implementation("com.revenuecat.purchases:purchases-ui:10.0.0")
     implementation(project(":paywallkit"))
     implementation(project(":crosspromokit"))
     implementation(project(":ratingkit"))
