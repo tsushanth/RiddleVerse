@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -23,6 +24,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -665,28 +667,28 @@ fun AdaptiveMemoryPreviousPairScreen(
                 3 to ForestAnimal(3, "Fox", "🦊", Color(0xFFD2691E)),
                 4 to ForestAnimal(4, "Elephant", "🐘", Color(0xFFA8A8A8)),
                 5 to ForestAnimal(5, "Hippo", "🦛", Color(0xFF708090)),
-                6 to ForestAnimal(6, "Rhino", "🦏", Color(0xFF808080)),
-                7 to ForestAnimal(7, "Tiger", "🐅", Color(0xFFFF8C00)),
+                6 to ForestAnimal(6, "Rhino", "🦏", RvInkSoft),
+                7 to ForestAnimal(7, "Tiger", "🐅", RvFlame),
                 8 to ForestAnimal(8, "Lion", "🦁", Color(0xFFDAA520)),
                 9 to ForestAnimal(9, "Leopard", "🐆", Color(0xFFCD853F)),
                 10 to ForestAnimal(10, "Giraffe", "🦒", Color(0xFFDEB887)),
                 11 to ForestAnimal(11, "Monkey", "🐵", Color(0xFFD2B48C)),
-                12 to ForestAnimal(12, "Panda", "🐼", Color(0xFF000000))
+                12 to ForestAnimal(12, "Panda", "🐼", RvInk)
             )
         } else {
             mapOf(
                 1 to ForestAnimal(1, "Lion", "🦁", Color(0xFFD4A574)),
                 2 to ForestAnimal(2, "Hippo", "🦛", Color(0xFF8B7D6B)),
                 3 to ForestAnimal(3, "Elephant", "🐘", Color(0xFFA8A8A8)),
-                4 to ForestAnimal(4, "Tiger", "🐅", Color(0xFFFF8C00)),
+                4 to ForestAnimal(4, "Tiger", "🐅", RvFlame),
                 5 to ForestAnimal(5, "Giraffe", "🦒", Color(0xFFDAA520)),
                 6 to ForestAnimal(6, "Monkey", "🐵", Color(0xFFCD853F)),
                 7 to ForestAnimal(7, "Bear", "🐻", Color(0xFF8B4513)),
                 8 to ForestAnimal(8, "Wolf", "🐺", Color(0xFF696969)),
                 9 to ForestAnimal(9, "Fox", "🦊", Color(0xFFD2691E)),
-                10 to ForestAnimal(10, "Panda", "🐼", Color(0xFF000000)),
-                11 to ForestAnimal(11, "Zebra", "🦓", Color(0xFF000000)),
-                12 to ForestAnimal(12, "Rhino", "🦏", Color(0xFF808080))
+                10 to ForestAnimal(10, "Panda", "🐼", RvInk),
+                11 to ForestAnimal(11, "Zebra", "🦓", RvInk),
+                12 to ForestAnimal(12, "Rhino", "🦏", RvInkSoft)
             )
         }
     }
@@ -719,7 +721,7 @@ fun AdaptiveMemoryPreviousPairScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -839,40 +841,58 @@ fun AdaptiveMemoryPreviousPairScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvCanvas)) {
+        // Fit-to-screen: HUD (fixed), instruction, scene (all remaining space), one-line stats footer.
+        val compact = maxHeight < 600.dp
+        val gutter = if (compact) 12.dp else 16.dp
+        val isFirst = currentScreenIndex < sequenceData.size && sequenceData[currentScreenIndex].isFirstScreen
+        val darkGreen = Color(0xFF15803D)
+        val darkOrange = Color(0xFFB45309)
+
         Column(
             modifier = Modifier
+                .widthIn(max = 720.dp)
                 .fillMaxSize()
-                .background(Color(0xFF1E1E1E))
-                .padding(16.dp)
+                .align(Alignment.TopCenter)
+                .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // ✅ REPLACE: Use unified header instead of AdaptiveMemoryPairTopBar
-            AdaptiveUnifiedHeader(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                score = totalScore,
-                puzzleType = "memoryPair",
-                challengeNumber = currentScreenIndex + 1,
-                totalChallenges = sequenceData.size,
-                competitiveInsight = competitiveInsight,
-                onBack = onBack,
-                onPause = { isPaused = !isPaused },
-                onHint = {
-                    if (currentScreenIndex < sequenceData.size && !sequenceData[currentScreenIndex].isFirstScreen) {
-                        val expectedAnimal = sequenceData[currentScreenIndex].linkingNumber
-                        Log.d(TAG, "Hint: Look for animal #$expectedAnimal from the previous screen")
+            // The shared unified header is ~150dp+ tall (more at large fonts), so short viewports get a
+            // compact HUD with the same essentials (timer, lives, score, level).
+            if (compact) {
+                BCompactHud(
+                    level = currentLevel,
+                    difficultyName = currentDifficultyLevel.name,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    streak = streakInfo.currentStreak,
+                    onBack = onBack,
+                    onPause = { isPaused = !isPaused }
+                )
+            } else {
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "memoryPair",
+                    challengeNumber = currentScreenIndex + 1,
+                    totalChallenges = sequenceData.size,
+                    competitiveInsight = competitiveInsight,
+                    onBack = onBack,
+                    onPause = { isPaused = !isPaused },
+                    onHint = {
+                        if (currentScreenIndex < sequenceData.size && !sequenceData[currentScreenIndex].isFirstScreen) {
+                            val expectedAnimal = sequenceData[currentScreenIndex].linkingNumber
+                            Log.d(TAG, "Hint: Look for animal #$expectedAnimal from the previous screen")
+                        }
                     }
-                }
-            )
+                )
+            }
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ✅ REPLACE: Use unified adaptation notification
             UnifiedAdaptationNotification(
                 adaptationInfo = adaptationInfo,
                 puzzleType = "memoryPair",
@@ -880,24 +900,25 @@ fun AdaptiveMemoryPreviousPairScreen(
                 onDismiss = { showAdaptationNotification = false }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 2.dp else 8.dp))
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = if (compact) 6.dp else 12.dp)
                 ) {
                     Text(
-                        text = if (currentScreenIndex < sequenceData.size && sequenceData[currentScreenIndex].isFirstScreen) {
+                        text = if (isFirst) {
                             "🧠 Remember these animals! (${adaptiveConfig.name})"
                         } else {
                             "🎯 Tap the animal that appeared in the previous screen"
                         },
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = if (compact) 2 else 3
                     )
 
                     Row(
@@ -906,28 +927,31 @@ fun AdaptiveMemoryPreviousPairScreen(
                     ) {
                         Text(
                             text = "Screen ${currentScreenIndex + 1} of ${sequenceData.size}",
-                            color = Color(0xFFB0B0B0),
-                            fontSize = 14.sp
+                            color = RvInkSoft,
+                            fontSize = 14.sp,
+                            maxLines = 1
                         )
 
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            if (adaptiveConfig.spatialMemoryChallenge) Text("🗺️", fontSize = 12.sp)
-                            if (adaptiveConfig.visualSimilarity) Text("👁️", fontSize = 12.sp)
-                            if (adaptiveConfig.interferenceItems) Text("⚡", fontSize = 12.sp)
-                            if (adaptiveConfig.temporalDecay) Text("⏰", fontSize = 12.sp)
+                        if (!compact) {
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                if (adaptiveConfig.spatialMemoryChallenge) Text("🗺️", fontSize = 14.sp)
+                                if (adaptiveConfig.visualSimilarity) Text("👁️", fontSize = 14.sp)
+                                if (adaptiveConfig.interferenceItems) Text("⚡", fontSize = 14.sp)
+                                if (adaptiveConfig.temporalDecay) Text("⏰", fontSize = 14.sp)
+                            }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            Box(
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
+                    .weight(1f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(
                         Brush.verticalGradient(
@@ -939,6 +963,8 @@ fun AdaptiveMemoryPreviousPairScreen(
                     ),
                 contentAlignment = Alignment.Center
             ) {
+                val sceneW = maxWidth
+                val sceneH = maxHeight
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     drawGrass(this)
                 }
@@ -946,6 +972,7 @@ fun AdaptiveMemoryPreviousPairScreen(
                 if (showingInterference && currentScreenIndex < sequenceData.size) {
                     val interferenceNumbers = sequenceData[currentScreenIndex].interferenceNumbers
                     if (interferenceNumbers.isNotEmpty()) {
+                        val interferSize = minOf(60.dp, (sceneW - 24.dp) / interferenceNumbers.size.coerceAtLeast(1))
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -958,13 +985,13 @@ fun AdaptiveMemoryPreviousPairScreen(
                                 if (animal != null) {
                                     Box(
                                         modifier = Modifier
-                                            .size(60.dp)
+                                            .size(interferSize)
                                             .background(Color.Red.copy(alpha = 0.3f), CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
                                             text = animal.emoji,
-                                            fontSize = 30.sp
+                                            fontSize = with(LocalDensity.current) { (interferSize * 0.5f).toSp() }
                                         )
                                     }
                                 }
@@ -978,58 +1005,82 @@ fun AdaptiveMemoryPreviousPairScreen(
                     val isFirstScreen = sequenceData[currentScreenIndex].isFirstScreen
                     val spatialPositions = sequenceData[currentScreenIndex].spatialPositions
 
-                    if (adaptiveConfig.spatialMemoryChallenge && spatialPositions.isNotEmpty()) {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            currentAnimals.forEachIndexed { index, animalId ->
-                                val animal = animals[animalId]
-                                val position = spatialPositions.getOrNull(index) ?: (0.5f to 0.5f)
+                    // Head size derived from the scene so every animal fits (>= 48dp where possible)
+                    val n = currentAnimals.size.coerceAtLeast(1)
+                    val pad = 24.dp // room for the bounce and result badge
+                    val availW = (sceneW - pad * 2).coerceAtLeast(48.dp)
+                    val availH = (sceneH - pad * 2).coerceAtLeast(48.dp)
+                    val baseMax = if (adaptiveConfig.workingMemoryLoad >= 4) 84.dp else 96.dp
+                    var bestCols = 1
+                    var bestSize = 0.dp
+                    for (c in 1..n) {
+                        val r = (n + c - 1) / c
+                        val size = minOf(baseMax, (availW - 8.dp * (c - 1)) / c, (availH - 8.dp * (r - 1)) / r)
+                        if (size > bestSize) { bestSize = size; bestCols = c }
+                    }
+                    val headSize = bestSize.coerceAtLeast(40.dp)
 
-                                if (animal != null) {
-                                    Box(
-                                        modifier = Modifier
-                                            .align(Alignment.Center)
-                                            .offset(
-                                                x = ((position.first - 0.5f) * 300).dp,
-                                                y = ((position.second - 0.5f) * 200).dp
+                    CompositionLocalProvider(LocalApAnimalSize provides headSize) {
+                        if (adaptiveConfig.spatialMemoryChallenge && spatialPositions.isNotEmpty()) {
+                            // spatial layout: positions are fractions of the scene, kept inside it
+                            val rangeX = (sceneW - headSize - pad * 2).coerceAtLeast(0.dp)
+                            val rangeY = (sceneH - headSize - pad * 2).coerceAtLeast(0.dp)
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                currentAnimals.forEachIndexed { index, animalId ->
+                                    val animal = animals[animalId]
+                                    val position = spatialPositions.getOrNull(index) ?: (0.5f to 0.5f)
+
+                                    if (animal != null) {
+                                        Box(
+                                            modifier = Modifier
+                                                .align(Alignment.Center)
+                                                .offset(
+                                                    x = rangeX * (position.first - 0.5f),
+                                                    y = rangeY * (position.second - 0.5f)
+                                                )
+                                        ) {
+                                            AdaptiveAnimatedAnimalHead(
+                                                animal = animal,
+                                                isAnimating = animatingAnimals.contains(animalId),
+                                                isFading = fadingAnimals.contains(animalId),
+                                                isClickable = !isFirstScreen,
+                                                isSelected = selectedAnimal == animalId,
+                                                showFeedback = showFeedback && selectedAnimal == animalId,
+                                                isCorrect = isCorrectAnswer,
+                                                adaptiveConfig = adaptiveConfig,
+                                                onClick = { handleAnimalClick(animalId) }
                                             )
-                                    ) {
-                                        AdaptiveAnimatedAnimalHead(
-                                            animal = animal,
-                                            isAnimating = animatingAnimals.contains(animalId),
-                                            isFading = fadingAnimals.contains(animalId),
-                                            isClickable = !isFirstScreen,
-                                            isSelected = selectedAnimal == animalId,
-                                            showFeedback = showFeedback && selectedAnimal == animalId,
-                                            isCorrect = isCorrectAnswer,
-                                            adaptiveConfig = adaptiveConfig,
-                                            onClick = { handleAnimalClick(animalId) }
-                                        )
+                                        }
                                     }
                                 }
                             }
-                        }
-                    } else {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(32.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            currentAnimals.forEach { animalId ->
-                                val animal = animals[animalId]
-                                if (animal != null) {
-                                    AdaptiveAnimatedAnimalHead(
-                                        animal = animal,
-                                        isAnimating = animatingAnimals.contains(animalId),
-                                        isFading = fadingAnimals.contains(animalId),
-                                        isClickable = !isFirstScreen,
-                                        isSelected = selectedAnimal == animalId,
-                                        showFeedback = showFeedback && selectedAnimal == animalId,
-                                        isCorrect = isCorrectAnswer,
-                                        adaptiveConfig = adaptiveConfig,
-                                        onClick = { handleAnimalClick(animalId) }
-                                    )
+                        } else {
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                currentAnimals.chunked(bestCols).forEach { rowAnimals ->
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        rowAnimals.forEach { animalId ->
+                                            val animal = animals[animalId]
+                                            if (animal != null) {
+                                                AdaptiveAnimatedAnimalHead(
+                                                    animal = animal,
+                                                    isAnimating = animatingAnimals.contains(animalId),
+                                                    isFading = fadingAnimals.contains(animalId),
+                                                    isClickable = !isFirstScreen,
+                                                    isSelected = selectedAnimal == animalId,
+                                                    showFeedback = showFeedback && selectedAnimal == animalId,
+                                                    isCorrect = isCorrectAnswer,
+                                                    adaptiveConfig = adaptiveConfig,
+                                                    onClick = { handleAnimalClick(animalId) }
+                                                )
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1037,84 +1088,36 @@ fun AdaptiveMemoryPreviousPairScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+            // Stats footer (one line; extra indicators only when there is room)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "Adaptive Score: $totalScore",
-                                color = Color(0xFF4CAF50),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        } else {
-                            Text(
-                                text = "🧠 ${adaptiveConfig.name} Pair Memory",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Text(
-                            text = "Correct: $correctAnswers/$totalQuestions",
-                            color = Color(0xFFB0B0B0),
-                            fontSize = 14.sp
-                        )
-                    }
-
-                    if (reactionTimes.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            val avgReaction = reactionTimes.average() / 1000.0
-                            Text(
-                                text = "⚡ Avg: ${String.format("%.1f", avgReaction)}s",
-                                color = when {
-                                    avgReaction <= 2.0 -> Color(0xFF4CAF50)
-                                    avgReaction <= 3.0 -> Color(0xFFFF9800)
-                                    else -> Color(0xFFFF5722)
-                                },
-                                fontSize = 12.sp
-                            )
-
-                            if (bestStreak > 1) {
-                                Text(
-                                    text = "🔥 Best streak: $bestStreak",
-                                    color = Color(0xFFFF6B00),
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-
-                        if (adaptiveConfig.workingMemoryLoad >= 3) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            val loadText = when (adaptiveConfig.workingMemoryLoad) {
-                                3 -> "🧠 Moderate Load"
-                                4 -> "🧠 High Load"
-                                5 -> "🧠 Maximum Load"
-                                else -> "🧠 Standard"
-                            }
-                            Text(
-                                text = loadText,
-                                color = Color(0xFF9C27B0),
-                                fontSize = 11.sp
-                            )
-                        }
-                    }
+                Text(
+                    text = "Correct: $correctAnswers/$totalQuestions",
+                    color = RvInkSoft,
+                    fontSize = 14.sp,
+                    maxLines = 1
+                )
+                if (!compact && reactionTimes.isNotEmpty()) {
+                    val avgReaction = reactionTimes.average() / 1000.0
+                    Text(
+                        text = "⚡ Avg: ${String.format("%.1f", avgReaction)}s",
+                        color = if (avgReaction <= 3.0) darkGreen else darkOrange,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
+                }
+                if (!compact && bestStreak > 1) {
+                    Text(
+                        text = "🔥 Best streak: $bestStreak",
+                        color = darkOrange,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
                 }
             }
         }
@@ -1184,7 +1187,7 @@ private fun AdaptiveMemoryPairTopBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -1194,12 +1197,12 @@ private fun AdaptiveMemoryPairTopBar(
                         text = "Level ${level.level}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Text(
                         text = adaptiveConfig.name,
                         fontSize = 12.sp,
-                        color = Color(0xFF4FC3F7)
+                        color = RvSky
                     )
                 }
             }
@@ -1239,7 +1242,7 @@ private fun AdaptiveMemoryPairTopBar(
                 Text(
                     text = "$currentScreen/$totalScreens",
                     fontSize = 14.sp,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 if (streak > 1) {
@@ -1247,7 +1250,7 @@ private fun AdaptiveMemoryPairTopBar(
                         text = "🔥 $streak",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6B00)
+                        color = RvFlame
                     )
                 }
 
@@ -1275,7 +1278,7 @@ private fun AdaptivePairNotificationCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
+            containerColor = RvSky.copy(alpha = 0.9f)
         )
     ) {
         Row(
@@ -1287,7 +1290,7 @@ private fun AdaptivePairNotificationCard(
             Icon(
                 Icons.Default.Psychology,
                 contentDescription = "Adapted",
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -1296,12 +1299,12 @@ private fun AdaptivePairNotificationCard(
                     text = "Pair Memory Adapted!",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = adaptationInfo?.adjustmentReason ?: "",
                     fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = RvInkSoft.copy(alpha = 0.9f)
                 )
             }
             IconButton(
@@ -1311,13 +1314,16 @@ private fun AdaptivePairNotificationCard(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(16.dp)
                 )
             }
         }
     }
 }
+
+/** Head size chosen by the scene so animals always fit. */
+internal val LocalApAnimalSize = compositionLocalOf { 80.dp }
 
 @Composable
 fun AdaptiveAnimatedAnimalHead(
@@ -1366,17 +1372,19 @@ fun AdaptiveAnimatedAnimalHead(
         label = "scale"
     )
 
+    val headSize = LocalApAnimalSize.current
+    val emojiSp = with(LocalDensity.current) { (headSize * 0.5f).toSp() } // glyph follows the head, not the font scale
     Box(
         modifier = Modifier
-            .size(if (adaptiveConfig.workingMemoryLoad >= 4) 70.dp else 80.dp)
+            .size(headSize)
             .offset(y = bounceOffset.dp)
             .scale(scale)
             .alpha(alpha)
             .clip(CircleShape)
             .background(
                 when {
-                    showFeedback && isCorrect -> Color(0xFF4CAF50)
-                    showFeedback && !isCorrect -> Color(0xFFF44336)
+                    showFeedback && isCorrect -> RvSuccessEdge
+                    showFeedback && !isCorrect -> RvErrorEdge
                     isSelected -> animal.color.copy(alpha = 0.3f)
                     else -> animal.color.copy(alpha = 0.1f)
                 }
@@ -1386,20 +1394,20 @@ fun AdaptiveAnimatedAnimalHead(
     ) {
         Text(
             text = animal.emoji,
-            fontSize = if (adaptiveConfig.workingMemoryLoad >= 4) 35.sp else 40.sp
+            fontSize = emojiSp
         )
 
         // Enhanced feedback for high difficulty
         if (showFeedback && isSelected) {
             Text(
                 text = if (isCorrect) "✓" else "✗",
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = if (adaptiveConfig.workingMemoryLoad >= 4) 20.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .offset(x = 15.dp, y = (-15).dp)
+                    .offset(x = headSize / 4, y = -(headSize / 4))
                     .background(
-                        color = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFF44336),
+                        color = if (isCorrect) RvSuccessEdge else RvErrorEdge,
                         shape = CircleShape
                     )
                     .padding(4.dp)
@@ -1419,7 +1427,7 @@ private fun AdaptiveScoreCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+        colors = CardDefaults.cardColors(containerColor = RvCanvas)
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
@@ -1432,14 +1440,14 @@ private fun AdaptiveScoreCard(
                 if (totalScore > 0) {
                     Text(
                         text = "Adaptive Score: $totalScore",
-                        color = Color(0xFF4CAF50),
+                        color = RvSuccess,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 } else {
                     Text(
                         text = "🧠 ${adaptiveConfig.name} Pair Memory",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -1447,7 +1455,7 @@ private fun AdaptiveScoreCard(
 
                 Text(
                     text = "Correct: $correctAnswers/$totalQuestions",
-                    color = Color(0xFFB0B0B0),
+                    color = RvDisabled,
                     fontSize = 14.sp
                 )
             }
@@ -1463,9 +1471,9 @@ private fun AdaptiveScoreCard(
                     Text(
                         text = "⚡ Avg: ${String.format("%.1f", avgReaction)}s",
                         color = when {
-                            avgReaction <= 2.0 -> Color(0xFF4CAF50)
-                            avgReaction <= 3.0 -> Color(0xFFFF9800)
-                            else -> Color(0xFFFF5722)
+                            avgReaction <= 2.0 -> RvSuccess
+                            avgReaction <= 3.0 -> RvSun
+                            else -> RvFlame
                         },
                         fontSize = 12.sp
                     )
@@ -1473,7 +1481,7 @@ private fun AdaptiveScoreCard(
                     if (bestStreak > 1) {
                         Text(
                             text = "🔥 Best streak: $bestStreak",
-                            color = Color(0xFFFF6B00),
+                            color = RvFlame,
                             fontSize = 12.sp
                         )
                     }
@@ -1490,7 +1498,7 @@ private fun AdaptiveScoreCard(
                     }
                     Text(
                         text = loadText,
-                        color = Color(0xFF9C27B0),
+                        color = RvGrape,
                         fontSize = 11.sp
                     )
                 }

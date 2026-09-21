@@ -1,9 +1,10 @@
 package com.kreativekoala.riddleverse
 
 import androidx.compose.foundation.background
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -23,6 +24,16 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.json.JSONObject
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvWarning
 
 data class MathCrosswordCell(
     val row: Int,
@@ -155,79 +166,36 @@ fun MathCrosswordPuzzleScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FF))
-            .padding(16.dp)
-    ) {
-        // Header
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Text("←", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = difficulty,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF666666)
-                )
-                Text(
-                    text = mcformatTime(timeLeft),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (timeLeft <= 30) Color.Red else Color(0xFF333333)
-                )
-            }
-
-            Row {
-                repeat(hearts) {
-                    Text("❤️", fontSize = 16.sp)
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Level indicator
-        Text(
-            text = level,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF666666),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Instructions
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
-        ) {
-            Text(
-                text = "Complete the math equations by placing missing numbers and operators",
-                fontSize = 14.sp,
-                color = Color(0xFF1976D2),
-                modifier = Modifier.padding(12.dp),
-                textAlign = TextAlign.Center
+    BCrosswordLayout(
+        background = Color(0xFFF8F9FF),
+        numberCount = usedNumbers.size,
+        hud = { compact ->
+            McHeader(
+                difficulty = difficulty,
+                timeLeft = timeLeft,
+                hearts = hearts,
+                level = level,
+                compact = compact,
+                onBack = onBack
             )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Math Crossword Grid
-        if (currentGrid.isNotEmpty()) {
-            Box(
+        },
+        instruction = {
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
             ) {
+                Text(
+                    text = "Complete the math equations by placing missing numbers and operators",
+                    fontSize = 14.sp,
+                    color = Color(0xFF0D47A1),
+                    modifier = Modifier.padding(8.dp),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2
+                )
+            }
+        },
+        grid = {
+            if (currentGrid.isNotEmpty()) {
                 CrosswordGridLayout(
                     grid = currentGrid,
                     selectedCell = selectedCell,
@@ -239,115 +207,106 @@ fun MathCrosswordPuzzleScreen(
                     }
                 )
             }
+        },
+        selectionLabel = {
+    selectedCell?.let { (row, col) ->
+        val cell = currentGrid[row][col]
+        if (!cell.isFixed && cell.cellType != CellType.BLOCKED) {
+            Text(
+                text = when (cell.cellType) {
+                    CellType.NUMBER -> "Select a number:"
+                    CellType.OPERATOR -> "Select an operator:"
+                    else -> "Select a value:"
+                },
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvInk,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Selection indicator
-        selectedCell?.let { (row, col) ->
-            val cell = currentGrid[row][col]
-            if (!cell.isFixed && cell.cellType != CellType.BLOCKED) {
-                Text(
-                    text = when (cell.cellType) {
-                        CellType.NUMBER -> "Select a number:"
-                        CellType.OPERATOR -> "Select an operator:"
-                        else -> "Select a value:"
-                    },
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF333333),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
-        }
-
-        // Available Numbers Grid (only show when number cell is selected)
-        if (selectedCellType == CellType.NUMBER && usedNumbers.isNotEmpty()) {
-            NumberSelectionGrid(
-                usedNumbers = usedNumbers,
-                onNumberSelected = { number ->
-                    selectedCell?.let { (row, col) ->
-                        val cell = currentGrid[row][col]
-                        if (!cell.isFixed && cell.cellType == CellType.NUMBER && usedNumbers[number]!! > 0) {
-                            // Remove old value if exists
-                            val oldValue = cell.value
-                            if (oldValue.isNotEmpty()) {
-                                usedNumbers = usedNumbers.toMutableMap().apply {
-                                    this[oldValue] = this.getOrDefault(oldValue, 0) + 1
-                                }
-                            }
-
-                            // Place new value
-                            currentGrid = currentGrid.mapIndexed { r, rowCells ->
-                                if (r == row) {
-                                    rowCells.mapIndexed { c, cellItem ->
-                                        if (c == col) {
-                                            cellItem.copy(value = number)
-                                        } else cellItem
-                                    }
-                                } else rowCells
-                            }
-
-                            // Update available numbers
+    }
+        },
+        numberPad = {
+    if (selectedCellType == CellType.NUMBER && usedNumbers.isNotEmpty()) {
+        NumberSelectionGrid(
+            usedNumbers = usedNumbers,
+            onNumberSelected = { number ->
+                selectedCell?.let { (row, col) ->
+                    val cell = currentGrid[row][col]
+                    if (!cell.isFixed && cell.cellType == CellType.NUMBER && usedNumbers[number]!! > 0) {
+                        // Remove old value if exists
+                        val oldValue = cell.value
+                        if (oldValue.isNotEmpty()) {
                             usedNumbers = usedNumbers.toMutableMap().apply {
-                                this[number] = this[number]!! - 1
+                                this[oldValue] = this.getOrDefault(oldValue, 0) + 1
                             }
-
-                            // Clear selection after placing
-                            selectedCell = null
                         }
-                    }
-                }
-            )
-        }
 
-        // Available Operators Grid (only show when operator cell is selected)
-        if (selectedCellType == CellType.OPERATOR && usedOperators.isNotEmpty()) {
-            OperatorSelectionGrid(
-                usedOperators = usedOperators,
-                onOperatorSelected = { operator ->
-                    selectedCell?.let { (row, col) ->
-                        val cell = currentGrid[row][col]
-                        if (!cell.isFixed && cell.cellType == CellType.OPERATOR && usedOperators[operator]!! > 0) {
-                            // Remove old value if exists
-                            val oldValue = cell.value
-                            if (oldValue.isNotEmpty()) {
-                                usedOperators = usedOperators.toMutableMap().apply {
-                                    this[oldValue] = this.getOrDefault(oldValue, 0) + 1
+                        // Place new value
+                        currentGrid = currentGrid.mapIndexed { r, rowCells ->
+                            if (r == row) {
+                                rowCells.mapIndexed { c, cellItem ->
+                                    if (c == col) {
+                                        cellItem.copy(value = number)
+                                    } else cellItem
                                 }
-                            }
-
-                            // Place new value
-                            currentGrid = currentGrid.mapIndexed { r, rowCells ->
-                                if (r == row) {
-                                    rowCells.mapIndexed { c, cellItem ->
-                                        if (c == col) {
-                                            cellItem.copy(value = operator)
-                                        } else cellItem
-                                    }
-                                } else rowCells
-                            }
-
-                            // Update available operators
-                            usedOperators = usedOperators.toMutableMap().apply {
-                                this[operator] = this[operator]!! - 1
-                            }
-
-                            // Clear selection after placing
-                            selectedCell = null
+                            } else rowCells
                         }
+
+                        // Update available numbers
+                        usedNumbers = usedNumbers.toMutableMap().apply {
+                            this[number] = this[number]!! - 1
+                        }
+
+                        // Clear selection after placing
+                        selectedCell = null
                     }
                 }
-            )
-        }
+            }
+        )
+    }
+        },
+        operatorPad = {
+    if (selectedCellType == CellType.OPERATOR && usedOperators.isNotEmpty()) {
+        OperatorSelectionGrid(
+            usedOperators = usedOperators,
+            onOperatorSelected = { operator ->
+                selectedCell?.let { (row, col) ->
+                    val cell = currentGrid[row][col]
+                    if (!cell.isFixed && cell.cellType == CellType.OPERATOR && usedOperators[operator]!! > 0) {
+                        // Remove old value if exists
+                        val oldValue = cell.value
+                        if (oldValue.isNotEmpty()) {
+                            usedOperators = usedOperators.toMutableMap().apply {
+                                this[oldValue] = this.getOrDefault(oldValue, 0) + 1
+                            }
+                        }
 
-        Spacer(modifier = Modifier.weight(1f))
+                        // Place new value
+                        currentGrid = currentGrid.mapIndexed { r, rowCells ->
+                            if (r == row) {
+                                rowCells.mapIndexed { c, cellItem ->
+                                    if (c == col) {
+                                        cellItem.copy(value = operator)
+                                    } else cellItem
+                                }
+                            } else rowCells
+                        }
 
-        // Control Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+                        // Update available operators
+                        usedOperators = usedOperators.toMutableMap().apply {
+                            this[operator] = this[operator]!! - 1
+                        }
+
+                        // Clear selection after placing
+                        selectedCell = null
+                    }
+                }
+            }
+        )
+    }
+        },
+        actions = {
             OutlinedButton(
                 onClick = {
                     selectedCell?.let { (row, col) ->
@@ -385,7 +344,7 @@ fun MathCrosswordPuzzleScreen(
                         }
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(56.dp),
                 enabled = selectedCell != null &&
                         selectedCell!!.let { (row, col) ->
                             row < currentGrid.size && col < currentGrid[row].size &&
@@ -393,7 +352,7 @@ fun MathCrosswordPuzzleScreen(
                                     currentGrid[row][col].value.isNotEmpty()
                         }
             ) {
-                Text(stringResource(R.string.clear))
+                Text(stringResource(R.string.clear), maxLines = 1)
             }
 
             OutlinedButton(
@@ -472,10 +431,10 @@ fun MathCrosswordPuzzleScreen(
                         }
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(56.dp),
                 enabled = !isComplete && answerData != null
             ) {
-                Text(stringResource(R.string.give_up))
+                Text(stringResource(R.string.give_up), maxLines = 1)
             }
 
             Button(
@@ -508,13 +467,14 @@ fun MathCrosswordPuzzleScreen(
                         feedbackMessage = "Please fill in all empty cells first! 📝"
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(56.dp),
                 enabled = !isComplete && checkAllCellsFilled(currentGrid)
             ) {
-                Text(stringResource(R.string.check))
+                Text(stringResource(R.string.check), maxLines = 1)
             }
+
         }
-    }
+    )
 
     // Feedback Dialog
     if (showFeedback) {
@@ -546,7 +506,7 @@ fun MathCrosswordPuzzleScreen(
                         Text(
                             text = "${stringResource(R.string.score_label)}: $score",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4CAF50)
+                            color = RvSuccess
                         )
                     }
                 }
@@ -639,31 +599,35 @@ fun MathCrosswordCellView(
         cell.isFixed -> when (cell.cellType) {
             CellType.OPERATOR -> Color(0xFFFFF3E0)
             CellType.EQUALS -> Color(0xFFF3E5F5)
-            else -> Color(0xFFF5F5F5)
+            else -> RvSurface
         }
-        else -> Color.White
+        else -> RvSurface
     }
 
     val borderColor = when {
-        isSelected -> Color(0xFF2196F3)
-        cell.isError -> Color(0xFFE53935)
-        cell.isCorrect -> Color(0xFF4CAF50)
-        cell.cellType == CellType.OPERATOR -> Color(0xFFFF9800)
-        cell.cellType == CellType.EQUALS -> Color(0xFF9C27B0)
-        else -> Color(0xFFE0E0E0)
+        isSelected -> RvSky
+        cell.isError -> Color(0xFFB3261E)
+        cell.isCorrect -> Color(0xFF0B6B47)
+        cell.cellType == CellType.OPERATOR -> RvWarning
+        cell.cellType == CellType.EQUALS -> RvGrape
+        else -> RvOutline
     }
 
     val textColor = when {
-        cell.isError -> Color(0xFFE53935)
-        cell.cellType == CellType.OPERATOR -> Color(0xFFE65100)
-        cell.cellType == CellType.EQUALS -> Color(0xFF7B1FA2)
-        cell.isFixed -> Color(0xFF2E7D32)
-        else -> Color(0xFF333333)
+        cell.isError -> Color(0xFFB3261E)
+        cell.cellType == CellType.OPERATOR -> Color(0xFF9A3B00)
+        cell.cellType == CellType.EQUALS -> Color(0xFF6A1B9A)
+        cell.isFixed -> Color(0xFF0B6B47)
+        else -> RvInk
     }
+
+    val cellSize = LocalMcCellSize.current
+    // glyph size follows the cell (not the font scale) so numbers never overflow small cells
+    val cellSp = with(androidx.compose.ui.platform.LocalDensity.current) { (cellSize * 0.42f).coerceIn(10.dp, 22.dp).toSp() }
 
     Box(
         modifier = Modifier
-            .size(52.dp)
+            .size(cellSize)
             .padding(1.dp)
             .clip(RoundedCornerShape(6.dp))
             .background(backgroundColor)
@@ -678,13 +642,12 @@ fun MathCrosswordCellView(
         if (cell.cellType != CellType.BLOCKED) {
             Text(
                 text = cell.value,
-                fontSize = when (cell.cellType) {
-                    CellType.OPERATOR, CellType.EQUALS -> 20.sp
-                    else -> 18.sp
-                },
-                fontWeight = if (cell.isFixed) FontWeight.Bold else FontWeight.Normal,
+                fontSize = cellSp,
+                fontWeight = if (cell.isFixed) FontWeight.Bold else FontWeight.SemiBold,
                 color = textColor,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                softWrap = false
             )
         }
     }
@@ -715,39 +678,211 @@ fun CrosswordGridLayout(
     val maxRow = visibleCells.keys.maxOf { it.first }
     val minCol = visibleCells.keys.minOf { it.second }
     val maxCol = visibleCells.keys.maxOf { it.second }
+    val rowCount = maxRow - minRow + 1
+    val colCount = maxCol - minCol + 1
 
-    // Add horizontal scrolling if the grid is too wide
-    val scrollState = rememberScrollState()
-
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(scrollState)
+    // Fit the whole board into the space we are given: no scrolling, square cells.
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
-        for (row in minRow..maxRow) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+        val availW = if (maxWidth == androidx.compose.ui.unit.Dp.Infinity) 360.dp else maxWidth
+        val availH = if (maxHeight == androidx.compose.ui.unit.Dp.Infinity) 360.dp else maxHeight
+        val cell = minOf(52.dp, availW / colCount, availH / rowCount).coerceAtLeast(12.dp)
+
+        CompositionLocalProvider(LocalMcCellSize provides cell) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                for (col in minCol..maxCol) {
-                    val cell = visibleCells[Pair(row, col)]
-                    if (cell != null) {
-                        MathCrosswordCellView(
-                            cell = cell,
-                            isSelected = selectedCell == Pair(row, col),
-                            onClick = { onCellClick(row, col) }
-                        )
-                    } else {
-                        // Empty space for layout - make sure it's the same size as a cell
-                        Spacer(
-                            modifier = Modifier
-                                .size(52.dp)
-                                .padding(1.dp)
-                        )
+                for (row in minRow..maxRow) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        for (col in minCol..maxCol) {
+                            val c = visibleCells[Pair(row, col)]
+                            if (c != null) {
+                                MathCrosswordCellView(
+                                    cell = c,
+                                    isSelected = selectedCell == Pair(row, col),
+                                    onClick = { onCellClick(row, col) }
+                                )
+                            } else {
+                                // Empty space for layout - make sure it's the same size as a cell
+                                Spacer(
+                                    modifier = Modifier
+                                        .size(cell)
+                                        .padding(1.dp)
+                                )
+                            }
+                        }
                     }
                 }
+            }
+        }
+    }
+}
+
+/** Board cell size (set by [CrosswordGridLayout] so the board always fits its space). */
+internal val LocalMcCellSize = compositionLocalOf { 52.dp }
+/** Selection-pad button size (set by [NumberSelectionGrid] / [OperatorSelectionGrid]). */
+internal val LocalMcPadSize = compositionLocalOf { 48.dp }
+/** True on short viewports: the pad shrinks and decorative chrome is dropped. */
+internal val LocalMcCompact = compositionLocalOf { false }
+
+/** Columns and button size for the number pad so buttons stay >= 44dp and never overflow the width. */
+internal fun mcPadMetrics(width: androidx.compose.ui.unit.Dp, compact: Boolean, count: Int): Pair<Int, androidx.compose.ui.unit.Dp> {
+    val btn = if (compact) 44.dp else 48.dp
+    val gap = 6.dp
+    val fit = ((width + gap) / (btn + gap)).toInt().coerceAtLeast(1)
+    val cols = minOf(fit, count.coerceAtLeast(1), 10)
+    return cols to btn
+}
+
+@Composable
+private fun McHeader(
+    difficulty: String,
+    timeLeft: Int,
+    hearts: Int,
+    level: String,
+    compact: Boolean,
+    onBack: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = RvInk
+            )
+        }
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = difficulty,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvInkSoft,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+            )
+            Text(
+                text = level,
+                fontSize = 14.sp,
+                color = RvInkSoft,
+                maxLines = 1
+            )
+        }
+        Text(
+            text = mcformatTime(timeLeft),
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (timeLeft <= 30) Color(0xFFB3261E) else RvInk,
+            maxLines = 1
+        )
+        Row {
+            repeat(hearts) {
+                Text("❤️", fontSize = 16.sp)
+            }
+        }
+    }
+}
+
+/**
+ * Fit-to-screen shell shared by the math crossword screens (group B): HUD, board (square cells sized
+ * to the remaining space), a reserved selection pad and a pinned action bar. Landscape / wide
+ * viewports become two panes (board | HUD + pad + actions). Nothing scrolls.
+ */
+@Composable
+internal fun BCrosswordLayout(
+    background: Color,
+    numberCount: Int,
+    hud: @Composable (compact: Boolean) -> Unit,
+    instruction: (@Composable () -> Unit)?,
+    grid: @Composable () -> Unit,
+    selectionLabel: @Composable () -> Unit,
+    numberPad: @Composable () -> Unit,
+    operatorPad: @Composable () -> Unit,
+    actions: @Composable RowScope.() -> Unit
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(background)) {
+        val compact = maxHeight < 600.dp
+        val landscape = maxWidth > maxHeight
+        val gutter = if (compact) 12.dp else 16.dp
+        val contentWidth = if (landscape) minOf(maxWidth, 1000.dp) else minOf(maxWidth, 640.dp)
+        val paneW = if (landscape) (contentWidth - gutter * 2) * 0.42f else contentWidth - gutter * 2
+        val (cols, btn) = mcPadMetrics(paneW, compact, numberCount)
+        val padRows = if (numberCount == 0) 1 else (numberCount + cols - 1) / cols
+        // pad area = label (24dp) + rows of buttons; reserved so the board never jumps when selecting
+        val padHeight = 24.dp + (btn + 6.dp) * padRows
+
+        val padArea: @Composable () -> Unit = {
+            CompositionLocalProvider(LocalMcCompact provides compact, LocalMcPadSize provides btn) {
+                Column(
+                    modifier = Modifier.fillMaxWidth().heightIn(min = padHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    selectionLabel()
+                    numberPad()
+                    operatorPad()
+                }
+            }
+        }
+        val actionBar: @Composable () -> Unit = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                content = actions
+            )
+        }
+
+        if (landscape) {
+            Row(
+                modifier = Modifier
+                    .widthIn(max = contentWidth)
+                    .fillMaxSize()
+                    .align(Alignment.TopCenter)
+                    .padding(gutter),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) { grid() }
+                Column(
+                    modifier = Modifier.width(paneW).fillMaxHeight(),
+                    verticalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        hud(true)
+                        Spacer(Modifier.height(8.dp))
+                        padArea()
+                    }
+                    actionBar()
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = contentWidth)
+                    .fillMaxSize()
+                    .align(Alignment.TopCenter)
+                    .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp)
+            ) {
+                hud(compact)
+                Spacer(Modifier.height(if (compact) 2.dp else 8.dp))
+                if (!compact && instruction != null) {
+                    instruction()
+                    Spacer(Modifier.height(8.dp))
+                }
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) { grid() }
+                Spacer(Modifier.height(4.dp))
+                padArea()
+                Spacer(Modifier.height(4.dp))
+                actionBar()
+                Spacer(Modifier.height(if (compact) 4.dp else 8.dp))
             }
         }
     }
@@ -759,25 +894,29 @@ fun NumberSelectionGrid(
     onNumberSelected: (String) -> Unit
 ) {
     val sortedNumbers = usedNumbers.keys.sortedBy { it.toIntOrNull() ?: 0 }
-    val chunkedNumbers = sortedNumbers.chunked(8) // 8 numbers per row for better density
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        chunkedNumbers.forEach { row ->
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                verticalAlignment = Alignment.CenterVertically
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        val (cols, btn) = mcPadMetrics(maxWidth, LocalMcCompact.current, sortedNumbers.size)
+        CompositionLocalProvider(LocalMcPadSize provides btn) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                row.forEach { number ->
-                    val count = usedNumbers[number] ?: 0
-                    NumberSelectionButton(
-                        number = number,
-                        count = count,
-                        isAvailable = count > 0,
-                        onClick = { if (count > 0) onNumberSelected(number) }
-                    )
+                sortedNumbers.chunked(cols).forEach { row ->
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        row.forEach { number ->
+                            val count = usedNumbers[number] ?: 0
+                            NumberSelectionButton(
+                                number = number,
+                                count = count,
+                                isAvailable = count > 0,
+                                onClick = { if (count > 0) onNumberSelected(number) }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -793,7 +932,7 @@ fun OperatorSelectionGrid(
     val sortedOperators = usedOperators.keys.sortedBy { operatorOrder.indexOf(it) }
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -819,14 +958,14 @@ fun NumberSelectionButton(
 ) {
     Box(
         modifier = Modifier
-            .size(44.dp)
+            .size(LocalMcPadSize.current)
             .clip(RoundedCornerShape(8.dp))
             .background(
-                if (isAvailable) Color(0xFF4CAF50) else Color(0xFFE0E0E0)
+                if (isAvailable) RvSuccess else RvOutline
             )
             .border(
                 width = 2.dp,
-                color = if (isAvailable) Color(0xFF2E7D32) else Color(0xFFBDBDBD),
+                color = if (isAvailable) Color(0xFF0B6B47) else RvInkSoft,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable(enabled = isAvailable) { onClick() },
@@ -837,15 +976,17 @@ fun NumberSelectionButton(
         ) {
             Text(
                 text = number,
-                fontSize = 16.sp,
+                fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { 16.dp.toSp() },
                 fontWeight = FontWeight.Bold,
-                color = if (isAvailable) Color.White else Color(0xFF757575)
+                color = if (isAvailable) RvInk else RvInkSoft,
+                maxLines = 1
             )
             if (count > 1) {
                 Text(
                     text = "×$count",
-                    fontSize = 9.sp,
-                    color = if (isAvailable) Color.White else Color(0xFF757575)
+                    fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { 12.dp.toSp() },
+                    color = if (isAvailable) RvInk else RvInkSoft,
+                    maxLines = 1
                 )
             }
         }
@@ -862,33 +1003,36 @@ fun OperatorSelectionButton(
 ) {
     Box(
         modifier = modifier
-            .height(50.dp)
+            .height(LocalMcPadSize.current)
             .clip(RoundedCornerShape(10.dp))
             .background(
-                if (isAvailable) Color(0xFFFF9800) else Color(0xFFE0E0E0)
+                if (isAvailable) RvWarning else RvOutline
             )
             .border(
                 width = 2.dp,
-                color = if (isAvailable) Color(0xFFE65100) else Color(0xFFBDBDBD),
+                color = if (isAvailable) Color(0xFFE65100) else RvInkSoft,
                 shape = RoundedCornerShape(10.dp)
             )
             .clickable(enabled = isAvailable) { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = operator,
-                fontSize = 22.sp,
+                fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { 22.dp.toSp() },
                 fontWeight = FontWeight.Bold,
-                color = if (isAvailable) Color.White else Color(0xFF757575)
+                color = if (isAvailable) RvInk else RvInkSoft,
+                maxLines = 1
             )
             if (count > 1) {
                 Text(
                     text = "×$count",
-                    fontSize = 10.sp,
-                    color = if (isAvailable) Color.White else Color(0xFF757575)
+                    fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { 12.dp.toSp() },
+                    color = if (isAvailable) RvInk else RvInkSoft,
+                    maxLines = 1
                 )
             }
         }

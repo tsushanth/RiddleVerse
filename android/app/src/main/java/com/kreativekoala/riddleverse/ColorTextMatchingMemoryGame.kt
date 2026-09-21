@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.annotation.SuppressLint
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -63,16 +64,16 @@ data class ColorTextAnswerData(
 // Color definitions
 object GameColors {
     val colorMap = mapOf(
-        "red" to Color(0xFFE53E3E),
+        "red" to RvError,
         "blue" to Color(0xFF3182CE),
-        "green" to Color(0xFF38A169),
-        "yellow" to Color(0xFFD69E2E),
-        "purple" to Color(0xFF805AD5),
+        "green" to RvSuccess,
+        "yellow" to RvSun,
+        "purple" to RvGrape,
         "orange" to Color(0xFFDD6B20),
         "pink" to Color(0xFFD53F8C),
         "brown" to Color(0xFF8B4513),
         "gray" to Color(0xFF718096),
-        "black" to Color(0xFF2D3748)
+        "black" to RvInk
     )
 
     val colorNames = colorMap.keys.toList()
@@ -145,12 +146,12 @@ fun ColorTextMatchingPuzzleScreen(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF3B82F6))
+                    .background(RvSky)
                     .clickable { onBack() }
                     .zIndex(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text("||", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("||", color = RvInk, fontWeight = FontWeight.Bold)
             }
 
             // Timer and Score
@@ -160,12 +161,12 @@ fun ColorTextMatchingPuzzleScreen(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
+                        .background(RvSurface)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "TIME ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -173,12 +174,12 @@ fun ColorTextMatchingPuzzleScreen(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
+                        .background(RvSurface)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "SCORE $currentScore",
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -273,7 +274,7 @@ private fun ColorTextInstructionsScreen(
                 text = instructions.title,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
 
@@ -282,7 +283,7 @@ private fun ColorTextInstructionsScreen(
             Text(
                 text = instructions.description,
                 fontSize = 16.sp,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
             )
 
@@ -291,7 +292,7 @@ private fun ColorTextInstructionsScreen(
             // Compact Example demonstration
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
@@ -301,7 +302,7 @@ private fun ColorTextInstructionsScreen(
                         text = "Example",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A)
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -320,14 +321,14 @@ private fun ColorTextInstructionsScreen(
                             Text(
                                 text = "meaning",
                                 fontSize = 10.sp,
-                                color = Color.Gray,
+                                color = RvInkSoft,
                                 modifier = Modifier
-                                    .background(Color.Gray.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                                    .background(RvInkSoft.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(40.dp)
@@ -340,7 +341,7 @@ private fun ColorTextInstructionsScreen(
                                         text = "blue",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Black,
+                                        color = RvInk,
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -355,7 +356,7 @@ private fun ColorTextInstructionsScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(40.dp)
@@ -377,9 +378,9 @@ private fun ColorTextInstructionsScreen(
                             Text(
                                 text = "text color",
                                 fontSize = 10.sp,
-                                color = Color.Gray,
+                                color = RvInkSoft,
                                 modifier = Modifier
-                                    .background(Color.Gray.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                                    .background(RvInkSoft.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
                                     .padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
@@ -390,7 +391,7 @@ private fun ColorTextInstructionsScreen(
                     Text(
                         text = "Answer: YES (both are blue)",
                         fontSize = 12.sp,
-                        color = Color(0xFF10B981),
+                        color = RvSuccess,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -401,7 +402,7 @@ private fun ColorTextInstructionsScreen(
             // Compact Instructions list
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -410,7 +411,7 @@ private fun ColorTextInstructionsScreen(
                         Text(
                             text = "• $step",
                             fontSize = 12.sp,
-                            color = Color(0xFF1E3A8A),
+                            color = RvInk,
                             modifier = Modifier.padding(vertical = 1.dp)
                         )
                     }
@@ -420,7 +421,7 @@ private fun ColorTextInstructionsScreen(
                     Text(
                         text = "💡 ${instructions.tip}",
                         fontSize = 12.sp,
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -436,13 +437,13 @@ private fun ColorTextInstructionsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+            colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(
                 text = stringResource(R.string.start_game),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvOnTone
             )
         }
     }
@@ -468,12 +469,12 @@ private fun ColorTextGameScreen(
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF10B981)),
+                .background(RvSuccess),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = currentQuestion.toString(),
-                color = Color.White,
+                color = RvInk,
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -485,7 +486,7 @@ private fun ColorTextGameScreen(
         Text(
             text = stringResource(R.string.color_match_question),
             fontSize = 18.sp,
-            color = Color.White,
+            color = RvInk,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium
         )
@@ -510,14 +511,14 @@ private fun ColorTextGameScreen(
                     Text(
                         text = "meaning",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                            .background(RvSurface, RoundedCornerShape(4.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -531,7 +532,7 @@ private fun ColorTextGameScreen(
                                 text = currentStep.meaningColorName,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
+                                color = RvInk,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -558,7 +559,7 @@ private fun ColorTextGameScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -581,9 +582,9 @@ private fun ColorTextGameScreen(
                     Text(
                         text = "text color",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                            .background(RvSurface, RoundedCornerShape(4.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
@@ -603,14 +604,14 @@ private fun ColorTextGameScreen(
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(
-                        if (lastAnswerCorrect) Color(0xFF10B981) else Color(0xFFEF4444)
+                        if (lastAnswerCorrect) RvSuccess else RvError
                     ),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = if (lastAnswerCorrect) "✓" else "✗",
                     fontSize = 60.sp,
-                    color = Color.White,
+                    color = RvInk,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -629,9 +630,9 @@ private fun ColorTextGameScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
+                    colors = ButtonDefaults.buttonColors(containerColor = RvSky)
                 ) {
-                    Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvOnTone)
                 }
 
                 Button(
@@ -639,9 +640,9 @@ private fun ColorTextGameScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
+                    colors = ButtonDefaults.buttonColors(containerColor = RvSky)
                 ) {
-                    Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvOnTone)
                 }
             }
         }
@@ -664,7 +665,7 @@ private fun ColorTextCompletionScreen(
             text = stringResource(R.string.game_complete),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = RvInk,
             textAlign = TextAlign.Center
         )
 
@@ -672,7 +673,7 @@ private fun ColorTextCompletionScreen(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+            colors = CardDefaults.cardColors(containerColor = RvSurface)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -682,7 +683,7 @@ private fun ColorTextCompletionScreen(
                     text = stringResource(R.string.final_score),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E3A8A)
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -691,7 +692,7 @@ private fun ColorTextCompletionScreen(
                     text = "$score / $maxScore",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10B981)
+                    color = RvSuccess
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -699,14 +700,14 @@ private fun ColorTextCompletionScreen(
                 Text(
                     text = "${stringResource(R.string.correct_answers)}: $correctCount / $totalQuestions",
                     fontSize = 16.sp,
-                    color = Color(0xFF1E3A8A)
+                    color = RvInk
                 )
 
                 val percentage = (correctCount.toDouble() / totalQuestions.toDouble() * 100).toInt()
                 Text(
                     text = "${stringResource(R.string.accuracy)}: $percentage%",
                     fontSize = 16.sp,
-                    color = Color(0xFF1E3A8A)
+                    color = RvInk
                 )
             }
         }
@@ -718,13 +719,13 @@ private fun ColorTextCompletionScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+            colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(
                 text = stringResource(R.string.continue_label_caps),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvOnTone
             )
         }
     }
@@ -752,11 +753,11 @@ private fun generateColorTextPuzzleData(difficulty: String): ColorTextPuzzleData
 
         val actualTextDisplayColor = if (shouldMatch) {
             // Make it match: text display color should match the meaning
-            GameColors.colorMap[meaningColorName] ?: Color.Black
+            GameColors.colorMap[meaningColorName] ?: RvInk
         } else {
             // Make it not match: use a different color for text display
             val differentColor = colorNames.filter { it != meaningColorName }.random()
-            GameColors.colorMap[differentColor] ?: Color.Black
+            GameColors.colorMap[differentColor] ?: RvInk
         }
 
         sequence.add(

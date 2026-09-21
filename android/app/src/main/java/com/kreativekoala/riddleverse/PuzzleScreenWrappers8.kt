@@ -38,6 +38,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvInk
 
 @Composable
 fun AveragesScreenWrapper(
@@ -350,14 +355,14 @@ private fun QuoteRevealDialog(
                 onClick = onContinue,
                 modifier = Modifier.padding(16.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = RvSuccess
                 )
             ) {
                 Text(
                     text = "Continue",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
             }
         },
@@ -381,7 +386,7 @@ private fun QuoteRevealDialog(
                 Text(
                     text = "Score: $finalScore points",
                     style = MaterialTheme.typography.titleMedium,
-                    color = Color(0xFF4CAF50),
+                    color = RvSuccess,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(top = 4.dp)
                 )
@@ -433,20 +438,20 @@ private fun QuoteRevealDialog(
                             modifier = Modifier
                                 .width(30.dp)
                                 .height(1.dp)
-                                .background(Color(0xFFBDBDBD))
+                                .background(RvInkSoft)
                         )
                         Text(
                             text = "  $author  ",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Medium,
-                            color = Color(0xFF666666),
+                            color = RvInkSoft,
                             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                         )
                         Box(
                             modifier = Modifier
                                 .width(30.dp)
                                 .height(1.dp)
-                                .background(Color(0xFFBDBDBD))
+                                .background(RvInkSoft)
                         )
                     }
                 }
@@ -641,7 +646,7 @@ private fun MultiWordRowDisplay(
                                 text = displayText,
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
+                                color = RvInk,
                                 modifier = Modifier.width(28.dp), // Fixed width for alignment
                                 textAlign = TextAlign.Center
                             )
@@ -685,7 +690,7 @@ private fun MultiWordRowDisplay(
                                             .size(32.dp)
                                             .background(
                                                 color = if (selectedNumber == number)
-                                                    Color(0xFF4CAF50)
+                                                    RvSuccess
                                                 else
                                                     MaterialTheme.colorScheme.surface,
                                                 shape = RoundedCornerShape(6.dp)
@@ -693,7 +698,7 @@ private fun MultiWordRowDisplay(
                                             .border(
                                                 1.5.dp,
                                                 if (selectedNumber == number)
-                                                    Color(0xFF4CAF50)
+                                                    RvSuccess
                                                 else
                                                     MaterialTheme.colorScheme.outline,
                                                 RoundedCornerShape(6.dp)
@@ -708,7 +713,7 @@ private fun MultiWordRowDisplay(
                                             style = MaterialTheme.typography.bodyMedium,
                                             fontWeight = FontWeight.Bold,
                                             color = if (selectedNumber == number)
-                                                Color.White
+                                                RvOnTone
                                             else
                                                 MaterialTheme.colorScheme.onSurface
                                         )
@@ -774,11 +779,11 @@ fun LetterSelectionKeyboard(
                             .size(width = 32.dp, height = 48.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = when {
-                                !isUsed && selectedNumber != null -> Color(0xFF1976D2) // Bright blue for available
-                                isUsed -> Color(0xFF4CAF50) // Green for used
+                                !isUsed && selectedNumber != null -> RvSky // Bright blue for available
+                                isUsed -> RvSuccess // Green for used
                                 else -> Color(0xFF424242) // Dark gray for inactive
                             },
-                            disabledContainerColor = Color(0xFF757575) // Medium gray for disabled
+                            disabledContainerColor = RvInkSoft // Medium gray for disabled
                         ),
                         contentPadding = PaddingValues(0.dp),
                         elevation = ButtonDefaults.buttonElevation(
@@ -791,10 +796,10 @@ fun LetterSelectionKeyboard(
                             style = MaterialTheme.typography.titleMedium, // Larger, bolder font
                             fontWeight = FontWeight.Bold, // Make letters bold
                             color = when {
-                                !isUsed && selectedNumber != null -> Color.White // White on blue
-                                isUsed -> Color.White // White on green
-                                selectedNumber == null -> Color(0xFFBDBDBD) // Light gray when inactive
-                                else -> Color.White
+                                !isUsed && selectedNumber != null -> RvOnTone // White on blue
+                                isUsed -> RvOnTone // White on green
+                                selectedNumber == null -> RvInkSoft // Light gray when inactive
+                                else -> RvOnTone
                             }
                         )
                     }

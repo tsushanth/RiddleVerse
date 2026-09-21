@@ -1,5 +1,22 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInfo
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSun
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import com.kreativekoala.riddleverse.ui.theme.RvWarning
+import com.kreativekoala.riddleverse.ui.theme.RvWarningEdge
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -68,6 +85,7 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -1342,12 +1360,7 @@ fun StartPuzzleScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF1A1A1A),
-                            Color(0xFF2D2D2D)
-                        )
-                    )
+                    SolidColor(RvCanvas)
                 )
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp)
@@ -1363,7 +1376,7 @@ fun StartPuzzleScreen(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = stringResource(R.string.close),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -1408,7 +1421,7 @@ fun StartPuzzleScreen(
                             Icon(
                                 imageVector = Icons.Default.Help,
                                 contentDescription = stringResource(R.string.hint),
-                                tint = Color.White,
+                                tint = RvInk,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -1418,7 +1431,7 @@ fun StartPuzzleScreen(
                         Icon(
                             imageVector = Icons.Default.FavoriteBorder,
                             contentDescription = stringResource(R.string.your_favorites),
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -1436,14 +1449,14 @@ fun StartPuzzleScreen(
                     text = if (isDailyPuzzle) "Daily $quizTitle" else quizTitle,
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
                     text = if (isDailyPuzzle) "Your personalized daily challenge" else getPuzzleCategory(type),
                     fontSize = 18.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(top = 8.dp)
                 )
@@ -1458,7 +1471,7 @@ fun StartPuzzleScreen(
                         .fillMaxWidth()
                         .padding(bottom = 16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF444444)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -1469,14 +1482,14 @@ fun StartPuzzleScreen(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = "From Group",
-                            tint = Color(0xFF00A8E8),
+                            tint = RvViolet,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "From: $sourceGroupName",
                             fontSize = 12.sp,
-                            color = Color.White
+                            color = RvInk
                         )
                     }
                 }
@@ -1531,7 +1544,7 @@ fun StartPuzzleScreen(
                         .height(screenHeight * 0.22f),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(color = RvInk)
                 }
             } else {
                 statsData?.let { stats ->
@@ -1565,17 +1578,17 @@ fun StartPuzzleScreen(
                         text = "ADVANCED STATS:",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Gray,
+                        color = RvInkSoft,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().height(IntrinsicSize.Max),
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         StatCard(
                             title = "TIME TRAINED",
-                            value = "${stats.timesTrained} hrs",
+                            value = "${"%.1f".format(stats.timesTrained)} hrs",
                             modifier = Modifier.weight(1f)
                         )
 
@@ -1602,7 +1615,7 @@ fun StartPuzzleScreen(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF5D4037)
+                        containerColor = RvWarning.copy(alpha = 0.15f)
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
@@ -1615,7 +1628,7 @@ fun StartPuzzleScreen(
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = "Error",
-                            tint = Color(0xFFFFAB91),
+                            tint = RvWarningEdge,
                             modifier = Modifier.size(20.dp)
                         )
 
@@ -1628,7 +1641,7 @@ fun StartPuzzleScreen(
                                 else -> "Unable to load puzzle. Please try again."
                             },
                             fontSize = 12.sp,
-                            color = Color.White,
+                            color = RvInk,
                             modifier = Modifier.weight(1f)
                         )
 
@@ -1639,7 +1652,7 @@ fun StartPuzzleScreen(
                             Text(
                                 text = "Dismiss",
                                 fontSize = 12.sp,
-                                color = Color(0xFFFFAB91)
+                                color = RvWarningEdge
                             )
                         }
                     }
@@ -2130,8 +2143,8 @@ fun StartPuzzleScreen(
                     Brush.verticalGradient(
                         colors = listOf(
                             Color.Transparent,
-                            Color(0xFF1A1A1A).copy(alpha = 0.8f),
-                            Color(0xFF1A1A1A)
+                            RvCanvas.copy(alpha = 0.8f),
+                            RvCanvas
                         ),
                         startY = 0f,
                         endY = 300f
@@ -2368,11 +2381,11 @@ fun StartPuzzleScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00A8E8)
+                        containerColor = RvViolet
                     ),
                     shape = RoundedCornerShape(28.dp),
                     enabled = !isLoading,
-                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 8.dp)
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                 ) {
                     if (isLoading) {
                         Row(
@@ -2381,7 +2394,7 @@ fun StartPuzzleScreen(
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp),
-                                color = Color.White
+                                color = RvOnTone
                             )
                             Text(
                                 text = when {
@@ -2396,13 +2409,13 @@ fun StartPuzzleScreen(
                             text = "🎮 Start Playing",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvOnTone
                         )
                         if (!isDailyPuzzle && !isCustomPuzzle && prefetchedPuzzle != null) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
                                 contentDescription = "Ready",
-                                tint = Color.Green,
+                                tint = RvSuccess,
                                 modifier = Modifier.size(16.dp)
                             )
                         }
@@ -2423,9 +2436,7 @@ fun StartPuzzleScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(
-                                Brush.horizontalGradient(
-                                    listOf(Color(0xFF9C27B0), Color(0xFF2196F3))
-                                ),
+                                SolidColor(RvGrape),
                                 RoundedCornerShape(28.dp)
                             )
                             .padding(horizontal = 16.dp),
@@ -2434,7 +2445,7 @@ fun StartPuzzleScreen(
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
@@ -2442,18 +2453,18 @@ fun StartPuzzleScreen(
                             stringResource(R.string.create_your_version),
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp,
-                            color = Color.White
+                            color = RvOnTone
                         )
                         Spacer(modifier = Modifier.weight(1f))
                         Text(
                             "Earn coins",
                             fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.6f)
+                            color = RvOnTone.copy(alpha = 0.8f)
                         )
                         Icon(
                             imageVector = Icons.Default.ArrowForward,
                             contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
+                            tint = RvOnTone.copy(alpha = 0.8f),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -2466,9 +2477,9 @@ fun StartPuzzleScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    border = BorderStroke(1.dp, Color(0xFF00A8E8).copy(alpha = 0.5f)),
+                    border = BorderStroke(1.dp, RvViolet.copy(alpha = 0.5f)),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color(0xFF00A8E8).copy(alpha = 0.8f)
+                        contentColor = RvViolet
                     )
                 ) {
                     Text(
@@ -2560,15 +2571,15 @@ fun StatCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.height(100.dp),
+        modifier = modifier.heightIn(min = 100.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF333333)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -2577,13 +2588,13 @@ fun StatCard(
                 text = value,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
             Text(
                 text = title,
                 fontSize = 12.sp,
-                color = Color.Gray,
+                color = RvInkSoft,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(top = 4.dp)
             )
@@ -2600,7 +2611,7 @@ fun BenefitsSection(puzzleType: String) {
             text = "BENEFITS:",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = RvInkSoft,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
@@ -2630,7 +2641,7 @@ fun BenefitItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            tint = Color.Gray,
+            tint = RvInkSoft,
             modifier = Modifier
                 .size(20.dp)
                 .padding(top = 2.dp)
@@ -2641,7 +2652,7 @@ fun BenefitItem(
         Text(
             text = text,
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = RvInkSoft,
             lineHeight = 20.sp,
             modifier = Modifier.weight(1f)
         )
@@ -2657,14 +2668,14 @@ fun TopScoresSection(topScores: List<Int>) {
             text = "TOP 10 SCORES:",
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Gray,
+            color = RvInkSoft,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF333333)
+                containerColor = RvSurface
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
@@ -2687,14 +2698,14 @@ fun TopScoresSection(topScores: List<Int>) {
                                 Text(
                                     text = "$position.",
                                     fontSize = 14.sp,
-                                    color = Color.Gray,
+                                    color = RvInkSoft,
                                     modifier = Modifier.width(24.dp)
                                 )
                                 Text(
                                     text = score.toString(),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color.White
+                                    color = RvInk
                                 )
                             }
                         }
@@ -2706,7 +2717,7 @@ fun TopScoresSection(topScores: List<Int>) {
 
                     if (rowIndex < 4) {
                         HorizontalDivider(
-                            color = Color(0xFF444444),
+                            color = RvSurface,
                             thickness = 0.5.dp
                         )
                     }
@@ -2735,7 +2746,7 @@ fun GameConfigurationSection(
             .fillMaxWidth()
             .clickable { isExpanded = !isExpanded },
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF333333)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -2751,13 +2762,13 @@ fun GameConfigurationSection(
                     text = stringResource(R.string.game_settings),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (isExpanded) "Collapse" else "Expand",
-                    tint = Color.Gray
+                    tint = RvInkSoft
                 )
             }
 
@@ -2771,7 +2782,7 @@ fun GameConfigurationSection(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(stringResource(R.string.difficulty_level), fontSize = 14.sp, color = Color.Gray)
+                        Text(stringResource(R.string.difficulty_level), fontSize = 14.sp, color = RvInkSoft)
                         IconButton(
                             onClick = onToggleDifficultyHint,
                             modifier = Modifier.size(24.dp)
@@ -2779,7 +2790,7 @@ fun GameConfigurationSection(
                             Icon(
                                 imageVector = Icons.Default.Info,
                                 contentDescription = "Difficulty Info",
-                                tint = Color(0xFF00A8E8),
+                                tint = RvViolet,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -2790,13 +2801,13 @@ fun GameConfigurationSection(
                     if (showDifficultyHint) {
                         Card(
                             modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1976D2).copy(alpha = 0.2f))
+                            colors = CardDefaults.cardColors(containerColor = RvInfo.copy(alpha = 0.15f))
                         ) {
                             Text(
                                 text = "💡 $difficultyInsight",
                                 modifier = Modifier.padding(12.dp),
                                 fontSize = 14.sp,
-                                color = Color(0xFF64B5F6)
+                                color = RvSkyEdge
                             )
                         }
                         Spacer(modifier = Modifier.height(12.dp))
@@ -2810,10 +2821,10 @@ fun GameConfigurationSection(
                                 label = { Text(level) },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFF00A8E8),
-                                    selectedLabelColor = Color.White,
-                                    containerColor = Color(0xFF555555),
-                                    labelColor = Color.Gray
+                                    selectedContainerColor = RvViolet,
+                                    selectedLabelColor = RvOnTone,
+                                    containerColor = RvOutline,
+                                    labelColor = RvInkSoft
                                 )
                             )
                         }
@@ -2823,7 +2834,7 @@ fun GameConfigurationSection(
                 }
 
                 if (screenOptions.size > 1) {
-                    Text(stringResource(R.string.game_mode), fontSize = 14.sp, color = Color.Gray)
+                    Text(stringResource(R.string.game_mode), fontSize = 14.sp, color = RvInkSoft)
                     Spacer(modifier = Modifier.height(8.dp))
 
                     LazyRow(
@@ -2847,10 +2858,10 @@ fun GameConfigurationSection(
                                     )
                                 },
                                 colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = Color(0xFF00A8E8),
-                                    selectedLabelColor = Color.White,
-                                    containerColor = Color(0xFF555555),
-                                    labelColor = Color.Gray
+                                    selectedContainerColor = RvViolet,
+                                    selectedLabelColor = RvOnTone,
+                                    containerColor = RvOutline,
+                                    labelColor = RvInkSoft
                                 )
                             )
                         }
@@ -3035,12 +3046,7 @@ fun RegenerationInProgressScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A1A1A),
-                        Color(0xFF2D2D2D)
-                    )
-                )
+                SolidColor(RvCanvas)
             )
     ) {
         Column(
@@ -3107,7 +3113,7 @@ private fun RegenerationStatusCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF333333)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -3122,13 +3128,13 @@ private fun RegenerationStatusCard(
             ) {
                 CircularProgressIndicator(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color(0xFF00A8E8),
+                    color = RvViolet,
                     strokeWidth = 6.dp
                 )
                 Icon(
                     imageVector = Icons.Default.Whatshot,
                     contentDescription = "Generating",
-                    tint = Color(0xFF00A8E8),
+                    tint = RvViolet,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -3142,7 +3148,7 @@ private fun RegenerationStatusCard(
                     "Generating Fresh Puzzles",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
 
@@ -3151,7 +3157,7 @@ private fun RegenerationStatusCard(
             Text(
                 text = regenerationInfo.message,
                 fontSize = 14.sp,
-                color = Color.Gray,
+                color = RvInkSoft,
                 textAlign = TextAlign.Center
             )
 
@@ -3175,7 +3181,7 @@ private fun RegenerationStatusCard(
                 Text(
                     text = "Estimated time: ${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
         }
@@ -3190,12 +3196,12 @@ private fun InfoChip(label: String, value: String) {
         Text(
             text = label,
             fontSize = 10.sp,
-            color = Color.Gray
+            color = RvInkSoft
         )
         Text(
             text = value,
             fontSize = 12.sp,
-            color = Color(0xFF00A8E8),
+            color = RvViolet,
             fontWeight = FontWeight.Medium
         )
     }
@@ -3206,7 +3212,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -3222,13 +3228,13 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
                     text = "Your Current Usage",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Icon(
                     imageVector = Icons.Default.BarChart,
                     contentDescription = "Usage Stats",
-                    tint = Color(0xFF00A8E8),
+                    tint = RvViolet,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -3244,7 +3250,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
                     label = "Daily",
                     used = limitInfo.dailyUsed,
                     total = limitInfo.dailyLimit,
-                    color = Color(0xFF2196F3),
+                    color = RvSky,
                     modifier = Modifier.weight(1f)
                 )
 
@@ -3255,7 +3261,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
                     label = "Monthly",
                     used = limitInfo.monthlyUsed,
                     total = limitInfo.monthlyLimit,
-                    color = Color(0xFF9C27B0),
+                    color = RvGrape,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -3265,7 +3271,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
                 Text(
                     text = "Limits reset: ${formatResetTime(limitInfo.resetTime)}",
                     fontSize = 11.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -3295,14 +3301,14 @@ private fun UsageIndicator(
                 modifier = Modifier.fillMaxSize(),
                 color = color,
                 strokeWidth = 5.dp,
-                trackColor = Color.Gray.copy(alpha = 0.3f)
+                trackColor = RvOutline
             )
 
             Text(
                 text = "$used",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
         }
 
@@ -3311,13 +3317,13 @@ private fun UsageIndicator(
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color.Gray
+            color = RvInkSoft
         )
 
         Text(
             text = "of $total",
             fontSize = 10.sp,
-            color = Color.Gray
+            color = RvInkSoft
         )
     }
 }
@@ -3332,9 +3338,9 @@ private fun UpgradeOptionsSection(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1565C0).copy(alpha = 0.15f)
+            containerColor = RvInfo.copy(alpha = 0.15f)
         ),
-        border = BorderStroke(1.dp, Color(0xFF1565C0).copy(alpha = 0.3f)),
+        border = BorderStroke(1.dp, RvInfo.copy(alpha = 0.3f)),
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
@@ -3347,7 +3353,7 @@ private fun UpgradeOptionsSection(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            Color(0xFFFFD700).copy(alpha = 0.2f),
+                            RvSun.copy(alpha = 0.2f),
                             RoundedCornerShape(24.dp)
                         ),
                     contentAlignment = Alignment.Center
@@ -3355,7 +3361,7 @@ private fun UpgradeOptionsSection(
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "Premium",
-                        tint = Color(0xFFFFD700),
+                        tint = RvSunEdge,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -3367,12 +3373,12 @@ private fun UpgradeOptionsSection(
                         text = "Skip the Wait!",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Text(
                         text = "Get instant puzzle generation",
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                 }
             }
@@ -3412,14 +3418,14 @@ private fun UpgradeOptionsSection(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = Color(0xFF4CAF50),
+                    tint = RvSuccess,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "No ads • Unlimited generations • Priority processing • Cancel anytime",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
         }
@@ -3431,7 +3437,7 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -3448,18 +3454,18 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                 Text(
                     text = "Wait Time",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
                 Text(
                     text = "${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Red
+                    color = RvError
                 )
                 Text(
                     text = "minutes",
                     fontSize = 10.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
 
@@ -3469,13 +3475,13 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
             ) {
                 Text(
                     text = "vs",
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     fontSize = 14.sp
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "vs",
-                    tint = Color(0xFFFFD700),
+                    tint = RvSunEdge,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -3488,18 +3494,18 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                 Text(
                     text = "Premium",
                     fontSize = 12.sp,
-                    color = Color(0xFFFFD700)
+                    color = RvSunEdge
                 )
                 Text(
                     text = "Instant",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFFD700)
+                    color = RvSunEdge
                 )
                 Text(
                     text = "generation",
                     fontSize = 10.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
         }
@@ -3543,12 +3549,12 @@ private fun SubscriptionTierCard(
             },
         colors = CardDefaults.cardColors(
             containerColor = if (isRecommended)
-                Color(0xFFFFD700).copy(alpha = 0.1f)
-            else Color(0xFF333333)
+                RvSun.copy(alpha = 0.1f)
+            else RvSurface
         ),
         border = BorderStroke(
             width = if (isRecommended) 2.dp else 1.dp,
-            color = if (isRecommended) Color(0xFFFFD700) else Color.Gray.copy(alpha = 0.3f)
+            color = if (isRecommended) RvSunEdge else RvOutline
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -3564,14 +3570,14 @@ private fun SubscriptionTierCard(
                         text = tier.displayName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     if (hasFreeTrial || isRecommended) {
                         Spacer(modifier = Modifier.width(8.dp))
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (hasFreeTrial) Color(0xFF4CAF50) else Color(0xFF4CAF50)
+                                containerColor = if (hasFreeTrial) RvSuccess else RvSuccess
                             ),
                             shape = RoundedCornerShape(4.dp)
                         ) {
@@ -3579,7 +3585,7 @@ private fun SubscriptionTierCard(
                                 text = if (hasFreeTrial) "FREE TRIAL" else "RECOMMENDED",
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = RvOnTone,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
                         }
@@ -3591,20 +3597,20 @@ private fun SubscriptionTierCard(
                         text = trialDuration,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50),
+                        color = RvSuccess,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                     Text(
                         text = "then $displayPrice",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                 } else {
                     Text(
                         text = displayPrice,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isRecommended) Color(0xFFFFD700) else Color.Gray,
+                        color = if (isRecommended) RvSunEdge else RvInkSoft,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
@@ -3612,7 +3618,7 @@ private fun SubscriptionTierCard(
                 Text(
                     text = if (tier.dailyLimit == -1) "Unlimited daily" else "${tier.dailyLimit} daily",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
 
@@ -3620,13 +3626,13 @@ private fun SubscriptionTierCard(
                 CircularProgressIndicator(
                     modifier = Modifier.size(24.dp),
                     strokeWidth = 2.dp,
-                    color = Color(0xFFFFD700)
+                    color = RvSunEdge
                 )
             } else {
                 Icon(
                     imageVector = Icons.Default.ArrowForward,
                     contentDescription = "Select",
-                    tint = if (isRecommended) Color(0xFFFFD700) else Color.Gray,
+                    tint = if (isRecommended) RvSunEdge else RvInkSoft,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -3639,7 +3645,7 @@ private fun PremiumUserSection() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4CAF50).copy(alpha = 0.1f)
+            containerColor = RvSuccess.copy(alpha = 0.1f)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -3650,7 +3656,7 @@ private fun PremiumUserSection() {
             Icon(
                 imageVector = Icons.Default.Star,
                 contentDescription = "Premium",
-                tint = Color(0xFFFFD700),
+                tint = RvSunEdge,
                 modifier = Modifier.size(32.dp)
             )
 
@@ -3661,12 +3667,12 @@ private fun PremiumUserSection() {
                     text = "Premium Member",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = "Thanks for your support! New puzzles will be ready shortly.",
                     fontSize = 14.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
         }
@@ -3679,7 +3685,7 @@ private fun AlternativeActionsSection(onBack: () -> Unit) {
         Text(
             text = "Or try these alternatives:",
             fontSize = 14.sp,
-            color = Color.Gray,
+            color = RvInkSoft,
             modifier = Modifier.padding(bottom = 12.dp)
         )
 
@@ -3715,7 +3721,7 @@ private fun AlternativeActionCard(
             .fillMaxWidth()
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2A2A2A)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -3726,7 +3732,7 @@ private fun AlternativeActionCard(
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = Color(0xFF4CAF50),
+                tint = RvSuccess,
                 modifier = Modifier.size(20.dp)
             )
 
@@ -3737,19 +3743,19 @@ private fun AlternativeActionCard(
                     text = title,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = subtitle,
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
 
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = "Go",
-                tint = Color.Gray,
+                tint = RvInkSoft,
                 modifier = Modifier.size(16.dp)
             )
         }
@@ -3772,7 +3778,7 @@ private fun ActionButtonsSection(
                 .fillMaxWidth()
                 .height(48.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00A8E8)
+                containerColor = RvViolet
             ),
             shape = RoundedCornerShape(24.dp),
             enabled = !isRetrying
@@ -3780,7 +3786,7 @@ private fun ActionButtonsSection(
             if (isRetrying) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
-                    color = Color.White
+                    color = RvOnTone
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Checking...")
@@ -3797,12 +3803,12 @@ private fun ActionButtonsSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(48.dp),
-            border = BorderStroke(1.dp, Color(0xFF00A8E8).copy(alpha = 0.5f)),
+            border = BorderStroke(1.dp, RvViolet.copy(alpha = 0.5f)),
             shape = RoundedCornerShape(24.dp)
         ) {
             Text(
                 text = "Back to Home",
-                color = Color(0xFF00A8E8).copy(alpha = 0.8f)
+                color = RvViolet
             )
         }
     }
@@ -3852,9 +3858,9 @@ private fun SubscriptionPromptCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF1565C0).copy(alpha = 0.15f)
+            containerColor = RvInfo.copy(alpha = 0.15f)
         ),
-        border = BorderStroke(1.dp, Color(0xFF1565C0).copy(alpha = 0.3f)),
+        border = BorderStroke(1.dp, RvInfo.copy(alpha = 0.3f)),
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
@@ -3867,7 +3873,7 @@ private fun SubscriptionPromptCard(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            Color(0xFFFFD700).copy(alpha = 0.2f),
+                            RvSun.copy(alpha = 0.2f),
                             RoundedCornerShape(20.dp)
                         ),
                     contentAlignment = Alignment.Center
@@ -3875,7 +3881,7 @@ private fun SubscriptionPromptCard(
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = "Premium",
-                        tint = Color(0xFFFFD700),
+                        tint = RvSunEdge,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -3887,12 +3893,12 @@ private fun SubscriptionPromptCard(
                         text = "Skip the Wait!",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Text(
                         text = "Get instant puzzle generation",
                         fontSize = 12.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                 }
             }
@@ -3912,25 +3918,25 @@ private fun SubscriptionPromptCard(
                     Text(
                         text = "Wait Time",
                         fontSize = 10.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                     Text(
                         text = "${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Red
+                        color = RvError
                     )
                     Text(
                         text = "minutes",
                         fontSize = 10.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                 }
 
                 // VS indicator
                 Text(
                     text = "vs",
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
 
@@ -3942,18 +3948,18 @@ private fun SubscriptionPromptCard(
                     Text(
                         text = "Premium",
                         fontSize = 10.sp,
-                        color = Color(0xFFFFD700)
+                        color = RvSunEdge
                     )
                     Text(
                         text = "Instant",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFFD700)
+                        color = RvSunEdge
                     )
                     Text(
                         text = "generation",
                         fontSize = 10.sp,
-                        color = Color.Gray
+                        color = RvInkSoft
                     )
                 }
             }
@@ -3967,14 +3973,14 @@ private fun SubscriptionPromptCard(
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
-                    tint = Color(0xFF4CAF50),
+                    tint = RvSuccess,
                     modifier = Modifier.size(12.dp)
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "No ads • Free coins monthly • Priority processing",
                     fontSize = 11.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
 
@@ -3985,7 +3991,7 @@ private fun SubscriptionPromptCard(
                 onClick = onUpgradeClick,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFFD700)
+                    containerColor = RvSun
                 ),
                 shape = RoundedCornerShape(24.dp)
             ) {
@@ -3995,13 +4001,13 @@ private fun SubscriptionPromptCard(
                     Icon(
                         imageVector = Icons.Default.Star,
                         contentDescription = null,
-                        tint = Color.Black,
+                        tint = RvInk,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "Upgrade Now",
-                        color = Color.Black,
+                        color = RvInk,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
                     )
@@ -4019,7 +4025,7 @@ private fun MinimalSubscriptionPrompt(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4CAF50).copy(alpha = 0.1f)
+            containerColor = RvSuccess.copy(alpha = 0.1f)
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -4033,19 +4039,19 @@ private fun MinimalSubscriptionPrompt(
                     text = "Tired of waiting?",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = "Get instant generation with Premium",
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = RvInkSoft
                 )
             }
 
             Button(
                 onClick = onUpgradeClick,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = RvSuccess
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {

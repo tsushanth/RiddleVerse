@@ -1,6 +1,17 @@
 package com.kreativekoala.riddleverse
 
 import android.util.Log
+import com.kreativekoala.riddleverse.ui.theme.RvDisabled
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvVioletEdge
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -50,6 +61,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 @Composable
 fun JumbleInputScreen(
@@ -105,202 +121,148 @@ fun JumbleInputScreen(
     }
 
 
-    Box(
+    // ---- Action handlers (logic unchanged; shared by every layout mode) ----
+    val onSkipClick: () -> Unit = {
+        if (!isAnswered) {
+            println("🔥 Jumble Skip clicked")
+            isAnswered = true
+            feedbackManager.showFeedback(
+                puzzleType = "anagram", // See specific types below
+                isCorrect = false,
+                userAnswer = "Skipped", // Keep existing user answer logic
+                correctAnswer = targetWord, // Keep existing correct answer logic
+                timeSpent = 90 * 1000L, // Convert to milliseconds
+                difficulty = "Easy",
+                timeRemaining = 0,
+                totalTime = 90, // See specific values below
+                onComplete = {
+                    onSkip()
+                }
+            )
+        }
+    }
+    val onSubmitClick: () -> Unit = {
+        if (!isAnswered && currentInput.isNotEmpty()) {
+            println("🔥 Jumble Submit clicked - input: $currentInput")
+            isAnswered = true
+
+            val isCorrect = currentInput.equals(targetWord, ignoreCase = true)
+            println("🎯 Jumble Answer: $currentInput, Correct: $isCorrect, Expected: $targetWord")
+
+            // Update streak and score
+            if (isCorrect) {
+                streak++
+                val timeBonus = if (remainingTime > 30) 15 else 10
+                currentScore += timeBonus
+            } else {
+                streak = 0
+            }
+
+            println("📊 Jumble Showing feedback - isCorrect: $isCorrect")
+
+            feedbackManager.showFeedback(
+                puzzleType = "anagram", // See specific types below
+                isCorrect = isCorrect,
+                userAnswer = currentInput, // Keep existing user answer logic
+                correctAnswer = targetWord, // Keep existing correct answer logic
+                timeSpent = 90 * 1000L, // Convert to milliseconds
+                difficulty = "Medium",
+                timeRemaining = 0,
+                totalTime = 90, // See specific values below
+                onComplete = {
+                    Log.d("JumbleInput", "🎯 Feedback onComplete called - calling onSubmit")
+                    onSubmit(currentInput, 10)
+                    Log.d("JumbleInput", "🎯 onSubmit finished")
+                }
+            )
+        }
+    }
+    val onBackspaceClick: () -> Unit = {
+        if (!isAnswered && currentInput.isNotEmpty()) {
+            currentInput = currentInput.dropLast(1)
+        }
+    }
+
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFB2E5F3))
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .padding(16.dp)
-        ) {
-            // Back button
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBackToHome) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.Black
-                    )
-                }
-            }
+        // Fit-to-screen: HUD on top, play area fills the middle, actions pinned at the bottom.
+        val compact = maxHeight < 600.dp
+        val landscape = maxWidth > maxHeight
+        val contentWidth = minOf(maxWidth, 640.dp.let { if (landscape) 880.dp else it })
+        val gutter = if (compact) 12.dp else 16.dp
+        val paneWidth = if (landscape) (contentWidth - gutter * 2 - 16.dp) / 2 else contentWidth - gutter * 2
+        val columns = 5
+        val tile = minOf(if (compact) 48.dp else 56.dp, (paneWidth - 8.dp * (columns - 1)) / columns)
+            .coerceAtLeast(44.dp)
+        val rows = (shuffledLetters.size + columns - 1) / columns
+        val clueSize = if (compact) 18.sp else 20.sp
 
-            // Top Bar with score and timer
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    // Level text with better contrast
-                    Text(
-                        text = "${stringResource(R.string.level_label)} ${currentLevel.level}",
-                        color = Color(0xFF243447), // Dark blue/gray for good contrast on light blue background
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-
-                    // Custom level progress bar with better colors
-                    Box(
-                        modifier = Modifier
-                            .width(100.dp)
-                            .height(6.dp)
-                            .background(
-                                Color.White.copy(alpha = 0.3f),
-                                RoundedCornerShape(3.dp)
-                            )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(fraction = (currentLevel.progressPercentage / 100f).coerceIn(0f, 1f))
-                                .background(
-                                    Color(0xFF264653), // Dark teal for good contrast
-                                    RoundedCornerShape(3.dp)
-                                )
-                        )
-                    }
-
-                    // Show streak if exists with better colors
-                    if (streakInfo.currentStreak > 0) {
-                        Text(
-                            text = "🔥 ${streakInfo.currentStreak}",
-                            color = Color(0xFF243447), // Same dark color for consistency
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                }
-
-                Text(
-                    text = String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
-                    color = Color(0xFFEF6C6C),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(Modifier.height(32.dp))
-
-            // Clue box
+        val clueBlock: @Composable () -> Unit = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFDEF6FC), shape = RoundedCornerShape(8.dp))
-                    .padding(16.dp)
+                    .padding(if (compact) 12.dp else 16.dp),
+                contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = clueText,
-                    color = Color(0xFF243447),
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center
+                    color = RvInk,
+                    fontSize = clueSize,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-
-            Spacer(Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Flight, // or use a finger/touch icon
-                    contentDescription = null,
-                    tint = Color(0xFF243447),
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Build your answer by tapping letters",
-                    color = Color(0xFF243447),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            // Current assembled word
-            // Replace the current assembled word box with:
+        }
+        val answerBlock: @Composable () -> Unit = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF51A7C1), shape = RoundedCornerShape(8.dp))
-                    .border(2.dp, Color.White, RoundedCornerShape(8.dp))
-                    .padding(vertical = 16.dp),
+                    .heightIn(min = 56.dp)
+                    .background(RvInk, shape = RoundedCornerShape(8.dp))
+                    .border(2.dp, RvViolet, RoundedCornerShape(8.dp))
+                    .padding(vertical = if (compact) 8.dp else 12.dp, horizontal = 8.dp),
                 contentAlignment = Alignment.Center
             ) {
                 if (currentInput.isEmpty()) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = "_ _ _ _ _ _ _",
-                            color = Color.White.copy(alpha = 0.7f),
+                            color = RvOnTone.copy(alpha = 0.8f),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            letterSpacing = 4.sp
+                            letterSpacing = 4.sp,
+                            maxLines = 1
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Tap letters to spell your answer",
-                            color = Color.White.copy(alpha = 0.6f),
-                            fontSize = 12.sp
-                        )
+                        if (!compact) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Tap letters to spell your answer",
+                                color = RvOnTone.copy(alpha = 0.8f),
+                                fontSize = 14.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 } else {
                     Text(
                         text = currentInput.uppercase(),
-                        color = Color.White,
+                        color = RvOnTone,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        letterSpacing = 2.sp
+                        letterSpacing = 2.sp,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
             }
-
-            Spacer(Modifier.height(16.dp))
-
-
-            Text(
-                text = "👆 Tap letters below to build your answer",
-                color = Color(0xFF243447),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            val infiniteTransition = rememberInfiniteTransition(label = "letter-hint")
-            val scale by infiniteTransition.animateFloat(
-                initialValue = 1f,
-                targetValue = 1.05f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(1000),
-                    repeatMode = RepeatMode.Reverse
-                ),
-                label = "scale"
-            )
-
-            var showHint by remember { mutableStateOf(true) }
-
-            LaunchedEffect(Unit) {
-                delay(3000) // Show hint for 3 seconds
-                showHint = false
-            }
-            // Letter grid (shuffled letters)
-            val columns = 5
-            val rows = (shuffledLetters.size + columns - 1) / columns
-
-
+        }
+        val lettersBlock: @Composable () -> Unit = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -308,7 +270,7 @@ fun JumbleInputScreen(
             ) {
                 for (rowIndex in 0 until rows) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -318,14 +280,12 @@ fun JumbleInputScreen(
                             val letter = shuffledLetters[i]
                             Box(
                                 modifier = Modifier
-                                    .size(56.dp)
+                                    .size(tile)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(
-                                        if (isAnswered) Color.Gray else Color(0xFF264653)
-                                    )
+                                    .background(if (isAnswered) RvDisabled else RvViolet)
                                     .border(
                                         width = 2.dp,
-                                        color = if (isAnswered) Color.Transparent else Color(0xFF51A7C1),
+                                        color = if (isAnswered) Color.Transparent else RvVioletEdge,
                                         shape = RoundedCornerShape(8.dp)
                                     )
                                     .clickable(enabled = !isAnswered) {
@@ -336,7 +296,7 @@ fun JumbleInputScreen(
                             ) {
                                 Text(
                                     text = letter.toString().uppercase(),
-                                    color = Color.White,
+                                    color = RvOnTone,
                                     fontSize = 24.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -345,117 +305,177 @@ fun JumbleInputScreen(
                     }
                 }
             }
+        }
 
-            Spacer(Modifier.height(24.dp))
-
-            // Bottom buttons: Skip, Submit, Backspace
+        Column(
+            modifier = Modifier
+                .widthIn(max = contentWidth)
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp)
+        ) {
+            // HUD: back, level + progress, timer (single compact row)
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(
-                    onClick = {
-                        if (!isAnswered) {
-                            println("🔥 Jumble Skip clicked")
-                            isAnswered = true
-                            feedbackManager.showFeedback(
-                                puzzleType = "anagram", // See specific types below
-                                isCorrect = false,
-                                userAnswer = "Skipped", // Keep existing user answer logic
-                                correctAnswer = targetWord, // Keep existing correct answer logic
-                                timeSpent = 90 * 1000L, // Convert to milliseconds
-                                difficulty = "Easy",
-                                timeRemaining = 0,
-                                totalTime = 90, // See specific values below
-                                onComplete = {
-                                    onSkip()
-                                }
+                IconButton(onClick = onBackToHome, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvInk
+                    )
+                }
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            text = "${stringResource(R.string.level_label)} ${currentLevel.level}",
+                            color = RvInk,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        if (streakInfo.currentStreak > 0) {
+                            Text(
+                                text = "🔥 ${streakInfo.currentStreak}",
+                                color = RvInk,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1
                             )
                         }
-                    },
+                    }
+                    Box(
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(6.dp)
+                            .background(RvOutline, RoundedCornerShape(3.dp))
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .fillMaxWidth(fraction = (currentLevel.progressPercentage / 100f).coerceIn(0f, 1f))
+                                .background(RvViolet, RoundedCornerShape(3.dp))
+                        )
+                    }
+                }
+                Text(
+                    text = String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
+                    color = Color(0xFFB3261E),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+            }
+
+            Spacer(Modifier.height(if (compact) 4.dp else 8.dp))
+
+            // Play area: takes all remaining space between the HUD and the pinned action bar.
+            // The scroll here is only an invisible last-resort safety net for extreme font/size combos.
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                if (landscape) {
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            clueBlock()
+                            answerBlock()
+                        }
+                        Box(modifier = Modifier.weight(1f)) { lettersBlock() }
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 16.dp, Alignment.CenterVertically)
+                    ) {
+                        clueBlock()
+                        answerBlock()
+                        if (!compact) {
+                            Text(
+                                text = "👆 Tap letters below to build your answer",
+                                color = RvInk,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        lettersBlock()
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(8.dp))
+
+            // Pinned action bar: Skip, Submit (primary), Backspace
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = if (compact) 4.dp else 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(
+                    onClick = onSkipClick,
                     enabled = !isAnswered,
+                    modifier = Modifier.weight(1f).height(56.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = RvSurfaceRaised,
+                        disabledContainerColor = RvOutline
                     ),
-                    border = BorderStroke(1.dp, Color.Gray)
+                    border = BorderStroke(2.dp, RvInkSoft)
                 ) {
-                    Text(stringResource(R.string.skip), color = Color.Gray)
+                    Text(stringResource(R.string.skip), color = RvInk, fontSize = 16.sp, maxLines = 1)
                 }
 
                 Button(
-                    onClick = {
-                        if (!isAnswered && currentInput.isNotEmpty()) {
-                            println("🔥 Jumble Submit clicked - input: $currentInput")
-                            isAnswered = true
-
-                            val isCorrect = currentInput.equals(targetWord, ignoreCase = true)
-                            println("🎯 Jumble Answer: $currentInput, Correct: $isCorrect, Expected: $targetWord")
-
-                            // Update streak and score
-                            if (isCorrect) {
-                                streak++
-                                val timeBonus = if (remainingTime > 30) 15 else 10
-                                currentScore += timeBonus
-                            } else {
-                                streak = 0
-                            }
-
-                            println("📊 Jumble Showing feedback - isCorrect: $isCorrect")
-
-                            feedbackManager.showFeedback(
-                                puzzleType = "anagram", // See specific types below
-                                isCorrect = isCorrect,
-                                userAnswer = currentInput, // Keep existing user answer logic
-                                correctAnswer = targetWord, // Keep existing correct answer logic
-                                timeSpent = 90 * 1000L, // Convert to milliseconds
-                                difficulty = "Medium",
-                                timeRemaining = 0,
-                                totalTime = 90, // See specific values below
-                                onComplete = {
-                                    Log.d("JumbleInput", "🎯 Feedback onComplete called - calling onSubmit")
-                                    onSubmit(currentInput, 10)
-                                    Log.d("JumbleInput", "🎯 onSubmit finished")
-                                }
-                            )
-                        }
-                    },
+                    onClick = onSubmitClick,
                     enabled = !isAnswered && currentInput.isNotEmpty(),
+                    modifier = Modifier.weight(1.6f).height(56.dp),
+                    contentPadding = PaddingValues(horizontal = 8.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFDEF6FC),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = RvViolet,
+                        disabledContainerColor = RvOutline
                     )
                 ) {
                     Text(
                         stringResource(R.string.submit),
-                        color = Color(0xFF243447),
-                        fontWeight = FontWeight.Bold
+                        color = if (!isAnswered && currentInput.isNotEmpty()) RvOnTone else RvInkSoft,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
                 }
 
                 Button(
-                    onClick = {
-                        if (!isAnswered && currentInput.isNotEmpty()) {
-                            currentInput = currentInput.dropLast(1)
-                        }
-                    },
+                    onClick = onBackspaceClick,
                     enabled = !isAnswered && currentInput.isNotEmpty(),
+                    modifier = Modifier.width(56.dp).height(56.dp),
+                    contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White,
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = RvSurfaceRaised,
+                        disabledContainerColor = RvOutline
                     ),
-                    border = BorderStroke(1.dp, Color.Gray)
+                    border = BorderStroke(2.dp, RvInkSoft)
                 ) {
                     Icon(
                         Icons.Default.Backspace,
                         contentDescription = "Backspace",
-                        tint = Color.Gray
+                        tint = RvInk
                     )
                 }
             }
         }
 
         EnhancedUniversalFeedback(feedbackManager)
-
     }
 }

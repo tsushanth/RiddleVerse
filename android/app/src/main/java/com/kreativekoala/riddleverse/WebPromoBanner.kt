@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -41,7 +42,7 @@ fun WebPromoBanner() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF7C4DFF).copy(alpha = 0.15f))
+                .background(RvViolet.copy(alpha = 0.15f))
                 .clickable {
                     val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://puzzleverseai.com"))
                     context.startActivity(intent)
@@ -54,7 +55,7 @@ fun WebPromoBanner() {
                 text = "Also available on iOS & Web \u2192 puzzleverseai.com",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFFB388FF),
+                color = RvGrape,
                 modifier = Modifier.weight(1f)
             )
 
@@ -68,7 +69,7 @@ fun WebPromoBanner() {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = Color.Gray,
+                    tint = RvInkSoft,
                     modifier = Modifier.size(16.dp)
                 )
             }

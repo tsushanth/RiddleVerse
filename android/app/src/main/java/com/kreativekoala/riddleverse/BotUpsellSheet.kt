@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -40,7 +41,7 @@ fun BotUpsellSheet(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 16.dp, bottomEnd = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E))
+            colors = CardDefaults.cardColors(containerColor = RvCanvas)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -55,7 +56,7 @@ fun BotUpsellSheet(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close",
-                            tint = Color.Gray,
+                            tint = RvInkSoft,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -67,7 +68,7 @@ fun BotUpsellSheet(
                     text = "Want more puzzles?",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -76,7 +77,7 @@ fun BotUpsellSheet(
                 Text(
                     text = "Continue with our bot for free puzzles beyond your daily limit!",
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center,
                     lineHeight = 20.sp
                 )
@@ -120,7 +121,7 @@ fun BotUpsellSheet(
                 Text(
                     text = "Or upgrade for unlimited in-app access",
                     fontSize = 12.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center
                 )
             }

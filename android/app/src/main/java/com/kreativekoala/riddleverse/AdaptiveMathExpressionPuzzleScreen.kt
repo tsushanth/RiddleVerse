@@ -1,6 +1,7 @@
 // AdaptiveMathExpressionPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -15,6 +16,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -133,7 +137,7 @@ fun AdaptiveMathExpressionPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -329,88 +333,144 @@ fun AdaptiveMathExpressionPuzzleScreen(
                 .fillMaxSize()
                 .background(PuzzleColors.Background)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                Spacer(modifier = Modifier.height(32.dp))
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val compact = groupEIsCompact(maxWidth, maxHeight)
+                val wide = maxWidth > maxHeight
+                val timerText = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60)
 
-                // ✅ REPLACE: Use unified header instead of AdaptiveMathExpressionTopBar
-                AdaptiveUnifiedHeader(
-                    level = currentLevel,
-                    streakInfo = streakInfo,
-                    timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-                    lives = currentHearts,
-                    currentDifficulty = currentDifficultyLevel,
-                    score = totalScore,
-                    puzzleType = "mathExpression",
-                    challengeNumber = correctAnswers,
-                    totalChallenges = adaptiveConfig.targetExpressions,
-                    competitiveInsight = competitiveInsight,
-                    onBack = {
-                        gameCompleted = true
-                        onBack()
-                    },
-                    onPause = { isPaused = !isPaused },
-                    onHint = {
-                        showHint = !showHint
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    }
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // ✅ REPLACE: Use unified adaptation notification
-                UnifiedAdaptationNotification(
-                    adaptationInfo = adaptationInfo,
-                    puzzleType = "mathExpression",
-                    visible = showAdaptationNotification,
-                    onDismiss = { showAdaptationNotification = false }
-                )
-
-                // Game area
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    // Moving expressions
-                    expressions.forEachIndexed { index, expression ->
-                        if (expression.yPosition > -100f) {
-                            AdaptiveExpressionView(
-                                expression = expression,
-                                modifier = Modifier.offset(
-                                    x = 0.dp,
-                                    y = with(density) { expression.yPosition.toDp() }
-                                ),
-                                isSelected = selectedExpressionId == expression.id,
-                                currentInputValue = if (selectedExpressionId == expression.id) currentInputValue else "",
-                                onDropZoneClick = {
-                                    if (!expression.isCompleted) {
-                                        selectedExpressionId = if (selectedExpressionId == expression.id) null else expression.id
-                                        currentInputValue = ""
+                // Play area: falling equations. Clipped so they never draw over the HUD or the keypad.
+                val playArea: @Composable (Modifier) -> Unit = { m ->
+                    Box(
+                        modifier = m
+                            .testTag("math_play_area")
+                            .clip(RoundedCornerShape(16.dp))
+                            .border(2.dp, RvOutline, RoundedCornerShape(16.dp))
+                            .padding(8.dp)
+                    ) {
+                        // Moving expressions
+                        expressions.forEachIndexed { index, expression ->
+                            if (expression.yPosition > -100f) {
+                                AdaptiveExpressionView(
+                                    expression = expression,
+                                    modifier = Modifier
+                                        .align(Alignment.TopCenter)
+                                        .offset(
+                                            x = 0.dp,
+                                            y = with(density) { expression.yPosition.toDp() }
+                                        ),
+                                    isSelected = selectedExpressionId == expression.id,
+                                    currentInputValue = if (selectedExpressionId == expression.id) currentInputValue else "",
+                                    onDropZoneClick = {
+                                        if (!expression.isCompleted) {
+                                            selectedExpressionId = if (selectedExpressionId == expression.id) null else expression.id
+                                            currentInputValue = ""
+                                        }
                                     }
-                                }
-                            )
+                                )
+                            }
                         }
-                    }
 
-                    LaunchedEffect(expressions) {
-                        expressions = expressions.filter { it.yPosition > -200f }
+                        LaunchedEffect(expressions) {
+                            expressions = expressions.filter { it.yPosition > -200f }
+                        }
                     }
                 }
 
-                // Custom keyboard area
-                CustomMathKeyboard(
-                    selectedExpressionId = selectedExpressionId,
-                    currentInputValue = currentInputValue,
-                    onItemSelected = { selectedValue ->
-                        handleAnswerSelection(selectedValue)
-                    },
-                    onEnterPressed = {
-                        handleEnterPress()
+                val keyboard: @Composable () -> Unit = {
+                    // Custom keyboard area
+                    CustomMathKeyboard(
+                        selectedExpressionId = selectedExpressionId,
+                        currentInputValue = currentInputValue,
+                        onItemSelected = { selectedValue ->
+                            handleAnswerSelection(selectedValue)
+                        },
+                        onEnterPressed = {
+                            handleEnterPress()
+                        }
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .widthIn(max = 900.dp)
+                        .fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(horizontal = 16.dp)
+                        .padding(bottom = 8.dp)
+                ) {
+                    if (compact) {
+                        GroupECompactHud(
+                            timer = timerText,
+                            onBack = {
+                                gameCompleted = true
+                                onBack()
+                            },
+                            subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore \u2022 $correctAnswers/${adaptiveConfig.targetExpressions}",
+                            lives = currentHearts,
+                            urgent = timeLeft <= 30,
+                            onPause = { isPaused = !isPaused }
+                        )
+                    } else {
+                        // ✅ REPLACE: Use unified header instead of AdaptiveMathExpressionTopBar
+                        Box(modifier = Modifier.testTag("hud_timer")) { AdaptiveUnifiedHeader(
+                            level = currentLevel,
+                            streakInfo = streakInfo,
+                            timer = timerText,
+                            lives = currentHearts,
+                            currentDifficulty = currentDifficultyLevel,
+                            score = totalScore,
+                            puzzleType = "mathExpression",
+                            challengeNumber = correctAnswers,
+                            totalChallenges = adaptiveConfig.targetExpressions,
+                            competitiveInsight = competitiveInsight,
+                            onBack = {
+                                gameCompleted = true
+                                onBack()
+                            },
+                            onPause = { isPaused = !isPaused },
+                            onHint = {
+                                showHint = !showHint
+                                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        ) }
                     }
-                )
+
+                    // ✅ REPLACE: Use unified adaptation notification
+                    UnifiedAdaptationNotification(
+                        adaptationInfo = adaptationInfo,
+                        puzzleType = "mathExpression",
+                        visible = showAdaptationNotification,
+                        onDismiss = { showAdaptationNotification = false }
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (wide) {
+                        // Two panes: equations left, keypad right.
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            playArea(Modifier.weight(1f).fillMaxHeight())
+                            Box(
+                                modifier = Modifier
+                                    // 42% of the actual row width, capped to 400dp - see the
+                                    // non-adaptive MathExpressionPuzzleScreen for why the order matters.
+                                    .fillMaxWidth(0.42f)
+                                    .widthIn(max = 400.dp)
+                                    .fillMaxHeight(),
+                                contentAlignment = Alignment.Center
+                            ) { keyboard() }
+                        }
+                    } else {
+                        playArea(Modifier.weight(1f).fillMaxWidth())
+                        Spacer(modifier = Modifier.height(8.dp))
+                        keyboard()
+                    }
+                }
             }
 
             // Game over overlay
@@ -455,183 +515,65 @@ fun CustomMathKeyboard(
     onItemSelected: (String) -> Unit,
     onEnterPressed: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(0xFF1E4A3A))
-            .padding(16.dp)
-    ) {
-        // Instruction text and current input display
-        if (selectedExpressionId != null) {
-            Text(
-                text = "Tap numbers/operators below, then press ENTER:",
-                color = Color(0xFFFFEB3B),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+    val selected = selectedExpressionId != null
+    val hasInput = selected && currentInputValue.isNotEmpty()
 
-            if (currentInputValue.isNotEmpty()) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFFFEB3B).copy(alpha = 0.9f)
-                    )
-                ) {
-                    Text(
-                        text = "Your answer: $currentInputValue",
-                        color = Color.Black,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(12.dp),
-                        textAlign = TextAlign.Center
-                    )
-                }
-            } else {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        } else {
-            Text(
-                text = "Tap a missing square (?) in an equation above:",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 16.sp,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-        }
+    BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+        val inner = maxWidth - 8.dp
+        // 6 columns (3 rows) when keys stay >= 48dp wide, otherwise 5 columns (4 rows).
+        val six = (inner - 8.dp * 5) / 6 >= 48.dp
+        val cols = if (six) 6 else 5
+        val key = ((inner - 8.dp * (cols - 1)) / cols).coerceIn(48.dp, 72.dp)
+        val keyH = if (six) 52.dp else 48.dp
 
-        // Keyboard grid
+        @Composable
+        fun num(t: String) = GroupEKeypadKey(t, "key_$t", selected, true, key, keyH, { onItemSelected(t) })
+        @Composable
+        fun op(t: String) = GroupEKeypadKey(t, "key_$t", selected, false, key, keyH, { onItemSelected(t) })
+        @Composable
+        fun clear() = GroupEKeypadKey("C", "key_C", hasInput, false, key, keyH, { onItemSelected("CLEAR") }, fill = RvOutline)
+        @Composable
+        fun back() = GroupEKeypadKey("\u232B", "key_BACK", hasInput, false, key, keyH, { onItemSelected("BACKSPACE") }, fill = RvOutline)
+        @Composable
+        fun enter(span: Int) = GroupEKeypadKey(
+            "ENTER \u21B5", "key_ENTER", hasInput, false,
+            key * span + 8.dp * (span - 1), keyH, onEnterPressed, fill = RvViolet, content = RvOnTone
+        )
+
         Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(RvSurface)
+                .padding(horizontal = 4.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Row 1: Numbers 2, 3, 4, 5 + operators +, -
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                listOf("2", "3", "4", "5").forEach { number ->
-                    KeyboardButton(
-                        text = number,
-                        isEnabled = selectedExpressionId != null,
-                        isNumber = true,
-                        onClick = { onItemSelected(number) }
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                listOf("+", "-").forEach { operator ->
-                    KeyboardButton(
-                        text = operator,
-                        isEnabled = selectedExpressionId != null,
-                        isNumber = false,
-                        onClick = { onItemSelected(operator) }
-                    )
-                }
-            }
-
-            // Row 2: Numbers 6, 7, 8, 9 + operators ×, ÷
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                listOf("6", "7", "8", "9").forEach { number ->
-                    KeyboardButton(
-                        text = number,
-                        isEnabled = selectedExpressionId != null,
-                        isNumber = true,
-                        onClick = { onItemSelected(number) }
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                listOf("×", "÷").forEach { operator ->
-                    KeyboardButton(
-                        text = operator,
-                        isEnabled = selectedExpressionId != null,
-                        isNumber = false,
-                        onClick = { onItemSelected(operator) }
-                    )
-                }
-            }
-
-            // Row 3: Utility buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                // Clear button
-                Button(
-                    onClick = { onItemSelected("CLEAR") },
-                    enabled = selectedExpressionId != null && currentInputValue.isNotEmpty(),
-                    modifier = Modifier.size(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF5722),
-                        disabledContainerColor = Color(0xFFFF5722).copy(alpha = 0.4f)
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "C",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                // Numbers 0 and 1
-                listOf("0", "1").forEach { number ->
-                    KeyboardButton(
-                        text = number,
-                        isEnabled = selectedExpressionId != null,
-                        isNumber = true,
-                        onClick = { onItemSelected(number) }
-                    )
-                }
-
-                Spacer(modifier = Modifier.width(16.dp))
-
-                // Backspace button
-                Button(
-                    onClick = { onItemSelected("BACKSPACE") },
-                    enabled = selectedExpressionId != null && currentInputValue.isNotEmpty(),
-                    modifier = Modifier.size(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF9800),
-                        disabledContainerColor = Color(0xFFFF9800).copy(alpha = 0.4f)
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text(
-                        text = "⌫",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-            // Row 4: Enter button (full width)
-            Button(
-                onClick = onEnterPressed,
-                enabled = selectedExpressionId != null && currentInputValue.isNotEmpty(),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50),
-                    disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.4f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
+            // State hint. Font scale capped so it cannot push the keys off screen. The typed value itself
+            // is shown live inside the selected equation slot.
+            GroupEFontCap {
                 Text(
-                    text = "ENTER ↵",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    text = if (selected) "Tap numbers/operators below, then press ENTER:" else "Tap a missing square (?) in an equation above:",
+                    color = if (selected) RvInk else RvInkSoft,
+                    fontSize = 14.sp,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp)
                 )
+            }
+
+            if (six) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { num("2"); num("3"); num("4"); num("5"); op("+"); op("-") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { num("6"); num("7"); num("8"); num("9"); op("\u00D7"); op("\u00F7") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { clear(); num("0"); num("1"); back(); enter(2) }
+            } else {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { num("2"); num("3"); num("4"); num("5"); op("+") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { num("6"); num("7"); num("8"); num("9"); op("-") }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { num("0"); num("1"); op("\u00D7"); op("\u00F7"); back() }
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { clear(); enter(4) }
             }
         }
     }
@@ -665,7 +607,7 @@ fun KeyboardButton(
     ) {
         Text(
             text = text,
-            color = if (isEnabled) Color.White else Color.White.copy(alpha = 0.5f),
+            color = if (isEnabled) RvInk else RvInkSoft,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
@@ -689,8 +631,8 @@ fun AdaptiveExpressionView(
     Row(
         modifier = modifier
             .background(backgroundColor, RoundedCornerShape(12.dp))
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+            .padding(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Left number
@@ -733,12 +675,14 @@ fun AdaptiveExpressionView(
         }
 
         // Equals sign
-        Text(
-            text = "=",
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = "=",
+                color = RvInk,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
         // Result
         if (expression.missingType == AdaptiveMissingType.RESULT) {
@@ -777,7 +721,7 @@ fun AdaptiveClickableDropZone(
             .height(48.dp)
             .background(
                 when {
-                    isSelected -> Color(0xFFFFEB3B)
+                    isSelected -> RvSun
                     !isEmpty -> PuzzleColors.NumberTile
                     else -> PuzzleColors.MissingSlot
                 },
@@ -785,17 +729,17 @@ fun AdaptiveClickableDropZone(
             )
             .border(
                 width = if (isSelected) 3.dp else 2.dp,
-                color = if (isSelected) Color(0xFF1976D2) else Color.White.copy(alpha = 0.5f),
+                color = if (isSelected) RvSky else RvInkSoft,
                 shape = RoundedCornerShape(8.dp)
             )
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        when {
+        GroupEFontCap(max = 1f) { when {
             droppedValue != null -> {
                 Text(
                     text = droppedValue,
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = if (droppedValue.length > 2) 16.sp else 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -803,7 +747,7 @@ fun AdaptiveClickableDropZone(
             isSelected && currentInputValue.isNotEmpty() -> {
                 Text(
                     text = currentInputValue,
-                    color = Color.Black,
+                    color = RvInk,
                     fontSize = if (currentInputValue.length > 2) 16.sp else 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -811,12 +755,12 @@ fun AdaptiveClickableDropZone(
             else -> {
                 Text(
                     text = "?",
-                    color = if (isSelected) Color.Black else Color.White.copy(alpha = 0.5f),
+                    color = if (isSelected) RvInk else RvInkSoft,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
-        }
+        } }
     }
 }
 
@@ -828,12 +772,15 @@ fun AdaptiveNumberTile(text: String) {
             .background(PuzzleColors.NumberTile, RoundedCornerShape(8.dp)),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            color = Color.White,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = text,
+                color = RvInk,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
+        }
     }
 }
 
@@ -845,12 +792,14 @@ fun AdaptiveOperatorTile(operator: String) {
             .background(PuzzleColors.OperatorTile, CircleShape),
         contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = operator,
-            color = Color.White,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = operator,
+                color = RvInk,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -1031,7 +980,7 @@ fun AdaptiveGameOverOverlay(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f)),
+            .background(RvSurface),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -1065,13 +1014,13 @@ fun AdaptiveGameOverOverlay(
                         text = "${stringResource(R.string.score_label)}: $totalScore",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                        color = RvSuccess
                     )
 
                     Text(
                         text = "$correctAnswers/$targetExpressions expressions solved",
                         fontSize = 16.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
 
                     if (totalAttempts > 0) {
@@ -1079,7 +1028,7 @@ fun AdaptiveGameOverOverlay(
                         Text(
                             text = "${stringResource(R.string.accuracy)}: $accuracy%",
                             fontSize = 14.sp,
-                            color = Color(0xFF666666)
+                            color = RvInkSoft
                         )
                     }
                 }
@@ -1100,7 +1049,7 @@ fun AdaptiveGameOverOverlay(
                         onClick = onContinue,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF52C178)
+                            containerColor = RvSuccess
                         )
                     ) {
                         Text(stringResource(R.string.continue_label))

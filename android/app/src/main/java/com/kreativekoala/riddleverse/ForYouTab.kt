@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -147,12 +148,12 @@ fun ForYouTab(
                         text = stringResource(R.string.tab_for_you),
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2E2E2E)
+                        color = RvInk
                     )
                     Text(
                         text = "${availablePuzzleTypes.size} puzzle types ready",
                         fontSize = 14.sp,
-                        color = if (availablePuzzleTypes.isNotEmpty()) Color(0xFF4CAF50) else Color.Gray
+                        color = if (availablePuzzleTypes.isNotEmpty()) RvSuccessEdge else RvInkSoft
                     )
                 }
 
@@ -177,7 +178,7 @@ fun ForYouTab(
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(R.string.reset),
-                        tint = Color.White
+                        tint = RvOnTone
                     )
                 }
             }
@@ -203,7 +204,7 @@ fun ForYouTab(
                         Text(
                             text = "Loading your personalized puzzles...",
                             fontSize = 14.sp,
-                            color = Color.Gray
+                            color = RvInkSoft
                         )
                     }
                 }
@@ -380,13 +381,13 @@ fun QuickActionsRow(
                 text = stringResource(R.string.quick_actions),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E2E2E)
+                color = RvInk
             )
 
             Text(
                 text = stringResource(R.string.start_playing_instantly),
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = RvInkSoft
             )
         }
 
@@ -456,23 +457,23 @@ fun FavoritesSection(
                         text = stringResource(R.string.your_favorites),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2E2E2E)
+                        color = RvInk
                     )
                     Text(
                         text = "${availableFavorites.size}/${favorites.size} ready",
                         fontSize = 12.sp,
-                        color = if (availableFavorites.isNotEmpty()) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                        color = if (availableFavorites.isNotEmpty()) RvSuccessEdge else RvSunEdge
                     )
                 }
 
                 Box(
                     modifier = Modifier
-                        .background(Color(0xFF2196F3), RoundedCornerShape(8.dp))
+                        .background(RvSky, RoundedCornerShape(16.dp))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = "FAVORITES",
-                        color = Color.White,
+                        color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -486,7 +487,7 @@ fun FavoritesSection(
                     PuzzleCard(
                         puzzleType = favorite.puzzleType,
                         subtitle = "${favorite.totalPlays} plays • ${(favorite.winRate * 100).toInt()}% win",
-                        backgroundColor = Color(0xFF2196F3),
+                        backgroundColor = RvSky,
                         onClick = { onPuzzleSelected(favorite.puzzleType) }
                     )
                 }
@@ -526,12 +527,12 @@ fun TrendingSection(
                     text = stringResource(R.string.trending_now),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2E2E2E)
+                    color = RvInk
                 )
                 Text(
                     text = "${availableTrending.size}/${trending.size} ready • Tap to see all",
                     fontSize = 12.sp,
-                    color = if (availableTrending.isNotEmpty()) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                    color = if (availableTrending.isNotEmpty()) RvSuccessEdge else RvSunEdge
                 )
             }
 
@@ -541,12 +542,12 @@ fun TrendingSection(
             ) {
                 Box(
                     modifier = Modifier
-                        .background(Color(0xFF4CAF50), RoundedCornerShape(8.dp))
+                        .background(RvSuccessEdge, RoundedCornerShape(16.dp))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = "TRENDING",
-                        color = Color.White,
+                        color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -555,7 +556,7 @@ fun TrendingSection(
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
                     contentDescription = "View all trending",
-                    tint = Color(0xFF4CAF50),
+                    tint = RvSuccessEdge,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -568,7 +569,7 @@ fun TrendingSection(
                 PuzzleCard(
                     puzzleType = trending.puzzleType,
                     subtitle = "#${trending.rank} • ${trending.recentStarts} recent plays",
-                    backgroundColor = Color(0xFF4CAF50),
+                    backgroundColor = RvSuccessEdge,
                     showRankBadge = true,
                     rank = trending.rank,
                     onClick = { onPuzzleSelected(trending.puzzleType) }
@@ -600,23 +601,23 @@ fun RecommendedSection(
                         text = stringResource(R.string.recommended_for_you),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2E2E2E)
+                        color = RvInk
                     )
                     Text(
                         text = "${availableRecommended.size}/${recommended.size} ready",
                         fontSize = 12.sp,
-                        color = if (availableRecommended.isNotEmpty()) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                        color = if (availableRecommended.isNotEmpty()) RvSuccessEdge else RvSunEdge
                     )
                 }
 
                 Box(
                     modifier = Modifier
-                        .background(Color(0xFF9C27B0), RoundedCornerShape(8.dp))
+                        .background(RvGrape, RoundedCornerShape(16.dp))
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
                         text = "FOR YOU",
-                        color = Color.White,
+                        color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -630,7 +631,7 @@ fun RecommendedSection(
                     PuzzleCard(
                         puzzleType = recommended.puzzleType,
                         subtitle = recommended.reason,
-                        backgroundColor = Color(0xFF9C27B0),
+                        backgroundColor = RvGrape,
                         showRecBadge = true,
                         onClick = { onPuzzleSelected(recommended.puzzleType) }
                     )
@@ -658,9 +659,9 @@ fun PuzzleCard(
             .width(140.dp)
             .height(120.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Image section (top portion)
@@ -701,7 +702,7 @@ fun PuzzleCard(
                         Icon(
                             imageVector = category?.icon ?: Icons.Default.Extension,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -717,7 +718,7 @@ fun PuzzleCard(
                     if (showRankBadge) {
                         Box(
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
+                                .background(RvCanvas.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             Text(
@@ -730,7 +731,7 @@ fun PuzzleCard(
                     } else if (showRecBadge) {
                         Box(
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
+                                .background(RvCanvas.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             Text(
@@ -748,14 +749,14 @@ fun PuzzleCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.White)
+                    .background(RvSurface)
                     .padding(8.dp)
             ) {
                 Text(
                     text = category?.title ?: puzzleType,
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2E2E2E),
+                    color = RvInk,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -763,7 +764,7 @@ fun PuzzleCard(
                 Text(
                     text = subtitle,
                     fontSize = 9.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -784,9 +785,10 @@ fun FavoriteQuickCard(
         modifier = Modifier
             .size(80.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background gradient
@@ -795,7 +797,7 @@ fun FavoriteQuickCard(
                     .fillMaxSize()
                     .background(
                         brush = Brush.linearGradient(
-                            listOf(Color(0xFF2196F3), Color(0xFF21CBF3))
+                            listOf(RvSky, RvSkyEdge)
                         )
                     )
             )
@@ -807,9 +809,9 @@ fun FavoriteQuickCard(
                     contentDescription = "${category?.title ?: favorite.puzzleType} preview",
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(12.dp)),
+                        .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop,
-                    alpha = 0.9f
+                    alpha = 1f
                 )
             }
 
@@ -817,10 +819,8 @@ fun FavoriteQuickCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        if (imageResource != null) Color.Black.copy(alpha = 0.3f) else Color.Transparent
-                    ),
-                contentAlignment = Alignment.Center
+                    .padding(top = if (imageResource != null) 4.dp else 0.dp),
+                contentAlignment = if (imageResource != null) Alignment.TopCenter else Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -830,21 +830,40 @@ fun FavoriteQuickCard(
                         Icon(
                             imageVector = category?.icon ?: Icons.Default.Star,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(20.dp)
                         )
                     }
 
+                    if (imageResource == null) {
                     Text(
-                        text = category?.title?.split(" ")?.firstOrNull() ?: favorite.puzzleType,
-                        fontSize = 9.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center
-                    )
+                            text = category?.title?.split(" ")?.firstOrNull() ?: favorite.puzzleType,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvOnTone,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
+            }
+            // Clean label band under the image
+            if (imageResource != null) {
+                Text(
+                    text = category?.title?.split(" ")?.firstOrNull() ?: favorite.puzzleType,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = RvInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(RvSurfaceRaised)
+                        .padding(horizontal = 2.dp, vertical = 3.dp)
+                )
             }
         }
     }
@@ -859,17 +878,17 @@ fun RandomChallengeCard(
         modifier = Modifier
             .size(80.dp)
             .clickable(enabled = isEnabled) { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
                     brush = if (isEnabled) {
-                        Brush.linearGradient(listOf(Color(0xFF6B73FF), Color(0xFF9B59B6)))
+                        Brush.linearGradient(listOf(RvViolet, RvGrape))
                     } else {
-                        Brush.linearGradient(listOf(Color(0xFF9E9E9E), Color(0xFFBDBDBD)))
+                        Brush.linearGradient(listOf(RvInkSoft, RvInkSoft))
                     }
                 ),
             contentAlignment = Alignment.Center
@@ -881,13 +900,13 @@ fun RandomChallengeCard(
                 Icon(
                     imageVector = if (isEnabled) Icons.Default.Shuffle else Icons.Default.HourglassEmpty,
                     contentDescription = "Random Challenge",
-                    tint = Color.White,
+                    tint = RvOnTone,
                     modifier = Modifier.size(20.dp)
                 )
 
                 Text(
                     text = if (isEnabled) "Surprise" else stringResource(R.string.loading),
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -895,7 +914,7 @@ fun RandomChallengeCard(
 
                 Text(
                     text = if (isEnabled) "Me!" else "...",
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
@@ -943,12 +962,12 @@ fun PuzzleGroupsSection(
                         text = stringResource(R.string.puzzle_collections),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2E2E2E)
+                        color = RvInk
                     )
                     Text(
                         text = "${availableGroups.size} collections ready • Tap to see all",
                         fontSize = 12.sp,
-                        color = if (availableGroups.isNotEmpty()) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                        color = if (availableGroups.isNotEmpty()) RvSuccessEdge else RvSunEdge
                     )
                 }
 
@@ -958,12 +977,12 @@ fun PuzzleGroupsSection(
                 ) {
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFF6B73FF), RoundedCornerShape(8.dp))
+                            .background(RvViolet, RoundedCornerShape(16.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(
                             text = "COLLECTIONS",
-                            color = Color.White,
+                            color = RvOnTone,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -972,7 +991,7 @@ fun PuzzleGroupsSection(
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
                         contentDescription = "View all collections",
-                        tint = Color(0xFF6B73FF),
+                        tint = RvViolet,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -1010,9 +1029,9 @@ fun PuzzleGroupCard(
             .width(160.dp)
             .height(120.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -1020,9 +1039,9 @@ fun PuzzleGroupCard(
                     .fillMaxSize()
                     .background(
                         brush = Brush.linearGradient(
-                            listOf(Color(0xFF6B73FF), Color(0xFF9B59B6))
+                            listOf(RvViolet, RvGrape)
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     )
             )
 
@@ -1047,7 +1066,7 @@ fun PuzzleGroupCard(
                             else -> Icons.Default.Extension
                         },
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = RvOnTone,
                         modifier = Modifier.size(20.dp)
                     )
 
@@ -1057,20 +1076,20 @@ fun PuzzleGroupCard(
                         Text(
                             text = "$availablePuzzlesInGroup/$totalPuzzlesInGroup",
                             fontSize = 10.sp,
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvOnTone.copy(alpha = 0.8f),
                             fontWeight = FontWeight.Medium
                         )
 
                         if (group.completedCount > 0) {
                             Box(
                                 modifier = Modifier
-                                    .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                                    .background(RvOnTone.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
                                     .padding(horizontal = 4.dp, vertical = 2.dp)
                             ) {
                                 Text(
                                     text = "${group.completedCount}/${group.totalTypes}",
                                     fontSize = 8.sp,
-                                    color = Color.White,
+                                    color = RvOnTone,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
@@ -1086,7 +1105,7 @@ fun PuzzleGroupCard(
                         text = group.name,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = RvOnTone,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -1098,15 +1117,15 @@ fun PuzzleGroupCard(
                                 .fillMaxWidth()
                                 .height(3.dp)
                                 .clip(RoundedCornerShape(1.5.dp)),
-                            color = Color.White,
-                            trackColor = Color.White.copy(alpha = 0.3f)
+                            color = RvOnTone,
+                            trackColor = RvOnTone.copy(alpha = 0.3f)
                         )
                     }
 
                     Text(
                         text = "${group.puzzleTypes.size} puzzle types • ${group.difficulty}",
                         fontSize = 10.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvOnTone.copy(alpha = 0.8f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -1234,9 +1253,10 @@ fun DailyQuickActionCard(
         modifier = Modifier
             .size(80.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background gradient
@@ -1245,7 +1265,7 @@ fun DailyQuickActionCard(
                     .fillMaxSize()
                     .background(
                         brush = Brush.linearGradient(
-                            listOf(Color(0xFF4CAF50), Color(0xFF66BB6A))
+                            listOf(RvSuccess, RvSuccessEdge)
                         )
                     )
             )
@@ -1257,9 +1277,9 @@ fun DailyQuickActionCard(
                     contentDescription = "${category?.title ?: puzzleType} preview",
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(12.dp)),
+                        .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop,
-                    alpha = 0.9f
+                    alpha = 1f
                 )
             }
 
@@ -1267,10 +1287,8 @@ fun DailyQuickActionCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        if (imageResource != null) Color.Black.copy(alpha = 0.3f) else Color.Transparent
-                    ),
-                contentAlignment = Alignment.Center
+                    .padding(top = if (imageResource != null) 4.dp else 0.dp),
+                contentAlignment = if (imageResource != null) Alignment.TopCenter else Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -1279,12 +1297,12 @@ fun DailyQuickActionCard(
                     // Small "TODAY" badge at top
                     Box(
                         modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
+                            .background(RvCanvas.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
                             .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
                         Text(
                             text = "TODAY",
-                            color = Color(0xFF4CAF50),
+                            color = RvSuccessEdge,
                             fontSize = 6.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -1294,20 +1312,22 @@ fun DailyQuickActionCard(
                         Icon(
                             imageVector = category?.icon ?: Icons.Default.Today,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(18.dp)
                         )
                     }
 
+                    if (imageResource == null) {
                     Text(
-                        text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center
-                    )
+                            text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvOnTone,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -1326,9 +1346,10 @@ fun RecentQuickCard(
         modifier = Modifier
             .size(80.dp)
             .clickable { onClick() },
-        shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background gradient
@@ -1337,7 +1358,7 @@ fun RecentQuickCard(
                     .fillMaxSize()
                     .background(
                         brush = Brush.linearGradient(
-                            listOf(Color(0xFF9C27B0), Color(0xFFBA68C8))
+                            listOf(RvGrape, RvGrapeEdge)
                         )
                     )
             )
@@ -1349,9 +1370,9 @@ fun RecentQuickCard(
                     contentDescription = "${category?.title ?: puzzleType} preview",
                     modifier = Modifier
                         .fillMaxSize()
-                        .clip(RoundedCornerShape(12.dp)),
+                        .clip(RoundedCornerShape(16.dp)),
                     contentScale = ContentScale.Crop,
-                    alpha = 0.9f
+                    alpha = 1f
                 )
             }
 
@@ -1359,10 +1380,8 @@ fun RecentQuickCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        if (imageResource != null) Color.Black.copy(alpha = 0.3f) else Color.Transparent
-                    ),
-                contentAlignment = Alignment.Center
+                    .padding(top = if (imageResource != null) 4.dp else 0.dp),
+                contentAlignment = if (imageResource != null) Alignment.TopCenter else Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -1371,12 +1390,12 @@ fun RecentQuickCard(
                     // Small "RECENT" badge at top
                     Box(
                         modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
+                            .background(RvCanvas.copy(alpha = 0.9f), RoundedCornerShape(4.dp))
                             .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
                         Text(
                             text = "RECENT",
-                            color = Color(0xFF9C27B0),
+                            color = RvGrape,
                             fontSize = 6.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -1386,21 +1405,40 @@ fun RecentQuickCard(
                         Icon(
                             imageVector = category?.icon ?: Icons.Default.History,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(18.dp)
                         )
                     }
 
+                    if (imageResource == null) {
                     Text(
-                        text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.Center
-                    )
+                            text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
+                            fontSize = 8.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvOnTone,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
+            }
+            // Clean label band under the image
+            if (imageResource != null) {
+                Text(
+                    text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
+                    fontSize = 8.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = RvInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .background(RvSurfaceRaised)
+                        .padding(horizontal = 2.dp, vertical = 3.dp)
+                )
             }
         }
     }
@@ -1417,7 +1455,7 @@ fun EarnMoneyBanner(
             .clip(RoundedCornerShape(14.dp))
             .background(
                 Brush.horizontalGradient(
-                    colors = listOf(Color(0xFF21BF63), Color(0xFF0F8C46))
+                    colors = listOf(RvSuccess, RvSuccessEdge)
                 )
             ),
         verticalAlignment = Alignment.CenterVertically
@@ -1436,18 +1474,18 @@ fun EarnMoneyBanner(
                     text = "Earn real cash on RiddleVerse",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
                 Text(
                     text = "Create a game → players find it → you get paid.",
                     fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.85f)
+                    color = RvOnTone.copy(alpha = 0.85f)
                 )
             }
             Icon(
                 imageVector = Icons.Default.ArrowForward,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.9f),
+                tint = RvOnTone.copy(alpha = 0.9f),
                 modifier = Modifier.size(22.dp)
             )
         }
@@ -1455,7 +1493,7 @@ fun EarnMoneyBanner(
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "Dismiss",
-                tint = Color.White.copy(alpha = 0.7f),
+                tint = RvOnTone.copy(alpha = 0.7f),
                 modifier = Modifier.size(16.dp)
             )
         }

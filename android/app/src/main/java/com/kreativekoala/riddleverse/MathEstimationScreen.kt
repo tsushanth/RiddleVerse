@@ -1,13 +1,12 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -27,6 +26,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.math.abs
@@ -68,10 +70,6 @@ fun EstimationPuzzleScreen(
     val feedbackManager = rememberUnifiedFeedbackManager()
     val currentLevel = feedbackManager.getCurrentLevel()
     val streakInfo = feedbackManager.getStreakInfo()
-
-    // Chart dimensions
-    val chartHeight = 350.dp
-    val chartWidth = 300.dp
 
     // Timer calculation and countdown
     val totalTimeSeconds = remember(timer) {
@@ -222,85 +220,57 @@ fun EstimationPuzzleScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Top Bar with live timer and enhanced info
+    // Fit-to-screen (never scrolls): this screen's primary interaction is dragging on the chart,
+    // which conflicts with a scrollable parent. EstimationFitLayout gives the chart whatever
+    // height is left after the HUD / estimate / submit, and switches to two panes in landscape.
+    EstimationFitLayout(
+        hud = { compact, wide, _ ->
             EnhancedEstimationTopGameBar(
                 level = currentLevel,
                 streakInfo = streakInfo,
                 timer = displayTimer, // Use live countdown timer
                 onBack = onBack,
-                modifier = Modifier.padding(top = 48.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(top = if (compact) 4.dp else 8.dp, start = 16.dp, end = 16.dp, bottom = 4.dp)
             )
-
-            // Score display (if any score accumulated)
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "${stringResource(R.string.score_label)}: $totalScore",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4CAF50)
-                            )
-                        }
-
-                        if (attempts > 0) {
-                            Text(
-                                text = "Attempt: $attempts",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Gray
-                            )
-                        }
-
-                        // Show accuracy range for current difficulty
-                        Text(
-                            text = "Target: ±${String.format("%.1f", tolerance)}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF9C27B0)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-            } else {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // Chart area
-            Box(
+        },
+        status = { _ ->
+            // EnhancedEstimationTopGameBar (this screen's hud) never shows score itself,
+            // so unlike the adaptive screen this row always needs to.
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(chartHeight + 60.dp),
-                contentAlignment = Alignment.Center
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = "${stringResource(R.string.score_label)}: $totalScore",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.testTag("hud_score")
+                )
+                if (attempts > 0) {
+                    Text(
+                        text = "Attempt: $attempts",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = RvInkSoft,
+                        maxLines = 1
+                    )
+                }
+                Text(
+                    text = "Target: ±${String.format("%.1f", tolerance)}",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    maxLines = 1
+                )
+            }
+        },
+        chart = { chartWidth, chartHeight ->
+            Box(modifier = Modifier.size(chartWidth + 80.dp, chartHeight + 60.dp).testTag("estimation_chart")) {
                 InteractiveChart(
                     dataPoints = dataPoints,
                     dragPosition = dragPosition,
@@ -346,128 +316,191 @@ fun EstimationPuzzleScreen(
                             }
                         }
                     },
-                    modifier = Modifier.size(chartWidth + 80.dp, chartHeight + 60.dp)
+                    modifier = Modifier.fillMaxSize()
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Enhanced instructions with scoring info
+        },
+        instructions = {
             EstimationInstructionsCard(
                 difficulty = difficulty,
                 tolerance = tolerance,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Submit section with enhanced feedback
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-                // Current estimate display with accuracy feedback
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (currentEstimate != null) {
-                            Color(0xFF1976D2).copy(alpha = 0.1f)
-                        } else {
-                            Color.Gray.copy(alpha = 0.1f)
-                        }
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = if (currentEstimate != null) {
-                                "Current Estimate: ${String.format("%.1f", currentEstimate!!)}"
-                            } else {
-                                "Drag on chart to set estimate"
-                            },
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (currentEstimate != null) Color(0xFF1976D2) else Color(0xFF666666)
-                        )
-
-                        // Show potential accuracy if estimate is made
-                        currentEstimate?.let { estimate ->
-                            val difference = abs(estimate - correctSum)
-                            val accuracyPercent = maxOf(0.0, (1.0 - difference / correctSum) * 100).toInt()
-
-                            Text(
-                                text = "Potential Accuracy: ~$accuracyPercent%",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = when {
-                                    accuracyPercent >= 90 -> Color(0xFF4CAF50)
-                                    accuracyPercent >= 70 -> Color(0xFFFF9800)
-                                    else -> Color(0xFFFF5722)
-                                },
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                        }
+        },
+        estimate = { compact ->
+            EstimationEstimateCard(
+                estimate = currentEstimate,
+                accuracyPercent = currentEstimate?.let { maxOf(0.0, (1.0 - abs(it - correctSum) / correctSum) * 100).toInt() },
+                compact = compact
+            )
+        },
+        submit = {
+            EstimationSubmitButton(
+                label = when {
+                    hasAnswered -> "SUBMITTED"
+                    currentEstimate != null -> "SUBMIT ESTIMATE"
+                    else -> "SUBMIT (will use middle value)"
+                },
+                enabled = !hasAnswered,
+                onClick = {
+                    if (!hasAnswered) {
+                        val estimate = currentEstimate ?: ((maxValue + minValue) / 2)
+                        submitAnswer(estimate)
                     }
                 }
+            )
+        },
+        overlay = { EnhancedUniversalFeedback(feedbackManager) }
+    )
+}
 
-                // Submit button with state-aware text
-                Button(
-                    onClick = {
-                        if (!hasAnswered) {
-                            if (currentEstimate != null) {
-                                submitAnswer(currentEstimate!!)
-                            } else {
-                                val fallbackEstimate = (maxValue + minValue) / 2
-                                submitAnswer(fallbackEstimate)
-                            }
-                        }
-                    },
-                    enabled = !hasAnswered,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentEstimate != null) {
-                            Color(0xFF1976D2)
-                        } else {
-                            Color(0xFF666666)
-                        },
-                        disabledContainerColor = Color(0xFF90A4AE)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
+/**
+ * Shared fit-to-screen skeleton for the estimation screens (plain + adaptive). HUD on top (fixed),
+ * chart in the middle taking the remaining space, estimate + SUBMIT pinned at the bottom.
+ * Landscape / wide: chart on the left, everything else on the right. Never scrolls.
+ */
+@Composable
+internal fun EstimationFitLayout(
+    hud: @Composable (compact: Boolean, wide: Boolean, tall: Boolean) -> Unit,
+    // tall=true is the only mode where `hud` doesn't already show a score itself (AdaptiveUnifiedHeader
+    // has none), so callers whose compact/wide hud repeats the score can skip it when tall is false.
+    status: @Composable (tall: Boolean) -> Unit,
+    chart: @Composable (chartWidth: androidx.compose.ui.unit.Dp, chartHeight: androidx.compose.ui.unit.Dp) -> Unit,
+    instructions: @Composable () -> Unit,
+    estimate: @Composable (compact: Boolean) -> Unit,
+    submit: @Composable () -> Unit,
+    overlay: @Composable BoxScope.() -> Unit
+) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RvSurface)
+    ) {
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val tall = !wide && maxHeight >= 700.dp
+        val compact = !tall
+        val availH = maxHeight
+
+        if (wide) {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                BoxWithConstraints(
+                    modifier = Modifier.weight(1.2f).fillMaxHeight(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = when {
-                            hasAnswered -> "SUBMITTED"
-                            currentEstimate != null -> "SUBMIT ESTIMATE"
-                            else -> "SUBMIT (will use middle value)"
-                        },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
+                    val cw = (maxWidth.coerceIn(240.dp, 560.dp) - 80.dp)
+                    val ch = (maxHeight.coerceIn(160.dp, 480.dp) - 60.dp)
+                    chart(cw, ch)
+                }
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight().widthIn(max = 480.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    hud(true, true, false)
+                    status(false)
+                    Spacer(Modifier.weight(1f))
+                    if (availH >= 600.dp) instructions()
+                    estimate(true)
+                    submit()
                 }
             }
-
-            // Was Spacer(Modifier.weight(1f)) — incompatible with the
-            // verticalScroll now on this Column (weight() requires bounded
-            // height, scroll wants unbounded). This screen's real bug was
-            // the Submit button getting pushed off-screen with no way to
-            // scroll to it on short screens; a trailing bottom-padding
-            // spacer serves the same cosmetic purpose without that conflict.
-            Spacer(modifier = Modifier.height(24.dp))
+        } else {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+                Column(modifier = Modifier.fillMaxSize().widthIn(max = 640.dp)) {
+                    hud(compact, false, tall)
+                    status(tall)
+                    BoxWithConstraints(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        val cw = (maxWidth.coerceIn(240.dp, 560.dp) - 80.dp)
+                        val ch = (maxHeight.coerceIn(160.dp, 460.dp) - 60.dp)
+                        chart(cw, ch)
+                    }
+                    if (tall) instructions()
+                    estimate(compact)
+                    submit()
+                    Spacer(Modifier.height(if (compact) 8.dp else 16.dp))
+                }
+            }
         }
+        overlay()
+    }
+}
 
-        EnhancedUniversalFeedback(feedbackManager)
+@Composable
+internal fun EstimationEstimateCard(estimate: Double?, accuracyPercent: Int?, compact: Boolean) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = if (estimate != null) Color(0xFFE3F1FF) else RvSurfaceRaised),
+        border = androidx.compose.foundation.BorderStroke(1.dp, RvOutline),
+        shape = RoundedCornerShape(12.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = if (compact) 8.dp else 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = if (estimate != null) {
+                    "Current Estimate: ${String.format("%.1f", estimate)}"
+                } else {
+                    "Drag on chart to set estimate"
+                },
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (estimate != null) RvSkyEdge else RvInkSoft,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (accuracyPercent != null && !compact) {
+                Text(
+                    text = "Potential Accuracy: ~$accuracyPercent%",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInk,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun EstimationSubmitButton(label: String, enabled: Boolean, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = RvViolet,
+            contentColor = RvOnTone,
+            disabledContainerColor = RvDisabled,
+            disabledContentColor = RvInk
+        ),
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .heightIn(min = 56.dp)
+    ) {
+        Text(
+            text = label,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
 
@@ -498,7 +531,7 @@ fun EstimationInstructionsCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowUp,
                     contentDescription = null,
-                    tint = Color(0xFF9C27B0),
+                    tint = RvGrape,
                     modifier = Modifier.size(24.dp)
                 )
 
@@ -507,7 +540,7 @@ fun EstimationInstructionsCard(
                 Text(
                     text = "Drag finger to estimate the sum",
                     fontSize = 16.sp,
-                    color = Color(0xFF9C27B0),
+                    color = RvGrape,
                     fontWeight = FontWeight.Medium
                 )
 
@@ -516,7 +549,7 @@ fun EstimationInstructionsCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = Color(0xFF9C27B0),
+                    tint = RvGrape,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -527,14 +560,14 @@ fun EstimationInstructionsCard(
             Text(
                 text = "💯 Scoring: Accuracy + Speed + Complexity",
                 fontSize = 12.sp,
-                color = Color(0xFF666666),
+                color = RvInkSoft,
                 fontWeight = FontWeight.Medium
             )
 
             Text(
                 text = "🎯 Target range: ±${String.format("%.1f", tolerance)} for perfect score",
-                fontSize = 11.sp,
-                color = Color(0xFF666666),
+                fontSize = 12.sp,
+                color = RvInkSoft,
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
@@ -568,12 +601,12 @@ fun EnhancedEstimationTopGameBar(
                         Log.d("EstimationPuzzle", "⚠️ No back action provided")
                     }
                 },
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color(0xFF333333),
+                    tint = RvInk,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -583,7 +616,7 @@ fun EnhancedEstimationTopGameBar(
                     text = "Level ${level.level}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
 
                 // Custom level progress bar with better colors
@@ -592,7 +625,7 @@ fun EnhancedEstimationTopGameBar(
                         .width(120.dp)
                         .height(6.dp)
                         .background(
-                            Color(0xFFE0E0E0),
+                            RvOutline,
                             RoundedCornerShape(3.dp)
                         )
                 ) {
@@ -601,7 +634,7 @@ fun EnhancedEstimationTopGameBar(
                             .fillMaxHeight()
                             .fillMaxWidth(fraction = (level.progressPercentage / 100f).coerceIn(0f, 1f))
                             .background(
-                                Color(0xFF9C27B0),
+                                RvGrape,
                                 RoundedCornerShape(3.dp)
                             )
                     )
@@ -620,7 +653,7 @@ fun EnhancedEstimationTopGameBar(
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
                     Color.Red // Red when ≤30 seconds
                 } else {
-                    Color(0xFF333333)
+                    RvInk
                 }
             )
 
@@ -630,7 +663,7 @@ fun EnhancedEstimationTopGameBar(
                     text = "🔥 ${streakInfo.currentStreak}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333),
+                    color = RvInk,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
@@ -711,7 +744,7 @@ fun DrawScope.drawChart(
 ) {
     // Draw Y-axis
     drawLine(
-        color = Color(0xFF9C27B0),
+        color = RvGrape,
         start = Offset(chartRect.left, chartRect.top),
         end = Offset(chartRect.left, chartRect.bottom),
         strokeWidth = 3.dp.toPx()
@@ -740,7 +773,7 @@ fun DrawScope.drawChart(
         if (yPos >= chartRect.top && yPos <= chartRect.bottom) {
             // Draw tick mark
             drawRect(
-                color = Color(0xFF9C27B0),
+                color = RvGrape,
                 topLeft = Offset(chartRect.left - 12.dp.toPx(), yPos - 2.dp.toPx()),
                 size = androidx.compose.ui.geometry.Size(18.dp.toPx(), 4.dp.toPx())
             )
@@ -871,7 +904,7 @@ fun DrawScope.drawChart(
 
             // Draw horizontal indicator line
             drawLine(
-                color = Color(0xFF4CAF50),
+                color = RvSuccess,
                 start = Offset(chartRect.left, position.y),
                 end = Offset(chartRect.right, position.y),
                 strokeWidth = 4.dp.toPx()
@@ -879,12 +912,12 @@ fun DrawScope.drawChart(
 
             // Draw indicator circle
             drawCircle(
-                color = Color(0xFF4CAF50),
+                color = RvSuccess,
                 radius = 10.dp.toPx(),
                 center = Offset(chartRect.left, position.y)
             )
             drawCircle(
-                color = Color.White,
+                color = RvInk,
                 radius = 6.dp.toPx(),
                 center = Offset(chartRect.left, position.y)
             )

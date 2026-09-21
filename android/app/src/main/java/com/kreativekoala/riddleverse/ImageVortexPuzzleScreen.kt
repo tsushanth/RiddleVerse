@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +24,12 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import kotlin.random.Random
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.Icons
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 data class ImageItem(
     val id: Int,
@@ -399,70 +406,74 @@ fun ImageVortexPuzzleScreen(
         return "$minutes:${remainingSeconds.toString().padStart(2, '0')}"
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(Color(0xFFF5F5F5))) {
+        // Fit-to-screen: HUD (fixed) + play area (remaining space) + progress (fixed). No scrolling.
+        val compact = maxHeight < 600.dp
+        val gutter = if (compact) 12.dp else 16.dp
+        val goodGreen = Color(0xFF15803D)
+        val warnOrange = Color(0xFFB45309)
+        val urgentRed = Color(0xFFB3261E)
+        val timerColor = if (timeRemaining < 30) urgentRed else Color(0xFF555555)
+
         Column(
             modifier = Modifier
+                .widthIn(max = 720.dp)
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
-                .padding(16.dp)
+                .align(Alignment.TopCenter)
+                .padding(horizontal = gutter, vertical = if (compact) 8.dp else 16.dp)
         ) {
-            // Enhanced Header with Score
+            // HUD
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
+                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
+                Column(modifier = Modifier.padding(horizontal = 12.dp, vertical = if (compact) 4.dp else 8.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = stringResource(R.string.back),
+                                tint = Color(0xFF2E3A59)
+                            )
+                        }
                         Text(
                             text = "Image Vortex",
-                            fontSize = 24.sp,
+                            fontSize = if (compact) 18.sp else 22.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2E3A59)
+                            color = Color(0xFF2E3A59),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
                         )
-
-                        IconButton(onClick = onBack) {
-                            Text("❌", fontSize = 20.sp)
-                        }
-                    }
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
                         Text(
                             text = level,
-                            fontSize = 16.sp,
-                            color = Color(0xFF666666)
+                            fontSize = 14.sp,
+                            color = Color(0xFF555555),
+                            maxLines = 1
                         )
-
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             repeat(hearts) {
                                 Text("❤️", fontSize = 16.sp)
                             }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Text(
-                                text = "⏱️ ${formatTime(timeRemaining)}",
-                                fontSize = 16.sp,
-                                color = if (timeRemaining < 30) Color.Red else Color(0xFF666666),
-                                fontWeight = if (timeRemaining < 30) FontWeight.Bold else FontWeight.Normal
-                            )
                         }
+                        Text(
+                            text = "⏱️ ${formatTime(timeRemaining)}",
+                            fontSize = 16.sp,
+                            color = timerColor,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
                     }
 
                     // Score and streak display
                     if (totalScore > 0 || correctAnswers > 0) {
-                        Spacer(modifier = Modifier.height(8.dp))
-
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             if (totalScore > 0) {
@@ -470,22 +481,23 @@ fun ImageVortexPuzzleScreen(
                                     text = "${stringResource(R.string.score_label)}: $totalScore",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4CAF50)
+                                    color = goodGreen,
+                                    maxLines = 1
                                 )
                             }
-
                             Text(
                                 text = "$correctAnswers/$totalAttempts correct",
                                 fontSize = 14.sp,
-                                color = Color(0xFF2196F3)
+                                color = Color(0xFF1565C0),
+                                maxLines = 1
                             )
-
                             if (streak > 1) {
                                 Text(
                                     text = "🔥 $streak",
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF6B00)
+                                    color = warnOrange,
+                                    maxLines = 1
                                 )
                             }
                         }
@@ -493,53 +505,66 @@ fun ImageVortexPuzzleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (compact) 8.dp else 12.dp))
 
-            // Enhanced Instructions
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2196F3).copy(alpha = 0.1f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+            // Instruction (collapses to one line on short screens)
+            if (compact) {
+                Text(
+                    text = "🎯 Find the NEW image! Level $currentLevel",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1565C0),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF2196F3).copy(alpha = 0.1f))
                 ) {
-                    Text(
-                        text = "🎯 Find the NEW image!",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2196F3),
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Level $currentLevel: Tap the image that just appeared",
-                        fontSize = 16.sp,
-                        color = Color(0xFF666666),
-                        textAlign = TextAlign.Center
-                    )
-
-                    // Performance coaching
-                    if (correctAnswers > 0 && reactionTimes.isNotEmpty()) {
-                        val avgReaction = reactionTimes.average() / 1000.0
+                    Column(
+                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = "⚡ Avg speed: ${String.format("%.1f", avgReaction)}s",
-                            fontSize = 12.sp,
-                            color = if (avgReaction <= 1.5) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                            text = "🎯 Find the NEW image!",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF1565C0),
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
+                        Text(
+                            text = "Level $currentLevel: Tap the image that just appeared",
+                            fontSize = 16.sp,
+                            color = Color(0xFF555555),
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        if (correctAnswers > 0 && reactionTimes.isNotEmpty()) {
+                            val avgReaction = reactionTimes.average() / 1000.0
+                            Text(
+                                text = "⚡ Avg speed: ${String.format("%.1f", avgReaction)}s",
+                                fontSize = 12.sp,
+                                color = if (avgReaction <= 1.5) goodGreen else warnOrange
+                            )
+                        }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            // Images randomly positioned
+            // Images randomly positioned: fills all remaining space
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
             ) {
-                // Generate random positions for each image
                 currentImages.forEach { imageItem ->
                     val randomX = remember(imageItem.id, currentLevel) { Random.nextFloat() * 0.8f }
                     val randomY = remember(imageItem.id, currentLevel) { Random.nextFloat() * 0.8f }
@@ -563,34 +588,37 @@ fun ImageVortexPuzzleScreen(
                     ) {
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = if (feedbackCorrect) Color(0xFF4CAF50) else Color(0xFFF44336)
+                                containerColor = if (feedbackCorrect) Color(0xFF15803D) else Color(0xFFB3261E)
                             ),
                             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                         ) {
-                            Column(
-                                modifier = Modifier.padding(24.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            Row(
+                                modifier = Modifier.padding(if (compact) 12.dp else 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
                                     text = if (feedbackCorrect) "✅" else "❌",
-                                    fontSize = 48.sp
+                                    fontSize = if (compact) 32.sp else 44.sp
                                 )
-                                Text(
-                                    text = if (feedbackCorrect) stringResource(R.string.correct) else "${stringResource(R.string.try_again)}!",
-                                    fontSize = 24.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                                if (feedbackCorrect) {
-                                    val reactionTime = if (reactionTimes.isNotEmpty()) {
-                                        reactionTimes.last() / 1000.0
-                                    } else 0.0
-
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
-                                        text = "⚡ ${String.format("%.1f", reactionTime)}s",
-                                        fontSize = 16.sp,
-                                        color = Color.White
+                                        text = if (feedbackCorrect) stringResource(R.string.correct) else "${stringResource(R.string.try_again)}!",
+                                        fontSize = 22.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = RvOnTone
                                     )
+                                    if (feedbackCorrect) {
+                                        val reactionTime = if (reactionTimes.isNotEmpty()) {
+                                            reactionTimes.last() / 1000.0
+                                        } else 0.0
+
+                                        Text(
+                                            text = "⚡ ${String.format("%.1f", reactionTime)}s",
+                                            fontSize = 16.sp,
+                                            color = RvOnTone
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -598,15 +626,15 @@ fun ImageVortexPuzzleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            // Enhanced Progress bar
+            // Progress (one line + thin bar; extra card chrome dropped on short screens)
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
+                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = if (compact) 6.dp else 10.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -615,19 +643,21 @@ fun ImageVortexPuzzleScreen(
                         Text(
                             text = "${stringResource(R.string.progress)}: $currentLevel / $targetPuzzleCount",
                             fontSize = 14.sp,
-                            color = Color(0xFF666666)
+                            color = Color(0xFF555555),
+                            maxLines = 1
                         )
 
                         if (bestStreak > 1) {
                             Text(
                                 text = "Best streak: $bestStreak",
                                 fontSize = 12.sp,
-                                color = Color(0xFFFF6B00)
+                                color = warnOrange,
+                                maxLines = 1
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     LinearProgressIndicator(
                         progress = currentLevel.toFloat() / targetPuzzleCount.toFloat(),
                         modifier = Modifier
@@ -671,12 +701,17 @@ fun RandomPositionedEmoji(
     BoxWithConstraints(
         modifier = Modifier.fillMaxSize()
     ) {
-        val xPosition = (maxWidth * xOffset)
-        val yPosition = (maxHeight * yOffset)
+        // Keep the whole emoji (plus selection scale) inside the play area
+        val edge = 8.dp
+        val emojiBox = 60.dp
+        val xPosition = edge + ((maxWidth - emojiBox - edge * 2).coerceAtLeast(0.dp)) * (xOffset / 0.8f)
+        val yPosition = edge + ((maxHeight - emojiBox - edge * 2).coerceAtLeast(0.dp)) * (yOffset / 0.8f)
+        val emojiSp = with(LocalDensity.current) { 44.dp.toSp() } // glyph stays 44dp at any font scale
 
         Box(
             modifier = Modifier
                 .offset(x = xPosition, y = yPosition)
+                .testTag("vortex_emoji")
                 .size(60.dp)
                 .scale(scale)
                 .clickable { onClick() },
@@ -685,7 +720,7 @@ fun RandomPositionedEmoji(
             // Main emoji
             Text(
                 text = imageItem.emoji,
-                fontSize = 48.sp,
+                fontSize = emojiSp,
                 modifier = Modifier.graphicsLayer(alpha = alpha)
             )
 

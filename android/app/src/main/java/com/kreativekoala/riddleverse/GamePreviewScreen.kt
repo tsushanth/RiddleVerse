@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -101,7 +102,7 @@ fun GamePreviewScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E))
+            .background(RvCanvas)
     ) {
         // Fullscreen WebView — nothing else on screen while playing
         key(reloadToken) {
@@ -133,10 +134,10 @@ fun GamePreviewScreen(
             Icon(
                 Icons.Default.Close,
                 contentDescription = stringResource(R.string.done),
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier
                     .size(28.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                    .background(RvSurface, CircleShape)
                     .padding(4.dp)
             )
         }
@@ -146,20 +147,20 @@ fun GamePreviewScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.7f)),
+                    .background(RvSurface),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CircularProgressIndicator(color = Color.White)
-                    Text("Modifying game...", color = Color.White, fontWeight = FontWeight.Bold)
+                    CircularProgressIndicator(color = RvInk)
+                    Text("Modifying game...", color = RvInk, fontWeight = FontWeight.Bold)
                     if (modifyPhase.isNotEmpty()) {
-                        Text(modifyPhase, color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+                        Text(modifyPhase, color = RvInkSoft.copy(alpha = 0.7f), fontSize = 12.sp)
                     }
                     if (modifyProgress > 0f) {
                         LinearProgressIndicator(
                             progress = { modifyProgress / 100f },
                             modifier = Modifier.width(200.dp),
-                            color = Color(0xFF6B5CE7)
+                            color = RvViolet
                         )
                     }
                 }
@@ -175,15 +176,15 @@ fun GamePreviewScreen(
         ) {
             Card(
                 modifier = Modifier.padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF27AE60)),
+                colors = CardDefaults.cardColors(containerColor = RvSuccess),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Game ready! 🎮", color = Color.White, fontWeight = FontWeight.Bold)
-                    Text("Tap 💰 in the top bar to publish and earn real cash!", color = Color(0xFFFFD700), fontSize = 12.sp)
+                    Text("Game ready! 🎮", color = RvInk, fontWeight = FontWeight.Bold)
+                    Text("Tap 💰 in the top bar to publish and earn real cash!", color = RvSun, fontSize = 12.sp)
                 }
             }
         }
@@ -196,12 +197,12 @@ fun GamePreviewScreen(
                     .padding(top = 64.dp, start = 16.dp, end = 16.dp)
             ) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFB71C1C)),
+                    colors = CardDefaults.cardColors(containerColor = RvError),
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
                         publishError!!,
-                        color = Color.White,
+                        color = RvOnTone,
                         fontSize = 12.sp,
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
                     )
@@ -218,14 +219,14 @@ fun GamePreviewScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     Text("💰", fontSize = 32.sp)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Publish before you go!", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                    Text("Publish before you go!", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
                 }
             },
             text = {
                 Text(
                     "Players can find your game and you earn real cash — 55% of every coin spent on it. Publish now to go live!",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft.copy(alpha = 0.8f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                 )
             },
@@ -251,18 +252,18 @@ fun GamePreviewScreen(
                             }
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF21BF63)),
+                    colors = ButtonDefaults.buttonColors(containerColor = RvSuccess),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Publish & Earn 💰", fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Publish & Earn 💰", fontWeight = FontWeight.Bold, color = RvOnTone)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showCloseDialog = false; onClose() }) {
-                    Text("Leave without saving", color = Color.White.copy(alpha = 0.5f))
+                    Text("Leave without saving", color = RvInkSoft)
                 }
             },
-            containerColor = Color(0xFF1E1E3A)
+            containerColor = RvSurfaceRaised
         )
     }
 
@@ -273,7 +274,7 @@ fun GamePreviewScreen(
             title = { Text(stringResource(R.string.modify_game)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Describe what's wrong or what to change:", fontSize = 14.sp, color = Color.Gray)
+                    Text("Describe what's wrong or what to change:", fontSize = 14.sp, color = RvInkSoft)
                     OutlinedTextField(
                         value = modifyDescription,
                         onValueChange = { if (it.length <= 500) modifyDescription = it },
@@ -283,7 +284,7 @@ fun GamePreviewScreen(
                     Text(
                         "${modifyDescription.length}/500",
                         fontSize = 12.sp,
-                        color = if (modifyDescription.length > 500) Color.Red else Color.Gray,
+                        color = if (modifyDescription.length > 500) RvError else RvInkSoft,
                         modifier = Modifier.align(Alignment.End)
                     )
                 }

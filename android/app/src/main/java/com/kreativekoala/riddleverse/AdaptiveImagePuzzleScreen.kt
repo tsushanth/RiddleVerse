@@ -1,6 +1,7 @@
 // AdaptiveImagePuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -12,6 +13,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,6 +41,9 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import coil.compose.AsyncImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -516,7 +522,7 @@ fun ImagePuzzleErrorScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D3748)),
+            .background(RvCanvas),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -532,7 +538,7 @@ fun ImagePuzzleErrorScreen(
 
             Text(
                 text = message,
-                color = Color.White,
+                color = RvInk,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
@@ -552,7 +558,7 @@ fun ImagePuzzleErrorScreen(
                     onClick = onSkip,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
-                    Text(stringResource(R.string.skip), color = Color.White)
+                    Text(stringResource(R.string.skip), color = RvInk)
                 }
             }
         }
@@ -564,7 +570,7 @@ fun AILoadingScreen(message: String) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D3748)),
+            .background(RvCanvas),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -578,7 +584,7 @@ fun AILoadingScreen(message: String) {
 
             Text(
                 text = message,
-                color = Color.White,
+                color = RvInk,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center
             )
@@ -810,15 +816,23 @@ fun AdaptiveImagePuzzleScreen(
         adaptationInfo = adaptiveConfig
         if (adaptiveConfig.confidenceScore > 0.5f) {
             currentDifficultyLevel = adaptiveConfig.level
-            showAdaptationNotification = true
+            showAdaptationNotification = SHOW_ADAPTATION_NOTICES
         }
     }
 
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D3748)) // Dark blue-gray background
-            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 16.dp)
+            .background(RvCanvas)
+    ) {
+    val wideScreen = maxWidth > maxHeight
+    val compactScreen = wideScreen || maxHeight < 720.dp
+    Column(
+        modifier = Modifier
+            .align(Alignment.TopCenter)
+            .widthIn(max = if (wideScreen) 1100.dp else 640.dp)
+            .fillMaxSize()
+            .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
     ) {
         when {
             isLoading -> {
@@ -850,6 +864,7 @@ fun AdaptiveImagePuzzleScreen(
                     currentScore = currentScore,
                     completedPieces = puzzlePieces.count { it.isCorrect },
                     totalPieces = puzzleDataParsed!!.totalPieces,
+                    compact = compactScreen,
                     onBack = onBack,
                     onPreview = { showPreview = !showPreview }
                 )
@@ -866,21 +881,25 @@ fun AdaptiveImagePuzzleScreen(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(if (compactScreen) 4.dp else 12.dp))
 
                 when (gameState) {
                     "instructions" -> {
-                        AdaptiveImagePuzzleInstructions(
-                            puzzleData = puzzleDataParsed!!,
-                            adaptiveConfig = adaptiveConfig,
-                            onStartGame = {
-                                gameState = "playing"
-                                gameStartTime = System.currentTimeMillis()
-                            }
-                        )
+                        Box(Modifier.weight(1f).fillMaxWidth()) {
+                            AdaptiveImagePuzzleInstructions(
+                                puzzleData = puzzleDataParsed!!,
+                                adaptiveConfig = adaptiveConfig,
+                                compact = compactScreen,
+                                onStartGame = {
+                                    gameState = "playing"
+                                    gameStartTime = System.currentTimeMillis()
+                                }
+                            )
+                        }
                     }
 
                     "playing" -> {
+                        Box(Modifier.weight(1f).fillMaxWidth()) {
                         AdaptiveImagePuzzleGameScreen(
                             puzzleData = puzzleDataParsed!!,
                             puzzlePieces = puzzlePieces,
@@ -911,6 +930,7 @@ fun AdaptiveImagePuzzleScreen(
                             },
                             onPreviewToggle = { showPreview = !showPreview }
                         )
+                        }
                     }
 
                     "completed" -> {
@@ -935,6 +955,7 @@ fun AdaptiveImagePuzzleScreen(
             }
         }
     }
+    }
 }
 
 @Composable
@@ -949,8 +970,42 @@ private fun AdaptiveImagePuzzleHeader(
     completedPieces: Int,
     totalPieces: Int,
     onBack: () -> Unit,
-    onPreview: () -> Unit
+    onPreview: () -> Unit,
+    compact: Boolean = false
 ) {
+    if (compact) {
+        // Single-row HUD for small / landscape screens: back, timer, progress, lives, preview.
+        Row(
+            modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
+            }
+            Text(text = timer, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvInk, maxLines = 1)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "$completedPieces/$totalPieces",
+                    fontSize = 12.sp,
+                    color = RvInk,
+                    maxLines = 1
+                )
+                LinearProgressIndicator(
+                    progress = completedPieces.toFloat() / totalPieces.coerceAtLeast(1).toFloat(),
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
+                    color = Color(0xFF0B7A57)
+                )
+            }
+            Row { repeat(hearts.coerceIn(0, 5)) { Text(text = "❤️", fontSize = 16.sp, maxLines = 1) } }
+            if (adaptiveConfig.showPreview) {
+                IconButton(onClick = onPreview, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.Preview, "Preview", tint = RvInk)
+                }
+            }
+        }
+        return
+    }
     Column(modifier = Modifier.statusBarsPadding()) {
         Row(
             modifier = Modifier
@@ -960,7 +1015,7 @@ private fun AdaptiveImagePuzzleHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
+                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
             }
 
             Column(
@@ -970,19 +1025,19 @@ private fun AdaptiveImagePuzzleHeader(
                     text = "Level ${level.level}",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = RvInkSoft.copy(alpha = 0.8f)
                 )
                 Text(
                     text = adaptiveConfig.name,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = timer,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    color = RvInk
                 )
             }
 
@@ -1000,8 +1055,8 @@ private fun AdaptiveImagePuzzleHeader(
                 if (streakInfo.currentStreak > 0) {
                     Text(
                         text = "🔥 ${streakInfo.currentStreak}",
-                        fontSize = 10.sp,
-                        color = Color(0xFFFF6B35)
+                        fontSize = 12.sp,
+                        color = Color(0xFFB34700)
                     )
                 }
             }
@@ -1020,12 +1075,12 @@ private fun AdaptiveImagePuzzleHeader(
                 Text(
                     text = "${stringResource(R.string.progress)}: $completedPieces/$totalPieces",
                     fontSize = 12.sp,
-                    color = Color.White
+                    color = RvInk
                 )
                 LinearProgressIndicator(
                     progress = completedPieces.toFloat() / totalPieces.toFloat(),
                     modifier = Modifier.width(120.dp),
-                    color = Color(0xFF10B981)
+                    color = Color(0xFF0B7A57)
                 )
             }
 
@@ -1037,13 +1092,13 @@ private fun AdaptiveImagePuzzleHeader(
                 if (adaptiveConfig.showPreview) {
                     IconButton(
                         onClick = onPreview,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
                             Icons.Default.Preview,
                             "Preview",
-                            tint = Color.Cyan,
-                            modifier = Modifier.size(20.dp)
+                            tint = RvSkyEdge,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
@@ -1060,21 +1115,21 @@ private fun AdaptiveImagePuzzleHeader(
             if (adaptiveConfig.allowRotation) {
                 Text(
                     text = "🔄 Rotation",
-                    fontSize = 10.sp,
-                    color = Color(0xFF4CAF50)
+                    fontSize = 12.sp,
+                    color = Color(0xFF2E7D32)
                 )
             }
             if (adaptiveConfig.adaptiveComplexity) {
                 Text(
                     text = "⚡ Adaptive",
-                    fontSize = 10.sp,
-                    color = Color(0xFF2196F3)
+                    fontSize = 12.sp,
+                    color = Color(0xFF1565C0)
                 )
             }
             Text(
                 text = "Score: $currentScore",
-                fontSize = 10.sp,
-                color = Color.White
+                fontSize = 12.sp,
+                color = RvInk
             )
         }
     }
@@ -1102,7 +1157,7 @@ private fun AdaptationNotificationCard(
             Icon(
                 Icons.Default.TrendingUp,
                 contentDescription = "Difficulty adjusted",
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -1111,12 +1166,12 @@ private fun AdaptationNotificationCard(
                     text = "Puzzle Adapted!",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = adaptationInfo?.adjustmentReason ?: "",
-                    fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    fontSize = 12.sp,
+                    color = RvInkSoft.copy(alpha = 0.9f)
                 )
             }
             IconButton(
@@ -1126,7 +1181,7 @@ private fun AdaptationNotificationCard(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -1138,43 +1193,53 @@ private fun AdaptationNotificationCard(
 private fun AdaptiveImagePuzzleInstructions(
     puzzleData: AdaptiveImagePuzzleData,
     adaptiveConfig: AdaptiveImagePuzzleConfig,
-    onStartGame: () -> Unit
+    onStartGame: () -> Unit,
+    compact: Boolean = false
 ) {
+    // Title + rules card (the card may scroll internally, it is not a game surface) and the
+    // start button pinned at the bottom so it never depends on leftover space.
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             text = "Adaptive Image Puzzle",
-            fontSize = 24.sp,
+            fontSize = if (compact) 20.sp else 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
+            color = RvInk,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        if (!compact) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = adaptiveConfig.description,
+                fontSize = 14.sp,
+                color = RvInkSoft,
+                textAlign = TextAlign.Center,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
 
-        Text(
-            text = adaptiveConfig.description,
-            fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(if (compact) 8.dp else 16.dp))
 
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f))
+            modifier = Modifier.fillMaxWidth().weight(1f, fill = false),
+            colors = CardDefaults.cardColors(containerColor = RvSurface)
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier
+                    .verticalScroll(rememberScrollState()) // safety net for tiny / huge-font screens
+                    .padding(if (compact) 12.dp else 16.dp)
             ) {
                 Text(
                     text = stringResource(R.string.how_to_play),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1191,8 +1256,8 @@ private fun AdaptiveImagePuzzleInstructions(
                 instructions.forEach { instruction ->
                     Text(
                         text = "• $instruction",
-                        fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.9f),
+                        fontSize = 14.sp,
+                        color = RvInkSoft,
                         modifier = Modifier.padding(vertical = 2.dp)
                     )
                 }
@@ -1206,36 +1271,41 @@ private fun AdaptiveImagePuzzleInstructions(
                     Text(
                         text = "Grid: ${puzzleData.gridSize}×${puzzleData.gridSize}",
                         fontSize = 12.sp,
-                        color = Color.Cyan
+                        color = RvInk
                     )
                     Text(
                         text = "Pieces: ${puzzleData.totalPieces}",
                         fontSize = 12.sp,
-                        color = Color.Yellow
+                        color = RvInk
                     )
                     Text(
                         text = "Theme: ${puzzleData.theme}",
                         fontSize = 12.sp,
-                        color = Color.Green
+                        color = RvInk,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(12.dp))
 
         Button(
             onClick = onStartGame,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                .height(56.dp)
+                .testTag("image_start"),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B7A57))
         ) {
             Text(
                 text = stringResource(R.string.start_puzzle),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.White,
+                maxLines = 1
             )
         }
     }
@@ -1300,18 +1370,21 @@ private fun EnhancedGridCellWithRemoval(
                         onClick = { onPieceRemoved(piece.id) },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .size(20.dp)
-                            .background(
-                                Color.Red.copy(alpha = 0.8f),
-                                CircleShape
-                            )
+                            .size(32.dp)
                     ) {
-                        Icon(
-                            Icons.Default.Close,
-                            contentDescription = "Remove piece",
-                            tint = Color.White,
-                            modifier = Modifier.size(12.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(22.dp)
+                                .background(Color(0xFFC62828), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Remove piece",
+                                tint = Color.White,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
                     }
 
                     // Correctness indicator
@@ -1330,20 +1403,28 @@ private fun EnhancedGridCellWithRemoval(
                 }
             }
         } ?: run {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Icon(
-                    Icons.Default.Add,
-                    contentDescription = "Drop zone",
-                    tint = Color.Gray.copy(alpha = 0.5f),
-                    modifier = Modifier.size(20.dp)
-                )
-                Text(
-                    text = stringResource(R.string.drop_here),
-                    fontSize = 8.sp,
-                    color = Color.Gray.copy(alpha = 0.7f)
-                )
+            BoxWithConstraints(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                val slotMaxHeight = maxHeight
+                val slotMaxWidth = maxWidth
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Icon(
+                        Icons.Default.Add,
+                        contentDescription = "Drop zone",
+                        tint = RvInkSoft,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    // Label only where there is room for legible (>=12sp) text.
+                    if (slotMaxHeight >= 64.dp && slotMaxWidth >= 64.dp) {
+                        Text(
+                            text = stringResource(R.string.drop_here),
+                            fontSize = 12.sp,
+                            color = RvInkSoft,
+                            maxLines = 1
+                        )
+                    }
+                }
             }
         }
     }
@@ -1427,7 +1508,7 @@ fun EnhancedPuzzleGridWithRemoval(
                         }
                         .zIndex(10f)
                         .shadow(8.dp, RoundedCornerShape(8.dp)),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Image(
@@ -1475,14 +1556,14 @@ fun EnhancedPuzzlePiecesPanel(
             Text(
                 text = "Drag pieces to the grid above (${pieces.size} remaining):",
                 fontSize = 12.sp,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
             LazyRow(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                    .background(RvSurface, RoundedCornerShape(8.dp))
                     .padding(8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(horizontal = 8.dp)
@@ -1515,7 +1596,8 @@ private fun EnhancedPuzzlePieceItem(
     onSelected: () -> Unit,
     onRotated: () -> Unit,
     onDragUpdate: (DragState) -> Unit,
-    onPiecePlaced: (Int, Int, Int) -> Unit
+    onPiecePlaced: (Int, Int, Int) -> Unit,
+    pieceSize: Dp = 80.dp
 ) {
     var isDragging by remember { mutableStateOf(false) }
     var dragOffset by remember { mutableStateOf(Offset.Zero) }
@@ -1532,7 +1614,7 @@ private fun EnhancedPuzzlePieceItem(
 
     Card(
         modifier = Modifier
-            .size(80.dp)
+            .size(pieceSize)
             .scale(scale)
             .onGloballyPositioned { coordinates ->
                 startPosition = coordinates.positionInWindow()
@@ -1608,10 +1690,10 @@ private fun EnhancedPuzzlePieceItem(
             }
         ),
         border = BorderStroke(
-            2.dp,
+            if (isSelected || isDragging) 4.dp else 2.dp,
             when {
-                isDragging -> Color.Yellow
-                isSelected -> Color.Blue
+                isDragging -> Color(0xFFB8860B)
+                isSelected -> Color(0xFF1F7BD6)
                 else -> Color.Gray
             }
         )
@@ -1634,40 +1716,98 @@ private fun EnhancedPuzzlePieceItem(
                 }
             }
 
-            if (isSelected && !isDragging) {
-                Column(
+            if (isSelected && !isDragging && allowRotation) {
+                Icon(
+                    Icons.Default.RotateRight,
+                    contentDescription = "Double-tap to rotate",
+                    tint = Color.White,
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
-                        .background(
-                            Color.Black.copy(alpha = 0.7f),
-                            RoundedCornerShape(topStart = 4.dp, topEnd = 4.dp)
-                        )
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                        .background(Color.Black.copy(alpha = 0.7f), CircleShape)
+                        .padding(2.dp)
+                        .size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+// Tray of remaining pieces: wraps onto as many rows as needed (never a horizontal scroller), with
+// the piece size chosen so that ALL pieces fit the height it was given.
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun PiecesTray(
+    pieces: List<EnhancedImagePuzzlePiece>,
+    totalPieces: Int,
+    selectedPieceId: Int,
+    allowRotation: Boolean,
+    gridBounds: androidx.compose.ui.geometry.Rect?,
+    gridSize: Int,
+    onPieceSelected: (Int) -> Unit,
+    onPieceRotated: (Int) -> Unit,
+    onPieceDragUpdate: (Int, DragState) -> Unit,
+    onPiecePlaced: (Int, Int, Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier.testTag("image_tray")) {
+        val gap = 8.dp
+        val innerW = maxWidth - 16.dp
+        val innerH = maxHeight - 16.dp - 24.dp // padding + hint text line
+        var pieceSize = 36.dp
+        var s = 72
+        while (s >= 36) {
+            val perRow = (((innerW + gap) / (s.dp + gap)).toInt()).coerceAtLeast(1)
+            val rows = (totalPieces + perRow - 1) / perRow
+            if ((s.dp + gap) * rows - gap <= innerH) { pieceSize = s.dp; break }
+            s -= 4
+        }
+        Column(modifier = Modifier.fillMaxSize()) {
+            if (pieces.isEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFDFF3E7))
                 ) {
                     Text(
-                        text = "DRAG TO GRID",
-                        fontSize = 7.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        text = "🎉 All pieces placed! Check if they're in the correct positions.",
+                        fontSize = 14.sp,
+                        color = RvInk,
+                        modifier = Modifier.padding(12.dp),
+                        textAlign = TextAlign.Center,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    if (allowRotation) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(2.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.RotateRight,
-                                contentDescription = "Double-tap to rotate",
-                                tint = Color.White,
-                                modifier = Modifier.size(10.dp)
-                            )
-                            Text(
-                                text = "2X TAP",
-                                fontSize = 6.sp,
-                                color = Color.White
-                            )
-                        }
+                }
+            } else {
+                Text(
+                    text = "Drag pieces to the grid (${pieces.size} remaining):",
+                    fontSize = 12.sp,
+                    color = RvInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = false)
+                        .background(RvSurface, RoundedCornerShape(8.dp))
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(gap, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    pieces.forEach { piece ->
+                        EnhancedPuzzlePieceItem(
+                            piece = piece,
+                            isSelected = piece.id == selectedPieceId,
+                            allowRotation = allowRotation,
+                            gridBounds = gridBounds,
+                            gridSize = gridSize,
+                            onSelected = { onPieceSelected(piece.id) },
+                            onRotated = { onPieceRotated(piece.id) },
+                            onDragUpdate = { dragState -> onPieceDragUpdate(piece.id, dragState) },
+                            onPiecePlaced = onPiecePlaced,
+                            pieceSize = pieceSize
+                        )
                     }
                 }
             }
@@ -1708,7 +1848,7 @@ fun PreviewOverlayDialog(
                     .align(Alignment.Center)
                     .padding(24.dp)
                     .clip(RoundedCornerShape(12.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF111418))
+                colors = CardDefaults.cardColors(containerColor = RvCanvas)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp),
@@ -1716,7 +1856,7 @@ fun PreviewOverlayDialog(
                 ) {
                     Text(
                         "Image Preview",
-                        color = Color.White,
+                        color = RvInk,
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp
                     )
@@ -1814,93 +1954,115 @@ fun AdaptiveImagePuzzleGameScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        // Preview overlay
-        // Floating preview (modal)
-        if (showPreview) {
-            PreviewOverlayDialog(
-                imageUrl = puzzleData.imageUrl,
-                originalBitmap = puzzleData.originalBitmap,
-                onDismiss = { onPreviewToggle() } // will set showPreview = false upstream
-            )
+    // Fit-to-screen: the (square) grid takes the space that is left, the piece tray is a wrapping
+    // block of fixed height under it (portrait) or beside it (landscape / wide). No scrolling.
+    if (showPreview) {
+        PreviewOverlayDialog(
+            imageUrl = puzzleData.imageUrl,
+            originalBitmap = puzzleData.originalBitmap,
+            onDismiss = { onPreviewToggle() } // will set showPreview = false upstream
+        )
+    }
+
+    val onDragUpdate: (Int, DragState) -> Unit = { pieceId, dragState ->
+        enhancedPieces = enhancedPieces.map { piece ->
+            if (piece.id == pieceId) piece.copy(dragState = dragState) else piece
         }
-
-
-        // Instructions with removal method info
+    }
+    val instructionCard: @Composable (Boolean) -> Unit = { full ->
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.Blue.copy(alpha = 0.2f))
+            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F0FF))
         ) {
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
+            Column(modifier = Modifier.padding(12.dp)) {
                 Text(
                     text = "🎯 Drag puzzle pieces from the bottom panel and drop them on the grid above",
                     fontSize = 14.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "💡 Long press placed pieces or click ❌ to remove them",
-                    fontSize = 12.sp,
-                    color = Color.Yellow,
-                    textAlign = TextAlign.Center
-                )
+                if (full) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "💡 Long press placed pieces or click ❌ to remove them",
+                        fontSize = 12.sp,
+                        color = RvInkSoft,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
-
-        // Main puzzle grid with enhanced removal functionality
-        EnhancedPuzzleGridWithRemoval(
-            gridSize = puzzleData.gridSize,
-            puzzlePieces = enhancedPieces,
-            onPiecePlaced = onPiecePlaced,
-            onPieceRemoved = onPieceRemoved,
-            onGridBoundsChanged = { bounds -> gridBounds = bounds },
-            onPieceDragUpdate = { pieceId, dragState ->
-                enhancedPieces = enhancedPieces.map { piece ->
-                    if (piece.id == pieceId) {
-                        piece.copy(dragState = dragState)
-                    } else piece
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(16.dp)
-        )
-
-        // Enhanced pieces panel
-        EnhancedPuzzlePiecesPanel(
+    }
+    val tray: @Composable (Modifier) -> Unit = { m ->
+        PiecesTray(
             pieces = enhancedPieces.filter { !it.isPlaced },
+            totalPieces = puzzleData.totalPieces.coerceAtLeast(enhancedPieces.size),
             selectedPieceId = selectedPieceId,
             allowRotation = puzzleData.config.allowRotation,
             gridBounds = gridBounds,
             gridSize = puzzleData.gridSize,
             onPieceSelected = onPieceSelected,
             onPieceRotated = onPieceRotated,
-            onPieceDragUpdate = { pieceId, dragState ->
-                enhancedPieces = enhancedPieces.map { piece ->
-                    if (piece.id == pieceId) {
-                        piece.copy(dragState = dragState)
-                    } else piece
-                }
-            },
+            onPieceDragUpdate = onDragUpdate,
             onPiecePlaced = onPiecePlaced,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(140.dp)
-                .padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = m
         )
     }
-}
+    val grid: @Composable (Modifier) -> Unit = { m ->
+        EnhancedPuzzleGridWithRemoval(
+            gridSize = puzzleData.gridSize,
+            puzzlePieces = enhancedPieces,
+            onPiecePlaced = onPiecePlaced,
+            onPieceRemoved = onPieceRemoved,
+            onGridBoundsChanged = { bounds -> gridBounds = bounds },
+            onPieceDragUpdate = onDragUpdate,
+            modifier = m.testTag("image_grid")
+        )
+    }
 
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val availableWidth = maxWidth
+        val availableHeight = maxHeight
+        val wide = availableWidth > availableHeight
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                BoxWithConstraints(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    grid(Modifier.size(minOf(maxWidth, maxHeight)))
+                }
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    if (availableHeight >= 360.dp) instructionCard(false)
+                    tray(Modifier.fillMaxWidth().weight(1f, fill = false).heightIn(max = availableHeight * 0.8f))
+                }
+            }
+        } else {
+            val compact = availableHeight < 520.dp
+            val trayH = (availableHeight * 0.3f).coerceIn(96.dp, 220.dp)
+            Column(modifier = Modifier.fillMaxSize()) {
+                if (!compact) instructionCard(availableHeight >= 620.dp)
+                BoxWithConstraints(
+                    modifier = Modifier.weight(1f).fillMaxWidth().padding(vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    grid(Modifier.size(minOf(maxWidth, maxHeight)))
+                }
+                tray(Modifier.fillMaxWidth().height(trayH))
+            }
+        }
+    }
+}
 
 @Composable
 private fun AdaptiveImagePuzzleCompletionScreen(
@@ -1981,13 +2143,13 @@ private fun AdaptiveImagePuzzleCompletionScreen(
                     Icon(
                         Icons.Default.ZoomIn,
                         contentDescription = "Tap to enlarge",
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(32.dp)
                     )
                     Text(
                         text = "Tap to view full screen",
                         fontSize = 12.sp,
-                        color = Color.White,
+                        color = RvInk,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
@@ -2000,7 +2162,7 @@ private fun AdaptiveImagePuzzleCompletionScreen(
         // Score and stats card
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f))
+            colors = CardDefaults.cardColors(containerColor = RvSurface)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -2010,7 +2172,7 @@ private fun AdaptiveImagePuzzleCompletionScreen(
                     text = "${stringResource(R.string.final_score)}: $score",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -2020,16 +2182,16 @@ private fun AdaptiveImagePuzzleCompletionScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(stringResource(R.string.completed), fontSize = 10.sp, color = Color.Gray)
-                        Text("$completedPieces/${puzzleData.totalPieces}", fontSize = 14.sp, color = Color.White)
+                        Text(stringResource(R.string.completed), fontSize = 12.sp, color = RvInkSoft)
+                        Text("$completedPieces/${puzzleData.totalPieces}", fontSize = 14.sp, color = RvInk)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(stringResource(R.string.time_used), fontSize = 10.sp, color = Color.Gray)
-                        Text(formatTime(timeUsed), fontSize = 14.sp, color = Color.White)
+                        Text(stringResource(R.string.time_used), fontSize = 12.sp, color = RvInkSoft)
+                        Text(formatTime(timeUsed), fontSize = 14.sp, color = RvInk)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Hints", fontSize = 10.sp, color = Color.Gray)
-                        Text("$hintsUsed", fontSize = 14.sp, color = Color.White)
+                        Text("Hints", fontSize = 12.sp, color = RvInkSoft)
+                        Text("$hintsUsed", fontSize = 14.sp, color = RvInk)
                     }
                 }
             }
@@ -2090,14 +2252,14 @@ private fun AdaptiveImagePuzzleCompletionScreen(
                     Icon(
                         Icons.Default.Save,
                         contentDescription = stringResource(R.string.save),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = stringResource(R.string.save).uppercase(),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                 }
             }
@@ -2127,14 +2289,14 @@ private fun AdaptiveImagePuzzleCompletionScreen(
                     Icon(
                         Icons.Default.Share,
                         contentDescription = stringResource(R.string.share),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                     Text(
                         text = stringResource(R.string.share).uppercase(),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                 }
             }
@@ -2828,7 +2990,7 @@ private fun FullScreenImageViewer(
             Icon(
                 Icons.Default.Save,
                 contentDescription = "Save image",
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -2845,7 +3007,7 @@ private fun FullScreenImageViewer(
             Icon(
                 Icons.Default.Close,
                 contentDescription = "Close full screen",
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -2863,18 +3025,18 @@ private fun FullScreenImageViewer(
                 text = puzzleData.theme,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
             if (puzzleData.description.isNotEmpty()) {
                 Text(
                     text = puzzleData.description,
                     fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = RvInkSoft.copy(alpha = 0.9f)
                 )
             }
             Text(
                 text = "${puzzleData.gridSize}×${puzzleData.gridSize} puzzle",
-                fontSize = 10.sp,
+                fontSize = 12.sp,
                 color = Color.Cyan
             )
         }
@@ -2896,7 +3058,7 @@ private fun FullScreenImageViewer(
                 Icon(
                     Icons.Default.ZoomIn,
                     contentDescription = "Zoom in",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -2907,7 +3069,7 @@ private fun FullScreenImageViewer(
                 Icon(
                     Icons.Default.ZoomOut,
                     contentDescription = "Zoom out",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -2922,7 +3084,7 @@ private fun FullScreenImageViewer(
                 Icon(
                     Icons.Default.CenterFocusStrong,
                     contentDescription = "Reset zoom",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(20.dp)
                 )
             }

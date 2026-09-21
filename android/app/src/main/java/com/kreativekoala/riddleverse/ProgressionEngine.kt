@@ -16,33 +16,6 @@ class ProgressionEngine(
 ) {
 
     companion object {
-        // Tier system configuration
-        private val TIER_THRESHOLDS = listOf(
-            "Bronze" to 0,
-            "Silver" to 500,
-            "Gold" to 1500,
-            "Platinum" to 3000,
-            "Diamond" to 6000,
-            "Master" to 10000
-        )
-
-        // Difficulty multipliers for scoring
-        private val DIFFICULTY_MULTIPLIERS = mapOf(
-            "Easy" to 1.0f,
-            "Medium" to 1.25f,
-            "Hard" to 1.5f
-        )
-
-        // Base scores for different puzzle types
-        private val BASE_SCORES = mapOf(
-            "math" to mapOf("Easy" to 10, "Medium" to 15, "Hard" to 20),
-            "anagram" to mapOf("Easy" to 15, "Medium" to 20, "Hard" to 25),
-            "trivia" to mapOf("Easy" to 12, "Medium" to 17, "Hard" to 22),
-            "wordsearch" to mapOf("Easy" to 14, "Medium" to 19, "Hard" to 24),
-            "crypto" to mapOf("Easy" to 18, "Medium" to 23, "Hard" to 28),
-            "wordsnake" to mapOf("Easy" to 16, "Medium" to 21, "Hard" to 26)
-        )
-
         // Achievement definitions
         val ACHIEVEMENT_DEFINITIONS = listOf(
             Achievement("first_correct", "First Success", "Solve your first puzzle", "🎯"),
@@ -85,6 +58,8 @@ class ProgressionEngine(
         val oldLevel = getCurrentLevel()
         val oldStreak = getCurrentStreak()
         val oldDailyStreak = getCurrentDailyStreak()
+        // Snapshot before recording today's play; afterwards hasPlayedToday is always true
+        val dailyBefore = userStatsManager.getDailyActivityData()
 
         // Record the completion in data layer
         userStatsManager.recordPuzzleCompletion(puzzleType, score, timeSpentSeconds, isCorrect, difficulty)
@@ -93,14 +68,14 @@ class ProgressionEngine(
 
         // Calculate progression results
         val scoreBreakdown = if (isCorrect) {
-            calculateScoreBreakdown(puzzleType, score, timeRemaining, totalTime, difficulty, getCurrentStreak() + 1)
+            ProgressionMath.scoreBreakdown(puzzleType, score, timeRemaining, totalTime, difficulty, getCurrentStreak() + 1)
         } else {
             ScoreBreakdown(0, 0, 0, 1.0f, 0, 0)
         }
 
         // Update streaks
         val newStreak = updateQuestionStreak(isCorrect)
-        val newDailyStreak = updateDailyStreak()
+        val newDailyStreak = updateDailyStreak(dailyBefore)
 
         // Update XP and check for level up
         var levelUpInfo: LevelUpInfo? = null
@@ -121,7 +96,7 @@ class ProgressionEngine(
         val streakInfo = StreakInfo(
             currentStreak = newStreak,
             bestStreak = getBestStreak(),
-            streakMultiplier = getStreakMultiplier(newStreak),
+            streakMultiplier = ProgressionMath.streakMultiplier(newStreak),
             dailyStreak = newDailyStreak,
             hasDailyStreakBonus = newDailyStreak >= 3
         )
@@ -144,81 +119,6 @@ class ProgressionEngine(
     // SCORING CALCULATIONS
     // ================================
 
-    /**
-     * Calculate detailed score breakdown
-     */
-    private fun calculateScoreBreakdown(
-        puzzleType: String,
-        baseScore: Int,
-        timeRemaining: Int,
-        totalTime: Int,
-        difficulty: String,
-        currentStreak: Int
-    ): ScoreBreakdown {
-
-        // Use provided score or calculate base score
-        val actualBaseScore = if (baseScore > 0) baseScore else getBaseScore(puzzleType, difficulty)
-
-        // Time bonus calculation
-        val timeBonus = calculateTimeBonus(timeRemaining, totalTime, actualBaseScore)
-
-        // Streak bonus calculation
-        val streakBonus = calculateStreakBonus(actualBaseScore, currentStreak)
-
-        // Difficulty multiplier
-        val difficultyMultiplier = DIFFICULTY_MULTIPLIERS[difficulty] ?: 1.0f
-
-        // Calculate total score
-        val subtotal = (actualBaseScore + timeBonus + streakBonus).toFloat()
-        val totalScore = (subtotal * difficultyMultiplier).toInt()
-
-        // XP calculation (same as total score for now)
-        val xpGained = totalScore
-
-        return ScoreBreakdown(
-            baseScore = actualBaseScore,
-            timeBonus = timeBonus,
-            streakBonus = streakBonus,
-            difficultyMultiplier = difficultyMultiplier,
-            totalScore = totalScore,
-            xpGained = xpGained
-        )
-    }
-
-    /**
-     * Get base score for puzzle type and difficulty
-     */
-    private fun getBaseScore(puzzleType: String, difficulty: String): Int {
-        return BASE_SCORES[puzzleType.lowercase()]?.get(difficulty) ?: 15
-    }
-
-    /**
-     * Calculate time-based bonus points
-     */
-    private fun calculateTimeBonus(timeRemaining: Int, totalTime: Int, baseScore: Int): Int {
-        if (timeRemaining <= 0 || totalTime <= 0) return 0
-
-        val timePercentage = timeRemaining.toDouble() / totalTime.toDouble()
-        val maxBonus = baseScore.toDouble() * 0.5 // Max 50% bonus
-
-        // Exponential curve for better rewards for fast completion
-        val bonus = maxBonus * timePercentage.pow(0.7)
-
-        return bonus.toInt()
-    }
-
-    /**
-     * Calculate streak-based bonus points
-     */
-    private fun calculateStreakBonus(baseScore: Int, currentStreak: Int): Int {
-        return when {
-            currentStreak >= 10 -> (baseScore * 0.5).toInt()
-            currentStreak >= 5 -> (baseScore * 0.3).toInt()
-            currentStreak >= 3 -> (baseScore * 0.2).toInt()
-            else -> 0
-        }
-    }
-
     // ================================
     // LEVEL PROGRESSION
     // ================================
@@ -230,11 +130,9 @@ class ProgressionEngine(
         val globalStats = userStatsManager.getGlobalStats()
         val totalXP = globalStats.totalXP
 
-        val level = calculateLevelFromXP(totalXP)
-        val xpForCurrentLevel = if (level > 1) getXPRequiredForLevel(level - 1) else 0
-        val xpForNextLevel = getXPRequiredForLevel(level)
-        val currentXP = totalXP - xpForCurrentLevel
-        val xpToNext = xpForNextLevel - xpForCurrentLevel
+        val level = ProgressionMath.levelFromXp(totalXP)
+        val currentXP = totalXP - ProgressionMath.xpAtStartOfLevel(level)
+        val xpToNext = ProgressionMath.xpRequiredForLevel(level)
 
         return UserLevel(
             level = level,
@@ -242,28 +140,6 @@ class ProgressionEngine(
             xpToNextLevel = xpToNext,
             totalXP = totalXP
         )
-    }
-
-    /**
-     * Calculate level from total XP
-     */
-    private fun calculateLevelFromXP(totalXP: Int): Int {
-        var level = 1
-        var xpNeeded = 0
-
-        while (xpNeeded <= totalXP) {
-            xpNeeded += getXPRequiredForLevel(level)
-            if (xpNeeded <= totalXP) level++
-        }
-
-        return level
-    }
-
-    /**
-     * Get XP required for a specific level
-     */
-    private fun getXPRequiredForLevel(level: Int): Int {
-        return (100 * level * (1 + level * 0.1)).toInt()
     }
 
     // ================================
@@ -277,13 +153,13 @@ class ProgressionEngine(
         val globalStats = userStatsManager.getGlobalStats()
         val totalXP = globalStats.totalXP
 
-        val currentTierIndex = TIER_THRESHOLDS.indexOfLast { it.second <= totalXP }
-        val currentTier = TIER_THRESHOLDS[currentTierIndex].first
-        val nextTierIndex = (currentTierIndex + 1).coerceAtMost(TIER_THRESHOLDS.size - 1)
-        val nextTier = TIER_THRESHOLDS[nextTierIndex].first
+        val currentTierIndex = ProgressionMath.tierIndexForXp(totalXP)
+        val currentTier = ProgressionMath.TIER_THRESHOLDS[currentTierIndex].first
+        val nextTierIndex = (currentTierIndex + 1).coerceAtMost(ProgressionMath.TIER_THRESHOLDS.size - 1)
+        val nextTier = ProgressionMath.TIER_THRESHOLDS[nextTierIndex].first
 
-        val pointsInTier = totalXP - TIER_THRESHOLDS[currentTierIndex].second
-        val pointsToNextTier = TIER_THRESHOLDS[nextTierIndex].second - TIER_THRESHOLDS[currentTierIndex].second
+        val pointsInTier = totalXP - ProgressionMath.TIER_THRESHOLDS[currentTierIndex].second
+        val pointsToNextTier = ProgressionMath.TIER_THRESHOLDS[nextTierIndex].second - ProgressionMath.TIER_THRESHOLDS[currentTierIndex].second
         val progress = if (pointsToNextTier > 0) pointsInTier.toFloat() / pointsToNextTier else 1f
 
         val rewards = when (nextTier) {
@@ -297,12 +173,12 @@ class ProgressionEngine(
 
         return TierInfo(
             currentTier = currentTier,
-            nextTier = if (currentTierIndex == TIER_THRESHOLDS.size - 1) currentTier else nextTier,
+            nextTier = if (currentTierIndex == ProgressionMath.TIER_THRESHOLDS.size - 1) currentTier else nextTier,
             pointsInTier = pointsInTier,
             pointsToNextTier = pointsToNextTier,
             progressPercentage = progress,
             nextTierRewards = rewards,
-            currentLevel = calculateLevelFromXP(totalXP),
+            currentLevel = ProgressionMath.levelFromXp(totalXP),
             totalXP = totalXP
         )
     }
@@ -333,17 +209,13 @@ class ProgressionEngine(
     /**
      * Update daily streak based on activity
      */
-    private fun updateDailyStreak(): Int {
-        val dailyData = userStatsManager.getDailyActivityData()
-
-        val newDailyStreak = when {
-            dailyData.lastActiveDate.isEmpty() -> 1 // First time
-            dailyData.hasPlayedYesterday || dailyData.hasPlayedToday -> {
-                // Continue or maintain streak
-                getCurrentDailyStreak() + if (!dailyData.hasPlayedToday) 1 else 0
-            }
-            else -> 1 // Streak broken, restart
-        }
+    private fun updateDailyStreak(before: DailyActivityData): Int {
+        val newDailyStreak = ProgressionMath.nextDailyStreak(
+            hasEverPlayed = before.lastActiveDate.isNotEmpty(),
+            hasPlayedToday = before.hasPlayedToday,
+            hasPlayedYesterday = before.hasPlayedYesterday,
+            currentStreak = getCurrentDailyStreak()
+        )
 
         // Store daily streak
         val context = this.context
@@ -378,18 +250,6 @@ class ProgressionEngine(
     fun getCurrentDailyStreak(): Int {
         val prefs = context.getSharedPreferences("progression_prefs", Context.MODE_PRIVATE)
         return prefs.getInt("daily_streak", 0)
-    }
-
-    /**
-     * Get streak multiplier for scoring
-     */
-    private fun getStreakMultiplier(streak: Int): Float {
-        return when {
-            streak >= 10 -> 2.0f
-            streak >= 5 -> 1.5f
-            streak >= 3 -> 1.25f
-            else -> 1.0f
-        }
     }
 
     // ================================

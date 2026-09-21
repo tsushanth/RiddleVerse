@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -26,6 +27,8 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
 import android.os.Handler
 import android.os.Looper
 import androidx.compose.ui.platform.LocalContext
@@ -93,7 +96,31 @@ fun FallingGameScreen(
         }
     }
 
-    Box(
+    val onOption: (String) -> Unit = { option ->
+        if (selectedAnswer == null && isGameActive) {
+            selectedAnswer = option
+            onOptionSelected(option)
+            isCorrect = option == correctAnswer
+            showResult = true
+            isGameActive = false
+
+            if (isCorrect) {
+                gameScore += 10
+                onCorrectAnswer(remainingTime > 0)
+            } else {
+                lives--
+            }
+
+            // Auto-continue after showing result
+            Handler(Looper.getMainLooper()).postDelayed({
+                onContinue(option)
+            }, 2500)
+        }
+    }
+
+    // HUD, question, falling region and answers are laid out from the measured size so that the
+    // answer buttons and the hint never depend on leftover space (no scrolling).
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -106,134 +133,232 @@ fun FallingGameScreen(
                 )
             )
             .statusBarsPadding()
-            .padding(16.dp)
     ) {
-        // Top Bar
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Back button and progress
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-                Column {
-                    Text(
-                        "Question $questionNumber/$totalQuestions",
-                        color = Color.White,
-                        fontSize = 12.sp
-                    )
-                    Text(
-                        difficulty,
-                        color = Color.White.copy(alpha = 0.7f),
-                        fontSize = 10.sp
-                    )
-                }
-            }
+        val wide = maxWidth > maxHeight
+        val compact = maxHeight < 700.dp
+        val pad = if (maxHeight < 600.dp) 12.dp else 16.dp
+        val showOptions = !showResult && isGameActive && lives > 0
+        val fallFraction = (rocketY / (screenHeightPx - rocketHeightPx)).coerceIn(0f, 1f)
 
-            // Score
-            Text(
-                "Score: $gameScore",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            // Timer and Lives
-            Column(horizontalAlignment = Alignment.End) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Timer,
-                        contentDescription = "Timer",
-                        tint = Color.White,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
-                        color = Color.White,
-                        fontSize = 14.sp
-                    )
-                }
-                Row {
-                    repeat(lives) {
+        val hud: @Composable () -> Unit = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                    IconButton(onClick = onBack) {
                         Icon(
-                            Icons.Default.Favorite,
-                            contentDescription = "Life",
-                            tint = Color.Red,
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back),
+                            tint = RvOnTone,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Column {
+                        Text(
+                            "Question $questionNumber/$totalQuestions",
+                            color = RvOnTone,
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            difficulty,
+                            color = RvOnTone.copy(alpha = 0.85f),
+                            fontSize = 12.sp,
+                            maxLines = 1
+                        )
+                    }
+                }
+
+                Text(
+                    "Score: $gameScore",
+                    color = RvOnTone,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.Timer,
+                            contentDescription = "Timer",
+                            tint = RvOnTone,
                             modifier = Modifier.size(16.dp)
                         )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
+                            color = RvOnTone,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
+                        )
+                    }
+                    Row {
+                        repeat(lives) {
+                            Icon(
+                                Icons.Default.Favorite,
+                                contentDescription = "Life",
+                                tint = Color(0xFFFF8A80),
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
             }
         }
 
-        // Falling Object (Rocket/Meteor/Star)
-        Box(
-            modifier = Modifier
-                .offset(y = with(LocalDensity.current) { rocketY.toDp() })
-                .align(Alignment.TopCenter)
-                .size(80.dp)
-        ) {
-            // Fallback design if no rocket image
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape)
-                    .background(
-                        androidx.compose.ui.graphics.Brush.radialGradient(
-                            colors = listOf(
-                                Color(0xFFFFD700),
-                                Color(0xFFFF8C00)
-                            )
-                        )
-                    ),
-                contentAlignment = Alignment.Center
+        val questionCard: @Composable () -> Unit = {
+            Card(
+                modifier = Modifier.fillMaxWidth().testTag("space_question"),
+                colors = CardDefaults.cardColors(containerColor = RvCanvas.copy(alpha = 0.92f)),
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Text(
-                    "🚀",
-                    fontSize = 32.sp
-                )
+                Column(
+                    modifier = Modifier.padding(if (compact) 12.dp else 20.dp).fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (!compact) {
+                        Text(
+                            "Quick! Answer before it crashes!",
+                            color = RvInkSoft,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                    Text(
+                        question,
+                        color = RvInk,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        maxLines = 4,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
 
-        // Question Card
-        Card(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 32.dp)
-                .offset(y = (-40).dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.Black.copy(alpha = 0.7f)
-            ),
-            shape = RoundedCornerShape(16.dp)
-        ) {
+        // The rocket falls through this region; its speed/timing still comes from the game logic,
+        // only the distance is mapped onto the space that is actually free.
+        val fallRegion: @Composable (Modifier) -> Unit = { regionModifier ->
+            BoxWithConstraints(modifier = regionModifier.testTag("space_fall_region")) {
+                val rocketSize = minOf(80.dp, maxHeight).coerceAtLeast(32.dp)
+                Box(
+                    modifier = Modifier
+                        .offset(y = ((maxHeight - rocketSize).coerceAtLeast(0.dp)) * fallFraction)
+                        .align(Alignment.TopCenter)
+                        .size(rocketSize)
+                        .clip(CircleShape)
+                        .background(
+                            androidx.compose.ui.graphics.Brush.radialGradient(
+                                colors = listOf(Color(0xFFFFD700), Color(0xFFFF8C00))
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("🚀", fontSize = (rocketSize.value * 0.4f).sp)
+                }
+            }
+        }
+
+        val optionsPane: @Composable (Boolean) -> Unit = { twoColumns ->
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.fillMaxWidth().testTag("space_options"),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    "Quick! Answer before it crashes!",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
-                    textAlign = TextAlign.Center
-                )
+                val optionButton: @Composable (String, Modifier) -> Unit = { option, m ->
+                    Button(
+                        onClick = { onOption(option) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1565C0)),
+                        shape = RoundedCornerShape(28.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                        border = androidx.compose.foundation.BorderStroke(2.dp, RvOnTone.copy(alpha = 0.6f)),
+                        modifier = m.heightIn(min = 56.dp)
+                    ) {
+                        Text(
+                            option,
+                            fontSize = 16.sp,
+                            color = RvOnTone,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                if (twoColumns) {
+                    options.chunked(2).forEach { pair ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            pair.forEach { option -> optionButton(option, Modifier.weight(1f)) }
+                            if (pair.size == 1) Spacer(Modifier.weight(1f))
+                        }
+                    }
+                } else {
+                    options.forEach { option -> optionButton(option, Modifier.fillMaxWidth()) }
+                }
+
+                // Hint Button
+                OutlinedButton(
+                    onClick = onHint,
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = RvOnTone),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, RvOnTone),
+                    shape = RoundedCornerShape(24.dp),
+                    enabled = isGameActive,
+                    modifier = Modifier.heightIn(min = 48.dp)
+                ) {
+                    Text("💡 ${stringResource(R.string.hint)}", fontSize = 14.sp, maxLines = 1)
+                }
+            }
+        }
+
+        if (wide) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 1100.dp)
+                    .fillMaxSize()
+                    .padding(pad),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                    hud()
+                    Spacer(Modifier.height(8.dp))
+                    questionCard()
+                    Spacer(Modifier.height(8.dp))
+                    fallRegion(Modifier.weight(1f).fillMaxWidth())
+                }
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (showOptions) optionsPane(false)
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 640.dp)
+                    .fillMaxSize()
+                    .padding(pad)
+            ) {
+                hud()
                 Spacer(Modifier.height(8.dp))
-                Text(
-                    question,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
+                questionCard()
+                fallRegion(Modifier.weight(1f).fillMaxWidth().padding(vertical = 8.dp))
+                if (showOptions) optionsPane(compact)
             }
         }
 
@@ -249,79 +374,12 @@ fun FallingGameScreen(
             ) {
                 Text(
                     text = if (isCorrect) "🎉 Correct! +10 Points" else "❌ Wrong! Answer: $correctAnswer",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(16.dp)
                 )
-            }
-        }
-
-        // Option Buttons
-        if (!showResult && isGameActive && lives > 0) {
-            Column(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 40.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                options.forEach { option ->
-                    Button(
-                        onClick = {
-                            if (selectedAnswer == null && isGameActive) {
-                                selectedAnswer = option
-                                onOptionSelected(option)
-                                isCorrect = option == correctAnswer
-                                showResult = true
-                                isGameActive = false
-
-                                if (isCorrect) {
-                                    gameScore += 10
-                                    onCorrectAnswer(remainingTime > 0)
-                                } else {
-                                    lives--
-                                }
-
-                                // Auto-continue after showing result
-                                Handler(Looper.getMainLooper()).postDelayed({
-                                    onContinue(option)
-                                }, 2500)
-                            }
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF1E88E5).copy(alpha = 0.9f)
-                        ),
-                        shape = RoundedCornerShape(25.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f)
-                            .height(50.dp)
-                    ) {
-                        Text(
-                            option,
-                            fontSize = 14.sp,
-                            color = Color.White,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(8.dp))
-
-                // Hint Button
-                OutlinedButton(
-                    onClick = onHint,
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.White
-                    ),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, Color.White),
-                    shape = RoundedCornerShape(20.dp),
-                    enabled = isGameActive
-                ) {
-                    Text("💡 Hint", fontSize = 12.sp)
-                }
             }
         }
 
@@ -332,7 +390,7 @@ fun FallingGameScreen(
                     .align(Alignment.Center)
                     .padding(32.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.Black.copy(alpha = 0.8f)
+                    containerColor = RvCanvas.copy(alpha = 0.8f)
                 )
             ) {
                 Column(
@@ -348,7 +406,7 @@ fun FallingGameScreen(
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "${stringResource(R.string.final_score)}: $gameScore",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp
                     )
                     Spacer(Modifier.height(16.dp))
@@ -371,7 +429,7 @@ fun FallingGameScreen(
                     .align(Alignment.Center)
                     .padding(32.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.Black.copy(alpha = 0.8f)
+                    containerColor = RvCanvas.copy(alpha = 0.8f)
                 )
             ) {
                 Column(
@@ -387,7 +445,7 @@ fun FallingGameScreen(
                     Spacer(Modifier.height(8.dp))
                     Text(
                         "Answer: $correctAnswer",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
                     )

@@ -1,6 +1,7 @@
 // ColorShapeMatchingPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -56,7 +57,7 @@ fun PuzzleHeader(
     Card(
         modifier = modifier.statusBarsPadding().fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = RvSurfaceRaised
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
@@ -78,14 +79,14 @@ fun PuzzleHeader(
                     modifier = Modifier
                         .size(40.dp)
                         .background(
-                            Color(0xFFF0F0F0),
+                            RvSurface,
                             CircleShape
                         )
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color(0xFF333333),
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -95,7 +96,7 @@ fun PuzzleHeader(
                     text = level,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333),
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -143,7 +144,7 @@ private fun DifficultyBadge(
         "medium" -> Color(0xFFFFF3CD) to Color(0xFFD69E2E)
         "hard" -> Color(0xFFFED7D7) to Color(0xFFE53E3E)
         "expert" -> Color(0xFFE6E6FA) to Color(0xFF805AD5)
-        else -> Color(0xFFF0F0F0) to Color(0xFF666666)
+        else -> RvSurface to RvInkSoft
     }
 
     Box(
@@ -224,7 +225,7 @@ fun PuzzleHeaderPreview() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFF5F5F5))
+            .background(RvSurface)
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -318,7 +319,7 @@ fun ColorShapeMatchingPuzzleScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(RvSurface)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -338,7 +339,7 @@ fun ColorShapeMatchingPuzzleScreen(
             text = "Challenge $challengeNumber of $totalChallenges",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF666666)
+            color = RvInkSoft
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -350,7 +351,7 @@ fun ColorShapeMatchingPuzzleScreen(
                 .height(4.dp)
                 .clip(RoundedCornerShape(2.dp)),
             color = Color(0xFF4CAF50),
-            trackColor = Color(0xFFE0E0E0)
+            trackColor = RvOutline
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -361,7 +362,7 @@ fun ColorShapeMatchingPuzzleScreen(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            color = Color(0xFF333333)
+            color = RvInk
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -427,13 +428,13 @@ fun ColorShapeMatchingPuzzleScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("✗", fontSize = 24.sp, color = Color.White)
+                        Text("✗", fontSize = 24.sp, color = RvInk)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "NO",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                     }
                 }
@@ -465,13 +466,13 @@ fun ColorShapeMatchingPuzzleScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("✓", fontSize = 24.sp, color = Color.White)
+                        Text("✓", fontSize = 24.sp, color = RvInk)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.yes),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                     }
                 }
@@ -506,7 +507,7 @@ fun ColorShapeMatchingPuzzleScreen(
                     Text(
                         text = "Score: $score",
                         fontSize = 14.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
                 }
             }

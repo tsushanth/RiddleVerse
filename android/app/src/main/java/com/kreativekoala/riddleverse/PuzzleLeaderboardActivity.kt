@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -362,8 +363,8 @@ fun TopPlayerCard(
     rank: Int
 ) {
     val gradient = when (rank) {
-        1 -> Brush.horizontalGradient(colors = listOf(Color(0xFFFFD700), Color(0xFFFFA500))) // Gold
-        2 -> Brush.horizontalGradient(colors = listOf(Color(0xFFC0C0C0), Color(0xFF808080))) // Silver
+        1 -> Brush.horizontalGradient(colors = listOf(RvSun, RvSun)) // Gold
+        2 -> Brush.horizontalGradient(colors = listOf(Color(0xFFC0C0C0), RvInkSoft)) // Silver
         3 -> Brush.horizontalGradient(colors = listOf(Color(0xFFCD7F32), Color(0xFF8B4513))) // Bronze
         else -> Brush.horizontalGradient(colors = listOf(Color.Gray, Color.DarkGray))
     }
@@ -394,7 +395,7 @@ fun TopPlayerCard(
                 Box(
                     modifier = Modifier
                         .size(48.dp)
-                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                        .background(RvSurface, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -413,13 +414,13 @@ fun TopPlayerCard(
                         text = player.playerName,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     if (player.timeTaken != null && player.timeTaken > 0) {
                         Text(
                             text = "Time: ${formatLeaderboardTime(player.timeTaken)}",
                             fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = RvInkSoft.copy(alpha = 0.8f)
                         )
                     }
                 }
@@ -429,7 +430,7 @@ fun TopPlayerCard(
                     text = formatScore(player.score),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
             }
         }

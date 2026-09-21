@@ -1,5 +1,21 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.RvCoral
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvErrorEdge
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvGrapeEdge
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvScrim
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSuccessEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSun
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvWarningEdge
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -372,7 +388,7 @@ fun EnhancedUniversalFeedbackOverlay(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.8f))
+                    .background(RvScrim)
                     .clickable { manager.hideFeedback() },
                 contentAlignment = Alignment.Center
             ) {
@@ -383,9 +399,9 @@ fun EnhancedUniversalFeedbackOverlay(
                         .clickable { manager.hideFeedback() },
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (feedback.isCorrect) Color(0xFFE8F5E8) else Color(0xFFFFEBEB)
+                        containerColor = if (feedback.isCorrect) RvSuccess.copy(alpha = 0.15f) else RvError.copy(alpha = 0.15f)
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
                 ) {
                     Column(
                         modifier = Modifier.padding(24.dp),
@@ -402,7 +418,7 @@ fun EnhancedUniversalFeedbackOverlay(
                         Icon(
                             imageVector = if (feedback.isCorrect) Icons.Default.Check else Icons.Default.Close,
                             contentDescription = null,
-                            tint = if (feedback.isCorrect) Color(0xFF4CAF50) else Color(0xFFFF5252),
+                            tint = if (feedback.isCorrect) RvSuccess else RvError,
                             modifier = Modifier
                                 .size(60.dp)
                                 .scale(scale)
@@ -413,7 +429,7 @@ fun EnhancedUniversalFeedbackOverlay(
                             text = feedback.mainMessage,
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
-                            color = if (feedback.isCorrect) Color(0xFF2E7D32) else Color(0xFFD32F2F)
+                            color = if (feedback.isCorrect) RvSuccessEdge else RvErrorEdge
                         )
 
                         // Enhanced progression content (only for correct answers)
@@ -435,12 +451,12 @@ fun EnhancedUniversalFeedbackOverlay(
                                     Text(
                                         text = "Your answer: ${feedback.userAnswer}",
                                         fontSize = 16.sp,
-                                        color = Color(0xFF424242)
+                                        color = RvInk
                                     )
                                     Text(
                                         text = "Correct answer: ${feedback.correctAnswer}",
                                         fontSize = 16.sp,
-                                        color = Color(0xFFD32F2F),
+                                        color = RvErrorEdge,
                                         fontWeight = FontWeight.Medium
                                     )
                                 }
@@ -448,7 +464,7 @@ fun EnhancedUniversalFeedbackOverlay(
                                 Text(
                                     text = "Keep trying! You've got this! 💪",
                                     fontSize = 16.sp,
-                                    color = Color(0xFF757575),
+                                    color = RvInkSoft,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
@@ -463,12 +479,12 @@ fun EnhancedUniversalFeedbackOverlay(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(16.dp),
                                     strokeWidth = 2.dp,
-                                    color = Color(0xFF4CAF50)
+                                    color = RvSuccess
                                 )
                                 Text(
                                     text = "Updating score...",
                                     fontSize = 12.sp,
-                                    color = Color(0xFF757575)
+                                    color = RvInkSoft
                                 )
                             }
                         }
@@ -477,7 +493,7 @@ fun EnhancedUniversalFeedbackOverlay(
                         Text(
                             text = "Tap to continue",
                             fontSize = 12.sp,
-                            color = Color(0xFF757575),
+                            color = RvInkSoft,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }
@@ -529,28 +545,28 @@ private fun EnhancedScoreBreakdownView(scoreBreakdown: ScoreBreakdown) {
             text = "+${scoreBreakdown.totalScore} points",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2E7D32)
+            color = RvSuccessEdge
         )
 
         // Breakdown details
         if (scoreBreakdown.timeBonus > 0 || scoreBreakdown.streakBonus > 0 || scoreBreakdown.difficultyMultiplier > 1.0f) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.7f)),
+                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    ScoreRowView("Base Score", scoreBreakdown.baseScore, Color(0xFF2E7D32))
+                    ScoreRowView("Base Score", scoreBreakdown.baseScore, RvSuccessEdge)
 
                     if (scoreBreakdown.timeBonus > 0) {
-                        ScoreRowView("Time Bonus", scoreBreakdown.timeBonus, Color(0xFF1976D2))
+                        ScoreRowView("Time Bonus", scoreBreakdown.timeBonus, RvSkyEdge)
                     }
 
                     if (scoreBreakdown.streakBonus > 0) {
-                        ScoreRowView("Streak Bonus", scoreBreakdown.streakBonus, Color(0xFFFF9800))
+                        ScoreRowView("Streak Bonus", scoreBreakdown.streakBonus, RvWarningEdge)
                     }
 
                     if (scoreBreakdown.difficultyMultiplier > 1.0f) {
@@ -558,7 +574,7 @@ private fun EnhancedScoreBreakdownView(scoreBreakdown: ScoreBreakdown) {
                         Text(
                             text = multiplierText,
                             fontSize = 12.sp,
-                            color = Color(0xFF7B1FA2),
+                            color = RvGrapeEdge,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -571,7 +587,7 @@ private fun EnhancedScoreBreakdownView(scoreBreakdown: ScoreBreakdown) {
             text = "+${scoreBreakdown.xpGained} XP",
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF1976D2)
+            color = RvSkyEdge
         )
     }
 }
@@ -581,7 +597,7 @@ private fun LevelUpView(levelUp: LevelUpInfo) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFD700).copy(alpha = 0.9f)
+            containerColor = RvSun.copy(alpha = 0.25f)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -593,7 +609,7 @@ private fun LevelUpView(levelUp: LevelUpInfo) {
             Icon(
                 imageVector = Icons.Default.Star,
                 contentDescription = null,
-                tint = Color(0xFFFF6F00),
+                tint = RvSunEdge,
                 modifier = Modifier.size(32.dp)
             )
 
@@ -601,20 +617,20 @@ private fun LevelUpView(levelUp: LevelUpInfo) {
                 text = "LEVEL UP!",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFFF6F00)
+                color = RvSunEdge
             )
 
             Text(
                 text = "Level ${levelUp.oldLevel} → ${levelUp.newLevel}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF424242)
+                color = RvInk
             )
 
             Text(
                 text = "+${levelUp.rewardPoints} bonus points!",
                 fontSize = 14.sp,
-                color = Color(0xFF2E7D32)
+                color = RvSuccessEdge
             )
         }
     }
@@ -629,7 +645,7 @@ fun EnhancedStreakBonusCard(
         Card(
             modifier = modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFFFFF3E0)
+                containerColor = RvSun.copy(alpha = 0.15f)
             ),
             shape = RoundedCornerShape(12.dp)
         ) {
@@ -648,12 +664,12 @@ fun EnhancedStreakBonusCard(
                                 text = "${streakInfo.currentStreak} question streak!",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF6F00)
+                                color = RvSunEdge
                             )
                             Text(
                                 text = "×${streakInfo.streakMultiplier} score multiplier",
                                 fontSize = 12.sp,
-                                color = Color(0xFFFF9800)
+                                color = RvWarningEdge
                             )
                         }
                     }
@@ -670,12 +686,12 @@ fun EnhancedStreakBonusCard(
                                 text = "${streakInfo.dailyStreak} day streak!",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF5722)
+                                color = RvCoralEdge
                             )
                             Text(
                                 text = "Daily streak bonus active",
                                 fontSize = 12.sp,
-                                color = Color(0xFFFF7043)
+                                color = RvCoral
                             )
                         }
                     }
@@ -695,14 +711,14 @@ private fun NewAchievementsView(achievements: List<Achievement>) {
             text = "🏆 Achievement${if (achievements.size > 1) "s" else ""} Unlocked!",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF7B1FA2)
+            color = RvGrapeEdge
         )
 
         achievements.take(2).forEach { achievement ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFE1BEE7).copy(alpha = 0.8f)
+                    containerColor = RvGrape.copy(alpha = 0.15f)
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -720,12 +736,12 @@ private fun NewAchievementsView(achievements: List<Achievement>) {
                             text = achievement.title,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4A148C)
+                            color = RvInk
                         )
                         Text(
                             text = achievement.description,
                             fontSize = 12.sp,
-                            color = Color(0xFF7B1FA2)
+                            color = RvGrapeEdge
                         )
                     }
                 }
@@ -736,7 +752,7 @@ private fun NewAchievementsView(achievements: List<Achievement>) {
             Text(
                 text = "+${achievements.size - 2} more achievements!",
                 fontSize = 12.sp,
-                color = Color(0xFF7B1FA2)
+                color = RvGrapeEdge
             )
         }
     }
@@ -757,7 +773,7 @@ private fun ScoreRowView(
             text = label,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF424242)
+            color = RvInk
         )
         Text(
             text = "+$value",

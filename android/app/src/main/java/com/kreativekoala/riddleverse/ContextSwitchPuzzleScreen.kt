@@ -32,6 +32,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.Check
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import com.kreativekoala.riddleverse.ui.theme.RvDisabled
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import kotlinx.coroutines.delay
@@ -40,6 +47,10 @@ import org.json.JSONObject
 import kotlin.random.Random
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.roundToInt
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 
 // Data classes for the puzzle
 data class ContextSwitchPuzzleData(
@@ -186,78 +197,99 @@ fun ContextSwitchPuzzleScreen(
         }
     }
 
-    Column(
+    // Fit-to-screen: fixed header, the current phase takes the remaining space, its primary
+    // action (I'm ready / Continue / Submit) is pinned at the bottom. Landscape uses two panes.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(RvCanvas)
     ) {
-        // Header
-        PuzzleHeader(
-            difficulty = difficulty,
-            timer = formatTime(timeRemaining),
-            hearts = hearts,
-            level = level,
-            onBack = onBack
-        )
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val compact = maxHeight < 700.dp
+        val pad = if (compact) 8.dp else 16.dp
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(pad)
+                .widthIn(max = if (wide) 960.dp else 640.dp)
+                .align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // Header
+            PuzzleHeader(
+                difficulty = difficulty,
+                timer = formatTime(timeRemaining),
+                hearts = hearts,
+                level = level,
+                onBack = onBack
+            )
 
-        when (gamePhase) {
-            "memory" -> MemoryPhase(
-                items = puzzleState.memoryItems,
-                onReady = {
-                    gamePhase = "interference"
-                    userAlphabetOrder = puzzleState.interferenceTask.items
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 16.dp))
+
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                when (gamePhase) {
+                    "memory" -> MemoryPhase(
+                        items = puzzleState.memoryItems,
+                        wide = wide,
+                        compact = compact,
+                        onReady = {
+                            gamePhase = "interference"
+                            userAlphabetOrder = puzzleState.interferenceTask.items
+                        }
+                    )
+
+                    "interference" -> AlphabetizeInterferencePhase(
+                        task = puzzleState.interferenceTask,
+                        userAlphabetOrder = userAlphabetOrder,
+                        alphabetTaskCompleted = alphabetTaskCompleted,
+                        hasInteracted = hasInteracted,
+                        draggedItemIndex = draggedItemIndex,
+                        dragOffset = dragOffset,
+                        wide = wide,
+                        compact = compact,
+                        onAlphabetOrderChanged = { userAlphabetOrder = it },
+                        onInteractionChanged = { hasInteracted = it },
+                        onTaskCompletedChanged = { alphabetTaskCompleted = it },
+                        onItemDrag = { index, offset ->
+                            draggedItemIndex = index
+                            dragOffset = offset
+                        },
+                        onItemDrop = { fromIndex, toIndex ->
+                            if (fromIndex != toIndex && fromIndex >= 0 && toIndex >= 0 && fromIndex < userAlphabetOrder.size) {
+                                val newItems = userAlphabetOrder.toMutableList()
+                                val item = newItems.removeAt(fromIndex)
+                                val clampedToIndex = toIndex.coerceIn(0, newItems.size)
+                                newItems.add(clampedToIndex, item)
+                                userAlphabetOrder = newItems
+                                hasInteracted = true
+                            }
+                            draggedItemIndex = -1
+                            dragOffset = Offset.Zero
+                        },
+                        onComplete = { gamePhase = "recognition" }
+                    )
+
+                    "recognition" -> RecognitionPhase(
+                        items = puzzleState.recognitionItems,
+                        selectedAnswers = selectedAnswers,
+                        wide = wide,
+                        compact = compact,
+                        onSelectionChanged = { selectedAnswers = it },
+                        onSubmit = {
+                            val score = calculateScore(selectedAnswers, puzzleState.correctAnswers, timeRemaining)
+                            val correct = selectedAnswers == puzzleState.correctAnswers.toSet()
+
+                            finalScore = score
+                            isCorrect = correct
+
+                            handleCompletion(correct, score, onSubmitAnswer, fetchNextPuzzle) {
+                                showFeedback = true
+                            }
+                        }
+                    )
                 }
-            )
-
-            "interference" -> AlphabetizeInterferencePhase(
-                task = puzzleState.interferenceTask,
-                userAlphabetOrder = userAlphabetOrder,
-                alphabetTaskCompleted = alphabetTaskCompleted,
-                hasInteracted = hasInteracted,
-                draggedItemIndex = draggedItemIndex,
-                dragOffset = dragOffset,
-                onAlphabetOrderChanged = { userAlphabetOrder = it },
-                onInteractionChanged = { hasInteracted = it },
-                onTaskCompletedChanged = { alphabetTaskCompleted = it },
-                onItemDrag = { index, offset ->
-                    draggedItemIndex = index
-                    dragOffset = offset
-                },
-                onItemDrop = { fromIndex, toIndex ->
-                    if (fromIndex != toIndex && fromIndex >= 0 && toIndex >= 0 && fromIndex < userAlphabetOrder.size) {
-                        val newItems = userAlphabetOrder.toMutableList()
-                        val item = newItems.removeAt(fromIndex)
-                        val clampedToIndex = toIndex.coerceIn(0, newItems.size)
-                        newItems.add(clampedToIndex, item)
-                        userAlphabetOrder = newItems
-                        hasInteracted = true
-                    }
-                    draggedItemIndex = -1
-                    dragOffset = Offset.Zero
-                },
-                onComplete = { gamePhase = "recognition" }
-            )
-
-            "recognition" -> RecognitionPhase(
-                items = puzzleState.recognitionItems,
-                selectedAnswers = selectedAnswers,
-                onSelectionChanged = { selectedAnswers = it },
-                onSubmit = {
-                    val score = calculateScore(selectedAnswers, puzzleState.correctAnswers, timeRemaining)
-                    val correct = selectedAnswers == puzzleState.correctAnswers.toSet()
-
-                    finalScore = score
-                    isCorrect = correct
-
-                    handleCompletion(correct, score, onSubmitAnswer, fetchNextPuzzle) {
-                        showFeedback = true
-                    }
-                }
-            )
+            }
         }
     }
 
@@ -273,74 +305,149 @@ fun ContextSwitchPuzzleScreen(
     }
 }
 
+/** Phase layout: title block + content + pinned primary action; two panes when [wide]. */
+@Composable
+internal fun CsPhaseScaffold(
+    wide: Boolean,
+    compact: Boolean,
+    title: String,
+    subtitle: String?,
+    action: @Composable () -> Unit,
+    content: @Composable (Modifier) -> Unit
+) {
+    val head: @Composable () -> Unit = {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = title,
+                fontSize = if (compact) 20.sp else 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (subtitle != null) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    fontSize = if (compact) 14.sp else 16.sp,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+    if (wide) {
+        Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                modifier = Modifier.weight(0.8f).fillMaxHeight(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                head()
+                Spacer(Modifier.weight(1f))
+                action()
+            }
+            content(Modifier.weight(1.2f).fillMaxHeight())
+        }
+    } else {
+        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            head()
+            Spacer(modifier = Modifier.height(if (compact) 8.dp else 16.dp))
+            content(Modifier.fillMaxWidth().weight(1f))
+            Spacer(modifier = Modifier.height(if (compact) 8.dp else 12.dp))
+            action()
+        }
+    }
+}
+
+@Composable
+internal fun CsPrimaryAction(text: String, enabled: Boolean = true, onClick: () -> Unit) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+            .testTag("ctx_action"),
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = RvViolet,
+            contentColor = RvOnTone,
+            disabledContainerColor = RvDisabled,
+            disabledContentColor = RvInk
+        )
+    ) {
+        Text(
+            text = text,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
 @Composable
 private fun MemoryPhase(
     items: List<String>,
+    wide: Boolean,
+    compact: Boolean,
     onReady: () -> Unit
 ) {
     var showItems by remember { mutableStateOf(true) }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Study these items",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Memorize all items in the list below",
-            fontSize = 16.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        if (showItems) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A3E))
-            ) {
-                LazyColumn(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(items) { item ->
-                        Text(
-                            text = "• $item",
-                            fontSize = 18.sp,
-                            color = Color.White,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
+    CsPhaseScaffold(
+        wide = wide,
+        compact = compact,
+        title = "Study these items",
+        subtitle = "Memorize all items in the list below",
+        action = {
+            if (showItems) {
+                CsPrimaryAction(text = stringResource(R.string.im_ready)) {
                     showItems = false
                     onReady()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-            ) {
-                Text(
-                    text = stringResource(R.string.im_ready),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                }
+            }
+        }
+    ) { m ->
+        if (showItems) {
+            CsMemoryList(items = items, modifier = m)
+        }
+    }
+}
+
+/** Memory list: items flow into as many columns as needed to fit the height (no scrolling). */
+@Composable
+internal fun CsMemoryList(items: List<String>, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = RvSurface)
+    ) {
+        BoxWithConstraints(modifier = Modifier.fillMaxSize().padding(12.dp), contentAlignment = Alignment.Center) {
+            val rowH = 40.dp
+            val perCol = (maxHeight / rowH).toInt().coerceAtLeast(1)
+            val cols = ((items.size + perCol - 1) / perCol).coerceIn(1, 3)
+            val chunk = (items.size + cols - 1) / cols
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                items.chunked(chunk.coerceAtLeast(1)).forEach { colItems ->
+                    Column(
+                        modifier = Modifier.weight(1f, fill = false),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        colItems.forEach { item ->
+                            Text(
+                                text = "• $item",
+                                fontSize = aCapSp(18f, 1.3f),
+                                color = RvInk,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.heightIn(min = 36.dp).testTag("ctx_memory_item")
+                            )
+                        }
+                    }
+                }
             }
         }
     }
@@ -354,6 +461,8 @@ private fun AlphabetizeInterferencePhase(
     hasInteracted: Boolean,
     draggedItemIndex: Int,
     dragOffset: Offset,
+    wide: Boolean,
+    compact: Boolean,
     onAlphabetOrderChanged: (List<String>) -> Unit,
     onInteractionChanged: (Boolean) -> Unit,
     onTaskCompletedChanged: (Boolean) -> Unit,
@@ -367,81 +476,30 @@ private fun AlphabetizeInterferencePhase(
         onTaskCompletedChanged(isCorrectOrder)
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Alphabetization Task",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = task.instruction,
-                fontSize = 16.sp,
-                color = Color.Gray,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Drag and drop alphabetization interface
-            AlphabetizeDragDropInterface(
-                items = userAlphabetOrder,
-                draggedItemIndex = draggedItemIndex,
-                dragOffset = dragOffset,
-                onItemDrag = onItemDrag,
-                onItemDrop = onItemDrop,
-                onOrderChanged = { newOrder ->
-                    onAlphabetOrderChanged(newOrder)
-                    onInteractionChanged(true)
-                }
-            )
-
-            Spacer(modifier = Modifier.height(80.dp)) // Space for floating button
+    CsPhaseScaffold(
+        wide = wide,
+        compact = compact,
+        title = "Alphabetization Task",
+        subtitle = task.instruction,
+        // The button is always visible (disabled until the order is right) so the layout never
+        // jumps and the next step is always discoverable.
+        action = {
+            CsPrimaryAction(text = "${stringResource(R.string.continue_label)} →", enabled = alphabetTaskCompleted, onClick = onComplete)
         }
-
-        // Floating Continue Button - only show when task is completed
-        if (alphabetTaskCompleted) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                Button(
-                    onClick = onComplete,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.continue_label),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = "→",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
-                    }
-                }
-            }
-        }
+    ) { m ->
+        // Drag and drop alphabetization interface
+        AlphabetizeDragDropInterface(
+            items = userAlphabetOrder,
+            draggedItemIndex = draggedItemIndex,
+            dragOffset = dragOffset,
+            onItemDrag = onItemDrag,
+            onItemDrop = onItemDrop,
+            onOrderChanged = { newOrder ->
+                onAlphabetOrderChanged(newOrder)
+                onInteractionChanged(true)
+            },
+            modifier = m
+        )
     }
 }
 
@@ -452,47 +510,55 @@ private fun AlphabetizeDragDropInterface(
     dragOffset: Offset,
     onItemDrag: (Int, Offset) -> Unit,
     onItemDrop: (Int, Int) -> Unit,
-    onOrderChanged: (List<String>) -> Unit
+    onOrderChanged: (List<String>) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val haptics = LocalHapticFeedback.current
 
-    Column(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Text(
-            text = "Drag to reorder alphabetically:",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        items.forEachIndexed { index, word ->
-            AlphabetizeItem(
-                word = word,
-                index = index,
-                isDragged = draggedItemIndex == index,
-                dragOffset = if (draggedItemIndex == index) dragOffset else Offset.Zero,
-                onMoveUp = {
-                    if (index > 0) {
-                        val newItems = items.toMutableList()
-                        newItems.add(index - 1, newItems.removeAt(index))
-                        onOrderChanged(newItems)
-                    }
-                },
-                onMoveDown = {
-                    if (index < items.size - 1) {
-                        val newItems = items.toMutableList()
-                        newItems.add(index + 1, newItems.removeAt(index))
-                        onOrderChanged(newItems)
-                    }
-                },
-                onDrag = { offset -> onItemDrag(index, offset) },
-                onDrop = { toIndex -> onItemDrop(index, toIndex) },
-                haptics = haptics
+    BoxWithConstraints(modifier = modifier) {
+        val gap = 8.dp
+        val n = items.size.coerceAtLeast(1)
+        // Rows share the available height (48-64dp); the drop index maths uses the same height.
+        val itemH = ((maxHeight - 28.dp - gap * (n - 1)) / n).coerceIn(48.dp, 64.dp)
+        Column(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter)) {
+            Text(
+                text = "Drag to reorder alphabetically:",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvInk,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.height(28.dp)
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            items.forEachIndexed { index, word ->
+                AlphabetizeItem(
+                    word = word,
+                    index = index,
+                    itemHeight = itemH,
+                    isDragged = draggedItemIndex == index,
+                    dragOffset = if (draggedItemIndex == index) dragOffset else Offset.Zero,
+                    onMoveUp = {
+                        if (index > 0) {
+                            val newItems = items.toMutableList()
+                            newItems.add(index - 1, newItems.removeAt(index))
+                            onOrderChanged(newItems)
+                        }
+                    },
+                    onMoveDown = {
+                        if (index < items.size - 1) {
+                            val newItems = items.toMutableList()
+                            newItems.add(index + 1, newItems.removeAt(index))
+                            onOrderChanged(newItems)
+                        }
+                    },
+                    onDrag = { offset -> onItemDrag(index, offset) },
+                    onDrop = { toIndex -> onItemDrop(index, toIndex) },
+                    haptics = haptics
+                )
+
+                if (index < items.size - 1) Spacer(modifier = Modifier.height(gap))
+            }
         }
     }
 }
@@ -501,6 +567,7 @@ private fun AlphabetizeDragDropInterface(
 private fun AlphabetizeItem(
     word: String,
     index: Int,
+    itemHeight: androidx.compose.ui.unit.Dp,
     isDragged: Boolean,
     dragOffset: Offset,
     onMoveUp: () -> Unit,
@@ -514,6 +581,8 @@ private fun AlphabetizeItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
+            .height(itemHeight)
+            .testTag("ctx_word")
             .offset {
                 if (isDragged) IntOffset(dragState.x.roundToInt(), dragState.y.roundToInt())
                 else IntOffset.Zero
@@ -531,9 +600,9 @@ private fun AlphabetizeItem(
                         onDrag(dragState)
                     },
                     onDragEnd = {
-                        // Calculate drop position based on drag offset
-                        val itemHeight = 64.dp.toPx()
-                        val offsetItems = (dragState.y / itemHeight).roundToInt()
+                        // Calculate drop position based on drag offset (row height + 8dp gap)
+                        val itemHeightPx = (itemHeight + 8.dp).toPx()
+                        val offsetItems = (dragState.y / itemHeightPx).roundToInt()
                         val newIndex = (index + offsetItems).coerceAtLeast(0)
                         onDrop(newIndex)
                         dragState = Offset.Zero
@@ -541,69 +610,61 @@ private fun AlphabetizeItem(
                 )
             },
         colors = CardDefaults.cardColors(
-            containerColor = if (isDragged)
-                Color(0xFF00BCD4).copy(alpha = 0.3f)
-            else
-                Color(0xFF2A2A3E)
+            containerColor = if (isDragged) RvViolet.copy(alpha = 0.2f) else RvSurface
         ),
+        border = androidx.compose.foundation.BorderStroke(1.dp, if (isDragged) RvViolet else RvOutline),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxSize()
+                .padding(start = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.DragHandle,
                 contentDescription = "Drag",
-                tint = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.size(20.dp)
+                tint = RvInkSoft,
+                modifier = Modifier.size(24.dp)
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
             Text(
                 text = "${index + 1}.",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White.copy(alpha = 0.7f),
-                modifier = Modifier.width(32.dp)
+                color = RvInkSoft,
+                modifier = Modifier.widthIn(min = 28.dp)
             )
 
             Text(
                 text = word,
-                fontSize = 16.sp,
+                fontSize = aCapSp(16f, 1.3f),
                 fontWeight = FontWeight.Medium,
-                color = Color.White,
+                color = RvInk,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)
             )
 
-            // Up/Down buttons for alternative interaction
-            Column {
-                IconButton(
-                    onClick = onMoveUp,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowUp,
-                        contentDescription = "Move Up",
-                        tint = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+            // Up/Down buttons for alternative interaction (48dp tap targets side by side)
+            IconButton(onClick = onMoveUp, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Move Up",
+                    tint = RvInk,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
 
-                IconButton(
-                    onClick = onMoveDown,
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = "Move Down",
-                        tint = Color.White.copy(alpha = 0.7f),
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
+            IconButton(onClick = onMoveDown, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    imageVector = Icons.Default.KeyboardArrowDown,
+                    contentDescription = "Move Down",
+                    tint = RvInk,
+                    modifier = Modifier.size(28.dp)
+                )
             }
         }
     }
@@ -613,89 +674,109 @@ private fun AlphabetizeItem(
 private fun RecognitionPhase(
     items: List<String>,
     selectedAnswers: Set<String>,
+    wide: Boolean,
+    compact: Boolean,
     onSelectionChanged: (Set<String>) -> Unit,
     onSubmit: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "Recognition Test",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
+    CsPhaseScaffold(
+        wide = wide,
+        compact = compact,
+        title = "Recognition Test",
+        subtitle = "Select all items from the original list",
+        action = {
+            CsPrimaryAction(
+                text = stringResource(R.string.submit_answer),
+                enabled = selectedAnswers.isNotEmpty(),
+                onClick = onSubmit
+            )
+        }
+    ) { m ->
+        CsSelectionGrid(
+            items = items,
+            selectedAnswers = selectedAnswers,
+            onSelectionChanged = onSelectionChanged,
+            modifier = m
         )
+    }
+}
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Select all items from the original list",
-            fontSize = 16.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(items) { item ->
-                val isSelected = item in selectedAnswers
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            val newSelection = if (isSelected) {
-                                selectedAnswers - item
-                            } else {
-                                selectedAnswers + item
+/** Multi-select grid of items, cell height derived from the space given (no scrolling). */
+@Composable
+internal fun CsSelectionGrid(
+    items: List<String>,
+    selectedAnswers: Set<String>,
+    onSelectionChanged: (Set<String>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+        BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+            val gap = 8.dp
+            // Fewest columns (2..4) whose rows still fit at >= 48dp each.
+            val cols = (2..4).firstOrNull { c ->
+                val rows = (items.size + c - 1) / c
+                (maxHeight - gap * (rows - 1)) / rows >= 48.dp
+            } ?: 4
+            val rows = ((items.size + cols - 1) / cols).coerceAtLeast(1)
+            val cellH = ((maxHeight - gap * (rows - 1)) / rows).coerceIn(48.dp, 72.dp)
+            Column(verticalArrangement = Arrangement.spacedBy(gap)) {
+                items.chunked(cols).forEach { rowItems ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(gap), modifier = Modifier.fillMaxWidth()) {
+                        rowItems.forEach { item ->
+                            val isSelected = item in selectedAnswers
+                            Card(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(cellH)
+                                    .testTag("ctx_item")
+                                    .clickable {
+                                        val newSelection = if (isSelected) {
+                                            selectedAnswers - item
+                                        } else {
+                                            selectedAnswers + item
+                                        }
+                                        onSelectionChanged(newSelection)
+                                    }
+                                    .border(
+                                        width = if (isSelected) 3.dp else 1.dp,
+                                        color = if (isSelected) RvViolet else RvInkSoft,
+                                        shape = RoundedCornerShape(12.dp)
+                                    ),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) RvViolet.copy(alpha = 0.12f) else RvSurface
+                                )
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    if (isSelected) {
+                                        Icon(
+                                            imageVector = Icons.Default.Check,
+                                            contentDescription = null,
+                                            tint = RvViolet,
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                        Spacer(Modifier.width(4.dp))
+                                    }
+                                    Text(
+                                        text = item,
+                                        fontSize = aCapSp(16f, 1.15f),
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = RvInk,
+                                        textAlign = TextAlign.Center,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
                             }
-                            onSelectionChanged(newSelection)
                         }
-                        .border(
-                            width = if (isSelected) 3.dp else 1.dp,
-                            color = if (isSelected) Color(0xFF4CAF50) else Color.Gray,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) Color(0xFF2A4A2A) else Color(0xFF2A2A3E)
-                    )
-                ) {
-                    Text(
-                        text = item,
-                        fontSize = 16.sp,
-                        color = Color.White,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
+                        // keep last-row cells the same width
+                        repeat(cols - rowItems.size) { Spacer(Modifier.weight(1f)) }
+                    }
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            onClick = onSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B35)),
-            enabled = selectedAnswers.isNotEmpty()
-        ) {
-            Text(
-                text = stringResource(R.string.submit_answer),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
 }
 
 // Helper functions
@@ -797,32 +878,37 @@ private fun PuzzleHeader(
     onBack: () -> Unit
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+        modifier = Modifier.fillMaxWidth().statusBarsPadding(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = onBack,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-        ) {
-            Text(stringResource(R.string.back), color = Color.White)
+        Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
+            TextButton(
+                onClick = onBack,
+                modifier = Modifier.heightIn(min = 48.dp)
+            ) {
+                Text(stringResource(R.string.back), color = RvInk, fontSize = 16.sp, maxLines = 1)
+            }
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = level,
-                color = Color.White,
-                fontSize = 14.sp
+                color = RvInkSoft,
+                fontSize = 14.sp,
+                maxLines = 1
             )
             Text(
                 text = timer,
-                color = Color.White,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                color = RvInk,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier.testTag("hud_timer")
             )
         }
 
-        Row {
+        Row(modifier = Modifier.weight(1f), horizontalArrangement = Arrangement.End) {
             repeat(hearts) {
                 Text("❤️", fontSize = 16.sp)
             }

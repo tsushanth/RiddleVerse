@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvSky
 
 /**
  * Client-side Conversion Puzzle Generator
@@ -19,6 +20,7 @@ open class ConversionPuzzleGenerator {
         // Conversion tolerance for equality comparisons (0.1% or 0.001, whichever is larger)
         private const val EQUALITY_TOLERANCE_PERCENT = 0.001
         private const val MIN_EQUALITY_TOLERANCE = 0.001
+        private const val MAX_FRIENDLY_ATTEMPTS = 40
     }
 
     private fun debugLog(message: String, type: String = "info") {
@@ -41,16 +43,21 @@ open class ConversionPuzzleGenerator {
 
         try {
             val difficultyConfig = getDifficultyConfig(difficulty)
-            val conversionType = selectConversionType(difficultyConfig)
-            val unitPair = selectUnitPair(conversionType, difficultyConfig)
 
-            // Generate values with controlled comparison result
-            val comparisonData = generateComparisonValues(
-                unitPair.first,
-                unitPair.second,
-                conversionType,
-                difficultyConfig
-            )
+            // Players don't care about long decimals: keep re-rolling the unit pair and values
+            // until both numbers are easy to read (see isFriendly).
+            fun roll(): Triple<ConversionType, Pair<String, String>, ComparisonData> {
+                val type = selectConversionType(difficultyConfig)
+                val units = selectUnitPair(type, difficultyConfig)
+                return Triple(type, units, generateComparisonValues(units.first, units.second, type, difficultyConfig))
+            }
+            var rolled = roll()
+            var attempts = 1
+            while (attempts < MAX_FRIENDLY_ATTEMPTS && !(isFriendly(rolled.third.value1) && isFriendly(rolled.third.value2))) {
+                rolled = roll()
+                attempts++
+            }
+            val (conversionType, unitPair, comparisonData) = rolled
 
             val leftBlock = ConversionBlock(
                 id = 1,
@@ -65,7 +72,7 @@ open class ConversionPuzzleGenerator {
                 label = formatValueLabel(comparisonData.value2, unitPair.second),
                 value = comparisonData.value2,
                 unit = unitPair.second,
-                color = Color(0xFF2196F3)
+                color = RvSky
             )
 
             val puzzleData = ConversionPuzzleData(
@@ -236,27 +243,24 @@ open class ConversionPuzzleGenerator {
         config: ConversionDifficultyConfig
     ): ComparisonData {
 
-        // Start with a base value in unit1
-        val baseValue = generateRandomValue(config.valueRange, config.decimalPlaces)
-
-        // Convert to unit2 to get the equivalent value
-        val comparisonResult = converter.compareValues(baseValue, unit1, 1.0, unit2)
-
-        // If comparison result is 0, units have same scale
-        // Otherwise, calculate the equivalent value
-        val equivalentValue = if (abs(comparisonResult) < 0.0001) {
-            baseValue
-        } else {
-            // Use the converter to find equivalent value
-            calculateEquivalentValue(baseValue, unit1, unit2, conversionType)
+        // Pick an easy number in unit2, convert it to unit1, and keep the pair only if that
+        // number is easy to read too (e.g. 90 min = 1.5 hr, not 84 sec = 0.0233 hr).
+        repeat(60) {
+            val target = friendlyRound(Random.nextDouble(config.valueRange.first, config.valueRange.second))
+            if (target < 0.5) return@repeat
+            val base = calculateEquivalentValue(target, unit2, unit1, conversionType)
+            if (isFriendly(base)) {
+                return ComparisonData(
+                    value1 = friendlyRound(base),
+                    value2 = target,
+                    correctAnswer = ComparisonResult.EQUAL,
+                    actualRatio = 1.0
+                )
+            }
         }
 
-        return ComparisonData(
-            value1 = baseValue,
-            value2 = equivalentValue,
-            correctAnswer = ComparisonResult.EQUAL,
-            actualRatio = 1.0
-        )
+        // These units never line up on readable numbers: fall back to an unequal pair.
+        return generateUnequalValues(unit1, unit2, conversionType, config)
     }
 
     /**
@@ -289,8 +293,8 @@ open class ConversionPuzzleGenerator {
         }
 
         // Round values appropriately
-        val roundedValue1 = roundToDecimalPlaces(finalValue1, config.decimalPlaces)
-        val roundedValue2 = roundToDecimalPlaces(finalValue2, config.decimalPlaces)
+        val roundedValue1 = friendlyRound(finalValue1)
+        val roundedValue2 = friendlyRound(finalValue2)
 
         // Verify the comparison is still correct after rounding
         val verificationResult = converter.compareValues(roundedValue1, unit1, roundedValue2, unit2)
@@ -388,8 +392,16 @@ open class ConversionPuzzleGenerator {
      */
     private fun generateRandomValue(range: Pair<Double, Double>, decimalPlaces: Int): Double {
         val value = Random.nextDouble(range.first, range.second)
-        return roundToDecimalPlaces(value, decimalPlaces)
+        return friendlyRound(value)
     }
+
+    /** Whole numbers from 100 up, otherwise at most one decimal place. */
+    private fun friendlyRound(value: Double): Double =
+        if (abs(value) >= 100.0) value.roundToLong().toDouble() else (value * 10.0).roundToLong() / 10.0
+
+    /** A number people can read at a glance: at least 0.5 and already at friendlyRound precision. */
+    internal fun isFriendly(value: Double): Boolean =
+        value >= 0.5 && abs(value - friendlyRound(value)) < 1e-6 * maxOf(1.0, abs(value))
 
     /**
      * Round to specified decimal places
@@ -404,10 +416,10 @@ open class ConversionPuzzleGenerator {
      */
     private fun formatValueLabel(value: Double, unit: String): String {
         val shortUnit = converter.getShortUnit(unit)
-        val formattedValue = if (value % 1.0 == 0.0) {
-            value.toInt().toString()
+        val formattedValue = if (abs(value) >= 100.0 || value % 1.0 == 0.0) {
+            value.roundToLong().toString()
         } else {
-            "%.3f".format(value).trimEnd('0').trimEnd('.')
+            "%.1f".format(value).trimEnd('0').trimEnd('.')
         }
         return "$formattedValue $shortUnit"
     }

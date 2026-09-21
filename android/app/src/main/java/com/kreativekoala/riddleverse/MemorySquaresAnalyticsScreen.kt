@@ -1,6 +1,7 @@
 // MemorySquaresAnalyticsScreen.kt - Shows adaptive difficulty analytics
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -50,20 +51,20 @@ fun MemorySquaresAnalyticsScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = Color.White)
+                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
             }
 
             Text(
                 text = stringResource(R.string.performance_analytics),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Icon(
                 Icons.Default.Analytics,
                 contentDescription = "Analytics",
-                tint = Color.White
+                tint = RvInk
             )
         }
 
@@ -77,7 +78,7 @@ fun MemorySquaresAnalyticsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -152,7 +153,7 @@ fun MemorySquaresAnalyticsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -216,7 +217,7 @@ fun MemorySquaresAnalyticsScreen(
                                     title = "Games",
                                     value = "${analytics["gamesPlayed"]}",
                                     subtitle = "Played",
-                                    color = Color(0xFF607D8B)
+                                    color = RvInkSoft
                                 )
 
                                 StatCard(
@@ -254,7 +255,7 @@ fun MemorySquaresAnalyticsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -290,7 +291,7 @@ fun MemorySquaresAnalyticsScreen(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(16.dp)
                 ) {
@@ -390,7 +391,7 @@ fun StatCard(
             text = title,
             fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Black
+            color = RvInk
         )
 
         Text(
@@ -440,19 +441,19 @@ fun DifficultyProgressionTimeline(currentDifficulty: DifficultyManager.Difficult
                         isCurrentLevel -> Icon(
                             Icons.Default.RadioButtonChecked,
                             contentDescription = "Current",
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(16.dp)
                         )
                         isPastLevel -> Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = "Completed",
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(16.dp)
                         )
                         else -> Icon(
                             Icons.Default.Circle,
                             contentDescription = "Future",
-                            tint = Color.White.copy(alpha = 0.5f),
+                            tint = RvInkSoft.copy(alpha = 0.5f),
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -547,21 +548,21 @@ fun InsightCards(analytics: Map<String, Any>, currentDifficulty: DifficultyManag
                 icon = Icons.Default.TipsAndUpdates,
                 title = "Beginner Memory Tip",
                 description = "Try the 'story method': create a mental story connecting the highlighted squares. For example, imagine a path or shape.",
-                color = Color(0xFF607D8B)
+                color = RvInkSoft
             )
 
             currentDifficulty.gridSize == 5 -> InsightCard(
                 icon = Icons.Default.Extension,
                 title = "Chunking Strategy",
                 description = "Group nearby squares into patterns or shapes. Your brain remembers 3-4 groups better than individual positions.",
-                color = Color(0xFF607D8B)
+                color = RvInkSoft
             )
 
             currentDifficulty.gridSize >= 6 -> InsightCard(
                 icon = Icons.Default.Memory,
                 title = "Advanced Technique",
                 description = "Use the 'palace method': imagine familiar locations and place each square there. This leverages spatial memory.",
-                color = Color(0xFF607D8B)
+                color = RvInkSoft
             )
         }
     }

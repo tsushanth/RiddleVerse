@@ -1,6 +1,7 @@
 // AdaptiveColorShapeMatchingPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -134,7 +135,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -307,7 +308,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                     adaptationInfo = config
                     if (config.confidenceScore > 0.5f) {
                         currentDifficultyLevel = config.level
-                        showAdaptationNotification = true
+                        showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                     }
                 }
 
@@ -320,7 +321,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(RvSurface)
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -362,7 +363,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
+                    containerColor = RvSky.copy(alpha = 0.9f)
                 )
             ) {
                 Row(
@@ -374,7 +375,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                     Icon(
                         Icons.Default.TrendingUp,
                         contentDescription = stringResource(R.string.difficulty_advanced),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -383,12 +384,12 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                             text = "Visual Challenge Adapted!",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                         Text(
                             text = adaptationInfo?.adjustmentReason ?: "",
                             fontSize = 10.sp,
-                            color = Color.White.copy(alpha = 0.9f)
+                            color = RvInkSoft.copy(alpha = 0.9f)
                         )
                     }
                     IconButton(
@@ -398,7 +399,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                         Icon(
                             Icons.Default.Close,
                             contentDescription = stringResource(R.string.close),
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -415,8 +416,8 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                 .fillMaxWidth()
                 .height(4.dp)
                 .clip(RoundedCornerShape(2.dp)),
-            color = Color(0xFF4CAF50),
-            trackColor = Color(0xFFE0E0E0)
+            color = RvSuccess,
+            trackColor = RvOutline
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -427,7 +428,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            color = Color(0xFF333333)
+            color = RvInk
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -449,7 +450,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
         Box(
             modifier = Modifier
                 .size(200.dp)
-                .background(Color.White, RoundedCornerShape(16.dp))
+                .background(RvSurfaceRaised, RoundedCornerShape(16.dp))
                 .padding(32.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -475,7 +476,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                         .weight(1f)
                         .height(60.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFE53E3E)
+                        containerColor = RvError
                     ),
                     shape = RoundedCornerShape(30.dp)
                 ) {
@@ -483,13 +484,13 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("✗", fontSize = 24.sp, color = Color.White)
+                        Text("✗", fontSize = 24.sp, color = RvInk)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "NO",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                     }
                 }
@@ -503,7 +504,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                         .weight(1f)
                         .height(60.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF38A169)
+                        containerColor = RvSuccess
                     ),
                     shape = RoundedCornerShape(30.dp)
                 ) {
@@ -511,13 +512,13 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text("✓", fontSize = 24.sp, color = Color.White)
+                        Text("✓", fontSize = 24.sp, color = RvInk)
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.yes),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                     }
                 }
@@ -553,7 +554,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                     Text(
                         text = "Score: $totalScore",
                         fontSize = 14.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -578,7 +579,7 @@ fun AdaptiveColorShapeTopBar(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth().statusBarsPadding(),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -597,12 +598,12 @@ fun AdaptiveColorShapeTopBar(
                     onClick = onBack,
                     modifier = Modifier
                         .size(40.dp)
-                        .background(Color(0xFFF0F0F0), CircleShape)
+                        .background(RvSurface, CircleShape)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color(0xFF333333),
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -612,13 +613,13 @@ fun AdaptiveColorShapeTopBar(
                         text = "Level ${level.level}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
+                        color = RvInk,
                         textAlign = TextAlign.Center
                     )
                     Text(
                         text = "Challenge $challengeNumber of $totalChallenges",
                         fontSize = 12.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
                 }
 
@@ -647,7 +648,7 @@ fun AdaptiveColorShapeTopBar(
                     text = currentDifficulty.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4FC3F7)
+                    color = RvSky
                 )
 
                 Text(
@@ -657,7 +658,7 @@ fun AdaptiveColorShapeTopBar(
                     color = if (timer.startsWith("00:") && timer.substring(3).toIntOrNull()?.let { it <= 30 } == true) {
                         Color.Red
                     } else {
-                        Color.Black
+                        RvInk
                     }
                 )
 
@@ -665,7 +666,7 @@ fun AdaptiveColorShapeTopBar(
                     text = "Score: $score",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4CAF50)
+                    color = RvSuccess
                 )
             }
         }
@@ -730,7 +731,7 @@ fun generateAdaptiveChallenge(config: AdaptiveColorShapeConfig): ColorShapeChall
         Color.Green to "GREEN",
         Color.Yellow to "YELLOW",
         Color.Magenta to "PURPLE",
-        Color(0xFFFFA500) to "ORANGE",
+        RvSun to "ORANGE",
         Color(0xFFFFC0CB) to "PINK",
         Color(0xFF8B4513) to "BROWN"
     )

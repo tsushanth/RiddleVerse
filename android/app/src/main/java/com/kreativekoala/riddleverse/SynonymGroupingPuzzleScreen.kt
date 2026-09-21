@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
@@ -25,6 +26,8 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -70,8 +73,8 @@ fun SynonymGroupingPuzzleScreen(
     val synonymSetData = remember(synonymSets) {
         val colors = listOf(
             Color(0xFFE91E63), // Pink
-            Color(0xFF2196F3), // Blue
-            Color(0xFF4CAF50)  // Green
+            RvSky, // Blue
+            RvSuccess  // Green
         )
 
         synonymSets.mapIndexed { index, words ->
@@ -317,248 +320,216 @@ fun SynonymGroupingPuzzleScreen(
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvCanvas)) {
+        val compact = groupEIsCompact(maxWidth, maxHeight)
+        val wide = groupEIsWide(maxWidth, maxHeight)
+        val timerText = "${timeRemaining / 60}:${(timeRemaining % 60).toString().padStart(2, '0')}"
+        val wordText = wordQueue.getOrNull(currentWordIndex)?.word
+
         Column(
             modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 840.dp)
                 .fillMaxSize()
-                .background(Color(0xFF1A1A2E))
                 .statusBarsPadding()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Header with enhanced info
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White
-                    )
-                }
+            // HUD: back, timer, level + score, hearts (single row).
+            GroupECompactHud(
+                timer = timerText,
+                onBack = onBack,
+                subtitle = "$level \u2022 ${stringResource(R.string.score_label)} $score",
+                lives = currentHearts,
+                urgent = timeRemaining <= 30
+            )
 
-                Text(
-                    text = difficulty.uppercase(),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp
-                )
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.Default.Timer,
-                        contentDescription = "Timer",
-                        tint = if (timeRemaining <= 30) Color.Red else Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Text(
-                        text = "${timeRemaining / 60}:${(timeRemaining % 60).toString().padStart(2, '0')}",
-                        color = if (timeRemaining <= 30) Color.Red else Color.White,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(start = 4.dp)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Level, Hearts, and Progress
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = level,
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp
-                    )
+            // Progress + streak (one slim row).
+            GroupEFontCap {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     Text(
                         text = "${currentWordIndex}/${wordQueue.size} words",
-                        color = Color.White.copy(alpha = 0.6f),
-                        fontSize = 12.sp
+                        color = RvInkSoft,
+                        fontSize = 14.sp,
+                        maxLines = 1
                     )
-                }
-
-                Row {
-                    repeat(hearts) { index ->
+                    LinearProgressIndicator(
+                        progress = if (wordQueue.isEmpty()) 0f else currentWordIndex.toFloat() / wordQueue.size,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = RvSuccess,
+                        trackColor = RvOutline
+                    )
+                    if (consecutiveCorrect > 1) {
                         Text(
-                            text = if (index < currentHearts) "❤️" else "🤍",
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(horizontal = 2.dp)
+                            text = "\uD83D\uDD25 $consecutiveCorrect",
+                            color = RvInk,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Score and Streak Display
-            if (score > 0 || consecutiveCorrect > 0) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF2A2A3E)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (score > 0) {
-                            Text(
-                                text = "${stringResource(R.string.score_label)}: $score",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        if (consecutiveCorrect > 1) {
-                            Text(
-                                text = "🔥 ${consecutiveCorrect} streak!",
-                                color = Color(0xFFFF9800),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            // Instructions
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF2A2A3E)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Group the synonyms! Tap the set that matches the word above.",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            // Add more space to push content down
-            Spacer(modifier = Modifier.height(64.dp))
-
-            // Main Game Area - moved down and simplified
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    // Central word display - simplified
-                    if (currentWordIndex < wordQueue.size && !gameComplete) {
-                        Card(
-                            modifier = Modifier
-                                .wrapContentSize()
-                                .padding(32.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White
-                            ),
-                            shape = RoundedCornerShape(20.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                        ) {
-                            Text(
-                                text = wordQueue.getOrNull(currentWordIndex)?.word ?: "Loading...",
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Black,
-                                modifier = Modifier.padding(32.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    } else {
-                        // Show a placeholder when game is complete (feedback will show the real completion)
-                        Card(
-                            modifier = Modifier
-                                .wrapContentSize()
-                                .padding(32.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color.White.copy(alpha = 0.8f)
-                            ),
-                            shape = RoundedCornerShape(20.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-                        ) {
-                            Text(
-                                text = "🎉",
-                                fontSize = 28.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4CAF50),
-                                modifier = Modifier.padding(32.dp),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-
-                    // Add space between word and buttons
-                    Spacer(modifier = Modifier.height(80.dp))
-
-                    // Synonym set buttons - arranged horizontally without arrows
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        synonymSetData.forEach { set ->
-                            SynonymSetButton(
-                                synonymSet = set,
-                                isSelected = selectedSetId == set.id,
-                                isHighlighted = false, // Remove highlighting since no arrows
-                                onClick = { handleSetSelection(set.id) }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Enhanced Score Display at Bottom
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "${stringResource(R.string.score_label)}: $score",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-
-                if (totalAnswered > 0) {
+            // Instruction (dropped on short screens where the play area needs the room).
+            if (!compact) {
+                GroupEFontCap {
                     Text(
-                        text = "${stringResource(R.string.accuracy)}: ${((consecutiveCorrect.toFloat() / totalAnswered) * 100).toInt()}%",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp
+                        text = "Group the synonyms! Tap the set that matches the word above.",
+                        color = RvInk,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Play area: the word to place + the sets to place it into. Fills all remaining space.
+            val wordCard: @Composable (Modifier) -> Unit = { m ->
+                Box(modifier = m, contentAlignment = Alignment.Center) {
+                    if (currentWordIndex < wordQueue.size && !gameComplete) {
+                        Card(
+                            modifier = Modifier
+                                .widthIn(min = 160.dp)
+                                .testTag("synonym_word"),
+                            colors = CardDefaults.cardColors(containerColor = RvSurface),
+                            shape = RoundedCornerShape(20.dp),
+                            border = BorderStroke(2.dp, RvOutline)
+                        ) {
+                            Text(
+                                text = wordText ?: "Loading...",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = RvInk,
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+                                textAlign = TextAlign.Center,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    } else {
+                        // Placeholder when the game is complete (feedback shows the real completion)
+                        Card(
+                            modifier = Modifier.testTag("synonym_word"),
+                            colors = CardDefaults.cardColors(containerColor = RvSurface),
+                            shape = RoundedCornerShape(20.dp)
+                        ) {
+                            Text(
+                                text = "\uD83C\uDF89",
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = RvSuccess,
+                                modifier = Modifier.padding(24.dp),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
+
+            val choices: @Composable (Modifier) -> Unit = { m ->
+                Column(modifier = m, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    synonymSetData.forEach { set ->
+                        GroupESynonymChoice(
+                            synonymSet = set,
+                            isSelected = selectedSetId == set.id,
+                            onClick = { handleSetSelection(set.id) },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+            }
+
+            if (wide) {
+                Row(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    wordCard(Modifier.weight(1f).fillMaxHeight())
+                    choices(Modifier.weight(1f))
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    wordCard(Modifier.weight(1f).fillMaxWidth())
+                    Spacer(modifier = Modifier.height(8.dp))
+                    // Answers pinned to the bottom, in thumb reach.
+                    choices(Modifier.fillMaxWidth())
+                }
+            }
         }
 
         // Use unified feedback system
         EnhancedUniversalFeedback(feedbackManager)
+    }
+}
+
+/**
+ * Answer button for one synonym set: full-width, >= 64dp tall, coloured outline + dot (set colour is game
+ * meaning), thicker outline + check when selected. Text follows the system font scale (capped) and wraps.
+ */
+@Composable
+private fun GroupESynonymChoice(
+    synonymSet: SynonymSet,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val shape = RoundedCornerShape(16.dp)
+    GroupEFontCap(max = 1.5f) {
+        Row(
+            modifier = modifier
+                .testTag("synonym_set_${synonymSet.id}")
+                .heightIn(min = 64.dp)
+                .clip(shape)
+                .background(synonymSet.color.copy(alpha = if (isSelected) 0.3f else 0.15f), shape)
+                .border(if (isSelected) 4.dp else 2.dp, synonymSet.color, shape)
+                .clickable { onClick() }
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .background(synonymSet.color, CircleShape)
+            )
+            Text(
+                text = synonymSet.displayWord,
+                color = RvInk,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            if (isSelected) {
+                Text(text = "\u2713", color = RvInk, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+        }
     }
 }
 
@@ -602,7 +573,7 @@ fun SynonymSetButton(
         ) {
             Text(
                 text = synonymSet.displayWord,
-                color = Color.White,
+                color = RvInk,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
