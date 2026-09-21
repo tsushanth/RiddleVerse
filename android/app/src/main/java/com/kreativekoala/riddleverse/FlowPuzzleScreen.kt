@@ -1,6 +1,7 @@
 // FlowPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.graphics.*
 import android.util.Log
@@ -33,6 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -483,7 +485,6 @@ fun FlowPuzzleScreen(
     var dragStart by remember { mutableStateOf<FlowPoint?>(null) }
 
     val density = LocalDensity.current
-    val cellSize = with(density) { 50.dp.toPx() }
 
     // Timer effect
     LaunchedEffect(timeLeft) {
@@ -524,14 +525,7 @@ fun FlowPuzzleScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF2A2A3A))
-            .statusBarsPadding()
-            .padding(16.dp)
-    ) {
-        // Header
+    val hudRow: @Composable () -> Unit = {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -541,21 +535,23 @@ fun FlowPuzzleScreen(
                 Icon(
                     Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White
+                    tint = RvOnTone
                 )
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = formatTime(timeLeft),
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
                 Text(
                     text = difficulty.uppercase(),
-                    color = Color.Gray,
-                    fontSize = 14.sp
+                    color = RvOnTone.copy(alpha = 0.8f),
+                    fontSize = 14.sp,
+                    maxLines = 1
                 )
             }
 
@@ -568,52 +564,118 @@ fun FlowPuzzleScreen(
                 Icon(
                     Icons.Default.Refresh,
                     contentDescription = stringResource(R.string.reset),
-                    tint = Color.White
+                    tint = RvOnTone
                 )
             }
         }
+    }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Game info
+    val infoRow: @Composable () -> Unit = {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = "Level: $level",
-                color = Color.White,
-                fontSize = 16.sp
+                color = RvOnTone,
+                fontSize = 14.sp,
+                maxLines = 1
             )
             Text(
                 text = "Moves: $moves",
-                color = Color.White,
-                fontSize = 16.sp
+                color = RvOnTone,
+                fontSize = 14.sp,
+                maxLines = 1
             )
             Text(
                 text = "Connected: ${paths.values.count { it.isComplete }}/${convertedPairs.size}",
-                color = Color.White,
-                fontSize = 16.sp
+                color = RvOnTone,
+                fontSize = 14.sp,
+                maxLines = 1
             )
         }
+    }
 
-        Spacer(modifier = Modifier.height(20.dp))
+    val actionButtons: @Composable (Boolean) -> Unit = { stacked ->
+        val clearBtn: @Composable (Modifier) -> Unit = { m ->
+            Button(
+                onClick = {
+                    paths.clear()
+                    moves = 0
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A90E2)),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = m.heightIn(min = 56.dp)
+            ) {
+                Text(stringResource(R.string.clear_all), color = RvInk, fontWeight = FontWeight.Bold, maxLines = 2, textAlign = TextAlign.Center)
+            }
+        }
+        val giveUpBtn: @Composable (Modifier) -> Unit = { m ->
+            Button(
+                onClick = {
+                    showingSolution = true
+                    showSolution(convertedPairs, paths)
+                    score = 0
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8A50)),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = m.heightIn(min = 56.dp)
+            ) {
+                Text(stringResource(R.string.give_up), color = RvInk, fontWeight = FontWeight.Bold, maxLines = 2, textAlign = TextAlign.Center)
+            }
+        }
+        val nextBtn: @Composable (Modifier) -> Unit = { m ->
+            Button(
+                onClick = {
+                    // Skip to next puzzle with current score (or 0 if not completed)
+                    val currentScore = if (isCompleted) score else 0
+                    fetchNextPuzzle(currentScore)
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF50C878)),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                modifier = m.heightIn(min = 56.dp)
+            ) {
+                Text(stringResource(R.string.next_puzzle), color = RvInk, fontWeight = FontWeight.Bold, maxLines = 2, textAlign = TextAlign.Center)
+            }
+        }
+        if (stacked) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                clearBtn(Modifier.fillMaxWidth())
+                giveUpBtn(Modifier.fillMaxWidth())
+                nextBtn(Modifier.fillMaxWidth())
+            }
+        } else {
+            Row(
+                modifier = Modifier.fillMaxWidth().testTag("flow_actions"),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                clearBtn(Modifier.weight(1f))
+                giveUpBtn(Modifier.weight(1f))
+                nextBtn(Modifier.weight(1f))
+            }
+        }
+    }
 
-        // Game canvas
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFF1A1A2E)),
-            contentAlignment = Alignment.Center
-        ) {
-            val textMeasurer = rememberTextMeasurer()
+    // The board is a square sized from the space that is left (cell size derived from it), so
+    // the drag surface always fits without scrolling. Result banners overlay the board.
+    val boardSlot: @Composable (Modifier) -> Unit = { slotModifier ->
+        BoxWithConstraints(modifier = slotModifier, contentAlignment = Alignment.Center) {
+            val side = minOf(maxWidth, maxHeight)
+            val cellSize = with(density) { (side / gridSize.coerceAtLeast(1)).toPx() }
+            Box(
+                modifier = Modifier
+                    .size(side)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(RvCanvas),
+                contentAlignment = Alignment.Center
+            ) {
+                val textMeasurer = rememberTextMeasurer()
 
             Canvas(
                 modifier = Modifier
                     .fillMaxSize()
-                    .pointerInput(Unit) {
+                    .testTag("flow_board")
+                    .pointerInput(cellSize) {
                         detectDragGestures(
                             onDragStart = { offset ->
                                 val canvasWidth = size.width.toFloat()
@@ -703,45 +765,86 @@ fun FlowPuzzleScreen(
             ) {
                 drawFlowPuzzle(this, convertedPairs, paths, cellSize, gridSize, textMeasurer)
             }
+            }
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (showingSolution) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFB27D))
+                    ) {
+                        Text(
+                            text = "Solution shown - Moving to next puzzle...",
+                            modifier = Modifier.padding(12.dp),
+                            color = RvInk,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                if (isCompleted) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFA5D6A7))
+                    ) {
+                        Text(
+                            text = "✓ Puzzle Completed! Score: $score",
+                            modifier = Modifier.padding(12.dp),
+                            color = RvInk,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
         }
+    }
 
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Control buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(
-                onClick = {
-                    paths.clear()
-                    moves = 0
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4A90E2))
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF2A2A3A))
+            .statusBarsPadding()
+    ) {
+        val wide = maxWidth > maxHeight
+        val pad = if (maxHeight < 600.dp) 8.dp else 16.dp
+        if (wide) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 1200.dp)
+                    .fillMaxSize()
+                    .padding(pad),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(stringResource(R.string.clear_all), color = Color.White)
+                boardSlot(Modifier.weight(1f).fillMaxHeight())
+                Column(
+                    modifier = Modifier.weight(1f).widthIn(max = 420.dp).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    hudRow()
+                    infoRow()
+                    Spacer(Modifier.weight(1f))
+                    actionButtons(true)
+                }
             }
-
-            Button(
-                onClick = {
-                    showingSolution = true
-                    showSolution(convertedPairs, paths)
-                    score = 0
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8A50))
+        } else {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 640.dp)
+                    .fillMaxSize()
+                    .padding(pad),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(stringResource(R.string.give_up), color = Color.White)
-            }
-
-            Button(
-                onClick = {
-                    // Skip to next puzzle with current score (or 0 if not completed)
-                    val currentScore = if (isCompleted) score else 0
-                    fetchNextPuzzle(currentScore)
-                },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF50C878))
-            ) {
-                Text(stringResource(R.string.next_puzzle), color = Color.White)
+                hudRow()
+                infoRow()
+                boardSlot(Modifier.weight(1f).fillMaxWidth())
+                actionButtons(false)
             }
         }
 
@@ -756,40 +859,6 @@ fun FlowPuzzleScreen(
                     }
                 }
             )
-        }
-
-        if (showingSolution) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFF8A50))
-            ) {
-                Text(
-                    text = "Solution shown - Moving to next puzzle...",
-                    modifier = Modifier.padding(16.dp),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        if (isCompleted) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF4CAF50))
-            ) {
-                Text(
-                    text = "Puzzle Completed! Score: $score",
-                    modifier = Modifier.padding(16.dp),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
         }
     }
 }
@@ -865,7 +934,7 @@ private fun drawFlowPuzzle(
     // Draw endpoints with letters
     for (pair in flowPairs) {
         val textStyle = TextStyle(
-            color = Color.White,
+            color = RvInk,
             fontSize = (cellSize * 0.3f).sp,
             fontWeight = FontWeight.Bold
         )
@@ -882,7 +951,7 @@ private fun drawFlowPuzzle(
 
         // Start point border for better contrast
         drawScope.drawCircle(
-            color = Color.White,
+            color = RvInk,
             radius = cellSize * 0.42f,
             center = Offset(
                 offsetX + pair.start.x * cellSize + cellSize / 2,
@@ -915,7 +984,7 @@ private fun drawFlowPuzzle(
 
         // End point border for better contrast
         drawScope.drawCircle(
-            color = Color.White,
+            color = RvInk,
             radius = cellSize * 0.42f,
             center = Offset(
                 offsetX + pair.end.x * cellSize + cellSize / 2,

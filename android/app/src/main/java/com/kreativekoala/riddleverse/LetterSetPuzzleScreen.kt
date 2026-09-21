@@ -2,6 +2,8 @@ package com.kreativekoala.riddleverse
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -62,6 +64,15 @@ import java.util.Locale
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvScrim
 
 // Replace your LetterSetScreenWrapper with this enhanced version:
 
@@ -305,8 +316,8 @@ fun EnhancedLetterSetGameScreen(
         return
     }
 
-    // Main game UI
-    Column(
+    // Main game UI (fit-to-screen: HUD on top, word + found words in the middle, keys + actions pinned below)
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(
@@ -315,137 +326,147 @@ fun EnhancedLetterSetGameScreen(
                 )
             )
     ) {
-        // Enhanced header with discovery tracking
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Pause button
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+        val compact = maxHeight < 600.dp
+        val landscape = maxWidth > maxHeight
+        val gutter = if (compact) 12.dp else 16.dp
+        val contentWidth = if (landscape) minOf(maxWidth, 1000.dp) else minOf(maxWidth, 640.dp)
+        val paneWidth = if (landscape) (contentWidth - gutter * 2 - 16.dp) / 2 else contentWidth - gutter * 2
+        val keyGap = 8.dp
+        val keyCols = 3
+        val keySize = minOf(if (compact) 56.dp else 72.dp, (paneWidth - keyGap * (keyCols - 1)) / keyCols).coerceAtLeast(48.dp)
+        val goldText = Color(0xFFFFD700)
+        val urgentText = Color(0xFFFFB4AB)
+
+        val hud: @Composable () -> Unit = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Pause,
-                    contentDescription = "Pause",
-                    tint = Color.White
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = puzzle.letterSet,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Text(
-                    text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (timeLeft < 60) Color.Red else Color(0xFFFFD700)
-                )
-            }
-
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "${stringResource(R.string.score_label)}: $score",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                if (discoveredWords > 0) {
-                    Text(
-                        text = "🎉 +$discoveredWords new",
-                        fontSize = 10.sp,
-                        color = Color(0xFFFFD700)
+                // Leave / pause button
+                IconButton(
+                    onClick = onBack,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .background(RvSurface, RoundedCornerShape(8.dp))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvInk
                     )
                 }
 
-                // ✅ ADD EARLY FINISH BUTTON (only show if they hit bronze target)
-                if (foundWords.size >= puzzle.targets.bronze) {
-                    TextButton(
-                        onClick = { showEarlyFinishDialog = true },
-                        modifier = Modifier.padding(top = 4.dp)
-                    ) {
+                Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = puzzle.letterSet,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvOnTone,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (timeLeft < 60) urgentText else goldText,
+                        maxLines = 1
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = "${stringResource(R.string.score_label)}: $score",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvOnTone,
+                        maxLines = 1
+                    )
+                    if (discoveredWords > 0 && !compact) {
                         Text(
-                            text = stringResource(R.string.finish_early),
-                            fontSize = 10.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            text = "🎉 +$discoveredWords new",
+                            fontSize = 12.sp,
+                            color = goldText,
+                            maxLines = 1
                         )
                     }
-                }
-            }
-        }
 
-        // Progress indicator
-        if (foundWords.size > 0) {
-            val progress = foundWords.size.toFloat() / puzzle.targets.gold
-
-            Column {
-                LinearProgressIndicator(
-                    progress = minOf(progress, 1f),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(6.dp),
-                    color = when {
-                        foundWords.size >= puzzle.targets.gold -> Color(0xFFFFD700)
-                        foundWords.size >= puzzle.targets.silver -> Color(0xFFC0C0C0)
-                        foundWords.size >= puzzle.targets.bronze -> Color(0xFFCD7F32)
-                        else -> Color(0xFF2196F3)
+                    // Early finish (only once the bronze target is reached)
+                    if (foundWords.size >= puzzle.targets.bronze) {
+                        TextButton(
+                            onClick = { showEarlyFinishDialog = true },
+                            contentPadding = PaddingValues(horizontal = 4.dp, vertical = 0.dp),
+                            modifier = Modifier.heightIn(min = 48.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.finish_early),
+                                fontSize = 12.sp,
+                                color = RvOnTone,
+                                maxLines = 1
+                            )
+                        }
                     }
-                )
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "🥉 ${puzzle.targets.bronze}",
-                        fontSize = 10.sp,
-                        color = if (foundWords.size >= puzzle.targets.bronze) Color(0xFFCD7F32) else Color.White.copy(alpha = 0.5f),
-                        fontWeight = if (foundWords.size >= puzzle.targets.bronze) FontWeight.Bold else FontWeight.Normal
-                    )
-                    Text(
-                        text = "🥈 ${puzzle.targets.silver}",
-                        fontSize = 10.sp,
-                        color = if (foundWords.size >= puzzle.targets.silver) Color(0xFFC0C0C0) else Color.White.copy(alpha = 0.5f),
-                        fontWeight = if (foundWords.size >= puzzle.targets.silver) FontWeight.Bold else FontWeight.Normal
-                    )
-                    Text(
-                        text = "🥇 ${puzzle.targets.gold}",
-                        fontSize = 10.sp,
-                        color = if (foundWords.size >= puzzle.targets.gold) Color(0xFFFFD700) else Color.White.copy(alpha = 0.5f),
-                        fontWeight = if (foundWords.size >= puzzle.targets.gold) FontWeight.Bold else FontWeight.Normal
-                    )
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            // Progress toward the medals
+            if (foundWords.size > 0) {
+                val progress = foundWords.size.toFloat() / puzzle.targets.gold
+
+                Column {
+                    LinearProgressIndicator(
+                        progress = minOf(progress, 1f),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(6.dp),
+                        color = when {
+                            foundWords.size >= puzzle.targets.gold -> Color(0xFFFFD700)
+                            foundWords.size >= puzzle.targets.silver -> Color(0xFFC0C0C0)
+                            foundWords.size >= puzzle.targets.bronze -> Color(0xFFCD7F32)
+                            else -> RvSky
+                        }
+                    )
+
+                    if (!compact) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "🥉 ${puzzle.targets.bronze}",
+                                fontSize = 12.sp,
+                                color = if (foundWords.size >= puzzle.targets.bronze) Color(0xFFFFB067) else RvOnTone.copy(alpha = 0.8f),
+                                fontWeight = if (foundWords.size >= puzzle.targets.bronze) FontWeight.Bold else FontWeight.Normal
+                            )
+                            Text(
+                                text = "🥈 ${puzzle.targets.silver}",
+                                fontSize = 12.sp,
+                                color = if (foundWords.size >= puzzle.targets.silver) Color(0xFFE0E0E0) else RvOnTone.copy(alpha = 0.8f),
+                                fontWeight = if (foundWords.size >= puzzle.targets.silver) FontWeight.Bold else FontWeight.Normal
+                            )
+                            Text(
+                                text = "🥇 ${puzzle.targets.gold}",
+                                fontSize = 12.sp,
+                                color = if (foundWords.size >= puzzle.targets.gold) goldText else RvOnTone.copy(alpha = 0.8f),
+                                fontWeight = if (foundWords.size >= puzzle.targets.gold) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+                    }
+                }
+            }
         }
 
-        // Main content area
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.Center
-        ) {
-            // Current word display
+        val wordBox: @Composable () -> Unit = {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
-                    .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                    .heightIn(min = if (compact) 48.dp else 64.dp)
+                    .background(RvSurface, RoundedCornerShape(12.dp))
+                    .padding(horizontal = 8.dp, vertical = 8.dp)
+                    .testTag("ls_word"),
                 contentAlignment = Alignment.Center
             ) {
                 val display = currentWord.uppercase()
@@ -457,94 +478,123 @@ fun EnhancedLetterSetGameScreen(
                     },
                     fontSize = if (display.isEmpty()) 14.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.height(24.dp))
+        val foundArea: @Composable () -> Unit = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Found Words (${foundWords.size})",
+                        fontSize = 14.sp,
+                        color = RvOnTone,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
 
-            // Found words section
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Found Words (${foundWords.size})",
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontWeight = FontWeight.Bold
-                )
+                    Text(
+                        text = "Target: ${puzzle.targets.bronze}+",
+                        fontSize = 12.sp,
+                        color = RvOnTone.copy(alpha = 0.85f),
+                        maxLines = 1
+                    )
+                }
 
-                Text(
-                    text = "Target: ${puzzle.targets.bronze}+",
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.6f)
-                )
-            }
+                Spacer(modifier = Modifier.height(4.dp))
 
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (foundWords.isEmpty()) {
-                Column {
+                if (foundWords.isEmpty()) {
                     Text(
                         text = "No words found yet",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.6f),
+                        color = RvOnTone.copy(alpha = 0.85f),
                         textAlign = TextAlign.Center,
                         modifier = Modifier.fillMaxWidth()
                     )
 
-                    if (hints.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                    if (hints.isNotEmpty() && !compact) {
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "💡 Try: ${hints.take(3).joinToString(", ")}",
                             fontSize = 12.sp,
-                            color = Color.White.copy(alpha = 0.5f),
+                            color = RvOnTone.copy(alpha = 0.85f),
                             textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
-                }
-            } else {
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 0.dp)
-                ) {
-                    items(foundWords, key = { it.key }) { fw ->
-                        // Check if this was a discovery
-                        val isDiscovery = !puzzleWordMap.containsKey(fw.key)
+                } else {
+                    // secondary list of chips (newest last); the keys and actions never depend on it
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(horizontal = 0.dp)
+                    ) {
+                        items(foundWords, key = { it.key }) { fw ->
+                            // Check if this was a discovery
+                            val isDiscovery = !puzzleWordMap.containsKey(fw.key)
 
-                        Box(
-                            modifier = Modifier
-                                .background(
-                                    if (isDiscovery) {
-                                        Color(0xFFFFD700).copy(alpha = 0.4f) // Gold for discoveries
-                                    } else {
-                                        Color(0xFF4CAF50).copy(alpha = 0.4f) // Green for server words
-                                    },
-                                    RoundedCornerShape(16.dp)
-                                )
-                                .padding(horizontal = 12.dp, vertical = 6.dp)
-                        ) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    if (isDiscovery) {
-                                        Text("🎉", fontSize = 8.sp)
-                                        Spacer(modifier = Modifier.width(2.dp))
+                            Box(
+                                modifier = Modifier
+                                    .background(
+                                        if (isDiscovery) {
+                                            Color(0xFFFFD700).copy(alpha = 0.4f) // Gold for discoveries
+                                        } else {
+                                            RvSuccess.copy(alpha = 0.4f) // Green for server words
+                                        },
+                                        RoundedCornerShape(16.dp)
+                                    )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        if (isDiscovery) {
+                                            Text("🎉", fontSize = 12.sp)
+                                            Spacer(modifier = Modifier.width(2.dp))
+                                        }
+                                        Text(
+                                            text = fw.display,
+                                            fontSize = 14.sp,
+                                            color = RvOnTone,
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1
+                                        )
                                     }
                                     Text(
-                                        text = fw.display,
+                                        text = "${fw.points}pts",
                                         fontSize = 12.sp,
-                                        color = Color.White,
-                                        fontWeight = FontWeight.Bold
+                                        color = RvOnTone.copy(alpha = 0.9f),
+                                        maxLines = 1
                                     )
                                 }
-                                Text(
-                                    text = "${fw.points}pts",
-                                    fontSize = 10.sp,
-                                    color = Color.White.copy(alpha = 0.8f)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        val keysBlock: @Composable () -> Unit = {
+            CompositionLocalProvider(LocalLsKeySize provides keySize) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(keyGap)
+                ) {
+                    puzzle.letters.chunked(keyCols).forEach { rowLetters ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(keyGap)) {
+                            rowLetters.forEach { letter ->
+                                LetterKey(
+                                    letter = letter,
+                                    onClick = { addLetter(letter) }
                                 )
                             }
                         }
@@ -553,53 +603,92 @@ fun EnhancedLetterSetGameScreen(
             }
         }
 
-        // Letter grid and controls
-        Column(Modifier.padding(16.dp)) {
-            // Letter keys in grid
-            val rows = puzzle.letters.chunked(3)
-            rows.forEach { rowLetters ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly
-                ) {
-                    rowLetters.forEach { letter ->
-                        LetterKey(
-                            letter = letter,
-                            onClick = { addLetter(letter) }
-                        )
-                    }
-                    repeat(3 - rowLetters.size) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
-                }
-                Spacer(Modifier.height(8.dp))
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Action buttons
+        val actionsBlock: @Composable () -> Unit = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                ActionButton(
+                LsActionButton(
                     icon = Icons.Default.Refresh,
+                    description = stringResource(R.string.clear),
                     onClick = ::resetWord,
-                    backgroundColor = Color(0xFF6C757D),
-                    enabled = currentWord.isNotEmpty()
+                    backgroundColor = Color(0xFF495057),
+                    enabled = currentWord.isNotEmpty(),
+                    modifier = Modifier.weight(1f)
                 )
-                ActionButton(
+                // primary action: submit the word
+                LsActionButton(
                     icon = Icons.Default.KeyboardReturn,
+                    description = stringResource(R.string.submit),
                     onClick = ::submitWord,
-                    backgroundColor = Color(0xFF007AFF),
-                    enabled = currentWord.length >= 3
+                    backgroundColor = Color(0xFF0058C7),
+                    enabled = currentWord.length >= 3,
+                    modifier = Modifier.weight(1.6f)
                 )
-                ActionButton(
+                LsActionButton(
                     icon = Icons.Default.Backspace,
+                    description = "Backspace",
                     onClick = ::removeLetter,
-                    backgroundColor = Color(0xFFDC3545),
-                    enabled = currentWord.isNotEmpty()
+                    backgroundColor = Color(0xFFB02A37),
+                    enabled = currentWord.isNotEmpty(),
+                    modifier = Modifier.weight(1f)
                 )
+            }
+        }
+
+        if (landscape) {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = contentWidth)
+                    .fillMaxSize()
+                    .align(Alignment.TopCenter)
+                    .padding(horizontal = gutter, vertical = 4.dp)
+            ) {
+                hud()
+                Spacer(Modifier.height(4.dp))
+                Row(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        wordBox()
+                        foundArea()
+                    }
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        keysBlock()
+                        actionsBlock()
+                    }
+                }
+                Spacer(Modifier.height(4.dp))
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .widthIn(max = contentWidth)
+                    .fillMaxSize()
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp)
+            ) {
+                hud()
+                Spacer(Modifier.height(if (compact) 4.dp else 8.dp))
+                wordBox()
+                Spacer(Modifier.height(if (compact) 4.dp else 8.dp))
+                // flexible area: found words; everything below is pinned
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) { foundArea() }
+                Spacer(Modifier.height(if (compact) 4.dp else 8.dp))
+                keysBlock()
+                Spacer(Modifier.height(if (compact) 8.dp else 12.dp))
+                actionsBlock()
+                Spacer(Modifier.height(if (compact) 4.dp else 8.dp))
             }
         }
 
@@ -664,7 +753,7 @@ fun EnhancedLetterSetGameScreen(
                             Text(
                                 text = "You still have ${String.format("%02d:%02d", timeLeft / 60, timeLeft % 60)} remaining!",
                                 fontSize = 12.sp,
-                                color = Color(0xFF666666)
+                                color = RvInkSoft
                             )
                         }
                     }
@@ -686,11 +775,11 @@ fun EnhancedCelebration(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f)),
+            .background(RvScrim),
         contentAlignment = Alignment.Center
     ) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
         ) {
@@ -711,7 +800,7 @@ fun EnhancedCelebration(
                     text = title,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4CAF50)
+                    color = RvSuccess
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -745,7 +834,7 @@ fun EnhancedCelebration(
                     Text(
                         text = "⚡ Time Bonus Earned!",
                         fontSize = 14.sp,
-                        color = Color(0xFF2196F3),
+                        color = RvSky,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -756,7 +845,7 @@ fun EnhancedCelebration(
                     text = "${stringResource(R.string.final_score)}: $score",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
             }
         }
@@ -816,7 +905,57 @@ data class SelectedPath(
 )
 
 
-@Composable fun LetterKey( letter: String, onClick: () -> Unit ) { Box( modifier = Modifier .size(80.dp) .background( Color(0xFF8B8BAE), RoundedCornerShape(8.dp) ) .clickable { onClick() }, contentAlignment = Alignment.Center ) { Text( text = letter.uppercase(), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White ) } } @Composable fun ActionButton( icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit, backgroundColor: Color, enabled: Boolean = true ) { Box( modifier = Modifier .size(60.dp) .background( if (enabled) backgroundColor else backgroundColor.copy(alpha = 0.5f), RoundedCornerShape(8.dp) ) .clickable(enabled = enabled) { onClick() }, contentAlignment = Alignment.Center ) { Icon( imageVector = icon, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp) ) } }
+/** Key size chosen by the game screen so the 3-column key pad always fits its pane. */
+internal val LocalLsKeySize = compositionLocalOf { 72.dp }
+
+@Composable fun LetterKey( letter: String, onClick: () -> Unit ) {
+    val keySize = LocalLsKeySize.current
+    Box(
+        modifier = Modifier
+            .size(keySize)
+            .background(RvSurface, RoundedCornerShape(8.dp))
+            .border(2.dp, RvOutline, RoundedCornerShape(8.dp))
+            .clickable { onClick() }
+            .testTag("ls_key"),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = letter.uppercase(),
+            fontSize = with(LocalDensity.current) { (keySize * 0.42f).toSp() }, // glyph follows the key, not the font scale
+            fontWeight = FontWeight.Bold,
+            color = RvInk
+        )
+    }
+}
+
+/** Action key with a description for screen readers (used by the game screen). */
+@Composable
+private fun LsActionButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    description: String,
+    onClick: () -> Unit,
+    backgroundColor: Color,
+    enabled: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(56.dp)
+            .background(
+                if (enabled) backgroundColor else RvOutline,
+                RoundedCornerShape(12.dp)
+            )
+            .clickable(enabled = enabled) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = description,
+            tint = if (enabled) RvOnTone else RvInkSoft,
+            modifier = Modifier.size(28.dp)
+        )
+    }
+} @Composable fun ActionButton( icon: androidx.compose.ui.graphics.vector.ImageVector, onClick: () -> Unit, backgroundColor: Color, enabled: Boolean = true ) { Box( modifier = Modifier .size(60.dp) .background( if (enabled) backgroundColor else backgroundColor.copy(alpha = 0.5f), RoundedCornerShape(8.dp) ) .clickable(enabled = enabled) { onClick() }, contentAlignment = Alignment.Center ) { Icon( imageVector = icon, contentDescription = null, tint = RvSurfaceRaised, modifier = Modifier.size(24.dp) ) } }
 
 
 @Composable
@@ -829,7 +968,7 @@ fun LetterSetHeader(
     Card(
         modifier = Modifier.fillMaxWidth().statusBarsPadding(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
+            containerColor = RvSurfaceRaised
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -849,7 +988,7 @@ fun LetterSetHeader(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color(0xFF333333)
+                    tint = RvInk
                 )
             }
 
@@ -858,12 +997,12 @@ fun LetterSetHeader(
                     text = "Letter Set: $letterSet",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
                 Text(
                     text = "${stringResource(R.string.score_label)}: $score",
                     fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    color = RvInkSoft
                 )
             }
 
@@ -871,7 +1010,7 @@ fun LetterSetHeader(
                 text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (timeLeft < 60) Color.Red else Color(0xFF333333)
+                color = if (timeLeft < 60) Color.Red else RvInk
             )
         }
     }
@@ -894,9 +1033,9 @@ fun LetterSetProgress(
                 foundWords >= targets.gold -> Color(0xFFFFD700) // Gold
                 foundWords >= targets.silver -> Color(0xFFC0C0C0) // Silver
                 foundWords >= targets.bronze -> Color(0xFFCD7F32) // Bronze
-                else -> Color(0xFF2196F3)
+                else -> RvSky
             },
-            trackColor = Color.White.copy(alpha = 0.3f)
+            trackColor = RvOutline
         )
 
         Spacer(modifier = Modifier.height(4.dp))
@@ -908,17 +1047,17 @@ fun LetterSetProgress(
             Text(
                 text = "Bronze: ${targets.bronze}",
                 fontSize = 10.sp,
-                color = Color.White
+                color = RvInk
             )
             Text(
                 text = "Silver: ${targets.silver}",
                 fontSize = 10.sp,
-                color = Color.White
+                color = RvInk
             )
             Text(
                 text = "Gold: ${targets.gold}",
                 fontSize = 10.sp,
-                color = Color.White
+                color = RvInk
             )
         }
     }
@@ -942,7 +1081,7 @@ fun LetterTiles(
                     .size(64.dp)
                     .clickable { onLetterSelected(index) },
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isSelected) Color(0xFF2196F3) else Color.White
+                    containerColor = if (isSelected) RvSky else RvSurfaceRaised
                 ),
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = if (isSelected) 8.dp else 4.dp
@@ -957,7 +1096,7 @@ fun LetterTiles(
                         text = letter,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (isSelected) Color.White else Color(0xFF333333)
+                        color = if (isSelected) RvOnTone else RvInk
                     )
                 }
             }
@@ -976,7 +1115,7 @@ fun FoundWordsList(
             text = "Found Words (${foundWords.size})",
             fontSize = 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333)
+            color = RvInk
         )
 
         Spacer(modifier = Modifier.height(8.dp))
@@ -991,7 +1130,7 @@ fun FoundWordsList(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            Color(0xFF4CAF50).copy(alpha = 0.1f),
+                            RvSuccess.copy(alpha = 0.1f),
                             RoundedCornerShape(4.dp)
                         )
                         .padding(8.dp),
@@ -1001,13 +1140,13 @@ fun FoundWordsList(
                         text = word,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333)
+                        color = RvInk
                     )
 
                     Text(
                         text = "${wordData?.points ?: 0} pts",
                         fontSize = 12.sp,
-                        color = Color(0xFF666666)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -1025,11 +1164,11 @@ fun LetterSetCelebration(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.7f)),
+            .background(RvScrim),
         contentAlignment = Alignment.Center
     ) {
         Card(
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(20.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
         ) {
@@ -1053,7 +1192,7 @@ fun LetterSetCelebration(
                     text = stringResource(R.string.great_job),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4CAF50)
+                    color = RvSuccess
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -1068,7 +1207,7 @@ fun LetterSetCelebration(
                     Text(
                         text = "⚡ Time Bonus!",
                         fontSize = 14.sp,
-                        color = Color(0xFF2196F3),
+                        color = RvSky,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -1079,7 +1218,7 @@ fun LetterSetCelebration(
                     text = "${stringResource(R.string.score_label)}: $score",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
             }
         }

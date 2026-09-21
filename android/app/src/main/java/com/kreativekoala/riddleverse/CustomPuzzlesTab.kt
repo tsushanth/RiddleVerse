@@ -36,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -232,9 +233,9 @@ fun FilterChipsRow(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = Color(0xFF667eea),
-                    selectedLabelColor = Color.White,
-                    selectedLeadingIconColor = Color.White
+                    selectedContainerColor = RvViolet,
+                    selectedLabelColor = RvOnTone,
+                    selectedLeadingIconColor = RvOnTone
                 )
             )
         }
@@ -430,15 +431,18 @@ fun EnhancedPuzzleCard(
 ) {
     val puzzleIcon = getPuzzleIcon(puzzle.topic, puzzle.format)
     val themeColors = puzzle.themeColors ?: generateThemeFromTopic(puzzle.topic)
+    val headerTones = listOf(RvToneViolet, RvToneSky, RvToneMint, RvToneCoral, RvToneGrape)
+    val headerTone = headerTones[Math.floorMod(puzzle.topic.hashCode(), headerTones.size)]
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = RvSurface
         )
     ) {
         Column {
@@ -447,14 +451,7 @@ fun EnhancedPuzzleCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(android.graphics.Color.parseColor(themeColors.primaryColor)),
-                                Color(android.graphics.Color.parseColor(themeColors.secondaryColor))
-                            )
-                        )
-                    )
+                    .background(headerTone.fill)
             ) {
                 Row(
                     modifier = Modifier
@@ -469,15 +466,15 @@ fun EnhancedPuzzleCard(
                             modifier = Modifier
                                 .size(48.dp)
                                 .background(
-                                    color = Color.White.copy(alpha = 0.2f),
-                                    shape = RoundedCornerShape(12.dp)
+                                    color = RvOnTone.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(16.dp)
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = puzzleIcon,
                                 contentDescription = puzzle.name,
-                                tint = Color.White,
+                                tint = RvOnTone,
                                 modifier = Modifier.size(28.dp)
                             )
                         }
@@ -487,7 +484,7 @@ fun EnhancedPuzzleCard(
                         Column {
                             Text(
                                 text = puzzle.name,
-                                color = Color.White,
+                                color = RvOnTone,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 18.sp,
                                 maxLines = 1,
@@ -507,7 +504,7 @@ fun EnhancedPuzzleCard(
 
                                 Text(
                                     text = "${puzzle.numPuzzles} ${puzzle.format}",
-                                    color = Color.White.copy(alpha = 0.9f),
+                                    color = RvOnTone.copy(alpha = 0.9f),
                                     fontSize = 12.sp
                                 )
                             }
@@ -520,8 +517,8 @@ fun EnhancedPuzzleCard(
                     ) {
                         if (isOwner) {
                             Badge(
-                                containerColor = Color.White.copy(alpha = 0.2f),
-                                contentColor = Color.White
+                                containerColor = RvOnTone.copy(alpha = 0.2f),
+                                contentColor = RvOnTone
                             ) {
                                 Text(
                                     text = "YOURS",
@@ -564,7 +561,7 @@ fun EnhancedPuzzleCard(
                                 Icon(
                                     imageVector = Icons.Default.Star,
                                     contentDescription = "Rating",
-                                    tint = Color(0xFFFFD700),
+                                    tint = RvSunEdge,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -583,14 +580,14 @@ fun EnhancedPuzzleCard(
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
                                 contentDescription = "Plays",
-                                tint = Color(0xFF6B7280),
+                                tint = RvInkSoft,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = "${puzzle.playCount} plays",
                                 fontSize = 12.sp,
-                                color = Color(0xFF6B7280)
+                                color = RvInkSoft
                             )
                         }
                     }
@@ -608,21 +605,21 @@ fun EnhancedPuzzleCard(
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "Creator",
-                            tint = Color(0xFF6B7280),
+                            tint = RvInkSoft,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "By ${puzzle.creator}",
                             fontSize = 12.sp,
-                            color = Color(0xFF6B7280)
+                            color = RvInkSoft
                         )
                     }
 
                     Text(
                         text = formatDate(puzzle.updatedAt),
                         fontSize = 12.sp,
-                        color = Color(0xFF6B7280)
+                        color = RvInkSoft
                     )
                 }
 
@@ -640,7 +637,7 @@ fun EnhancedPuzzleCard(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(android.graphics.Color.parseColor(themeColors.primaryColor))
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.PlayArrow,
@@ -659,7 +656,7 @@ fun EnhancedPuzzleCard(
                             1.dp,
                             Color(android.graphics.Color.parseColor(themeColors.primaryColor))
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Leaderboard,
@@ -703,7 +700,7 @@ fun StatItem(
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color(0xFF6B7280)
+            color = RvInkSoft
         )
     }
 }
@@ -724,7 +721,7 @@ fun SectionHeader(
             Icon(
                 imageVector = it,
                 contentDescription = title,
-                tint = Color(0xFF667eea),
+                tint = RvViolet,
                 modifier = Modifier.size(24.dp)
             )
             Spacer(modifier = Modifier.width(12.dp))
@@ -735,14 +732,14 @@ fun SectionHeader(
                 text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E3440)
+                color = RvInk
             )
 
             subtitle?.let {
                 Text(
                     text = it,
                     fontSize = 14.sp,
-                    color = Color(0xFF6B7280)
+                    color = RvInkSoft
                 )
             }
         }
@@ -752,10 +749,10 @@ fun SectionHeader(
 @Composable
 fun StatusBadge(status: String) {
     val (backgroundColor, textColor, text) = when (status) {
-        "pending" -> Triple(Color(0xFFFFEBCD), Color(0xFFD2691E), "Processing")
-        "failed" -> Triple(Color(0xFFFFE4E1), Color(0xFFDC143C), "Failed")
-        "completed" -> Triple(Color(0xFFE6FFE6), Color(0xFF32CD32), "Ready")
-        else -> Triple(Color(0xFFF0F0F0), Color(0xFF666666), status)
+        "pending" -> Triple(RvWarning.copy(alpha = 0.2f), RvSunEdge, "Processing")
+        "failed" -> Triple(RvError.copy(alpha = 0.15f), RvErrorEdge, "Failed")
+        "completed" -> Triple(RvSuccess.copy(alpha = 0.15f), RvSuccessEdge, "Ready")
+        else -> Triple(RvSurface, RvInkSoft, status)
     }
 
     Badge(
@@ -773,10 +770,10 @@ fun StatusBadge(status: String) {
 @Composable
 fun DifficultyBadge(difficulty: String) {
     val (backgroundColor, textColor) = when (difficulty.lowercase()) {
-        "easy" -> Pair(Color(0xFFE6FFE6), Color(0xFF32CD32))
-        "medium" -> Pair(Color(0xFFFFF4E6), Color(0xFFFF8C00))
-        "hard" -> Pair(Color(0xFFFFE4E1), Color(0xFFDC143C))
-        else -> Pair(Color(0xFFF0F0F0), Color(0xFF666666))
+        "easy" -> Pair(RvSuccess.copy(alpha = 0.15f), RvSuccessEdge)
+        "medium" -> Pair(RvWarning.copy(alpha = 0.2f), RvSunEdge)
+        "hard" -> Pair(RvError.copy(alpha = 0.15f), RvErrorEdge)
+        else -> Pair(RvSurface, RvInkSoft)
     }
 
     Badge(

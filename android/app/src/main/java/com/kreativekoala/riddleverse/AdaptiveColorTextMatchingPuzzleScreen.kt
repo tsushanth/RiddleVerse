@@ -1,6 +1,7 @@
 // AdaptiveColorTextMatchingPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.annotation.SuppressLint
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -96,7 +97,7 @@ object AdaptiveGameColors {
         "pink" to Color(0xFFD53F8C),
         "brown" to Color(0xFF8B4513),
         "gray" to Color(0xFF718096),
-        "black" to Color(0xFF2D3748),
+        "black" to RvInk,
         "cyan" to Color(0xFF0891B2),
         "lime" to Color(0xFF65A30D),
         "indigo" to Color(0xFF4338CA),
@@ -213,7 +214,7 @@ fun AdaptiveColorTextMatchingPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -238,7 +239,7 @@ fun AdaptiveColorTextMatchingPuzzleScreen(
         adaptationInfo = adaptiveConfig
         if (adaptiveConfig.confidenceScore > 0.5f) {
             currentDifficultyLevel = adaptiveConfig.level
-            showAdaptationNotification = true
+            showAdaptationNotification = SHOW_ADAPTATION_NOTICES
         }
     }
 
@@ -499,7 +500,7 @@ private fun AdaptiveColorTextGameScreenContent(
                     Text(
                         text = "$currentQuestion / $totalQuestions",
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = RvInkSoft.copy(alpha = 0.8f)
                     )
                     LinearProgressIndicator(
                         progress = currentQuestion.toFloat() / totalQuestions.toFloat(),
@@ -526,7 +527,7 @@ private fun AdaptiveColorTextGameScreenContent(
             Text(
                 text = stringResource(R.string.color_match_question),
                 fontSize = 18.sp,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium
             )
@@ -561,14 +562,14 @@ private fun AdaptiveColorTextGameScreenContent(
                     Text(
                         text = "meaning",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                            .background(RvSurface, RoundedCornerShape(4.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -582,7 +583,7 @@ private fun AdaptiveColorTextGameScreenContent(
                                 text = currentStep.meaningColorName,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
+                                color = RvInk,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -609,7 +610,7 @@ private fun AdaptiveColorTextGameScreenContent(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -636,9 +637,9 @@ private fun AdaptiveColorTextGameScreenContent(
                         Text(
                             text = "text color",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft.copy(alpha = 0.8f),
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                                .background(RvSurface, RoundedCornerShape(4.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                         if (adaptiveConfig.visualHints && !currentStep.isMatch) {
@@ -672,7 +673,7 @@ private fun AdaptiveColorTextGameScreenContent(
                 Text(
                     text = if (lastAnswerCorrect) "✓" else "✗",
                     fontSize = 60.sp,
-                    color = Color.White,
+                    color = RvInk,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -705,7 +706,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                 text = instructions.title,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
 
@@ -714,7 +715,7 @@ private fun AdaptiveColorTextInstructionsScreen(
             Text(
                 text = adaptiveConfig.description,
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium
             )
@@ -724,7 +725,7 @@ private fun AdaptiveColorTextInstructionsScreen(
             Text(
                 text = instructions.description,
                 fontSize = 16.sp,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
             )
 
@@ -733,7 +734,7 @@ private fun AdaptiveColorTextInstructionsScreen(
             // Enhanced Example demonstration with adaptive features
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp),
@@ -743,7 +744,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                         text = "Adaptive Example",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A)
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -787,7 +788,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(40.dp)
@@ -800,7 +801,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                                         text = "blue",
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.Black,
+                                        color = RvInk,
                                         textAlign = TextAlign.Center
                                     )
                                 }
@@ -815,7 +816,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                             modifier = Modifier.weight(1f)
                         ) {
                             Card(
-                                colors = CardDefaults.cardColors(containerColor = Color.White),
+                                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(40.dp)
@@ -869,7 +870,7 @@ private fun AdaptiveColorTextInstructionsScreen(
             // Adaptive features explanation
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
                     modifier = Modifier.padding(12.dp)
@@ -878,7 +879,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                         text = "🎯 Adaptive Features",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -886,7 +887,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                         Text(
                             text = "• $feature",
                             fontSize = 12.sp,
-                            color = Color(0xFF1E3A8A),
+                            color = RvInk,
                             modifier = Modifier.padding(vertical = 1.dp)
                         )
                     }
@@ -896,7 +897,7 @@ private fun AdaptiveColorTextInstructionsScreen(
                     Text(
                         text = "💡 ${instructions.tip}",
                         fontSize = 12.sp,
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -965,7 +966,7 @@ private fun AdaptiveColorTextGameScreen(
                     Text(
                         text = "$currentQuestion / $totalQuestions",
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = RvInkSoft.copy(alpha = 0.8f)
                     )
                     LinearProgressIndicator(
                         progress = currentQuestion.toFloat() / totalQuestions.toFloat(),
@@ -992,7 +993,7 @@ private fun AdaptiveColorTextGameScreen(
             Text(
                 text = stringResource(R.string.color_match_question),
                 fontSize = 18.sp,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Medium
             )
@@ -1027,14 +1028,14 @@ private fun AdaptiveColorTextGameScreen(
                     Text(
                         text = "meaning",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         modifier = Modifier
-                            .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                            .background(RvSurface, RoundedCornerShape(4.dp))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -1048,7 +1049,7 @@ private fun AdaptiveColorTextGameScreen(
                                 text = currentStep.meaningColorName,
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black,
+                                color = RvInk,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -1075,7 +1076,7 @@ private fun AdaptiveColorTextGameScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Card(
-                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(80.dp),
@@ -1102,9 +1103,9 @@ private fun AdaptiveColorTextGameScreen(
                         Text(
                             text = "text color",
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft.copy(alpha = 0.8f),
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(4.dp))
+                                .background(RvSurface, RoundedCornerShape(4.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                         if (adaptiveConfig.visualHints && !currentStep.isMatch) {
@@ -1138,7 +1139,7 @@ private fun AdaptiveColorTextGameScreen(
                 Text(
                     text = if (lastAnswerCorrect) "✓" else "✗",
                     fontSize = 60.sp,
-                    color = Color.White,
+                    color = RvInk,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -1162,7 +1163,7 @@ private fun AdaptiveColorTextGameScreen(
                             Color(0xFF4CAF50) else Color(0xFF3B82F6)
                     )
                 ) {
-                    Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvInk)
                 }
 
                 Button(
@@ -1175,7 +1176,7 @@ private fun AdaptiveColorTextGameScreen(
                             Color(0xFF4CAF50) else Color(0xFF3B82F6)
                     )
                 ) {
-                    Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvInk)
                 }
             }
         }
@@ -1201,7 +1202,7 @@ private fun AdaptiveColorTextCompletionScreen(
             text = "Adaptive Challenge Complete!",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = RvInk,
             textAlign = TextAlign.Center
         )
 
@@ -1209,7 +1210,7 @@ private fun AdaptiveColorTextCompletionScreen(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+            colors = CardDefaults.cardColors(containerColor = RvSurface)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -1219,7 +1220,7 @@ private fun AdaptiveColorTextCompletionScreen(
                     text = stringResource(R.string.final_score),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E3A8A)
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1248,7 +1249,7 @@ private fun AdaptiveColorTextCompletionScreen(
                             text = "${(correctCount.toDouble() / totalQuestions.toDouble() * 100).toInt()}%",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E3A8A)
+                            color = RvInk
                         )
                     }
 
@@ -1262,7 +1263,7 @@ private fun AdaptiveColorTextCompletionScreen(
                             text = "${averageResponseTime / 1000f}s",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E3A8A)
+                            color = RvInk
                         )
                     }
 

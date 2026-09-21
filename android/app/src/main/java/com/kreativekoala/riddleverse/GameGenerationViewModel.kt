@@ -22,6 +22,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.Protocol
 import okhttp3.Request
+import okhttp3.Response
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.ByteArrayInputStream
@@ -45,6 +46,22 @@ data class GenerationResult(
 class GameGenerationViewModel : ViewModel() {
     private val TAG = "GameGenVM"
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    companion object {
+        // Flip to false to instantly roll back to the old sync-SSE path if the
+        // polling flow misbehaves in the field. When true, Custom generation
+        // uses POST /jobs/generate + GET /jobs/:id polling. Remix stays on the
+        // sync path until the Fly backend grows a /jobs/remix counterpart.
+        // Added 2026-08-04 with the submit+poll rollout.
+        private const val USE_POLLING_FOR_CUSTOM = true
+
+        // Poll cadence — 3s balances "responsive UI" against "server load".
+        // Machine-warm cost on Fly assumes activity every few seconds; 3s
+        // keeps the machine from idling out.
+        private const val POLL_INTERVAL_MS = 3_000L
+        // Matches Fly backend AbortSignal + worker JOB_ZOMBIE_TIMEOUT.
+        private const val POLL_MAX_TOTAL_WAIT_MS = 30 * 60 * 1_000L
+    }
 
     // Generation state
     var isGenerating by mutableStateOf(false)
@@ -125,7 +142,14 @@ class GameGenerationViewModel : ViewModel() {
         }
 
         generationJob = scope.launch {
-            val result = streamInternal(mode, context)
+            // Dispatch: Custom mode uses the network-resilient polling path
+            // (submit + poll); Remix stays on the sync SSE path until backend
+            // gets a /jobs/remix counterpart.
+            val result = if (USE_POLLING_FOR_CUSTOM && mode is GenerationMode.Custom) {
+                pollInternal(mode, context)
+            } else {
+                streamInternal(mode, context)
+            }
             stopProgressInterpolation()
             isGenerating = false
             if (result != null) {
@@ -249,7 +273,7 @@ class GameGenerationViewModel : ViewModel() {
 
                 val client = HttpClientProvider.client.newBuilder()
                     .protocols(listOf(Protocol.HTTP_1_1))
-                    .readTimeout(java.time.Duration.ofMinutes(10))
+                    .readTimeout(java.time.Duration.ofMinutes(30)) // matches Fly backend AbortSignal.timeout (bumped 2026-08-04)
                     .build()
 
                 Log.d(TAG, "$logPrefix request to: $url")
@@ -398,6 +422,221 @@ class GameGenerationViewModel : ViewModel() {
                 null
             }
         }
+    }
+
+    // MARK: - Async job polling (network-resilient alternative to streamInternal)
+    //
+    // Two phases:
+    //   1. POST /api/game-creation/jobs/generate → {jobId} (~50ms)
+    //   2. GET /api/game-creation/jobs/{jobId} every 3s until succeeded/failed
+    //
+    // Survives WiFi ↔ cellular handoff, brief app backgrounding, proxy
+    // hiccups — none of which the sync SSE path handles. Each poll is a
+    // short request; there is no long-held HTTP connection to drop.
+    private suspend fun pollInternal(mode: GenerationMode, context: Context): GenerationResult? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
+                val userName = FirebaseAuth.getInstance().currentUser?.displayName
+                    ?: FirebaseAuth.getInstance().currentUser?.email?.substringBefore("@")
+                    ?: "Anonymous"
+
+                val (submitUrl, json, logPrefix) = buildRequest(mode, userId, userName)
+                // Swap /generate → /jobs/generate. buildRequest emits the sync URL;
+                // rewriting here keeps buildRequest a single source of truth for the
+                // request body shape (headers, prompt, userName, useCoins, image).
+                val jobsSubmitUrl = submitUrl.replace("/api/game-creation/generate", "/api/game-creation/jobs/generate")
+
+                val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
+                val submitRequest = Request.Builder()
+                    .url(jobsSubmitUrl)
+                    .addHeader("x-platform", "android")
+                    .addHeader("Content-Type", "application/json")
+                    .post(body)
+                    .build()
+
+                val client = HttpClientProvider.client.newBuilder()
+                    .protocols(listOf(Protocol.HTTP_1_1))
+                    .readTimeout(java.time.Duration.ofSeconds(30)) // submit is fast; polls have their own client below
+                    .build()
+
+                Log.d(TAG, "$logPrefix submit to: $jobsSubmitUrl")
+                val submitResp = client.newCall(submitRequest).execute()
+                if (!submitResp.isSuccessful) {
+                    Log.e(TAG, "$logPrefix submit HTTP ${submitResp.code}")
+                    val handled = handleSubmitError(submitResp)
+                    submitResp.close()
+                    return@withContext handled
+                }
+
+                val submitJson = JSONObject(submitResp.body?.string() ?: "{}")
+                submitResp.close()
+                val jobId = submitJson.optString("jobId", "")
+                if (jobId.isBlank()) {
+                    withContext(Dispatchers.Main) { errorMessage = "Server did not return a jobId" }
+                    return@withContext null
+                }
+                Log.d(TAG, "$logPrefix jobId=$jobId; polling every ${POLL_INTERVAL_MS}ms")
+
+                val statusUrl = jobsSubmitUrl.replace("/jobs/generate", "/jobs/$jobId")
+
+                var bundleBase64Result: String? = null
+                var gameIdResult: String? = null
+                val pollStartMs = System.currentTimeMillis()
+                var consecutivePollErrors = 0
+
+                while (System.currentTimeMillis() - pollStartMs < POLL_MAX_TOTAL_WAIT_MS) {
+                    delay(POLL_INTERVAL_MS)
+
+                    val pollReq = Request.Builder()
+                        .url(statusUrl)
+                        .addHeader("x-platform", "android")
+                        .get()
+                        .build()
+
+                    try {
+                        val pollResp = client.newCall(pollReq).execute()
+                        if (!pollResp.isSuccessful) {
+                            Log.w(TAG, "$logPrefix poll HTTP ${pollResp.code} — retrying")
+                            pollResp.close()
+                            consecutivePollErrors++
+                            // 15 consecutive fails ≈ 45s of no signal → give up
+                            if (consecutivePollErrors >= 15) {
+                                withContext(Dispatchers.Main) {
+                                    errorMessage = "Lost contact with build server. Try again."
+                                }
+                                return@withContext null
+                            }
+                            continue
+                        }
+                        consecutivePollErrors = 0
+
+                        val pollJson = JSONObject(pollResp.body?.string() ?: "{}")
+                        pollResp.close()
+
+                        val status = pollJson.optString("status", "unknown")
+                        val message = pollJson.optString("message", "")
+                        val detail = pollJson.optString("detail", "")
+                        val pct = pollJson.optDouble("progressPercent", 0.0).toFloat()
+                        val endPct = pollJson.optDouble("progressEndPct", pct.toDouble()).toFloat()
+                        val eta = pollJson.optInt("estimatedSecondsRemaining", 0)
+
+                        withContext(Dispatchers.Main) {
+                            buildPhase = message
+                            buildDetail = detail
+                            progressPercent = pct
+                            estimatedSecondsRemaining = eta
+                            phaseStartPct = pct
+                            phaseEndPct = endPct
+                            // Poll-driven progress doesn't have a natural phase duration
+                            // like the SSE path did. Use the poll interval as a soft
+                            // interpolation window — good enough for smooth UI.
+                            phaseDuration = POLL_INTERVAL_MS / 1000
+                            startProgressInterpolation()
+                        }
+
+                        if (status == "succeeded") {
+                            val result = pollJson.optJSONObject("result")
+                            if (result != null) {
+                                bundleBase64Result = result.optString("bundle", null).takeIf { it.isNotBlank() }
+                            }
+                            gameIdResult = pollJson.optString("gameId", null).takeIf { !it.isNullOrBlank() }
+                            break
+                        }
+                        if (status == "failed") {
+                            val errMsg = pollJson.optString("error", "Generation failed")
+                            val reason = pollJson.optString("reason", "")
+                            Log.e(TAG, "$logPrefix job failed reason=$reason: $errMsg")
+                            withContext(Dispatchers.Main) { errorMessage = errMsg }
+                            return@withContext null
+                        }
+                    } catch (e: Exception) {
+                        Log.w(TAG, "$logPrefix poll exception (will retry)", e)
+                        consecutivePollErrors++
+                        if (consecutivePollErrors >= 15) {
+                            withContext(Dispatchers.Main) {
+                                errorMessage = "Network unstable. Please try again."
+                            }
+                            return@withContext null
+                        }
+                    }
+                }
+
+                if (bundleBase64Result == null) {
+                    withContext(Dispatchers.Main) {
+                        errorMessage = "Game generation timed out after 30 minutes. Try a simpler prompt."
+                    }
+                    return@withContext null
+                }
+
+                // Fire-and-forget cleanup — worker GCs on its own eventually
+                try {
+                    val delReq = Request.Builder().url(statusUrl).delete().build()
+                    client.newCall(delReq).execute().close()
+                } catch (_: Exception) {}
+
+                withContext(Dispatchers.Main) {
+                    buildPhase = "Extracting game..."
+                    buildDetail = ""
+                    progressPercent = 95f
+                }
+
+                val dir = extractGameBundle(context, bundleBase64Result!!)
+                if (dir == null) {
+                    withContext(Dispatchers.Main) {
+                        errorMessage = "Failed to extract game bundle. Please try again."
+                    }
+                    return@withContext null
+                }
+
+                GenerationResult(dir.absolutePath, bundleBase64Result!!, gameIdResult)
+            } catch (e: Exception) {
+                Log.e(TAG, "Poll error", e)
+                withContext(Dispatchers.Main) {
+                    errorMessage = when {
+                        e is java.net.UnknownHostException -> "Cannot reach server. Please check your internet connection."
+                        e is java.net.ConnectException -> "Cannot connect to server. Please try again later."
+                        else -> "Generation error: ${e.localizedMessage ?: "Unknown error"}"
+                    }
+                }
+                null
+            }
+        }
+    }
+
+    // Shared error handler for both the sync submit and the polling submit.
+    // Sets the correct paywall/rate-limit state and returns null so the caller
+    // can early-return.
+    private suspend fun handleSubmitError(response: Response): GenerationResult? {
+        var serverError = "Server error (${response.code})"
+        var canUseCoinsFlag = false
+        var coinCost = 10
+        try {
+            val errBody = response.body?.string()
+            if (errBody != null) {
+                val errJson = JSONObject(errBody)
+                errJson.optString("error", "").let { if (it.isNotEmpty()) serverError = it }
+                canUseCoinsFlag = errJson.optBoolean("canUseCoins", false)
+                coinCost = errJson.optInt("coinCost", 10)
+                if (response.code == 403 && errJson.optBoolean("requiresSubscription", false)) {
+                    withContext(Dispatchers.Main) { showHardPaywall = true }
+                    return null
+                }
+            }
+        } catch (_: Exception) {}
+        if (response.code == 403) {
+            withContext(Dispatchers.Main) { showHardPaywall = true }
+            return null
+        }
+        if ((response.code == 429 || response.code == 402) && canUseCoinsFlag) {
+            withContext(Dispatchers.Main) {
+                rateLimitCoinCost = coinCost
+                showRateLimitUpsell = true
+            }
+            return null
+        }
+        withContext(Dispatchers.Main) { errorMessage = serverError }
+        return null
     }
 
     private fun buildRequest(mode: GenerationMode, userId: String, userName: String): Triple<String, JSONObject, String> {

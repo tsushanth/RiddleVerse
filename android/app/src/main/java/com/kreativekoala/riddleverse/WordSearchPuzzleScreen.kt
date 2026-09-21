@@ -1,8 +1,12 @@
 package com.kreativekoala.riddleverse
 
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.*
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -22,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -82,6 +87,7 @@ data class WordFindEvent(
     val timeFromStart: Long
 )
 
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 @Composable
 fun WordSearchPuzzleScreen(
     difficulty: String = "Easy",
@@ -176,21 +182,21 @@ fun WordSearchPuzzleScreen(
     // Colors for found words
     val wordColors = remember {
         listOf(
-            Color(0xFF4CAF50), // Green
-            Color(0xFF2196F3), // Blue
-            Color(0xFFFF9800), // Orange
-            Color(0xFF9C27B0), // Purple
+            RvSuccess, // Green
+            RvSky, // Blue
+            RvSun, // Orange
+            RvGrape, // Purple
             Color(0xFFE91E63), // Pink
-            Color(0xFF00BCD4), // Cyan
+            RvSky, // Cyan
             Color(0xFFFFEB3B), // Yellow
             Color(0xFF795548), // Brown
-            Color(0xFF607D8B), // Blue Grey
+            RvInkSoft, // Blue Grey
             Color(0xFF3F51B5), // Indigo
         )
     }
 
     // Special color for revealed words
-    val revealedColor = Color(0xFFFF5722) // Deep Orange
+    val revealedColor = RvFlame // Deep Orange
 
     // Calculate word search score (excluding revealed words)
     fun calculateWordSearchScore(
@@ -466,290 +472,232 @@ fun WordSearchPuzzleScreen(
         )
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF00BCD4)) // Cyan background
+            .background(RvSky), // Cyan background
+        contentAlignment = Alignment.TopCenter
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().statusBarsPadding()
-        ) {
-            // Compact Top Bar with live timer
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(topBarHeight)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
+        val compact = maxHeight < 600.dp
+        val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+        val screenMaxHeight = maxHeight
+        val boardArea: @Composable (Modifier) -> Unit = { areaModifier ->
+            BoxWithConstraints(modifier = areaModifier, contentAlignment = Alignment.Center) {
+                val cellCount = maxOf(gridWidth, gridHeight, 1)
+                val side = minOf(maxWidth, maxHeight)
+                val boardCell = ((side - (cellCount - 1).dp) / cellCount).coerceIn(14.dp, 48.dp)
+                Box(modifier = Modifier.testTag("word_grid")) {
+                    WordSearchGrid(
+                        grid = grid,
+                        words = words,
+                        gridWidth = gridWidth,
+                        gridHeight = gridHeight,
+                        foundPaths = foundPaths,
+                        currentDragPath = currentDragPath,
+                        cellSize = boardCell,
+                        setCurrentDragPath = { currentDragPath = it },
+                        onDragStart = { x, y ->
+                            currentDragPath = listOf(Pair(x, y))
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        onDragUpdate = { x, y ->
+                            if (currentDragPath.isNotEmpty()) {
+                                val newPath = currentDragPath + Pair(x, y)
+                                currentDragPath = newPath.distinct()
+                            }
+                        },
+                        onDragEnd = {
+                            if (currentDragPath.size >= 2) {
+                                val result = checkWordInPath(currentDragPath, grid, words)
+                                if (result != null) {
+                                    val (draggedWord, correctPath) = result
+                                    handleWordFound(draggedWord, correctPath, "drag")
+                                } else {
+                                    // Reset streak on failed attempt
+                                    currentStreak = 0
+                                }
+                            }
+                            currentDragPath = emptyList()
+                        },
+                        onDoubleTap = { x, y ->
+                            val tappedCell = grid[y][x]
+                            val foundWord = findWordAtPosition(x, y, words, grid)
+                            if (foundWord != null && !foundWords.contains(foundWord.word) && !revealedWords.contains(foundWord.word)) {
+                                val wordPath = getWordPath(foundWord, grid)
+                                if (wordPath.isNotEmpty()) {
+                                    handleWordFound(foundWord, wordPath, "double-tap")
+                                }
+                            } else {
+                                currentStreak = 0
+                            }
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        },
+                        tapStart = tapStart,
+                        onTapStartChange = { tapStart = it },
+                        haptics = haptics,
+                        handleWordFound = { word, path ->
+                            // This lambda expects the correct path to be passed
+                            handleWordFound(word, path, "tap")
+                        }
                     )
                 }
-
-                Text(
-                    text = displayTimer,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (timeRemaining <= 30) Color.Red else Color.White
-                )
-
-                // Right side icons
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    // Double-tap info button
-                    IconButton(
-                        onClick = { showDoubleTapInfo = true },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Double-tap tip",
-                            tint = Color.White,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-
-                    // Hints button
-                    IconButton(
-                        onClick = {
-                            showHintsDialog = true
-                            hintUsed = true
-                        },
-                        modifier = Modifier.size(36.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Help,
-                            contentDescription = stringResource(R.string.hint),
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
             }
-
-            // Compact progress indicator with score
+        }
+        val wordsPanel: @Composable (Modifier) -> Unit = { panelModifier ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(progressBarHeight)
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.9f)
-                ),
-                shape = RoundedCornerShape(8.dp)
+                modifier = panelModifier,
+                colors = CardDefaults.cardColors(containerColor = RvSurface),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                        .verticalScroll(rememberScrollState()), // last-resort safety net only
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    val totalFoundAndRevealed = foundWords.size + revealedWords.size
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val totalFoundAndRevealed = foundWords.size + revealedWords.size
                         Text(
                             text = "Words: $totalFoundAndRevealed/${words.size}" +
                                     if (revealedWords.size > 0) " (${revealedWords.size} revealed)" else "",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF00BCD4)
+                            color = RvInk,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
                         )
-
-                        LinearProgressIndicator(
-                            progress = totalFoundAndRevealed.toFloat() / words.size.toFloat(),
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(6.dp),
-                            color = Color(0xFF4CAF50),
-                            trackColor = Color.Gray.copy(alpha = 0.3f)
-                        )
-                    }
-
-                    // Score and streak display (compact)
-                    if (totalScore > 0 || currentStreak > 0) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            if (totalScore > 0) {
-                                Text(
-                                    text = "Score: $totalScore",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4CAF50)
-                                )
-                            }
-
-                            if (currentStreak > 1) {
-                                Text(
-                                    text = "🔥$currentStreak",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF5722)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Clear instruction text
-            Text(
-                text = stringResource(R.string.drag_to_find_words),
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.White.copy(alpha = 0.9f),
-                textAlign = TextAlign.Center,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 6.dp)
-            )
-
-            // Maximized Word Search Grid
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(availableGridHeight - 30.dp)  // Account for instruction text
-                    .padding(horizontal = 8.dp), // Minimal horizontal padding
-                contentAlignment = Alignment.Center
-            ) {
-                WordSearchGrid(
-                    grid = grid,
-                    words = words,
-                    gridWidth = gridWidth,
-                    gridHeight = gridHeight,
-                    foundPaths = foundPaths,
-                    currentDragPath = currentDragPath,
-                    cellSize = optimalCellSize,
-                    setCurrentDragPath = { currentDragPath = it },
-                    onDragStart = { x, y ->
-                        currentDragPath = listOf(Pair(x, y))
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    },
-                    onDragUpdate = { x, y ->
-                        if (currentDragPath.isNotEmpty()) {
-                            val newPath = currentDragPath + Pair(x, y)
-                            currentDragPath = newPath.distinct()
-                        }
-                    },
-                    onDragEnd = {
-                        if (currentDragPath.size >= 2) {
-                            val result = checkWordInPath(currentDragPath, grid, words)
-                            if (result != null) {
-                                val (draggedWord, correctPath) = result
-                                handleWordFound(draggedWord, correctPath, "drag")
-                            } else {
-                                // Reset streak on failed attempt
-                                currentStreak = 0
-                            }
-                        }
-                        currentDragPath = emptyList()
-                    },
-                    onDoubleTap = { x, y ->
-                        val tappedCell = grid[y][x]
-                        val foundWord = findWordAtPosition(x, y, words, grid)
-                        if (foundWord != null && !foundWords.contains(foundWord.word) && !revealedWords.contains(foundWord.word)) {
-                            val wordPath = getWordPath(foundWord, grid)
-                            if (wordPath.isNotEmpty()) {
-                                handleWordFound(foundWord, wordPath, "double-tap")
-                            }
-                        } else {
-                            currentStreak = 0
-                        }
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    },
-                    tapStart = tapStart,
-                    onTapStartChange = { tapStart = it },
-                    haptics = haptics,
-                    handleWordFound = { word, path ->
-                        // This lambda expects the correct path to be passed
-                        handleWordFound(word, path, "tap")
-                    }
-                )
-            }
-
-            // Compact Hints List
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.95f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.find_these_words),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF00BCD4)
-                        )
-
-                        if (difficulty.isNotEmpty()) {
+                        if (totalScore > 0) {
                             Text(
-                                text = difficulty.uppercase(),
-                                fontSize = 10.sp,
+                                text = "${stringResource(R.string.score_label)}: $totalScore",
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Gray
+                                color = RvInk,
+                                maxLines = 1
+                            )
+                        }
+                        if (currentStreak > 1) {
+                            Text(
+                                text = "🔥$currentStreak",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = RvInk,
+                                maxLines = 1
                             )
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    LazyColumn(
+                    androidx.compose.foundation.layout.FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(words) { word ->
-                            CompactWordHintItem(
-                                word = word,
-                                isFound = foundWords.contains(word.word),
-                                isRevealed = revealedWords.contains(word.word),
-                                color = if (foundWords.contains(word.word)) {
-                                    val index = foundWords.toList().indexOf(word.word)
-                                    wordColors[index % wordColors.size]
-                                } else if (revealedWords.contains(word.word)) {
-                                    revealedColor
-                                } else {
-                                    Color.Gray
-                                },
-                                onRevealWord = { revealWord(word) }
-                            )
+                        words.forEach { word ->
+                            val isFound = foundWords.contains(word.word)
+                            val isRevealed = revealedWords.contains(word.word)
+                            Row(
+                                modifier = Modifier
+                                    .background(
+                                        if (isFound) RvSuccess.copy(alpha = 0.2f)
+                                        else if (isRevealed) RvFlame.copy(alpha = 0.2f)
+                                        else RvSurfaceRaised,
+                                        RoundedCornerShape(50)
+                                    )
+                                    .border(
+                                        1.dp,
+                                        if (isFound) RvSuccessEdge else if (isRevealed) RvFlame else RvOutline,
+                                        RoundedCornerShape(50)
+                                    )
+                                    .padding(horizontal = 12.dp, vertical = 6.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (isFound) {
+                                    Text("✓ ", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvSuccessEdge)
+                                } else if (isRevealed) {
+                                    Icon(
+                                        imageVector = Icons.Default.Visibility,
+                                        contentDescription = stringResource(R.string.revealed),
+                                        tint = RvFlame,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                }
+                                Text(
+                                    text = word.word,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isFound || isRevealed) RvInkSoft else RvInk,
+                                    textDecoration = if (isFound || isRevealed) TextDecoration.LineThrough else TextDecoration.None,
+                                    maxLines = 1
+                                )
+                            }
                         }
                     }
                 }
             }
+        }
 
-            // Compact reset button
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 1000.dp)
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(bottom = 8.dp)
+        ) {
+            // Compact HUD: back, timer, info, hint, reset (all >= 48dp hit targets)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(resetButtonHeight)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.Center
+                    .heightIn(min = 48.dp)
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                OutlinedButton(
-                    onClick = {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvInk,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+
+                Text(
+                    text = displayTimer,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    color = if (timeRemaining <= 30) RvCoralEdge else RvInk
+                )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(0.dp)) {
+                    IconButton(onClick = { showDoubleTapInfo = true }, modifier = Modifier.size(48.dp)) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Double-tap tip",
+                            tint = RvInk,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
+                            showHintsDialog = true
+                            hintUsed = true
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Help,
+                            contentDescription = stringResource(R.string.hint),
+                            tint = RvInk,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    IconButton(
+                        onClick = {
                         clearWordSearchGrid(grid)
                         foundWords = emptySet()
                         revealedWords = emptySet()
@@ -765,20 +713,58 @@ fun WordSearchPuzzleScreen(
                         recompositionTrigger += 1
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.White
-                    ),
-                    border = BorderStroke(2.dp, Color.White),
-                    modifier = Modifier.height(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = stringResource(R.string.reset),
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(stringResource(R.string.reset).uppercase(), fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.reset),
+                            tint = RvInk,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
+            }
+
+            if (wide) {
+                Row(
+                    modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    boardArea(Modifier.weight(1f).fillMaxHeight())
+                    Column(
+                        modifier = Modifier.widthIn(max = 360.dp).weight(0.6f).fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
+                    ) {
+                        Text(
+                            text = stringResource(R.string.drag_to_find_words),
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = RvInk,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        wordsPanel(Modifier.fillMaxWidth().heightIn(max = screenMaxHeight * 0.7f))
+                    }
+                }
+            } else {
+                if (!compact) {
+                    Text(
+                        text = stringResource(R.string.drag_to_find_words),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = RvInk,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+                    )
+                }
+                boardArea(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 8.dp))
+                Spacer(Modifier.height(8.dp))
+                wordsPanel(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .heightIn(max = screenMaxHeight * 0.32f)
+                )
             }
         }
 
@@ -906,7 +892,7 @@ fun WordSearchGrid(
                 val endCenterY = endPos.second * (cellSize.toPx() + 1.dp.toPx()) + cellSize.toPx() / 2
 
                 drawLine(
-                    color = Color(0xFF81C784).copy(alpha = 0.8f),
+                    color = RvSuccess.copy(alpha = 0.8f),
                     start = androidx.compose.ui.geometry.Offset(startCenterX, startCenterY),
                     end = androidx.compose.ui.geometry.Offset(endCenterX, endCenterY),
                     strokeWidth = 6.dp.toPx()
@@ -936,7 +922,7 @@ fun CompactWordHintItem(
             modifier = Modifier
                 .size(12.dp)
                 .background(
-                    color = if (isFound || isRevealed) color else Color.Gray.copy(alpha = 0.3f),
+                    color = if (isFound || isRevealed) color else RvInkSoft.copy(alpha = 0.3f),
                     shape = RoundedCornerShape(6.dp)
                 )
         )
@@ -953,7 +939,7 @@ fun CompactWordHintItem(
                     text = word.word,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isFound || isRevealed) Color.Gray else Color.Black,
+                    color = if (isFound || isRevealed) RvInkSoft else RvInk,
                     textDecoration = if (isFound || isRevealed) TextDecoration.LineThrough else TextDecoration.None,
                     modifier = Modifier.weight(1f)
                 )
@@ -964,7 +950,7 @@ fun CompactWordHintItem(
                         text = stringResource(R.string.revealed).uppercase(),
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF5722),
+                        color = RvFlame,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -973,7 +959,7 @@ fun CompactWordHintItem(
             Text(
                 text = word.hint,
                 fontSize = 10.sp,
-                color = if (isFound || isRevealed) Color.Gray.copy(alpha = 0.7f) else Color.Gray,
+                color = if (isFound || isRevealed) RvInkSoft.copy(alpha = 0.7f) else RvInkSoft,
                 modifier = Modifier.alpha(if (isFound || isRevealed) 0.6f else 1f),
                 maxLines = 1
             )
@@ -984,14 +970,14 @@ fun CompactWordHintItem(
             Text(
                 text = "✓",
                 fontSize = 14.sp,
-                color = Color(0xFF4CAF50),
+                color = RvSuccess,
                 fontWeight = FontWeight.Bold
             )
         } else if (isRevealed) {
             Icon(
                 imageVector = Icons.Default.Visibility,
                 contentDescription = stringResource(R.string.revealed),
-                tint = Color(0xFFFF5722),
+                tint = RvFlame,
                 modifier = Modifier.size(16.dp)
             )
         } else {
@@ -1002,8 +988,8 @@ fun CompactWordHintItem(
                     .height(24.dp)
                     .padding(horizontal = 4.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFF5722).copy(alpha = 0.1f),
-                    contentColor = Color(0xFFFF5722)
+                    containerColor = RvFlame.copy(alpha = 0.1f),
+                    contentColor = RvFlame
                 ),
                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
             ) {
@@ -1037,7 +1023,7 @@ fun EnhancedWordSearchCompletionDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF00BCD4)),
+            colors = CardDefaults.cardColors(containerColor = RvSky),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -1048,7 +1034,7 @@ fun EnhancedWordSearchCompletionDialog(
                     text = "🎉 ${stringResource(R.string.puzzle_complete)}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -1058,7 +1044,7 @@ fun EnhancedWordSearchCompletionDialog(
                     text = "Final Score: $finalScore",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -1067,7 +1053,7 @@ fun EnhancedWordSearchCompletionDialog(
                 // Performance stats
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
+                        containerColor = RvSurface
                     )
                 ) {
                     Column(
@@ -1078,7 +1064,7 @@ fun EnhancedWordSearchCompletionDialog(
                             text = "Performance:",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -1088,25 +1074,25 @@ fun EnhancedWordSearchCompletionDialog(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$wordsFound/$totalWords", color = Color.White, fontSize = 12.sp)
-                                Text(stringResource(R.string.found), color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                Text("$wordsFound/$totalWords", color = RvInk, fontSize = 12.sp)
+                                Text(stringResource(R.string.found), color = RvInkSoft.copy(0.8f), fontSize = 10.sp)
                             }
 
                             if (revealedWords > 0) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Text("$revealedWords", color = Color.White, fontSize = 12.sp)
-                                    Text(stringResource(R.string.revealed), color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                    Text("$revealedWords", color = RvInk, fontSize = 12.sp)
+                                    Text(stringResource(R.string.revealed), color = RvInkSoft.copy(0.8f), fontSize = 10.sp)
                                 }
                             }
 
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$bestStreak", color = Color.White, fontSize = 12.sp)
-                                Text(stringResource(R.string.best_streak), color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                Text("$bestStreak", color = RvInk, fontSize = 12.sp)
+                                Text(stringResource(R.string.best_streak), color = RvInkSoft.copy(0.8f), fontSize = 10.sp)
                             }
 
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("${String.format("%.1f", avgTimePerWord)}s", color = Color.White, fontSize = 12.sp)
-                                Text("Avg/Word", color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                Text("${String.format("%.1f", avgTimePerWord)}s", color = RvInk, fontSize = 12.sp)
+                                Text("Avg/Word", color = RvInkSoft.copy(0.8f), fontSize = 10.sp)
                             }
                         }
                     }
@@ -1117,7 +1103,7 @@ fun EnhancedWordSearchCompletionDialog(
                     Text(
                         text = "⚠️ Revealed words don't count towards score",
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center,
                         style = androidx.compose.ui.text.TextStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
                     )
@@ -1129,7 +1115,7 @@ fun EnhancedWordSearchCompletionDialog(
                 Text(
                     text = "Time: ${timeUsed/60}:${String.format("%02d", timeUsed%60)}",
                     fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = RvInkSoft.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center
                 )
 
@@ -1144,7 +1130,7 @@ fun EnhancedWordSearchCompletionDialog(
                         onClick = onReset,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
+                            contentColor = RvInk
                         ),
                         border = BorderStroke(2.dp, Color.White)
                     ) {
@@ -1157,10 +1143,10 @@ fun EnhancedWordSearchCompletionDialog(
                         onClick = onNext,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White
+                            containerColor = RvSurfaceRaised
                         )
                     ) {
-                        Text(stringResource(R.string.next), color = Color(0xFF00BCD4))
+                        Text(stringResource(R.string.next), color = RvSky)
                     }
                 }
             }
@@ -1188,7 +1174,7 @@ fun EnhancedWordSearchHintsDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -1198,14 +1184,14 @@ fun EnhancedWordSearchHintsDialog(
                     text = "All Words & Hints",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = RvInk,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Text(
                     text = "⚠️ Using hints or revealing words reduces your final score",
                     fontSize = 12.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -1218,7 +1204,7 @@ fun EnhancedWordSearchHintsDialog(
                             word = word,
                             isFound = foundWords.contains(word.word),
                             isRevealed = revealedWords.contains(word.word),
-                            color = if (foundWords.contains(word.word)) Color(0xFF4CAF50) else Color(0xFFFF5722),
+                            color = if (foundWords.contains(word.word)) RvSuccess else RvFlame,
                             onRevealWord = { onRevealWord(word) }
                         )
                     }
@@ -1230,7 +1216,7 @@ fun EnhancedWordSearchHintsDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00BCD4)
+                        containerColor = RvSky
                     )
                 ) {
                     Text(stringResource(R.string.close))
@@ -1314,7 +1300,7 @@ fun DoubleTapInfoDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -1325,7 +1311,7 @@ fun DoubleTapInfoDialog(
                     text = "💡 Quick Selection Tip",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF00BCD4),
+                    color = RvSky,
                     textAlign = TextAlign.Center
                 )
 
@@ -1334,7 +1320,7 @@ fun DoubleTapInfoDialog(
                 Text(
                     text = "🖱️ Double-tap the start and end letter to select the entire word!",
                     fontSize = 16.sp,
-                    color = Color.Black,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     lineHeight = 22.sp
                 )
@@ -1344,7 +1330,7 @@ fun DoubleTapInfoDialog(
                 Text(
                     text = "This works for horizontal, vertical, and diagonal words.",
                     fontSize = 14.sp,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center,
                     style = androidx.compose.ui.text.TextStyle(fontStyle = androidx.compose.ui.text.font.FontStyle.Italic)
                 )
@@ -1354,10 +1340,10 @@ fun DoubleTapInfoDialog(
                 Button(
                     onClick = onDismiss,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF00BCD4)
+                        containerColor = RvSky
                     )
                 ) {
-                    Text(stringResource(R.string.got_it), color = Color.White)
+                    Text(stringResource(R.string.got_it), color = RvOnTone)
                 }
             }
         }
@@ -1445,16 +1431,16 @@ fun WordSearchCell(
             .size(size)
             .background(
                 color = when {
-                    isInCurrentPath -> Color(0xFF81C784).copy(alpha = 0.7f)
-                    cell.isRevealed -> Color(0xFFFF5722).copy(alpha = 0.3f) // Orange for revealed
-                    cell.isFound -> Color(0xFF4CAF50).copy(alpha = 0.3f) // Green for found
-                    else -> Color.White
+                    isInCurrentPath -> RvSuccess.copy(alpha = 0.7f).compositeOver(RvSurface)
+                    cell.isRevealed -> RvFlame.copy(alpha = 0.3f).compositeOver(RvSurface) // Orange for revealed
+                    cell.isFound -> RvSuccess.copy(alpha = 0.3f).compositeOver(RvSurface) // Green for found
+                    else -> RvSurface
                 },
                 shape = RoundedCornerShape(4.dp)
             )
             .border(
                 width = 1.dp,
-                color = Color.Gray.copy(alpha = 0.3f),
+                color = RvInkSoft.copy(alpha = 0.3f),
                 shape = RoundedCornerShape(4.dp)
             )
             .clickable { onClick() },
@@ -1462,9 +1448,9 @@ fun WordSearchCell(
     ) {
         Text(
             text = cell.letter,
-            fontSize = (size.value * 0.6).sp,
+            fontSize = with(androidx.compose.ui.platform.LocalDensity.current) { (size * 0.6f).toSp() },
             fontWeight = FontWeight.Bold,
-            color = if (cell.isFound || cell.isRevealed) Color.White else Color.Black,
+            color = if (cell.isFound || cell.isRevealed) RvInk else RvInk,
             textAlign = TextAlign.Center
         )
     }
@@ -1489,7 +1475,7 @@ fun WordHintItem(
             modifier = Modifier
                 .size(16.dp)
                 .background(
-                    color = if (isFound || isRevealed) color else Color.Gray.copy(alpha = 0.3f),
+                    color = if (isFound || isRevealed) color else RvInkSoft.copy(alpha = 0.3f),
                     shape = RoundedCornerShape(8.dp)
                 )
         )
@@ -1506,7 +1492,7 @@ fun WordHintItem(
                     text = word.word,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isFound || isRevealed) Color.Gray else Color.Black,
+                    color = if (isFound || isRevealed) RvInkSoft else RvInk,
                     textDecoration = if (isFound || isRevealed) TextDecoration.LineThrough else TextDecoration.None,
                     modifier = Modifier.weight(1f)
                 )
@@ -1517,7 +1503,7 @@ fun WordHintItem(
                         text = stringResource(R.string.revealed).uppercase(),
                         fontSize = 8.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF5722),
+                        color = RvFlame,
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 }
@@ -1526,7 +1512,7 @@ fun WordHintItem(
             Text(
                 text = word.hint,
                 fontSize = 12.sp,
-                color = if (isFound || isRevealed) Color.Gray.copy(alpha = 0.7f) else Color.Gray,
+                color = if (isFound || isRevealed) RvInkSoft.copy(alpha = 0.7f) else RvInkSoft,
                 modifier = Modifier.alpha(if (isFound || isRevealed) 0.6f else 1f)
             )
         }
@@ -1536,14 +1522,14 @@ fun WordHintItem(
             Text(
                 text = "✓",
                 fontSize = 18.sp,
-                color = Color(0xFF4CAF50),
+                color = RvSuccess,
                 fontWeight = FontWeight.Bold
             )
         } else if (isRevealed) {
             Icon(
                 imageVector = Icons.Default.Visibility,
                 contentDescription = stringResource(R.string.revealed),
-                tint = Color(0xFFFF5722),
+                tint = RvFlame,
                 modifier = Modifier.size(20.dp)
             )
         } else {
@@ -1552,8 +1538,8 @@ fun WordHintItem(
                 onClick = onRevealWord,
                 modifier = Modifier.height(32.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFFFF5722).copy(alpha = 0.1f),
-                    contentColor = Color(0xFFFF5722)
+                    containerColor = RvFlame.copy(alpha = 0.1f),
+                    contentColor = RvFlame
                 ),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
             ) {

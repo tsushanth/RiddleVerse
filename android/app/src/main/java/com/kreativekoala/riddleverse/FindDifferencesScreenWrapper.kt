@@ -1,6 +1,7 @@
 // FindDifferencesScreenWrapper.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import android.graphics.RectF
 import androidx.compose.foundation.layout.*
@@ -572,7 +573,13 @@ fun FindDifferencesPuzzleScreen(
                             onWrongClick = { wrongClicks++ }
                         )
                     },
-                    onImageSizeChanged = { imageSize = it }
+                    onImageSizeChanged = { imageSize = it },
+                    // Without an explicit weight this non-scrolling Column gives the image
+                    // the same max height budget as the whole screen, pushing the progress
+                    // row below it off-screen (only showed up on wider/landscape layouts).
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
                 )
             }
 
@@ -636,34 +643,34 @@ fun FindDifferencesPuzzleScreen(
             }
         }
 
-        // Progress and status
-        Column(
-            modifier = Modifier.padding(16.dp)
+        // Compact progress and status (single row)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Text(
+                text = "Found: ${foundDifferences.size}/${puzzleData.totalDifferences}",
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
             LinearProgressIndicator(
                 progress = foundDifferences.size.toFloat() / puzzleData.totalDifferences,
-                modifier = Modifier.fillMaxWidth(),
-                color = Color.Green,
-                trackColor = Color.Gray
+                modifier = Modifier.weight(1f),
+                color = RvSuccess,
+                trackColor = Color(0xFF444444)
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Found: ${foundDifferences.size}/${puzzleData.totalDifferences}",
-                    color = Color.White,
-                    fontSize = 12.sp
-                )
-                Text(
-                    text = "Wrong: $wrongClicks/${puzzleData.gameSettings.maxWrongClicks}",
-                    color = if (wrongClicks >= puzzleData.gameSettings.maxWrongClicks * 0.8) Color.Red else Color.White,
-                    fontSize = 12.sp
-                )
-            }
+            Text(
+                text = "Wrong: $wrongClicks/${puzzleData.gameSettings.maxWrongClicks}",
+                color = if (wrongClicks >= puzzleData.gameSettings.maxWrongClicks * 0.8) RvCoral else Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
+            )
         }
     }
 }
@@ -683,48 +690,9 @@ fun EnhancedFindDifferencesHeader(
     onHint: () -> Unit,
     canUseHint: Boolean
 ) {
-    Column(modifier = Modifier.statusBarsPadding()) {
-        // Top row with basic controls
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = difficulty.uppercase(),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = round,
-                    color = Color.White,
-                    fontSize = 10.sp
-                )
-            }
-
-            Text(
-                text = formatTime(timeRemaining),
-                color = if (timeRemaining < 30) Color.Red else Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        // View mode selector
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+    BoxWithConstraints(modifier = Modifier.statusBarsPadding()) {
+        val wide = maxWidth >= 560.dp
+        val modeButtons: @Composable () -> Unit = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ViewModeButton(
                     icon = Icons.Default.Landscape,
@@ -745,16 +713,79 @@ fun EnhancedFindDifferencesHeader(
                     onClick = { onViewModeChange(ViewMode.ZONES_LIST) }
                 )
             }
-
+        }
+        val hintButton: @Composable () -> Unit = {
             IconButton(
                 onClick = onHint,
-                enabled = canUseHint
+                enabled = canUseHint,
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     Icons.Default.Lightbulb,
-                    "Hint",
+                    stringResource(R.string.hint),
                     tint = if (canUseHint) Color.Yellow else Color.Gray
                 )
+            }
+        }
+        Column {
+            // Single compact HUD row: back, title, timer (+ mode buttons and hint when there is room)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
+                }
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = difficulty.uppercase(),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = round,
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
+                }
+
+                Text(
+                    text = formatTime(timeRemaining),
+                    color = if (timeRemaining < 30) RvCoralEdge else Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                if (wide) {
+
+                    modeButtons()
+                    hintButton()
+                } else {
+                    hintButton()
+                }
+            }
+
+            if (!wide) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    modeButtons()
+
+                }
             }
         }
     }
@@ -770,9 +801,9 @@ fun ViewModeButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.Blue else Color.Gray
+            containerColor = if (isSelected) RvViolet else Color(0xFF444444)
         ),
-        modifier = Modifier.size(width = 70.dp, height = 36.dp),
+        modifier = Modifier.defaultMinSize(minWidth = 72.dp).heightIn(min = 48.dp),
         contentPadding = PaddingValues(4.dp)
     ) {
         Column(
@@ -782,12 +813,12 @@ fun ViewModeButton(
             Icon(
                 icon,
                 contentDescription = label,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Text(
                 text = label,
-                fontSize = 8.sp,
+                fontSize = 12.sp,
                 color = Color.White
             )
         }

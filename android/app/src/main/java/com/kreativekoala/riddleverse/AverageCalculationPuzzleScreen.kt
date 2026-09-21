@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -22,6 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.math.*
@@ -175,99 +179,44 @@ fun AveragePuzzleScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(RvCanvas)
     ) {
         // Background components
         MountainLandscapeBackground()
         GeometricOverlay()
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Enhanced Top Bar with hearts
-            EnhancedAveragesTopGameBar(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts, // Show current hearts
-                onBack = onBack,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Score display
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "Score: $totalScore",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
+        AverageFitLayout(
+            hud = { compact ->
+                EnhancedAveragesTopGameBar(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts, // Show current hearts
+                    onBack = onBack,
+                    compact = compact,
+                    modifier = Modifier.statusBarsPadding()
+                )
+            },
+            info = {
+                if (totalScore > 0 || attempts > 0) {
+                    AverageInfoStrip(
+                        buildString {
+                            append("${stringResource(R.string.score_label)}: $totalScore")
+                            if (attempts > 0) append("  •  Attempt: $attempts")
+                            append("  •  Avg of ${numbers.size} numbers")
                         }
-
-                        if (attempts > 0) {
-                            Text(
-                                text = "Attempt: $attempts",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        }
-
-                        Text(
-                            text = "Avg of ${numbers.size} numbers",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White.copy(alpha = 0.7f)
-                        )
-                    }
+                    )
                 }
-                Spacer(modifier = Modifier.height(20.dp))
-            } else {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-
-            // Title and numbers
-            PuzzleHeader(
-                numbers = numbers,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Input display
-            InputDisplay(
-                currentInput = currentInput,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Calculator interface
-            CalculatorGrid(
+            },
+            question = { compact ->
+                AverageQuestionPane(
+                    numbers = numbers,
+                    currentInput = currentInput,
+                    compact = compact
+                )
+            },
+            keypad = {
+                AverageKeypad(
                 currentInput = currentInput,
                 onNumberClick = { digit ->
                     if (!isAnswered && currentInput.length < 6) {
@@ -352,11 +301,10 @@ fun AveragePuzzleScreen(
                         )
                     }
                 },
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.fillMaxSize()
             )
-
-            Spacer(modifier = Modifier.height(30.dp))
-        }
+            }
+        )
 
         EnhancedUniversalFeedback(feedbackManager)
     }
@@ -370,7 +318,7 @@ fun InputDisplay(
     Card(
         modifier = modifier.height(60.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.1f)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -382,10 +330,7 @@ fun InputDisplay(
                 text = currentInput.ifEmpty { "Enter your answer" },
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (currentInput.isEmpty())
-                    Color.White.copy(alpha = 0.6f)
-                else
-                    Color.White,
+                color = if (currentInput.isEmpty()) RvInkSoft else RvInk,
                 textAlign = TextAlign.Center
             )
         }
@@ -405,7 +350,7 @@ fun PuzzleHeader(
             text = "FIND THE AVERAGE",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
+            color = RvInkSoft.copy(alpha = 0.9f),
             letterSpacing = 1.sp
         )
 
@@ -421,7 +366,7 @@ fun PuzzleHeader(
                     text = number.toString(),
                     fontSize = 48.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
             }
@@ -494,11 +439,8 @@ fun CalculatorGrid(
                 .fillMaxWidth()
                 .height(56.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = if (currentInput.isNotEmpty()) {
-                    Color.White.copy(alpha = 0.3f)
-                } else {
-                    Color.White.copy(alpha = 0.1f)
-                }
+                containerColor = RvViolet,
+                disabledContainerColor = RvDisabled
             ),
             shape = RoundedCornerShape(8.dp),
             enabled = currentInput.isNotEmpty()
@@ -507,7 +449,7 @@ fun CalculatorGrid(
                 text = "SUBMIT",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (currentInput.isNotEmpty()) Color.White else Color.White.copy(alpha = 0.5f)
+                color = if (currentInput.isNotEmpty()) RvOnTone else RvInkSoft
             )
         }
     }
@@ -526,9 +468,9 @@ fun AverageCalculatorButton(
         modifier = modifier.height(56.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = when {
-                isSpecial -> Color.Red.copy(alpha = 0.3f)
-                isInput -> Color.Blue.copy(alpha = 0.3f)
-                else -> Color.White.copy(alpha = 0.2f)
+                isSpecial -> RvError.copy(alpha = 0.25f)
+                isInput -> RvSky.copy(alpha = 0.3f)
+                else -> RvSurface
             }
         ),
         shape = RoundedCornerShape(8.dp)
@@ -537,7 +479,7 @@ fun AverageCalculatorButton(
             text = text,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = RvInk
         )
     }
 }
@@ -650,7 +592,7 @@ fun DrawScope.drawGeometricShapes(size: androidx.compose.ui.geometry.Size) {
         triangleOffsets.forEach { end ->
             if (start != end) {
                 drawLine(
-                    color = Color.White.copy(alpha = 0.1f),
+                    color = RvInkSoft.copy(alpha = 0.1f),
                     start = start,
                     end = end,
                     strokeWidth = 1.dp.toPx()
@@ -669,14 +611,14 @@ fun DrawScope.drawGeometricShapes(size: androidx.compose.ui.geometry.Size) {
         }
         drawPath(
             trianglePath,
-            color = Color.White.copy(alpha = 0.15f),
+            color = RvInkSoft.copy(alpha = 0.15f),
             style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx())
         )
     }
 
     // Additional geometric elements
     drawCircle(
-        color = Color.White.copy(alpha = 0.1f),
+        color = RvInkSoft.copy(alpha = 0.1f),
         radius = 60f,
         center = Offset(centerX, centerY),
         style = androidx.compose.ui.graphics.drawscope.Stroke(width = 1.dp.toPx())
@@ -684,14 +626,14 @@ fun DrawScope.drawGeometricShapes(size: androidx.compose.ui.geometry.Size) {
 
     // Cross lines
     drawLine(
-        color = Color.White.copy(alpha = 0.2f),
+        color = RvInkSoft.copy(alpha = 0.2f),
         start = Offset(centerX - 80f, centerY),
         end = Offset(centerX + 80f, centerY),
         strokeWidth = 2.dp.toPx()
     )
 
     drawLine(
-        color = Color.White.copy(alpha = 0.2f),
+        color = RvInkSoft.copy(alpha = 0.2f),
         start = Offset(centerX, centerY - 80f),
         end = Offset(centerX, centerY + 80f),
         strokeWidth = 2.dp.toPx()
@@ -706,88 +648,300 @@ fun EnhancedAveragesTopGameBar(
     timer: String,
     lives: Int,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
     Row(
-        modifier = modifier.statusBarsPadding().fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        modifier = modifier.fillMaxWidth().heightIn(min = 48.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        // Left side: Back button, pause, and level
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.size(40.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
             Icon(
-                imageVector = Icons.Default.Pause,
-                contentDescription = null,
-                tint = Color.White.copy(alpha = 0.7f),
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = RvInk,
                 modifier = Modifier.size(24.dp)
             )
+        }
 
-            Column {
-                Text(
-                    text = "Level ${level.level}",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                // Level progress bar
-                LevelProgressBar(
-                    level = level,
-                    modifier = Modifier.width(120.dp)
-                )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = "Level ${level.level}",
+                fontSize = if (compact) 16.sp else 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (!compact) {
+                LevelProgressBar(level = level, modifier = Modifier.width(120.dp))
             }
         }
 
-        // Center: Lives display
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            repeat(lives) {
-                Text(
-                    text = "❤️",
-                    fontSize = 16.sp
-                )
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+            repeat(lives) { Text(text = "❤️", fontSize = 16.sp) }
         }
 
-        // Right side: Timer with color coding and streak
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
+        Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = timer,
-                fontSize = 24.sp,
+                fontSize = if (compact) 20.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
-                    Color.Red // Red when ≤30 seconds
+                    RvErrorEdge // Red when <=30 seconds
                 } else {
-                    Color.White
-                }
+                    RvInk
+                },
+                maxLines = 1
             )
-
-            // Streak display
-            if (streakInfo.currentStreak > 0) {
-                StreakDisplay(
-                    streakInfo = streakInfo,
-                    modifier = Modifier.padding(top = 4.dp)
-                )
+            if (!compact && streakInfo.currentStreak > 0) {
+                StreakDisplay(streakInfo = streakInfo, modifier = Modifier.padding(top = 4.dp))
             }
         }
     }
+}
+
+/**
+ * Fit-to-screen scaffold for the average puzzles (no scrolling). Portrait: HUD on top, the
+ * question (title, numbers, answer display) in the flexible middle and the keypad pinned at the
+ * bottom with a height derived from the space that is left. Landscape / wide: question on the
+ * left, keypad on the right. Content width is capped for tablets.
+ */
+@Composable
+fun AverageFitLayout(
+    modifier: Modifier = Modifier,
+    hud: @Composable (compact: Boolean) -> Unit,
+    info: @Composable () -> Unit,
+    question: @Composable (compact: Boolean) -> Unit,
+    keypad: @Composable () -> Unit
+) {
+    BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+        val wide = maxWidth > maxHeight
+        val compact = wide || maxHeight < 720.dp
+        val pad = if (maxHeight < 600.dp) 12.dp else 16.dp
+        if (wide) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 1000.dp)
+                    .fillMaxSize()
+                    .padding(pad)
+            ) {
+                hud(true)
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxHeight(),
+                        verticalArrangement = Arrangement.Center
+                    ) { question(true) }
+                    Box(
+                        modifier = Modifier.weight(1f).widthIn(max = 420.dp).fillMaxHeight()
+                    ) { keypad() }
+                }
+            }
+        } else {
+            // Height for the keypad: about 55% of what the HUD leaves, but never squashed.
+            val hudH = if (compact) 56.dp else 150.dp
+            val remaining = maxHeight - pad * 2 - hudH
+            val keypadH = (remaining * 0.55f).coerceIn(232.dp, 400.dp)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 640.dp)
+                    .fillMaxSize()
+                    .padding(pad)
+            ) {
+                hud(compact)
+                if (!compact) {
+                    Spacer(Modifier.height(8.dp))
+                    info()
+                }
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center
+                ) { question(compact) }
+                Box(
+                    modifier = Modifier.fillMaxWidth().height(keypadH).testTag("avg_keypad")
+                ) { keypad() }
+            }
+        }
+    }
+}
+
+/** Title + numbers + answer display. Number size is set in dp so it is stable at any font scale. */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun AverageQuestionPane(
+    numbers: List<Int>,
+    currentInput: String,
+    compact: Boolean,
+    subtitle: String? = null
+) {
+    val fontScale = LocalDensity.current.fontScale
+    val numberDp = when {
+        numbers.size <= 3 -> if (compact) 40 else 52
+        numbers.size == 4 -> if (compact) 36 else 44
+        else -> if (compact) 28 else 36
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = "FIND THE AVERAGE",
+            fontSize = if (compact) 14.sp else 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = RvInkSoft,
+            letterSpacing = 1.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        if (subtitle != null) {
+            Text(
+                text = subtitle,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvVioletEdge,
+                maxLines = 1
+            )
+        }
+        Spacer(Modifier.height(if (compact) 8.dp else 16.dp))
+        FlowRow(
+            modifier = Modifier.fillMaxWidth().testTag("avg_numbers"),
+            horizontalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            numbers.forEach { number ->
+                Text(
+                    text = number.toString(),
+                    fontSize = (numberDp / fontScale).sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
+            }
+        }
+        Spacer(Modifier.height(if (compact) 8.dp else 24.dp))
+        AverageInputDisplay(
+            currentInput = currentInput,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            compact = compact
+        )
+    }
+}
+
+@Composable
+fun AverageInputDisplay(
+    currentInput: String,
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
+) {
+    Card(
+        modifier = modifier.height(if (compact) 52.dp else 64.dp).testTag("avg_input"),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(
+                text = currentInput.ifEmpty { "Enter your answer" },
+                fontSize = if (currentInput.isEmpty()) 16.sp else 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (currentInput.isEmpty()) RvInkSoft else RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    }
+}
+
+/**
+ * Number pad that fills the box it is given: 4 rows of keys plus the submit bar, all rows
+ * share the height equally. The submit bar is the visually strongest control.
+ */
+@Composable
+fun AverageKeypad(
+    currentInput: String,
+    onNumberClick: (String) -> Unit,
+    onClear: () -> Unit,
+    onDecimal: () -> Unit,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    @Composable
+    fun RowScope.Key(text: String, onClick: () -> Unit, special: Boolean = false) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier.weight(1f).fillMaxHeight(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = if (special) RvSurface else RvSurfaceRaised,
+                contentColor = if (special) RvErrorEdge else RvInk
+            ),
+            border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+            contentPadding = PaddingValues(0.dp),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text(text, fontSize = 22.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        }
+    }
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        for (row in 0..2) {
+            Row(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (col in 0..2) {
+                    val number = row * 3 + col + 1
+                    Key(number.toString(), { onNumberClick(number.toString()) })
+                }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Key("✕", onClear, special = true)
+            Key("0", { onNumberClick("0") })
+            // Answers are whole numbers, so there is no decimal key: keep the slot empty.
+            Spacer(Modifier.weight(1f))
+        }
+        Button(
+            onClick = onSubmit,
+            modifier = Modifier.fillMaxWidth().weight(1.1f).testTag("avg_submit"),
+            enabled = currentInput.isNotEmpty(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = RvViolet,
+                contentColor = RvOnTone,
+                disabledContainerColor = RvDisabled,
+                disabledContentColor = RvInkSoft
+            ),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Text(stringResource(R.string.submit), fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+        }
+    }
+}
+
+/** One-line score/attempt strip shown above the question on tall screens. */
+@Composable
+fun AverageInfoStrip(text: String) {
+    Text(
+        text = text,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.Medium,
+        color = RvInkSoft,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)
+    )
 }

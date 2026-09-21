@@ -1,6 +1,7 @@
 // MultiMatchMusicPuzzleScreen.kt - Circular Multi-Match Music Puzzle
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.animation.*
@@ -10,6 +11,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -121,8 +123,8 @@ private fun OrbitRings(center: Offset, innerR: Float, outerR: Float) {
             }
         }
 
-        drawDotted(innerR, Color(0x55FFFFFF))
-        drawDotted(outerR, Color(0x66FFFFFF))
+        drawDotted(innerR, RvInkSoft.copy(alpha = 0.35f))
+        drawDotted(outerR, RvInkSoft.copy(alpha = 0.45f))
     }
 }
 
@@ -147,33 +149,43 @@ fun BottomAnswerBar(
     onSkip: () -> Unit,
     onHint: () -> Unit
 ) {
-    Box(Modifier.fillMaxWidth().padding(16.dp)) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .widthIn(max = 640.dp)
+            .padding(horizontal = 8.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         // Skip (left)
         TextButton(
             onClick = onSkip,
-            modifier = Modifier.align(Alignment.CenterStart)
-        ) { Text(stringResource(R.string.skip)) }
+            modifier = Modifier.heightIn(min = 48.dp)
+        ) { Text(stringResource(R.string.skip), fontSize = 14.sp, color = RvInk, maxLines = 1) }
 
-        // Answer (center)
+        // Answer (center, primary action)
         Button(
             onClick = onAnswer,
             enabled = enabled,
             shape = RoundedCornerShape(28.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = RvViolet,
+                contentColor = RvOnTone,
+                disabledContainerColor = RvDisabled,
+                disabledContentColor = RvInkSoft
+            ),
             modifier = Modifier
-                .align(Alignment.Center)
-                .height(56.dp)
-                .fillMaxWidth(0.6f)
+                .weight(1f)
+                .heightIn(min = 56.dp)
         ) {
-            Text("Answer")
+            Text("Answer", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         // Hint (right)
         IconButton(
             onClick = onHint,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .size(48.dp)
-        ) { Icon(Icons.Default.Lightbulb, null, tint = Color.Yellow) }
+            modifier = Modifier.size(48.dp)
+        ) { Icon(Icons.Default.Lightbulb, stringResource(R.string.hint), tint = RvSunEdge) }
     }
 }
 
@@ -331,7 +343,7 @@ fun MultiMatchMusicPuzzleScreen(
     var timeRemaining by remember { mutableStateOf(puzzleData.timeLimit / 1000) }
     var gameCompleted by remember { mutableStateOf(false) }
     var showFeedback by remember { mutableStateOf<String?>(null) }
-    var feedbackColor by remember { mutableStateOf(Color.Green) }
+    var feedbackColor by remember { mutableStateOf(RvSuccess) }
 
     // --- Circle state ---
     var centerPosition by remember { mutableStateOf(Offset.Zero) }
@@ -422,8 +434,20 @@ fun MultiMatchMusicPuzzleScreen(
         }
     }
 
+    BoxWithConstraints(
+        modifier = Modifier.fillMaxSize().background(RvCanvas),
+        contentAlignment = Alignment.TopCenter
+    ) {
+    val compactScreen = maxHeight < 600.dp
+    // Ring geometry is derived from the measured play area (see onGloballyPositioned below).
+    val density = LocalDensity.current
+    val outerR = with(density) { circleRadius.toDp() }
+    val questionDiameter = (outerR * 0.6f * 0.75f).coerceIn(48.dp, 80.dp)
+    val pillHeight = (outerR * 0.4f).coerceIn(40.dp, 50.dp)
+    val ringN = maxOf(questionItems.count { !it.isAnswered }, 1)
+    val pillWidth = (outerR.value * 2f * Math.PI.toFloat() / ringN * 0.9f).coerceIn(72f, 110f).dp
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.Black)
+        modifier = Modifier.fillMaxHeight().widthIn(max = 1000.dp).fillMaxWidth()
     ) {
         MultiMatchMusicHeader(
             difficulty = difficulty,
@@ -443,7 +467,10 @@ fun MultiMatchMusicPuzzleScreen(
                 .weight(1f)
                 .onGloballyPositioned { coords ->
                     centerPosition = Offset(coords.size.width / 2f, coords.size.height / 2f)
-                    circleRadius = min(coords.size.width, coords.size.height) / 3f
+                    // Outer ring radius: as large as fits, leaving room for the answer pills.
+                    val pillReserve = with(density) { 56.dp.toPx() }
+                    circleRadius = (min(coords.size.width, coords.size.height) / 2f - pillReserve)
+                        .coerceAtLeast(min(coords.size.width, coords.size.height) / 4f)
                 }
         ) {
             if (circleRadius > 0f && centerPosition != Offset.Zero) {
@@ -459,6 +486,7 @@ fun MultiMatchMusicPuzzleScreen(
                         item = item,
                         centerPosition = centerPosition,
                         radius = circleRadius * 0.6f,
+                        diameter = questionDiameter,
                         isSelected = selectedQuestion?.id == item.id,
                         isPlaying = currentPlayingId == item.id && audioState == AudioState.PLAYING,
                         playbackProgress = if (currentPlayingId == item.id) playbackProgress else 0f,
@@ -516,6 +544,8 @@ fun MultiMatchMusicPuzzleScreen(
                         item = item,
                         centerPosition = centerPosition,
                         radius = circleRadius,
+                        itemWidth = pillWidth,
+                        itemHeight = pillHeight,
                         isSelected = selectedAnswer?.id == item.id,
                         onClick = {
                             selectedAnswer = if (selectedAnswer?.id == item.id) null else item
@@ -535,18 +565,20 @@ fun MultiMatchMusicPuzzleScreen(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .zIndex(2f)
-                        .size(180.dp)
-                        .background(Color(0x33000000), CircleShape)
-                        .border(3.dp, Color.White, CircleShape)
-                        .padding(16.dp),
+                        .size((outerR * 1.2f - questionDiameter - 8.dp).coerceIn(72.dp, 180.dp))
+                        .background(RvSurface, CircleShape)
+                        .border(3.dp, RvOutline, CircleShape)
+                        .padding(8.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "Which track matches?",
-                        color = Color.White,
+                        color = RvInk,
                         textAlign = TextAlign.Center,
                         lineHeight = 18.sp,
-                        fontSize = 16.sp,
+                        fontSize = 14.sp,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -562,7 +594,7 @@ fun MultiMatchMusicPuzzleScreen(
                 ) {
                     Text(
                         text = feedback,
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
@@ -572,6 +604,7 @@ fun MultiMatchMusicPuzzleScreen(
         }
 
         // ---- Bottom controls ----
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         BottomAnswerBar(
             enabled = selectedQuestion != null && selectedAnswer != null,
             onAnswer = {
@@ -580,7 +613,7 @@ fun MultiMatchMusicPuzzleScreen(
                     val isCorrect = q?.answer == selectedAnswer!!.text
                     if (isCorrect) {
                         correctAnswers++
-                        feedbackColor = Color.Green
+                        feedbackColor = RvSuccess
                         showFeedback = "Correct! 🎉"
 
                         questionItems = questionItems.map { it ->
@@ -606,7 +639,7 @@ fun MultiMatchMusicPuzzleScreen(
                         }
                     } else {
                         wrongAnswers++
-                        feedbackColor = Color.Red
+                        feedbackColor = RvError
                         showFeedback = "Wrong! Try again 🤔"
                     }
                     selectedQuestion = null
@@ -621,15 +654,17 @@ fun MultiMatchMusicPuzzleScreen(
             },
             onHint = {}
         )
+        }
 
-        if (puzzleData.gameSettings.showProgress) {
+        if (puzzleData.gameSettings.showProgress && !compactScreen) {
             LinearProgressIndicator(
                 progress = correctAnswers.toFloat() / puzzleData.totalQuestions,
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
-                color = Color.Green,
-                trackColor = Color.Gray
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                color = RvSuccess,
+                trackColor = RvOutline
             )
         }
+    }
     }
 }
 
@@ -645,7 +680,8 @@ fun QuestionCircleItem(
     onClick: () -> Unit,
     onPlayPause: () -> Unit,
     onDrag: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    diameter: androidx.compose.ui.unit.Dp = 80.dp
 ) {
     val density = LocalDensity.current
     var myOffsetInParent by remember { mutableStateOf(Offset.Zero) }
@@ -671,13 +707,17 @@ fun QuestionCircleItem(
             .onGloballyPositioned { coords ->
                 myOffsetInParent = coords.positionInParent()
             }
-            .offset { IntOffset((posPx.x - 40f).roundToInt(), (posPx.y - 40f).roundToInt()) }
-            .size(80.dp) // or .size(100.dp, 50.dp) for answers
+            .offset {
+                val half = diameter.toPx() / 2f
+                IntOffset((posPx.x - half).roundToInt(), (posPx.y - half).roundToInt())
+            }
+            .size(diameter)
+            .testTag("question_circle_${item.id}")
             .background(
-                if (isSelected) Color.Red else if (isPlaying) Color.Blue else Color.Gray,
+                if (isSelected) RvCoral else if (isPlaying) RvSky else RvSurfaceRaised,
                 CircleShape
             )
-            .border(if (isSelected) 3.dp else 1.dp, Color.White, CircleShape)
+            .border(if (isSelected) 4.dp else 2.dp, if (isSelected) RvInk else RvInkSoft, CircleShape)
             .clickable(onClick = onClick)
             .pointerInput(item.id) {
                 detectDragGestures(onDrag = { change, _ ->
@@ -695,12 +735,12 @@ fun QuestionCircleItem(
             // Play/pause button
             IconButton(
                 onClick = onPlayPause,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(if (diameter < 64.dp) 24.dp else 32.dp)
             ) {
                 Icon(
                     if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                     contentDescription = if (isPlaying) "Pause" else "Play",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -708,8 +748,8 @@ fun QuestionCircleItem(
             // Question number
             Text(
                 text = item.id.toString(),
-                color = Color.White,
-                fontSize = 12.sp,
+                color = RvInk,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -738,7 +778,9 @@ fun AnswerCircleItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     onDrag: (Float) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    itemWidth: androidx.compose.ui.unit.Dp = 100.dp,
+    itemHeight: androidx.compose.ui.unit.Dp = 50.dp
 ) {
     val density = LocalDensity.current
 
@@ -765,16 +807,20 @@ fun AnswerCircleItem(
                 myOffsetInParent = coords.positionInParent()
             }
             .offset {
-                IntOffset((posPx.x - 50f).roundToInt(), (posPx.y - 25f).roundToInt())
+                IntOffset(
+                    (posPx.x - itemWidth.toPx() / 2f).roundToInt(),
+                    (posPx.y - itemHeight.toPx() / 2f).roundToInt()
+                )
             }
-            .size(width = 100.dp, height = 50.dp)
+            .size(width = itemWidth, height = itemHeight)
+            .testTag("answer_pill_${item.text}")
             .background(
-                if (isSelected) Color.Green else Color.White,
+                if (isSelected) RvSuccess else RvSurfaceRaised,
                 RoundedCornerShape(25.dp)
             )
             .border(
-                width = if (isSelected) 3.dp else 1.dp,
-                color = if (isSelected) Color.White else Color.Gray,
+                width = if (isSelected) 4.dp else 2.dp,
+                color = if (isSelected) RvInk else RvInkSoft,
                 shape = RoundedCornerShape(25.dp)
             )
             .clickable { onClick() }
@@ -792,8 +838,8 @@ fun AnswerCircleItem(
     ) {
         Text(
             text = item.text.split(" - ").firstOrNull() ?: item.text,
-            color = if (isSelected) Color.White else Color.Black,
-            fontSize = 10.sp,
+            color = if (isSelected) RvInk else RvInk,
+            fontSize = 12.sp,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             maxLines = 2,
@@ -816,93 +862,86 @@ fun MultiMatchMusicHeader(
     onBack: () -> Unit
 ) {
     Column(
-        modifier = Modifier.statusBarsPadding().padding(16.dp)
+        modifier = Modifier.statusBarsPadding().padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
-        // Top row
+        // Single HUD row: back, difficulty/round, lives, timer
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = RvInk)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = difficulty.uppercase(),
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
                 )
                 Text(
                     text = round,
-                    color = Color.White,
-                    fontSize = 10.sp
+                    color = RvInkSoft,
+                    fontSize = 12.sp,
+                    maxLines = 1
                 )
             }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Lives indicator
                 repeat(3) { index ->
                     Icon(
                         Icons.Default.Favorite,
                         contentDescription = "Life",
-                        tint = if (index < (3 - wrongAnswers.coerceAtMost(3))) Color.Red else Color.Gray,
-                        modifier = Modifier.size(16.dp)
+                        tint = if (index < (3 - wrongAnswers.coerceAtMost(3))) RvCoralEdge else RvOutline,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 
                 Text(
                     text = formatTime(timeRemaining),
-                    color = if (timeRemaining < 30) Color.Red else Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
+                    color = if (timeRemaining < 30) RvCoralEdge else RvInk,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.padding(start = 4.dp, end = 8.dp)
                 )
             }
         }
 
-        // Title and progress
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = theme,
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Text(
-            text = description,
-            color = Color.Gray,
-            fontSize = 12.sp
-        )
-
-        // Score display
+        // Theme + progress on one line (description dropped: not needed to play)
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                repeat(totalQuestions) { index ->
-                    Icon(
-                        Icons.Default.Star,
-                        contentDescription = "Progress",
-                        tint = if (index < correctAnswers) Color.Yellow else Color.Gray,
-                        modifier = Modifier.size(16.dp)
-                    )
-                }
-            }
-
+            Text(
+                text = theme,
+                color = RvInk,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                Icons.Default.Star,
+                contentDescription = "Progress",
+                tint = RvSunEdge,
+                modifier = Modifier.size(20.dp)
+            )
             Text(
                 text = "$correctAnswers/$totalQuestions",
-                color = Color.White,
+                color = RvInk,
                 fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                maxLines = 1
             )
         }
     }
@@ -926,8 +965,8 @@ fun MultiMatchBottomControls(
         // Skip button
         Button(
             onClick = onSkip,
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
-            modifier = Modifier.size(width = 80.dp, height = 48.dp)
+            colors = ButtonDefaults.buttonColors(containerColor = RvInkSoft),
+            modifier = Modifier.size(width = 96.dp, height = 48.dp)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -948,7 +987,7 @@ fun MultiMatchBottomControls(
             enabled = selectedQuestion != null && selectedAnswer != null,
             colors = ButtonDefaults.buttonColors(
                 containerColor = if (selectedQuestion != null && selectedAnswer != null)
-                    Color.Green else Color.Gray
+                    RvSuccess else RvInkSoft
             ),
             modifier = Modifier
                 .weight(1f)
@@ -970,7 +1009,7 @@ fun MultiMatchBottomControls(
             Icon(
                 Icons.Default.Lightbulb,
                 contentDescription = stringResource(R.string.hint),
-                tint = Color.Yellow,
+                tint = RvSunEdge,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -986,7 +1025,7 @@ fun MusicErrorScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(RvCanvas),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -995,14 +1034,14 @@ fun MusicErrorScreen(
         ) {
             Text(
                 text = "⚠️ Error",
-                color = Color.Red,
+                color = RvError,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = message,
-                color = Color.White,
+                color = RvInk,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
@@ -1017,7 +1056,7 @@ fun MusicErrorScreen(
 
                 Button(
                     onClick = onSkip,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                    colors = ButtonDefaults.buttonColors(containerColor = RvInkSoft)
                 ) {
                     Text(stringResource(R.string.skip))
                 }

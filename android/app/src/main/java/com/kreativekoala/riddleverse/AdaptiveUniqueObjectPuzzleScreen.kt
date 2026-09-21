@@ -1,8 +1,10 @@
 // AdaptiveUniqueObjectPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,7 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -140,7 +144,7 @@ fun AdaptiveUniqueObjectPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -178,38 +182,47 @@ fun AdaptiveUniqueObjectPuzzleScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Background
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF2D1B69))
-        )
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvCanvas)) {
+        val compact = groupEIsCompact(maxWidth, maxHeight)
+        val timerUrgent = displayTimer.startsWith("0:") && (displayTimer.substringAfter(":").toIntOrNull() ?: 99) <= 10
 
         Column(
             modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 720.dp)
                 .fillMaxSize()
                 .statusBarsPadding()
-                .padding(16.dp)
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // ✅ REPLACE: Use unified header instead of AdaptiveUniqueObjectTopBar
-            AdaptiveUnifiedHeader(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                score = totalScore,
-                puzzleType = "uniqueObject",
-                competitiveInsight = competitiveInsight,
-                onBack = onBack,
-                challengeNumber = attempts, // Fixed: Current attempt number
-                totalChallenges = 1, // Fixed: Single challenge per session for unique object puzzles
-                onPause = { /* Visual puzzles don't need pause functionality */ }, // Fixed: Optional pause
-                onHint = { /* Hints would give away the answer for visual puzzles */ } // Fixed: No hints for visual identification
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
+            if (compact) {
+                GroupECompactHud(
+                    timer = displayTimer,
+                    onBack = onBack,
+                    subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore" +
+                        (if (currentStreak > 0) " \u2022 \uD83D\uDD25$currentStreak" else ""),
+                    lives = currentHearts,
+                    urgent = timerUrgent
+                )
+            } else {
+                // ✅ REPLACE: Use unified header instead of AdaptiveUniqueObjectTopBar
+                Box(modifier = Modifier.testTag("hud_timer")) { AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "uniqueObject",
+                    competitiveInsight = competitiveInsight,
+                    onBack = onBack,
+                    challengeNumber = attempts, // Fixed: Current attempt number
+                    totalChallenges = 1, // Fixed: Single challenge per session for unique object puzzles
+                    onPause = { /* Visual puzzles don't need pause functionality */ }, // Fixed: Optional pause
+                    onHint = { /* Hints would give away the answer for visual puzzles */ } // Fixed: No hints for visual identification
+                ) }
+            }
 
             // ✅ REPLACE: Use unified adaptation notification
             UnifiedAdaptationNotification(
@@ -219,141 +232,86 @@ fun AdaptiveUniqueObjectPuzzleScreen(
                 onDismiss = { showAdaptationNotification = false }
             )
 
-            // Score and progress display
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.score_label),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "$totalScore",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                        }
+            Spacer(modifier = Modifier.height(8.dp))
 
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentDifficultyLevel.name.uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Cyan
-                            )
-                            Text(
-                                text = "${puzzleData.objects.size} objects",
-                                fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-
-                        if (currentStreak > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.streak_label),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "🔥 $currentStreak",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF6F00)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            // Enhanced hearts display
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                repeat(currentDifficultyLevel.livesAllowed) { index ->
-                    Text(
-                        text = if (index < currentHearts) "❤️" else "🤍",
-                        fontSize = 20.sp
-                    )
-                    if (index < currentDifficultyLevel.livesAllowed - 1) Spacer(modifier = Modifier.width(4.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Instruction with difficulty info
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = puzzleData.instruction,
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center
-                )
-
+            // Instruction: the question the player answers, kept prominent.
+            Text(
+                text = puzzleData.instruction,
+                color = RvInk,
+                fontSize = if (compact) 16.sp else 18.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (!compact) {
                 Text(
                     text = currentDifficultyLevel.description,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 12.sp,
+                    color = RvInkSoft,
+                    fontSize = 14.sp,
                     textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(top = 4.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Objects scattered randomly across screen
-            Box(
+            // Objects: laid out on a grid sized from the space available, so all of them are always on screen.
+            BoxWithConstraints(
                 modifier = Modifier
-                    .fillMaxWidth()
                     .weight(1f)
+                    .fillMaxWidth()
+                    .testTag("unique_area")
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(RvSurface)
+                    .padding(8.dp)
             ) {
-                // Generate random positions for each object
-                val objectPositions = remember(puzzleData.objects.size) {
-                    generateRandomPositions(puzzleData.objects.size)
+                val areaW = maxWidth
+                val areaH = maxHeight
+                val n = puzzleData.objects.size.coerceAtLeast(1)
+
+                // Pick the column count that gives the largest square cell.
+                var bestCols = 1
+                var bestCell = 0.dp
+                for (cols in 1..n) {
+                    val rows = (n + cols - 1) / cols
+                    val cell = minOf(areaW / cols, areaH / rows)
+                    if (cell > bestCell) {
+                        bestCell = cell
+                        bestCols = cols
+                    }
                 }
+                val cell = bestCell.coerceAtMost(140.dp)
+                val rows = (n + bestCols - 1) / bestCols
 
-                puzzleData.objects.forEachIndexed { index, obj ->
-                    val position = objectPositions[index]
-
-                    Box(
-                        modifier = Modifier
-                            .offset(
-                                x = (position.first * 80).dp, // Reduced spacing for more objects
-                                y = (position.second * 80).dp
-                            )
-                    ) {
-                        AdaptiveObjectItem(
-                            uniqueObject = obj,
-                            shapeMappings = puzzleData.shapeMappings,
-                            colorMappings = puzzleData.colorMappings,
-                            isSelected = selectedIndex == index,
-                            difficulty = currentDifficultyLevel,
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    for (r in 0 until rows) {
+                        Row(horizontalArrangement = Arrangement.Center) {
+                            for (c in 0 until bestCols) {
+                                val index = r * bestCols + c
+                                if (index >= puzzleData.objects.size) {
+                                    Spacer(modifier = Modifier.size(cell))
+                                    continue
+                                }
+                                val obj = puzzleData.objects[index]
+                                Box(
+                                    modifier = Modifier
+                                        .size(cell)
+                                        .testTag("unique_object"),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    AdaptiveObjectItem(
+                                        uniqueObject = obj,
+                                        shapeMappings = puzzleData.shapeMappings,
+                                        colorMappings = puzzleData.colorMappings,
+                                        isSelected = selectedIndex == index,
+                                        difficulty = currentDifficultyLevel,
                             onClick = {
                                 if (isGameActive && !showFeedback) {
                                     selectedIndex = index
@@ -447,27 +405,13 @@ fun AdaptiveUniqueObjectPuzzleScreen(
                                     }
                                 }
                             }
-                        )
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        // Back button - positioned as floating action button
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .background(
-                    Color.Black.copy(alpha = 0.3f),
-                    shape = CircleShape
-                )
-                .size(48.dp)
-        ) {
-            Text("←", color = Color.White, fontSize = 24.sp)
         }
 
         // Enhanced Universal Feedback Overlay
@@ -482,28 +426,26 @@ fun AdaptiveUniqueObjectPuzzleScreen(
         ) {
             Card(
                 modifier = Modifier
+                    .widthIn(max = 720.dp)
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF44336)
-                )
+                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+                border = BorderStroke(2.dp, RvError)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "❌ Not the unique object",
-                        color = Color.White,
+                        text = "\u274C Not the unique object",
+                        color = RvInk,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
-
                     Text(
                         text = "Keep looking! Hearts remaining: $currentHearts",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center
                     )
@@ -560,7 +502,7 @@ fun AdaptiveUniqueObjectTopBar(
         Column(horizontalAlignment = Alignment.Start) {
             Text(
                 text = "Level ${level.level}",
-                color = Color.White,
+                color = RvInk,
                 fontSize = 14.sp
             )
             Text(
@@ -590,9 +532,9 @@ fun AdaptiveUniqueObjectTopBar(
             color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 10 } == true) {
                 Color.Red
             } else if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
-                Color(0xFFFFA500)
+                RvSun
             } else {
-                Color.White
+                RvInk
             },
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
@@ -613,8 +555,8 @@ fun AdaptiveObjectItem(
     val colorName = colorMappings[uniqueObject.color.toString()] ?: "blue"
     val color = getColorFromName(colorName)
 
-    // Adaptive object size based on difficulty
-    val objectSize = when (difficulty.index) {
+    // Adaptive object size: difficulty preference, shrunk to the cell the parent gives us.
+    val preferredSize = when (difficulty.index) {
         0 -> 110.dp // Beginner - larger objects
         1 -> 100.dp // Easy
         2 -> 90.dp  // Medium
@@ -622,6 +564,8 @@ fun AdaptiveObjectItem(
         4 -> 70.dp  // Expert - smaller objects
         else -> 100.dp
     }
+    BoxWithConstraints(contentAlignment = Alignment.Center) {
+    val objectSize = minOf(preferredSize, maxWidth - 4.dp, maxHeight - 4.dp).coerceAtLeast(32.dp)
 
     when (shape.lowercase()) {
         "circle" -> {
@@ -631,7 +575,7 @@ fun AdaptiveObjectItem(
                     .background(color, CircleShape)
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvViolet else RvInkSoft,
                         shape = CircleShape
                     )
                     .clickable { onClick() }
@@ -644,7 +588,7 @@ fun AdaptiveObjectItem(
                     .background(color, RoundedCornerShape(8.dp))
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvViolet else RvInkSoft,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable { onClick() }
@@ -666,7 +610,7 @@ fun AdaptiveObjectItem(
                         )
                         .border(
                             width = if (isSelected) 4.dp else 2.dp,
-                            color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                            color = if (isSelected) RvViolet else RvInkSoft,
                             shape = RoundedCornerShape(topStart = 50.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp)
                         )
                 )
@@ -685,7 +629,7 @@ fun AdaptiveObjectItem(
                         .background(color, RoundedCornerShape(8.dp))
                         .border(
                             width = if (isSelected) 4.dp else 2.dp,
-                            color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                            color = if (isSelected) RvViolet else RvInkSoft,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .graphicsLayer {
@@ -701,7 +645,7 @@ fun AdaptiveObjectItem(
                     .background(color, RoundedCornerShape(16.dp))
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvViolet else RvInkSoft,
                         shape = RoundedCornerShape(16.dp)
                     )
                     .clickable { onClick() }
@@ -719,7 +663,7 @@ fun AdaptiveObjectItem(
                     fontSize = (objectSize.value * 0.6f).sp,
                     modifier = Modifier
                         .background(
-                            if (isSelected) Color.Yellow.copy(alpha = 0.3f) else Color.Transparent,
+                            if (isSelected) RvViolet.copy(alpha = 0.25f) else Color.Transparent,
                             CircleShape
                         )
                         .padding(8.dp)
@@ -733,12 +677,13 @@ fun AdaptiveObjectItem(
                     .background(color, RoundedCornerShape(8.dp))
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvViolet else RvInkSoft,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable { onClick() }
             )
         }
+    }
     }
 }
 

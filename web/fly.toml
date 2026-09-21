@@ -9,7 +9,11 @@ primary_region = "iad"
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 0
+  # 1 (not 0) because /api/game-creation/jobs/* keeps an in-memory context map
+  # that MUST survive idle periods — otherwise a job that finishes while the
+  # machine is stopped can't be saved to Supabase. See gameCreation.routes.js
+  # comment near the flyJobContext declaration.
+  min_machines_running = 1
   processes = ["app"]
 
 [[vm]]

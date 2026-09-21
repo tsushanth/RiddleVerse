@@ -24,8 +24,8 @@ android {
         applicationId = "com.kreativekoala.riddleverse"
         minSdk = 26
         targetSdk = 36
-        versionCode = 171
-        versionName = "171.0"
+        versionCode = 172
+        versionName = "172.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL for sharing games
@@ -35,6 +35,11 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true  // android.util.Log etc. are no-ops on the JVM
+        unitTests.isIncludeAndroidResources = true  // Robolectric Compose layout tests need R.string.*
     }
 
     buildFeatures {
@@ -183,6 +188,9 @@ dependencies {
     implementation("com.google.accompanist:accompanist-pager-indicators:0.30.1")
 
     testImplementation(libs.junit)
+    testImplementation("org.robolectric:robolectric:4.15.1")
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))

@@ -1,6 +1,7 @@
 // AdaptiveTriangleDotMemoryPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.annotation.SuppressLint
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +16,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.TrendingUp
@@ -164,7 +166,7 @@ fun AdaptiveTriangleDotMemoryPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -187,30 +189,44 @@ fun AdaptiveTriangleDotMemoryPuzzleScreen(
         }
     }
 
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvCanvas)) {
+    val compact = groupEIsCompact(maxWidth, maxHeight)
     Column(
         modifier = Modifier
+            .align(Alignment.TopCenter)
+            .widthIn(max = 720.dp)
             .fillMaxSize()
-            .background(Color(0xFF1E3A8A))
-            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 32.dp)
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 8.dp)
     ) {
-        // ✅ REPLACE: Use unified header instead of AdaptiveTriangleDotTopBar
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60),
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = totalScore,
-            puzzleType = "triangledotmemory",
-            competitiveInsight = competitiveInsight,
-            onBack = onBack,
-            challengeNumber = currentQuestionIndex + 1, // Fixed: Current question number
-            totalChallenges = puzzleData.totalQuestions, // Fixed: Total questions in sequence
-            onPause = { /* Game can be paused by going back */ }, // Fixed: Optional pause functionality
-            onHint = { /* No hints for memory games */ } // Fixed: No hints for pure memory tasks
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+        val timerText = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)
+        if (compact) {
+            GroupECompactHud(
+                timer = timerText,
+                onBack = onBack,
+                subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore",
+                lives = currentHearts,
+                urgent = timeRemaining <= 10 && gameState == "playing"
+            )
+        } else {
+            // ✅ REPLACE: Use unified header instead of AdaptiveTriangleDotTopBar
+            Box(modifier = Modifier.testTag("hud_timer")) { AdaptiveUnifiedHeader(
+                level = currentLevel,
+                streakInfo = streakInfo,
+                timer = timerText,
+                lives = currentHearts,
+                currentDifficulty = currentDifficultyLevel,
+                score = totalScore,
+                puzzleType = "triangledotmemory",
+                competitiveInsight = competitiveInsight,
+                onBack = onBack,
+                challengeNumber = currentQuestionIndex + 1, // Fixed: Current question number
+                totalChallenges = puzzleData.totalQuestions, // Fixed: Total questions in sequence
+                onPause = { /* Game can be paused by going back */ }, // Fixed: Optional pause functionality
+                onHint = { /* No hints for memory games */ } // Fixed: No hints for pure memory tasks
+            ) }
+        }
 
         // ✅ REPLACE: Use unified adaptation notification
         UnifiedAdaptationNotification(
@@ -220,7 +236,7 @@ fun AdaptiveTriangleDotMemoryPuzzleScreen(
             onDismiss = { showAdaptationNotification = false }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         when (gameState) {
             "instructions" -> {
@@ -364,6 +380,7 @@ fun AdaptiveTriangleDotMemoryPuzzleScreen(
             // Session completion handled
         }
     }
+    }
 }
 
 @Composable
@@ -391,24 +408,24 @@ fun AdaptiveTriangleDotTopBar(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF3B82F6))
+                    .background(RvSky)
                     .clickable { onBack() }
                     .zIndex(1f),
                 contentAlignment = Alignment.Center
             ) {
-                Text("||", color = Color.White, fontWeight = FontWeight.Bold)
+                Text("||", color = RvInk, fontWeight = FontWeight.Bold)
             }
 
             Column {
                 Text(
                     text = "Level ${level.level}",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = currentDifficulty.name.uppercase(),
-                    color = Color.Cyan,
+                    color = RvSkyEdge,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -422,12 +439,12 @@ fun AdaptiveTriangleDotTopBar(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White.copy(alpha = 0.9f))
+                    .background(RvSurface)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
                     text = "TIME $timer",
-                    color = Color(0xFF1E3A8A),
+                    color = RvInk,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -436,12 +453,12 @@ fun AdaptiveTriangleDotTopBar(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
+                        .background(RvSurface)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
                         text = "SCORE $score",
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -472,139 +489,11 @@ private fun AdaptiveTriangleDotInstructionsScreen(
     difficulty: DifficultyManager.DifficultyLevel,
     onStartGame: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Scrollable content
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = instructions.title,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = difficulty.description,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Cyan,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = instructions.description,
-                fontSize = 16.sp,
-                color = Color.White.copy(alpha = 0.9f),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Example triangle
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Example Pattern",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A)
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    TriangleDotPattern(
-                        redDotPosition = 1, // Bottom-left red
-                        modifier = Modifier.size(120.dp)
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "Red dot at bottom-left",
-                        fontSize = 12.sp,
-                        color = Color(0xFF1E3A8A)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Instructions list
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    instructions.steps.forEach { step ->
-                        Text(
-                            text = "• $step",
-                            fontSize = 14.sp,
-                            color = Color(0xFF1E3A8A),
-                            modifier = Modifier.padding(vertical = 2.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    Text(
-                        text = "💡 ${instructions.tip}",
-                        fontSize = 14.sp,
-                        color = Color(0xFF1E3A8A),
-                        fontWeight = FontWeight.Medium
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = "⚡ Difficulty: ${difficulty.name} • Time Limit: ${difficulty.timeLimit}s",
-                        fontSize = 12.sp,
-                        color = Color(0xFF666666),
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            // Add some bottom padding to ensure content doesn't get cut off
-            Spacer(modifier = Modifier.height(24.dp))
-        }
-
-        // Fixed button at bottom
-        Button(
-            onClick = onStartGame,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
-        ) {
-            Text(
-                text = stringResource(R.string.start_game),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-    }
+    GroupETriangleInstructionsBody(
+        instructions = instructions,
+        extra = "\u26A1 Difficulty: ${difficulty.name} \u2022 Time Limit: ${difficulty.timeLimit}s",
+        onStart = onStartGame
+    )
 }
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
@@ -620,157 +509,15 @@ private fun AdaptiveTriangleDotGameScreen(
     difficulty: DifficultyManager.DifficultyLevel,
     onAnswer: (Boolean) -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Progress indicator with difficulty info
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f))
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFF10B981)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = currentQuestion.toString(),
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "$currentQuestion / $totalQuestions",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = difficulty.name,
-                        color = Color.Cyan,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                // Progress bar
-                LinearProgressIndicator(
-                    progress = currentQuestion.toFloat() / totalQuestions.toFloat(),
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(6.dp)
-                        .clip(RoundedCornerShape(3.dp)),
-                    color = Color(0xFF10B981),
-                    trackColor = Color.White.copy(alpha = 0.3f)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Triangle pattern with animation
-        AnimatedContent(
-            targetState = currentQuestion,
-            transitionSpec = {
-                (fadeIn(tween(300)) + scaleIn(tween(300))) with
-                        (fadeOut(tween(300)) + scaleOut(tween(300)))
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(240.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                TriangleDotPattern(
-                    redDotPosition = currentStep.redDotPosition,
-                    modifier = Modifier.size(160.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        if (currentQuestion >= 2) {
-            Text(
-                text = "Does this pattern match the\nprevious pattern?",
-                fontSize = 18.sp,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                lineHeight = 24.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Feedback animation
-        AnimatedVisibility(
-            visible = showFeedback,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (lastAnswerCorrect) Color(0xFF10B981) else Color(0xFFEF4444)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (lastAnswerCorrect) "✓" else "✗",
-                    fontSize = 60.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Answer buttons
-        if (!showFeedback && currentQuestion >= 2) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(
-                    onClick = { onAnswer(false) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
-                ) {
-                    Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-
-                Button(
-                    onClick = { onAnswer(true) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
-                ) {
-                    Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-    }
+    GroupETriangleGameBody(
+        currentQuestion = currentQuestion,
+        totalQuestions = totalQuestions,
+        redDotPosition = currentStep.redDotPosition,
+        showFeedback = showFeedback,
+        lastAnswerCorrect = lastAnswerCorrect,
+        extraLabel = difficulty.name,
+        onAnswer = onAnswer
+    )
 }
 
 @Composable
@@ -784,15 +531,19 @@ private fun AdaptiveTriangleDotCompletionScreen(
     streak: Int,
     onContinue: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
+    Column(modifier = Modifier.fillMaxSize()) {
+      Column(
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+      ) {
         Text(
             text = "Memory Challenge Complete!",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = RvInk,
             textAlign = TextAlign.Center
         )
 
@@ -800,7 +551,7 @@ private fun AdaptiveTriangleDotCompletionScreen(
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+            colors = CardDefaults.cardColors(containerColor = RvSurface)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
@@ -810,7 +561,7 @@ private fun AdaptiveTriangleDotCompletionScreen(
                     text = stringResource(R.string.final_results),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E3A8A)
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -824,12 +575,12 @@ private fun AdaptiveTriangleDotCompletionScreen(
                             text = "$score",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF10B981)
+                            color = RvInk
                         )
                         Text(
                             text = stringResource(R.string.session_score),
-                            fontSize = 12.sp,
-                            color = Color(0xFF1E3A8A)
+                            fontSize = 14.sp,
+                            color = RvInk
                         )
                     }
 
@@ -838,12 +589,12 @@ private fun AdaptiveTriangleDotCompletionScreen(
                             text = "$totalScore",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2196F3)
+                            color = RvInk
                         )
                         Text(
                             text = stringResource(R.string.total_score),
-                            fontSize = 12.sp,
-                            color = Color(0xFF1E3A8A)
+                            fontSize = 14.sp,
+                            color = RvInk
                         )
                     }
                 }
@@ -859,12 +610,12 @@ private fun AdaptiveTriangleDotCompletionScreen(
                             text = "$correctCount / $totalQuestions",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E3A8A)
+                            color = RvInk
                         )
                         Text(
                             text = stringResource(R.string.correct_answers),
-                            fontSize = 12.sp,
-                            color = Color(0xFF1E3A8A)
+                            fontSize = 14.sp,
+                            color = RvInk
                         )
                     }
 
@@ -874,12 +625,12 @@ private fun AdaptiveTriangleDotCompletionScreen(
                             text = "$percentage%",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1E3A8A)
+                            color = RvInk
                         )
                         Text(
                             text = stringResource(R.string.accuracy),
-                            fontSize = 12.sp,
-                            color = Color(0xFF1E3A8A)
+                            fontSize = 14.sp,
+                            color = RvInk
                         )
                     }
                 }
@@ -889,7 +640,7 @@ private fun AdaptiveTriangleDotCompletionScreen(
                 Text(
                     text = "Difficulty: ${difficulty.name}",
                     fontSize = 14.sp,
-                    color = Color(0xFF666666),
+                    color = RvInkSoft,
                     fontWeight = FontWeight.Medium
                 )
 
@@ -897,29 +648,22 @@ private fun AdaptiveTriangleDotCompletionScreen(
                     Text(
                         text = "${stringResource(R.string.best_streak)}: $streak",
                         fontSize = 14.sp,
-                        color = Color(0xFFFF6F00),
+                        color = RvInk,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+      }
 
-        Button(
+        Spacer(modifier = Modifier.height(8.dp))
+
+        GroupEPrimaryButton(
+            text = stringResource(R.string.continue_label_caps),
             onClick = onContinue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
-        ) {
-            Text(
-                text = stringResource(R.string.continue_label_caps),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 

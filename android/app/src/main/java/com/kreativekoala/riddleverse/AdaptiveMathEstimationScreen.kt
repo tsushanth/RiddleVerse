@@ -21,10 +21,19 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import com.kreativekoala.riddleverse.ui.theme.RvInk
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.math.abs
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 @Composable
 fun AdaptiveMathEstimationScreen(
@@ -100,10 +109,6 @@ fun AdaptiveMathEstimationScreen(
     val currentLevel = feedbackManager.getCurrentLevel()
     val streakInfo = feedbackManager.getStreakInfo()
 
-    // Chart dimensions
-    val chartHeight = 350.dp
-    val chartWidth = 300.dp
-
     fun calculateAdaptiveChartBounds(numbers: List<Double>): Pair<Double, Double> {
         if (numbers.isEmpty()) return 0.0 to 100.0
         val sum = numbers.sum()
@@ -149,7 +154,7 @@ fun AdaptiveMathEstimationScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -239,121 +244,78 @@ fun AdaptiveMathEstimationScreen(
         return "${seconds / 60}:${String.format("%02d", seconds % 60)}"
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
-    ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Unified header
-            AdaptiveUnifiedHeader(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = 3, // Estimation doesn't use lives
-                currentDifficulty = currentDifficultyLevel,
-                score = totalScore,
-                puzzleType = "mathestimation",
-                competitiveInsight = competitiveInsight,
-                onBack = onBack ?: {},
-                onHint = {
-                    showHint = !showHint
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                }
-            )
-
-            // Unified adaptation notification
+    EstimationFitLayout(
+        hud = { compact, wide, tall ->
+            if (tall) {
+                // Unified header
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = 3, // Estimation doesn't use lives
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "mathestimation",
+                    competitiveInsight = competitiveInsight,
+                    onBack = onBack ?: {},
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                )
+            } else {
+                AdaptiveCompactHud(
+                    level = currentLevel,
+                    timer = displayTimer.let { if (it.indexOf(':') == 1) "0$it" else it },
+                    lives = 3,
+                    maxLives = 0,
+                    score = totalScore,
+                    difficultyName = currentDifficultyLevel.name,
+                    challengeText = null,
+                    onBack = onBack ?: {},
+                    onPause = null,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+        },
+        status = { _ ->
+            // Unified adaptation notification (banner intentionally off via SHOW_ADAPTATION_NOTICES)
             UnifiedAdaptationNotification(
                 adaptationInfo = adaptationInfo,
                 puzzleType = "mathestimation",
                 visible = showAdaptationNotification,
                 onDismiss = { showAdaptationNotification = false }
             )
-
-            // Enhanced game info with adaptive metrics
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.score_label).uppercase(),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "$totalScore",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4CAF50)
-                                )
-                            }
-                        }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentDifficultyLevel.name.uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF9C27B0)
-                            )
-                            Text(
-                                text = "${currentPuzzle.numbers.size} numbers",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Gray
-                            )
-                        }
-
-                        if (currentStreak > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.streak_label).uppercase(),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "🔥 $currentStreak",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF6F00)
-                                )
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(8.dp))
-            } else {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // Chart area
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(chartHeight + 60.dp),
-                contentAlignment = Alignment.Center
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Both hud() variants (AdaptiveCompactHud and AdaptiveUnifiedHeader) already show
+                // the score with a "hud_score" tag - repeating it here doubled it on screen.
+                Text(
+                    text = "${currentDifficultyLevel.name} • ${currentPuzzle.numbers.size} numbers",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInkSoft,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                if (currentStreak > 0) {
+                    Text(
+                        text = "🔥 $currentStreak",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                }
+            }
+        },
+        chart = { chartWidth, chartHeight ->
+            Box(modifier = Modifier.size(chartWidth + 80.dp, chartHeight + 60.dp).testTag("estimation_chart")) {
                 InteractiveChart(
                     dataPoints = dataPoints,
                     dragPosition = dragPosition,
@@ -399,119 +361,41 @@ fun AdaptiveMathEstimationScreen(
                             }
                         }
                     },
-                    modifier = Modifier.size(chartWidth + 80.dp, chartHeight + 60.dp)
+                    modifier = Modifier.fillMaxSize()
                 )
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Enhanced instructions with adaptive difficulty info
+        },
+        instructions = {
             AdaptiveEstimationInstructionsCard(
                 difficultyLevel = currentDifficultyLevel,
                 tolerance = currentPuzzle.sum * 0.1,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp)
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // ✅ FIXED: Submit section without revealing accuracy
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            ) {
-                // Current estimate display WITHOUT accuracy spoiler
-                Card(
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (currentEstimate != null) {
-                            Color(0xFF1976D2).copy(alpha = 0.1f)
-                        } else {
-                            Color.Gray.copy(alpha = 0.1f)
-                        }
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = if (currentEstimate != null) {
-                                "Current Estimate: ${String.format("%.1f", currentEstimate!!)}"
-                            } else {
-                                "Drag on chart to set estimate"
-                            },
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = if (currentEstimate != null) Color(0xFF1976D2) else Color(0xFF666666)
-                        )
-
-                        // ✅ REMOVED: Potential accuracy display that gave away the answer
-                        // Instead, show helpful guidance
-                        Text(
-                            text = if (currentEstimate != null) {
-                                "Ready to submit your estimation!"
-                            } else {
-                                "Move your finger up and down to estimate"
-                            },
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF666666),
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
+        },
+        // No accuracy spoiler here (intentional in the adaptive variant).
+        estimate = { compact ->
+            EstimationEstimateCard(estimate = currentEstimate, accuracyPercent = null, compact = compact)
+        },
+        submit = {
+            EstimationSubmitButton(
+                label = when {
+                    hasAnswered -> "SUBMITTED"
+                    currentEstimate != null -> "SUBMIT ESTIMATE"
+                    else -> "SUBMIT (will use middle value)"
+                },
+                enabled = !hasAnswered,
+                onClick = {
+                    if (!hasAnswered) {
+                        val estimate = currentEstimate ?: ((maxValue + minValue) / 2)
+                        submitAnswer(estimate)
                     }
                 }
-
-                // Submit button with state-aware text
-                Button(
-                    onClick = {
-                        if (!hasAnswered) {
-                            if (currentEstimate != null) {
-                                submitAnswer(currentEstimate!!)
-                            } else {
-                                val fallbackEstimate = (maxValue + minValue) / 2
-                                submitAnswer(fallbackEstimate)
-                            }
-                        }
-                    },
-                    enabled = !hasAnswered,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (currentEstimate != null) {
-                            Color(0xFF1976D2)
-                        } else {
-                            Color(0xFF666666)
-                        },
-                        disabledContainerColor = Color(0xFF90A4AE)
-                    ),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp)
-                ) {
-                    Text(
-                        text = when {
-                            hasAnswered -> "SUBMITTED"
-                            currentEstimate != null -> "SUBMIT ESTIMATE"
-                            else -> "SUBMIT (will use middle value)"
-                        },
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        EnhancedUniversalFeedback(feedbackManager)
-    }
+            )
+        },
+        overlay = { EnhancedUniversalFeedback(feedbackManager) }
+    )
 
     // Timer countdown effect
     LaunchedEffect(timeRemaining, hasAnswered) {
@@ -574,7 +458,7 @@ fun AdaptiveEstimationInstructionsCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowUp,
                     contentDescription = null,
-                    tint = Color(0xFF9C27B0),
+                    tint = RvGrape,
                     modifier = Modifier.size(24.dp)
                 )
 
@@ -583,7 +467,7 @@ fun AdaptiveEstimationInstructionsCard(
                 Text(
                     text = "Drag finger to estimate the sum",
                     fontSize = 16.sp,
-                    color = Color(0xFF9C27B0),
+                    color = RvGrape,
                     fontWeight = FontWeight.Medium
                 )
 
@@ -592,7 +476,7 @@ fun AdaptiveEstimationInstructionsCard(
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = Color(0xFF9C27B0),
+                    tint = RvGrape,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -603,14 +487,14 @@ fun AdaptiveEstimationInstructionsCard(
             Text(
                 text = "🎯 ${difficultyLevel.name}: ${difficultyLevel.targetCount} numbers",
                 fontSize = 12.sp,
-                color = Color(0xFF666666),
+                color = RvInkSoft,
                 fontWeight = FontWeight.Medium
             )
 
             Text(
                 text = "💯 Target range: ±${String.format("%.1f", tolerance)} for perfect score",
-                fontSize = 11.sp,
-                color = Color(0xFF666666),
+                fontSize = 12.sp,
+                color = RvInkSoft,
                 modifier = Modifier.padding(top = 2.dp)
             )
         }

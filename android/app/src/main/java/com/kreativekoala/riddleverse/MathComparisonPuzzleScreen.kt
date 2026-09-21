@@ -25,6 +25,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
+import com.kreativekoala.riddleverse.ui.theme.RvMintEdge
+import com.kreativekoala.riddleverse.ui.theme.RvFlame
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
 
 data class ComparisonPair(
     val pairNumber: Int,
@@ -326,179 +338,176 @@ fun MathComparisonPuzzleScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RvSuccess)
+    ) {
+        // Fit-to-screen: HUD top (fixed), question + values in the middle, EQUAL pinned at the bottom.
+        val compact = maxHeight < 600.dp
+        val landscape = maxWidth > maxHeight
+        val gutter = if (compact) 12.dp else 16.dp
+
+        Column(
             modifier = Modifier
+                .widthIn(max = if (landscape) 880.dp else 640.dp)
                 .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF4CAF50), // Green top
-                            Color(0xFF2E7D32)  // Darker green bottom
-                        )
-                    )
-                )
+                .align(Alignment.TopCenter)
+                .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Column(
+            // Enhanced Header with Score
+            EnhancedMathComparisonTopBar(
+                level = currentUserLevel,
+                streakInfo = streakInfo,
+                timer = displayTimer,
+                totalScore = totalScore,
+                correctAnswers = correctAnswers,
+                totalAttempts = totalAttempts,
+                streak = streak,
+                onBack = onBack,
+                compact = compact,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Lives + progress on one row
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(vertical = if (compact) 2.dp else 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Enhanced Header with Score
-                EnhancedMathComparisonTopBar(
-                    level = currentUserLevel,
-                    streakInfo = streakInfo,
-                    timer = displayTimer,
-                    totalScore = totalScore,
-                    correctAnswers = correctAnswers,
-                    totalAttempts = totalAttempts,
-                    streak = streak,
-                    onBack = onBack,
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    "Question ${currentPairIndex + 1} of ${parsedData.size}",
+                    color = RvInk,
+                    fontSize = 14.sp,
+                    maxLines = 1
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Lives indicator
-                Row(
-                    modifier = Modifier.padding(bottom = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     repeat(hearts) { index ->
                         Icon(
                             imageVector = Icons.Default.Favorite,
                             contentDescription = null,
-                            tint = if (index < livesRemaining) Color(0xFFFF69B4) else Color.Gray,
+                            tint = if (index < livesRemaining) Color(0xFFC2185B) else RvInk.copy(alpha = 0.35f),
                             modifier = Modifier.size(20.dp)
                         )
                     }
                 }
+            }
 
-                // Progress indicator
-                Column(
-                    modifier = Modifier.padding(bottom = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        "Question ${currentPairIndex + 1} of ${parsedData.size}",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Progress bar
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .background(
-                                Color.Black.copy(alpha = 0.3f),
-                                RoundedCornerShape(2.dp)
-                            )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(
-                                    fraction = (currentPairIndex + 1).toFloat() / parsedData.size.toFloat()
-                                )
-                                .background(
-                                    Color.Green,
-                                    RoundedCornerShape(2.dp)
-                                )
-                                .animateContentSize()
+            // Progress bar
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(RvInk.copy(alpha = 0.25f), RoundedCornerShape(2.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(
+                            fraction = ((currentPairIndex + 1).toFloat() / parsedData.size.toFloat().coerceAtLeast(1f)).coerceIn(0f, 1f)
                         )
-                    }
-                }
+                        .background(RvInk, RoundedCornerShape(2.dp))
+                        .animateContentSize()
+                )
+            }
 
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+
+            // Play area: takes all the remaining height. The scroll is an invisible last-resort
+            // safety net only (extreme font scale on tiny screens).
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 16.dp, Alignment.CenterVertically)
+            ) {
                 // Question text with difficulty indicator
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         "Which value is greater?",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium
+                        color = RvInk,
+                        fontSize = if (compact) 20.sp else 24.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
                     )
 
-                    if (currentPair != null) {
+                    if (currentPair != null && !compact) {
                         Text(
                             "Difficulty: ${String.format("%.1f", currentPair.difficulty)}/5",
-                            color = Color.White.copy(alpha = 0.7f),
+                            color = RvInk.copy(alpha = 0.8f),
                             fontSize = 12.sp
                         )
                     }
                 }
 
                 if (currentPair != null) {
-                    // Clickable Value boxes
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(bottom = 32.dp)
-                    ) {
-                        // First value (clickable)
-                        AnimatedContent(
-                            targetState = currentPair.leftValue,
-                            transitionSpec = {
-                                slideInHorizontally { it } + fadeIn() with
-                                        slideOutHorizontally { -it } + fadeOut()
+                    // Clickable value cards: stacked in portrait, side by side in landscape
+                    val leftCard: @Composable (Modifier) -> Unit = { m ->
+                        Box(modifier = m) {
+                            AnimatedContent(
+                                targetState = currentPair.leftValue,
+                                transitionSpec = {
+                                    slideInHorizontally { it } + fadeIn() with
+                                            slideOutHorizontally { -it } + fadeOut()
+                                }
+                            ) { leftValue ->
+                                ClickableValueCard(
+                                    value = leftValue,
+                                    isSelected = selectedAnswer == "left",
+                                    isCorrect = if (showResult) currentPair.correctAnswer == "left" else null,
+                                    isWrong = if (showResult && selectedAnswer == "left") currentPair.correctAnswer != "left" else false,
+                                    enabled = !showResult,
+                                    onClick = { handleAnswer("left") }
+                                )
                             }
-                        ) { leftValue ->
-                            ClickableValueCard(
-                                value = leftValue,
-                                isSelected = selectedAnswer == "left",
-                                isCorrect = if (showResult) currentPair.correctAnswer == "left" else null,
-                                isWrong = if (showResult && selectedAnswer == "left") currentPair.correctAnswer != "left" else false,
-                                enabled = !showResult,
-                                onClick = { handleAnswer("left") }
-                            )
                         }
-
-                        // Second value (clickable)
-                        AnimatedContent(
-                            targetState = currentPair.rightValue,
-                            transitionSpec = {
-                                slideInHorizontally { it } + fadeIn() with
-                                        slideOutHorizontally { -it } + fadeOut()
+                    }
+                    val rightCard: @Composable (Modifier) -> Unit = { m ->
+                        Box(modifier = m) {
+                            AnimatedContent(
+                                targetState = currentPair.rightValue,
+                                transitionSpec = {
+                                    slideInHorizontally { it } + fadeIn() with
+                                            slideOutHorizontally { -it } + fadeOut()
+                                }
+                            ) { rightValue ->
+                                ClickableValueCard(
+                                    value = rightValue,
+                                    isSelected = selectedAnswer == "right",
+                                    isCorrect = if (showResult) currentPair.correctAnswer == "right" else null,
+                                    isWrong = if (showResult && selectedAnswer == "right") currentPair.correctAnswer != "right" else false,
+                                    enabled = !showResult,
+                                    onClick = { handleAnswer("right") }
+                                )
                             }
-                        ) { rightValue ->
-                            ClickableValueCard(
-                                value = rightValue,
-                                isSelected = selectedAnswer == "right",
-                                isCorrect = if (showResult) currentPair.correctAnswer == "right" else null,
-                                isWrong = if (showResult && selectedAnswer == "right") currentPair.correctAnswer != "right" else false,
-                                enabled = !showResult,
-                                onClick = { handleAnswer("right") }
-                            )
+                        }
+                    }
+                    if (landscape) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            leftCard(Modifier.weight(1f))
+                            rightCard(Modifier.weight(1f))
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 16.dp)
+                        ) {
+                            leftCard(Modifier.fillMaxWidth())
+                            rightCard(Modifier.fillMaxWidth())
                         }
                     }
 
-                    // Equal button
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        AnswerButton(
-                            text = "EQUAL",
-                            isSelected = selectedAnswer == "equal",
-                            isCorrect = if (showResult) currentPair.correctAnswer == "equal" else null,
-                            isWrong = if (showResult && selectedAnswer == "equal") currentPair.correctAnswer != "equal" else false,
-                            enabled = !showResult,
-                            onClick = { handleAnswer("equal") },
-                            isEqual = true
-                        )
-                    }
-
-                    // Result feedback
+                    // Result feedback (inside the play area so the action bar never moves)
                     if (showResult) {
-                        Spacer(modifier = Modifier.height(16.dp))
-
                         val isCorrect = selectedAnswer == currentPair.correctAnswer
 
                         AnimatedVisibility(
@@ -508,34 +517,32 @@ fun MathComparisonPuzzleScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(
-                                        if (isCorrect) Color.Green.copy(alpha = 0.2f)
-                                        else Color.Red.copy(alpha = 0.2f),
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(16.dp),
+                                    .background(RvInk, RoundedCornerShape(8.dp))
+                                    .padding(if (compact) 8.dp else 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         if (isCorrect) "✅ Correct!" else "❌ Wrong answer. Lives: $livesRemaining",
-                                        color = Color.White,
+                                        color = RvOnTone,
                                         fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium
+                                        fontWeight = FontWeight.Medium,
+                                        textAlign = TextAlign.Center
                                     )
 
                                     if (isCorrect && reactionTimes.isNotEmpty()) {
                                         val reactionTime = reactionTimes.last() / 1000.0
                                         Text(
                                             "⚡ ${String.format("%.1f", reactionTime)}s",
-                                            color = Color.White.copy(alpha = 0.8f),
+                                            color = RvOnTone,
                                             fontSize = 14.sp
                                         )
                                     } else if (!isCorrect) {
                                         Text(
                                             "${currentPair.leftValue} = ${currentPair.leftNumeric.toInt()}, ${currentPair.rightValue} = ${currentPair.rightNumeric.toInt()}",
-                                            color = Color.White.copy(alpha = 0.8f),
+                                            color = RvOnTone,
                                             fontSize = 14.sp,
+                                            textAlign = TextAlign.Center,
                                             modifier = Modifier.padding(top = 4.dp)
                                         )
                                     }
@@ -544,6 +551,21 @@ fun MathComparisonPuzzleScreen(
                         }
                     }
                 }
+            }
+
+            // Pinned primary action
+            if (currentPair != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                AnswerButton(
+                    text = "EQUAL",
+                    isSelected = selectedAnswer == "equal",
+                    isCorrect = if (showResult) currentPair.correctAnswer == "equal" else null,
+                    isWrong = if (showResult && selectedAnswer == "equal") currentPair.correctAnswer != "equal" else false,
+                    enabled = !showResult,
+                    onClick = { handleAnswer("equal") },
+                    isEqual = true
+                )
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
             }
         }
 
@@ -562,27 +584,29 @@ private fun EnhancedMathComparisonTopBar(
     totalAttempts: Int,
     streak: Int,
     onBack: () -> Unit,
+    compact: Boolean,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.statusBarsPadding()) {
+    Column(modifier = modifier) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             // Left side: Back button and level
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f)
             ) {
                 IconButton(
                     onClick = onBack,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -590,22 +614,23 @@ private fun EnhancedMathComparisonTopBar(
                 Column {
                     Text(
                         text = "Level ${level.level}",
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk,
+                        maxLines = 1
                     )
 
                     LevelProgressBar(
                         level = level,
-                        modifier = Modifier.width(100.dp)
+                        modifier = Modifier.width(80.dp),
+                        showLabel = false,
+                        compact = true
                     )
                 }
             }
 
-            // Center: Timer
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            // Center: Timer (the most important HUD value)
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 val timeValue = timer.substringAfter(":").toIntOrNull() ?: 0
                 val isUrgent = timer.startsWith("0:") && timeValue <= 30
 
@@ -613,60 +638,39 @@ private fun EnhancedMathComparisonTopBar(
                     text = timer,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
+                    color = if (isUrgent) Color(0xFF8B0000) else RvInk,
+                    maxLines = 1
                 )
-
-                if (streakInfo.currentStreak > 0) {
-                    StreakDisplay(
-                        streakInfo = streakInfo,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
             }
 
-            // Right side: Streak
+            // Right side: score / streak
             Column(
-                horizontalAlignment = Alignment.End
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.weight(1f)
             ) {
+                if (totalScore > 0 || totalAttempts > 0) {
+                    Text(
+                        text = "${stringResource(R.string.score_label)}: $totalScore",
+                        color = RvInk,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                }
                 if (streak > 1) {
                     Text(
                         text = "🔥 $streak",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6B00)
-                    )
-                }
-            }
-        }
-
-        // Score and progress display
-        if (totalScore > 0 || totalAttempts > 0) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                if (totalScore > 0) {
-                    Text(
-                        text = "${stringResource(R.string.score_label)}: $totalScore",
-                        color = Color(0xFFFFEB3B),
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
                     )
-                }
-
-                Text(
-                    text = "🧮 Math Comparison",
-                    color = Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp
-                )
-
-                if (totalAttempts > 0) {
+                } else if (!compact && totalAttempts > 0) {
                     Text(
                         text = "$correctAnswers/$totalAttempts",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 12.sp
+                        color = RvInk,
+                        fontSize = 12.sp,
+                        maxLines = 1
                     )
                 }
             }
@@ -715,7 +719,8 @@ fun ClickableValueCard(
             .background(animatedBackgroundColor, RoundedCornerShape(12.dp))
             .border(2.dp, animatedBorderColor, RoundedCornerShape(12.dp))
             .clickable(enabled = enabled) { onClick() }
-            .padding(24.dp),
+            .heightIn(min = 72.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -724,19 +729,20 @@ fun ClickableValueCard(
         ) {
             Text(
                 text = value,
-                color = Color(0xFF2196F3),
-                fontSize = 32.sp,
+                color = RvOnTone,
+                fontSize = cmpCapSp(30f),
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 2
             )
 
             // Show checkmark or X when result is shown
             if (isCorrect == true) {
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("✓", color = Color.Green, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text("✓", color = RvOnTone, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             } else if (isWrong) {
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("✗", color = Color.Red, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text("✗", color = RvOnTone, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -753,10 +759,9 @@ fun AnswerButton(
     isEqual: Boolean = false
 ) {
     val backgroundColor = when {
-        isCorrect == true -> Color.Green
-        isWrong -> Color.Red
-        isEqual -> Color(0xFF00BCD4) // Cyan for EQUAL button
-        else -> Color(0xFF2196F3) // Blue for other buttons
+        isCorrect == true -> RvMintEdge
+        isWrong -> RvCoralEdge
+        else -> RvViolet // primary action: white text >= 4.5:1
     }
 
     val animatedColor by animateColorAsState(
@@ -773,7 +778,7 @@ fun AnswerButton(
             .height(56.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = animatedColor,
-            disabledContainerColor = animatedColor.copy(alpha = 0.6f)
+            disabledContainerColor = animatedColor
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -783,7 +788,7 @@ fun AnswerButton(
         ) {
             Text(
                 text = text,
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -791,11 +796,17 @@ fun AnswerButton(
             // Show checkmark or X when result is shown
             if (isCorrect == true) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("✓", color = Color.White, fontSize = 20.sp)
+                Text("✓", color = RvOnTone, fontSize = 20.sp)
             } else if (isWrong) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("✗", color = Color.White, fontSize = 20.sp)
+                Text("✗", color = RvOnTone, fontSize = 20.sp)
             }
         }
     }
+}
+/** Font size that keeps growing with the user's font scale but stops at 1.3x so big play-area text still fits. */
+@Composable
+private fun cmpCapSp(base: Float, maxScale: Float = 1.3f): androidx.compose.ui.unit.TextUnit {
+    val fs = androidx.compose.ui.platform.LocalDensity.current.fontScale
+    return (base * minOf(fs, maxScale) / fs).sp
 }

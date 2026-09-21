@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Intent
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
@@ -373,7 +374,7 @@ fun DeepLinkLoadingScreen() {
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFFB388FF), Color(0xFF7C4DFF))
+                    colors = listOf(RvGrape, RvViolet)
                 )
             ),
         contentAlignment = Alignment.Center
@@ -384,7 +385,7 @@ fun DeepLinkLoadingScreen() {
         ) {
             androidx.compose.material3.CircularProgressIndicator(
                 modifier = Modifier.size(48.dp),
-                color = Color.White,
+                color = RvInk,
                 strokeWidth = 4.dp
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -392,7 +393,7 @@ fun DeepLinkLoadingScreen() {
                 text = stringResource(R.string.loading_puzzle),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color.White
+                color = RvInk
             )
         }
     }
@@ -405,7 +406,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFFB388FF), Color(0xFF7C4DFF))
+                    colors = listOf(RvGrape, RvViolet)
                 )
             ),
         contentAlignment = Alignment.Center
@@ -420,7 +421,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
                 imageVector = Icons.Default.CheckCircle,
                 contentDescription = null,
                 modifier = Modifier.size(120.dp),
-                tint = Color.White
+                tint = RvInk
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -439,7 +440,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color(0xFFB388FF)
+                        color = RvGrape
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -449,7 +450,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
-                        color = Color(0xFFB388FF)
+                        color = RvGrape
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -492,7 +493,7 @@ fun WelcomeScreen() {
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(Color(0xFFB388FF), Color(0xFF7C4DFF))
+                    colors = listOf(RvGrape, RvViolet)
                 )
             ),
         contentAlignment = Alignment.Center

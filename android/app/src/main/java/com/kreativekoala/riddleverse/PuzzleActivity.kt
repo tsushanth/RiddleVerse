@@ -1,5 +1,14 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSuccessEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import android.app.Activity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
@@ -256,7 +265,7 @@ class PuzzleActivity : AppCompatActivity() {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xFF4CAF50)),
+                            .background(RvSurface),
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -264,12 +273,12 @@ class PuzzleActivity : AppCompatActivity() {
                         ) {
                             Text(
                                 "🎉 Puzzle Type Completed!",
-                                color = Color.White,
+                                color = RvInk,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Spacer(modifier = Modifier.height(16.dp))
-                            CircularProgressIndicator(color = Color.White)
+                            CircularProgressIndicator(color = RvSuccess)
                         }
                     }
                 } else {
@@ -415,27 +424,27 @@ fun QAPuzzleScreen(
                 .fillMaxWidth()
                 .height(30.dp)
                 .clip(RoundedCornerShape(50))
-                .background(Color(0xFFB388FF).copy(alpha = 0.3f)),
+                .background(RvSurface),
             contentAlignment = Alignment.CenterEnd
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth(progress.coerceIn(0f, 1f))
                     .fillMaxHeight()
-                    .background(Color(0xFFB388FF)),
+                    .background(RvViolet.copy(alpha = 0.3f)),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
                     "00:${if (timerValue < 10) "0$timerValue" else "$timerValue"}",
-                    color = Color.White
+                    color = RvInk
                 )
             }
             Icon(
                 imageVector = Icons.Default.Timer,
                 contentDescription = null,
                 modifier = Modifier.padding(end = 8.dp),
-                tint = Color.White
+                tint = RvInk
             )
         }
 
@@ -446,14 +455,14 @@ fun QAPuzzleScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(0xFF8A4DFF), shape = RoundedCornerShape(20.dp))
+                .background(RvViolet, shape = RoundedCornerShape(20.dp))
                 .padding(16.dp)
         ) {
-            Text("Q&A Puzzle", color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+            Text("Q&A Puzzle", color = RvOnTone.copy(alpha = 0.85f), fontSize = 12.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 puzzle.question,
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = 16.sp
             )
         }
@@ -468,14 +477,14 @@ fun QAPuzzleScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(50))
-                .border(2.dp, Color(0xFF8A4DFF), RoundedCornerShape(50))
-                .background(Color.White),
+                .border(2.dp, RvViolet, RoundedCornerShape(50))
+                .background(RvCanvas),
             singleLine = true,
             colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF8A4DFF),
-                unfocusedBorderColor = Color(0xFF8A4DFF),
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
+                focusedBorderColor = RvViolet,
+                unfocusedBorderColor = RvViolet,
+                focusedTextColor = RvInk,
+                unfocusedTextColor = RvInk,
             )
         )
 
@@ -550,7 +559,7 @@ fun QAPuzzleScreen(
                 .fillMaxWidth()
                 .height(50.dp),
             shape = RoundedCornerShape(25),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8A65)),
+            colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
             enabled = !isCheckingAnswer
         ) {
             Text(if (isCheckingAnswer) stringResource(R.string.checking) else stringResource(R.string.continue_label))
@@ -568,7 +577,7 @@ fun QAPuzzleScreen(
                         text = "🎉 Correct!",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                        color = RvSuccess
                     )
                     ConfettiAnimation()
                 } else if (isCorrectAnswer == false) {
@@ -576,7 +585,7 @@ fun QAPuzzleScreen(
                         text = "❌ Incorrect!" + " The correct answer is: ${puzzle.answer}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Red
+                        color = RvError
                     )
                 }
             }
@@ -598,7 +607,7 @@ fun QAPuzzleScreen(
                 text = "+2 In-Time Bonus!",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF00C853),
+                color = RvSuccessEdge,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 8.dp)
@@ -619,11 +628,11 @@ fun QAPuzzleScreen(
             },
             modifier = Modifier.align(Alignment.CenterHorizontally),
             shape = RoundedCornerShape(50),
-            border = BorderStroke(1.dp, Color(0xFFFF8A65))
+            border = BorderStroke(1.dp, RvSunEdge)
         ) {
-            Icon(Icons.Default.Lightbulb, contentDescription = null, tint = Color(0xFFFF8A65))
+            Icon(Icons.Default.Lightbulb, contentDescription = null, tint = RvSunEdge)
             Spacer(modifier = Modifier.width(4.dp))
-            Text(stringResource(R.string.hint), color = Color(0xFFFF8A65))
+            Text(stringResource(R.string.hint), color = RvSunEdge)
         }
     }
         SnackbarHost(

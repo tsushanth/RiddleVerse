@@ -1,6 +1,7 @@
 // UnifiedAdaptiveIntegration.kt - Unified system for all adaptive puzzle screens
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -15,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.*
@@ -185,7 +187,7 @@ fun AdaptiveUnifiedHeader(
     val haptics = LocalHapticFeedback.current
     Card(
         modifier = Modifier.fillMaxWidth().statusBarsPadding(),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f)),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -207,13 +209,13 @@ fun AdaptiveUnifiedHeader(
                     IconButton(
                         onClick = onBack,
                         modifier = Modifier
-                            .size(40.dp)
-                            .background(Color(0xFFF0F0F0), CircleShape)
+                            .size(48.dp)
+                            .background(RvSurface, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF333333),
+                            tint = RvInk,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -222,13 +224,13 @@ fun AdaptiveUnifiedHeader(
                         IconButton(
                             onClick = pauseAction,
                             modifier = Modifier
-                                .size(40.dp)
-                                .background(Color(0xFFF0F0F0), CircleShape)
+                                .size(48.dp)
+                                .background(RvSurface, CircleShape)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Pause,
                                 contentDescription = "Pause",
-                                tint = Color(0xFF333333),
+                                tint = RvInk,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -240,7 +242,7 @@ fun AdaptiveUnifiedHeader(
                         text = "Level ${level.level}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333),
+                        color = RvInk,
                         textAlign = TextAlign.Center
                     )
 
@@ -248,7 +250,7 @@ fun AdaptiveUnifiedHeader(
                         Text(
                             text = "Challenge $challengeNumber of $totalChallenges",
                             fontSize = 12.sp,
-                            color = Color(0xFF666666)
+                            color = RvInkSoft
                         )
                     }
 
@@ -299,12 +301,12 @@ fun AdaptiveUnifiedHeader(
                         text = currentDifficulty.name,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4FC3F7)
+                        color = RvSky
                     )
                     Text(
                         text = getPuzzleDisplayName(puzzleType),
-                        fontSize = 10.sp,
-                        color = Color(0xFF666666)
+                        fontSize = 12.sp,
+                        color = RvInkSoft
                     )
                 }
 
@@ -324,14 +326,15 @@ fun AdaptiveUnifiedHeader(
                         text = "Score: $score",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                        color = RvSuccess,
+                        modifier = Modifier.testTag("hud_score")
                     )
 
                     if (streakInfo.currentStreak > 0) {
                         Text(
                             text = "🔥 ${streakInfo.currentStreak}",
-                            fontSize = 10.sp,
-                            color = Color(0xFFFF6B35)
+                            fontSize = 12.sp,
+                            color = RvFlame
                         )
                     }
                 }
@@ -339,6 +342,12 @@ fun AdaptiveUnifiedHeader(
         }
     }
 }
+
+/**
+ * The "<Puzzle> Adapted!" banners sit inline in the puzzle column and push the answer buttons
+ * down on shorter screens. Adaptation still runs; only the banner is suppressed. Flip to bring it back.
+ */
+const val SHOW_ADAPTATION_NOTICES = false
 
 /**
  * Unified adaptation notification that works for any puzzle type
@@ -360,7 +369,7 @@ fun UnifiedAdaptationNotification(
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
+                containerColor = RvSky.copy(alpha = 0.9f)
             )
         ) {
             Row(
@@ -372,7 +381,7 @@ fun UnifiedAdaptationNotification(
                 Icon(
                     Icons.Default.TrendingUp,
                     contentDescription = "Difficulty adjusted",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -381,12 +390,12 @@ fun UnifiedAdaptationNotification(
                         text = "${getPuzzleDisplayName(puzzleType)} Adapted!",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Text(
                         text = adaptationInfo?.adjustmentReason ?: "",
                         fontSize = 10.sp,
-                        color = Color.White.copy(alpha = 0.9f)
+                        color = RvInkSoft.copy(alpha = 0.9f)
                     )
                 }
                 IconButton(
@@ -396,7 +405,7 @@ fun UnifiedAdaptationNotification(
                     Icon(
                         Icons.Default.Close,
                         contentDescription = "Dismiss",
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -451,7 +460,7 @@ fun CompactRankingDisplay(
     Row(
         modifier = modifier
             .background(
-                Color(0xFF9C27B0).copy(alpha = 0.1f),
+                RvGrape.copy(alpha = 0.1f),
                 RoundedCornerShape(8.dp)
             )
             .padding(8.dp),
@@ -468,7 +477,7 @@ fun CompactRankingDisplay(
                 text = "${competitiveInsight.currentPercentile}%",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF9C27B0)
+                color = RvGrape
             )
             Text(
                 text = competitiveInsight.performanceLevel.displayName,
@@ -489,7 +498,7 @@ fun CompactRankingDisplay(
 
                 // Background circle
                 drawCircle(
-                    color = Color.White.copy(alpha = 0.3f),
+                    color = RvInkSoft.copy(alpha = 0.3f),
                     radius = radius,
                     center = center,
                     style = Stroke(width = strokeWidth)
@@ -498,7 +507,7 @@ fun CompactRankingDisplay(
                 // Progress arc
                 val sweepAngle = (competitiveInsight.currentPercentile / 100f) * 360f
                 drawArc(
-                    color = Color(0xFF9C27B0),
+                    color = RvGrape,
                     startAngle = -90f,
                     sweepAngle = sweepAngle,
                     useCenter = false,

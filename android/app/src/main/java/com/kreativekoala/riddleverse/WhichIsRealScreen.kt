@@ -30,6 +30,15 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import org.json.JSONObject
 import androidx.compose.ui.platform.LocalContext
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
 
 /**
  * Wrapper for Which Is Real puzzle screen
@@ -469,7 +478,7 @@ fun WhichIsRealScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E)) // Dark purple-blue background
+            .background(RvCanvas) // Dark purple-blue background
     ) {
         when {
             showWelcome -> {
@@ -552,7 +561,7 @@ fun WhichIsRealScreen(
                                         .fillMaxWidth()
                                         .height(56.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = Color(0xFF6C5CE7)
+                                        containerColor = RvViolet
                                     ),
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
@@ -602,7 +611,7 @@ fun WhichIsRealWelcomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E))
+            .background(RvCanvas)
             .windowInsetsPadding(WindowInsets.safeDrawing)
     ) {
         Column(
@@ -621,7 +630,7 @@ fun WhichIsRealWelcomeScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White
+                    tint = RvInk
                 )
             }
 
@@ -632,7 +641,7 @@ fun WhichIsRealWelcomeScreen(
                 text = "🔍 Which Is Real?",
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -643,7 +652,7 @@ fun WhichIsRealWelcomeScreen(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF16213E)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
@@ -658,14 +667,14 @@ fun WhichIsRealWelcomeScreen(
                         Icon(
                             imageVector = Icons.Default.Info,
                             contentDescription = null,
-                            tint = Color(0xFF6C5CE7),
+                            tint = RvViolet,
                             modifier = Modifier.size(32.dp)
                         )
                         Text(
                             text = "Why This Matters",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                     }
 
@@ -674,12 +683,12 @@ fun WhichIsRealWelcomeScreen(
                                 "Distinguishing between real and AI-generated content is becoming " +
                                 "an essential skill for media literacy and critical thinking.",
                         fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = RvInkSoft,
                         lineHeight = 20.sp
                     )
 
                     HorizontalDivider(
-                        color = Color.White.copy(alpha = 0.2f),
+                        color = RvOutline,
                         thickness = 1.dp
                     )
 
@@ -687,7 +696,7 @@ fun WhichIsRealWelcomeScreen(
                         text = "🎯 Your Challenge:",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6C5CE7)
+                        color = RvViolet
                     )
 
                     Column(
@@ -710,7 +719,7 @@ fun WhichIsRealWelcomeScreen(
                     .fillMaxWidth()
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF6C5CE7)
+                    containerColor = RvViolet
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -733,12 +742,12 @@ fun BulletPoint(text: String) {
         Text(
             text = "•",
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.8f)
+            color = RvInkSoft
         )
         Text(
             text = text,
             fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.8f)
+            color = RvInkSoft
         )
     }
 }
@@ -766,7 +775,7 @@ fun TopBar(
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = stringResource(R.string.back),
-                tint = Color.White
+                tint = RvInk
             )
         }
 
@@ -777,13 +786,13 @@ fun TopBar(
                 text = displayTimer,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (timeRemaining <= 30) Color.Red else Color.White
+                color = if (timeRemaining <= 30) Color.Red else RvInk
             )
             if (totalScore > 0) {
                 Text(
                     text = "${stringResource(R.string.score_label)}: $totalScore",
                     fontSize = 12.sp,
-                    color = Color(0xFF6C5CE7)
+                    color = RvViolet
                 )
             }
         }
@@ -795,7 +804,7 @@ fun TopBar(
             Icon(
                 imageVector = Icons.Default.Help,
                 contentDescription = "Expert Clues",
-                tint = Color.White
+                tint = RvInk
             )
         }
     }
@@ -809,7 +818,7 @@ fun ChallengeCard(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF16213E)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -821,13 +830,13 @@ fun ChallengeCard(
                 text = puzzle.subjectName,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Text(
                 text = puzzle.description,
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.8f)
+                color = RvInkSoft
             )
 
             AnimatedVisibility(visible = showExpertClues) {
@@ -835,7 +844,7 @@ fun ChallengeCard(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     HorizontalDivider(
-                        color = Color.White.copy(alpha = 0.2f),
+                        color = RvOutline,
                         thickness = 1.dp
                     )
 
@@ -843,20 +852,20 @@ fun ChallengeCard(
                         text = "🎓 Expert Clues:",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6C5CE7)
+                        color = RvViolet
                     )
 
                     Text(
                         text = "Look for real photos:",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF27AE60)
+                        color = RvSuccess
                     )
                     puzzle.expertClues.real.take(2).forEach { clue ->
                         Text(
                             text = "• $clue",
                             fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = RvInkSoft
                         )
                     }
 
@@ -864,13 +873,13 @@ fun ChallengeCard(
                         text = "AI tells:",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFE74C3C)
+                        color = RvError
                     )
                     puzzle.expertClues.ai.take(2).forEach { clue ->
                         Text(
                             text = "• $clue",
                             fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = RvInkSoft
                         )
                     }
                 }
@@ -895,7 +904,7 @@ fun ImageComparisonSection(
             text = "Which image is AI-generated?",
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = RvInk,
             textAlign = TextAlign.Center,
             modifier = Modifier.fillMaxWidth()
         )
@@ -941,10 +950,10 @@ fun ImageCard(
     onSelect: () -> Unit
 ) {
     val borderColor = when {
-        isAnswerRevealed && isCorrectAnswer -> Color(0xFFE74C3C) // Red for AI
-        isAnswerRevealed && !isCorrectAnswer -> Color(0xFF27AE60) // Green for real
-        isSelected -> Color(0xFF6C5CE7) // Purple for selected
-        else -> Color.White.copy(alpha = 0.3f)
+        isAnswerRevealed && isCorrectAnswer -> RvError // Red for AI
+        isAnswerRevealed && !isCorrectAnswer -> RvSuccess // Green for real
+        isSelected -> RvViolet // Purple for selected
+        else -> RvOutline
     }
 
     val borderWidth = if (isSelected || isAnswerRevealed) 4.dp else 2.dp
@@ -987,7 +996,7 @@ fun ImageCard(
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(32.dp),
-                        color = Color.White,
+                        color = RvInk,
                         strokeWidth = 3.dp
                     )
                 }
@@ -1005,13 +1014,13 @@ fun ImageCard(
                         Icon(
                             imageVector = Icons.Default.BrokenImage,
                             contentDescription = "Image failed to load",
-                            tint = Color.White,
+                            tint = RvOnTone,
                             modifier = Modifier.size(48.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Image unavailable",
-                            color = Color.White,
+                            color = RvOnTone,
                             fontSize = 12.sp
                         )
                     }
@@ -1033,7 +1042,7 @@ fun ImageCard(
                     text = label,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
             }
 
@@ -1044,7 +1053,7 @@ fun ImageCard(
                         .align(Alignment.TopEnd)
                         .padding(12.dp)
                         .background(
-                            if (isCorrectAnswer) Color(0xFFE74C3C) else Color(0xFF27AE60),  // ✅ BACK TO ORIGINAL
+                            if (isCorrectAnswer) RvError else RvSuccess,  // ✅ BACK TO ORIGINAL
                             RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 12.dp, vertical = 6.dp)
@@ -1053,7 +1062,7 @@ fun ImageCard(
                         text = if (isCorrectAnswer) "🤖 AI" else "📷 Real",  // ✅ BACK TO ORIGINAL
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvOnTone
                     )
                 }
             }
@@ -1072,9 +1081,9 @@ fun ResultSection(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = if (userWasCorrect)
-                Color(0xFF27AE60).copy(alpha = 0.2f)
+                RvSuccess.copy(alpha = 0.2f)
             else
-                Color(0xFFE74C3C).copy(alpha = 0.2f)
+                RvError.copy(alpha = 0.2f)
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -1089,7 +1098,7 @@ fun ResultSection(
                 Icon(
                     imageVector = if (userWasCorrect) Icons.Default.CheckCircle else Icons.Default.Close,
                     contentDescription = null,
-                    tint = if (userWasCorrect) Color(0xFF27AE60) else Color(0xFFE74C3C),
+                    tint = if (userWasCorrect) RvSuccess else RvError,
                     modifier = Modifier.size(32.dp)
                 )
                 Column {
@@ -1097,20 +1106,20 @@ fun ResultSection(
                         text = if (userWasCorrect) "Correct! 🎉" else "Not quite...",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvOnTone
                     )
                     if (userWasCorrect) {
                         Text(
                             text = "${stringResource(R.string.score_label)}: +$totalScore",
                             fontSize = 14.sp,
-                            color = Color(0xFF6C5CE7)
+                            color = RvViolet
                         )
                     }
                 }
             }
 
             HorizontalDivider(
-                color = Color.White.copy(alpha = 0.2f),
+                color = RvOutline,
                 thickness = 1.dp
             )
 
@@ -1120,16 +1129,16 @@ fun ResultSection(
                 else
                     "The AI-generated image was ${if (puzzle.correctAnswer == "image_a") "Image A" else "Image B"}.",
                 fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.9f)
+                color = RvOnTone.copy(alpha = 0.9f)
             )
 
             OutlinedButton(
                 onClick = onViewCommunityReasoning,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.White
+                    contentColor = RvOnTone
                 ),
-                border = BorderStroke(2.dp, Color.White.copy(alpha = 0.5f))
+                border = BorderStroke(2.dp, RvOutline)
             ) {
                 Icon(
                     imageVector = Icons.Default.People,
@@ -1156,7 +1165,7 @@ fun ReasoningDialog(
                 .fillMaxWidth()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF16213E)
+                containerColor = RvSurface
             ),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -1168,7 +1177,7 @@ fun ReasoningDialog(
                     text = "🎁 Bonus Question",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -1176,7 +1185,7 @@ fun ReasoningDialog(
                 Text(
                     text = "Help others learn! Why did you think this was the AI image?",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = RvInkSoft
                 )
 
                 OutlinedTextField(
@@ -1192,10 +1201,10 @@ fun ReasoningDialog(
                         )
                     },
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        focusedBorderColor = Color(0xFF6C5CE7),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.5f)
+                        focusedTextColor = RvInk,
+                        unfocusedTextColor = RvInk,
+                        focusedBorderColor = RvViolet,
+                        unfocusedBorderColor = RvOutline
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
@@ -1208,9 +1217,9 @@ fun ReasoningDialog(
                         onClick = onSkip,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
+                            contentColor = RvInk
                         ),
-                        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.5f))
+                        border = BorderStroke(2.dp, RvOutline)
                     ) {
                         Text("Skip")
                     }
@@ -1220,7 +1229,7 @@ fun ReasoningDialog(
                         modifier = Modifier.weight(1f),
                         enabled = reasoning.length >= 10,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF6C5CE7)
+                            containerColor = RvViolet
                         )
                     ) {
                         Text("Submit (+20% bonus)")
@@ -1266,7 +1275,7 @@ fun CommunityReasoningDialog(
                 .fillMaxWidth()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF16213E)
+                containerColor = RvSurface
             ),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -1278,13 +1287,13 @@ fun CommunityReasoningDialog(
                     text = "💡 Community Insights",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Text(
                     text = "Learn from others who identified the AI image correctly:",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f)
+                    color = RvInkSoft
                 )
 
                 LazyColumn(
@@ -1300,7 +1309,7 @@ fun CommunityReasoningDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF6C5CE7)
+                        containerColor = RvViolet
                     )
                 ) {
                     Text("Close")
@@ -1315,7 +1324,7 @@ fun CommunityReasoningItem(reasoning: CommunityReasoning) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF0F3460)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -1326,7 +1335,7 @@ fun CommunityReasoningItem(reasoning: CommunityReasoning) {
             Text(
                 text = reasoning.reasoning,
                 fontSize = 13.sp,
-                color = Color.White
+                color = RvInk
             )
 
             Row(
@@ -1336,13 +1345,13 @@ fun CommunityReasoningItem(reasoning: CommunityReasoning) {
                 Icon(
                     imageVector = Icons.Default.ThumbUp,
                     contentDescription = null,
-                    tint = Color(0xFF6C5CE7),
+                    tint = RvViolet,
                     modifier = Modifier.size(16.dp)
                 )
                 Text(
                     text = "${reasoning.helpfulVotes} found this helpful",
                     fontSize = 11.sp,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = RvInkSoft
                 )
             }
         }

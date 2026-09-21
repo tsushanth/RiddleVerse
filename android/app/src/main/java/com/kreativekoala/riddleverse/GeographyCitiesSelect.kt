@@ -1,6 +1,11 @@
 package com.kreativekoala.riddleverse
 
 
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.layout.ContentScale
 import android.util.Log
@@ -42,12 +47,12 @@ import kotlin.math.*
 
 // Data classes for geography puzzle
 enum class Continent(val displayName: String, val color: Color) {
-    NORTH_AMERICA("North America", Color(0xFF4CAF50)),
-    SOUTH_AMERICA("South America", Color(0xFFFF9800)),
-    EUROPE("Europe", Color(0xFF2196F3)),
+    NORTH_AMERICA("North America", RvSuccess),
+    SOUTH_AMERICA("South America", RvSun),
+    EUROPE("Europe", RvSky),
     AFRICA("Africa", Color(0xFFE91E63)),
-    ASIA("Asia", Color(0xFF9C27B0)),
-    OCEANIA("Oceania", Color(0xFF00BCD4))
+    ASIA("Asia", RvGrape),
+    OCEANIA("Oceania", RvSky)
 }
 
 data class GeographyCity(
@@ -488,18 +493,22 @@ fun GeographyDragDropPuzzleScreen(
         }
     }
 
+    val backLabel = stringResource(R.string.back)
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1E3A8A))
-            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 32.dp)
+            .background(RvCanvas)
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Header (only show during gameplay, not in testing mode)
         if (gameStage != GameStage.GRID_TESTING) {
             Row(
                 modifier = Modifier
+                    .widthIn(max = 720.dp)
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -508,28 +517,31 @@ fun GeographyDragDropPuzzleScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFF3B82F6))
+                        .background(RvSky)
                         .clickable { onBack() }
+                        .semantics { contentDescription = backLabel }
                         .zIndex(1f),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("||", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("||", color = RvInk, fontWeight = FontWeight.Bold)
                 }
 
                 // Timer and Score (only show during active gameplay)
                 if (gameStage != GameStage.INSTRUCTIONS && gameStage != GameStage.GRID_TESTING) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White.copy(alpha = 0.9f))
+                                .background(RvSurface)
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
                                 text = "TIME ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
-                                color = Color(0xFF1E3A8A),
+                                color = RvInk,
+                                fontSize = 14.sp,
+                                maxLines = 1,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -537,12 +549,14 @@ fun GeographyDragDropPuzzleScreen(
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White.copy(alpha = 0.9f))
+                                .background(RvSurface)
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
                                 text = "SCORE $totalScore",
-                                color = Color(0xFF1E3A8A),
+                                color = RvInk,
+                                fontSize = 14.sp,
+                                maxLines = 1,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -553,9 +567,10 @@ fun GeographyDragDropPuzzleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
         }
 
+        Box(modifier = Modifier.weight(1f).widthIn(max = 1000.dp).fillMaxWidth()) {
         when (gameStage) {
             GameStage.INSTRUCTIONS -> {
                 GeographyInstructionsScreen(
@@ -679,6 +694,7 @@ fun GeographyDragDropPuzzleScreen(
                 )
             }
         }
+        }
     }
 }
 
@@ -702,7 +718,7 @@ private fun GeographyInstructionsScreen(
                 text = "Geography Challenge",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
 
@@ -711,7 +727,7 @@ private fun GeographyInstructionsScreen(
             Text(
                 text = "Place cities in their correct locations on the world map",
                 fontSize = 16.sp,
-                color = Color.White.copy(alpha = 0.9f),
+                color = RvInkSoft.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center
             )
 
@@ -720,7 +736,7 @@ private fun GeographyInstructionsScreen(
             // Instructions card
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
                     modifier = Modifier.padding(16.dp)
@@ -729,7 +745,7 @@ private fun GeographyInstructionsScreen(
                         text = stringResource(R.string.how_to_play),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A)
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -745,7 +761,7 @@ private fun GeographyInstructionsScreen(
                         Text(
                             text = instruction,
                             fontSize = 14.sp,
-                            color = Color(0xFF1E3A8A),
+                            color = RvInk,
                             modifier = Modifier.padding(vertical = 2.dp)
                         )
                     }
@@ -755,7 +771,7 @@ private fun GeographyInstructionsScreen(
                     Text(
                         text = "💡 Scoring: 25 pts for correct continent + up to 50 pts for accuracy",
                         fontSize = 12.sp,
-                        color = Color(0xFF1E3A8A),
+                        color = RvInk,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -773,13 +789,13 @@ private fun GeographyInstructionsScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
             ) {
                 Text(
                     text = stringResource(R.string.start_challenge),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
             }
 
@@ -797,7 +813,7 @@ private fun GeographyInstructionsScreen(
                         text = "GRID TESTING MODE",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvOnTone
                     )
                 }
             }
@@ -814,129 +830,130 @@ private fun ContinentSelectionScreen(
     maxQuestions: Int,
     onContinentSelected: (Continent) -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Progress
-        Text(
-            text = "Question ${questionsAnswered + 1} of $maxQuestions",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // City card (static, no dragging)
-        CityCard(city = city)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Which continent is ${city.name} located in?",
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // World map with clickable continents - FIXED LAYOUT
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(450.dp)
-                .background(Color(0xFF87CEEB), RoundedCornerShape(12.dp))
-                .padding(12.dp)
-        ) {
-            // Row 1: North America, Europe, Asia
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+        val questionBlock: @Composable (Modifier) -> Unit = { m ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
+                modifier = m,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                ContinentShape(
-                    continent = Continent.NORTH_AMERICA,
-                    modifier = Modifier.clickable { onContinentSelected(Continent.NORTH_AMERICA) }
-                )
-
-                ContinentShape(
-                    continent = Continent.EUROPE,
-                    modifier = Modifier.clickable { onContinentSelected(Continent.EUROPE) }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .offset(y = 140.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ContinentShape(
-                    continent = Continent.ASIA,
-                    modifier = Modifier.width(280.dp).size(100.dp)
-                        .clickable { onContinentSelected(Continent.ASIA) }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Row 2: South America, Africa, Oceania
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .offset(y = 280.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ContinentShape(
-                    continent = Continent.SOUTH_AMERICA,
-                    modifier = Modifier.clickable { onContinentSelected(Continent.SOUTH_AMERICA) }
-                )
-
-                ContinentShape(
-                    continent = Continent.AFRICA,
-                    modifier = Modifier.clickable { onContinentSelected(Continent.AFRICA) }
-                )
-
-                ContinentShape(
-                    continent = Continent.OCEANIA,
-                    modifier = Modifier.clickable { onContinentSelected(Continent.OCEANIA) }
-                )
+                CityCard(city = city)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Question ${questionsAnswered + 1} of $maxQuestions",
+                        color = RvInkSoft,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "Which continent is ${city.name} located in?",
+                        color = RvInk,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Feedback
-        AnimatedVisibility(
-            visible = showFeedback,
-            enter = fadeIn() + slideInVertically(),
-            exit = fadeOut() + slideOutVertically()
-        ) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = if (feedbackMessage.contains("Correct"))
-                        Color(0xFF10B981) else Color(0xFFEF4444)
-                )
+        val map: @Composable (Modifier) -> Unit = { m ->
+            Box(modifier = m) {
+                CitiesContinentMap(onContinentSelected = onContinentSelected, modifier = Modifier.fillMaxSize())
+                // Feedback overlays the map so the layout never shifts
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showFeedback,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically(),
+                    modifier = Modifier.align(Alignment.BottomCenter).padding(8.dp)
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (feedbackMessage.contains("Correct"))
+                                RvSuccess else RvError
+                        )
+                    ) {
+                        Text(
+                            text = feedbackMessage,
+                            color = RvInk,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.padding(12.dp),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = feedbackMessage,
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(16.dp),
-                    textAlign = TextAlign.Center
-                )
+                questionBlock(Modifier.weight(1f))
+                map(Modifier.weight(1.4f).fillMaxHeight().testTag("continent_map"))
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxHeight().widthIn(max = 720.dp).fillMaxWidth().align(Alignment.TopCenter),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                questionBlock(Modifier.fillMaxWidth())
+                map(Modifier.weight(1f).fillMaxWidth().testTag("continent_map"))
+            }
+        }
+    }
+}
+
+
+/** Fit-to-screen world map: 2x3 grid of labelled continent tiles that always fills the given area. */
+@Composable
+private fun CitiesContinentMap(
+    onContinentSelected: (Continent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val rows = listOf(
+        listOf(Continent.NORTH_AMERICA, Continent.EUROPE, Continent.ASIA),
+        listOf(Continent.SOUTH_AMERICA, Continent.AFRICA, Continent.OCEANIA)
+    )
+    Column(
+        modifier = modifier
+            .background(Color(0xFF87CEEB), RoundedCornerShape(12.dp))
+            .padding(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        rows.forEach { row ->
+            Row(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                row.forEach { continent ->
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White.copy(alpha = 0.35f))
+                            .clickable { onContinentSelected(continent) }
+                            .padding(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        ContinentShape(
+                            continent = continent,
+                            modifier = Modifier.weight(1f).fillMaxWidth()
+                        )
+                        Text(
+                            text = continent.displayName,
+                            color = RvInk,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
     }
@@ -1019,76 +1036,78 @@ private fun PrecisePlacementScreen(
         GeographyGridSystem.getCityHints(city.id, continent)
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Progress
-        Text(
-            text = "Question ${questionsAnswered + 1} of $maxQuestions - Precise Placement",
-            color = Color.White,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // City card with enhanced info
-        EnhancedCityCard(city = city)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Instructions with hint option
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Click the grid section where ${city.name} is located",
-                color = Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                textAlign = TextAlign.Start,
-                modifier = Modifier.weight(1f)
-            )
-
-            // Hint button (only show if player is struggling)
-            if (playerSuccessRate < 0.6 && !showFeedback) {
-                Button(
-                    onClick = { showHints = !showHints },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF9500).copy(alpha = 0.8f)
-                    ),
-                    modifier = Modifier.size(width = 80.dp, height = 32.dp)
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+        val compact = maxHeight < 600.dp
+        val topInfo: @Composable (Modifier) -> Unit = { m ->
+            Column(modifier = m, verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp)) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    EnhancedCityCard(city = city, compact = compact)
+                    Column(modifier = Modifier.weight(1f)) {
+                        if (!compact) {
+                            Text(
+                                text = "Question ${questionsAnswered + 1} of $maxQuestions - Precise Placement",
+                                color = RvInkSoft,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Text(
+                            text = "Click the grid section where ${city.name} is located",
+                            color = RvInk,
+                            fontSize = if (compact) 14.sp else 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = if (compact) 2 else 3,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                // Hint button (only show if player is struggling)
+                if (playerSuccessRate < 0.6 && !showFeedback) {
+                    Button(
+                        onClick = { showHints = !showHints },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = RvSun,
+                            contentColor = RvInk
+                        ),
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    ) {
+                        Text(
+                            text = if (showHints) "Hide" else "Hint",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk
+                        )
+                    }
+                }
+                if (showHints && hintCells.isNotEmpty()) {
                     Text(
-                        text = if (showHints) "Hide" else "Hint",
-                        fontSize = 10.sp,
-                        color = Color.White
+                        text = "💡 ${city.name} is near the highlighted areas",
+                        color = RvInk,
+                        fontSize = 14.sp
                     )
                 }
             }
         }
+        val board: @Composable (Modifier) -> Unit = { m ->
+            Box(
+                modifier = m
+                    .background(Color(0xFF87CEEB), RoundedCornerShape(12.dp))
+                    .border(3.dp, continent.color, RoundedCornerShape(12.dp))
+                    .padding(8.dp)
+                    .testTag("placement_board")
+            ) {
+                // Continent background image
+                ZoomedContinentView(
+                    continent = continent,
+                    modifier = Modifier.fillMaxSize()
+                )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Enhanced grid with forgiving visual feedback
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(350.dp)
-                .background(Color(0xFF87CEEB), RoundedCornerShape(12.dp))
-                .border(3.dp, continent.color, RoundedCornerShape(12.dp))
-                .padding(8.dp)
-        ) {
-            // Continent background image
-            ZoomedContinentView(
-                continent = continent,
-                modifier = Modifier.fillMaxSize()
-            )
-
-            // Enhanced grid overlay with forgiveness features
             EnhancedGridOverlay(
                 rows = gridRows,
                 cols = gridCols,
@@ -1123,24 +1142,22 @@ private fun PrecisePlacementScreen(
                     }
                 }
             )
-        }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Enhanced feedback with encouragement
-        AnimatedVisibility(
-            visible = showFeedback && gridResult != null,
-            enter = fadeIn() + slideInVertically(),
-            exit = fadeOut() + slideOutVertically()
-        ) {
+                // Feedback overlays the board so the layout never shifts
+                androidx.compose.animation.AnimatedVisibility(
+                    visible = showFeedback && gridResult != null,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically(),
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) {
             gridResult?.let { result ->
                 Card(
                     colors = CardDefaults.cardColors(
                         containerColor = when {
-                            result.score >= 40 -> Color(0xFF10B981)
-                            result.score >= 25 -> Color(0xFF3B82F6)
-                            result.score >= 15 -> Color(0xFFFF9800)
-                            else -> Color(0xFFEF4444)
+                            result.score >= 40 -> RvSuccess
+                            result.score >= 25 -> RvSky
+                            result.score >= 15 -> RvSun
+                            else -> RvError
                         }
                     )
                 ) {
@@ -1150,13 +1167,13 @@ private fun PrecisePlacementScreen(
                     ) {
                         Text(
                             text = result.accuracy,
-                            color = Color.White,
+                            color = RvInk,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             text = "+${result.score} points",
-                            color = Color.White,
+                            color = RvInk,
                             fontSize = 14.sp
                         )
 
@@ -1166,15 +1183,15 @@ private fun PrecisePlacementScreen(
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = "Exact location: Row ${correct.row + 1}, Column ${correct.col + 1}",
-                                    color = Color.White.copy(alpha = 0.9f),
+                                    color = RvInkSoft.copy(alpha = 0.9f),
                                     fontSize = 12.sp
                                 )
 
                                 // Show some geographic context
                                 Text(
                                     text = "Tip: ${city.name} is ${getGeographicHint(city, continent)}",
-                                    color = Color.White.copy(alpha = 0.8f),
-                                    fontSize = 11.sp,
+                                    color = RvInkSoft.copy(alpha = 0.8f),
+                                    fontSize = 12.sp,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -1185,7 +1202,7 @@ private fun PrecisePlacementScreen(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = result.encouragement,
-                                color = Color.White.copy(alpha = 0.9f),
+                                color = RvInkSoft.copy(alpha = 0.9f),
                                 fontSize = 12.sp,
                                 fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                             )
@@ -1193,21 +1210,24 @@ private fun PrecisePlacementScreen(
                     }
                 }
             }
+                }
+            }
         }
-
-        // Show hint information when hints are active
-        if (showHints && hintCells.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFF9500).copy(alpha = 0.9f))
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "💡 ${city.name} is near the highlighted areas",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(12.dp),
-                    textAlign = TextAlign.Center
-                )
+                topInfo(Modifier.weight(1f).fillMaxHeight())
+                board(Modifier.weight(1.4f).fillMaxHeight())
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxHeight().widthIn(max = 720.dp).fillMaxWidth().align(Alignment.TopCenter),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                topInfo(Modifier.fillMaxWidth())
+                board(Modifier.weight(1f).fillMaxWidth())
             }
         }
     }
@@ -1216,17 +1236,19 @@ private fun PrecisePlacementScreen(
 @Composable
 private fun EnhancedCityCard(
     city: GeographyCity,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
     Card(
         modifier = modifier
             .shadow(8.dp, RoundedCornerShape(12.dp))
-            .size(140.dp, 70.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+            .widthIn(min = if (compact) 88.dp else 120.dp, max = if (compact) 112.dp else 160.dp)
+            .heightIn(min = if (compact) 48.dp else 70.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
         shape = RoundedCornerShape(12.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.padding(if (compact) 4.dp else 8.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -1234,20 +1256,22 @@ private fun EnhancedCityCard(
             ) {
                 Text(
                     text = city.flag,
-                    fontSize = 22.sp
+                    fontSize = if (compact) 16.sp else 22.sp
                 )
                 Text(
                     text = city.name,
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
-                    textAlign = TextAlign.Center
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
-                if (city.isCapital) {
+                if (city.isCapital && !compact) {
                     Text(
                         text = "Capital",
-                        fontSize = 8.sp,
-                        color = Color(0xFF10B981),
+                        fontSize = 12.sp,
+                        color = RvSuccessEdge,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -1287,7 +1311,7 @@ private fun EnhancedGridOverlay(
         val cellHeight = size.height / rows
 
         // Draw grid lines
-        val gridColor = Color.White.copy(alpha = 0.7f)
+        val gridColor = RvInkSoft.copy(alpha = 0.7f)
         val strokeWidth = 1.5.dp.toPx()
 
         // Vertical lines
@@ -1330,7 +1354,7 @@ private fun EnhancedGridOverlay(
             val top = cell.row * cellHeight
 
             drawRect(
-                color = Color(0xFF10B981).copy(alpha = 0.2f),
+                color = RvSuccess.copy(alpha = 0.2f),
                 topLeft = Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
             )
@@ -1362,14 +1386,14 @@ private fun EnhancedGridOverlay(
             val top = cell.row * cellHeight
 
             drawRect(
-                color = Color(0xFF10B981).copy(alpha = 0.4f),
+                color = RvSuccess.copy(alpha = 0.4f),
                 topLeft = Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
             )
 
             // Draw border for correct cell
             drawRect(
-                color = Color(0xFF10B981),
+                color = RvSuccess,
                 topLeft = Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4.dp.toPx())
@@ -1382,14 +1406,14 @@ private fun EnhancedGridOverlay(
 
             // Enhanced checkmark
             drawLine(
-                color = Color.White,
+                color = RvInk,
                 start = Offset(centerX - checkSize/2, centerY),
                 end = Offset(centerX - checkSize/4, centerY + checkSize/2),
                 strokeWidth = 4.dp.toPx(),
                 cap = androidx.compose.ui.graphics.StrokeCap.Round
             )
             drawLine(
-                color = Color.White,
+                color = RvInk,
                 start = Offset(centerX - checkSize/4, centerY + checkSize/2),
                 end = Offset(centerX + checkSize/2, centerY - checkSize/2),
                 strokeWidth = 4.dp.toPx(),
@@ -1407,7 +1431,7 @@ private fun EnhancedGridOverlay(
                 if (row == 0 && col < cols) {
                     // Column numbers at top
                     drawCircle(
-                        color = Color.White.copy(alpha = 0.6f),
+                        color = RvInkSoft.copy(alpha = 0.6f),
                         radius = 8.dp.toPx(),
                         center = Offset(centerX, 12.dp.toPx())
                     )
@@ -1416,7 +1440,7 @@ private fun EnhancedGridOverlay(
                 if (col == 0 && row < rows) {
                     // Row numbers at left
                     drawCircle(
-                        color = Color.White.copy(alpha = 0.6f),
+                        color = RvInkSoft.copy(alpha = 0.6f),
                         radius = 8.dp.toPx(),
                         center = Offset(12.dp.toPx(), centerY)
                     )
@@ -1504,7 +1528,7 @@ private fun GridOverlay(
         val cellHeight = size.height / rows
 
         // Draw grid lines
-        val gridColor = Color.White.copy(alpha = 0.6f)
+        val gridColor = RvInkSoft.copy(alpha = 0.6f)
         val strokeWidth = 2.dp.toPx()
 
         // Vertical lines
@@ -1555,14 +1579,14 @@ private fun GridOverlay(
             val top = cell.row * cellHeight
 
             drawRect(
-                color = Color(0xFF10B981).copy(alpha = 0.3f),
+                color = RvSuccess.copy(alpha = 0.3f),
                 topLeft = Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight)
             )
 
             // Draw border for correct cell
             drawRect(
-                color = Color(0xFF10B981),
+                color = RvSuccess,
                 topLeft = Offset(left, top),
                 size = androidx.compose.ui.geometry.Size(cellWidth, cellHeight),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(width = 4.dp.toPx())
@@ -1575,14 +1599,14 @@ private fun GridOverlay(
 
             // Simple checkmark using lines
             drawLine(
-                color = Color(0xFF10B981),
+                color = RvSuccess,
                 start = Offset(centerX - checkSize/2, centerY),
                 end = Offset(centerX - checkSize/4, centerY + checkSize/2),
                 strokeWidth = 6.dp.toPx(),
                 cap = androidx.compose.ui.graphics.StrokeCap.Round
             )
             drawLine(
-                color = Color(0xFF10B981),
+                color = RvSuccess,
                 start = Offset(centerX - checkSize/4, centerY + checkSize/2),
                 end = Offset(centerX + checkSize/2, centerY - checkSize/2),
                 strokeWidth = 6.dp.toPx(),
@@ -1635,7 +1659,7 @@ private fun GeographyCompletionScreen(
                 text = "Geography Challenge Complete!",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 textAlign = TextAlign.Center
             )
 
@@ -1643,7 +1667,7 @@ private fun GeographyCompletionScreen(
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
@@ -1653,7 +1677,7 @@ private fun GeographyCompletionScreen(
                         text = stringResource(R.string.final_score),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1E3A8A)
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
@@ -1662,7 +1686,7 @@ private fun GeographyCompletionScreen(
                         text = "$totalScore",
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF10B981)
+                        color = RvSuccess
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -1670,14 +1694,14 @@ private fun GeographyCompletionScreen(
                     Text(
                         text = "Cities Placed: $questionsAnswered",
                         fontSize = 16.sp,
-                        color = Color(0xFF1E3A8A)
+                        color = RvInk
                     )
 
                     val percentage = (totalScore.toDouble() / (maxQuestions * 75).toDouble() * 100).toInt()
                     Text(
                         text = "${stringResource(R.string.accuracy)}: $percentage%",
                         fontSize = 16.sp,
-                        color = Color(0xFF1E3A8A)
+                        color = RvInk
                     )
                 }
             }
@@ -1688,13 +1712,13 @@ private fun GeographyCompletionScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+            colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(
                 text = stringResource(R.string.continue_label_caps),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvOnTone
             )
         }
     }
@@ -1708,12 +1732,13 @@ private fun CityCard(
     Card(
         modifier = modifier
             .shadow(8.dp, RoundedCornerShape(12.dp))
-            .size(120.dp, 60.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+            .widthIn(min = 120.dp)
+            .heightIn(min = 60.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
         shape = RoundedCornerShape(12.dp)
     ) {
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.padding(8.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(
@@ -1727,7 +1752,7 @@ private fun CityCard(
                     text = city.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
             }
@@ -1801,7 +1826,7 @@ fun GeographyGridTestingScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1E3A8A))
+            .background(RvCanvas)
             .padding(16.dp)
     ) {
         // Header
@@ -1812,23 +1837,23 @@ fun GeographyGridTestingScreen(
         ) {
             Button(
                 onClick = onBack,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
+                colors = ButtonDefaults.buttonColors(containerColor = RvSky)
             ) {
-                Text("← Back", color = Color.White)
+                Text("← Back", color = RvOnTone)
             }
 
             Text(
                 text = "Grid Testing Mode",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Button(
                 onClick = { showExportDialog = true },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+                colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
             ) {
-                Text("Export", color = Color.White)
+                Text("Export", color = RvOnTone)
             }
         }
 
@@ -1846,13 +1871,13 @@ fun GeographyGridTestingScreen(
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (selectedContinent == continent)
-                            continent.color else Color.Gray
+                            continent.color else RvInkSoft
                     )
                 ) {
                     Text(
                         text = continent.displayName,
                         fontSize = 12.sp,
-                        color = Color.White
+                        color = RvInk
                     )
                 }
             }
@@ -1873,7 +1898,7 @@ fun GeographyGridTestingScreen(
                     text = "Cities in ${selectedContinent.displayName}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1890,7 +1915,7 @@ fun GeographyGridTestingScreen(
                                 .clickable { selectedCity = city },
                             colors = CardDefaults.cardColors(
                                 containerColor = if (selectedCity?.id == city.id)
-                                    Color(0xFFFF9500) else Color.White
+                                    Color(0xFFFF9500) else RvInk
                             )
                         ) {
                             Column(
@@ -1905,7 +1930,7 @@ fun GeographyGridTestingScreen(
                                         text = city.name,
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (selectedCity?.id == city.id) Color.White else Color.Black
+                                        color = if (selectedCity?.id == city.id) RvInk else RvInk
                                     )
                                 }
 
@@ -1914,7 +1939,7 @@ fun GeographyGridTestingScreen(
                                         text = "Grid: R${grid.row + 1}, C${grid.col + 1}",
                                         fontSize = 10.sp,
                                         color = if (selectedCity?.id == city.id)
-                                            Color.White.copy(alpha = 0.8f) else Color.Gray
+                                            RvInkSoft else RvInkSoft
                                     )
                                 }
                             }
@@ -1932,7 +1957,7 @@ fun GeographyGridTestingScreen(
                 Text(
                     text = "Click on grid to place ${selectedCity?.name ?: "selected city"}",
                     fontSize = 14.sp,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -1971,7 +1996,7 @@ fun GeographyGridTestingScreen(
                 Text(
                     text = "Grid: ${gridRows}×${gridCols} | Selected: ${selectedCity?.name ?: "None"}",
                     fontSize = 12.sp,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -2035,7 +2060,7 @@ private fun TestingGridOverlay(
         val cellHeight = size.height / rows
 
         // Draw grid lines
-        val gridColor = Color.White.copy(alpha = 0.8f)
+        val gridColor = RvInkSoft.copy(alpha = 0.8f)
         val strokeWidth = 2.dp.toPx()
 
         // Vertical lines
@@ -2067,7 +2092,7 @@ private fun TestingGridOverlay(
                 val centerY = gridCell.row * cellHeight + cellHeight / 2
 
                 val isSelected = selectedCity?.id == city.id
-                val dotColor = if (isSelected) Color(0xFFFF9500) else Color(0xFFEF4444)
+                val dotColor = if (isSelected) Color(0xFFFF9500) else RvError
                 val dotSize = if (isSelected) 16.dp.toPx() else 12.dp.toPx()
 
                 // Draw city dot
@@ -2079,7 +2104,7 @@ private fun TestingGridOverlay(
 
                 // Draw white border
                 drawCircle(
-                    color = Color.White,
+                    color = RvInk,
                     radius = dotSize / 2,
                     center = Offset(centerX, centerY),
                     style = androidx.compose.ui.graphics.drawscope.Stroke(width = 2.dp.toPx())
@@ -2099,7 +2124,7 @@ private fun TestingGridOverlay(
 
                 // Draw small coordinate indicator
                 drawCircle(
-                    color = Color.White.copy(alpha = 0.3f),
+                    color = RvInkSoft.copy(alpha = 0.3f),
                     radius = 3.dp.toPx(),
                     center = Offset(centerX, centerY)
                 )

@@ -1,11 +1,19 @@
 // SymbolSwipePuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -35,13 +43,13 @@ import kotlin.random.Random
 
 // Symbol definitions
 sealed class GameSymbol(val color: Color, val name: String) {
-    object Star : GameSymbol(Color(0xFF4CAF50), "Star")
-    object Circle : GameSymbol(Color(0xFF2196F3), "Circle")
-    object Triangle : GameSymbol(Color(0xFFFF9800), "Triangle")
+    object Star : GameSymbol(RvSuccess, "Star")
+    object Circle : GameSymbol(RvSky, "Circle")
+    object Triangle : GameSymbol(RvSun, "Triangle")
     object Diamond : GameSymbol(Color(0xFFE91E63), "Diamond")
-    object Square : GameSymbol(Color(0xFF9C27B0), "Square")
-    object Heart : GameSymbol(Color(0xFFFF5722), "Heart")
-    object Hexagon : GameSymbol(Color(0xFF00BCD4), "Hexagon")
+    object Square : GameSymbol(RvGrape, "Square")
+    object Heart : GameSymbol(RvFlame, "Heart")
+    object Hexagon : GameSymbol(RvSky, "Hexagon")
     object Cross : GameSymbol(Color(0xFF795548), "Cross")
 }
 
@@ -199,7 +207,7 @@ fun SymbolSwipePuzzleScreen(
             score += points
 
             feedbackMessage = if (multiplier > 1) "Perfect! +$points (x${multiplier})" else "Correct! +$points"
-            feedbackColor = Color(0xFF4CAF50)
+            feedbackColor = RvSuccess
         } else {
             consecutiveCorrect = 0
             multiplier = 1
@@ -239,332 +247,317 @@ fun SymbolSwipePuzzleScreen(
         animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy)
     )
 
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF6A1B9A)) // Purple gradient background
-            .statusBarsPadding()
+            .background(RvCanvas)
     ) {
-        // Header
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 720.dp)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            GroupECompactHud(
+                timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                onBack = onBack,
+                subtitle = "${stringResource(R.string.score_label)} $score" +
+                    (if (multiplier > 1) " \u00D7$multiplier" else "") +
+                    " \u2022 ${currentSymbolIndex}/${symbolSequence.size}",
+                lives = currentHearts,
+                urgent = timeLeft <= 30,
+                onPause = { isPaused = !isPaused }
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (!gameStarted && isFirstPuzzle) {
+                GroupESwipeInstructions(
+                    title = "\uD83D\uDD04 Symbol Swipe",
+                    leftSymbol = leftSymbol,
+                    rightSymbol = rightSymbol,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                GroupEPrimaryButton(
+                    text = stringResource(R.string.start),
+                    onClick = { gameStarted = true },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
+            if (gameStarted && !gameCompleted && currentSymbolIndex < symbolSequence.size) {
+                GroupESwipeField(
+                    leftSymbol = leftSymbol,
+                    rightSymbol = rightSymbol,
+                    currentSymbol = symbolSequence[currentSymbolIndex].symbol,
+                    offsetDp = currentSymbolOffset,
+                    scale = animatedScale,
+                    dragKey = currentSymbolIndex,
+                    onDragStart = { symbolScale = 1.05f },
+                    onDragEnd = {
+                        symbolScale = 1f
+                        if (abs(currentSymbolOffset) > 100) {
+                            val direction = if (currentSymbolOffset > 0) SwipeDirection.RIGHT else SwipeDirection.LEFT
+                            handleSwipe(direction)
+                        }
+                        currentSymbolOffset = 0f
+                    },
+                    onDrag = { dx ->
+                        currentSymbolOffset += dx * 0.5f // Reduce sensitivity
+                        currentSymbolOffset = currentSymbolOffset.coerceIn(-300f, 300f)
+                    },
+                    progressIndex = currentSymbolIndex,
+                    progressTotal = symbolSequence.size,
+                    feedbackMessage = if (showFeedback) feedbackMessage else null,
+                    feedbackColor = feedbackColor,
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                )
+            }
+
+            // Auto-start countdown for non-first puzzles
+            if (!gameStarted && !isFirstPuzzle) {
+                var countdown by remember { mutableStateOf(3) }
+
+                LaunchedEffect(Unit) {
+                    while (countdown > 0) {
+                        delay(1000)
+                        countdown--
+                    }
+                    gameStarted = true
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Card(
+                        colors = CardDefaults.cardColors(containerColor = RvSurface)
+                    ) {
+                        Text(
+                            text = "${stringResource(R.string.get_ready)}\n$countdown",
+                            modifier = Modifier.padding(32.dp),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Instructions for the swipe games. Scrolls only as a last-resort safety net; Start sits outside it. */
+@Composable
+internal fun GroupESwipeInstructions(
+    title: String,
+    leftSymbol: GameSymbol?,
+    rightSymbol: GameSymbol?,
+    modifier: Modifier = Modifier,
+    extra: String? = null
+) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+                .verticalScroll(rememberScrollState()),
+            colors = CardDefaults.cardColors(containerColor = RvSurface),
+            shape = RoundedCornerShape(16.dp)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                }
-
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = title,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT",
+                    fontSize = 16.sp,
+                    color = RvInk,
+                    textAlign = TextAlign.Center
+                )
+                if (extra != null) {
                     Text(
-                        text = "${config.name} • Puzzle $currentPuzzleNumber/$totalPuzzles",
+                        text = extra,
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "${currentSymbolIndex}/${symbolSequence.size} symbols",
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (timeLeft <= 30) Color.Red else Color.Black
+                        color = RvInkSoft,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = stringResource(R.string.score_label),
-                        fontSize = 12.sp,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = "$score",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    if (multiplier > 1) {
-                        Text(
-                            text = "x$multiplier",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFF9800)
-                        )
-                    }
-                }
-
-                IconButton(onClick = { isPaused = !isPaused }) {
-                    Icon(Icons.Default.Pause, contentDescription = "Pause")
-                }
-            }
-        }
-
-        // Instructions - only show for first puzzle
-        if (!gameStarted && isFirstPuzzle) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "🔄 Symbol Swipe",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "When you see the LEFT symbol, swipe LEFT\nWhen you see the RIGHT symbol, swipe RIGHT",
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Show the two symbols that will be used
-                    if (leftSymbol != null && rightSymbol != null) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(32.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                if (leftSymbol != null && rightSymbol != null) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        listOf(leftSymbol to "\u2190 SWIPE LEFT", rightSymbol to "SWIPE RIGHT \u2192").forEach { (sym, label) ->
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Box(
                                     modifier = Modifier
-                                        .size(60.dp)
+                                        .size(64.dp)
                                         .clip(RoundedCornerShape(12.dp))
-                                        .background(Color.Gray.copy(alpha = 0.1f)),
+                                        .background(RvSurfaceRaised),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    SymbolCanvas(
-                                        symbol = leftSymbol!!,
-                                        modifier = Modifier.size(40.dp)
-                                    )
+                                    SymbolCanvas(symbol = sym, modifier = Modifier.size(44.dp))
                                 }
-                                Text("← SWIPE LEFT", fontSize = 12.sp, color = Color.Gray)
-                            }
-
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(60.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color.Gray.copy(alpha = 0.1f)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    SymbolCanvas(
-                                        symbol = rightSymbol!!,
-                                        modifier = Modifier.size(40.dp)
-                                    )
-                                }
-                                Text("SWIPE RIGHT →", fontSize = 12.sp, color = Color.Gray)
+                                Text(label, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvInkSoft, textAlign = TextAlign.Center)
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Button(
-                        onClick = { gameStarted = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-                    ) {
-                        Text(stringResource(R.string.start), fontWeight = FontWeight.Bold)
-                    }
                 }
             }
         }
+    }
+}
 
-        // Game Area
-        if (gameStarted && !gameCompleted && currentSymbolIndex < symbolSequence.size) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(16.dp)
-            ) {
-                // Reference symbols in corners (smaller, semi-transparent)
-                if (leftSymbol != null) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .padding(16.dp)
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.Black.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SymbolCanvas(
-                            symbol = leftSymbol!!,
-                            modifier = Modifier.size(50.dp)
-                        )
-                    }
-                }
+/**
+ * Swipe play field: the two reference symbols sit on the sides they must be swiped to, the card is in
+ * the middle and everything is sized from the space actually available (no scrolling, no clipping).
+ */
+@Composable
+internal fun GroupESwipeField(
+    leftSymbol: GameSymbol?,
+    rightSymbol: GameSymbol?,
+    currentSymbol: GameSymbol,
+    offsetDp: Float,
+    scale: Float,
+    dragKey: Int,
+    onDragStart: () -> Unit,
+    onDragEnd: () -> Unit,
+    onDrag: (Float) -> Unit,
+    progressIndex: Int,
+    progressTotal: Int,
+    feedbackMessage: String?,
+    feedbackColor: Color,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(
+        modifier = modifier
+            .testTag("swipe_area")
+            .clip(RoundedCornerShape(16.dp))
+            .background(RvSurface)
+    ) {
+        val w = maxWidth
+        val h = maxHeight
+        val dotsBand = 24.dp
+        val refSize = (w * 0.2f).coerceIn(56.dp, 88.dp)
+        val cardMax = minOf(w - (refSize + 8.dp) * 2 - 16.dp, h - dotsBand - 16.dp)
+        val card = cardMax.coerceIn(96.dp, 260.dp)
 
-                if (rightSymbol != null) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                            .size(80.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.Black.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        SymbolCanvas(
-                            symbol = rightSymbol!!,
-                            modifier = Modifier.size(50.dp)
-                        )
-                    }
-                }
-
-                // Current symbol display (center) - removed TAP indicators
-                val currentSymbol = symbolSequence[currentSymbolIndex]
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .size(200.dp)
-                        .offset(x = currentSymbolOffset.dp)
-                        .scale(animatedScale)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White.copy(alpha = 0.95f))
-                        .pointerInput(currentSymbolIndex) {
-                            detectDragGestures(
-                                onDragStart = {
-                                    symbolScale = 1.05f
-                                },
-                                onDragEnd = {
-                                    symbolScale = 1f
-                                    if (abs(currentSymbolOffset) > 100) {
-                                        val direction = if (currentSymbolOffset > 0) SwipeDirection.RIGHT else SwipeDirection.LEFT
-                                        handleSwipe(direction)
-                                    }
-                                    currentSymbolOffset = 0f
-                                }
-                            ) { _, dragAmount ->
-                                currentSymbolOffset += dragAmount.x * 0.5f // Reduce sensitivity
-                                currentSymbolOffset = currentSymbolOffset.coerceIn(-300f, 300f)
-                            }
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    SymbolCanvas(
-                        symbol = currentSymbol.symbol,
-                        modifier = Modifier.size(120.dp)
-                    )
-                }
-
-                // Progress dots at bottom
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    repeat(minOf(symbolSequence.size, 9)) { index ->
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .clip(CircleShape)
-                                .background(
-                                    when {
-                                        index < currentSymbolIndex -> Color(0xFF4CAF50)
-                                        index == currentSymbolIndex -> Color(0xFFFFEB3B)
-                                        else -> Color.White.copy(alpha = 0.4f)
-                                    }
-                                )
-                        )
-                    }
-                }
-
-                // Hearts display
-                Row(
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    repeat(5) { index ->
-                        val alpha = if (index < currentHearts) 1f else 0.3f
-                        Text(
-                            text = "●",
-                            color = Color(0xFFFFEB3B).copy(alpha = alpha),
-                            fontSize = 16.sp
-                        )
-                    }
-                    Text(
-                        text = "x1",
-                        color = Color(0xFFFFEB3B),
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
-        }
-
-        // Auto-start countdown for non-first puzzles
-        if (!gameStarted && !isFirstPuzzle) {
-            var countdown by remember { mutableStateOf(3) }
-
-            LaunchedEffect(Unit) {
-                while (countdown > 0) {
-                    delay(1000)
-                    countdown--
-                }
-                gameStarted = true
-            }
+        Row(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 8.dp, end = 8.dp, bottom = dotsBand),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            GroupESwipeRef(leftSymbol, refSize, "\u2190", "swipe_ref_left")
 
             Box(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
+                    .size(card)
+                    .offset(x = offsetDp.dp)
+                    .scale(scale)
+                    .testTag("swipe_card")
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(RvSurfaceRaised)
+                    .border(2.dp, RvOutline, RoundedCornerShape(20.dp))
+                    .pointerInput(dragKey) {
+                        detectDragGestures(
+                            onDragStart = { onDragStart() },
+                            onDragEnd = { onDragEnd() }
+                        ) { _, dragAmount -> onDrag(dragAmount.x) }
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    Text(
-                        text = "${stringResource(R.string.get_ready)}\n$countdown",
-                        modifier = Modifier.padding(32.dp),
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                SymbolCanvas(symbol = currentSymbol, modifier = Modifier.size(card * 0.6f))
             }
+
+            GroupESwipeRef(rightSymbol, refSize, "\u2192", "swipe_ref_right")
         }
 
-        // Feedback overlay
-        if (showFeedback) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = feedbackColor.copy(alpha = 0.9f))
-            ) {
-                Text(
-                    text = feedbackMessage,
+        // Progress dots (decorative; the exact count is also in the HUD text).
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            repeat(minOf(progressTotal, 9)) { index ->
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(
+                            when {
+                                index < progressIndex -> RvSuccess
+                                index == progressIndex -> RvSun
+                                else -> RvOutline
+                            }
+                        )
                 )
             }
         }
+
+        if (feedbackMessage != null) {
+            Card(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(8.dp),
+                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+                border = BorderStroke(2.dp, feedbackColor)
+            ) {
+                Text(
+                    text = feedbackMessage,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                    color = RvInk,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupESwipeRef(symbol: GameSymbol?, size: Dp, arrow: String, tag: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(
+            modifier = Modifier
+                .size(size)
+                .testTag(tag)
+                .clip(RoundedCornerShape(12.dp))
+                .background(RvSurfaceRaised)
+                .border(2.dp, RvOutline, RoundedCornerShape(12.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            if (symbol != null) SymbolCanvas(symbol = symbol, modifier = Modifier.size(size * 0.7f))
+        }
+        Text(text = arrow, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvInkSoft)
     }
 }
 

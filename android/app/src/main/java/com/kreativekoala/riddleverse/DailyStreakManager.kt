@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -304,7 +305,7 @@ fun DailyStreakGiftDialog(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.8f))
+            .background(RvScrim)
             .clickable { onDismiss() },
         contentAlignment = Alignment.Center
     ) {
@@ -325,14 +326,14 @@ fun DailyStreakGiftDialog(
                         .scale(closeButtonScale)
                         .size(48.dp)
                         .background(
-                            Color.White.copy(alpha = 0.9f),
+                            RvSurfaceRaised,
                             CircleShape
                         )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
-                        tint = Color(0xFF666666),
+                        tint = RvInkSoft,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -343,11 +344,12 @@ fun DailyStreakGiftDialog(
             modifier = Modifier
                 .fillMaxWidth(0.85f)
                 .wrapContentHeight(),
-            shape = RoundedCornerShape(20.dp),
+            shape = RoundedCornerShape(32.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
+                containerColor = RvCanvas
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+            border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -358,9 +360,9 @@ fun DailyStreakGiftDialog(
                 // Title
                 Text(
                     text = if (!giftOpened) "Daily Reward!" else "Congratulations! 🎉",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2E2E2E),
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = com.kreativekoala.riddleverse.ui.theme.RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -372,9 +374,9 @@ fun DailyStreakGiftDialog(
                     if (previousStreak > 0) {
                         Card(
                             colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFF9C27B0).copy(alpha = 0.1f)
+                                containerColor = com.kreativekoala.riddleverse.ui.theme.RvSun.copy(alpha = 0.18f)
                             ),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(50)
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
@@ -388,8 +390,8 @@ fun DailyStreakGiftDialog(
                                 Text(
                                     text = "Current streak: $previousStreak days",
                                     fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color(0xFF9C27B0)
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = com.kreativekoala.riddleverse.ui.theme.RvSunEdge
                                 )
                             }
                         }
@@ -400,14 +402,14 @@ fun DailyStreakGiftDialog(
                     Text(
                         text = if (!giftOpened) "Tap the gift to open your reward!" else "Opening...",
                         fontSize = 16.sp,
-                        color = Color(0xFF666666),
+                        color = RvInkSoft,
                         textAlign = TextAlign.Center
                     )
                 } else {
                     Text(
                         text = "Here's your reward for day $newStreak!",
                         fontSize = 16.sp,
-                        color = Color(0xFF666666),
+                        color = RvInkSoft,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -427,17 +429,12 @@ fun DailyStreakGiftDialog(
                             modifier = Modifier
                                 .size(100.dp)
                                 .background(
-                                    brush = Brush.verticalGradient(
-                                        colors = listOf(
-                                            Color(0xFFFF6B35),
-                                            Color(0xFFD32F2F)
-                                        )
-                                    ),
+                                    brush = Brush.verticalGradient(colors = listOf(RvCoral, RvCoral)),
                                     shape = RoundedCornerShape(12.dp)
                                 )
                                 .border(
                                     width = 3.dp,
-                                    color = Color(0xFFFFD700),
+                                    color = RvSun,
                                     shape = RoundedCornerShape(12.dp)
                                 )
                         )
@@ -448,7 +445,7 @@ fun DailyStreakGiftDialog(
                                 .fillMaxWidth()
                                 .height(20.dp)
                                 .background(
-                                    Color(0xFFFFD700),
+                                    RvSun,
                                     RoundedCornerShape(10.dp)
                                 )
                         )
@@ -459,7 +456,7 @@ fun DailyStreakGiftDialog(
                                 .width(20.dp)
                                 .fillMaxHeight()
                                 .background(
-                                    Color(0xFFFFD700),
+                                    RvSun,
                                     RoundedCornerShape(10.dp)
                                 )
                         )
@@ -468,7 +465,7 @@ fun DailyStreakGiftDialog(
                         Icon(
                             imageVector = Icons.Default.CardGiftcard,
                             contentDescription = "Gift",
-                            tint = Color(0xFFFFD700),
+                            tint = RvSun,
                             modifier = Modifier.size(32.dp)
                         )
                     }
@@ -505,7 +502,7 @@ fun DailyStreakGiftDialog(
                                             )
                                             .scale(streakScale)
                                             .background(
-                                                Color(0xFFFFD700),
+                                                RvSun,
                                                 CircleShape
                                             )
                                     )
@@ -514,7 +511,7 @@ fun DailyStreakGiftDialog(
                                 // Main streak number
                                 Card(
                                     colors = CardDefaults.cardColors(
-                                        containerColor = Color(0xFFFF6B35)
+                                        containerColor = RvFlame
                                     ),
                                     shape = CircleShape,
                                     modifier = Modifier
@@ -536,7 +533,7 @@ fun DailyStreakGiftDialog(
                                                 text = "$newStreak",
                                                 fontSize = 24.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = Color.White
+                                                color = RvOnTone
                                             )
                                         }
                                     }
@@ -553,7 +550,7 @@ fun DailyStreakGiftDialog(
                                 },
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF6B35),
+                                color = RvFlame,
                                 textAlign = TextAlign.Center
                             )
 
@@ -568,7 +565,7 @@ fun DailyStreakGiftDialog(
                             Icon(
                                 imageVector = Icons.Default.MonetizationOn,
                                 contentDescription = "Coins",
-                                tint = Color(0xFFFFD700),
+                                tint = RvSun,
                                 modifier = Modifier
                                     .size(48.dp)
                                     .scale(coinScale)
@@ -577,8 +574,8 @@ fun DailyStreakGiftDialog(
                             Text(
                                 text = "+${streakReward.coins}",
                                 fontSize = 36.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFFD700)
+                                fontWeight = FontWeight.ExtraBold,
+                                color = RvSunEdge
                             )
                         }
 
@@ -588,7 +585,7 @@ fun DailyStreakGiftDialog(
                         streakReward.specialReward?.let { specialReward ->
                             Card(
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Color(0xFF9C27B0)
+                                    containerColor = RvGrape
                                 ),
                                 shape = RoundedCornerShape(16.dp)
                             ) {
@@ -596,7 +593,7 @@ fun DailyStreakGiftDialog(
                                     text = specialReward,
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = RvOnTone,
                                     modifier = Modifier.padding(16.dp),
                                     textAlign = TextAlign.Center
                                 )
@@ -620,7 +617,7 @@ fun DailyStreakGiftDialog(
                                 else -> "Legendary streak! You're unstoppable! 🚀"
                             },
                             fontSize = 14.sp,
-                            color = Color(0xFF666666),
+                            color = RvInkSoft,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -640,7 +637,7 @@ fun DailyStreakGiftDialog(
                             .height(48.dp)
                             .scale(closeButtonScale),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50)
+                            containerColor = RvSuccess
                         ),
                         shape = RoundedCornerShape(24.dp)
                     ) {
@@ -648,18 +645,18 @@ fun DailyStreakGiftDialog(
                             text = "Let's Play! 🎮",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvOnTone
                         )
                     }
                 } else if (!giftOpened) {
                     Text(
                         text = "👆 Tap the gift above!",
                         fontSize = 14.sp,
-                        color = Color(0xFF9C27B0),
+                        color = RvGrape,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .background(
-                                Color(0xFF9C27B0).copy(alpha = 0.1f),
+                                RvGrape.copy(alpha = 0.1f),
                                 RoundedCornerShape(8.dp)
                             )
                             .padding(horizontal = 12.dp, vertical = 6.dp)

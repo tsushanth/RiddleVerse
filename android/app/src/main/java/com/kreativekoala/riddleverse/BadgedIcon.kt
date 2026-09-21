@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -27,6 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 
 @Composable
 fun BadgedIcon(
@@ -58,7 +62,7 @@ fun BadgedIcon(
                             text = "NEW",
                             fontSize = 8.sp,
                             fontWeight = FontWeight.Bold,
-                            color = androidx.compose.ui.graphics.Color.White,
+                            color = RvInk,
                             modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
                         )
                     }
@@ -74,7 +78,7 @@ fun BadgedIcon(
                             .offset(x = 6.dp, y = (-6).dp)
                             .size(16.dp)
                             .background(
-                                androidx.compose.ui.graphics.Color.White,
+                                RvInk,
                                 CircleShape
                             )
                             .padding(2.dp)
@@ -85,13 +89,13 @@ fun BadgedIcon(
                     Icon(
                         imageVector = Icons.Default.ChatBubble,
                         contentDescription = "New Feature",
-                        tint = Color(0xFF4CAF50),
+                        tint = RvSuccess,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .offset(x = 6.dp, y = (-6).dp)
                             .size(16.dp)
                             .background(
-                                androidx.compose.ui.graphics.Color.White,
+                                RvInk,
                                 CircleShape
                             )
                             .padding(2.dp)

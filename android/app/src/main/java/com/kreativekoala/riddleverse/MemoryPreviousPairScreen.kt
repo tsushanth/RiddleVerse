@@ -32,6 +32,11 @@ import kotlinx.coroutines.delay
 import org.json.JSONObject
 import androidx.compose.ui.res.stringResource
 import kotlin.math.sin
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 
 data class MemorySequence(
     val screenNumber: Int,
@@ -384,51 +389,53 @@ fun MemoryPreviousPairPuzzleScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvCanvas)) {
+        // Fit-to-screen: HUD (fixed), instruction, forest scene (all remaining space), stats footer.
+        val compact = maxHeight < 600.dp
+        val gutter = if (compact) 12.dp else 16.dp
+        val isFirst = currentScreenIndex < sequenceData.size && sequenceData[currentScreenIndex].isFirstScreen
+        val darkGreen = Color(0xFF15803D)
+        val darkOrange = Color(0xFFB45309)
+
         Column(
             modifier = Modifier
+                .widthIn(max = 720.dp)
                 .fillMaxSize()
-                .background(Color(0xFF1E1E1E))
-                .padding(16.dp)
+                .align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp)
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Enhanced Header with Score
-            EnhancedMemoryPairTopBar(
+            BCompactHud(
                 level = currentUserLevel,
-                streakInfo = streakInfo,
+                difficultyName = difficulty,
                 timer = displayTimer,
-                hearts = hearts,
-                difficulty = difficulty,
-                totalScore = totalScore,
-                correctAnswers = correctAnswers,
-                totalQuestions = totalQuestions,
+                lives = hearts,
+                maxLives = hearts,
+                score = totalScore,
                 streak = streak,
-                currentScreen = currentScreenIndex + 1,
-                totalScreens = sequenceData.size,
-                onBack = onBack,
-                modifier = Modifier.fillMaxWidth()
+                onBack = onBack
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 2.dp else 8.dp))
 
-            // Enhanced Instructions
+            // Instructions
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = if (compact) 6.dp else 12.dp)
                 ) {
                     Text(
-                        text = if (currentScreenIndex < sequenceData.size && sequenceData[currentScreenIndex].isFirstScreen) {
+                        text = if (isFirst) {
                             "🧠 Remember these animals!"
                         } else {
                             "🎯 Tap the animal that appeared in the previous screen"
                         },
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = if (compact) 2 else 3
                     )
 
                     Row(
@@ -437,29 +444,31 @@ fun MemoryPreviousPairPuzzleScreen(
                     ) {
                         Text(
                             text = "Screen ${currentScreenIndex + 1} of ${sequenceData.size}",
-                            color = Color(0xFFB0B0B0),
-                            fontSize = 14.sp
+                            color = RvInkSoft,
+                            fontSize = 14.sp,
+                            maxLines = 1
                         )
 
-                        if (currentScreenIndex < sequenceData.size) {
+                        if (!compact && currentScreenIndex < sequenceData.size) {
                             val memoryLoad = sequenceData[currentScreenIndex].numbers.size
                             Text(
                                 text = "Memory load: $memoryLoad items",
-                                color = Color(0xFF4CAF50),
-                                fontSize = 12.sp
+                                color = darkGreen,
+                                fontSize = 12.sp,
+                                maxLines = 1
                             )
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            // Forest Scene
-            Box(
+            // Forest scene: fills the remaining height; animal size is derived from the scene
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
+                    .weight(1f)
                     .clip(RoundedCornerShape(16.dp))
                     .background(
                         Brush.verticalGradient(
@@ -483,92 +492,80 @@ fun MemoryPreviousPairPuzzleScreen(
                     val currentAnimals = sequenceData[currentScreenIndex].numbers
                     val isFirstScreen = sequenceData[currentScreenIndex].isFirstScreen
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(32.dp),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        currentAnimals.forEach { animalId ->
-                            val animal = animals[animalId]
-                            if (animal != null) {
-                                AnimatedAnimalHead(
-                                    animal = animal,
-                                    isAnimating = animatingAnimals.contains(animalId),
-                                    isClickable = !isFirstScreen,
-                                    isSelected = selectedAnimal == animalId,
-                                    showFeedback = showFeedback && selectedAnimal == animalId,
-                                    isCorrect = isCorrectAnswer,
-                                    onClick = { handleAnimalClick(animalId) }
-                                )
+                    // Best grid (cols x rows) so every head is >= 48dp when possible and never overflows
+                    val n = currentAnimals.size.coerceAtLeast(1)
+                    val pad = 24.dp // room for the bounce (20dp) and the result badge
+                    val availW = (maxWidth - pad * 2).coerceAtLeast(48.dp)
+                    val availH = (maxHeight - pad * 2).coerceAtLeast(48.dp)
+                    var bestCols = 1
+                    var bestSize = 0.dp
+                    for (c in 1..n) {
+                        val r = (n + c - 1) / c
+                        val size = minOf(96.dp, (availW - 8.dp * (c - 1)) / c, (availH - 8.dp * (r - 1)) / r)
+                        if (size > bestSize) { bestSize = size; bestCols = c }
+                    }
+
+                    CompositionLocalProvider(LocalMpAnimalSize provides bestSize.coerceAtLeast(40.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            currentAnimals.chunked(bestCols).forEach { rowAnimals ->
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    rowAnimals.forEach { animalId ->
+                                        val animal = animals[animalId]
+                                        if (animal != null) {
+                                            AnimatedAnimalHead(
+                                                animal = animal,
+                                                isAnimating = animatingAnimals.contains(animalId),
+                                                isClickable = !isFirstScreen,
+                                                isSelected = selectedAnimal == animalId,
+                                                showFeedback = showFeedback && selectedAnimal == animalId,
+                                                isCorrect = isCorrectAnswer,
+                                                onClick = { handleAnimalClick(animalId) }
+                                            )
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            // Enhanced Score Display
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+            // Stats footer (one line)
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "Score: $totalScore",
-                                color = Color(0xFF4CAF50),
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        } else {
-                            Text(
-                                text = "🧠 Pair Memory",
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        Text(
-                            text = "Correct: $correctAnswers/$totalQuestions",
-                            color = Color(0xFFB0B0B0),
-                            fontSize = 14.sp
-                        )
-                    }
-
-                    // Performance indicators
-                    if (reactionTimes.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            val avgReaction = reactionTimes.average() / 1000.0
-                            Text(
-                                text = "⚡ Avg: ${String.format("%.1f", avgReaction)}s",
-                                color = if (avgReaction <= 2.5) Color(0xFF4CAF50) else Color(0xFFFF9800),
-                                fontSize = 12.sp
-                            )
-
-                            if (bestStreak > 1) {
-                                Text(
-                                    text = "🔥 Best streak: $bestStreak",
-                                    color = Color(0xFFFF6B00),
-                                    fontSize = 12.sp
-                                )
-                            }
-                        }
-                    }
+                Text(
+                    text = "Correct: $correctAnswers/$totalQuestions",
+                    color = RvInkSoft,
+                    fontSize = 14.sp,
+                    maxLines = 1
+                )
+                if (!compact && reactionTimes.isNotEmpty()) {
+                    val avgReaction = reactionTimes.average() / 1000.0
+                    Text(
+                        text = "⚡ Avg: ${String.format("%.1f", avgReaction)}s",
+                        color = if (avgReaction <= 2.5) darkGreen else darkOrange,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
+                }
+                if (!compact && bestStreak > 1) {
+                    Text(
+                        text = "🔥 Best streak: $bestStreak",
+                        color = darkOrange,
+                        fontSize = 12.sp,
+                        maxLines = 1
+                    )
                 }
             }
         }
@@ -578,143 +575,8 @@ fun MemoryPreviousPairPuzzleScreen(
     }
 }
 
-@Composable
-private fun EnhancedMemoryPairTopBar(
-    level: UserLevel,
-    streakInfo: StreakInfo,
-    timer: String,
-    hearts: Int,
-    difficulty: String,
-    totalScore: Int,
-    correctAnswers: Int,
-    totalQuestions: Int,
-    streak: Int,
-    currentScreen: Int,
-    totalScreens: Int,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier.statusBarsPadding()) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            // Left side: Back button and level
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                Column {
-                    Text(
-                        text = "Level ${level.level}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-
-                    LevelProgressBar(
-                        level = level,
-                        modifier = Modifier.width(100.dp)
-                    )
-                }
-            }
-
-            // Center: Hearts and timer
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    repeat(hearts) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Heart",
-                            tint = Color(0xFFFF69B4),
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                }
-
-                val timeValue = timer.substringAfter(":").toIntOrNull() ?: 0
-                val isUrgent = timer.startsWith("0:") && timeValue <= 30
-
-                Text(
-                    text = timer,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
-                )
-            }
-
-            // Right side: Progress and streak
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                Text(
-                    text = "$currentScreen/$totalScreens",
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
-
-                if (streak > 1) {
-                    Text(
-                        text = "🔥 $streak",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6B00)
-                    )
-                }
-            }
-        }
-
-        // Score and difficulty display
-        if (totalScore > 0 || correctAnswers > 0) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                if (totalScore > 0) {
-                    Text(
-                        text = "Score: $totalScore",
-                        color = Color(0xFF4CAF50),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Text(
-                    text = "Difficulty: $difficulty",
-                    color = Color(0xFFB0B0B0),
-                    fontSize = 12.sp
-                )
-
-                if (totalQuestions > 0) {
-                    Text(
-                        text = "$correctAnswers/$totalQuestions pairs",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        }
-    }
-}
+/** Head size chosen by the forest scene so animals always fit (see MemoryPreviousPairPuzzleScreen). */
+internal val LocalMpAnimalSize = compositionLocalOf { 80.dp }
 
 @Composable
 fun AnimatedAnimalHead(
@@ -747,16 +609,18 @@ fun AnimatedAnimalHead(
         label = "scale"
     )
 
+    val headSize = LocalMpAnimalSize.current
+    val emojiSp = with(androidx.compose.ui.platform.LocalDensity.current) { (headSize * 0.5f).toSp() } // glyph follows the head, not the font scale
     Box(
         modifier = Modifier
-            .size(80.dp)
+            .size(headSize)
             .offset(y = bounceOffset.dp)
             .scale(scale)
             .clip(CircleShape)
             .background(
                 when {
-                    showFeedback && isCorrect -> Color(0xFF4CAF50)
-                    showFeedback && !isCorrect -> Color(0xFFF44336)
+                    showFeedback && isCorrect -> Color(0xFF15803D)
+                    showFeedback && !isCorrect -> Color(0xFFB3261E)
                     isSelected -> animal.color.copy(alpha = 0.3f)
                     else -> animal.color.copy(alpha = 0.1f)
                 }
@@ -766,20 +630,20 @@ fun AnimatedAnimalHead(
     ) {
         Text(
             text = animal.emoji,
-            fontSize = 40.sp
+            fontSize = emojiSp
         )
 
         // Feedback overlay
         if (showFeedback && isSelected) {
             Text(
                 text = if (isCorrect) "✓" else "✗",
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .offset(x = 20.dp, y = (-20).dp)
+                    .offset(x = headSize / 4, y = -(headSize / 4))
                     .background(
-                        color = if (isCorrect) Color(0xFF4CAF50) else Color(0xFFF44336),
+                        color = if (isCorrect) Color(0xFF15803D) else Color(0xFFB3261E),
                         shape = CircleShape
                     )
                     .padding(4.dp)

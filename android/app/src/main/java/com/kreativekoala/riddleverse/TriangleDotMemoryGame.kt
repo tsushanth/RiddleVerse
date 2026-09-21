@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.annotation.SuppressLint
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -8,6 +9,10 @@ import kotlinx.coroutines.launch
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -113,66 +118,25 @@ fun TriangleDotMemoryPuzzleScreen(
         }
     }
 
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().background(RvCanvas)) {
     Column(
         modifier = Modifier
+            .align(Alignment.TopCenter)
+            .widthIn(max = 720.dp)
             .fillMaxSize()
-            .background(Color(0xFF1E3A8A))
-            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 32.dp)
+            .statusBarsPadding()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 8.dp)
     ) {
-        // Header with timer and score
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Pause button
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFF3B82F6))
-                    .clickable { onBack() }
-                    .zIndex(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("||", color = Color.White, fontWeight = FontWeight.Bold)
-            }
+        // HUD: back, timer and score in one compact row.
+        GroupECompactHud(
+            timer = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60),
+            onBack = onBack,
+            subtitle = "${stringResource(R.string.score_label)} $currentScore",
+            urgent = timeRemaining <= 10 && gameState == "playing"
+        )
 
-            // Timer and Score
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = "TIME ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
-                        color = Color(0xFF1E3A8A),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White.copy(alpha = 0.9f))
-                        .padding(horizontal = 12.dp, vertical = 6.dp)
-                ) {
-                    Text(
-                        text = "SCORE $currentScore",
-                        color = Color(0xFF1E3A8A),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         when (gameState) {
             "instructions" -> {
@@ -241,6 +205,7 @@ fun TriangleDotMemoryPuzzleScreen(
             }
         }
     }
+    }
 }
 
 @Composable
@@ -248,109 +213,7 @@ private fun TriangleDotInstructionsScreen(
     instructions: TriangleDotInstructions,
     onStartGame: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = instructions.title,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = instructions.description,
-            fontSize = 16.sp,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Example triangle
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Example Pattern",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E3A8A)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                TriangleDotPattern(
-                    redDotPosition = 1, // Bottom-left red
-                    modifier = Modifier.size(120.dp)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Red dot at bottom-left",
-                    fontSize = 12.sp,
-                    color = Color(0xFF1E3A8A)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Instructions list
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                instructions.steps.forEach { step ->
-                    Text(
-                        text = "• $step",
-                        fontSize = 14.sp,
-                        color = Color(0xFF1E3A8A),
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "💡 ${instructions.tip}",
-                    fontSize = 14.sp,
-                    color = Color(0xFF1E3A8A),
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onStartGame,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
-        ) {
-            Text(
-                text = stringResource(R.string.start_game),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-        }
-    }
+    GroupETriangleInstructionsBody(instructions = instructions, extra = null, onStart = onStartGame)
 }
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
@@ -365,144 +228,46 @@ private fun TriangleDotGameScreen(
     lastAnswerCorrect: Boolean,
     onAnswer: (Boolean) -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Progress indicator
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF10B981)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = currentQuestion.toString(),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Triangle pattern with animation
-        AnimatedContent(
-            targetState = currentQuestion,
-            transitionSpec = {
-                (fadeIn(tween(300)) + scaleIn(tween(300))) with
-                        (fadeOut(tween(300)) + scaleOut(tween(300)))
-            }
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(240.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                TriangleDotPattern(
-                    redDotPosition = currentStep.redDotPosition,
-                    modifier = Modifier.size(160.dp)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        if (currentQuestion >= 2) {
-            Text(
-                text = "Does this pattern match the\nprevious pattern?",
-                fontSize = 18.sp,
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                lineHeight = 24.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Feedback animation
-        AnimatedVisibility(
-            visible = showFeedback,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (lastAnswerCorrect) Color(0xFF10B981) else Color(0xFFEF4444)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (lastAnswerCorrect) "✓" else "✗",
-                    fontSize = 60.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Answer buttons
-        if (!showFeedback && currentQuestion >= 2) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(
-                    onClick = { onAnswer(false) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
-                ) {
-                    Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-
-                Button(
-                    onClick = { onAnswer(true) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
-                ) {
-                    Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-            }
-        }
-    }
+    GroupETriangleGameBody(
+        currentQuestion = currentQuestion,
+        totalQuestions = totalQuestions,
+        redDotPosition = currentStep.redDotPosition,
+        showFeedback = showFeedback,
+        lastAnswerCorrect = lastAnswerCorrect,
+        extraLabel = null,
+        onAnswer = onAnswer
+    )
 }
 
+/**
+ * Scales with the box it is given (designed for 160dp): dot size and triangle radius follow the
+ * available size so the pattern is never clipped and can grow on tablets.
+ */
 @Composable
 fun TriangleDotPattern(
     redDotPosition: Int,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    BoxWithConstraints(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        // Calculate triangle positions
-        val dotSize = 24.dp
-        val triangleRadius = 60.dp
+        val side = if (maxWidth.value.isFinite() && maxHeight.value.isFinite()) minOf(maxWidth, maxHeight) else 160.dp
+        val k = side.value / 160f
+        val dotSize = (24f * k).dp
+        val triangleRadius = 60f * k
 
         // Position 0: Top
-        val topOffset = Offset(0f, -triangleRadius.value)
+        val topOffset = Offset(0f, -triangleRadius)
         // Position 1: Bottom-left
         val bottomLeftOffset = Offset(
-            -triangleRadius.value * cos(PI/6).toFloat(),
-            triangleRadius.value * sin(PI/6).toFloat()
+            -triangleRadius * cos(PI/6).toFloat(),
+            triangleRadius * sin(PI/6).toFloat()
         )
         // Position 2: Bottom-right
         val bottomRightOffset = Offset(
-            triangleRadius.value * cos(PI/6).toFloat(),
-            triangleRadius.value * sin(PI/6).toFloat()
+            triangleRadius * cos(PI/6).toFloat(),
+            triangleRadius * sin(PI/6).toFloat()
         )
 
         val offsets = listOf(topOffset, bottomLeftOffset, bottomRightOffset)
@@ -529,77 +294,353 @@ private fun TriangleDotCompletionScreen(
     correctCount: Int,
     onContinue: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = stringResource(R.string.game_complete),
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+    Column(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Text(
+                text = stringResource(R.string.game_complete),
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
+            ) {
+                Column(
+                    modifier = Modifier.padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.final_score),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = "$score / $maxScore",
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(
+                        text = "Correct Answers: $correctCount / $totalQuestions",
+                        fontSize = 16.sp,
+                        color = RvInk
+                    )
+
+                    val percentage = (correctCount.toDouble() / totalQuestions.toDouble() * 100).toInt()
+                    Text(
+                        text = "Accuracy: $percentage%",
+                        fontSize = 16.sp,
+                        color = RvInk
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        GroupEPrimaryButton(
+            text = stringResource(R.string.continue_label_caps),
+            onClick = onContinue,
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Shared bodies (also used by AdaptiveTriangleDotMemoryPuzzleScreen)
+// ---------------------------------------------------------------------------------------------
+
+/** Instructions: content may scroll (non-game copy) but the Start button is pinned and always visible. */
+@Composable
+internal fun GroupETriangleInstructionsBody(
+    instructions: TriangleDotInstructions,
+    extra: String?,
+    onStart: () -> Unit
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val short = maxHeight < 460.dp
+        Column(modifier = Modifier.fillMaxSize()) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.final_score),
+                    text = instructions.title,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    textAlign = TextAlign.Center
+                )
+
+                if (!short) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = instructions.description,
+                        fontSize = 16.sp,
+                        color = RvInkSoft,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Example triangle
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = RvSurface)
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            TriangleDotPattern(
+                                redDotPosition = 1, // Bottom-left red
+                                modifier = Modifier.size(96.dp)
+                            )
+                            Column {
+                                Text(
+                                    text = "Example Pattern",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = RvInk
+                                )
+                                Text(
+                                    text = "Red dot at bottom-left",
+                                    fontSize = 14.sp,
+                                    color = RvInk
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Instructions list
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = RvSurface)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        instructions.steps.forEach { step ->
+                            Text(
+                                text = "\u2022 $step",
+                                fontSize = 14.sp,
+                                color = RvInk,
+                                modifier = Modifier.padding(vertical = 2.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        Text(
+                            text = "\uD83D\uDCA1 ${instructions.tip}",
+                            fontSize = 14.sp,
+                            color = RvInk,
+                            fontWeight = FontWeight.Medium
+                        )
+
+                        if (extra != null) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = extra,
+                                fontSize = 14.sp,
+                                color = RvInkSoft,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            GroupEPrimaryButton(
+                text = stringResource(R.string.start_game),
+                onClick = onStart,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+/**
+ * Game body: pattern (dominant, square, sized from the space left), the question, and the YES/NO
+ * buttons pinned at the bottom (side by side with the pattern on wide screens). No scrolling.
+ */
+@Composable
+internal fun GroupETriangleGameBody(
+    currentQuestion: Int,
+    totalQuestions: Int,
+    redDotPosition: Int,
+    showFeedback: Boolean,
+    lastAnswerCorrect: Boolean,
+    extraLabel: String?,
+    onAnswer: (Boolean) -> Unit
+) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val wide = maxWidth > maxHeight
+        val canAnswer = currentQuestion >= 2 && !showFeedback
+
+        val progress: @Composable () -> Unit = {
+            GroupEFontCap {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Text(
+                        text = "$currentQuestion / $totalQuestions",
+                        color = RvInk,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                    LinearProgressIndicator(
+                        progress = (currentQuestion.toFloat() / totalQuestions.coerceAtLeast(1)).coerceIn(0f, 1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = RvSuccess,
+                        trackColor = RvOutline
+                    )
+                    if (extraLabel != null) {
+                        Text(text = extraLabel, color = RvInkSoft, fontSize = 14.sp, maxLines = 1)
+                    }
+                }
+            }
+        }
+
+        val question: @Composable () -> Unit = {
+            GroupEFontCap {
+                Text(
+                    text = "Does this pattern match the\nprevious pattern?",
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E3A8A)
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "$score / $maxScore",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF10B981)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = "Correct Answers: $correctCount / $totalQuestions",
-                    fontSize = 16.sp,
-                    color = Color(0xFF1E3A8A)
-                )
-
-                val percentage = (correctCount.toDouble() / totalQuestions.toDouble() * 100).toInt()
-                Text(
-                    text = "Accuracy: $percentage%",
-                    fontSize = 16.sp,
-                    color = Color(0xFF1E3A8A)
+                    fontWeight = FontWeight.Medium,
+                    color = if (currentQuestion >= 2) RvInk else Color.Transparent,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 24.sp,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onContinue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
-        ) {
-            Text(
-                text = stringResource(R.string.continue_label_caps),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+        val buttons: @Composable (Modifier) -> Unit = { m ->
+            Row(modifier = m, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                GroupEAnswerButton("NO", canAnswer, { onAnswer(false) }, Modifier.weight(1f))
+                GroupEAnswerButton("YES", canAnswer, { onAnswer(true) }, Modifier.weight(1f))
+            }
         }
+
+        val pattern: @Composable (Modifier) -> Unit = { m ->
+            BoxWithConstraints(modifier = m, contentAlignment = Alignment.Center) {
+                val side = minOf(maxWidth, maxHeight).coerceAtMost(360.dp)
+                Box(
+                    modifier = Modifier
+                        .size(side)
+                        .testTag("triangle_pattern")
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(RvSurfaceRaised)
+                        .border(2.dp, RvOutline, RoundedCornerShape(16.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    TriangleDotPattern(
+                        redDotPosition = redDotPosition,
+                        modifier = Modifier.size(side * 0.68f)
+                    )
+                    // Result mark: shape + colour, so correctness is not colour-only.
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showFeedback,
+                        enter = fadeIn() + scaleIn(),
+                        exit = fadeOut() + scaleOut()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size((side * 0.4f).coerceAtMost(120.dp))
+                                .clip(CircleShape)
+                                .background(if (lastAnswerCorrect) RvSuccess else RvError),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (lastAnswerCorrect) "\u2713" else "\u2717",
+                                fontSize = 48.sp,
+                                color = RvInk,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                pattern(Modifier.weight(1f).fillMaxHeight())
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    progress()
+                    question()
+                    buttons(Modifier.fillMaxWidth())
+                }
+            }
+        } else {
+            Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                progress()
+                pattern(Modifier.weight(1f).fillMaxWidth())
+                Spacer(modifier = Modifier.height(8.dp))
+                question()
+                Spacer(modifier = Modifier.height(8.dp))
+                buttons(Modifier.fillMaxWidth())
+            }
+        }
+    }
+}
+
+@Composable
+private fun GroupEAnswerButton(text: String, enabled: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier.height(64.dp),
+        shape = RoundedCornerShape(18.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = RvViolet,
+            contentColor = RvOnTone,
+            disabledContainerColor = RvDisabled,
+            disabledContentColor = RvInkSoft
+        )
+    ) {
+        Text(text, fontSize = 20.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1)
     }
 }
 
