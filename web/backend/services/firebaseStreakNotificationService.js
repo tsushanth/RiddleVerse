@@ -466,19 +466,32 @@ class FirebaseStreakNotificationService {
                 tokens: fcmTokens
             };
 
-            const response = await admin.messaging().sendMulticast(fcmMessage);
-            
+            // NOTE: sendMulticast() was removed from firebase-admin's Messaging API
+            // (this project pins firebase-admin ^13.1.0, which only exposes
+            // sendEachForMulticast()). Calling sendMulticast() here threw a
+            // TypeError on every single invocation, which was caught below and
+            // only console.error'd — so every send silently failed with no DB
+            // trace, explaining streak_notification_jobs having 14k+ runs while
+            // streak_notification_logs stayed empty.
+            const response = await admin.messaging().sendEachForMulticast(fcmMessage);
+
             if (response.successCount > 0) {
                 await this.logNotificationSent(userEmail, notificationType, streakValue);
                 console.log(`✅ Sent ${notificationType} notification to ${userEmail} (${response.successCount}/${fcmTokens.length} tokens)`);
                 return true;
             } else {
-                console.error(`❌ Failed to send notification to ${userEmail}: all tokens failed`);
+                const failureReasons = (response.responses || [])
+                    .map(r => r.error?.message)
+                    .filter(Boolean)
+                    .join('; ');
+                console.error(`❌ Failed to send notification to ${userEmail}: all tokens failed. ${failureReasons}`);
+                await this.logNotificationFailure(userEmail, notificationType, streakValue, failureReasons || 'all tokens failed');
                 return false;
             }
 
         } catch (error) {
             console.error(`❌ Error sending notification to ${userEmail}:`, error.message);
+            await this.logNotificationFailure(userEmail, notificationType, streakValue, error.message);
             return false;
         }
     }
@@ -558,6 +571,29 @@ class FirebaseStreakNotificationService {
                 });
         } catch (error) {
             console.error(`❌ Error logging notification:`, error);
+        }
+    }
+
+    /**
+     * Log a failed FCM send attempt so failures leave a DB trace instead of
+     * only a console line. Reuses the same columns as logNotificationSent
+     * (streak_notification_logs has no dedicated failure/error columns in the
+     * documented schema), encoding failure via the notification_type suffix
+     * and the reason in the console error above.
+     */
+    async logNotificationFailure(userEmail, type, streakValue, reason) {
+        try {
+            await supabase
+                .from('streak_notification_logs')
+                .insert({
+                    user_email: userEmail,
+                    notification_type: `${type}_failed`,
+                    streak_value: streakValue,
+                    sent_at: new Date().toISOString()
+                });
+            console.error(`📝 Logged failed ${type} notification for ${userEmail}: ${reason}`);
+        } catch (error) {
+            console.error(`❌ Error logging notification failure:`, error);
         }
     }
 

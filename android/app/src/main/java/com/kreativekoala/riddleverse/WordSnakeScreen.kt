@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -28,6 +29,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -421,216 +425,106 @@ fun WordSnakeScreen(
         )
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2C3E50)) // Dark blue-grey background
+            .background(RvCanvas)
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize().statusBarsPadding()
-        ) {
-            // Top Bar
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(topBarHeight)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+        val wide = maxWidth > maxHeight
 
-                Text(
-                    text = displayTimer,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (timeRemaining <= 30) Color.Red else Color.White
-                )
-
-                IconButton(
-                    onClick = {
-                        showHintsDialog = true
-                        hintUsed = true
-                    },
-                    modifier = Modifier.size(36.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Help,
-                        contentDescription = "Hints",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-
-            // Progress indicator
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(progressBarHeight)
-                    .padding(horizontal = 16.dp, vertical = 4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.95f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Words: ${foundWords.size}/${words.size}",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2C3E50)
-                        )
-
-                        LinearProgressIndicator(
-                            progress = foundWords.size.toFloat() / words.size.toFloat(),
-                            modifier = Modifier
-                                .width(100.dp)
-                                .height(6.dp),
-                            color = Color(0xFF27AE60),
-                            trackColor = Color.Gray.copy(alpha = 0.3f)
-                        )
-                    }
-
-                    if (totalScore > 0 || currentStreak > 0) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            if (totalScore > 0) {
-                                Text(
-                                    text = "${stringResource(R.string.score_label)}: $totalScore",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF27AE60)
-                                )
-                            }
-
-                            if (currentStreak > 1) {
-                                Text(
-                                    text = "🔥$currentStreak",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFE74C3C)
-                                )
-                            }
-                        }
-                    }
-
-                    // Show current selection word
-                    if (currentSelectionWord.isNotEmpty()) {
-                        Text(
-                            text = "Current: $currentSelectionWord",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF3498DB)
-                        )
-                    }
-                }
-            }
-
-            // Word Snake Grid
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(availableGridHeight)
-                    .padding(horizontal = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                WordSnakeGrid(
-                    grid = grid,
-                    words = words,
-                    gridSize = gridSize,
-                    foundPaths = foundPaths,
-                    selectedCells = selectedCells,
-                    cellSize = optimalCellSize,
-                    onCellTap = { position -> handleCellTap(position) },
-                    haptics = haptics
-                )
-            }
-
-            // Word clues
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.95f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
+        // --- shared pieces -------------------------------------------------------------------
+        val progressRow: @Composable () -> Unit = {
+            GroupEFontCap {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 32.dp)
+                        .testTag("snake_words_progress"),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        text = "Find these snake words:",
-                        fontSize = 18.sp,
+                        text = "Words: ${foundWords.size}/${words.size}",
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2C3E50)
+                        color = RvInk,
+                        maxLines = 1
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        items(words) { word ->
-                            WordSnakeClueItem(
-                                word = word,
-                                isFound = foundWords.contains(word.word),
-                                color = Color(android.graphics.Color.parseColor(word.color))
-                            )
-                        }
+                    LinearProgressIndicator(
+                        progress = if (words.isEmpty()) 0f else foundWords.size.toFloat() / words.size.toFloat(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(6.dp)
+                            .clip(RoundedCornerShape(3.dp)),
+                        color = RvSuccess,
+                        trackColor = RvOutline
+                    )
+                    if (currentSelectionWord.isNotEmpty()) {
+                        Text(
+                            text = currentSelectionWord,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.widthIn(max = 120.dp)
+                        )
                     }
                 }
             }
+        }
 
-            // Control buttons
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(resetButtonHeight)
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
+        val clueList: @Composable (Modifier) -> Unit = { m ->
+            // Fits without scrolling on normal devices; the scroll state is only a last-resort safety net.
+            val cols = if (maxWidth >= 300.dp && words.size > 3) 2 else 1
+            Column(
+                modifier = m
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(RvSurface)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                // Clear selection button
+                words.chunked(cols).forEach { rowWords ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        rowWords.forEach { word ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                WordSnakeClueItem(
+                                    word = word,
+                                    isFound = foundWords.contains(word.word),
+                                    color = Color(android.graphics.Color.parseColor(word.color))
+                                )
+                            }
+                        }
+                        if (rowWords.size < cols) Spacer(Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+
+        val controls: @Composable (Modifier) -> Unit = { m ->
+            Row(
+                modifier = m,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 OutlinedButton(
                     onClick = { clearCurrentSelection() },
                     enabled = selectedCells.isNotEmpty(),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.White,
-                        disabledContentColor = Color.White.copy(alpha = 0.5f)
+                        contentColor = RvVioletEdge,
+                        disabledContentColor = RvInkSoft
                     ),
-                    border = BorderStroke(2.dp, Color.White.copy(alpha = if (selectedCells.isNotEmpty()) 1f else 0.5f)),
+                    border = BorderStroke(2.dp, if (selectedCells.isNotEmpty()) RvViolet else RvDisabled),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .height(36.dp)
+                        .heightIn(min = 48.dp)
+                        .testTag("snake_clear")
                 ) {
-                    Text("CLEAR", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("CLEAR", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
 
-                Spacer(modifier = Modifier.width(8.dp))
-
-                // Reset button
                 OutlinedButton(
                     onClick = {
                         clearWordSnakeGrid(grid)
@@ -648,21 +542,131 @@ fun WordSnakeScreen(
                         recompositionTrigger += 1
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.White
-                    ),
-                    border = BorderStroke(2.dp, Color.White),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = RvInk),
+                    border = BorderStroke(2.dp, RvOutline),
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier
                         .weight(1f)
-                        .height(36.dp)
+                        .heightIn(min = 48.dp)
+                        .testTag("snake_reset")
                 ) {
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = stringResource(R.string.reset),
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("RESET", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("RESET", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                }
+            }
+        }
+
+        // Grid sized from the space it is given: a square, cells derived from it.
+        val gridBox: @Composable (Modifier, Dp) -> Unit = { m, side ->
+            val spacing = 2.dp
+            val cell = ((side - spacing * (gridSize - 1)) / gridSize).coerceIn(16.dp, 56.dp)
+            Box(
+                modifier = m,
+                contentAlignment = Alignment.Center
+            ) {
+                Box(modifier = Modifier.testTag("snake_grid")) {
+                    WordSnakeGrid(
+                        grid = grid,
+                        words = words,
+                        gridSize = gridSize,
+                        foundPaths = foundPaths,
+                        selectedCells = selectedCells,
+                        cellSize = cell,
+                        onCellTap = { position -> handleCellTap(position) },
+                        haptics = haptics
+                    )
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 960.dp)
+                .fillMaxSize()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 8.dp)
+        ) {
+            GroupECompactHud(
+                timer = displayTimer,
+                onBack = onBack,
+                subtitle = "${stringResource(R.string.score_label)} $totalScore" +
+                    (if (currentStreak > 1) " \u2022 \uD83D\uDD25$currentStreak" else ""),
+                urgent = timeRemaining <= 30,
+                actions = {
+                    IconButton(
+                        onClick = {
+                            showHintsDialog = true
+                            hintUsed = true
+                        },
+                        modifier = Modifier
+                            .size(48.dp)
+                            .testTag("snake_hints")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Help,
+                            contentDescription = "Hints",
+                            tint = RvInk
+                        )
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            BoxWithConstraints(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                val bodyW = maxWidth
+                val bodyH = maxHeight
+                val controlsH = 48.dp + 8.dp
+                val progressH = 32.dp + 4.dp
+                val gridMin = 28.dp * gridSize + 2.dp * (gridSize - 1)
+
+                if (wide) {
+                    // Two panes: grid on the left, progress + clues + controls on the right.
+                    val side = minOf(bodyH, bodyW * 0.55f)
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        gridBox(Modifier.size(width = side, height = bodyH), side)
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            progressRow()
+                            clueList(Modifier.weight(1f).fillMaxWidth())
+                            controls(Modifier.fillMaxWidth())
+                        }
+                    }
+                } else {
+                    val rowsNeeded = if (bodyW >= 300.dp && words.size > 3) (words.size + 1) / 2 else words.size
+                    val clueNeed = (44.dp * rowsNeeded + 16.dp).coerceIn(72.dp, 200.dp)
+                    val avail = bodyH - controlsH - progressH - 16.dp
+                    var side = minOf(bodyW, avail - clueNeed)
+                    // Never let the grid drop below tappable cells if the clue list can give way.
+                    side = maxOf(side, minOf(gridMin, bodyW, avail - 72.dp))
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        progressRow()
+                        gridBox(Modifier.fillMaxWidth().height(side), side)
+                        clueList(Modifier.weight(1f).fillMaxWidth())
+                        controls(Modifier.fillMaxWidth())
+                    }
                 }
             }
         }
@@ -751,8 +755,8 @@ fun WordSnakeCell(
             .size(size)
             .background(
                 color = when {
-                    isSelected -> Color(0xFF3498DB).copy(alpha = 0.8f) // Blue for selected
-                    cell.isFound -> Color(0xFF27AE60).copy(alpha = 0.3f) // Green for found
+                    isSelected -> RvSky.copy(alpha = 0.8f) // Blue for selected
+                    cell.isFound -> RvSuccess.copy(alpha = 0.3f) // Green for found
                     else -> Color.White
                 },
                 shape = RoundedCornerShape(6.dp)
@@ -761,11 +765,12 @@ fun WordSnakeCell(
                 width = if (isSelected) 3.dp else 2.dp,
                 color = when {
                     isSelected -> Color(0xFF2980B9) // Darker blue border for selected
-                    cell.isFound -> Color(0xFF27AE60)
+                    cell.isFound -> RvSuccess
                     else -> Color.Gray.copy(alpha = 0.3f)
                 },
                 shape = RoundedCornerShape(6.dp)
             )
+            .testTag("snake_cell")
             .clickable { onTap() },
         contentAlignment = Alignment.Center
     ) {
@@ -773,7 +778,7 @@ fun WordSnakeCell(
         if (isSelected && selectionOrder >= 0) {
             Box(
                 modifier = Modifier
-                    .size((size.value * 0.3).dp)
+                    .size(maxOf(size.value * 0.36f, 14f).dp)
                     .background(
                         Color(0xFF2980B9),
                         shape = RoundedCornerShape(50)
@@ -784,20 +789,24 @@ fun WordSnakeCell(
             ) {
                 Text(
                     text = (selectionOrder + 1).toString(),
-                    fontSize = (size.value * 0.2).sp,
+                    fontSize = maxOf(size.value * 0.24f, 10f).sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
                 )
             }
         }
 
-        Text(
-            text = cell.letter,
-            fontSize = (size.value * 0.5).sp,
-            fontWeight = FontWeight.Bold,
-            color = if (cell.isFound || isSelected) Color.White else Color.Black,
-            textAlign = TextAlign.Center
-        )
+        // Fixed-size cell: the letter does not follow the system font scale (the HUD and clues do).
+        GroupEFontCap(max = 1f) {
+            Text(
+                text = cell.letter,
+                fontSize = (size.value * 0.5f).sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                textAlign = TextAlign.Center,
+                maxLines = 1
+            )
+        }
     }
 }
 
@@ -831,15 +840,17 @@ fun WordSnakeClueItem(
                 text = word.word,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isFound) Color.Gray else Color.Black,
+                color = if (isFound) RvInkSoft else RvInk,
                 textDecoration = if (isFound) TextDecoration.LineThrough else TextDecoration.None
             )
 
             Text(
                 text = word.clue,
                 fontSize = 12.sp,
-                color = if (isFound) Color.Gray.copy(alpha = 0.7f) else Color.Gray,
-                modifier = Modifier.alpha(if (isFound) 0.6f else 1f)
+                color = RvInkSoft,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.alpha(if (isFound) 0.7f else 1f)
             )
         }
 
@@ -847,7 +858,7 @@ fun WordSnakeClueItem(
             Text(
                 text = "✓",
                 fontSize = 18.sp,
-                color = Color(0xFF27AE60),
+                color = RvInk,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -872,7 +883,7 @@ fun WordSnakeCompletionDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2C3E50)),
+            colors = CardDefaults.cardColors(containerColor = RvCanvas),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -883,7 +894,7 @@ fun WordSnakeCompletionDialog(
                     text = "🐍 Snake Complete!",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -893,7 +904,7 @@ fun WordSnakeCompletionDialog(
                     text = "${stringResource(R.string.final_score)}: $finalScore",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = RvInk,
                     textAlign = TextAlign.Center
                 )
 
@@ -901,7 +912,7 @@ fun WordSnakeCompletionDialog(
 
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
+                        containerColor = RvSurface
                     )
                 ) {
                     Column(
@@ -912,7 +923,7 @@ fun WordSnakeCompletionDialog(
                             text = "Performance:",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
@@ -922,18 +933,18 @@ fun WordSnakeCompletionDialog(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$wordsFound/$totalWords", color = Color.White, fontSize = 12.sp)
-                                Text(stringResource(R.string.found), color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                Text("$wordsFound/$totalWords", color = RvInk, fontSize = 12.sp)
+                                Text(stringResource(R.string.found), color = RvInkSoft.copy(0.8f), fontSize = 12.sp)
                             }
 
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("$bestStreak", color = Color.White, fontSize = 12.sp)
-                                Text(stringResource(R.string.best_streak), color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                Text("$bestStreak", color = RvInk, fontSize = 12.sp)
+                                Text(stringResource(R.string.best_streak), color = RvInkSoft.copy(0.8f), fontSize = 12.sp)
                             }
 
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("${String.format("%.1f", avgTimePerWord)}s", color = Color.White, fontSize = 12.sp)
-                                Text("Avg/Word", color = Color.White.copy(0.8f), fontSize = 10.sp)
+                                Text("${String.format("%.1f", avgTimePerWord)}s", color = RvInk, fontSize = 12.sp)
+                                Text("Avg/Word", color = RvInkSoft.copy(0.8f), fontSize = 12.sp)
                             }
                         }
                     }
@@ -945,7 +956,7 @@ fun WordSnakeCompletionDialog(
                 Text(
                     text = "${stringResource(R.string.time_label)}: ${timeUsed/60}:${String.format("%02d", timeUsed%60)}",
                     fontSize = 16.sp,
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = RvInkSoft.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center
                 )
 
@@ -959,7 +970,7 @@ fun WordSnakeCompletionDialog(
                         onClick = onReset,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
+                            contentColor = RvInk
                         ),
                         border = BorderStroke(2.dp, Color.White)
                     ) {
@@ -972,10 +983,10 @@ fun WordSnakeCompletionDialog(
                         onClick = onNext,
                         modifier = Modifier.weight(1f),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.White
+                            containerColor = RvSurfaceRaised
                         )
                     ) {
-                        Text(stringResource(R.string.continue_label), color = Color(0xFF2C3E50))
+                        Text(stringResource(R.string.continue_label), color = RvInk)
                     }
                 }
             }
@@ -999,7 +1010,7 @@ fun WordSnakeHintsDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
@@ -1009,7 +1020,7 @@ fun WordSnakeHintsDialog(
                     text = "Word Snake Hints",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = RvInk,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
@@ -1032,7 +1043,7 @@ fun WordSnakeHintsDialog(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2C3E50)
+                        containerColor = RvCanvas
                     )
                 ) {
                     Text(stringResource(R.string.close))
@@ -1090,7 +1101,7 @@ fun DrawScope.drawSelectionPath(
     if (path.size < 2) return
 
     val strokeWidth = 6.dp.toPx()
-    val color = Color(0xFF3498DB).copy(alpha = 0.8f)
+    val color = RvSky.copy(alpha = 0.8f)
 
     val positions = path.map { pos ->
         Offset(

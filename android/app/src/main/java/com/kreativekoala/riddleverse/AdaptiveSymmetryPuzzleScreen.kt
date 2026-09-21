@@ -1,6 +1,7 @@
 // AdaptiveSymmetryPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -21,6 +22,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
@@ -142,7 +145,7 @@ fun AdaptiveSymmetryPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -224,83 +227,64 @@ fun AdaptiveSymmetryPuzzleScreen(
         }
     }
 
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(RvSurface)
     ) {
-        // ✅ REPLACE: Use unified header instead of AdaptiveSymmetryTopBar
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = formatTime(timeRemaining),
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = totalScore,
-            puzzleType = "symmetry",
-            competitiveInsight = competitiveInsight,
-            onBack = onBack,
-            challengeNumber = totalAnswers + 1,
-            totalChallenges = 10, // Or whatever makes sense for symmetry puzzles
-            onPause = {
-                isTimerRunning = !isTimerRunning
-                Log.d(TAG, "Timer paused/resumed")
-            },
-            onHint = {
-                // Show hint functionality - could highlight required cells count
-                Log.d(TAG, "Hint: You need to select $requiredCells cells total")
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ REPLACE: Use unified adaptation notification
-        UnifiedAdaptationNotification(
-            adaptationInfo = adaptationInfo,
-            puzzleType = "symmetry",
-            visible = showAdaptationNotification,
-            onDismiss = { showAdaptationNotification = false }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Title with mirror indicator and difficulty info
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+        // The shared unified header is ~150dp tall; below this height use the compact HUD row.
+        val compact = maxHeight < 720.dp
+        Column(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .widthIn(max = 720.dp)
+                .fillMaxSize()
+                .padding(horizontal = 16.dp, vertical = if (compact) 8.dp else 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Symmetry",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E2E2E)
-            )
-
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Mirror indicator
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = if (puzzleData.isMirror) Color(0xFFE3F2FD) else Color(0xFFF3E5F5)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(
-                    text = if (puzzleData.isMirror) "🪞 MIRROR" else "📋 COPY",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (puzzleData.isMirror) Color(0xFF1976D2) else Color(0xFF7B1FA2),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            if (compact) {
+                GameCompactHud(
+                    timer = formatTime(timeRemaining),
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    onBack = onBack
+                )
+            } else {
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = formatTime(timeRemaining),
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "symmetry",
+                    competitiveInsight = competitiveInsight,
+                    onBack = onBack,
+                    challengeNumber = totalAnswers + 1,
+                    totalChallenges = 10, // Or whatever makes sense for symmetry puzzles
+                    onPause = {
+                        isTimerRunning = !isTimerRunning
+                        Log.d(TAG, "Timer paused/resumed")
+                    },
+                    onHint = {
+                        // Show hint functionality - could highlight required cells count
+                        Log.d(TAG, "Hint: You need to select $requiredCells cells total")
+                    }
                 )
             }
-        }
 
-        // Dynamic instruction and difficulty description
-        Text(
-            text = if (puzzleData.isMirror) {
+            // Adaptation banners are intentionally off (SHOW_ADAPTATION_NOTICES=false); keep the hook.
+            UnifiedAdaptationNotification(
+                adaptationInfo = adaptationInfo,
+                puzzleType = "symmetry",
+                visible = showAdaptationNotification,
+                onDismiss = { showAdaptationNotification = false }
+            )
+
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+
+            val instruction = if (puzzleData.isMirror) {
                 when (puzzleData.mirrorType) {
                     "horizontal" -> "Create a horizontal mirror reflection ↔️"
                     "vertical" -> "Create a vertical mirror reflection ↕️"
@@ -308,205 +292,163 @@ fun AdaptiveSymmetryPuzzleScreen(
                 }
             } else {
                 "Copy the exact pattern as fast as possible!"
-            },
-            fontSize = 14.sp,
-            color = Color(0xFF666666),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 4.dp)
-        )
-
-        Text(
-            text = currentDifficultyLevel.description,
-            fontSize = 12.sp,
-            color = Color(0xFF2196F3),
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp, vertical = 2.dp)
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Enhanced progress with adaptive metrics
-        if (totalScore > 0 || gamesPlayedThisSession > 0) {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.9f)
-                ),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+            }
+            val chipBg = if (puzzleData.isMirror) Color(0xFFE3F2FD) else Color(0xFFF3E5F5)
+            val chipFg = if (puzzleData.isMirror) Color(0xFF1565C0) else Color(0xFF7B1FA2)
+            val chip: @Composable () -> Unit = {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = chipBg),
+                    shape = RoundedCornerShape(8.dp)
                 ) {
-                    if (totalScore > 0) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.score_label).uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "$totalScore",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF2196F3)
-                            )
-                        }
-                    }
-
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = currentDifficultyLevel.name.uppercase(),
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2196F3)
-                        )
-                        Text(
-                            text = "${puzzleData.gridSize}x${puzzleData.gridSize}",
-                            fontSize = 12.sp,
-                            color = Color(0xFF666666)
-                        )
-                    }
-
-                    // Cell counter for user feedback
-                    val selectedCells = userRightPattern.sumOf { row -> row.count { it } }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = "CELLS",
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Gray
-                        )
-                        Text(
-                            text = "$selectedCells / $requiredCells",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = if (selectedCells == requiredCells) Color(0xFF4CAF50) else Color(0xFF666666)
-                        )
-                    }
-
-                    if (currentStreak > 0) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = stringResource(R.string.streak_label).uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Gray
-                            )
-                            Text(
-                                text = "🔥 $currentStreak",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF6F00)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Grid section
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Left grid (pattern to copy/mirror)
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = if (puzzleData.isMirror) "Mirror this:" else "Copy this:",
-                    fontSize = 12.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-
-                AdaptiveSymmetryGrid(
-                    pattern = puzzleData.leftPattern,
-                    isInteractive = false,
-                    difficulty = currentDifficultyLevel,
-                    onCellClick = { _, _ -> }
-                )
-            }
-
-            // Divider with mirror indicator
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (puzzleData.isMirror) {
                     Text(
-                        text = when (puzzleData.mirrorType) {
-                            "horizontal" -> "↔️"
-                            "vertical" -> "↕️"
-                            else -> "="
-                        },
-                        fontSize = 20.sp,
-                        color = Color(0xFF2196F3),
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        text = if (puzzleData.isMirror) "🪞 MIRROR" else "📋 COPY",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = chipFg,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                 }
+            }
 
-                Box(
-                    modifier = Modifier
-                        .width(2.dp)
-                        .height(if (puzzleData.isMirror) 100.dp else 120.dp)
-                        .background(
-                            if (puzzleData.isMirror) Color(0xFF2196F3) else Color(0xFFE0E0E0)
-                        )
+            if (compact) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    chip()
+                    Text(
+                        text = instruction,
+                        fontSize = 14.sp,
+                        color = RvInkSoft,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Symmetry",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    chip()
+                }
+                Text(
+                    text = instruction,
+                    fontSize = 14.sp,
+                    color = RvInkSoft,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                )
+                Text(
+                    text = currentDifficultyLevel.description,
+                    fontSize = 12.sp,
+                    color = RvVioletEdge,
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 2.dp)
                 )
             }
 
-            // Right grid (user input)
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "To here:",
-                    fontSize = 12.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-                AdaptiveSymmetryGrid(
-                    pattern = userRightPattern,
-                    isInteractive = !showFeedback,
-                    difficulty = currentDifficultyLevel,
-                    onCellClick = { row, col ->
-                        if (!showFeedback) {
-                            userRightPattern = userRightPattern.mapIndexed { r, rowList ->
-                                if (r == row) {
-                                    rowList.mapIndexed { c, value ->
-                                        if (c == col) !value else value
-                                    }.toMutableList()
-                                } else {
-                                    rowList.toMutableList()
+            // Cell counter (the only live progress the player needs while playing)
+            val selectedCells = userRightPattern.sumOf { row -> row.count { it } }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "${puzzleData.gridSize}x${puzzleData.gridSize}",
+                    fontSize = 14.sp,
+                    color = RvInkSoft,
+                    maxLines = 1
+                )
+                if (currentStreak > 0 && !compact) {
+                    Text(
+                        text = "🔥 $currentStreak",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvFlame,
+                        maxLines = 1
+                    )
+                }
+                Text(
+                    text = if (selectedCells == requiredCells) "$selectedCells / $requiredCells ✓" else "$selectedCells / $requiredCells",
+                    fontSize = 14.sp,
+                    fontWeight = if (selectedCells == requiredCells) FontWeight.Bold else FontWeight.Medium,
+                    color = if (selectedCells == requiredCells) GameSuccessText else RvInkSoft,
+                    maxLines = 1
+                )
+            }
+
+            // Play area takes all remaining space; cell size is derived from it.
+            SymmetryBoardsArea(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                gridSize = puzzleData.gridSize,
+                isMirror = puzzleData.isMirror,
+                mirrorType = puzzleData.mirrorType,
+                leftLabel = if (puzzleData.isMirror) "Mirror this:" else "Copy this:",
+                rightLabel = "To here:",
+                left = { cell ->
+                    AdaptiveSymmetryGrid(
+                        pattern = puzzleData.leftPattern,
+                        isInteractive = false,
+                        difficulty = currentDifficultyLevel,
+                        onCellClick = { _, _ -> },
+                        cellSize = cell
+                    )
+                },
+                right = { cell ->
+                    AdaptiveSymmetryGrid(
+                        pattern = userRightPattern,
+                        isInteractive = !showFeedback,
+                        difficulty = currentDifficultyLevel,
+                        onCellClick = { row, col ->
+                            if (!showFeedback) {
+                                userRightPattern = userRightPattern.mapIndexed { r, rowList ->
+                                    if (r == row) {
+                                        rowList.mapIndexed { c, value ->
+                                            if (c == col) !value else value
+                                        }.toMutableList()
+                                    } else {
+                                        rowList.toMutableList()
+                                    }
                                 }
                             }
-                        }
-                    }
+                        },
+                        cellSize = cell
+                    )
+                }
+            )
+
+            // Feedback section
+            if (showFeedback) {
+                AdaptiveSymmetrySpeedFeedback(
+                    isCorrect = isCorrect,
+                    message = feedbackMessage,
+                    score = score,
+                    difficultyLevel = currentDifficultyLevel
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Feedback section
-        if (showFeedback) {
-            AdaptiveSymmetrySpeedFeedback(
-                isCorrect = isCorrect,
-                message = feedbackMessage,
-                score = score,
-                difficultyLevel = currentDifficultyLevel
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
     }
 
     // ✅ NEW: Session completion handling outside of LaunchedEffect
@@ -558,13 +500,13 @@ fun AdaptiveSymmetryTopBar(
         ) {
             Button(
                 onClick = onBack,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(48.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent
                 ),
                 contentPadding = PaddingValues(0.dp)
             ) {
-                Text("⏸", fontSize = 20.sp, color = Color(0xFF2E2E2E))
+                Text("⏸", fontSize = 20.sp, color = RvInk)
             }
 
             Column {
@@ -572,14 +514,14 @@ fun AdaptiveSymmetryTopBar(
                     text = "Level ${level.level}",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFF666666)
+                    color = RvInkSoft
                 )
 
                 Text(
                     text = currentDifficulty.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2196F3)
+                    color = RvSky
                 )
             }
         }
@@ -589,7 +531,7 @@ fun AdaptiveSymmetryTopBar(
             text = timer,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Color(0xFF2196F3)
+            color = RvSky
         )
 
         // Hearts with adaptive count
@@ -609,12 +551,13 @@ fun AdaptiveSymmetryGrid(
     pattern: List<List<Boolean>>,
     isInteractive: Boolean,
     difficulty: DifficultyManager.DifficultyLevel,
-    onCellClick: (Int, Int) -> Unit
+    onCellClick: (Int, Int) -> Unit,
+    cellSize: Dp? = null
 ) {
     val gridSize = pattern.size
 
-    // Adaptive cell size based on difficulty and grid size
-    val cellSize = when {
+    // Adaptive cell size based on difficulty and grid size (or the size measured by the caller)
+    val cellSize = cellSize ?: when {
         gridSize <= 3 -> 35.dp
         gridSize == 4 -> 28.dp
         gridSize == 5 -> 22.dp
@@ -625,8 +568,8 @@ fun AdaptiveSymmetryGrid(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .border(2.dp, Color(0xFFE0E0E0), RoundedCornerShape(8.dp))
-            .background(Color.White)
+            .border(2.dp, RvOutline, RoundedCornerShape(8.dp))
+            .background(RvSurfaceRaised)
             .padding(8.dp)
     ) {
         pattern.forEachIndexed { rowIndex, row ->
@@ -638,11 +581,11 @@ fun AdaptiveSymmetryGrid(
                             .padding(1.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(
-                                if (isSelected) Color(0xFF424242) else Color(0xFFF5F5F5)
+                                if (isSelected) Color(0xFF424242) else RvSurface
                             )
                             .border(
                                 1.dp,
-                                Color(0xFFE0E0E0),
+                                RvOutline,
                                 RoundedCornerShape(4.dp)
                             )
                             .clickable(enabled = isInteractive) {
@@ -679,7 +622,7 @@ fun AdaptiveSymmetrySpeedFeedback(
                 text = message,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isCorrect) Color(0xFF2E7D32) else Color(0xFFE65100),
+                color = if (isCorrect) RvSuccess else RvFlame,
                 textAlign = TextAlign.Center
             )
 
@@ -689,13 +632,13 @@ fun AdaptiveSymmetrySpeedFeedback(
                     text = "+$score pts",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2E7D32)
+                    color = RvSuccess
                 )
 
                 Text(
                     text = "Difficulty: ${difficultyLevel.name} • Speed Bonus! ⚡",
                     fontSize = 12.sp,
-                    color = Color(0xFF2E7D32),
+                    color = RvSuccess,
                     fontWeight = FontWeight.Medium
                 )
             }

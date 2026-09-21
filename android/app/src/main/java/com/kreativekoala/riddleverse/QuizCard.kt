@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
 
 @Composable
 fun QuizCard(title: String, subtitle: String, onClick: () -> Unit) {
@@ -40,8 +41,8 @@ fun QuizCard(title: String, subtitle: String, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-            Text(subtitle, fontSize = 12.sp, color = Color.White.copy(alpha = 0.8f))
+            Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvOnTone)
+            Text(subtitle, fontSize = 12.sp, color = RvOnTone.copy(alpha = 0.8f))
 
             Spacer(modifier = Modifier.height(10.dp))
 

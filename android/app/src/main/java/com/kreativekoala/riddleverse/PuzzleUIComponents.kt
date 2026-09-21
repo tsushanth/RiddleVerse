@@ -1,5 +1,16 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
+import com.kreativekoala.riddleverse.ui.theme.RvFlame
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSun
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -50,14 +61,14 @@ fun LevelProgressBar(
                     text = "${stringResource(R.string.level_label)} ${level.level}",
                     fontSize = if (compact) 12.sp else 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 if (!compact) {
                     Text(
                         text = "${level.currentXP}/${level.xpToNextLevel} XP",
                         fontSize = 10.sp,
-                        color = Color.White.copy(alpha = 0.8f)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -71,15 +82,15 @@ fun LevelProgressBar(
                 .fillMaxWidth()
                 .height(if (compact) 4.dp else 6.dp)
                 .clip(RoundedCornerShape(if (compact) 2.dp else 3.dp)),
-            color = Color(0xFFFFD700),
-            trackColor = Color.White.copy(alpha = 0.3f)
+            color = RvSun,
+            trackColor = RvOutline
         )
 
         if (compact && showLabel) {
             Text(
                 text = "${level.currentXP}/${level.xpToNextLevel}",
                 fontSize = 8.sp,
-                color = Color.White.copy(alpha = 0.7f)
+                color = RvInkSoft
             )
         }
     }
@@ -117,13 +128,13 @@ fun StreakDisplay(
                         text = streakInfo.currentStreak.toString(),
                         fontSize = if (compact) 12.sp else 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6F00)
+                        color = RvFlame
                     )
                     if (streakInfo.hasStreakBonus && !compact) {
                         Text(
                             text = "×${streakInfo.streakMultiplier}",
                             fontSize = 10.sp,
-                            color = Color(0xFFFF9800),
+                            color = RvSun,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -144,7 +155,7 @@ fun StreakDisplay(
                         text = "${streakInfo.dailyStreak}d",
                         fontSize = if (compact) 12.sp else 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF5722)
+                        color = RvCoralEdge
                     )
                 }
             }
@@ -174,7 +185,7 @@ fun EnhancedStreakDisplay(
                 emoji = "⚡",
                 value = streakInfo.currentQuestionStreak.toString(),
                 label = if (showBonusInfo) "×${streakInfo.questionStreakMultiplier}" else null,
-                color = Color(0xFFFF6F00)
+                color = RvFlame
             )
         }
 
@@ -184,7 +195,7 @@ fun EnhancedStreakDisplay(
                 emoji = "🔥",
                 value = "${streakInfo.currentDailyStreak}d",
                 label = if (showBonusInfo && streakInfo.dailyStreakBonus > 1.0f) "×${streakInfo.dailyStreakBonus}" else null,
-                color = Color(0xFFFF5722)
+                color = RvCoralEdge
             )
         }
     }
@@ -264,7 +275,7 @@ fun PuzzleHeader(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = Color.White
+                            tint = RvInk
                         )
                     }
                 }
@@ -274,7 +285,7 @@ fun PuzzleHeader(
                         text = title,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                 }
             }
@@ -295,7 +306,7 @@ fun PuzzleHeader(
                         text = "$currentScore pts",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFFD700)
+                        color = RvSunEdge
                     )
                 }
 
@@ -324,10 +335,10 @@ fun PuzzleProgressCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Row(
             modifier = Modifier
@@ -340,21 +351,21 @@ fun PuzzleProgressCard(
                 label = stringResource(R.string.progress),
                 value = "$questionsAnswered/$totalQuestions",
                 icon = "📊",
-                color = Color(0xFF2196F3)
+                color = RvSky
             )
 
             ProgressItem(
                 label = stringResource(R.string.correct_answers),
                 value = correctAnswers.toString(),
                 icon = "✅",
-                color = Color(0xFF4CAF50)
+                color = RvSuccess
             )
 
             ProgressItem(
                 label = stringResource(R.string.score_label),
                 value = currentScore.toString(),
                 icon = "⭐",
-                color = Color(0xFFFF9800)
+                color = RvSun
             )
 
             val accuracy = if (questionsAnswered > 0) {
@@ -365,7 +376,7 @@ fun PuzzleProgressCard(
                 label = stringResource(R.string.accuracy),
                 value = "$accuracy%",
                 icon = "🎯",
-                color = Color(0xFF9C27B0)
+                color = RvGrape
             )
         }
     }
@@ -391,7 +402,7 @@ private fun ProgressItem(
         Text(
             text = label,
             fontSize = 10.sp,
-            color = Color.Gray
+            color = RvInkSoft
         )
     }
 }

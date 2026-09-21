@@ -1,11 +1,14 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -890,7 +893,7 @@ fun AdaptiveMathComparisonPuzzleScreen(
             if (config.confidenceScore > 0.5f && !showResult) {
                 Log.d(TAG, "🎯 Adapting difficulty from ${currentDifficultyLevel.name} to ${config.level.name}")
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -1005,28 +1008,38 @@ fun AdaptiveMathComparisonPuzzleScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF4CAF50), // Green top
-                            Color(0xFF2E7D32)  // Darker green bottom
-                        )
-                    )
-                )
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Spacer(modifier = Modifier.height(32.dp))
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RvCanvas)
+    ) {
+        // Fit-to-screen: HUD (fixed) / question + values (remaining space) / EQUAL pinned at the bottom.
+        val compact = maxHeight < 600.dp
+        val landscape = maxWidth > maxHeight
+        val gutter = if (compact) 12.dp else 16.dp
 
-                // ✅ REPLACE: Use unified header instead of AdaptiveMathComparisonTopBar
+        Column(
+            modifier = Modifier
+                .widthIn(max = if (landscape) 880.dp else 640.dp)
+                .fillMaxSize()
+                .align(Alignment.TopCenter)
+                .padding(horizontal = gutter, vertical = if (compact) 4.dp else 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // The shared unified header needs ~150dp+ (much more at large fonts), so short viewports
+            // get a one/two-row compact HUD with the same essentials (timer, lives, score, level).
+            if (compact) {
+                BCompactHud(
+                    level = currentUserLevel,
+                    difficultyName = currentDifficultyLevel.name,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    streak = streakInfo.currentStreak,
+                    onBack = onBack
+                )
+            } else {
                 AdaptiveUnifiedHeader(
                     level = currentUserLevel,
                     streakInfo = streakInfo,
@@ -1044,95 +1057,98 @@ fun AdaptiveMathComparisonPuzzleScreen(
                         haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     }
                 )
+            }
 
-                // ✅ REPLACE: Use unified adaptation notification
-                UnifiedAdaptationNotification(
-                    adaptationInfo = adaptationInfo,
-                    puzzleType = "mathComparison",
-                    visible = showAdaptationNotification,
-                    onDismiss = { showAdaptationNotification = false }
+            UnifiedAdaptationNotification(
+                adaptationInfo = adaptationInfo,
+                puzzleType = "mathComparison",
+                visible = showAdaptationNotification,
+                onDismiss = { showAdaptationNotification = false }
+            )
+
+            // Progress row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = if (compact) 4.dp else 8.dp, bottom = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Question ${currentPairIndex + 1} of ${sequencePairs.size}",
+                    color = RvInkSoft,
+                    fontSize = 14.sp,
+                    maxLines = 1
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                // Lives indicator
-                Row(
-                    modifier = Modifier.padding(bottom = 24.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    repeat(hearts) { index ->
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = null,
-                            tint = if (index < currentHearts) Color(0xFFFF69B4) else Color.Gray,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                }
-
-                // Progress indicator
-                Column(
-                    modifier = Modifier.padding(bottom = 32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        "Question ${currentPairIndex + 1} of ${sequencePairs.size}",
-                        color = Color.White.copy(alpha = 0.8f),
-                        fontSize = 14.sp
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Progress bar
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .background(
-                                Color.Black.copy(alpha = 0.3f),
-                                RoundedCornerShape(2.dp)
+                if (compact) {
+                    // lives are part of the compact HUD already
+                } else {
+                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        repeat(hearts) { index ->
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = null,
+                                tint = if (index < currentHearts) Color(0xFFC2185B) else RvInkSoft,
+                                modifier = Modifier.size(20.dp)
                             )
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(
-                                    fraction = (currentPairIndex + 1).toFloat() / sequencePairs.size.toFloat()
-                                )
-                                .background(
-                                    Color.Green,
-                                    RoundedCornerShape(2.dp)
-                                )
-                                .animateContentSize()
-                        )
+                        }
                     }
                 }
+            }
 
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .background(RvInk.copy(alpha = 0.2f), RoundedCornerShape(2.dp))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .fillMaxWidth(
+                            fraction = ((currentPairIndex + 1).toFloat() / sequencePairs.size.toFloat().coerceAtLeast(1f)).coerceIn(0f, 1f)
+                        )
+                        .background(RvSuccessEdge, RoundedCornerShape(2.dp))
+                        .animateContentSize()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+
+            // Play area. The scroll is an invisible last-resort safety net (extreme font scale on tiny
+            // screens); the answer action below is pinned outside it and never depends on leftover space.
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 16.dp, Alignment.CenterVertically)
+            ) {
                 // Question text with adaptive difficulty indicator
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         "Which value is greater?",
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Medium
+                        color = RvInk,
+                        fontSize = if (compact) 20.sp else 24.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
                     )
 
-                    if (currentPair != null) {
+                    if (currentPair != null && !compact) {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 "Difficulty: ${String.format("%.1f", currentPair.difficulty)}/5",
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = RvInkSoft,
                                 fontSize = 12.sp
                             )
                             Text(
                                 "Load: ${currentPair.cognitiveLoad}/10",
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = RvInkSoft,
                                 fontSize = 12.sp
                             )
                         }
@@ -1140,71 +1156,68 @@ fun AdaptiveMathComparisonPuzzleScreen(
                 }
 
                 if (currentPair != null) {
-                    // Clickable Value boxes
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.padding(bottom = 32.dp)
-                    ) {
-                        // First value (clickable)
-                        AnimatedContent(
-                            targetState = currentPair.leftValue,
-                            transitionSpec = {
-                                slideInHorizontally { it } + fadeIn() with
-                                        slideOutHorizontally { -it } + fadeOut()
+                    val leftCard: @Composable (Modifier) -> Unit = { m ->
+                        Box(modifier = m) {
+                            AnimatedContent(
+                                targetState = currentPair.leftValue,
+                                transitionSpec = {
+                                    slideInHorizontally { it } + fadeIn() with
+                                            slideOutHorizontally { -it } + fadeOut()
+                                }
+                            ) { leftValue ->
+                                AdaptiveClickableValueCard(
+                                    value = leftValue,
+                                    isSelected = selectedAnswer == "left",
+                                    isCorrect = if (showResult) currentPair.correctAnswer == "left" else null,
+                                    isWrong = if (showResult && selectedAnswer == "left") currentPair.correctAnswer != "left" else false,
+                                    enabled = !showResult,
+                                    adaptiveConfig = adaptiveConfig,
+                                    onClick = { handleAnswer("left") }
+                                )
                             }
-                        ) { leftValue ->
-                            AdaptiveClickableValueCard(
-                                value = leftValue,
-                                isSelected = selectedAnswer == "left",
-                                isCorrect = if (showResult) currentPair.correctAnswer == "left" else null,
-                                isWrong = if (showResult && selectedAnswer == "left") currentPair.correctAnswer != "left" else false,
-                                enabled = !showResult,
-                                adaptiveConfig = adaptiveConfig,
-                                onClick = { handleAnswer("left") }
-                            )
                         }
-
-                        // Second value (clickable)
-                        AnimatedContent(
-                            targetState = currentPair.rightValue,
-                            transitionSpec = {
-                                slideInHorizontally { it } + fadeIn() with
-                                        slideOutHorizontally { -it } + fadeOut()
+                    }
+                    val rightCard: @Composable (Modifier) -> Unit = { m ->
+                        Box(modifier = m) {
+                            AnimatedContent(
+                                targetState = currentPair.rightValue,
+                                transitionSpec = {
+                                    slideInHorizontally { it } + fadeIn() with
+                                            slideOutHorizontally { -it } + fadeOut()
+                                }
+                            ) { rightValue ->
+                                AdaptiveClickableValueCard(
+                                    value = rightValue,
+                                    isSelected = selectedAnswer == "right",
+                                    isCorrect = if (showResult) currentPair.correctAnswer == "right" else null,
+                                    isWrong = if (showResult && selectedAnswer == "right") currentPair.correctAnswer != "right" else false,
+                                    enabled = !showResult,
+                                    adaptiveConfig = adaptiveConfig,
+                                    onClick = { handleAnswer("right") }
+                                )
                             }
-                        ) { rightValue ->
-                            AdaptiveClickableValueCard(
-                                value = rightValue,
-                                isSelected = selectedAnswer == "right",
-                                isCorrect = if (showResult) currentPair.correctAnswer == "right" else null,
-                                isWrong = if (showResult && selectedAnswer == "right") currentPair.correctAnswer != "right" else false,
-                                enabled = !showResult,
-                                adaptiveConfig = adaptiveConfig,
-                                onClick = { handleAnswer("right") }
-                            )
+                        }
+                    }
+                    if (landscape) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            leftCard(Modifier.weight(1f))
+                            rightCard(Modifier.weight(1f))
+                        }
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(if (compact) 8.dp else 16.dp)
+                        ) {
+                            leftCard(Modifier.fillMaxWidth())
+                            rightCard(Modifier.fillMaxWidth())
                         }
                     }
 
-                    // Equal button
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        AdaptiveAnswerButton(
-                            text = "EQUAL",
-                            isSelected = selectedAnswer == "equal",
-                            isCorrect = if (showResult) currentPair.correctAnswer == "equal" else null,
-                            isWrong = if (showResult && selectedAnswer == "equal") currentPair.correctAnswer != "equal" else false,
-                            enabled = !showResult,
-                            onClick = { handleAnswer("equal") },
-                            adaptiveConfig = adaptiveConfig,
-                            isEqual = true
-                        )
-                    }
-
-                    // Result feedback
+                    // Result feedback (kept inside the play area so the action never moves)
                     if (showResult) {
-                        Spacer(modifier = Modifier.height(16.dp))
-
                         val isCorrect = selectedAnswer == currentPair.correctAnswer
 
                         AnimatedVisibility(
@@ -1214,34 +1227,32 @@ fun AdaptiveMathComparisonPuzzleScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .background(
-                                        if (isCorrect) Color.Green.copy(alpha = 0.2f)
-                                        else Color.Red.copy(alpha = 0.2f),
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(16.dp),
+                                    .background(RvInk, RoundedCornerShape(8.dp))
+                                    .padding(if (compact) 8.dp else 12.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         if (isCorrect) "✅ Correct!" else "❌ Wrong answer. Lives: $currentHearts",
-                                        color = Color.White,
+                                        color = RvOnTone,
                                         fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium
+                                        fontWeight = FontWeight.Medium,
+                                        textAlign = TextAlign.Center
                                     )
 
                                     if (isCorrect && reactionTimes.isNotEmpty()) {
                                         val reactionTime = reactionTimes.last() / 1000.0
                                         Text(
                                             "⚡ ${String.format("%.1f", reactionTime)}s",
-                                            color = Color.White.copy(alpha = 0.8f),
+                                            color = RvOnTone,
                                             fontSize = 14.sp
                                         )
                                     } else if (!isCorrect) {
                                         Text(
                                             "${currentPair.leftValue} = ${String.format("%.1f", currentPair.leftNumeric)}, ${currentPair.rightValue} = ${String.format("%.1f", currentPair.rightNumeric)}",
-                                            color = Color.White.copy(alpha = 0.8f),
+                                            color = RvOnTone,
                                             fontSize = 14.sp,
+                                            textAlign = TextAlign.Center,
                                             modifier = Modifier.padding(top = 4.dp)
                                         )
                                     }
@@ -1250,6 +1261,22 @@ fun AdaptiveMathComparisonPuzzleScreen(
                         }
                     }
                 }
+            }
+
+            // Pinned primary action
+            if (currentPair != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                AdaptiveAnswerButton(
+                    text = "EQUAL",
+                    isSelected = selectedAnswer == "equal",
+                    isCorrect = if (showResult) currentPair.correctAnswer == "equal" else null,
+                    isWrong = if (showResult && selectedAnswer == "equal") currentPair.correctAnswer != "equal" else false,
+                    enabled = !showResult,
+                    onClick = { handleAnswer("equal") },
+                    adaptiveConfig = adaptiveConfig,
+                    isEqual = true
+                )
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
             }
         }
 
@@ -1311,7 +1338,7 @@ private fun AdaptiveMathComparisonTopBar(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -1321,7 +1348,7 @@ private fun AdaptiveMathComparisonTopBar(
                         text = "Level ${level.level}",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     LevelProgressBar(
@@ -1342,13 +1369,13 @@ private fun AdaptiveMathComparisonTopBar(
                     text = timer,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
+                    color = if (isUrgent) RvError else RvInk
                 )
 
                 Text(
                     text = adaptiveConfig.name,
                     fontSize = 12.sp,
-                    color = Color(0xFF4FC3F7)
+                    color = RvSky
                 )
 
                 if (streakInfo.currentStreak > 0) {
@@ -1368,7 +1395,7 @@ private fun AdaptiveMathComparisonTopBar(
                         text = "🔥 $streak",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF6B00)
+                        color = RvFlame
                     )
                 }
 
@@ -1403,14 +1430,14 @@ private fun AdaptiveMathComparisonTopBar(
 
                 Text(
                     text = "🧮 ${adaptiveConfig.name} Math",
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft.copy(alpha = 0.8f),
                     fontSize = 12.sp
                 )
 
                 if (totalAttempts > 0) {
                     Text(
                         text = "$correctAnswers/$totalAttempts",
-                        color = Color.White.copy(alpha = 0.8f),
+                        color = RvInkSoft.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
                 }
@@ -1429,7 +1456,7 @@ private fun AdaptiveMathNotificationCard(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
+            containerColor = RvSky.copy(alpha = 0.9f)
         )
     ) {
         Row(
@@ -1441,7 +1468,7 @@ private fun AdaptiveMathNotificationCard(
             Icon(
                 Icons.Default.Functions,
                 contentDescription = "Math adapted",
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -1450,12 +1477,12 @@ private fun AdaptiveMathNotificationCard(
                     text = "Math Challenge Adapted!",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
                 Text(
                     text = adaptationInfo?.adjustmentReason ?: "",
                     fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = RvInkSoft.copy(alpha = 0.9f)
                 )
             }
             IconButton(
@@ -1465,7 +1492,7 @@ private fun AdaptiveMathNotificationCard(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -1484,17 +1511,17 @@ fun AdaptiveClickableValueCard(
     onClick: () -> Unit
 ) {
     val backgroundColor = when {
-        isCorrect == true -> Color.Green.copy(alpha = 0.3f)
-        isWrong -> Color.Red.copy(alpha = 0.3f)
-        isSelected -> Color.Blue.copy(alpha = 0.3f)
-        else -> Color.Black.copy(alpha = 0.4f)
+        isCorrect == true -> RvSuccess.copy(alpha = 0.3f)
+        isWrong -> RvError.copy(alpha = 0.3f)
+        isSelected -> RvViolet.copy(alpha = 0.2f)
+        else -> RvSurface
     }
 
     val borderColor = when {
-        isCorrect == true -> Color.Green
-        isWrong -> Color.Red
-        isSelected -> Color.Blue
-        else -> Color.Black.copy(alpha = 0.4f)
+        isCorrect == true -> RvSuccessEdge
+        isWrong -> RvErrorEdge
+        isSelected -> RvViolet
+        else -> RvInkSoft
     }
 
     val animatedBackgroundColor by animateColorAsState(
@@ -1515,7 +1542,8 @@ fun AdaptiveClickableValueCard(
             .background(animatedBackgroundColor, RoundedCornerShape(12.dp))
             .border(2.dp, animatedBorderColor, RoundedCornerShape(12.dp))
             .clickable(enabled = enabled) { onClick() }
-            .padding(24.dp),
+            .heightIn(min = 72.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -1524,19 +1552,20 @@ fun AdaptiveClickableValueCard(
         ) {
             Text(
                 text = value,
-                color = Color(0xFF2196F3),
-                fontSize = if (adaptiveConfig.numericalComplexity >= 4) 28.sp else 32.sp,
+                color = RvInk,
+                fontSize = adaptCapSp(if (adaptiveConfig.numericalComplexity >= 4) 28f else 30f),
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 2
             )
 
             // Show checkmark or X when result is shown
             if (isCorrect == true) {
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("✓", color = Color.Green, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text("✓", color = RvInk, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             } else if (isWrong) {
                 Spacer(modifier = Modifier.width(12.dp))
-                Text("✗", color = Color.Red, fontSize = 28.sp, fontWeight = FontWeight.Bold)
+                Text("✗", color = RvInk, fontSize = 28.sp, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -1554,10 +1583,10 @@ fun AdaptiveAnswerButton(
     isEqual: Boolean = false
 ) {
     val backgroundColor = when {
-        isCorrect == true -> Color.Green
-        isWrong -> Color.Red
-        isEqual -> Color(0xFF00BCD4) // Cyan for EQUAL button
-        else -> Color(0xFF2196F3) // Blue for other buttons
+        isCorrect == true -> RvSuccess
+        isWrong -> RvError
+        isEqual -> RvSky // Cyan for EQUAL button
+        else -> RvSky // Blue for other buttons
     }
 
     val animatedColor by animateColorAsState(
@@ -1584,7 +1613,7 @@ fun AdaptiveAnswerButton(
         ) {
             Text(
                 text = text,
-                color = Color.White,
+                color = RvInk,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1592,17 +1621,109 @@ fun AdaptiveAnswerButton(
             // Show complexity indicator for EQUAL button
             if (isEqual && adaptiveConfig.errorInduction) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("⚠️", color = Color.White, fontSize = 14.sp)
+                Text("⚠️", color = RvInk, fontSize = 14.sp)
             }
 
             // Show checkmark or X when result is shown
             if (isCorrect == true) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("✓", color = Color.White, fontSize = 20.sp)
+                Text("✓", color = RvInk, fontSize = 20.sp)
             } else if (isWrong) {
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("✗", color = Color.White, fontSize = 20.sp)
+                Text("✗", color = RvInk, fontSize = 20.sp)
             }
+        }
+    }
+}
+/** Font size that grows with the user's font scale but stops at 1.3x so play-area text still fits. */
+@Composable
+private fun adaptCapSp(base: Float, maxScale: Float = 1.3f): androidx.compose.ui.unit.TextUnit {
+    val fs = androidx.compose.ui.platform.LocalDensity.current.fontScale
+    return (base * minOf(fs, maxScale) / fs).sp
+}
+
+/**
+ * Compact HUD for short viewports (small phones, landscape, split-screen), where the shared
+ * AdaptiveUnifiedHeader is too tall. Wraps to a second row at large font scales instead of clipping.
+ * Shared by the group-B adaptive screens.
+ */
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+internal fun BCompactHud(
+    level: UserLevel,
+    difficultyName: String,
+    timer: String,
+    lives: Int,
+    maxLives: Int,
+    score: Int,
+    streak: Int,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    onPause: (() -> Unit)? = null,
+    pauseDescription: String = "Pause"
+) {
+    val urgent = timer.startsWith("0:") && (timer.substringAfter(":").toIntOrNull() ?: 99) <= 30
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+        verticalArrangement = Arrangement.Center,
+        maxItemsInEachRow = 4
+    ) {
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = RvInk
+            )
+        }
+        if (onPause != null) {
+            IconButton(onClick = onPause, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Pause,
+                    contentDescription = pauseDescription,
+                    tint = RvInk
+                )
+            }
+        }
+        Column(modifier = Modifier.heightIn(min = 48.dp), verticalArrangement = Arrangement.Center) {
+            Text(
+                text = "${stringResource(R.string.level_label)} ${level.level}",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                maxLines = 1
+            )
+            Text(
+                text = difficultyName + if (streak > 0) "  🔥 $streak" else "",
+                fontSize = 12.sp,
+                color = RvInkSoft,
+                maxLines = 1
+            )
+        }
+        Box(modifier = Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+            Text(
+                text = timer,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (urgent) Color(0xFF8B0000) else RvInk,
+                maxLines = 1
+            )
+        }
+        Box(modifier = Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+            Row {
+                repeat(maxLives) { index ->
+                    Text(text = if (index < lives) "❤️" else "🤍", fontSize = 14.sp)
+                }
+            }
+        }
+        Box(modifier = Modifier.heightIn(min = 48.dp), contentAlignment = Alignment.Center) {
+            Text(
+                text = "${stringResource(R.string.score_label)}: $score",
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                maxLines = 1
+            )
         }
     }
 }

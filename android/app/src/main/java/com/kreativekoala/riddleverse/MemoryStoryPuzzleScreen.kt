@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.ContentValues.TAG
 import android.media.MediaPlayer
 import android.util.Log
@@ -36,6 +37,9 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -327,9 +331,9 @@ fun MemoryStoryPuzzleScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
+                        RvInk,
+                        RvInk,
+                        RvInk
                     )
                 )
             )
@@ -450,50 +454,10 @@ private fun AudioIntroScreen(
     onBegin: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(48.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.Start
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = Icons.Default.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
-                    tint = Color.White
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = "AUDITORY MEMORY",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "THIS GAME REQUIRES AUDIO",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp)
-        )
-
-        Spacer(modifier = Modifier.height(60.dp))
-
+    BoxWithConstraints(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        val compact = maxHeight < 600.dp
+        val wide = maxWidth > maxHeight
+        val circle = if (compact) 72.dp else 120.dp
         val infiniteTransition = rememberInfiniteTransition(label = "pulse")
         val scale by infiniteTransition.animateFloat(
             initialValue = 1f,
@@ -504,55 +468,95 @@ private fun AudioIntroScreen(
             ),
             label = "scale"
         )
-
-        Box(
+        Column(
             modifier = Modifier
-                .size(120.dp)
-                .background(
-                    Color.White.copy(alpha = 0.1f),
-                    CircleShape
+                .align(Alignment.TopCenter)
+                .widthIn(max = 640.dp)
+                .fillMaxSize()
+                .padding(horizontal = 24.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvOnTone
+                    )
+                }
+            }
+
+            // Middle block takes the remaining space and is centred; the Begin button stays pinned.
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "AUDITORY MEMORY",
+                    fontSize = if (compact) 22.sp else 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-                .scale(scale),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.VolumeUp,
-                contentDescription = "Audio",
-                tint = Color.White,
-                modifier = Modifier.size(60.dp)
-            )
-        }
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
+                Text(
+                    text = "THIS GAME REQUIRES AUDIO",
+                    fontSize = if (compact) 14.sp else 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvOnTone.copy(alpha = 0.85f),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(if (compact) 8.dp else 24.dp))
+                Box(
+                    modifier = Modifier
+                        .size(circle)
+                        .background(Color.White.copy(alpha = 0.1f), CircleShape)
+                        .scale(scale),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.VolumeUp,
+                        contentDescription = "Audio",
+                        tint = RvOnTone,
+                        modifier = Modifier.size(circle / 2)
+                    )
+                }
+                Spacer(modifier = Modifier.height(if (compact) 8.dp else 24.dp))
+                Text(
+                    text = "LISTEN CAREFULLY AND\nREMEMBER THE DETAILS",
+                    fontSize = if (compact) 14.sp else 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvOnTone.copy(alpha = 0.85f),
+                    textAlign = TextAlign.Center,
+                    lineHeight = if (compact) 18.sp else 24.sp,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
 
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Text(
-            text = "LISTEN CAREFULLY AND\nREMEMBER THE DETAILS",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            lineHeight = 24.sp
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Button(
-            onClick = onBegin,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(32.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4)
-            ),
-            shape = RoundedCornerShape(28.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.begin),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            Button(
+                onClick = onBegin,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 56.dp)
+                    .testTag("story_begin"),
+                colors = ButtonDefaults.buttonColors(containerColor = RvSky),
+                shape = RoundedCornerShape(28.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.begin),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
         }
     }
 }
@@ -631,110 +635,119 @@ private fun EnhancedAudioListeningScreen(
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Spacer(modifier = Modifier.height(48.dp))
-
-        // Enhanced top bar with score
-        EnhancedMemoryStoryTopBar(
-            level = level,
-            streakInfo = streakInfo,
-            timer = timer,
-            lives = hearts,
-            totalScore = totalScore,
-            onBack = onBack,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Text(
-            text = if (storyCard.contains("business", ignoreCase = true)) {
-                "BUSINESS TRAVEL"
-            } else if (storyCard.contains("pack", ignoreCase = true)) {
-                "PACKING ESSENTIALS"
-            } else if (storyCard.contains("grocery", ignoreCase = true) || storyCard.contains("shop", ignoreCase = true)) {
-                "SHOPPING LIST"
-            } else if (storyCard.contains("recipe", ignoreCase = true) || storyCard.contains("cook", ignoreCase = true)) {
-                "COOKING INGREDIENTS"
-            } else {
-                "MEMORY CHALLENGE"
-            },
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Canvas(
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val compact = maxHeight < 600.dp
+        val wide = maxWidth > maxHeight
+        val title = if (storyCard.contains("business", ignoreCase = true)) {
+            "BUSINESS TRAVEL"
+        } else if (storyCard.contains("pack", ignoreCase = true)) {
+            "PACKING ESSENTIALS"
+        } else if (storyCard.contains("grocery", ignoreCase = true) || storyCard.contains("shop", ignoreCase = true)) {
+            "SHOPPING LIST"
+        } else if (storyCard.contains("recipe", ignoreCase = true) || storyCard.contains("cook", ignoreCase = true)) {
+            "COOKING INGREDIENTS"
+        } else {
+            "MEMORY CHALLENGE"
+        }
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .padding(horizontal = 40.dp)
+                .align(Alignment.TopCenter)
+                .widthIn(max = 720.dp)
+                .fillMaxSize()
         ) {
-            drawAudioWaves(audioWaves, isPlaying)
-        }
+            EnhancedMemoryStoryTopBar(
+                level = level,
+                streakInfo = streakInfo,
+                timer = timer,
+                lives = hearts,
+                totalScore = totalScore,
+                onBack = onBack,
+                compact = compact || wide,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
 
-        Spacer(modifier = Modifier.height(40.dp))
-
-        Text(
-            text = if (isPlaying) "LISTENING..." else "LISTEN CAREFULLY",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        if (storyCard.isNotEmpty()) {
-            Spacer(modifier = Modifier.height(20.dp))
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
-                ),
-                shape = RoundedCornerShape(12.dp)
+            // Waves + status + story text share the remaining space (no scrolling).
+            Column(
+                modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = storyCard,
-                    fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    text = title,
+                    fontSize = if (compact) 16.sp else 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(16.dp),
-                    lineHeight = 18.sp
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
-        }
 
-        if (!audioUrl.isNullOrEmpty()) {
-            Spacer(modifier = Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.VolumeUp,
-                    contentDescription = "Audio Playing",
-                    tint = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.5f),
-                    modifier = Modifier.size(16.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f, fill = true)
+                        .heightIn(max = 120.dp)
+                        .padding(vertical = if (compact) 4.dp else 16.dp)
+                        .testTag("story_waves")
+                ) {
+                    drawAudioWaves(audioWaves, isPlaying)
+                }
+
                 Text(
-                    text = if (isPlaying) "Playing audio..." else "Audio ready",
-                    fontSize = 12.sp,
-                    color = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.5f)
+                    text = if (isPlaying) "LISTENING..." else "LISTEN CAREFULLY",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = if (isPlaying) RvSky else RvOnTone.copy(alpha = 0.85f),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    modifier = Modifier.fillMaxWidth()
                 )
-            }
-        }
 
-        Spacer(modifier = Modifier.weight(1f))
+                if (storyCard.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(if (compact) 8.dp else 16.dp))
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = RvSurface),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Text(
+                            text = storyCard,
+                            fontSize = 14.sp,
+                            color = RvInk,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(if (compact) 8.dp else 16.dp),
+                            lineHeight = 18.sp,
+                            maxLines = if (compact) 4 else 8,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                if (!audioUrl.isNullOrEmpty() && !compact) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.VolumeUp,
+                            contentDescription = "Audio Playing",
+                            tint = if (isPlaying) RvSky else RvOnTone.copy(alpha = 0.7f),
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isPlaying) "Playing audio..." else "Audio ready",
+                            fontSize = 12.sp,
+                            color = if (isPlaying) RvSky else RvOnTone.copy(alpha = 0.7f)
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
     }
 }
 
@@ -754,100 +767,162 @@ private fun EnhancedAnswerSelectionScreen(
     onSubmit: () -> Unit,
     onBack: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Spacer(modifier = Modifier.height(32.dp))
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val compact = maxHeight < 600.dp
+        val wide = maxWidth > maxHeight
 
-        // Enhanced top bar with score
-        EnhancedMemoryStoryTopBar(
-            level = level,
-            streakInfo = streakInfo,
-            timer = timer,
-            lives = hearts,
-            totalScore = totalScore,
-            onBack = onBack,
-            modifier = Modifier.padding(16.dp)
-        )
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(
-            text = question,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.weight(1f)
-        ) {
-            items(options) { option ->
-                MemoryOptionCard(
-                    option = option,
-                    isSelected = selectedItems.contains(option),
-                    onClick = { onItemToggle(option) }
-                )
-            }
+        val topBar: @Composable () -> Unit = {
+            EnhancedMemoryStoryTopBar(
+                level = level,
+                streakInfo = streakInfo,
+                timer = timer,
+                lives = hearts,
+                totalScore = totalScore,
+                onBack = onBack,
+                compact = compact || wide,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // Progress indicator
-        Text(
-            text = "Selected: ${selectedItems.size} / ${correctItems.size} items",
-            fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.7f),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        if (difficulty.isNotEmpty() && totalScore == 0) {
+        val questionText: @Composable () -> Unit = {
             Text(
-                text = "⚡ Quick, accurate selections earn bonus points!",
-                fontSize = 12.sp,
-                color = Color.Yellow.copy(alpha = 0.7f),
+                text = question,
+                fontSize = if (compact) 16.sp else 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvOnTone,
                 textAlign = TextAlign.Center,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 4.dp)
+                    .padding(horizontal = 24.dp, vertical = 4.dp)
+                    .testTag("story_question")
+            )
+        }
+        val submitBar: @Composable () -> Unit = {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Selected: ${selectedItems.size} / ${correctItems.size} items",
+                    fontSize = 14.sp,
+                    color = RvOnTone.copy(alpha = 0.9f),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Button(
+                    onClick = onSubmit,
+                    enabled = selectedItems.isNotEmpty(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 56.dp)
+                        .testTag("story_submit"),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = RvSky,
+                        disabledContainerColor = Color.White.copy(alpha = 0.18f)
+                    ),
+                    shape = RoundedCornerShape(28.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.submit),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (selectedItems.isNotEmpty()) RvInk else RvOnTone.copy(alpha = 0.7f),
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+        val optionsGrid: @Composable (Modifier) -> Unit = { m ->
+            MemoryOptionsGrid(
+                options = options,
+                selectedItems = selectedItems,
+                onItemToggle = onItemToggle,
+                modifier = m.padding(horizontal = 16.dp).testTag("story_options")
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        if (wide) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 1200.dp)
+                    .fillMaxSize()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Column(modifier = Modifier.weight(0.8f).fillMaxHeight()) {
+                    topBar()
+                    Spacer(Modifier.weight(1f))
+                    questionText()
+                    Spacer(Modifier.weight(1f))
+                    submitBar()
+                }
+                optionsGrid(Modifier.weight(1.2f).fillMaxHeight().padding(vertical = 8.dp))
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .widthIn(max = 720.dp)
+                    .fillMaxSize()
+                    .padding(bottom = 8.dp)
+            ) {
+                topBar()
+                questionText()
+                optionsGrid(Modifier.weight(1f).fillMaxWidth().padding(vertical = 8.dp))
+                submitBar()
+            }
+        }
+    }
+}
 
-        Button(
-            onClick = onSubmit,
-            enabled = selectedItems.isNotEmpty(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp)
-                .height(56.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color(0xFF00BCD4),
-                disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
-            ),
-            shape = RoundedCornerShape(28.dp)
+/**
+ * Option cards laid out in a fixed grid whose card height is derived from the space available,
+ * so every option is visible without scrolling. Falls back to three columns when two would not fit.
+ */
+@Composable
+private fun MemoryOptionsGrid(
+    options: List<String>,
+    selectedItems: Set<String>,
+    onItemToggle: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+        val gap = 8.dp
+        val minCard = 56.dp
+        fun rowsFor(cols: Int) = (options.size + cols - 1) / cols
+        val cols = when {
+            maxWidth < 240.dp -> 1
+            minCard * rowsFor(2) + gap * (rowsFor(2) - 1) <= maxHeight -> 2
+            else -> 3
+        }
+        val rows = rowsFor(cols).coerceAtLeast(1)
+        val cardHeight = ((maxHeight - gap * (rows - 1)) / rows).coerceIn(minCard, 96.dp)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(gap),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = stringResource(R.string.submit),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
+            options.chunked(cols).forEach { rowItems ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    rowItems.forEach { option ->
+                        MemoryOptionCard(
+                            option = option,
+                            isSelected = selectedItems.contains(option),
+                            onClick = { onItemToggle(option) },
+                            modifier = Modifier.weight(1f).height(cardHeight)
+                        )
+                    }
+                    repeat(cols - rowItems.size) { Spacer(Modifier.weight(1f)) }
+                }
+            }
         }
-
-        Spacer(modifier = Modifier.height(30.dp))
     }
 }
 
@@ -855,23 +930,20 @@ private fun EnhancedAnswerSelectionScreen(
 private fun MemoryOptionCard(
     option: String,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
+        modifier = modifier
             .clickable { onClick() }
-            .let { modifier ->
-                if (isSelected) {
-                    modifier.border(2.dp, Color(0xFF00BCD4), RoundedCornerShape(12.dp))
-                } else {
-                    modifier
-                }
-            },
+            .border(
+                width = if (isSelected) 3.dp else 1.dp,
+                color = if (isSelected) RvSky else Color.White.copy(alpha = 0.35f),
+                shape = RoundedCornerShape(12.dp)
+            ),
         colors = CardDefaults.cardColors(
             containerColor = if (isSelected) {
-                Color(0xFF00BCD4).copy(alpha = 0.2f)
+                RvSky.copy(alpha = 0.25f)
             } else {
                 Color.White.copy(alpha = 0.1f)
             }
@@ -886,11 +958,25 @@ private fun MemoryOptionCard(
                 text = option,
                 fontSize = 16.sp,
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
-                color = if (isSelected) Color(0xFF00BCD4) else Color.White,
+                color = RvOnTone,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(8.dp),
-                lineHeight = 20.sp
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+                lineHeight = 20.sp,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
             )
+            if (isSelected) {
+                // Selected is shown by a check mark and a thicker outline, not by colour alone.
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = null,
+                    tint = RvSky,
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .padding(start = 4.dp)
+                        .size(20.dp)
+                )
+            }
         }
     }
 }
@@ -903,95 +989,79 @@ private fun EnhancedMemoryStoryTopBar(
     lives: Int,
     totalScore: Int,
     onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
+    val timeValue = timer.substringAfter(":").toIntOrNull() ?: 0
+    val isUrgent = timer.startsWith("0:") && timeValue <= 30
+    val timerColor = if (isUrgent) Color(0xFFFF8A80) else RvOnTone
     Column(modifier = modifier.statusBarsPadding()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Left side: Back button and level
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back),
+                    tint = RvOnTone,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
-                Column {
-                    Text(
-                        text = "Level ${level.level}",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-
-                    LevelProgressBar(
-                        level = level,
-                        modifier = Modifier.width(120.dp)
-                    )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Level ${level.level}",
+                    fontSize = if (compact) 16.sp else 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvOnTone,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (!compact) {
+                    LevelProgressBar(level = level, modifier = Modifier.width(120.dp))
                 }
             }
 
-            // Center: Lives display
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                repeat(lives) {
-                    Text(
-                        text = "❤️",
-                        fontSize = 16.sp
-                    )
-                }
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+                repeat(lives) { Text(text = "❤️", fontSize = 16.sp) }
             }
 
-            // Right side: Timer and streak
-            Column(
-                horizontalAlignment = Alignment.End
-            ) {
-                val timeValue = timer.substringAfter(":").toIntOrNull() ?: 0
-                val isUrgent = timer.startsWith("0:") && timeValue <= 30
+            if (compact && totalScore > 0) {
+                Text(
+                    text = "🎯 $totalScore",
+                    color = Color(0xFFA5D6A7),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+            }
 
+            Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = timer,
-                    fontSize = 24.sp,
+                    fontSize = if (compact) 20.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isUrgent) Color.Red else Color.White
+                    color = timerColor,
+                    maxLines = 1
                 )
-
-                if (streakInfo.currentStreak > 0) {
-                    StreakDisplay(
-                        streakInfo = streakInfo,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+                if (!compact && streakInfo.currentStreak > 0) {
+                    StreakDisplay(streakInfo = streakInfo, modifier = Modifier.padding(top = 4.dp))
                 }
             }
         }
 
-        // Score display
-        if (totalScore > 0) {
+        // Score display (tall layouts only; compact folds it into the row above)
+        if (!compact && totalScore > 0) {
             Spacer(modifier = Modifier.height(8.dp))
-
             Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF4CAF50).copy(alpha = 0.2f)
-                ),
+                colors = CardDefaults.cardColors(containerColor = RvSuccess.copy(alpha = 0.2f)),
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
                     text = "🎯 Score: $totalScore",
-                    color = Color(0xFF4CAF50),
+                    color = Color(0xFFA5D6A7),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(8.dp)
@@ -1011,7 +1081,7 @@ private fun generateAnimatedWaves(): List<Float> {
 }
 
 private fun DrawScope.drawAudioWaves(waves: List<Float>, isPlaying: Boolean) {
-    val waveColor = if (isPlaying) Color(0xFF00BCD4) else Color.White.copy(alpha = 0.3f)
+    val waveColor = if (isPlaying) RvSky else Color.White.copy(alpha = 0.3f)
     val barWidth = size.width / waves.size
     val centerY = size.height / 2
 

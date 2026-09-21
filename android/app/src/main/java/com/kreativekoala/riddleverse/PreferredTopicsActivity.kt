@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -52,16 +53,16 @@ class PreferredTopicsActivity : AppCompatActivity() {
 
 // Color palette for topics (similar to HomeActivity)
 val topicColors = listOf(
-    Color(0xFFE3F2FD), // Light Blue
-    Color(0xFFF3E5F5), // Light Purple
-    Color(0xFFE8F5E8), // Light Green
-    Color(0xFFFFF3E0), // Light Orange
-    Color(0xFFFFEBEE), // Light Red
-    Color(0xFFF1F8E9), // Light Lime
-    Color(0xFFE0F2F1), // Light Teal
-    Color(0xFFFCE4EC), // Light Pink
-    Color(0xFFF9FBE7), // Light Yellow Green
-    Color(0xFFEDE7F6)  // Light Deep Purple
+    RvSky.copy(alpha = 0.18f),
+    RvGrape.copy(alpha = 0.18f),
+    RvMint.copy(alpha = 0.18f),
+    RvSun.copy(alpha = 0.22f),
+    RvCoral.copy(alpha = 0.18f),
+    RvViolet.copy(alpha = 0.16f),
+    RvMint.copy(alpha = 0.25f),
+    RvCoral.copy(alpha = 0.25f),
+    RvSun.copy(alpha = 0.3f),
+    RvGrape.copy(alpha = 0.25f)
 )
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -96,7 +97,7 @@ fun PreferredTopicsScreen(onSaveComplete: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF9F9F9))
+            .background(RvCanvas)
     ) {
         // Top Navigation Bar
         TopNavigationBar(
@@ -192,7 +193,8 @@ fun TopNavigationBar(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
         shape = RoundedCornerShape(0.dp)
     ) {
         Row(
@@ -219,7 +221,7 @@ fun TopNavigationBar(
                 text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = RvInk
             )
         }
     }
@@ -229,10 +231,10 @@ fun TopNavigationBar(
 fun ExplanationCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFE8F5E8)
+            containerColor = RvSurface
         )
     ) {
         Column(
@@ -242,7 +244,7 @@ fun ExplanationCard() {
                 text = "🎯 Personalize Your Experience",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E7D32)
+                color = RvMintEdge
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -250,7 +252,7 @@ fun ExplanationCard() {
             Text(
                 text = "Select topics you're interested in to receive personalized daily quizzes. We'll generate 5 questions each day based on your preferences!",
                 fontSize = 14.sp,
-                color = Color(0xFF1B5E20),
+                color = RvInk,
                 lineHeight = 20.sp
             )
         }
@@ -269,7 +271,7 @@ fun PopularTopicsSection(
             text = stringResource(R.string.popular_topics),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = RvInk
         )
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -287,16 +289,15 @@ fun PopularTopicsSection(
                     topicColors[index % topicColors.size]
                 }
                 val textColor = if (isSelected) {
-                    Color.White
+                    RvOnTone
                 } else {
-                    MaterialTheme.colorScheme.onSurface
+                    RvInk
                 }
 
                 Card(
                     modifier = Modifier.clickable { onTopicToggle(topic) },
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = if (isSelected) 6.dp else 2.dp
-                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                    border = androidx.compose.foundation.BorderStroke(2.dp, if (isSelected) RvVioletEdge else RvOutline),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = backgroundColor
@@ -326,15 +327,17 @@ fun AddCustomTopicSection(
             text = stringResource(R.string.add_custom_topic),
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = RvInk
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
         Card(
             modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            shape = RoundedCornerShape(16.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+            colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+            border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+            shape = RoundedCornerShape(20.dp)
         ) {
             Row(
                 modifier = Modifier
@@ -394,7 +397,7 @@ fun SelectedTopicsSection(
                 text = stringResource(R.string.your_selected_topics),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.width(8.dp))
@@ -410,7 +413,7 @@ fun SelectedTopicsSection(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
             }
         }
@@ -420,10 +423,10 @@ fun SelectedTopicsSection(
         if (selectedTopics.isEmpty()) {
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF5F5F5)
+                    containerColor = RvSurface
                 )
             ) {
                 Column(
@@ -476,7 +479,7 @@ fun SelectedTopicChip(
     onRemove: () -> Unit
 ) {
     Card(
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -520,8 +523,10 @@ fun BottomActionButton(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvOutline),
+        shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
@@ -531,7 +536,7 @@ fun BottomActionButton(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFE3F2FD)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -548,7 +553,7 @@ fun BottomActionButton(
                         Text(
                             text = "🎯 Generating your daily puzzles...",
                             fontSize = 14.sp,
-                            color = Color(0xFF1976D2)
+                            color = RvSkyEdge
                         )
                     }
                 }
@@ -593,7 +598,7 @@ fun BottomActionButton(
                     if (isSaving) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(16.dp),
-                            color = Color.White,
+                            color = RvOnTone,
                             strokeWidth = 2.dp
                         )
                         Spacer(modifier = Modifier.width(8.dp))

@@ -7,9 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Pause
@@ -26,8 +24,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvMint
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 @Composable
 fun SubscriptionPuzzleScreen(
@@ -173,29 +183,10 @@ fun SubscriptionPuzzleScreen(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF0A0A2E),
-                        Color(0xFF1A1A4A),
-                        Color(0xFF2D2D5F)
-                    )
-                )
-            )
-    ) {
-        // Animated star background
-        AnimatedStarField()
-
-        val scrollState = rememberScrollState()
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(scrollState)
-        ) {
-            // Top Bar with live timer
+    SubscriptionFitLayout(
+        payment = payment.toInt(), // 21.49 -> $21
+        frequency = frequency, // "biweekly" -> "BIWEEKLY"
+        hud = { _ ->
             EnhancedSubscriptionTopGameBar(
                 level = currentLevel,
                 streakInfo = streakInfo,
@@ -205,122 +196,35 @@ fun SubscriptionPuzzleScreen(
                     showHint = !showHint
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                 },
-                modifier = Modifier.padding(top = 40.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
-
-            // Score display (if any score accumulated)
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "${stringResource(R.string.score_label)}: $totalScore",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color(0xFF4ECDC4)
-                            )
-                        }
-
-                        if (attempts > 0) {
-                            Text(
-                                text = "Attempt: $attempts",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        }
-
-                        // Show calculation complexity info
-                        Text(
-                            text = "${frequency.capitalize()} → ${yearlyTotal.toInt()}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.White.copy(alpha = 0.7f)
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-            } else {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-
-            // Game type icons row
-            GameTypeIconsRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp)
-            )
-
-            Spacer(modifier = Modifier.height(60.dp))
-
-            // Concert tickets icon
-            TicketsIcon(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Payment display - show actual payment from JSON
-            PriceDisplay(
-                price = payment.toInt(), // 21.49 -> $21
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Calculation prompt - show actual frequency from JSON
-            CalculationPrompt(
-                frequency = frequency.uppercase(), // "biweekly" -> "BIWEEKLY"
-                period = "A YEAR", // Always "ANNUALLY" since we're calculating yearly total
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            AnimatedVisibility(
-                visible = showHint,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
+        },
+        status = {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                SubscriptionHintBubble(
-                    frequency = frequency,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 16.dp)
+                Text(
+                    text = "${stringResource(R.string.score_label)}: $totalScore",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.testTag("hud_score")
                 )
+                if (attempts > 0) {
+                    Text(
+                        text = "Attempt: $attempts",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = RvInkSoft,
+                        maxLines = 1
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text = "ANNUALLY IS:",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4ECDC4),
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(30.dp))
-
+        },
+        options = { m ->
             // Answer options grid with enhanced interaction and double-click prevention
             AnswerOptionsGrid(
                 options = options,
@@ -373,40 +277,114 @@ fun SubscriptionPuzzleScreen(
                         )
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
+                modifier = m
             )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Enhanced progress bar with visual feedback
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp, vertical = 30.dp)
-                    .height(6.dp)
-                    .background(
-                        Color.White.copy(alpha = 0.3f),
-                        shape = RoundedCornerShape(3.dp)
-                    )
+        },
+        hint = {
+            AnimatedVisibility(
+                visible = showHint,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
             ) {
-                // Progress indicator based on selection
-                if (selectedAnswer != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f) // Show 80% progress when answered
-                            .fillMaxHeight()
-                            .background(
-                                Color(0xFF4ECDC4),
-                                shape = RoundedCornerShape(3.dp)
-                            )
-                    )
-                }
+                SubscriptionHintBubble(frequency = frequency, modifier = Modifier.fillMaxWidth())
+            }
+        },
+        overlay = { EnhancedUniversalFeedback(feedbackManager) }
+    )
+}
+
+/**
+ * Shared fit-to-screen skeleton for the subscription screens (plain + adaptive): HUD on top,
+ * price + "BIWEEKLY A YEAR" prompt, and the 2x2 answer grid filling the remaining space.
+ * Landscape / wide: prompt on the left, answers on the right. Never scrolls.
+ */
+@Composable
+internal fun SubscriptionFitLayout(
+    payment: Int,
+    frequency: String,
+    hud: @Composable (tall: Boolean) -> Unit,
+    status: @Composable () -> Unit,
+    options: @Composable (Modifier) -> Unit,
+    hint: @Composable () -> Unit,
+    overlay: @Composable BoxScope.() -> Unit
+) {
+    BoxWithConstraints(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(RvSurface)
+    ) {
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val tall = !wide && maxHeight >= 780.dp
+        val compact = !tall
+        val pad = if (compact) 8.dp else 16.dp
+
+        val problem: @Composable () -> Unit = {
+            Column(
+                modifier = Modifier.fillMaxWidth().testTag("subscription_problem"),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp)
+            ) {
+                PriceDisplay(price = payment, modifier = Modifier.fillMaxWidth())
+                CalculationPrompt(
+                    frequency = frequency.uppercase(),
+                    period = "A YEAR",
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = "ANNUALLY IS:",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    maxLines = 1
+                )
             }
         }
 
-        EnhancedUniversalFeedback(feedbackManager)
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(pad),
+                horizontalArrangement = Arrangement.spacedBy(pad)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    hud(false)
+                    status()
+                    Spacer(Modifier.weight(1f))
+                    problem()
+                    Spacer(Modifier.weight(1f))
+                }
+                options(Modifier.weight(1f).fillMaxHeight().widthIn(max = 480.dp))
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = pad)
+                    .padding(bottom = pad)
+                    .widthIn(max = 640.dp)
+                    .align(Alignment.TopCenter),
+                verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp)
+            ) {
+                hud(tall)
+                status()
+                if (tall) {
+                    GameTypeIconsRow(modifier = Modifier.fillMaxWidth().padding(horizontal = 40.dp))
+                    TicketsIcon(modifier = Modifier.fillMaxWidth().height(96.dp))
+                }
+                problem()
+                options(Modifier.fillMaxWidth().weight(1f))
+            }
+        }
+
+        // Hint floats over the play area instead of pushing the answers off screen.
+        Box(
+            modifier = Modifier.align(Alignment.Center).padding(horizontal = 16.dp).widthIn(max = 480.dp)
+        ) { hint() }
+        overlay()
     }
 }
 
@@ -423,12 +401,13 @@ fun EnhancedSubscriptionTopGameBar(
     Row(
         modifier = modifier.statusBarsPadding().fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // Left side: Back button, hint button, and level
         Row(
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Back button
             IconButton(
@@ -438,12 +417,12 @@ fun EnhancedSubscriptionTopGameBar(
                         Log.d("SubscriptionPuzzle", "⚠️ No back action provided")
                     }
                 },
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color(0xFF4ECDC4),
+                    tint = RvInk,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -451,26 +430,31 @@ fun EnhancedSubscriptionTopGameBar(
             // Hint button
             IconButton(
                 onClick = onHintClick,
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier.size(48.dp)
             ) {
+                val hintLabel = stringResource(R.string.hint)
                 Text(
                     text = "💡",
-                    fontSize = 20.sp
+                    fontSize = 22.sp,
+                    modifier = Modifier.semantics { contentDescription = hintLabel }
                 )
             }
 
             Column {
                 Text(
                     text = "${stringResource(R.string.level_label)} ${level.level}",
-                    fontSize = 18.sp,
+                    fontSize = aCapSp(18f, 1.15f),
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4ECDC4)
+                    color = RvInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                // Level progress bar
+                // Level progress bar (label omitted: the level is already shown above)
                 LevelProgressBar(
                     level = level,
-                    modifier = Modifier.width(100.dp)
+                    modifier = Modifier.width(72.dp),
+                    showLabel = false
                 )
             }
         }
@@ -481,12 +465,14 @@ fun EnhancedSubscriptionTopGameBar(
         ) {
             Text(
                 text = timer,
-                fontSize = 24.sp,
+                fontSize = aCapSp(24f, 1.15f),
                 fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier.testTag("hud_timer"),
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
                     Color.Red // Red when ≤30 seconds
                 } else {
-                    Color(0xFF4ECDC4)
+                    RvInk
                 }
             )
 
@@ -494,7 +480,7 @@ fun EnhancedSubscriptionTopGameBar(
             if (streakInfo.currentStreak > 0) {
                 StreakDisplay(
                     streakInfo = streakInfo,
-                    modifier = Modifier.padding(top = 4.dp)
+                    modifier = Modifier.padding(top = 2.dp)
                 )
             }
         }
@@ -510,33 +496,10 @@ fun GameTypeIconsRow(
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Card games icon
-        Text(
-            text = "🎴",
-            fontSize = 32.sp,
-            color = Color.White.copy(alpha = 0.6f)
-        )
-
-        // Scissors icon
-        Text(
-            text = "✂️",
-            fontSize = 32.sp,
-            color = Color.White.copy(alpha = 0.6f)
-        )
-
-        // Theater masks icon
-        Text(
-            text = "🎭",
-            fontSize = 32.sp,
-            color = Color.White.copy(alpha = 0.6f)
-        )
-
-        // Diamond icon
-        Text(
-            text = "💎",
-            fontSize = 32.sp,
-            color = Color.White.copy(alpha = 0.6f)
-        )
+        Text(text = "🎴", fontSize = 28.sp, color = RvInkSoft)
+        Text(text = "✂️", fontSize = 28.sp, color = RvInkSoft)
+        Text(text = "🎭", fontSize = 28.sp, color = RvInkSoft)
+        Text(text = "💎", fontSize = 28.sp, color = RvInkSoft)
     }
 }
 
@@ -551,7 +514,7 @@ fun TicketsIcon(
         // Animated ticket icon
         Text(
             text = "🎟️",
-            fontSize = 80.sp,
+            fontSize = 64.sp,
             modifier = Modifier
                 .animateContentSize()
         )
@@ -565,19 +528,19 @@ fun PriceDisplay(
 ) {
     Box(
         modifier = modifier
-            .height(80.dp)
-            .padding(horizontal = 40.dp)
-            .background(
-                Color(0xFF2D2D5F).copy(alpha = 0.8f),
-                shape = RoundedCornerShape(12.dp)
-            ),
+            .heightIn(min = 56.dp)
+            .background(RvSurfaceRaised, shape = RoundedCornerShape(12.dp))
+            .border(1.dp, RvOutline, RoundedCornerShape(12.dp))
+            .testTag("subscription_price"),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = "$$price",
-            fontSize = 36.sp,
+            fontSize = aCapSp(36f, 1.3f),
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF4ECDC4)
+            color = RvInk,
+            maxLines = 1,
+            modifier = Modifier.padding(vertical = 4.dp)
         )
     }
 }
@@ -589,56 +552,63 @@ fun CalculationPrompt(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .height(80.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2D2D5F).copy(alpha = 0.8f)
-        ),
+        modifier = modifier.heightIn(min = 56.dp),
+        colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
         shape = RoundedCornerShape(12.dp),
-        border = androidx.compose.foundation.BorderStroke(
-            2.dp,
-            Color(0xFF4ECDC4)
-        )
+        border = androidx.compose.foundation.BorderStroke(2.dp, RvViolet)
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .fillMaxHeight()
-                    .background(
-                        Color(0xFF4ECDC4).copy(alpha = 0.1f)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = frequency,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
-
-            Box(
-                modifier = Modifier
-                    .weight(2f)
-                    .fillMaxHeight(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = period,
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+        BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
+            if (maxWidth < 420.dp) {
+                // Narrow: stack "BIWEEKLY" over "A YEAR" so nothing is squeezed.
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = frequency,
+                        fontSize = aCapSp(24f, 1.2f),
+                        fontWeight = FontWeight.Bold,
+                        color = RvViolet,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = period,
+                        fontSize = aCapSp(18f, 1.2f),
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                }
+            } else {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = frequency,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvViolet,
+                            maxLines = 1
+                        )
+                    }
+                    Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
+                        Text(
+                            text = period,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            maxLines = 1
+                        )
+                    }
+                }
             }
         }
     }
 }
 
-// Enhanced answer options with better visual feedback
+// Enhanced answer options with better visual feedback. Rows share the height the parent gives.
 @Composable
 fun AnswerOptionsGrid(
     options: List<Int>,
@@ -647,50 +617,33 @@ fun AnswerOptionsGrid(
     onAnswerSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // First row
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+        val gap = if (maxHeight < 260.dp) 8.dp else 12.dp
+        val rowCount = ((options.size + 1) / 2).coerceAtLeast(1)
+        val optH = if (constraints.hasBoundedHeight) {
+            ((maxHeight - gap * (rowCount - 1)) / rowCount).coerceIn(56.dp, 96.dp)
+        } else 80.dp
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(gap)
         ) {
-            AnswerOption(
-                amount = options[0],
-                isSelected = selectedAnswer == options[0],
-                isAnswered = isAnswered,
-                onClick = { onAnswerSelected(options[0]) },
-                modifier = Modifier.weight(1f)
-            )
-
-            AnswerOption(
-                amount = options[1],
-                isSelected = selectedAnswer == options[1],
-                isAnswered = isAnswered,
-                onClick = { onAnswerSelected(options[1]) },
-                modifier = Modifier.weight(1f)
-            )
-        }
-
-        // Second row
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            AnswerOption(
-                amount = options[2],
-                isSelected = selectedAnswer == options[2],
-                isAnswered = isAnswered,
-                onClick = { onAnswerSelected(options[2]) },
-                modifier = Modifier.weight(1f)
-            )
-
-            AnswerOption(
-                amount = options[3],
-                isSelected = selectedAnswer == options[3],
-                isAnswered = isAnswered,
-                onClick = { onAnswerSelected(options[3]) },
-                modifier = Modifier.weight(1f)
-            )
+            options.chunked(2).forEach { rowOptions ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    rowOptions.forEach { amount ->
+                        AnswerOption(
+                            amount = amount,
+                            isSelected = selectedAnswer == amount,
+                            isAnswered = isAnswered,
+                            onClick = { onAnswerSelected(amount) },
+                            modifier = Modifier.weight(1f).height(optH)
+                        )
+                    }
+                    if (rowOptions.size == 1) Spacer(Modifier.weight(1f))
+                }
+            }
         }
     }
 }
@@ -705,24 +658,21 @@ fun AnswerOption(
 ) {
     Card(
         modifier = modifier
-            .height(80.dp)
-            .clickable(enabled = !isAnswered) { onClick() },
+            .heightIn(min = 56.dp)
+            .clickable(enabled = !isAnswered) { onClick() }
+            .testTag("subscription_option"),
         colors = CardDefaults.cardColors(
             containerColor = when {
-                isAnswered && isSelected -> Color(0xFF4ECDC4).copy(alpha = 0.5f)
-                isSelected -> Color(0xFF4ECDC4).copy(alpha = 0.3f)
-                isAnswered -> Color(0xFF2D2D5F).copy(alpha = 0.4f)
-                else -> Color(0xFF2D2D5F).copy(alpha = 0.8f)
+                isSelected -> RvViolet.copy(alpha = 0.15f)
+                isAnswered -> RvSurface
+                else -> RvSurfaceRaised
             }
         ),
         shape = RoundedCornerShape(12.dp),
         border = if (isSelected) {
-            androidx.compose.foundation.BorderStroke(3.dp, Color(0xFF4ECDC4))
+            androidx.compose.foundation.BorderStroke(3.dp, RvViolet)
         } else {
-            androidx.compose.foundation.BorderStroke(
-                1.dp,
-                if (isAnswered) Color.White.copy(alpha = 0.2f) else Color.White.copy(alpha = 0.3f)
-            )
+            androidx.compose.foundation.BorderStroke(1.dp, if (isAnswered) RvOutline else RvInkSoft)
         }
     ) {
         Box(
@@ -731,13 +681,10 @@ fun AnswerOption(
         ) {
             Text(
                 text = "$$amount",
-                fontSize = 24.sp,
+                fontSize = aCapSp(24f, 1.3f),
                 fontWeight = FontWeight.Bold,
-                color = if (isAnswered && !isSelected) {
-                    Color.White.copy(alpha = 0.6f)
-                } else {
-                    Color.White
-                }
+                maxLines = 1,
+                color = if (isAnswered && !isSelected) RvInkSoft else RvInk
             )
         }
     }
@@ -763,7 +710,7 @@ fun SubscriptionHintBubble(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = RvSurfaceRaised
         ),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -784,7 +731,7 @@ fun SubscriptionHintBubble(
                     text = "Payment Frequency Multipliers",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF333333)
+                    color = RvInk
                 )
             }
 
@@ -801,7 +748,7 @@ fun SubscriptionHintBubble(
                 Spacer(modifier = Modifier.height(4.dp))
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF4ECDC4).copy(alpha = 0.2f)
+                        containerColor = RvMint.copy(alpha = 0.2f)
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
@@ -809,7 +756,7 @@ fun SubscriptionHintBubble(
                         text = "💡 Your frequency: Biweekly = 26 payments per year",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2D2D5F),
+                        color = RvInk,
                         modifier = Modifier.padding(8.dp)
                     )
                 }
@@ -819,8 +766,8 @@ fun SubscriptionHintBubble(
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "⚠️ Using hints reduces your final score",
-                fontSize = 10.sp,
-                color = Color(0xFF999999),
+                fontSize = 12.sp,
+                color = RvInkSoft,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -842,22 +789,22 @@ fun SubscriptionHintRow(
     ) {
         Text(
             text = frequency,
-            fontSize = 12.sp,
-            color = Color(0xFF666666),
+            fontSize = 14.sp,
+            color = RvInkSoft,
             modifier = Modifier.weight(2f)
         )
         Text(
             text = multiplier,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF333333),
+            color = RvInk,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
         Text(
             text = note,
-            fontSize = 10.sp,
-            color = Color(0xFF999999),
+            fontSize = 12.sp,
+            color = RvInkSoft,
             modifier = Modifier.weight(2f),
             textAlign = TextAlign.End
         )

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -360,7 +361,7 @@ fun DismissalOptionsDialog(
                     },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFFF5722)
+                        containerColor = RvFlame
                     )
                 ) {
                     Text(stringResource(R.string.dont_ask_again))
@@ -476,7 +477,7 @@ fun RatingFlowDialog(
                                 Text(
                                     text = stringResource(R.string.rate_incentive),
                                     fontSize = 12.sp,
-                                    color = Color(0xFFFFD700),
+                                    color = RvSun,
                                     fontWeight = FontWeight.Bold,
                                     textAlign = TextAlign.Center
                                 )
@@ -622,7 +623,7 @@ fun FeedbackDialog(
                 submissionResult?.let { (success, message) ->
                     Text(
                         text = message ?: if (success) stringResource(R.string.submitted_successfully) else stringResource(R.string.submission_failed),
-                        color = if (success) Color(0xFF4CAF50) else Color(0xFFFF5722),
+                        color = if (success) RvSuccess else RvFlame,
                         fontSize = 12.sp
                     )
                 }
@@ -657,7 +658,7 @@ fun FeedbackDialog(
                 if (isSubmitting) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(16.dp),
-                        color = Color.White
+                        color = RvInk
                     )
                 } else {
                     Text(stringResource(R.string.submit))
@@ -686,7 +687,7 @@ fun RatingStars(
             Icon(
                 imageVector = if (i <= rating) Icons.Default.Star else Icons.Default.StarOutline,
                 contentDescription = "Star $i",
-                tint = if (i <= rating) Color(0xFFFFD700) else Color.Gray,
+                tint = if (i <= rating) RvSun else Color.Gray,
                 modifier = Modifier
                     .size(32.dp)
                     .clickable { onRatingChanged(i) }
@@ -731,13 +732,13 @@ fun CoinBalanceWidget() {
                     text = "$coinBalance Coins",
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp,
-                    color = Color(0xFFE65100)
+                    color = RvFlame
                 )
 
                 Text(
                     text = stringResource(R.string.rate_for_early_access),
                     fontSize = 10.sp,
-                    color = Color(0xFFE65100)
+                    color = RvFlame
                 )
             }
         }

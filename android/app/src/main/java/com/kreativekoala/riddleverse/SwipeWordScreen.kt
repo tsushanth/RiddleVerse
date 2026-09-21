@@ -1,4 +1,5 @@
 package com.kreativekoala.riddleverse
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
@@ -6,6 +7,8 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.*
@@ -68,8 +71,6 @@ fun SwipeWordScreen(
     val offsetX = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
-    LevelProgressBar(level = currentLevel)
-
     // Timer
     LaunchedEffect(Unit) {
         while (timeLeft.value > 0 && allWords.isNotEmpty() && !isCompleted) {
@@ -99,17 +100,20 @@ fun SwipeWordScreen(
     val swipeState = rememberSwipeableState(0)
     val anchors = mapOf(0f to 0, -300f to -1, 300f to 1)
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Brush.linearGradient(listOf(Color(0xFFF7E6D4), Color(0xFFEBD3C0))))
+            .background(Brush.linearGradient(listOf(Color(0xFFF7E6D4), Color(0xFFEBD3C0)))),
+        contentAlignment = Alignment.TopCenter
     ) {
+        val compact = maxHeight < 600.dp
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxHeight()
+                .widthIn(max = 640.dp)
+                .fillMaxWidth()
                 .statusBarsPadding()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+                .padding(horizontal = 16.dp, vertical = if (compact) 4.dp else 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Top Bar with Back Button
@@ -122,42 +126,54 @@ fun SwipeWordScreen(
                     Icon(
                         Icons.Default.ArrowBack,
                         contentDescription = stringResource(R.string.back_to_home),
-                        tint = Color(0xFF6D4C41)
+                        tint = RvInk
                     )
                 }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.weight(1f).padding(horizontal = 4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
                         text = questionData.topic.uppercase(),
-                        color = Color(0xFF6D4C41),
+                        color = RvInk,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = "Swipe the word left or right",
-                        color = Color(0xFF6D4C41).copy(alpha = 0.8f),
-                        fontSize = 14.sp
-                    )
+                    if (!compact) {
+                        Text(
+                            text = "Swipe the word left or right",
+                            color = RvInk,
+                            fontSize = 14.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("${stringResource(R.string.score_label)}: ${score.value}", color = Color(0xFF6D4C41), fontWeight = FontWeight.Bold)
-                    Text("${stringResource(R.string.time_label)}: ${timeLeft.value}s", color = Color(0xFF6D4C41))
+                    Text("${stringResource(R.string.score_label)}: ${score.value}", color = RvInk, fontWeight = FontWeight.Bold, fontSize = 14.sp, maxLines = 1)
+                    Text("${stringResource(R.string.time_label)}: ${timeLeft.value}s", color = RvInk, fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
-            Divider(color = Color(0xFF6D4C41), thickness = 1.dp)
+            Divider(color = RvInk, thickness = 1.dp)
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Main Word Card with swipe
+            // Main Word Card with swipe (takes the remaining space, centred)
             if (currentWord.value != null && !isCompleted) {
+              Box(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
+                contentAlignment = Alignment.Center
+              ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(150.dp)
+                        .heightIn(min = 96.dp, max = 180.dp)
+                        .fillMaxHeight(0.9f)
                         .swipeable(
                             state = swipeState,
                             anchors = anchors,
@@ -166,16 +182,20 @@ fun SwipeWordScreen(
                         )
                         .offset { IntOffset(swipeState.offset.value.roundToInt(), 0) }
                         .background(Color(0xFF4D4036), shape = RoundedCornerShape(12.dp))
-                        .padding(horizontal = 32.dp, vertical = 24.dp),
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = currentWord.value!!.first,
-                        color = Color.White,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold
+                        color = RvOnTone,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
+              }
 
                 // Check swipe state
                 LaunchedEffect(swipeState.currentValue) {
@@ -229,26 +249,26 @@ fun SwipeWordScreen(
             } else if (isCompleted) {
                 // ✅ Show completion state
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             Icons.Default.CheckCircle,
                             contentDescription = stringResource(R.string.completed),
-                            tint = Color(0xFF4CAF50),
+                            tint = RvSuccess,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = stringResource(R.string.puzzle_completed),
-                            color = Color(0xFF6D4C41),
+                            color = RvInk,
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
                         )
                         Text(
                             text = "${stringResource(R.string.final_score)}: ${score.value}",
-                            color = Color(0xFF6D4C41),
+                            color = RvInk,
                             fontSize = 18.sp
                         )
                     }
@@ -256,15 +276,15 @@ fun SwipeWordScreen(
             } else {
                 // No current word but not completed - should not happen with fixed logic
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = Color(0xFF6D4C41))
+                        CircularProgressIndicator(color = RvInk)
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Loading next word...",
-                            color = Color(0xFF6D4C41),
+                            color = RvInk,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp
                         )
@@ -272,7 +292,7 @@ fun SwipeWordScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 16.dp))
 
             // Swipe Directions - only show if not completed
             if (!isCompleted) {
@@ -282,20 +302,20 @@ fun SwipeWordScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("SWIPE LEFT", color = Color(0xFF6D4C41), fontWeight = FontWeight.Bold)
-                        Text("(Negative)", color = Color(0xFF6D4C41))
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Swipe left", tint = Color(0xFF6D4C41))
+                        Text("SWIPE LEFT", color = RvInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("(Negative)", color = RvInk, fontSize = 14.sp)
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Swipe left", tint = RvInk, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
                     }
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("SWIPE RIGHT", color = Color(0xFF6D4C41), fontWeight = FontWeight.Bold)
-                        Text("(Positive)", color = Color(0xFF6D4C41))
-                        Icon(Icons.Default.ArrowForward, contentDescription = "Swipe right", tint = Color(0xFF6D4C41))
+                        Text("SWIPE RIGHT", color = RvInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("(Positive)", color = RvInk, fontSize = 14.sp)
+                        Icon(Icons.Default.ArrowForward, contentDescription = "Swipe right", tint = RvInk, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
 
             // Hint - only show if not completed
             if (!isCompleted) {
@@ -303,7 +323,10 @@ fun SwipeWordScreen(
                     text = "💡 ${questionData.hint}",
                     fontSize = 14.sp,
                     fontStyle = FontStyle.Italic,
-                    color = Color(0xFF6D4C41),
+                    color = RvInk,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
             }

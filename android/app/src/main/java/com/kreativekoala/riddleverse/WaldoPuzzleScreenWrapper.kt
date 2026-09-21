@@ -1,6 +1,9 @@
 // WaldoPuzzleScreenWrapper.kt - Enhanced Where's Waldo Style Puzzle with Dual Detection
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.Image
@@ -480,71 +483,9 @@ fun WaldoPuzzleHeader(
     onHint: () -> Unit,
     canUseHint: Boolean
 ) {
-    Column(modifier = Modifier.statusBarsPadding()) {
-        // Top row with basic controls
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
-            }
-
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = difficulty.uppercase(),
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = round,
-                    color = Color.White,
-                    fontSize = 10.sp
-                )
-                Text(
-                    text = "ENHANCED WALDO",
-                    color = Color.Red,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Text(
-                text = formatWaldoTime(timeRemaining),
-                color = if (timeRemaining < 30) Color.Red else Color.White,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        // Theme and description
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = theme,
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = description,
-                color = Color.Gray,
-                fontSize = 12.sp
-            )
-        }
-
-        // View mode selector and controls
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+    BoxWithConstraints(modifier = Modifier.statusBarsPadding()) {
+        val wide = maxWidth >= 560.dp
+        val modeButtons: @Composable () -> Unit = {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 WaldoViewModeButton(
                     icon = Icons.Default.ZoomIn,
@@ -559,26 +500,91 @@ fun WaldoPuzzleHeader(
                     onClick = { onViewModeChange(WaldoViewMode.OBJECTS_LIST) }
                 )
             }
-
+        }
+        val hintButton: @Composable () -> Unit = {
+            IconButton(
+                onClick = onHint,
+                enabled = canUseHint,
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    Icons.Default.Lightbulb,
+                    stringResource(R.string.hint),
+                    tint = if (canUseHint) Color.Yellow else Color.Gray
+                )
+            }
+        }
+        Column {
+            // Single compact HUD row: back, title, timer (+ mode buttons and hint when there is room)
             Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "$foundCount/$totalObjects",
-                    color = Color.White,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
+                }
 
-                IconButton(
-                    onClick = onHint,
-                    enabled = canUseHint
+                Column(
+                    modifier = Modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Icon(
-                        Icons.Default.Lightbulb,
-                        "Hint",
-                        tint = if (canUseHint) Color.Yellow else Color.Gray
+                    Text(
+                        text = theme,
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "${difficulty.uppercase()} · $round",
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Text(
+                    text = formatWaldoTime(timeRemaining),
+                    color = if (timeRemaining < 30) RvCoralEdge else Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1
+                )
+                if (wide) {
+                    Text(
+                        text = "$foundCount/$totalObjects",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                    modeButtons()
+                    hintButton()
+                } else {
+                    hintButton()
+                }
+            }
+
+            if (!wide) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    modeButtons()
+                    Text(
+                        text = "$foundCount/$totalObjects",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
                 }
             }
@@ -596,9 +602,9 @@ fun WaldoViewModeButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (isSelected) Color.Red else Color.Gray
+            containerColor = if (isSelected) RvViolet else Color(0xFF444444)
         ),
-        modifier = Modifier.size(width = 70.dp, height = 36.dp),
+        modifier = Modifier.defaultMinSize(minWidth = 72.dp).heightIn(min = 48.dp),
         contentPadding = PaddingValues(4.dp)
     ) {
         Column(
@@ -608,12 +614,12 @@ fun WaldoViewModeButton(
             Icon(
                 icon,
                 contentDescription = label,
-                modifier = Modifier.size(16.dp),
+                modifier = Modifier.size(20.dp),
                 tint = Color.White
             )
             Text(
                 text = label,
-                fontSize = 8.sp,
+                fontSize = 12.sp,
                 color = Color.White
             )
         }
@@ -1065,38 +1071,40 @@ fun WaldoProgressBar(
     wrongClicks: Int,
     hintsUsed: Int
 ) {
-    Column(
-        modifier = Modifier.padding(16.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
+        Text(
+            text = "Found: $foundCount/$totalObjects",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
         LinearProgressIndicator(
             progress = foundCount.toFloat() / totalObjects,
-            modifier = Modifier.fillMaxWidth(),
-            color = Color.Red,
-            trackColor = Color.Gray
+            modifier = Modifier.weight(1f),
+            color = RvSuccess,
+            trackColor = Color(0xFF444444)
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Found: $foundCount/$totalObjects",
-                color = Color.White,
-                fontSize = 12.sp
-            )
-            Text(
-                text = "Wrong: $wrongClicks",
-                color = if (wrongClicks > 5) Color.Red else Color.White,
-                fontSize = 12.sp
-            )
-            Text(
-                text = "Hints: $hintsUsed/3",
-                color = Color.Yellow,
-                fontSize = 12.sp
-            )
-        }
+        Text(
+            text = "Wrong: $wrongClicks",
+            color = if (wrongClicks > 5) RvCoral else Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
+        Text(
+            text = "Hints: $hintsUsed/3",
+            color = Color.Yellow,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
     }
 }
 

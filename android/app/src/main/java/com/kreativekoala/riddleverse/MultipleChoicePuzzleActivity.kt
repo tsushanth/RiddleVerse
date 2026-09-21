@@ -1,5 +1,22 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSuccessEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -73,6 +90,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -137,18 +155,12 @@ fun MultipleChoicePuzzleScreen(
     val themeColors = if (useEnhancedTheme) {
         when (puzzleType.lowercase()) {
             "sentencetransitions" -> ThemeColors(
-                background = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF1A365D), // Deep blue
-                        Color(0xFF2C7A7B), // Teal
-                        Color(0xFF38A169)  // Green
-                    )
-                ),
-                primary = Color(0xFF4FD1C7),
-                secondary = Color(0xFF63B3ED),
-                surface = Color.White.copy(alpha = 0.95f),
-                onSurface = Color(0xFF2D3748),
-                accent = Color(0xFFF687B3)
+                background = SolidColor(RvCanvas),
+                primary = RvSuccess,
+                secondary = RvSky,
+                surface = RvSurface,
+                onSurface = RvInk,
+                accent = RvGrape
             )
             else -> getDefaultThemeColors()
         }
@@ -161,7 +173,7 @@ fun MultipleChoicePuzzleScreen(
             .fillMaxSize()
             .background(
                 if (useEnhancedTheme) themeColors.background
-                else Brush.verticalGradient(listOf(Color.White, Color.White))
+                else SolidColor(RvCanvas)
             )
     ) {
         // Background effects for enhanced theme
@@ -169,128 +181,154 @@ fun MultipleChoicePuzzleScreen(
             FloatingParticles()
         }
 
-        // CHANGED: Replaced Column with Arrangement.SpaceBetween with scrollable Column
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()) // Added scrollable behavior
-                .padding(20.dp)
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            val compact = maxHeight < 600.dp
+            val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+            val gap = if (compact) 8.dp else 16.dp
+            val optionsContent: @Composable () -> Unit = {
+                EnhancedOptionsSection(
+                    options = options,
+                    selectedOption = selectedOption,
+                    correctAnswer = correctAnswer,
+                    isAnswered = isAnswered,
+                    useEnhancedTheme = useEnhancedTheme,
+                    themeColors = themeColors,
+                    onOptionSelected = { option ->
+                        if (!isAnswered) {
+                            onOptionSelected(option)
+                            isAnswered = true
+                            val isCorrect = option == correctAnswer
 
-            // Header Row
-            EnhancedHeaderRow(
-                questionNumber = questionNumber,
-                totalQuestions = totalQuestions,
-                onBack = onBack,
-                onMenuExpanded = { expanded = it },
-                expanded = expanded,
-                onSharePuzzle = { showCustomShareDialog = true },
-                useEnhancedTheme = useEnhancedTheme,
-                themeColors = themeColors
-            )
+                            // UPDATED: Removed automatic sharing after correct answers
+                            feedbackManager.showFeedback(
+                                puzzleType = puzzleType,
+                                isCorrect = isCorrect,
+                                userAnswer = option,
+                                correctAnswer = correctAnswer,
+                                timeSpent = (timerSeconds - timeLeft) * 1000L,
+                                difficulty = difficulty,
+                                timeRemaining = timeLeft,
+                                totalTime = timerSeconds,
+                                onComplete = {
+                                    // Simply continue without showing share dialog
+                                    onContinue(true)
+                                }
+                            )
+                        }
+                    }
+                )
+            }
+            val questionContent: @Composable () -> Unit = {
+                EnhancedQuestionCard(
+                    question = question,
+                    questionNumber = questionNumber,
+                    totalQuestions = totalQuestions,
+                    puzzleType = puzzleType,
+                    useEnhancedTheme = useEnhancedTheme,
+                    themeColors = themeColors
+                )
+            }
+            val resultContent: @Composable () -> Unit = {
+                AnimatedVisibility(visible = showResult) {
+                    EnhancedResultDisplay(
+                        isCorrectAnswer = isCorrectAnswer,
+                        correctAnswer = correctAnswer,
+                        useEnhancedTheme = useEnhancedTheme,
+                        themeColors = themeColors
+                    )
+                }
+                AnimatedVisibility(
+                    visible = showInTimeBonus,
+                    enter = fadeIn(animationSpec = tween(500)) + scaleIn(),
+                    exit = fadeOut(animationSpec = tween(300))
+                ) {
+                    Text(
+                        "+2 In-Time Bonus!",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (useEnhancedTheme) themeColors.accent else RvSuccessEdge,
+                        modifier = Modifier.fillMaxWidth()
+                            .wrapContentWidth(Alignment.CenterHorizontally)
+                    )
+                }
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            // Fit-to-screen: fixed header/timer on top, question + options in the middle,
+            // hint pinned at the bottom. The inner scroll is only an invisible last-resort net.
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = 720.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = if (compact) 8.dp else 16.dp)
+            ) {
+                EnhancedHeaderRow(
+                    questionNumber = questionNumber,
+                    totalQuestions = totalQuestions,
+                    onBack = onBack,
+                    onMenuExpanded = { expanded = it },
+                    expanded = expanded,
+                    onSharePuzzle = { showCustomShareDialog = true },
+                    useEnhancedTheme = useEnhancedTheme,
+                    themeColors = themeColors
+                )
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+                EnhancedTimerBar(
+                    timeLeft = timeLeft,
+                    progress = progress,
+                    useEnhancedTheme = useEnhancedTheme,
+                    themeColors = themeColors
+                )
+                Spacer(modifier = Modifier.height(gap))
 
-            // Timer Bar
-            EnhancedTimerBar(
-                timeLeft = timeLeft,
-                progress = progress,
-                useEnhancedTheme = useEnhancedTheme,
-                themeColors = themeColors
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Question Card
-            EnhancedQuestionCard(
-                question = question,
-                questionNumber = questionNumber,
-                totalQuestions = totalQuestions,
-                puzzleType = puzzleType,
-                useEnhancedTheme = useEnhancedTheme,
-                themeColors = themeColors
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Options
-            EnhancedOptionsSection(
-                options = options,
-                selectedOption = selectedOption,
-                correctAnswer = correctAnswer,
-                isAnswered = isAnswered,
-                useEnhancedTheme = useEnhancedTheme,
-                themeColors = themeColors,
-                onOptionSelected = { option ->
-                    if (!isAnswered) {
-                        onOptionSelected(option)
-                        isAnswered = true
-                        val isCorrect = option == correctAnswer
-
-                        // UPDATED: Removed automatic sharing after correct answers
-                        feedbackManager.showFeedback(
-                            puzzleType = puzzleType,
-                            isCorrect = isCorrect,
-                            userAnswer = option,
-                            correctAnswer = correctAnswer,
-                            timeSpent = (timerSeconds - timeLeft) * 1000L,
-                            difficulty = difficulty,
-                            timeRemaining = timeLeft,
-                            totalTime = timerSeconds,
-                            onComplete = {
-                                // Simply continue without showing share dialog
-                                onContinue(true)
-                            }
-                        )
+                if (wide) {
+                    Row(
+                        modifier = Modifier.weight(1f).fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f).fillMaxHeight()
+                                .verticalScroll(rememberScrollState())
+                        ) {
+                            questionContent()
+                            resultContent()
+                        }
+                        Column(
+                            modifier = Modifier.weight(1f).fillMaxHeight()
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            optionsContent()
+                        }
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier.weight(1f).fillMaxWidth()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        questionContent()
+                        Spacer(modifier = Modifier.height(gap))
+                        optionsContent()
+                        resultContent()
                     }
                 }
-            )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Results
-            AnimatedVisibility(visible = showResult) {
-                EnhancedResultDisplay(
-                    isCorrectAnswer = isCorrectAnswer,
-                    correctAnswer = correctAnswer,
-                    useEnhancedTheme = useEnhancedTheme,
-                    themeColors = themeColors
-                )
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    EnhancedHintButton(
+                        onHint = onHint,
+                        useEnhancedTheme = useEnhancedTheme,
+                        themeColors = themeColors
+                    )
+                }
             }
-
-            // Bonus Display
-            AnimatedVisibility(
-                visible = showInTimeBonus,
-                enter = fadeIn(animationSpec = tween(500)) + scaleIn(),
-                exit = fadeOut(animationSpec = tween(300))
-            ) {
-                Text(
-                    "+2 In-Time Bonus!",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (useEnhancedTheme) themeColors.accent else Color(0xFF00C853),
-                    modifier = Modifier.fillMaxWidth()
-                        .wrapContentWidth(Alignment.CenterHorizontally)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Hint Button
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                EnhancedHintButton(
-                    onHint = onHint,
-                    useEnhancedTheme = useEnhancedTheme,
-                    themeColors = themeColors
-                )
-            }
-
-            // CHANGED: Replaced weight(1f) with fixed bottom spacing
-            Spacer(modifier = Modifier.height(24.dp))
         }
 
         // Keep the feedback overlay positioned absolutely
@@ -329,12 +367,12 @@ data class ThemeColors(
 )
 
 fun getDefaultThemeColors() = ThemeColors(
-    background = Brush.verticalGradient(listOf(Color.White, Color.White)),
-    primary = Color(0xFF8A4DFF),
-    secondary = Color(0xFFB388FF),
-    surface = Color.White,
-    onSurface = Color.Black,
-    accent = Color(0xFFFF8A65)
+    background = SolidColor(RvCanvas),
+    primary = RvViolet,
+    secondary = RvViolet,
+    surface = RvSurfaceRaised,
+    onSurface = RvInk,
+    accent = RvSunEdge
 )
 
 // Enhanced Components
@@ -358,7 +396,7 @@ fun EnhancedHeaderRow(
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = "Back",
-                tint = if (useEnhancedTheme) Color.White else Color.Black
+                tint = RvInk
             )
         }
 
@@ -367,18 +405,18 @@ fun EnhancedHeaderRow(
                 "Question $questionNumber of $totalQuestions",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = if (useEnhancedTheme) Color.White else Color.Black
+                color = RvInk
             )
             LinearProgressIndicator(
                 progress = questionNumber.toFloat() / totalQuestions.toFloat(),
                 modifier = Modifier
                     .width(120.dp)
                     .padding(top = 4.dp),
-                color = if (useEnhancedTheme) themeColors.accent else Color(0xFF8A4DFF),
+                color = if (useEnhancedTheme) themeColors.accent else RvViolet,
                 trackColor = if (useEnhancedTheme)
-                    themeColors.accent.copy(alpha = 0.3f)
+                    RvOutline
                 else
-                    Color(0xFF8A4DFF).copy(alpha = 0.3f)
+                    RvOutline
             )
         }
 
@@ -387,7 +425,7 @@ fun EnhancedHeaderRow(
                 Icon(
                     Icons.Default.MoreVert,
                     contentDescription = "Settings",
-                    tint = if (useEnhancedTheme) Color.White else Color.Black
+                    tint = RvInk
                 )
             }
 
@@ -406,7 +444,7 @@ fun EnhancedHeaderRow(
                                 Icons.Default.Email,
                                 contentDescription = "Share Puzzle",
                                 modifier = Modifier.size(20.dp),
-                                tint = Color(0xFF4CAF50)
+                                tint = RvSuccess
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Share Puzzle")
@@ -432,9 +470,9 @@ fun EnhancedTimerBar(
             .clip(RoundedCornerShape(50))
             .background(
                 if (useEnhancedTheme)
-                    themeColors.secondary.copy(alpha = 0.3f)
+                    RvSurface
                 else
-                    Color(0xFFB388FF).copy(alpha = 0.3f)
+                    RvSurface
             ),
         contentAlignment = Alignment.Center
     ) {
@@ -443,21 +481,21 @@ fun EnhancedTimerBar(
                 .fillMaxWidth(progress.coerceIn(0f, 1f))
                 .fillMaxHeight()
                 .background(
-                    if (useEnhancedTheme) themeColors.secondary else Color(0xFFB388FF)
+                    if (useEnhancedTheme) themeColors.secondary.copy(alpha = 0.35f) else RvViolet.copy(alpha = 0.3f)
                 ),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "00:${String.format("%02d", timeLeft)}",
-                color = Color.White,
+                color = RvInk,
                 fontWeight = FontWeight.Bold
             )
         }
         Icon(
             imageVector = Icons.Default.Timer,
             contentDescription = null,
-            tint = Color.White,
+            tint = RvInk,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
                 .padding(end = 8.dp)
@@ -479,40 +517,13 @@ fun EnhancedQuestionCard(
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp)),
         colors = CardDefaults.cardColors(
-            containerColor = if (useEnhancedTheme) themeColors.surface else Color(0xFF8A4DFF)
+            containerColor = if (useEnhancedTheme) themeColors.surface else RvViolet
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = if (useEnhancedTheme) 8.dp else 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(16.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    "Question $questionNumber/$totalQuestions",
-                    color = if (useEnhancedTheme)
-                        themeColors.onSurface.copy(alpha = 0.7f)
-                    else
-                        Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    "${((questionNumber.toFloat() / totalQuestions.toFloat()) * 100).toInt()}% Complete",
-                    color = if (useEnhancedTheme)
-                        themeColors.onSurface.copy(alpha = 0.7f)
-                    else
-                        Color.White.copy(alpha = 0.8f),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
             // Enhanced question text for sentence transitions
             if (puzzleType.lowercase() == "sentencetransitions" && useEnhancedTheme) {
                 val parts = question.split("_______")
@@ -562,7 +573,7 @@ fun EnhancedQuestionCard(
             } else {
                 Text(
                     question,
-                    color = if (useEnhancedTheme) themeColors.onSurface else Color.White,
+                    color = if (useEnhancedTheme) themeColors.onSurface else RvOnTone,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium,
                     lineHeight = 26.sp
@@ -589,18 +600,18 @@ fun EnhancedOptionsSection(
 
             val backgroundColor = when {
                 isSelected && isCorrect -> if (useEnhancedTheme)
-                    themeColors.primary.copy(alpha = 0.1f) else Color(0xFFDFFFE0)
+                    themeColors.primary.copy(alpha = 0.1f) else RvSuccess.copy(alpha = 0.15f)
                 isSelected && !isCorrect -> if (useEnhancedTheme)
-                    Color(0xFFFFEBEB) else Color(0xFFFFEBEB)
-                else -> if (useEnhancedTheme) themeColors.surface else Color.White
+                    RvError.copy(alpha = 0.15f) else RvError.copy(alpha = 0.15f)
+                else -> if (useEnhancedTheme) themeColors.surface else RvSurfaceRaised
             }
 
             val borderColor = when {
                 isSelected && isCorrect -> if (useEnhancedTheme)
-                    themeColors.primary else Color(0xFF4CAF50)
-                isSelected && !isCorrect -> Color(0xFFFF0000)
+                    themeColors.primary else RvSuccess
+                isSelected && !isCorrect -> RvError
                 else -> if (useEnhancedTheme)
-                    themeColors.primary.copy(alpha = 0.5f) else Color(0xFF8A4DFF)
+                    themeColors.primary.copy(alpha = 0.5f) else RvViolet
             }
 
             val icon = when {
@@ -612,25 +623,28 @@ fun EnhancedOptionsSection(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 6.dp)
+                    .padding(vertical = 4.dp)
                     .clickable { onOptionSelected(option) },
                 shape = RoundedCornerShape(if (useEnhancedTheme) 16.dp else 40.dp),
                 border = BorderStroke(2.dp, borderColor),
                 colors = CardDefaults.cardColors(containerColor = backgroundColor),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = if (useEnhancedTheme) 4.dp else 0.dp
+                    defaultElevation = 0.dp
                 )
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .heightIn(min = 56.dp)
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         option,
                         modifier = Modifier.weight(1f),
-                        color = if (useEnhancedTheme) themeColors.onSurface else Color.Black,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        color = if (useEnhancedTheme) themeColors.onSurface else RvInk,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium
                     )
@@ -664,7 +678,7 @@ fun EnhancedResultDisplay(
                 "\uD83C\uDF89 Excellent!",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (useEnhancedTheme) themeColors.primary else Color(0xFF4CAF50)
+                color = if (useEnhancedTheme) themeColors.primary else RvSuccess
             )
             if (useEnhancedTheme) {
                 ConfettiAnimation()
@@ -674,7 +688,7 @@ fun EnhancedResultDisplay(
                 "\u274C Incorrect! Correct: $correctAnswer",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Red,
+                color = RvError,
                 textAlign = TextAlign.Center
             )
         }
@@ -694,30 +708,30 @@ fun EnhancedHintButton(
         shape = RoundedCornerShape(50),
         border = BorderStroke(
             1.dp,
-            if (useEnhancedTheme) themeColors.accent else Color(0xFFFF8A65)
+            if (useEnhancedTheme) themeColors.accent else RvSunEdge
         ),
         colors = CardDefaults.cardColors(
             containerColor = if (useEnhancedTheme)
                 themeColors.surface else Color.Transparent
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = if (useEnhancedTheme) 4.dp else 0.dp
+            defaultElevation = 0.dp
         )
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+            modifier = Modifier.heightIn(min = 48.dp).padding(horizontal = 20.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 Icons.Default.Lightbulb,
                 contentDescription = null,
-                tint = if (useEnhancedTheme) themeColors.accent else Color(0xFFFF8A65),
+                tint = if (useEnhancedTheme) themeColors.accent else RvSunEdge,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
                 "Need a Hint?",
-                color = if (useEnhancedTheme) themeColors.accent else Color(0xFFFF8A65),
+                color = if (useEnhancedTheme) themeColors.accent else RvSunEdge,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -758,7 +772,7 @@ fun FloatingParticles() {
                 )
                 .size(4.dp)
                 .background(
-                    Color.White.copy(alpha = 0.3f),
+                    RvGrape.copy(alpha = 0.3f),
                     CircleShape
                 )
         )

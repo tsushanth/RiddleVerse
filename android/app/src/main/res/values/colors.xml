@@ -10,4 +10,5 @@
     <color name="primary_color">#FF8A65</color>
     <color name="gray_text">#757575</color>
     <color name="notification_color">#FF6200EE</color>
+    <color name="rv_canvas">#FFFFFFFF</color>
 </resources>

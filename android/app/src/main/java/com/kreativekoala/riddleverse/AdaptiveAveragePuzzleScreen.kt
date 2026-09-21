@@ -1,6 +1,7 @@
 // AdaptiveAveragePuzzleScreen.kt - Enhanced with adaptive difficulty
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -123,7 +124,7 @@ fun AdaptiveAveragePuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -167,140 +168,69 @@ fun AdaptiveAveragePuzzleScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(RvCanvas)
     ) {
         // Background components
         MountainLandscapeBackground()
         GeometricOverlay()
 
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // ✅ REPLACE: Use unified header instead of AdaptiveAveragesTopGameBar
-            AdaptiveUnifiedHeader(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                score = totalScore,
-                puzzleType = "average",
-                competitiveInsight = competitiveInsight,
-                onBack = onBack,
-                onPause = {  },
-                onHint = {
-                    showHint = !showHint
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+        AverageFitLayout(
+            hud = { compact ->
+                if (compact) {
+                    GameCompactHud(
+                        timer = displayTimer,
+                        lives = currentHearts,
+                        maxLives = currentDifficultyLevel.livesAllowed,
+                        score = totalScore,
+                        onBack = onBack
+                    )
+                } else {
+                    AdaptiveUnifiedHeader(
+                        level = currentLevel,
+                        streakInfo = streakInfo,
+                        timer = displayTimer,
+                        lives = currentHearts,
+                        currentDifficulty = currentDifficultyLevel,
+                        score = totalScore,
+                        puzzleType = "average",
+                        competitiveInsight = competitiveInsight,
+                        onBack = onBack,
+                        onPause = {  },
+                        onHint = {
+                            showHint = !showHint
+                            haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        }
+                    )
                 }
-            )
-
-            // ✅ REPLACE: Use unified adaptation notification
-            UnifiedAdaptationNotification(
-                adaptationInfo = adaptationInfo,
-                puzzleType = "average",
-                visible = showAdaptationNotification,
-                onDismiss = { showAdaptationNotification = false }
-            )
-
-            // Enhanced game info with adaptive metrics
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.score_label).uppercase(),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "$totalScore",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
+                // Adaptation banners are intentionally off (SHOW_ADAPTATION_NOTICES=false); keep the hook.
+                UnifiedAdaptationNotification(
+                    adaptationInfo = adaptationInfo,
+                    puzzleType = "average",
+                    visible = showAdaptationNotification,
+                    onDismiss = { showAdaptationNotification = false }
+                )
+            },
+            info = {
+                if (totalScore > 0 || attempts > 0) {
+                    AverageInfoStrip(
+                        buildString {
+                            append("${stringResource(R.string.score_label)}: $totalScore")
+                            append("  •  ${currentPuzzle.numbers.size} numbers")
+                            if (currentStreak > 0) append("  •  🔥 $currentStreak")
                         }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentDifficultyLevel.name.uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Cyan
-                            )
-                            Text(
-                                text = "${currentPuzzle.numbers.size} numbers",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.7f)
-                            )
-                        }
-
-                        if (currentStreak > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.streak_label).uppercase(),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "🔥 $currentStreak",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF6F00)
-                                )
-                            }
-                        }
-                    }
+                    )
                 }
-                Spacer(modifier = Modifier.height(20.dp))
-            } else {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-
-            // Title and numbers
-            AdaptivePuzzleHeader(
-                numbers = currentPuzzle.numbers,
-                difficultyLevel = currentDifficultyLevel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Input display
-            InputDisplay(
-                currentInput = currentInput,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Calculator interface
-            CalculatorGrid(
+            },
+            question = { compact ->
+                AverageQuestionPane(
+                    numbers = currentPuzzle.numbers,
+                    currentInput = currentInput,
+                    compact = compact,
+                    subtitle = currentDifficultyLevel.name
+                )
+            },
+            keypad = {
+                AverageKeypad(
                 currentInput = currentInput,
                 onNumberClick = { digit ->
                     if (!isAnswered && currentInput.length < 6) {
@@ -361,11 +291,10 @@ fun AdaptiveAveragePuzzleScreen(
                         )
                     }
                 },
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.fillMaxSize()
             )
-
-            Spacer(modifier = Modifier.height(30.dp))
-        }
+            }
+        )
 
         EnhancedUniversalFeedback(feedbackManager)
     }
@@ -451,7 +380,7 @@ fun AdaptivePuzzleHeader(
             text = "FIND THE AVERAGE",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
+            color = RvInkSoft.copy(alpha = 0.9f),
             letterSpacing = 1.sp
         )
 
@@ -459,7 +388,7 @@ fun AdaptivePuzzleHeader(
             text = difficultyLevel.name,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Cyan,
+            color = RvSky,
             modifier = Modifier.padding(top = 4.dp)
         )
 
@@ -479,7 +408,7 @@ fun AdaptivePuzzleHeader(
                             text = number.toString(),
                             fontSize = 48.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = RvInk,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -499,7 +428,7 @@ fun AdaptivePuzzleHeader(
                                 text = number.toString(),
                                 fontSize = 42.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = RvInk,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -512,7 +441,7 @@ fun AdaptivePuzzleHeader(
                                 text = number.toString(),
                                 fontSize = 42.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = RvInk,
                                 textAlign = TextAlign.Center
                             )
                         }
@@ -538,7 +467,7 @@ fun AdaptivePuzzleHeader(
                                     text = number.toString(),
                                     fontSize = 36.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.White,
+                                    color = RvInk,
                                     textAlign = TextAlign.Center
                                 )
                             }
@@ -584,7 +513,7 @@ fun AdaptiveAveragesTopGameBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -592,7 +521,7 @@ fun AdaptiveAveragesTopGameBar(
             Icon(
                 imageVector = Icons.Default.Pause,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.7f),
+                tint = RvInkSoft.copy(alpha = 0.7f),
                 modifier = Modifier.size(24.dp)
             )
 
@@ -601,7 +530,7 @@ fun AdaptiveAveragesTopGameBar(
                     text = "Level ${level.level}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 // Adaptive difficulty indicator
@@ -609,7 +538,7 @@ fun AdaptiveAveragesTopGameBar(
                     text = currentDifficulty.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Cyan
+                    color = RvSky
                 )
 
                 // Level progress bar
@@ -642,9 +571,9 @@ fun AdaptiveAveragesTopGameBar(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
-                    Color.Red // Red when ≤30 seconds
+                    RvError // Red when ≤30 seconds
                 } else {
-                    Color.White
+                    RvInk
                 }
             )
 

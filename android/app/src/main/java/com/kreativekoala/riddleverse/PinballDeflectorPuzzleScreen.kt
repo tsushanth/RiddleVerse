@@ -22,10 +22,21 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.testTag
+import com.kreativekoala.riddleverse.ui.theme.RvMintEdge
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import org.json.JSONObject
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 
 data class DeflectorData(
     val row: Int,
@@ -485,79 +496,106 @@ fun PinballDeflectorPuzzleScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF1E1E1E))
-                .padding(16.dp)
+                .background(RvCanvas)
         ) {
-            // Enhanced header with live timer and score
-            EnhancedPinballHeader(
-                difficulty = difficulty,
-                timer = displayTimer, // Use live countdown
-                hearts = hearts,
-                level = level,
-                totalScore = totalScore,
-                attempts = attempts,
-                onBack = onBack
-            )
+            val compact = maxHeight < 600.dp
+            val pad = if (compact) 8.dp else 16.dp
+            val wide = maxWidth > maxHeight && maxWidth >= 480.dp
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Game state indicator
-            when (gameState) {
-                PinballGameState.MEMORIZING -> {
-                    Text(
-                        text = "Memorize deflector positions: ${timeLeft}s",
-                        color = Color.Yellow,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                PinballGameState.GUESSING -> {
-                    Text(
-                        text = "Select where the ball will end up",
-                        color = Color.Cyan,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                }
-                PinballGameState.SHOWING_RESULT -> {
-                    Text(
-                        text = if (isCorrect) "Correct! 🎉" else "Incorrect ❌",
-                        color = if (isCorrect) Color.Green else Color.Red,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
+            val header: @Composable () -> Unit = {
+                EnhancedPinballHeader(
+                    difficulty = difficulty,
+                    timer = displayTimer, // Use live countdown
+                    hearts = hearts,
+                    level = level,
+                    totalScore = totalScore,
+                    attempts = attempts,
+                    onBack = onBack
+                )
+            }
+            val status: @Composable () -> Unit = {
+                when (gameState) {
+                    PinballGameState.MEMORIZING -> {
+                        Text(
+                            text = "Memorize deflector positions: ${timeLeft}s",
+                            color = RvInk,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    PinballGameState.GUESSING -> {
+                        Text(
+                            text = "Select where the ball will end up",
+                            color = RvInk,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                    PinballGameState.SHOWING_RESULT -> {
+                        Text(
+                            text = if (isCorrect) "Correct! 🎉" else "Incorrect ❌",
+                            color = if (isCorrect) RvMintEdge else RvCoralEdge,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
+            val board: @Composable (Modifier) -> Unit = { m ->
+                PinballGameBoard(
+                    matrixSize = matrixSize,
+                    startPosition = startPosition,
+                    startDirection = startDirection,
+                    deflectors = allDeflectors,
+                    selectedEndPosition = selectedEndPosition,
+                    correctEndPosition = correctEndPosition,
+                    ballPath = ballPath,
+                    trajectoryProgress = trajectoryProgress,
+                    gameState = gameState,
+                    onCellClick = ::handleCellSelection,
+                    modifier = m
+                )
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Game board - what to show depends on game state
-            PinballGameBoard(
-                matrixSize = matrixSize,
-                startPosition = startPosition,
-                startDirection = startDirection,
-                deflectors = allDeflectors,
-                selectedEndPosition = selectedEndPosition,
-                correctEndPosition = correctEndPosition,
-                ballPath = ballPath,
-                trajectoryProgress = trajectoryProgress,
-                gameState = gameState,
-                onCellClick = ::handleCellSelection,
-                modifier = Modifier.weight(1f)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Removed all buttons since the game now auto-proceeds
+            if (wide) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(pad),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    board(Modifier.weight(1f).fillMaxHeight())
+                    Column(
+                        modifier = Modifier.weight(0.7f).widthIn(max = 360.dp).fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically)
+                    ) {
+                        header()
+                        status()
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(pad),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    header()
+                    Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+                    status()
+                    Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+                    board(Modifier.weight(1f).fillMaxWidth())
+                }
+            }
         }
 
         // Universal Feedback Overlay - now in BoxScope
@@ -580,28 +618,27 @@ fun EnhancedPinballHeader(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Bottom
+            verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
                 onClick = onBack,
                 modifier = Modifier
-                    .padding(top = 16.dp)
                     .size(48.dp)
                     .background(Color(0xFF444444), CircleShape)
             ) {
-                Text("←", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+                Text("←", color = RvOnTone, fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = "Pinball Deflector",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = level,
-                    color = Color.Gray,
+                    color = RvInkSoft,
                     fontSize = 14.sp
                 )
             }
@@ -612,7 +649,7 @@ fun EnhancedPinballHeader(
                     color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
                         Color.Red // Red when ≤30 seconds
                     } else {
-                        Color.White
+                        RvInk
                     },
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
@@ -632,7 +669,7 @@ fun EnhancedPinballHeader(
 
             Card(
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.1f)
+                    containerColor = RvSurface
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
@@ -646,7 +683,7 @@ fun EnhancedPinballHeader(
                     if (totalScore > 0) {
                         Text(
                             text = "${stringResource(R.string.score_label)}: $totalScore",
-                            color = Color.White,
+                            color = RvInk,
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -654,7 +691,7 @@ fun EnhancedPinballHeader(
 
                     Text(
                         text = difficulty.uppercase(),
-                        color = Color.Yellow,
+                        color = RvSunEdge,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -662,7 +699,7 @@ fun EnhancedPinballHeader(
                     if (attempts > 0) {
                         Text(
                             text = "Attempt: $attempts",
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft,
                             fontSize = 12.sp
                         )
                     }
@@ -686,18 +723,23 @@ fun PinballGameBoard(
     onCellClick: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val boardSize = 350.dp
-
-    Box(
-        modifier = modifier.fillMaxWidth(),
+    BoxWithConstraints(
+        modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
+        // Edge markers live in a ring around the board (48dp hit targets), so reserve it.
+        val ring = 48.dp
+        val boardSize = minOf(maxWidth - ring * 2, maxHeight - ring * 2)
+            .coerceAtMost(520.dp)
+            .coerceAtLeast(120.dp)
+
         // Main game board canvas
         Canvas(
             modifier = Modifier
+                .testTag("pinball_board")
                 .size(boardSize)
                 .clip(RoundedCornerShape(12.dp))
-                .background(Color(0xFF2D2D2D))
+                .background(RvSurface)
                 .border(2.dp, Color(0xFF555555), RoundedCornerShape(12.dp))
         ) {
             val cellSize = size.width / matrixSize
@@ -866,7 +908,7 @@ fun DrawScope.drawAnimatedBallPath(
             )
 
             drawCircle(
-                color = Color.White.copy(alpha = dotAlpha),
+                color = RvInk.copy(alpha = dotAlpha),
                 radius = dotRadius,
                 center = Offset(adjustedX, adjustedY),
                 style = Stroke(width = 1.dp.toPx())
@@ -901,7 +943,7 @@ fun DrawScope.drawAnimatedBallPath(
             )
 
             drawCircle(
-                color = Color.White,
+                color = RvInk,
                 radius = cellSize * 0.15f,
                 center = Offset(adjustedFinalX, adjustedFinalY),
                 style = Stroke(width = 2.dp.toPx())
@@ -932,8 +974,12 @@ fun EdgePositionsOverlay(
     boardSize: androidx.compose.ui.unit.Dp
 ) {
     val cellSize = boardSize / matrixSize
-    val topBottomOffset = 40.dp
-    val leftRightOffset = 20.dp
+    // Markers sit 24dp outside the board edge; each has a >=48dp touch target (or a full cell
+    // when cells are smaller) while the visible dot stays proportional to the cell.
+    val topBottomOffset = 24.dp
+    val leftRightOffset = 24.dp
+    val hitSize = minOf(48.dp, cellSize).coerceAtLeast(24.dp)
+    val dotSize = (cellSize * 0.4f).coerceIn(24.dp, hitSize)
 
     // Create edge positions
     val edgePositions = mutableListOf<Triple<Int, Int, String>>()
@@ -1022,7 +1068,16 @@ fun EdgePositionsOverlay(
         Box(
             modifier = Modifier
                 .offset(x = offsetX, y = offsetY)
-                .size(cellSize * 0.4f)
+                .size(hitSize)
+                .testTag("pinball_edge")
+                .clickable(enabled = isClickEnabled) {
+                    onCellClick(row, col)
+                },
+            contentAlignment = Alignment.Center
+        ) {
+        Box(
+            modifier = Modifier
+                .size(dotSize)
                 .clip(CircleShape)
                 .background(
                     when {
@@ -1037,33 +1092,33 @@ fun EdgePositionsOverlay(
                 .border(
                     2.dp,
                     when {
-                        isStartPosition && shouldShowStartPosition -> Color.White
-                        (isSelected || isCorrectAnswer) && gameState == PinballGameState.SHOWING_RESULT -> Color.White
-                        isSelected && gameState == PinballGameState.GUESSING -> Color.White
+                        isStartPosition && shouldShowStartPosition -> RvOnTone
+                        (isSelected || isCorrectAnswer) && gameState == PinballGameState.SHOWING_RESULT -> RvOnTone
+                        isSelected && gameState == PinballGameState.GUESSING -> RvOnTone
                         gameState == PinballGameState.GUESSING -> Color(0xFF888888)
                         else -> Color.Transparent
                     },
                     CircleShape
                 )
-                .clickable(enabled = isClickEnabled) {
-                    onCellClick(row, col)
-                },
+                ,
             contentAlignment = Alignment.Center
         ) {
+            val glyph = with(LocalDensity.current) { (dotSize * 0.6f).toSp() }
             when {
                 isStartPosition && shouldShowStartPosition -> {
-                    Text("●", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 10.sp)
+                    Text("●", color = RvOnTone, fontWeight = FontWeight.Bold, fontSize = glyph)
                 }
                 isSelected && gameState == PinballGameState.SHOWING_RESULT && !isCorrectAnswer -> {
-                    Text("✗", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 8.sp)
+                    Text("✗", color = RvOnTone, fontWeight = FontWeight.Bold, fontSize = glyph)
                 }
                 isCorrectAnswer && shouldShowCorrectAnswer -> {
-                    Text("✓", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 8.sp)
+                    Text("✓", color = RvOnTone, fontWeight = FontWeight.Bold, fontSize = glyph)
                 }
                 isSelected && gameState == PinballGameState.GUESSING -> {
-                    Text("?", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 8.sp)
+                    Text("?", color = RvOnTone, fontWeight = FontWeight.Bold, fontSize = glyph)
                 }
             }
+        }
         }
     }
 }
@@ -1137,13 +1192,13 @@ fun DrawScope.drawSelectedEndPosition(position: BallPosition, cellSize: Float) {
     // Draw X mark
     val markSize = radius * 0.5f
     drawLine(
-        color = Color.White,
+        color = RvInk,
         start = Offset(centerX - markSize, centerY - markSize),
         end = Offset(centerX + markSize, centerY + markSize),
         strokeWidth = 3.dp.toPx()
     )
     drawLine(
-        color = Color.White,
+        color = RvInk,
         start = Offset(centerX + markSize, centerY - markSize),
         end = Offset(centerX - markSize, centerY + markSize),
         strokeWidth = 3.dp.toPx()

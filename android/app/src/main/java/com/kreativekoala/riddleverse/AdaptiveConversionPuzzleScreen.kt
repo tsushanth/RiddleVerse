@@ -1,6 +1,7 @@
 // AdaptiveConversionPuzzleScreen.kt - Enhanced with adaptive difficulty
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -121,7 +122,7 @@ class AdaptiveConversionPuzzleGenerator {
                 label = "${leftTemp.toInt()}°${converter.getShortUnit(leftUnit).last()}",
                 value = leftTemp,
                 unit = leftUnit,
-                color = Color(0xFFFF6B35)
+                color = RvFlame
             ),
             ConversionBlock(
                 id = 2,
@@ -179,7 +180,7 @@ class AdaptiveConversionPuzzleGenerator {
                 label = "${leftDistance.toInt()} ${converter.getShortUnit(leftUnit)}",
                 value = leftDistance,
                 unit = leftUnit,
-                color = Color(0xFF3498DB)
+                color = RvSky
             ),
             ConversionBlock(
                 id = 2,
@@ -266,7 +267,7 @@ class AdaptiveConversionPuzzleGenerator {
                 label = "${leftArea.toInt()} ${converter.getShortUnit(leftUnit)}",
                 value = leftArea,
                 unit = leftUnit,
-                color = Color(0xFF27AE60)
+                color = RvSuccess
             ),
             ConversionBlock(
                 id = 2,
@@ -395,7 +396,7 @@ fun AdaptiveConversionPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -439,9 +440,9 @@ fun AdaptiveConversionPuzzleScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF1A1A2E),
-                        Color(0xFF16213E),
-                        Color(0xFF0F3460)
+                        RvInk,
+                        RvInk,
+                        RvInk
                     )
                 )
             )
@@ -483,7 +484,7 @@ fun AdaptiveConversionPuzzleScreen(
                 text = "COMPARE ${currentPuzzle.conversionType.displayName.uppercase()}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -498,7 +499,7 @@ fun AdaptiveConversionPuzzleScreen(
                 Text(
                     text = "Drag the blocks to show which ${currentPuzzle.conversionType.displayName.lowercase()} is greater",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = RvInkSoft.copy(alpha = 0.8f),
                     textAlign = TextAlign.Center
                 )
 
@@ -757,7 +758,7 @@ fun AdaptiveConversionTopGameBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -777,7 +778,7 @@ fun AdaptiveConversionTopGameBar(
                     text = "Level ${level.level}",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 // Adaptive difficulty indicator
@@ -826,7 +827,7 @@ fun AdaptiveConversionTopGameBar(
             Text(
                 text = "${conversionType.icon} ${conversionType.displayName}",
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.8f),
+                color = RvInkSoft.copy(alpha = 0.8f),
                 modifier = Modifier.padding(top = 4.dp)
             )
 

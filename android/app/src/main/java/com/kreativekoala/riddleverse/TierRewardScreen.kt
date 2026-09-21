@@ -27,6 +27,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.ui.res.stringResource
 import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
+import com.kreativekoala.riddleverse.ui.theme.RvGrape
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 class TierRewardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -105,7 +112,7 @@ fun TierRewardScreen(onBack: () -> Unit = {}) {
                 xpRequired = 10000,
                 rewards = listOf("👑 Master Crown", "🌟 Ultimate Rewards", "🎪 VIP Features"),
                 isUnlocked = tierInfo.totalXP >= 10000,
-                color = Color(0xFF9C27B0)
+                color = RvGrape
             )
         )
     }
@@ -151,7 +158,7 @@ fun TierRewardScreen(onBack: () -> Unit = {}) {
             ) {
                 Text(
                     "${tierInfo.totalXP} XP",
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -186,7 +193,7 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = RvSurfaceRaised
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(16.dp)
@@ -224,12 +231,12 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                             "${getTierEmoji(tierInfo.currentTier)} ${tierInfo.currentTier} Tier",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                         Text(
                             "Level ${currentLevel.level}",
                             fontSize = 16.sp,
-                            color = Color.White.copy(alpha = 0.9f)
+                            color = RvInkSoft
                         )
                     }
 
@@ -238,13 +245,13 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                             "${tierInfo.totalXP} XP",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvInk
                         )
                         if (tierInfo.currentTier != tierInfo.nextTier) {
                             Text(
                                 "Next: ${tierInfo.nextTier}",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = RvInkSoft
                             )
                         }
                     }
@@ -262,12 +269,12 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                             Text(
                                 "Progress to ${tierInfo.nextTier}",
                                 fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.9f)
+                                color = RvInkSoft
                             )
                             Text(
                                 "${tierInfo.pointsToNextTier - tierInfo.pointsInTier} XP to go",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = RvInkSoft
                             )
                         }
 
@@ -279,8 +286,8 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                                 .fillMaxWidth()
                                 .height(8.dp)
                                 .clip(RoundedCornerShape(4.dp)),
-                            color = Color.White,
-                            trackColor = Color.White.copy(alpha = 0.3f)
+                            color = RvInk,
+                            trackColor = RvOutline
                         )
                     }
                 } else {
@@ -289,7 +296,7 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                         "🎉 Maximum tier achieved! 🎉",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White,
+                        color = RvInk,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -402,7 +409,7 @@ fun TierRewardCard(
                         ) {
                             Text(
                                 "CURRENT",
-                                color = Color.White,
+                                color = RvInk,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -411,14 +418,14 @@ fun TierRewardCard(
                         Box(
                             modifier = Modifier
                                 .background(
-                                    Color(0xFF4CAF50),
+                                    RvSuccess,
                                     RoundedCornerShape(8.dp)
                                 )
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 "UNLOCKED",
-                                color = Color.White,
+                                color = RvOnTone,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
                             )
@@ -439,7 +446,7 @@ fun TierRewardCard(
                         text = "• $reward",
                         fontSize = 12.sp,
                         color = if (tierReward.isUnlocked) {
-                            Color(0xFF2E7D32)
+                            RvSuccess
                         } else {
                             Color.Gray
                         },

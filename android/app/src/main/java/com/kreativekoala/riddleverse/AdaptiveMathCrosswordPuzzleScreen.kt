@@ -1,6 +1,7 @@
 // AdaptiveMathCrosswordPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -148,7 +149,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -248,78 +249,81 @@ fun AdaptiveMathCrosswordPuzzleScreen(
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FF))
-            .padding(16.dp)
-    ) {
-        // ✅ REPLACE: Use unified header instead of AdaptiveMathCrosswordTopBar
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = totalScore,
-            puzzleType = "mathcrossword",
-            competitiveInsight = competitiveInsight,
-            onBack = {
-                gameCompleted = true
-                onBack()
-            },
-            onPause = { isPaused = !isPaused },
-            onHint = {
-                showHint = !showHint
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // ✅ REPLACE: Use unified adaptation notification
-        UnifiedAdaptationNotification(
-            adaptationInfo = adaptationInfo,
-            puzzleType = "mathcrossword",
-            visible = showAdaptationNotification,
-            onDismiss = { showAdaptationNotification = false }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Instructions with adaptive info
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
-        ) {
-            Column(
-                modifier = Modifier.padding(12.dp)
-            ) {
-                Text(
-                    text = "Complete the math equations by placing missing numbers and operators",
-                    fontSize = 14.sp,
-                    color = Color(0xFF1976D2),
-                    textAlign = TextAlign.Center
+    BCrosswordLayout(
+        background = Color(0xFFF8F9FF),
+        numberCount = usedNumbers.size,
+        hud = { compact ->
+            if (compact) {
+                BCompactHud(
+                    level = currentLevel,
+                    difficultyName = currentDifficultyLevel.name,
+                    timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = totalScore,
+                    streak = streakInfo.currentStreak,
+                    onBack = {
+                        gameCompleted = true
+                        onBack()
+                    },
+                    onPause = { isPaused = !isPaused }
                 )
-
-                Text(
-                    text = "Complexity: ${adaptiveConfig.equationComplexity}/5 • Grid: ${adaptiveConfig.gridSize}x${adaptiveConfig.gridSize}",
-                    fontSize = 12.sp,
-                    color = Color(0xFF666666),
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 4.dp)
+            } else {
+                AdaptiveUnifiedHeader(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = totalScore,
+                    puzzleType = "mathcrossword",
+                    competitiveInsight = competitiveInsight,
+                    onBack = {
+                        gameCompleted = true
+                        onBack()
+                    },
+                    onPause = { isPaused = !isPaused },
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
                 )
             }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Math Crossword Grid
-        if (currentGrid.isNotEmpty()) {
-            Box(
+            // "<Puzzle> Adapted!" banner (intentionally off via SHOW_ADAPTATION_NOTICES)
+            UnifiedAdaptationNotification(
+                adaptationInfo = adaptationInfo,
+                puzzleType = "mathcrossword",
+                visible = showAdaptationNotification,
+                onDismiss = { showAdaptationNotification = false }
+            )
+        },
+        instruction = {
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD))
             ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(
+                        text = "Complete the math equations by placing missing numbers and operators",
+                        fontSize = 14.sp,
+                        color = Color(0xFF0D47A1),
+                        textAlign = TextAlign.Center,
+                        maxLines = 2
+                    )
+
+                    Text(
+                        text = "Complexity: ${adaptiveConfig.equationComplexity}/5 • Grid: ${adaptiveConfig.gridSize}x${adaptiveConfig.gridSize}",
+                        fontSize = 12.sp,
+                        color = RvInkSoft,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 2.dp).fillMaxWidth(),
+                        maxLines = 1
+                    )
+                }
+            }
+        },
+        grid = {
+            if (currentGrid.isNotEmpty()) {
                 CrosswordGridLayout(
                     grid = currentGrid,
                     selectedCell = selectedCell,
@@ -331,113 +335,104 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                     }
                 )
             }
+        },
+        selectionLabel = {
+    selectedCell?.let { (row, col) ->
+        val cell = currentGrid[row][col]
+        if (!cell.isFixed && cell.cellType != CellType.BLOCKED) {
+            Text(
+                text = when (cell.cellType) {
+                    CellType.NUMBER -> "Select a number:"
+                    CellType.OPERATOR -> "Select an operator:"
+                    else -> "Select a value:"
+                },
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvInk,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Selection indicator
-        selectedCell?.let { (row, col) ->
-            val cell = currentGrid[row][col]
-            if (!cell.isFixed && cell.cellType != CellType.BLOCKED) {
-                Text(
-                    text = when (cell.cellType) {
-                        CellType.NUMBER -> "Select a number:"
-                        CellType.OPERATOR -> "Select an operator:"
-                        else -> "Select a value:"
-                    },
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF333333),
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
-        }
-
-        // Available Numbers Grid (only show when number cell is selected)
-        if (selectedCellType == CellType.NUMBER && usedNumbers.isNotEmpty()) {
-            NumberSelectionGrid(
-                usedNumbers = usedNumbers,
-                onNumberSelected = { number ->
-                    selectedCell?.let { (row, col) ->
-                        val cell = currentGrid[row][col]
-                        if (!cell.isFixed && cell.cellType == CellType.NUMBER && usedNumbers[number]!! > 0) {
-                            // Remove old value if exists
-                            val oldValue = cell.value
-                            if (oldValue.isNotEmpty()) {
-                                usedNumbers = usedNumbers.toMutableMap().apply {
-                                    this[oldValue] = this.getOrDefault(oldValue, 0) + 1
-                                }
-                            }
-
-                            // Place new value
-                            currentGrid = currentGrid.mapIndexed { r, rowCells ->
-                                if (r == row) {
-                                    rowCells.mapIndexed { c, cellItem ->
-                                        if (c == col) {
-                                            cellItem.copy(value = number)
-                                        } else cellItem
-                                    }
-                                } else rowCells
-                            }
-
-                            // Update available numbers
+    }
+        },
+        numberPad = {
+    if (selectedCellType == CellType.NUMBER && usedNumbers.isNotEmpty()) {
+        NumberSelectionGrid(
+            usedNumbers = usedNumbers,
+            onNumberSelected = { number ->
+                selectedCell?.let { (row, col) ->
+                    val cell = currentGrid[row][col]
+                    if (!cell.isFixed && cell.cellType == CellType.NUMBER && usedNumbers[number]!! > 0) {
+                        // Remove old value if exists
+                        val oldValue = cell.value
+                        if (oldValue.isNotEmpty()) {
                             usedNumbers = usedNumbers.toMutableMap().apply {
-                                this[number] = this[number]!! - 1
+                                this[oldValue] = this.getOrDefault(oldValue, 0) + 1
                             }
-
-                            selectedCell = null
                         }
-                    }
-                }
-            )
-        }
 
-        // Available Operators Grid (only show when operator cell is selected)
-        if (selectedCellType == CellType.OPERATOR && usedOperators.isNotEmpty()) {
-            OperatorSelectionGrid(
-                usedOperators = usedOperators,
-                onOperatorSelected = { operator ->
-                    selectedCell?.let { (row, col) ->
-                        val cell = currentGrid[row][col]
-                        if (!cell.isFixed && cell.cellType == CellType.OPERATOR && usedOperators[operator]!! > 0) {
-                            // Remove old value if exists
-                            val oldValue = cell.value
-                            if (oldValue.isNotEmpty()) {
-                                usedOperators = usedOperators.toMutableMap().apply {
-                                    this[oldValue] = this.getOrDefault(oldValue, 0) + 1
+                        // Place new value
+                        currentGrid = currentGrid.mapIndexed { r, rowCells ->
+                            if (r == row) {
+                                rowCells.mapIndexed { c, cellItem ->
+                                    if (c == col) {
+                                        cellItem.copy(value = number)
+                                    } else cellItem
                                 }
-                            }
-
-                            // Place new value
-                            currentGrid = currentGrid.mapIndexed { r, rowCells ->
-                                if (r == row) {
-                                    rowCells.mapIndexed { c, cellItem ->
-                                        if (c == col) {
-                                            cellItem.copy(value = operator)
-                                        } else cellItem
-                                    }
-                                } else rowCells
-                            }
-
-                            // Update available operators
-                            usedOperators = usedOperators.toMutableMap().apply {
-                                this[operator] = this[operator]!! - 1
-                            }
-
-                            selectedCell = null
+                            } else rowCells
                         }
+
+                        // Update available numbers
+                        usedNumbers = usedNumbers.toMutableMap().apply {
+                            this[number] = this[number]!! - 1
+                        }
+
+                        selectedCell = null
                     }
                 }
-            )
-        }
+            }
+        )
+    }
+        },
+        operatorPad = {
+    if (selectedCellType == CellType.OPERATOR && usedOperators.isNotEmpty()) {
+        OperatorSelectionGrid(
+            usedOperators = usedOperators,
+            onOperatorSelected = { operator ->
+                selectedCell?.let { (row, col) ->
+                    val cell = currentGrid[row][col]
+                    if (!cell.isFixed && cell.cellType == CellType.OPERATOR && usedOperators[operator]!! > 0) {
+                        // Remove old value if exists
+                        val oldValue = cell.value
+                        if (oldValue.isNotEmpty()) {
+                            usedOperators = usedOperators.toMutableMap().apply {
+                                this[oldValue] = this.getOrDefault(oldValue, 0) + 1
+                            }
+                        }
 
-        Spacer(modifier = Modifier.weight(1f))
+                        // Place new value
+                        currentGrid = currentGrid.mapIndexed { r, rowCells ->
+                            if (r == row) {
+                                rowCells.mapIndexed { c, cellItem ->
+                                    if (c == col) {
+                                        cellItem.copy(value = operator)
+                                    } else cellItem
+                                }
+                            } else rowCells
+                        }
 
-        // Control Buttons
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+                        // Update available operators
+                        usedOperators = usedOperators.toMutableMap().apply {
+                            this[operator] = this[operator]!! - 1
+                        }
+
+                        selectedCell = null
+                    }
+                }
+            }
+        )
+    }
+        },
+        actions = {
             OutlinedButton(
                 onClick = {
                     selectedCell?.let { (row, col) ->
@@ -475,7 +470,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                         }
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(56.dp),
                 enabled = selectedCell != null &&
                         selectedCell!!.let { (row, col) ->
                             row < currentGrid.size && col < currentGrid[row].size &&
@@ -483,7 +478,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                                     currentGrid[row][col].value.isNotEmpty()
                         }
             ) {
-                Text(stringResource(R.string.clear))
+                Text(stringResource(R.string.clear), maxLines = 1)
             }
 
             Button(
@@ -510,13 +505,14 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                         feedbackMessage = "Please fill in all empty cells first! 📝"
                     }
                 },
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).height(56.dp),
                 enabled = !isComplete && checkAllCellsFilled(currentGrid)
             ) {
-                Text(stringResource(R.string.check))
+                Text(stringResource(R.string.check), maxLines = 1)
             }
+
         }
-    }
+    )
 
     // Feedback Dialog
     if (showFeedback) {
@@ -548,7 +544,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                         Text(
                             text = "${stringResource(R.string.score_label)}: $totalScore",
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4CAF50)
+                            color = RvSuccess
                         )
                     }
                 }

@@ -1,6 +1,11 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -560,45 +565,75 @@ fun SimplifiedAdaptiveMemoryScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
 
-    Column(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1E3A8A), Color(0xFF3730A3))
+                    colors = listOf(RvInk, Color(0xFF3730A3))
                 )
             )
-            .padding(top = 80.dp, start = 16.dp, end = 16.dp, bottom = 32.dp)
     ) {
-        // Unified header
-        AdaptiveUnifiedHeader(
-            level = currentLevel,
-            streakInfo = streakInfo,
-            timer = "${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = currentScore,
-            puzzleType = "memorySingle",
-            challengeNumber = currentQuestionIndex + 1,
-            totalChallenges = questionSequence.size,
-            competitiveInsight = competitiveInsight,
-            onBack = onBack,
-            onPause = {
-                Log.d(TAG, "Pause requested")
-            },
-            onHint = {
-                showHint = !showHint
-                if (showHint && currentQuestionIndex > 0) {
-                    Log.d(TAG, "Hint: Compare current symbol with the previous one only")
-                }
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+    // Fit-to-screen: HUD on top, play area in the middle (remaining space), answers pinned at the bottom.
+    val compact = maxHeight < 600.dp
+    val wide = maxWidth > maxHeight
+    Column(
+        modifier = Modifier
+            .widthIn(max = if (wide) 880.dp else 640.dp)
+            .fillMaxSize()
+            .align(Alignment.TopCenter)
+            .padding(horizontal = if (compact) 12.dp else 16.dp, vertical = if (compact) 4.dp else 12.dp)
+    ) {
+        // Unified header (compact HUD on short viewports, where the shared header is too tall)
+        if (compact) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = RvSurface),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                BCompactHud(
+                    level = currentLevel,
+                    difficultyName = currentDifficultyLevel.name,
+                    timer = "${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = currentScore,
+                    streak = streakInfo.currentStreak,
+                    onBack = onBack,
+                    onPause = { Log.d(TAG, "Pause requested") },
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
             }
-        )
+        } else {
+            AdaptiveUnifiedHeader(
+                level = currentLevel,
+                streakInfo = streakInfo,
+                timer = "${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
+                lives = currentHearts,
+                currentDifficulty = currentDifficultyLevel,
+                score = currentScore,
+                puzzleType = "memorySingle",
+                challengeNumber = currentQuestionIndex + 1,
+                totalChallenges = questionSequence.size,
+                competitiveInsight = competitiveInsight,
+                onBack = onBack,
+                onPause = {
+                    Log.d(TAG, "Pause requested")
+                },
+                onHint = {
+                    showHint = !showHint
+                    if (showHint && currentQuestionIndex > 0) {
+                        Log.d(TAG, "Hint: Compare current symbol with the previous one only")
+                    }
+                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            )
+        }
 
         // Adaptation notification
         UnifiedAdaptationNotification(
@@ -608,11 +643,13 @@ fun SimplifiedAdaptiveMemoryScreen(
             onDismiss = { showAdaptationNotification = false }
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
 
         when (gameState) {
             "instructions" -> {
                 SimpleInstructionsScreen(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    compact = compact,
                     simpleConfig = simpleConfig,
                     onStartGame = {
                         gameState = "playing"
@@ -631,6 +668,9 @@ fun SimplifiedAdaptiveMemoryScreen(
 
             "playing" -> {
                 SimpleGameScreen(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    compact = compact,
+                    wide = wide,
                     currentQuestion = currentQuestionIndex + 1,
                     totalQuestions = questionSequence.size,
                     totalAnswerQuestions = correctAnswers.size,
@@ -737,95 +777,106 @@ fun SimplifiedAdaptiveMemoryScreen(
             }
         }
     }
+    }
 }
 
 @Composable
 private fun SimpleInstructionsScreen(
+    modifier: Modifier,
+    compact: Boolean,
     simpleConfig: SimplifiedAdaptiveMemoryGenerator.SimpleConfig,
     onStartGame: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Memory Previous Single",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = simpleConfig.description,
-            fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.9f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.9f))
+        // Middle: title + instructions (fills the space above the pinned start button)
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()), // invisible last-resort net only
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp, Alignment.CenterVertically)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Text(
+                text = "Memory Previous Single",
+                fontSize = if (compact) 20.sp else 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvOnTone,
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
+
+            Text(
+                text = simpleConfig.description,
+                fontSize = 14.sp,
+                color = RvOnTone.copy(alpha = 0.9f),
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = RvSurface)
             ) {
-                Text(
-                    text = "Instructions",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1E3A8A)
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                val instructions = listOf(
-                    "1. Look at the first symbol and remember it",
-                    "2. For each new symbol, decide if it's SAME or DIFFERENT",
-                    "3. Compare only with the previous symbol",
-                    "4. Tap SAME if it matches, DIFFERENT if not"
-                )
-
-                instructions.forEach { instruction ->
+                Column(
+                    modifier = Modifier.padding(if (compact) 8.dp else 16.dp).fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Text(
-                        text = instruction,
-                        fontSize = 12.sp,
-                        color = Color(0xFF1E3A8A),
-                        modifier = Modifier.padding(vertical = 2.dp)
+                        text = "Instructions",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk
                     )
-                }
 
-                if (simpleConfig.delayMs > 0) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = "Note: Symbols will have a ${simpleConfig.delayMs}ms delay",
-                        fontSize = 11.sp,
-                        color = Color(0xFF7C3AED),
-                        fontWeight = FontWeight.Medium
+                    Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
+
+                    val instructions = listOf(
+                        "1. Look at the first symbol and remember it",
+                        "2. For each new symbol, decide if it's SAME or DIFFERENT",
+                        "3. Compare only with the previous symbol",
+                        "4. Tap SAME if it matches, DIFFERENT if not"
                     )
+
+                    instructions.forEach { instruction ->
+                        Text(
+                            text = instruction,
+                            fontSize = 14.sp,
+                            color = RvInk,
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 2.dp)
+                        )
+                    }
+
+                    if (simpleConfig.delayMs > 0) {
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Note: Symbols will have a ${simpleConfig.delayMs}ms delay",
+                            fontSize = 12.sp,
+                            color = Color(0xFF6D28D9),
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Button(
             onClick = onStartGame,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
+            colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(
                 text = stringResource(R.string.start_challenge),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
         }
     }
@@ -834,6 +885,9 @@ private fun SimpleInstructionsScreen(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun SimpleGameScreen(
+    modifier: Modifier,
+    compact: Boolean,
+    wide: Boolean,
     currentQuestion: Int,
     totalQuestions: Int,
     totalAnswerQuestions: Int,
@@ -846,45 +900,60 @@ private fun SimpleGameScreen(
     canAnswer: Boolean,
     onAnswer: (Boolean) -> Unit
 ) {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        // Progress indicator
-        Text(
-            text = "Symbol $currentQuestion of $totalQuestions",
-            fontSize = 16.sp,
-            color = Color.White.copy(alpha = 0.8f)
-        )
-
-        if (canAnswer) {
+    val progressLine: @Composable () -> Unit = {
+        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Question ${currentQuestion - 1} of $totalAnswerQuestions",
-                fontSize = 14.sp,
-                color = Color.White.copy(alpha = 0.6f)
+                text = "Symbol $currentQuestion of $totalQuestions" +
+                        if (canAnswer && compact) "  ·  Question ${currentQuestion - 1} of $totalAnswerQuestions" else "",
+                fontSize = 16.sp,
+                color = RvOnTone,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            if (canAnswer && !compact) {
+                Text(
+                    text = "Question ${currentQuestion - 1} of $totalAnswerQuestions",
+                    fontSize = 14.sp,
+                    color = RvOnTone.copy(alpha = 0.85f),
+                    maxLines = 1
+                )
+            }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            LinearProgressIndicator(
+                progress = currentQuestion.toFloat() / totalQuestions.toFloat().coerceAtLeast(1f),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(2.dp)),
+                color = RvSuccess,
+                trackColor = RvOutline.copy(alpha = 0.4f)
             )
         }
+    }
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Progress bar
-        LinearProgressIndicator(
-            progress = currentQuestion.toFloat() / totalQuestions.toFloat(),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(4.dp)
-                .clip(RoundedCornerShape(2.dp)),
-            color = Color(0xFF10B981),
-            trackColor = Color.White.copy(alpha = 0.3f)
+    val promptText: @Composable () -> Unit = {
+        val (text, color) = when {
+            currentQuestion == 1 -> "Remember this symbol" to RvOnTone
+            canAnswer -> "Does this symbol match the\nprevious symbol?" to RvOnTone
+            else -> "Watch carefully..." to RvOnTone.copy(alpha = 0.85f)
+        }
+        Text(
+            text = text,
+            fontSize = 18.sp,
+            color = color,
+            textAlign = TextAlign.Center,
+            lineHeight = 24.sp,
+            maxLines = 3,
+            overflow = TextOverflow.Ellipsis
         )
+    }
 
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Main symbol display (simplified - no distractors)
-        Box(
-            modifier = Modifier.size(200.dp),
-            contentAlignment = Alignment.Center
-        ) {
+    // symbol with the result overlaid on it (keeps the answer bar in place)
+    val symbolBlock: @Composable (androidx.compose.ui.unit.Dp) -> Unit = { size ->
+        Box(modifier = Modifier.size(size), contentAlignment = Alignment.Center) {
             AnimatedContent(
                 targetState = currentQuestion to isRevealed,
                 transitionSpec = {
@@ -894,7 +963,7 @@ private fun SimpleGameScreen(
             ) { (_, revealed) ->
                 Box(
                     modifier = Modifier
-                        .size(200.dp)
+                        .size(size)
                         .clip(RoundedCornerShape(16.dp))
                         .background(
                             if (revealed) Color.White else Color.Gray.copy(alpha = 0.3f)
@@ -904,97 +973,116 @@ private fun SimpleGameScreen(
                     if (revealed && currentStep != null) {
                         Text(
                             text = if (currentStep.value == 0) "★" else "☆",
-                            fontSize = 120.sp,
-                            color = Color(0xFF9C27B0)
+                            fontSize = with(LocalDensity.current) { (size * 0.6f).toSp() },
+                            color = RvGrape
                         )
                     }
                 }
             }
-        }
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        // Instructions text
-        when {
-            currentQuestion == 1 -> {
-                Text(
-                    text = "Remember this symbol",
-                    fontSize = 18.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center
-                )
-            }
-            canAnswer -> {
-                Text(
-                    text = "Does this symbol match the\nprevious symbol?",
-                    fontSize = 18.sp,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    lineHeight = 24.sp
-                )
-            }
-            else -> {
-                Text(
-                    text = "Watch carefully...",
-                    fontSize = 18.sp,
-                    color = Color.White.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Answer buttons - only show when answering is allowed
-        if (!showFeedback && canAnswer) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            androidx.compose.animation.AnimatedVisibility(
+                visible = showFeedback,
+                enter = fadeIn() + scaleIn(),
+                exit = fadeOut() + scaleOut()
             ) {
-                Button(
-                    onClick = { onAnswer(false) },
+                Box(
                     modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
+                        .size(size * 0.6f)
+                        .clip(CircleShape)
+                        .background(if (lastAnswerCorrect) RvSuccess else RvError),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(stringResource(R.string.different), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
-                }
-
-                Button(
-                    onClick = { onAnswer(true) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(64.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3B82F6))
-                ) {
-                    Text(stringResource(R.string.same), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text(
+                        text = if (lastAnswerCorrect) "✓" else "✗",
+                        fontSize = with(LocalDensity.current) { (size * 0.35f).toSp() },
+                        color = RvInk,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
+    }
 
-        // Feedback display
-        AnimatedVisibility(
-            visible = showFeedback,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
+    val answerButtons: @Composable () -> Unit = {
+        // Answer buttons are only enabled when answering is allowed; the bar keeps its height
+        // otherwise so the layout never jumps.
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Box(
+            val enabled = canAnswer && !showFeedback
+            Button(
+                onClick = { onAnswer(false) },
+                enabled = enabled,
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (lastAnswerCorrect) Color(0xFF10B981) else Color(0xFFEF4444)
-                    ),
+                    .weight(1f)
+                    .height(64.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = RvSky,
+                    disabledContainerColor = RvSky.copy(alpha = 0.35f)
+                )
+            ) {
+                Text(stringResource(R.string.different), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvInk, maxLines = 1)
+            }
+
+            Button(
+                onClick = { onAnswer(true) },
+                enabled = enabled,
+                modifier = Modifier
+                    .weight(1f)
+                    .height(64.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = RvSky,
+                    disabledContainerColor = RvSky.copy(alpha = 0.35f)
+                )
+            ) {
+                Text(stringResource(R.string.same), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvInk, maxLines = 1)
+            }
+        }
+    }
+
+    if (wide) {
+        // two panes: symbol | progress + prompt + answers
+        Row(
+            modifier = modifier,
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BoxWithConstraints(modifier = Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
+                symbolBlock(minOf(200.dp, maxWidth, maxHeight).coerceAtLeast(96.dp))
+            }
+            Column(
+                modifier = Modifier.weight(1f).fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                progressLine()
+                promptText()
+                answerButtons()
+            }
+        }
+    } else {
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            progressLine()
+            BoxWithConstraints(
+                modifier = Modifier.weight(1f).fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = if (lastAnswerCorrect) "✓" else "✗",
-                    fontSize = 60.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                // symbol + prompt share the area; the symbol shrinks first
+                val promptReserve = if (compact) 40.dp else 72.dp
+                val size = minOf(200.dp, maxWidth, maxHeight - promptReserve).coerceAtLeast(72.dp)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 16.dp, Alignment.CenterVertically)
+                ) {
+                    symbolBlock(size)
+                    promptText()
+                }
             }
+            answerButtons()
+            Spacer(modifier = Modifier.height(4.dp))
         }
     }
 }

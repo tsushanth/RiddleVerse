@@ -10,34 +10,42 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = Color(0xFF9C86FF),
+    onPrimary = RvInk,
+    secondary = RvSun,
+    tertiary = RvMint,
+    background = RvNight,
+    surface = Color(0xFF2A2650),
+    onBackground = Color.White,
+    onSurface = Color.White
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
+    primary = RvViolet,
     onPrimary = Color.White,
-    onSecondary = Color.White,
+    secondary = RvSun,
+    onSecondary = RvInk,
+    tertiary = RvMint,
     onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    background = RvCanvas,
+    onBackground = RvInk,
+    surface = RvCanvas,
+    onSurface = RvInk,
+    surfaceVariant = RvSurface,
+    onSurfaceVariant = RvInkSoft,
+    outline = RvOutline,
+    error = RvCoral
 )
 
 @Composable
 fun RiddleVerseTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    // Light-only: every screen is styled with the light Rv tokens. Pass true only once a dark palette exists.
+    darkTheme: Boolean = false,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = remember(darkTheme, dynamicColor) {
@@ -64,6 +72,7 @@ fun RiddleVerseTheme(
     MaterialTheme(
         colorScheme = finalColorScheme,
         typography = Typography,
+        shapes = RvShapes,
         content = content
     )
 }

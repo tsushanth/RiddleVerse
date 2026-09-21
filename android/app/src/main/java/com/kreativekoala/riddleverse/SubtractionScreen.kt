@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -25,6 +26,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.math.*
@@ -151,22 +154,22 @@ fun MathDifferenceGameScreen(
         // Don't reset score or hearts - keep for cumulative tracking
     }
 
-    Box(
+    // Fit-to-screen: HUD on top, problem + calculator take the remaining space, no scrolling.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(RvCanvas)
     ) {
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val compact = maxHeight < 700.dp
+        val pad = if (compact) 8.dp else 16.dp
+
         // Animated background pattern
-        Canvas(
-            modifier = Modifier.fillMaxSize()
-        ) {
+        Canvas(modifier = Modifier.fillMaxSize()) {
             drawAnimatedPattern(size)
         }
 
-        Column(
-            modifier = Modifier.fillMaxSize().padding(bottom = 24.dp)
-        ) {
-            // Top Bar with live timer and current hearts
+        val hud: @Composable () -> Unit = {
             EnhancedSubtractionTopGameBar(
                 level = currentLevel,
                 streakInfo = streakInfo,
@@ -174,117 +177,74 @@ fun MathDifferenceGameScreen(
                 hearts = currentHearts, // Use current hearts instead of initial hearts
                 roundLevel = level,
                 onBack = onBack,
-                modifier = Modifier.padding(top = 40.dp, start = 16.dp, end = 16.dp, bottom = 8.dp)
+                modifier = Modifier.padding(top = 4.dp)
             )
-
-            // Score display (if any score accumulated)
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "Score: $totalScore",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                        }
-
-                        if (attempts > 0) {
-                            Text(
-                                text = "Attempt: $attempts",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.8f)
-                            )
-                        }
-
-                        // Show problem complexity info
-                        val complexity = maxOf(number1, number2)
-                        if (complexity >= 100) {
-                            Text(
-                                text = when {
-                                    complexity >= 1000 -> "🔥 Expert"
-                                    complexity >= 500 -> "⭐ Hard"
-                                    complexity >= 100 -> "💪 Medium"
-                                    else -> "✨ Easy"
-                                },
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(12.dp))
-            } else {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-
-            // Title
-            Text(
-                text = "FIND THE DIFFERENCE",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White,
+        }
+        val scoreLine: @Composable () -> Unit = {
+            Row(
                 modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Numbers to compare with enhanced visual feedback
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Score: $totalScore",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.testTag("hud_score")
+                )
+                if (attempts > 0) {
+                    Text(
+                        text = "Attempt: $attempts",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = RvInkSoft,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+        val problem: @Composable () -> Unit = {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = number1.toString(),
-                    fontSize = 42.sp,
+                    text = "FIND THE DIFFERENCE",
+                    fontSize = if (compact) 16.sp else 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = "−", // Minus symbol
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.7f)
-                )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
-                Text(
-                    text = number2.toString(),
-                    fontSize = 42.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
+                Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
+                if (compact || wide) {
+                    // Single line: 123 − 45
+                    Text(
+                        text = "$number1 − $number2",
+                        fontSize = aCapSp(if (compact) 36f else 44f, 1.3f),
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1,
+                        modifier = Modifier.testTag("subtraction_problem")
+                    )
+                } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.testTag("subtraction_problem")
+                    ) {
+                        Text(text = number1.toString(), fontSize = 42.sp, fontWeight = FontWeight.Bold, color = RvInk)
+                        Text(text = "−", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = RvInkSoft)
+                        Text(text = number2.toString(), fontSize = 42.sp, fontWeight = FontWeight.Bold, color = RvInk)
+                    }
+                }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Spacer(modifier = Modifier.weight(1f, fill = false))
-
-            // Calculator Grid with enhanced submit logic
+        }
+        val calculator: @Composable (Modifier) -> Unit = { m ->
+            // Calculator grid with enhanced submit logic
             CalculatorGrid(
                 currentInput = currentInput,
                 isAnswered = isAnswered,
@@ -353,17 +313,53 @@ fun MathDifferenceGameScreen(
                         Log.w("SubtractionScreen", "⚠️ Cannot submit - isAnswered: $isAnswered, input: '$currentInput'")
                     }
                 },
-                modifier = Modifier.padding(horizontal = 20.dp).wrapContentHeight()
+                modifier = m
             )
+        }
 
-            Spacer(modifier = Modifier.height(48.dp))
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    hud()
+                    scoreLine()
+                    Spacer(Modifier.weight(1f))
+                    problem()
+                    Spacer(Modifier.weight(1f))
+                }
+                Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) {
+                    calculator(Modifier.fillMaxSize().widthIn(max = 360.dp))
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = pad)
+                    .padding(bottom = pad)
+                    .widthIn(max = 480.dp)
+                    .align(Alignment.TopCenter),
+                verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 8.dp)
+            ) {
+                hud()
+                scoreLine()
+                problem()
+                calculator(Modifier.fillMaxWidth().weight(1f))
+            }
         }
 
         EnhancedUniversalFeedback(feedbackManager)
     }
 }
 
-// Enhanced Calculator Grid with visual state management
+// Enhanced Calculator Grid with visual state management.
+// Also used by AdaptiveSubtractionPuzzleScreen. Key sizes derive from the space given: when the
+// parent gives a bounded height the keys share it (48-88dp tall); otherwise they stay square.
 @Composable
 fun CalculatorGrid(
     currentInput: String,
@@ -373,97 +369,95 @@ fun CalculatorGrid(
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Display current input with state-aware styling
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = if (isAnswered) {
-                    Color.White.copy(alpha = 0.05f)
-                } else {
-                    Color.Transparent
-                }
-            ),
-            border = androidx.compose.foundation.BorderStroke(
-                2.dp,
-                if (isAnswered) {
-                    Color.White.copy(alpha = 0.2f)
-                } else {
-                    Color.White.copy(alpha = 0.3f)
-                }
-            )
-        ) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = if (currentInput.isEmpty()) {
-                        if (isAnswered) "Submitted" else "0"
-                    } else {
-                        currentInput
-                    },
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isAnswered) {
-                        Color.White.copy(alpha = 0.6f)
-                    } else {
-                        Color.White
-                    }
-                )
-            }
+    BoxWithConstraints(modifier = modifier.fillMaxWidth()) {
+        val gap = if (constraints.hasBoundedHeight && maxHeight < 360.dp) 8.dp else 12.dp
+        val displayH = if (constraints.hasBoundedHeight && maxHeight < 360.dp) 48.dp else 60.dp
+        val keyH: androidx.compose.ui.unit.Dp? = if (constraints.hasBoundedHeight) {
+            ((maxHeight - displayH - gap * 4) / 4).coerceIn(48.dp, 88.dp)
+        } else null
+        val keyModifier: (Modifier) -> Modifier = { m ->
+            if (keyH != null) m.height(keyH) else m.aspectRatio(1f)
         }
 
-        // Number grid (1-9)
-        for (row in 0..2) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(gap)
+        ) {
+            // Display current input with state-aware styling
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(displayH)
+                    .testTag("calc_display"),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isAnswered) RvSurface else RvSurfaceRaised
+                ),
+                border = androidx.compose.foundation.BorderStroke(2.dp, if (isAnswered) RvOutline else RvInkSoft)
             ) {
-                for (col in 0..2) {
-                    val number = row * 3 + col + 1
-                    CalculatorButton(
-                        text = number.toString(),
-                        onClick = { onNumberClick(number.toString()) },
-                        modifier = Modifier.weight(1f),
-                        isEnabled = !isAnswered
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (currentInput.isEmpty()) {
+                            if (isAnswered) "Submitted" else "0"
+                        } else {
+                            currentInput
+                        },
+                        fontSize = aCapSp(24f, 1.3f),
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        color = if (isAnswered) RvInkSoft else RvInk
                     )
                 }
             }
-        }
 
-        // Bottom row (Clear, 0, Submit)
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            CalculatorButton(
-                text = "✕",
-                onClick = onClear,
-                modifier = Modifier.weight(1f),
-                isSpecial = true,
-                isEnabled = !isAnswered
-            )
+            // Number grid (1-9)
+            for (row in 0..2) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(gap)
+                ) {
+                    for (col in 0..2) {
+                        val number = row * 3 + col + 1
+                        CalculatorButton(
+                            text = number.toString(),
+                            onClick = { onNumberClick(number.toString()) },
+                            modifier = keyModifier(Modifier.weight(1f)),
+                            isEnabled = !isAnswered
+                        )
+                    }
+                }
+            }
 
-            CalculatorButton(
-                text = "0",
-                onClick = { onNumberClick("0") },
-                modifier = Modifier.weight(1f),
-                isEnabled = !isAnswered
-            )
+            // Bottom row (Clear, 0, Submit)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(gap)
+            ) {
+                CalculatorButton(
+                    text = "✕",
+                    onClick = onClear,
+                    modifier = keyModifier(Modifier.weight(1f)),
+                    isSpecial = true,
+                    isEnabled = !isAnswered
+                )
 
-            CalculatorButton(
-                text = if (isAnswered) "SENT" else "SUBMIT",
-                onClick = onSubmit,
-                modifier = Modifier.weight(1f),
-                isSpecial = true,
-                isEnabled = !isAnswered
-            )
+                CalculatorButton(
+                    text = "0",
+                    onClick = { onNumberClick("0") },
+                    modifier = keyModifier(Modifier.weight(1f)),
+                    isEnabled = !isAnswered
+                )
+
+                CalculatorButton(
+                    text = if (isAnswered) "SENT" else "SUBMIT",
+                    onClick = onSubmit,
+                    modifier = keyModifier(Modifier.weight(1f)),
+                    isSpecial = true,
+                    isEnabled = !isAnswered
+                )
+            }
         }
     }
 }
@@ -477,24 +471,23 @@ fun CalculatorButton(
     isSpecial: Boolean = false,
     isEnabled: Boolean = true
 ) {
-    val borderAlpha = if (isEnabled) {
-        if (isSpecial) 0.6f else 0.3f
-    } else {
-        0.15f
-    }
-
-    val textAlpha = if (isEnabled) 1f else 0.4f
-
+    val isAction = text == "SUBMIT" || text == "SENT"
     Card(
         modifier = modifier
-            .aspectRatio(1f)
-            .clickable(enabled = isEnabled) { onClick() },
+            .heightIn(min = 48.dp)
+            .clickable(enabled = isEnabled) { onClick() }
+            .testTag(if (isAction) "calc_submit" else "calc_key"),
         colors = CardDefaults.cardColors(
-            containerColor = Color.Transparent
+            containerColor = when {
+                !isEnabled -> RvSurface
+                isAction -> RvViolet
+                isSpecial -> RvOutline
+                else -> RvSurfaceRaised
+            }
         ),
         border = androidx.compose.foundation.BorderStroke(
             2.dp,
-            Color.White.copy(alpha = borderAlpha)
+            if (isEnabled) (if (isAction) RvVioletEdge else RvInkSoft) else RvOutline
         )
     ) {
         Box(
@@ -503,10 +496,15 @@ fun CalculatorButton(
         ) {
             Text(
                 text = text,
-                fontSize = if (text == "SUBMIT" || text == "SENT") 14.sp else 20.sp,
+                fontSize = if (isAction) aCapSp(16f, 1.2f) else aCapSp(22f, 1.3f),
                 fontWeight = FontWeight.Bold,
-                color = Color.White.copy(alpha = textAlpha),
-                textAlign = TextAlign.Center
+                color = when {
+                    !isEnabled -> RvInkSoft
+                    isAction -> RvOnTone
+                    else -> RvInk
+                },
+                textAlign = TextAlign.Center,
+                maxLines = 1
             )
         }
     }
@@ -526,12 +524,13 @@ fun EnhancedSubtractionTopGameBar(
     Row(
         modifier = modifier.statusBarsPadding().fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = Alignment.CenterVertically
     ) {
         // Left side: Back button and level progression
         Row(
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Back button
             IconButton(
@@ -541,12 +540,12 @@ fun EnhancedSubtractionTopGameBar(
                         Log.d("SubtractionScreen", "⚠️ No back action provided")
                     }
                 },
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(28.dp)
                 )
             }
@@ -554,15 +553,18 @@ fun EnhancedSubtractionTopGameBar(
             Column {
                 Text(
                     text = "Level ${level.level}",
-                    fontSize = 18.sp,
+                    fontSize = aCapSp(18f, 1.15f),
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                // Level progress bar
+                // Level progress bar (label omitted: the level is already shown above)
                 LevelProgressBar(
                     level = level,
-                    modifier = Modifier.width(100.dp)
+                    modifier = Modifier.width(80.dp),
+                    showLabel = false
                 )
             }
         }
@@ -573,12 +575,14 @@ fun EnhancedSubtractionTopGameBar(
         ) {
             Text(
                 text = timer,
-                fontSize = 20.sp,
+                fontSize = aCapSp(22f, 1.15f),
                 fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                modifier = Modifier.testTag("hud_timer"),
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 10 } == true) {
                     Color.Red // Red when ≤10 seconds
                 } else {
-                    Color.White
+                    RvInk
                 }
             )
 
@@ -593,29 +597,31 @@ fun EnhancedSubtractionTopGameBar(
 
         // Right side: Hearts and round level with enhanced heart display
         Column(
+            modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.End
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                horizontalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 repeat(5) { index ->
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
                         tint = if (index < hearts) {
-                            Color(0xFFFF69B4)
+                            RvCoralEdge
                         } else {
-                            Color.White.copy(alpha = 0.3f)
+                            RvDisabled
                         },
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(16.dp)
                     )
                 }
             }
             Text(
                 text = roundLevel,
-                fontSize = 16.sp,
-                color = Color.White,
-                modifier = Modifier.padding(top = 4.dp)
+                fontSize = aCapSp(16f, 1.15f),
+                color = RvInk,
+                maxLines = 1,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
     }
@@ -629,7 +635,7 @@ fun DrawScope.drawAnimatedPattern(size: androidx.compose.ui.geometry.Size) {
     // Draw subtle animated circles
     for (i in 1..3) {
         drawCircle(
-            color = Color.White.copy(alpha = 0.05f),
+            color = RvInkSoft.copy(alpha = 0.05f),
             radius = (size.minDimension / 4) * i,
             center = Offset(centerX, centerY),
             style = Stroke(width = 2.dp.toPx())
@@ -644,7 +650,7 @@ fun DrawScope.drawAnimatedPattern(size: androidx.compose.ui.geometry.Size) {
         val y = centerY + (sin(angle) * radius).toFloat()
 
         drawCircle(
-            color = Color.White.copy(alpha = 0.1f),
+            color = RvInkSoft.copy(alpha = 0.1f),
             radius = 4.dp.toPx(),
             center = Offset(x, y)
         )

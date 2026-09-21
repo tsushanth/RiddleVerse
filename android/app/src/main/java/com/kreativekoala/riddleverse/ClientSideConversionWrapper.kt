@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
+
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,6 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 
 /**
  * Client-side Conversion Screen Wrapper
@@ -133,7 +138,7 @@ private fun LoadingState() {
             CircularProgressIndicator()
             Text(
                 text = stringResource(R.string.loading_puzzle),
-                color = androidx.compose.ui.graphics.Color.White
+                color = RvInk
             )
         }
     }
@@ -165,13 +170,13 @@ private fun ErrorState(
             Text(
                 text = stringResource(R.string.error_loading_puzzle),
                 style = androidx.compose.material3.MaterialTheme.typography.titleMedium,
-                color = androidx.compose.ui.graphics.Color.White
+                color = RvInk
             )
 
             Text(
                 text = "There was an issue creating the conversion puzzle. You can try again or skip to the next puzzle.",
                 style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f),
+                color = RvInkSoft,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
             )
 
@@ -181,7 +186,7 @@ private fun ErrorState(
                 OutlinedButton(
                     onClick = onRetry,
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = androidx.compose.ui.graphics.Color.White
+                        contentColor = RvInk
                     )
                 ) {
                     Text(stringResource(R.string.try_again))
@@ -190,7 +195,7 @@ private fun ErrorState(
                 Button(
                     onClick = onSkip,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = androidx.compose.ui.graphics.Color(0xFF4CAF50)
+                        containerColor = RvSuccess
                     )
                 ) {
                     Text(stringResource(R.string.skip_puzzle))

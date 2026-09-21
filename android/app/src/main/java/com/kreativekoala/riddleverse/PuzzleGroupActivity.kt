@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -292,7 +293,7 @@ fun GroupProgressCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = if (isCompleted) Color(0xFF4CAF50).copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
+            containerColor = if (isCompleted) RvSuccess.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
@@ -320,7 +321,7 @@ fun GroupProgressCard(
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
                         contentDescription = "Completed",
-                        tint = Color(0xFF4CAF50),
+                        tint = RvSuccess,
                         modifier = Modifier.size(32.dp)
                     )
                 } else {
@@ -338,7 +339,7 @@ fun GroupProgressCard(
             LinearProgressIndicator(
                 progress = progressPercentage / 100f,
                 modifier = Modifier.fillMaxWidth(),
-                color = if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary
+                color = if (isCompleted) RvSuccess else MaterialTheme.colorScheme.primary
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -380,10 +381,10 @@ fun PuzzleTypeStepCard(
                     .size(20.dp)
                     .background(
                         color = when {
-                            isCompleted -> Color(0xFF4CAF50)
+                            isCompleted -> RvSuccess
                             isCurrent -> MaterialTheme.colorScheme.primary
                             isUnlocked -> MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                            else -> Color(0xFFE0E0E0)
+                            else -> RvOutline
                         },
                         shape = RoundedCornerShape(10.dp)
                     ),
@@ -394,7 +395,7 @@ fun PuzzleTypeStepCard(
                         Icon(
                             imageVector = Icons.Default.Check,
                             contentDescription = "Completed",
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(12.dp)
                         )
                     }
@@ -402,7 +403,7 @@ fun PuzzleTypeStepCard(
                         Box(
                             modifier = Modifier
                                 .size(8.dp)
-                                .background(Color.White, RoundedCornerShape(4.dp))
+                                .background(RvSurfaceRaised, RoundedCornerShape(4.dp))
                         )
                     }
                     isUnlocked -> {
@@ -416,7 +417,7 @@ fun PuzzleTypeStepCard(
                         Icon(
                             imageVector = Icons.Default.Lock,
                             contentDescription = "Locked",
-                            tint = Color.Gray,
+                            tint = RvInkSoft,
                             modifier = Modifier.size(10.dp)
                         )
                     }
@@ -429,7 +430,7 @@ fun PuzzleTypeStepCard(
                     modifier = Modifier
                         .width(2.dp)
                         .height(16.dp)
-                        .background(Color(0xFFE0E0E0))
+                        .background(RvOutline)
                 )
             }
         }
@@ -446,7 +447,7 @@ fun PuzzleTypeStepCard(
             ),
             colors = CardDefaults.cardColors(
                 containerColor = when {
-                    isCompleted -> Color(0xFF4CAF50).copy(alpha = 0.1f)
+                    isCompleted -> RvSuccess.copy(alpha = 0.1f)
                     isCurrent -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                     isUnlocked -> MaterialTheme.colorScheme.surface
                     else -> MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
@@ -467,7 +468,7 @@ fun PuzzleTypeStepCard(
                     Icon(
                         imageVector = displayInfo.icon,
                         contentDescription = displayInfo.title,
-                        tint = if (isUnlocked) MaterialTheme.colorScheme.primary else Color.Gray,
+                        tint = if (isUnlocked) MaterialTheme.colorScheme.primary else RvInkSoft,
                         modifier = Modifier.size(24.dp)
                     )
 
@@ -478,7 +479,7 @@ fun PuzzleTypeStepCard(
                             text = displayInfo.title,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold,
-                            color = if (isUnlocked) MaterialTheme.colorScheme.onSurface else Color.Gray
+                            color = if (isUnlocked) MaterialTheme.colorScheme.onSurface else RvInkSoft
                         )
 
                         Text(
@@ -490,10 +491,10 @@ fun PuzzleTypeStepCard(
                             },
                             fontSize = 12.sp,
                             color = when {
-                                isCompleted -> Color(0xFF4CAF50)
+                                isCompleted -> RvSuccess
                                 isCurrent -> MaterialTheme.colorScheme.primary
                                 isUnlocked -> MaterialTheme.colorScheme.onSurfaceVariant
-                                else -> Color.Gray
+                                else -> RvInkSoft
                             }
                         )
                     }
@@ -516,7 +517,7 @@ fun PuzzleTypeStepCard(
                         Icon(
                             imageVector = if (isCompleted) Icons.Default.Replay else Icons.Default.PlayArrow,
                             contentDescription = if (isCompleted) stringResource(R.string.play_again) else stringResource(R.string.start),
-                            tint = if (isCompleted) MaterialTheme.colorScheme.primary else Color.White,
+                            tint = if (isCompleted) MaterialTheme.colorScheme.primary else RvOnTone,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -531,7 +532,7 @@ fun CompletionCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF4CAF50).copy(alpha = 0.1f)
+            containerColor = RvSuccess.copy(alpha = 0.1f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
@@ -544,7 +545,7 @@ fun CompletionCard() {
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
                 contentDescription = "Completed",
-                tint = Color(0xFFFFD700),
+                tint = RvSun,
                 modifier = Modifier.size(48.dp)
             )
 

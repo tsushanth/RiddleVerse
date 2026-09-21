@@ -5,6 +5,12 @@ import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -29,6 +35,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 data class NumberSumConfig(
     val targetSum: Int,
@@ -289,143 +299,188 @@ fun NumberSumPuzzleScreen(
         }
     }
 
-    Column(
+    // Fit-to-screen: HUD fixed on top, target + tile grid take the remaining space, no scrolling.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1B5E20))
+            .background(RvSurface)
             .statusBarsPadding()
     ) {
-        // Header
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val compact = maxHeight < 600.dp
+        val pad = if (compact) 8.dp else 16.dp
+
+        val header: @Composable () -> Unit = {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised)
             ) {
-                IconButton(
-                    onClick = {
-                        gameCompleted = true
-                        onBack()
-                    }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = if (compact) 0.dp else 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
-                }
+                    IconButton(
+                        onClick = {
+                            gameCompleted = true
+                            onBack()
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
+                    }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Puzzle $level",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.Gray
-                    )
-                    Text(
-                        text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = if (timeLeft <= 30) Color.Red else Color.Black
-                    )
-                }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Puzzle $level",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInkSoft,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = String.format("%02d:%02d", timeLeft / 60, timeLeft % 60),
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (timeLeft <= 30) RvCoralEdge else RvInk,
+                            maxLines = 1,
+                            modifier = Modifier.testTag("hud_timer")
+                        )
+                    }
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "Score: $currentScore",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        repeat(currentHearts) {
-                            Text("❤️", fontSize = 16.sp)
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = "Score: $currentScore",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            maxLines = 1,
+                            modifier = Modifier.testTag("hud_score")
+                        )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            repeat(currentHearts) {
+                                Text("❤️", fontSize = 16.sp)
+                            }
                         }
                     }
-                }
 
-                IconButton(onClick = { isPaused = !isPaused }) {
-                    Icon(Icons.Default.Pause, contentDescription = null)
+                    IconButton(onClick = { isPaused = !isPaused }, modifier = Modifier.size(48.dp)) {
+                        Icon(Icons.Default.Pause, contentDescription = null, tint = RvInk)
+                    }
                 }
             }
         }
 
-
-        // Game Area
-        if (!gameCompleted) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Target Sum Display
+        val targetCard: @Composable (Modifier) -> Unit = { m ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2E7D32))
+                modifier = m.testTag("numsum_target"),
+                colors = CardDefaults.cardColors(containerColor = RvSuccess)
             ) {
                 Column(
-                    modifier = Modifier.padding(24.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = if (compact) 8.dp else 16.dp, horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Target",
                         fontSize = 16.sp,
-                        color = Color.White,
+                        color = RvInk,
                         fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = currentConfig.targetSum.toString(),
-                        fontSize = 48.sp,
-                        color = Color(0xFF4CAF50),
-                        fontWeight = FontWeight.Bold
+                        fontSize = if (compact) 40.sp else 48.sp,
+                        color = RvInk,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
-                    if (currentSum > 0) {
-                        Text(
-                            text = "Current: $currentSum",
-                            fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // Number Grid
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                contentPadding = PaddingValues(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                items(numberTiles) { tile ->
-                    NumberTileComponent(
-                        tile = tile,
-                        onClick = { onNumberClick(tile.id, tile.number, tile.isCorrect) }
+                    // Always reserve the line so the layout does not jump when a tile is picked.
+                    Text(
+                        text = if (currentSum > 0) "Current: $currentSum" else " ",
+                        fontSize = 14.sp,
+                        color = RvInk,
+                        maxLines = 1
                     )
                 }
             }
         }
 
-        // Completion message overlay
-        if (showCompletionMessage) {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
-                Card(
-                    modifier = Modifier.padding(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF4CAF50).copy(alpha = 0.9f))
+        // Tile grid sized from the space it is given.
+        val tileGrid: @Composable (Modifier) -> Unit = { m ->
+            BoxWithConstraints(modifier = m, contentAlignment = Alignment.Center) {
+                val n = numberTiles.size.coerceAtLeast(1)
+                val cols = if (n <= 4) 2 else 3
+                val rows = (n + cols - 1) / cols
+                val gap = if (compact) 8.dp else 16.dp
+                val byW = (maxWidth - gap * (cols - 1)) / cols
+                val byH = (maxHeight - gap * (rows - 1)) / rows
+                val tileSize = minOf(byW, byH).coerceIn(48.dp, 96.dp)
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(gap),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = completionMessage,
-                        modifier = Modifier.padding(16.dp),
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
+                    numberTiles.chunked(cols).forEach { rowTiles ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                            rowTiles.forEach { tile ->
+                                Box(Modifier.size(tileSize), contentAlignment = Alignment.Center) {
+                                    NumberTileComponent(
+                                        tile = tile,
+                                        onClick = { onNumberClick(tile.id, tile.number, tile.isCorrect) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(pad)
+                .widthIn(max = 720.dp)
+                .align(Alignment.TopCenter),
+            verticalArrangement = Arrangement.spacedBy(pad)
+        ) {
+            header()
+
+            if (!gameCompleted) {
+                if (wide) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth().weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(pad),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        targetCard(Modifier.weight(1f))
+                        tileGrid(Modifier.weight(1f).fillMaxHeight())
+                    }
+                } else {
+                    targetCard(Modifier.fillMaxWidth())
+                    tileGrid(Modifier.fillMaxWidth().weight(1f))
+                }
+            }
+
+            // Completion message overlay
+            if (showCompletionMessage) {
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    Card(
+                        modifier = Modifier.padding(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = RvSuccess)
+                    ) {
+                        Text(
+                            text = completionMessage,
+                            modifier = Modifier.padding(16.dp),
+                            color = RvInk,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             }
         }
@@ -443,23 +498,25 @@ fun NumberTileComponent(
     )
 
     val backgroundColor = when {
-        tile.isSelected -> Color(0xFF4CAF50)
+        tile.isSelected -> RvSuccess
         tile.showFeedback && tile.feedbackType == FeedbackType.WRONG -> Color.Red
-        else -> Color.White
+        else -> RvOnTone
     }
 
     val textColor = when {
-        tile.isSelected -> Color.White
-        tile.showFeedback && tile.feedbackType == FeedbackType.WRONG -> Color.White
+        tile.isSelected -> RvInk
+        tile.showFeedback && tile.feedbackType == FeedbackType.WRONG -> RvInk
         else -> Color.Black
     }
 
     Box(
         modifier = Modifier
+            .testTag("numtile")
             .size(80.dp)
             .scale(scale)
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
+            .then(if (tile.isSelected) Modifier.border(3.dp, RvInk, RoundedCornerShape(12.dp)) else Modifier)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
@@ -468,7 +525,7 @@ fun NumberTileComponent(
             Icon(
                 Icons.Default.Close,
                 contentDescription = stringResource(R.string.wrong),
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(32.dp)
             )
         } else {

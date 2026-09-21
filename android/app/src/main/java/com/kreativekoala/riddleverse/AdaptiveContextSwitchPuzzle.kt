@@ -38,6 +38,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.testTag
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
+import com.kreativekoala.riddleverse.ui.theme.RvDisabled
+import com.kreativekoala.riddleverse.ui.theme.RvCoral
+import com.kreativekoala.riddleverse.ui.theme.RvCoralEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSky
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
@@ -49,6 +56,11 @@ import org.json.JSONObject
 import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
 
 data class SessionCompletionData(
     val puzzleType: String,
@@ -760,7 +772,7 @@ fun AdaptiveContextSwitchPuzzleScreen(
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
                 currentDifficultyLevel = config.level
-                showAdaptationNotification = true
+                showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
     }
@@ -779,130 +791,160 @@ fun AdaptiveContextSwitchPuzzleScreen(
         }
     }
 
-    Column(
+    // Fit-to-screen: fixed header, the current phase takes the remaining space, its primary
+    // action is pinned at the bottom. Landscape / wide screens use two panes.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFF1A1A2E), Color(0xFF16213E))
-                )
-            )
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(RvCanvas)
     ) {
-        Spacer(modifier = Modifier.height(32.dp))
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val tall = !wide && maxHeight >= 780.dp
+        val compact = !tall
+        val pad = if (compact) 8.dp else 16.dp
 
-        AdaptiveUnifiedHeader(
-            level = currentUserLevel,
-            streakInfo = streakInfo,
-            timer = displayTimer,
-            lives = currentHearts,
-            currentDifficulty = currentDifficultyLevel,
-            score = finalScore,
-            puzzleType = "contextSwitch",
-            competitiveInsight = competitiveInsight,
-            onBack = onBack,
-            onHint = {
-                showHint = !showHint
-                haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-            }
-        )
-
-        // ✅ REPLACE: Use unified adaptation notification
-        UnifiedAdaptationNotification(
-            adaptationInfo = adaptationInfo,
-            puzzleType = "contextSwitch",
-            visible = showAdaptationNotification,
-            onDismiss = { showAdaptationNotification = false }
-        )
-
-        // Adaptation notification
-        AnimatedVisibility(
-            visible = showAdaptationNotification,
-            enter = slideInVertically() + fadeIn(),
-            exit = slideOutVertically() + fadeOut()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(pad)
+                .widthIn(max = if (wide) 960.dp else 640.dp)
+                .align(Alignment.TopCenter),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AdaptiveContextNotificationCard(
+            if (tall) {
+                AdaptiveUnifiedHeader(
+                    level = currentUserLevel,
+                    streakInfo = streakInfo,
+                    timer = displayTimer,
+                    lives = currentHearts,
+                    currentDifficulty = currentDifficultyLevel,
+                    score = finalScore,
+                    puzzleType = "contextSwitch",
+                    competitiveInsight = competitiveInsight,
+                    onBack = onBack,
+                    onHint = {
+                        showHint = !showHint
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                    }
+                )
+            } else {
+                AdaptiveCompactHud(
+                    level = currentUserLevel,
+                    timer = displayTimer.let { if (it.indexOf(':') == 1) "0$it" else it },
+                    lives = currentHearts,
+                    maxLives = currentDifficultyLevel.livesAllowed,
+                    score = finalScore,
+                    difficultyName = currentDifficultyLevel.name,
+                    challengeText = null,
+                    onBack = onBack,
+                    onPause = null
+                )
+            }
+
+            // Unified adaptation notification (banner intentionally off via SHOW_ADAPTATION_NOTICES)
+            UnifiedAdaptationNotification(
                 adaptationInfo = adaptationInfo,
+                puzzleType = "contextSwitch",
+                visible = showAdaptationNotification,
                 onDismiss = { showAdaptationNotification = false }
             )
-        }
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        // Add this after your Column/UI setup, but before the when statement
-        if (shouldCompleteSession && sessionData != null) {
-            UnifiedSessionCompletionHandler(
-                puzzleType = sessionData!!.puzzleType,
-                sessionScore = sessionData!!.sessionScore,
-                sessionStats = sessionData!!.sessionStats,
-                currentDifficulty = sessionData!!.currentDifficulty
-            ) { result ->
-                shouldCompleteSession = false
-                sessionData = null
-                showFeedback = true
+            // Adaptation notification
+            AnimatedVisibility(
+                visible = showAdaptationNotification,
+                enter = slideInVertically() + fadeIn(),
+                exit = slideOutVertically() + fadeOut()
+            ) {
+                AdaptiveContextNotificationCard(
+                    adaptationInfo = adaptationInfo,
+                    onDismiss = { showAdaptationNotification = false }
+                )
             }
-        }
 
-        when (gamePhase) {
-            "memory" -> AdaptiveMemoryPhase(
-                items = parsedData.memoryItems,
-                adaptiveConfig = parsedData.adaptiveConfig,
-                onReady = { gamePhase = "interference" }
-            )
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 16.dp))
 
-            "interference" -> AdaptiveInterferencePhase(
-                task = parsedData.interferenceTask,
-                answers = interferenceAnswers,
-                adaptiveConfig = parsedData.adaptiveConfig,
-                onAnswersChanged = { interferenceAnswers = it },
-                onComplete = { gamePhase = "recognition" }
-            )
-
-            "recognition" -> AdaptiveRecognitionPhase(
-                items = parsedData.recognitionItems,
-                selectedAnswers = selectedAnswers,
-                adaptiveConfig = parsedData.adaptiveConfig,
-                onSelectionChanged = { selectedAnswers = it },
-                onSubmit = {
-                    val score = calculateAdaptiveContextScore(
-                        selectedAnswers,
-                        parsedData.correctAnswers,
-                        timeRemaining,
-                        parsedData.adaptiveConfig
-                    )
-                    val correct = selectedAnswers == parsedData.correctAnswers.toSet()
-
-                    finalScore = score
-                    isCorrect = correct
-
-                    if (correct) {
-                        currentStreak++
-                    } else {
-                        currentHearts = maxOf(0, currentHearts - 1)
-                        currentStreak = 0
-                    }
-
-                    recordPerformance(correct)
-                    sessionData = SessionCompletionData(
-                        puzzleType = "contextSwitch",
-                        sessionScore = finalScore,
-                        sessionStats = SessionStatistics(
-                            correctAnswers = if (isCorrect) 1 else 0,
-                            totalAnswers = 1,
-                            totalTimeSeconds = ((System.currentTimeMillis() - startTime) / 1000).toInt(),
-                            bestStreak = currentStreak,
-                            winRate = if (isCorrect) 1f else 0f,
-                            totalScore = finalScore,
-                            averageTimePerPuzzle = ((System.currentTimeMillis() - startTime) / 1000).toInt()/5,
-                            currentStreak = currentStreak,
-                            individualTimes = emptyList()
-                        ),
-                        currentDifficulty = currentDifficultyLevel
-                    )
-                    shouldCompleteSession = true
+            // Add this after your Column/UI setup, but before the when statement
+            if (shouldCompleteSession && sessionData != null) {
+                UnifiedSessionCompletionHandler(
+                    puzzleType = sessionData!!.puzzleType,
+                    sessionScore = sessionData!!.sessionScore,
+                    sessionStats = sessionData!!.sessionStats,
+                    currentDifficulty = sessionData!!.currentDifficulty
+                ) { result ->
+                    shouldCompleteSession = false
+                    sessionData = null
+                    showFeedback = true
                 }
-            )
+            }
+
+            Box(modifier = Modifier.weight(1f).fillMaxWidth()) {
+                when (gamePhase) {
+                    "memory" -> AdaptiveMemoryPhase(
+                        items = parsedData.memoryItems,
+                        adaptiveConfig = parsedData.adaptiveConfig,
+                        wide = wide,
+                        compact = compact,
+                        onReady = { gamePhase = "interference" }
+                    )
+
+                    "interference" -> AdaptiveInterferencePhase(
+                        task = parsedData.interferenceTask,
+                        answers = interferenceAnswers,
+                        adaptiveConfig = parsedData.adaptiveConfig,
+                        wide = wide,
+                        compact = compact,
+                        onAnswersChanged = { interferenceAnswers = it },
+                        onComplete = { gamePhase = "recognition" }
+                    )
+
+                    "recognition" -> AdaptiveRecognitionPhase(
+                        items = parsedData.recognitionItems,
+                        selectedAnswers = selectedAnswers,
+                        adaptiveConfig = parsedData.adaptiveConfig,
+                        wide = wide,
+                        compact = compact,
+                        onSelectionChanged = { selectedAnswers = it },
+                        onSubmit = {
+                            val score = calculateAdaptiveContextScore(
+                                selectedAnswers,
+                                parsedData.correctAnswers,
+                                timeRemaining,
+                                parsedData.adaptiveConfig
+                            )
+                            val correct = selectedAnswers == parsedData.correctAnswers.toSet()
+
+                            finalScore = score
+                            isCorrect = correct
+
+                            if (correct) {
+                                currentStreak++
+                            } else {
+                                currentHearts = maxOf(0, currentHearts - 1)
+                                currentStreak = 0
+                            }
+
+                            recordPerformance(correct)
+                            sessionData = SessionCompletionData(
+                                puzzleType = "contextSwitch",
+                                sessionScore = finalScore,
+                                sessionStats = SessionStatistics(
+                                    correctAnswers = if (isCorrect) 1 else 0,
+                                    totalAnswers = 1,
+                                    totalTimeSeconds = ((System.currentTimeMillis() - startTime) / 1000).toInt(),
+                                    bestStreak = currentStreak,
+                                    winRate = if (isCorrect) 1f else 0f,
+                                    totalScore = finalScore,
+                                    averageTimePerPuzzle = ((System.currentTimeMillis() - startTime) / 1000).toInt()/5,
+                                    currentStreak = currentStreak,
+                                    individualTimes = emptyList()
+                                ),
+                                currentDifficulty = currentDifficultyLevel
+                            )
+                            shouldCompleteSession = true
+                        }
+                    )
+                }
+            }
         }
     }
 
@@ -955,7 +997,7 @@ private fun AdaptiveContextSwitchHeader(
             Icon(
                 Icons.Default.ArrowBack,
                 contentDescription = stringResource(R.string.back),
-                tint = Color.White,
+                tint = RvInk,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -966,18 +1008,18 @@ private fun AdaptiveContextSwitchHeader(
             Text(
                 text = "Level ${level.level}",
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.8f)
+                color = RvInkSoft
             )
             Text(
                 text = adaptiveConfig.name,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
             Text(
                 text = timer,
                 fontSize = 14.sp,
-                color = Color.White
+                color = RvInk
             )
 
             // Adaptive features indicator
@@ -987,7 +1029,7 @@ private fun AdaptiveContextSwitchHeader(
                 if (adaptiveConfig.dualTaskDemand) Text("🧠", fontSize = 10.sp)
                 if (adaptiveConfig.attentionalControl) Text("👁️", fontSize = 10.sp)
                 if (adaptiveConfig.temporalComplexity) Text("⏱️", fontSize = 10.sp)
-                Text("${adaptiveConfig.workingMemoryLoad}", fontSize = 10.sp, color = Color.White)
+                Text("${adaptiveConfig.workingMemoryLoad}", fontSize = 10.sp, color = RvInk)
             }
         }
 
@@ -997,7 +1039,7 @@ private fun AdaptiveContextSwitchHeader(
             Text(
                 text = "${stringResource(R.string.score_label)}: $score",
                 fontSize = 12.sp,
-                color = Color.White
+                color = RvInk
             )
             Row {
                 repeat(hearts) {
@@ -1037,7 +1079,7 @@ private fun AdaptiveContextNotificationCard(
             Icon(
                 Icons.Default.Psychology,
                 contentDescription = "Adapted",
-                tint = Color.White,
+                tint = RvOnTone,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -1046,12 +1088,12 @@ private fun AdaptiveContextNotificationCard(
                     text = "Context Switch Adapted!",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
                 Text(
                     text = adaptationInfo?.adjustmentReason ?: "",
                     fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    color = RvOnTone.copy(alpha = 0.9f)
                 )
             }
             IconButton(
@@ -1061,7 +1103,7 @@ private fun AdaptiveContextNotificationCard(
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Dismiss",
-                    tint = Color.White,
+                    tint = RvOnTone,
                     modifier = Modifier.size(16.dp)
                 )
             }
@@ -1075,82 +1117,27 @@ private fun AdaptiveContextNotificationCard(
 private fun AdaptiveMemoryPhase(
     items: List<String>,
     adaptiveConfig: AdaptiveContextConfig,
+    wide: Boolean,
+    compact: Boolean,
     onReady: () -> Unit
 ) {
     var showItems by remember { mutableStateOf(true) }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = "🧠 Study these items",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "${adaptiveConfig.name}: ${adaptiveConfig.description}",
-            fontSize = 14.sp,
-            color = Color.White.copy(alpha = 0.8f),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Text(
-            text = "Memory load: ${adaptiveConfig.workingMemoryLoad}/5 items",
-            fontSize = 12.sp,
-            color = Color(0xFF4FC3F7),
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        if (showItems) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A3E))
-            ) {
-                LazyColumn(
-                    modifier = Modifier.padding(24.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(items) { item ->
-                        Text(
-                            text = "• $item",
-                            fontSize = 18.sp,
-                            color = Color.White,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Button(
-                onClick = {
+    CsPhaseScaffold(
+        wide = wide,
+        compact = compact,
+        title = "🧠 Study these items",
+        subtitle = "${adaptiveConfig.name}: ${adaptiveConfig.description}\nMemory load: ${adaptiveConfig.workingMemoryLoad}/5 items",
+        action = {
+            if (showItems) {
+                CsPrimaryAction(text = "I'm Ready! 💪") {
                     showItems = false
                     onReady()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
-            ) {
-                Text(
-                    text = "I'm Ready! 💪",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                }
             }
         }
+    ) { m ->
+        if (showItems) CsMemoryList(items = items, modifier = m)
     }
 }
 
@@ -1159,6 +1146,8 @@ private fun AdaptiveInterferencePhase(
     task: AdaptiveInterferenceTask,
     answers: List<String>,
     adaptiveConfig: AdaptiveContextConfig,
+    wide: Boolean,
+    compact: Boolean,
     onAnswersChanged: (List<String>) -> Unit,
     onComplete: () -> Unit
 ) {
@@ -1175,158 +1164,114 @@ private fun AdaptiveInterferencePhase(
         }
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFF1E1E2C))
-            .systemBarsPadding()
-            .imePadding()
-            .navigationBarsPadding()
-    ) {
-
-        // Compact top bar: title + (optional) timer chip on the same row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "🧩 Interference Task",
-                fontSize = 18.sp, // smaller
-                fontWeight = FontWeight.SemiBold,
-                color = Color.White,
-                modifier = Modifier.weight(1f)
+    CsPhaseScaffold(
+        wide = wide,
+        compact = compact,
+        title = "🧩 Interference Task",
+        subtitle = task.instruction,
+        action = {
+            CsPrimaryAction(
+                text = "Continue →",
+                enabled = when (task.type) {
+                    "simple_math" -> answers.size == task.items.size && answers.all { it.isNotEmpty() }
+                    "working_memory_update" -> answers.isNotEmpty()
+                    else -> true
+                },
+                onClick = {
+                    val isValid = AdaptiveContextSwitchGenerator.validateInterferenceAnswer(
+                        taskType = task.type,
+                        userAnswers = answers,
+                        originalItems = task.items
+                    )
+                    if (isValid) {
+                        showValidationError = false
+                        onComplete()
+                    } else {
+                        validationMessage = when (task.type) {
+                            "number_sort" -> "Please sort the numbers correctly from smallest to largest"
+                            "word_alphabetize" -> "Please arrange the words in alphabetical order"
+                            "simple_math" -> "Please check your math calculations"
+                            "working_memory_update" -> "Please check your running total calculation"
+                            "triple_task" -> "Please complete all parts of the triple task"
+                            else -> "Please check your answer"
+                        }
+                        showValidationError = true
+                        CoroutineScope(Dispatchers.Main).launch {
+                            delay(3000); showValidationError = false
+                        }
+                    }
+                }
             )
+        }
+    ) { m ->
+        Box(modifier = m) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                if (task.timeConstraint > 0) {
+                    Surface(
+                        color = if (timeRemaining <= 10) RvCoral.copy(alpha = 0.2f) else RvSky.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = "⏳ ${timeRemaining}s",
+                            color = RvInk,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                        )
+                    }
+                    Spacer(Modifier.height(8.dp))
+                }
 
-            if (task.timeConstraint > 0) {
-                Surface(
-                    color = if (timeRemaining <= 10) Color(0x33FF0000) else Color(0x332196F3),
-                    shape = RoundedCornerShape(12.dp),
+                // QUESTIONS AREA - takes the remaining height
+                Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
+                    when (task.type) {
+                        "number_sort", "word_alphabetize" -> {
+                            AdaptiveSortingInterface(
+                                items = task.items,
+                                taskType = task.type,
+                                onItemsChanged = onAnswersChanged
+                            )
+                        }
+                        "simple_math" -> {
+                            AdaptiveMathInterface(
+                                problems = task.items,
+                                answers = answers,
+                                onAnswersChanged = onAnswersChanged
+                            )
+                        }
+                        "working_memory_update" -> {
+                            AdaptiveWorkingMemoryInterface(
+                                numbers = task.items,
+                                onComplete = { result -> onAnswersChanged(listOf(result.toString())) }
+                            )
+                        }
+                        "triple_task" -> {
+                            AdaptiveTripleTaskInterface(
+                                items = task.items,
+                                onAnswersChanged = onAnswersChanged
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Validation error floats over the play area (no layout jump)
+            if (showValidationError) {
+                Card(
+                    modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter),
+                    colors = CardDefaults.cardColors(containerColor = RvCoralEdge)
                 ) {
                     Text(
-                        text = "⏳ ${timeRemaining}s",
-                        color = if (timeRemaining <= 10) Color.Red else Color(0xFFB3D9FF),
-                        fontSize = 12.sp,
+                        text = validationMessage,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                        color = RvOnTone,
+                        modifier = Modifier.padding(10.dp),
+                        textAlign = TextAlign.Center
                     )
                 }
             }
-        }
-
-        // Instruction: smaller, 2-line cap, tighter padding
-        Text(
-            text = task.instruction,
-            fontSize = 14.sp,
-            color = Color(0xFFB0B0C3),
-            textAlign = TextAlign.Center,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        )
-
-        Spacer(Modifier.height(8.dp))
-
-        // Validation error (compact)
-        AnimatedVisibility(
-            visible = showValidationError,
-            enter = slideInVertically() + fadeIn(),
-            exit = slideOutVertically() + fadeOut()
-        ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFFF5252))
-            ) {
-                Text(
-                    text = validationMessage,
-                    fontSize = 13.sp,
-                    color = Color.White,
-                    modifier = Modifier.padding(10.dp),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-
-        if (showValidationError) Spacer(Modifier.height(6.dp))
-
-        // QUESTIONS AREA — grows to take remaining height
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f, fill = true) // ensure it claims space
-        ) {
-            when (task.type) {
-                "number_sort", "word_alphabetize" -> {
-                    AdaptiveSortingInterface(
-                        items = task.items,
-                        taskType = task.type,
-                        onItemsChanged = onAnswersChanged
-                    )
-                }
-                "simple_math" -> {
-                    AdaptiveMathInterface(
-                        problems = task.items,
-                        answers = answers,
-                        onAnswersChanged = onAnswersChanged
-                    )
-                }
-                "working_memory_update" -> {
-                    AdaptiveWorkingMemoryInterface(
-                        numbers = task.items,
-                        onComplete = { result -> onAnswersChanged(listOf(result.toString())) }
-                    )
-                }
-                "triple_task" -> {
-                    AdaptiveTripleTaskInterface(
-                        items = task.items,
-                        onAnswersChanged = onAnswersChanged
-                    )
-                }
-            }
-        }
-
-        Button(
-            onClick = {
-                val isValid = AdaptiveContextSwitchGenerator.validateInterferenceAnswer(
-                    taskType = task.type,
-                    userAnswers = answers,
-                    originalItems = task.items
-                )
-                if (isValid) {
-                    showValidationError = false
-                    onComplete()
-                } else {
-                    validationMessage = when (task.type) {
-                        "number_sort" -> "Please sort the numbers correctly from smallest to largest"
-                        "word_alphabetize" -> "Please arrange the words in alphabetical order"
-                        "simple_math" -> "Please check your math calculations"
-                        "working_memory_update" -> "Please check your running total calculation"
-                        "triple_task" -> "Please complete all parts of the triple task"
-                        else -> "Please check your answer"
-                    }
-                    showValidationError = true
-                    CoroutineScope(Dispatchers.Main).launch {
-                        delay(3000); showValidationError = false
-                    }
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2196F3)),
-            enabled = when (task.type) {
-                "simple_math" -> answers.size == task.items.size && answers.all { it.isNotEmpty() }
-                "working_memory_update" -> answers.isNotEmpty()
-                else -> true
-            }
-        ) {
-            Text("Continue →", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -1336,112 +1281,31 @@ private fun AdaptiveRecognitionPhase(
     items: List<String>,
     selectedAnswers: Set<String>,
     adaptiveConfig: AdaptiveContextConfig,
+    wide: Boolean,
+    compact: Boolean,
     onSelectionChanged: (Set<String>) -> Unit,
     onSubmit: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // Fixed header section
-        Text(
-            text = "🎯 Recognition Test",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Select all items from the original list",
-            fontSize = 16.sp,
-            color = Color.Gray,
-            textAlign = TextAlign.Center
-        )
-
-        if (adaptiveConfig.attentionalControl) {
-            Text(
-                text = "⚠️ Items are arranged to test attention control",
-                fontSize = 12.sp,
-                color = Color(0xFFFF6B35),
-                textAlign = TextAlign.Center
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Scrollable grid section with explicit height constraints
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(if (adaptiveConfig.workingMemoryLoad >= 4) 2 else 2),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f) // This allows the grid to take available space and scroll
-                .padding(horizontal = 8.dp),
-            contentPadding = PaddingValues(bottom = 16.dp) // Extra padding at bottom
-        ) {
-            items(items) { item ->
-                val isSelected = item in selectedAnswers
-
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(2.5f) // Ensures consistent card sizing
-                        .clickable {
-                            val newSelection = if (isSelected) {
-                                selectedAnswers - item
-                            } else {
-                                selectedAnswers + item
-                            }
-                            onSelectionChanged(newSelection)
-                        }
-                        .border(
-                            width = if (isSelected) 3.dp else 1.dp,
-                            color = if (isSelected) Color(0xFF4CAF50) else Color.Gray,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) Color(0xFF2A4A2A) else Color(0xFF2A2A3E)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = item,
-                            fontSize = if (adaptiveConfig.workingMemoryLoad >= 4) 14.sp else 16.sp,
-                            color = Color.White,
-                            textAlign = TextAlign.Center,
-                            maxLines = 2 // Prevent text overflow
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Fixed submit button at bottom
-        Button(
-            onClick = onSubmit,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6B35)),
-            enabled = selectedAnswers.isNotEmpty()
-        ) {
-            Text(
+    CsPhaseScaffold(
+        wide = wide,
+        compact = compact,
+        title = "🎯 Recognition Test",
+        subtitle = "Select all items from the original list" +
+            if (adaptiveConfig.attentionalControl) "\n⚠️ Items are arranged to test attention control" else "",
+        action = {
+            CsPrimaryAction(
                 text = "Submit Answer ✓",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                enabled = selectedAnswers.isNotEmpty(),
+                onClick = onSubmit
             )
         }
+    ) { m ->
+        CsSelectionGrid(
+            items = items,
+            selectedAnswers = selectedAnswers,
+            onSelectionChanged = onSelectionChanged,
+            modifier = m
+        )
     }
 }
 
@@ -1454,58 +1318,72 @@ private fun AdaptiveSortingInterface(
 ) {
     var sortedItems by remember { mutableStateOf(items) }
 
-    LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        itemsIndexed(sortedItems) { index, item ->
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A3E))
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+    // Rows share the available height (48-72dp); both arrows are always present (48dp targets).
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val gap = 8.dp
+        val n = sortedItems.size.coerceAtLeast(1)
+        val rowH = ((maxHeight - gap * (n - 1)) / n).coerceIn(48.dp, 72.dp)
+        Column(
+            modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter),
+            verticalArrangement = Arrangement.spacedBy(gap)
+        ) {
+            sortedItems.forEachIndexed { index, item ->
+                Card(
+                    modifier = Modifier.fillMaxWidth().height(rowH).testTag("ctx_word"),
+                    colors = CardDefaults.cardColors(containerColor = RvSurface),
+                    border = androidx.compose.foundation.BorderStroke(1.dp, RvOutline)
                 ) {
-                    Text(
-                        text = "${index + 1}. $item",
-                        fontSize = 16.sp,
-                        color = Color.White,
-                        modifier = Modifier.weight(1f)
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxSize().padding(start = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "${index + 1}. $item",
+                            fontSize = aCapSp(16f, 1.3f),
+                            color = RvInk,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
 
-                    Row {
-                        if (index > 0) {
-                            IconButton(
-                                onClick = {
-                                    val newItems = sortedItems.toMutableList()
-                                    val temp = newItems[index]
-                                    newItems[index] = newItems[index - 1]
-                                    newItems[index - 1] = temp
-                                    sortedItems = newItems
-                                    onItemsChanged(newItems)
-                                }
-                            ) {
-                                Icon(Icons.Default.KeyboardArrowUp, contentDescription = null, tint = Color.White)
+                        IconButton(
+                            enabled = index > 0,
+                            modifier = Modifier.size(48.dp),
+                            onClick = {
+                                val newItems = sortedItems.toMutableList()
+                                val temp = newItems[index]
+                                newItems[index] = newItems[index - 1]
+                                newItems[index - 1] = temp
+                                sortedItems = newItems
+                                onItemsChanged(newItems)
                             }
+                        ) {
+                            Icon(
+                                Icons.Default.KeyboardArrowUp,
+                                contentDescription = null,
+                                tint = if (index > 0) RvInk else RvDisabled,
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
 
-                        if (index < sortedItems.size - 1) {
-                            IconButton(
-                                onClick = {
-                                    val newItems = sortedItems.toMutableList()
-                                    val temp = newItems[index]
-                                    newItems[index] = newItems[index + 1]
-                                    newItems[index + 1] = temp
-                                    sortedItems = newItems
-                                    onItemsChanged(newItems)
-                                }
-                            ) {
-                                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, tint = Color.White)
+                        IconButton(
+                            enabled = index < sortedItems.size - 1,
+                            modifier = Modifier.size(48.dp),
+                            onClick = {
+                                val newItems = sortedItems.toMutableList()
+                                val temp = newItems[index]
+                                newItems[index] = newItems[index + 1]
+                                newItems[index + 1] = temp
+                                sortedItems = newItems
+                                onItemsChanged(newItems)
                             }
+                        ) {
+                            Icon(
+                                Icons.Default.KeyboardArrowDown,
+                                contentDescription = null,
+                                tint = if (index < sortedItems.size - 1) RvInk else RvDisabled,
+                                modifier = Modifier.size(28.dp)
+                            )
                         }
                     }
                 }
@@ -1527,11 +1405,11 @@ private fun AdaptiveMathInterface(
 
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        contentPadding = PaddingValues(bottom = 24.dp)
+            .padding(horizontal = 4.dp),
+        contentPadding = PaddingValues(bottom = 8.dp)
     ) {
         items(problems.size) { index ->
             val currentAnswers = remember(answers) { answers.toMutableList() }.apply {
@@ -1542,21 +1420,21 @@ private fun AdaptiveMathInterface(
             val imeAction = if (isLast) ImeAction.Done else ImeAction.Next
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A3E)),
+                modifier = Modifier.fillMaxWidth().testTag("ctx_word"),
+                colors = CardDefaults.cardColors(containerColor = RvSurface),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(12.dp), // tighter than 16dp
+                        .padding(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "${problems[index]} =",
                         fontSize = 18.sp,
-                        color = Color.White,
+                        color = RvInk,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -1574,7 +1452,7 @@ private fun AdaptiveMathInterface(
                         textStyle = LocalTextStyle.current.copy(
                             textAlign = TextAlign.Center,
                             fontSize = 18.sp,
-                            color = Color.White
+                            color = RvInk
                         ),
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.NumberPassword,
@@ -1585,11 +1463,11 @@ private fun AdaptiveMathInterface(
                             onDone = { focusManager.clearFocus() }
                         ),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White,
-                            focusedBorderColor = Color(0xFF4CAF50),
-                            unfocusedBorderColor = Color.Gray,
-                            cursorColor = Color.White
+                            focusedTextColor = RvInk,
+                            unfocusedTextColor = RvInk,
+                            focusedBorderColor = RvViolet,
+                            unfocusedBorderColor = RvInkSoft,
+                            cursorColor = RvInk
                         )
                     )
                 }
@@ -1621,14 +1499,16 @@ private fun AdaptiveWorkingMemoryInterface(
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
         if (currentIndex < numbers.size) {
             Text(
                 text = numbers[currentIndex],
                 fontSize = 48.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -1636,20 +1516,21 @@ private fun AdaptiveWorkingMemoryInterface(
             Text(
                 text = "Keep running total of last 3 numbers",
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = RvInkSoft,
+                textAlign = TextAlign.Center
             )
 
             Text(
                 text = "Current total: $runningTotal",
                 fontSize = 16.sp,
-                color = Color(0xFF4CAF50)
+                color = RvInk
             )
         } else {
             Text(
                 text = "Final total: $runningTotal",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF4CAF50)
+                color = RvInk
             )
         }
     }
@@ -1666,16 +1547,16 @@ private fun AdaptiveTripleTaskInterface(
         Text(
             text = "For each item, provide:",
             fontSize = 16.sp,
-            color = Color.White,
+            color = RvInk,
             fontWeight = FontWeight.Bold
         )
         Text(
             text = "• Sort the number\n• Count vowels in word\n• Identify if number is prime",
             fontSize = 12.sp,
-            color = Color.Gray
+            color = RvInkSoft
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -1688,15 +1569,15 @@ private fun AdaptiveTripleTaskInterface(
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF2A2A3E))
+                    colors = CardDefaults.cardColors(containerColor = RvSurface)
                 ) {
                     Column(
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(8.dp).testTag("ctx_word")
                     ) {
                         Text(
                             text = "$number $word",
                             fontSize = 16.sp,
-                            color = Color.White,
+                            color = RvInk,
                             fontWeight = FontWeight.Bold
                         )
 
@@ -1704,8 +1585,8 @@ private fun AdaptiveTripleTaskInterface(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Vowels: ${word.count { it.lowercaseChar() in "aeiou" }}", fontSize = 12.sp, color = Color.Gray)
-                            Text("Prime: ${isPrime(number.toIntOrNull() ?: 0)}", fontSize = 12.sp, color = Color.Gray)
+                            Text("Vowels: ${word.count { it.lowercaseChar() in "aeiou" }}", fontSize = 12.sp, color = RvInkSoft)
+                            Text("Prime: ${isPrime(number.toIntOrNull() ?: 0)}", fontSize = 12.sp, color = RvInkSoft)
                         }
                     }
                 }

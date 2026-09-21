@@ -1,6 +1,7 @@
 // AdaptivePercentagePuzzleScreen.kt - Enhanced with adaptive difficulty
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -8,6 +9,11 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -191,189 +197,16 @@ fun AdaptivePercentagePuzzleScreen(
         onAdaptation(adaptiveConfig)
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF8E44AD),
-                        Color(0xFF6B2C91),
-                        Color(0xFF4A1F68)
-                    )
-                )
-            )
+            .background(RvCanvas),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Enhanced Top Bar with adaptive difficulty info
-            AdaptivePercentageTopGameBar(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = displayTimer,
-                lives = currentHearts,
-                currentDifficulty = currentDifficultyLevel,
-                onBack = onBack,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            // Adaptive difficulty notification
-            AnimatedVisibility(
-                visible = showAdaptationNotification,
-                enter = slideInVertically() + fadeIn(),
-                exit = slideOutVertically() + fadeOut()
-            ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFF4FC3F7).copy(alpha = 0.9f)
-                    )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.TrendingUp,
-                            contentDescription = stringResource(R.string.difficulty_advanced),
-                            tint = Color.White,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = stringResource(R.string.difficulty_advanced),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
-                            Text(
-                                text = adaptationInfo?.adjustmentReason ?: "",
-                                fontSize = 10.sp,
-                                color = Color.White.copy(alpha = 0.9f)
-                            )
-                        }
-                        IconButton(
-                            onClick = { showAdaptationNotification = false },
-                            modifier = Modifier.size(20.dp)
-                        ) {
-                            Icon(
-                                Icons.Default.Close,
-                                contentDescription = stringResource(R.string.close),
-                                tint = Color.White,
-                                modifier = Modifier.size(16.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Enhanced game info with adaptive metrics
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 16.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.score_label).uppercase(),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "$totalScore",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                            }
-                        }
-
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = currentDifficultyLevel.name.uppercase(),
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Cyan
-                            )
-                            currentPuzzle?.let { puzzle ->
-                                Text(
-                                    text = "${puzzle.percentage}% calculation",
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.White.copy(alpha = 0.7f)
-                                )
-                            }
-                        }
-
-                        if (currentStreak > 0) {
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = stringResource(R.string.streak_label).uppercase(),
-                                    fontSize = 10.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.Gray
-                                )
-                                Text(
-                                    text = "🔥 $currentStreak",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFFFF6F00)
-                                )
-                            }
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(20.dp))
-            } else {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-
-            // Title and percentage problem
-            AdaptivePercentagePuzzleHeader(
-                puzzle = currentPuzzle,
-                difficultyLevel = currentDifficultyLevel,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.height(40.dp))
-
-            // Input display
-            InputDisplay(
-                currentInput = currentInput,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            // Calculator interface
-            CalculatorGrid(
+        val compact = maxHeight < 600.dp
+        val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+        val keypad: @Composable (Modifier) -> Unit = { keypadModifier ->
+            PercentageKeypad(
                 currentInput = currentInput,
                 onNumberClick = { digit ->
                     if (!isAnswered && currentInput.length < 8) {
@@ -453,7 +286,7 @@ fun AdaptivePercentagePuzzleScreen(
                                 adaptationInfo = config
                                 if (config.confidenceScore > 0.5f) {
                                     currentDifficultyLevel = config.level
-                                    showAdaptationNotification = true
+                                    showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                                 }
                             }
 
@@ -476,10 +309,70 @@ fun AdaptivePercentagePuzzleScreen(
                         }
                     }
                 },
-                modifier = Modifier.padding(20.dp)
+                modifier = keypadModifier
+            )
+        }
+        // Keypad height leaves room for HUD + problem + input in portrait.
+        val keypadHeight = (maxHeight - 56.dp - 56.dp - (if (compact) 96.dp else 160.dp))
+            .coerceIn(232.dp, 380.dp)
+
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .widthIn(max = 720.dp)
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 16.dp)
+                .padding(bottom = if (compact) 8.dp else 16.dp)
+        ) {
+            PercentageHud(
+                level = currentLevel,
+                streak = currentStreak,
+                score = totalScore,
+                timer = displayTimer,
+                lives = currentHearts,
+                maxLives = currentDifficultyLevel.livesAllowed,
+                onBack = onBack
             )
 
-            Spacer(modifier = Modifier.height(30.dp))
+            if (wide) {
+                Row(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(24.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(
+                        modifier = Modifier.weight(1f),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        AdaptivePercentagePuzzleHeader(
+                            puzzle = currentPuzzle,
+                            difficultyLevel = currentDifficultyLevel,
+                            compact = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        PercentageInput(currentInput = currentInput, modifier = Modifier.fillMaxWidth())
+                    }
+                    keypad(Modifier.weight(1f).fillMaxHeight())
+                }
+            } else {
+                Box(
+                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    AdaptivePercentagePuzzleHeader(
+                        puzzle = currentPuzzle,
+                        difficultyLevel = currentDifficultyLevel,
+                        compact = compact,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                PercentageInput(currentInput = currentInput, modifier = Modifier.fillMaxWidth())
+                Spacer(modifier = Modifier.height(if (compact) 8.dp else 16.dp))
+                keypad(Modifier.fillMaxWidth().height(keypadHeight))
+            }
         }
 
         EnhancedUniversalFeedback(feedbackManager)
@@ -520,7 +413,7 @@ fun AdaptivePercentagePuzzleScreen(
                     adaptationInfo = config
                     if (config.confidenceScore > 0.5f) {
                         currentDifficultyLevel = config.level
-                        showAdaptationNotification = true
+                        showAdaptationNotification = SHOW_ADAPTATION_NOTICES
                     }
                 }
 
@@ -549,40 +442,43 @@ fun AdaptivePercentagePuzzleScreen(
 fun AdaptivePercentagePuzzleHeader(
     puzzle: PercentagePuzzle?,
     difficultyLevel: DifficultyManager.DifficultyLevel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "CALCULATE THE PERCENTAGE",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White.copy(alpha = 0.9f),
-            letterSpacing = 1.sp
-        )
+        if (!compact) {
+            Text(
+                text = "CALCULATE THE PERCENTAGE",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInkSoft,
+                letterSpacing = 1.sp
+            )
 
-        Text(
-            text = difficultyLevel.name,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Cyan,
-            modifier = Modifier.padding(top = 4.dp)
-        )
+            Text(
+                text = difficultyLevel.name,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                color = RvInkSoft,
+                modifier = Modifier.padding(top = 4.dp)
+            )
 
-        Spacer(modifier = Modifier.height(30.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         puzzle?.let { puzzle ->
             // Percentage display
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
+                horizontalArrangement = Arrangement.spacedBy(if (compact) 12.dp else 20.dp)
             ) {
                 // Percentage circle
                 Box(
                     modifier = Modifier
-                        .size(100.dp)
+                        .size(if (compact) 72.dp else 100.dp)
                         .clip(CircleShape)
                         .background(
                             Brush.radialGradient(
@@ -599,7 +495,7 @@ fun AdaptivePercentagePuzzleHeader(
                         text = "${puzzle.percentage}%",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                 }
 
@@ -607,33 +503,33 @@ fun AdaptivePercentagePuzzleHeader(
                     text = "OF",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Text(
                     text = puzzle.total.toInt().toString(),
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Text(
                     text = "=",
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 Text(
                     text = "?",
                     fontSize = 36.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.6f)
+                    color = RvInkSoft
                 )
             }
 
             // Hint display for lower difficulties
-            if (puzzle.hint.isNotEmpty() && difficultyLevel.name.contains("easy", ignoreCase = true) ||
+            if (!compact && puzzle.hint.isNotEmpty() && difficultyLevel.name.contains("easy", ignoreCase = true) ||
                 difficultyLevel.name.contains("tutorial", ignoreCase = true) ||
                 difficultyLevel.name.contains("beginner", ignoreCase = true)) {
 
@@ -641,14 +537,14 @@ fun AdaptivePercentagePuzzleHeader(
 
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(8.dp)
                 ) {
                     Text(
                         text = "💡 ${puzzle.hint}",
-                        fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.8f),
+                        fontSize = 14.sp,
+                        color = RvInkSoft,
                         modifier = Modifier.padding(12.dp),
                         textAlign = TextAlign.Center
                     )
@@ -685,7 +581,7 @@ fun AdaptivePercentageTopGameBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -693,7 +589,7 @@ fun AdaptivePercentageTopGameBar(
             Icon(
                 imageVector = Icons.Default.Pause,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.7f),
+                tint = RvInkSoft.copy(alpha = 0.7f),
                 modifier = Modifier.size(24.dp)
             )
 
@@ -702,7 +598,7 @@ fun AdaptivePercentageTopGameBar(
                     text = "Level ${level.level}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 // Adaptive difficulty indicator
@@ -710,7 +606,7 @@ fun AdaptivePercentageTopGameBar(
                     text = currentDifficulty.name,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Cyan
+                    color = RvSky
                 )
 
                 // Level progress bar
@@ -743,9 +639,9 @@ fun AdaptivePercentageTopGameBar(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
-                    Color.Red // Red when ≤30 seconds
+                    RvError // Red when ≤30 seconds
                 } else {
-                    Color.White
+                    RvInk
                 }
             )
 
@@ -773,4 +669,184 @@ fun generatePercentagePuzzleFromDifficulty(
         difficulty = difficultyLevel.name,
         hint = "Multiply by 20 and divide by 100"
     )
+}
+
+/** Compact single-row HUD: back, level, lives, score/streak and timer. */
+@Composable
+private fun PercentageHud(
+    level: UserLevel,
+    streak: Int,
+    score: Int,
+    timer: String,
+    lives: Int,
+    maxLives: Int,
+    onBack: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = stringResource(R.string.back),
+                    tint = RvInk
+                )
+            }
+            Text(
+                text = "Level ${level.level}",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = RvInk,
+                maxLines = 1
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            repeat(maxLives) { index ->
+                Text(
+                    text = if (index < lives) "❤️" else "🤍",
+                    fontSize = 16.sp
+                )
+            }
+            if (score > 0) {
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "$score",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1
+                )
+            }
+            if (streak > 0) {
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = "🔥 $streak",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = RvInk,
+                    maxLines = 1
+                )
+            }
+        }
+        Text(
+            text = timer,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1,
+            color = if (timer.startsWith("0:") && timer.substring(2).toIntOrNull()?.let { it <= 30 } == true) {
+                RvCoralEdge
+            } else {
+                RvInk
+            }
+        )
+    }
+}
+
+@Composable
+private fun PercentageInput(currentInput: String, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .heightIn(min = 56.dp)
+            .background(RvSurface, RoundedCornerShape(12.dp))
+            .border(2.dp, RvOutline, RoundedCornerShape(12.dp)),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = currentInput.ifEmpty { "?" },
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            color = if (currentInput.isEmpty()) RvInkSoft else RvInk,
+            textAlign = TextAlign.Center,
+            maxLines = 1
+        )
+    }
+}
+
+/** Fit-to-screen keypad: key rows share the available height; Submit is a pinned 56dp+ bar. */
+@Composable
+private fun PercentageKeypad(
+    currentInput: String,
+    onNumberClick: (String) -> Unit,
+    onClear: () -> Unit,
+    onDecimal: () -> Unit,
+    onSubmit: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        for (row in 0..2) {
+            Row(
+                modifier = Modifier.fillMaxWidth().weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                for (col in 0..2) {
+                    val number = (row * 3 + col + 1).toString()
+                    PercentageKey(number, Modifier.weight(1f).fillMaxHeight()) { onNumberClick(number) }
+                }
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth().weight(1f),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            PercentageKey(
+                "✕", Modifier.weight(1f).fillMaxHeight(),
+                container = RvCoral.copy(alpha = 0.18f),
+                description = stringResource(R.string.clear),
+                onClick = onClear
+            )
+            PercentageKey("0", Modifier.weight(2f).fillMaxHeight()) { onNumberClick("0") }
+        }
+        val ready = currentInput.isNotEmpty()
+        RvChunkyButton(
+            onClick = onSubmit,
+            modifier = Modifier.fillMaxWidth().heightIn(min = 56.dp),
+            tone = if (ready) RvToneViolet else RvTone(RvDisabled, RvOutline)
+        ) {
+            Text(
+                text = stringResource(R.string.submit),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = if (ready) RvOnTone else RvInkSoft,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun PercentageKey(
+    label: String,
+    modifier: Modifier,
+    container: Color = RvSurface,
+    description: String? = null,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .heightIn(min = 40.dp)
+            .background(container, RoundedCornerShape(12.dp))
+            .border(1.dp, RvOutline, RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .semantics { if (description != null) contentDescription = description },
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = label,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = RvInk,
+            modifier = if (description != null) Modifier.clearAndSetSemantics { } else Modifier
+        )
+    }
 }

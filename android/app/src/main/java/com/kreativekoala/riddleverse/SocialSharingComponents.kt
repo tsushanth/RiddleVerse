@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -76,7 +77,7 @@ fun SocialShareDialog(
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFF5F5F5)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -94,7 +95,7 @@ fun SocialShareDialog(
                         Text(
                             shareableContent.message,
                             fontSize = 14.sp,
-                            color = Color.Gray,
+                            color = RvInkSoft,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -123,7 +124,7 @@ fun SocialShareDialog(
                             option = ShareOption(
                                 title = stringResource(R.string.send_via_email),
                                 icon = Icons.Default.Email,
-                                color = Color(0xFF1976D2),
+                                color = RvSky,
                                 action = { _, _ -> }
                             ),
                             content = shareableContent,
@@ -203,7 +204,7 @@ fun ShareOptionRow(
         Icon(
             imageVector = Icons.Default.ChevronRight,
             contentDescription = "Share",
-            tint = Color.Gray,
+            tint = RvInkSoft,
             modifier = Modifier.size(20.dp)
         )
     }

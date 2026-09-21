@@ -414,9 +414,10 @@ fun checkQAAnswer(
     if (puzzleType?.contains("math", ignoreCase = true) == true ||
         puzzleType?.contains("arithmetic", ignoreCase = true) == true) {
 
-        val numericResult = checkNumericAnswerQA(userAnswer, correctAnswer)
-        if (numericResult.isMatch && numericResult.confidence > result.confidence) {
-            return numericResult
+        // When both sides are numbers the numeric comparison is authoritative:
+        // string fuzzing would otherwise accept e.g. 1001 for 1000.
+        if (parseNumber(userAnswer) != null && parseNumber(correctAnswer) != null) {
+            return checkNumericAnswerQA(userAnswer, correctAnswer)
         }
     }
 
@@ -570,9 +571,15 @@ private fun checkNumericAnswerQA(userAnswer: String, correctAnswer: String): Mat
                 )
             }
 
-            // Allow for small floating point differences
+            // Integer answers must be exact. Non-integer answers get a small tolerance
+            // for rounding (e.g. 3.14 for 3.14159).
             val difference = kotlin.math.abs(userNum - correctNum)
-            val tolerance = kotlin.math.max(1.0, kotlin.math.abs(correctNum) * 0.001)
+            val isIntegerAnswer = correctNum == kotlin.math.floor(correctNum)
+            val tolerance = if (isIntegerAnswer) {
+                1e-9
+            } else {
+                kotlin.math.max(0.01, kotlin.math.abs(correctNum) * 0.001)
+            }
 
             if (difference <= tolerance) {
                 return MatchResult(
@@ -580,16 +587,6 @@ private fun checkNumericAnswerQA(userAnswer: String, correctAnswer: String): Mat
                     confidence = 0.98,
                     matchType = MatchType.FUZZY,
                     explanation = "Close numeric match within tolerance"
-                )
-            }
-
-            // Check for reasonable rounding differences
-            if (difference <= 1.0 && correctNum > 10) {
-                return MatchResult(
-                    isMatch = true,
-                    confidence = 0.90,
-                    matchType = MatchType.FUZZY,
-                    explanation = "Reasonable rounding difference"
                 )
             }
         }
@@ -602,7 +599,7 @@ private fun checkNumericAnswerQA(userAnswer: String, correctAnswer: String): Mat
         isMatch = false,
         confidence = 0.0,
         matchType = MatchType.NO_MATCH,
-        explanation = "Numeric parsing failed"
+        explanation = "Numeric answer does not match"
     )
 }
 

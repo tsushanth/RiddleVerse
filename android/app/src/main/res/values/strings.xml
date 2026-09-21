@@ -253,6 +253,7 @@
 
     <!-- Game Browse -->
     <string name="community_games">Community Games</string>
+    <string name="refresh">Refresh</string>
     <string name="my_games">My Games</string>
     <string name="draft">Draft</string>
     <string name="generating_harder_challenge">Generating Harder Challenge</string>

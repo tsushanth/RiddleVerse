@@ -7,10 +7,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
@@ -29,8 +27,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
+import com.kreativekoala.riddleverse.ui.theme.RvSun
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import com.kreativekoala.riddleverse.ui.theme.RvFlame
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 
 data class PriceItem(
     val id: Int,
@@ -272,121 +282,182 @@ fun PriceOrderingPuzzleScreen(
         }
     }
 
-    // Rest of the composable remains the same, but update the top bar to show current hearts
-    Box(
+    // Fit-to-screen: HUD fixed on top, item grid takes the remaining space, progress at the
+    // bottom. No scrolling; landscape / wide uses two panes.
+    BoxWithConstraints(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF4A90E2),
-                        Color(0xFF357ABD),
-                        Color(0xFF7B68EE)
-                    )
-                )
-            )
+            .background(RvSurface)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
-            // Top Bar - pass current hearts and formatted timer
-            EnhancedDiscountTopGameBar(
-                level = currentLevel,
-                streakInfo = streakInfo,
-                timer = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60),
-                hearts = currentHearts, // Use current hearts instead of initial hearts
-                onBack = onBack,
-                modifier = Modifier.padding(16.dp)
-            )
+        val wide = maxWidth > maxHeight || maxWidth >= 600.dp
+        val compact = maxHeight < 700.dp
+        val pad = if (compact) 8.dp else 16.dp
 
-            // Instructions
-            DiscountInstructionsCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 20.dp)
-            )
-
-            // Round indicator with score
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+        val hud: @Composable () -> Unit = {
+            if (compact) {
+                CompactDiscountHud(
+                    timer = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60),
+                    hearts = currentHearts,
+                    level = currentLevel,
+                    onBack = onBack
+                )
+            } else {
+                EnhancedDiscountTopGameBar(
+                    level = currentLevel,
+                    streakInfo = streakInfo,
+                    timer = String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60),
+                    hearts = currentHearts, // Use current hearts instead of initial hearts
+                    onBack = onBack,
+                    modifier = Modifier
+                )
+            }
+        }
+        val info: @Composable () -> Unit = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = round,
-                    fontSize = 24.sp,
+                    fontSize = if (compact) 18.sp else 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White.copy(alpha = 0.7f),
-                    textAlign = TextAlign.Center
+                    color = RvInk,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
-
-                if (score > 0) {
-                    Text(
-                        text = "Score: $score",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.White.copy(alpha = 0.9f),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
-                }
-
+                Text(
+                    text = "Score: $score",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = RvInk,
+                    maxLines = 1,
+                    modifier = Modifier.testTag("hud_score")
+                )
                 if (attempts > 0) {
                     Text(
                         text = "Attempt: $attempts",
                         fontSize = 14.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color.White.copy(alpha = 0.6f),
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 2.dp)
+                        color = RvInkSoft,
+                        maxLines = 1
                     )
                 }
             }
-
-            // Items grid — no longer weight(1f): the screen now scrolls as
-            // a whole (see root Column above), so this sizes to its own
-            // content instead of claiming "remaining space" in a layout
-            // that no longer has a fixed remaining-space budget.
-            ItemsGrid(
-                items = gameItems,
-                onItemClick = ::selectItem,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp)
-            )
-
-            // Progress bar showing completion progress
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 40.dp, vertical = 30.dp)
-            ) {
+        }
+        val progress: @Composable () -> Unit = {
+            Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
                 Text(
                     text = "${selectedOrder.size}/${items.size} items selected",
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.7f),
+                    fontSize = 14.sp,
+                    color = RvInkSoft,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
+                Spacer(modifier = Modifier.height(4.dp))
                 LinearProgressIndicator(
                     progress = selectedOrder.size.toFloat() / items.size.toFloat(),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.3f)
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
+                    color = RvViolet,
+                    trackColor = RvOutline
                 )
             }
         }
 
+        if (wide) {
+            Row(
+                modifier = Modifier.fillMaxSize().padding(pad),
+                horizontalArrangement = Arrangement.spacedBy(pad)
+            ) {
+                Column(
+                    modifier = Modifier.weight(0.8f).fillMaxHeight(),
+                    verticalArrangement = Arrangement.spacedBy(pad)
+                ) {
+                    hud()
+                    DiscountInstructionsCard(modifier = Modifier.fillMaxWidth(), compact = compact)
+                    info()
+                    Spacer(Modifier.weight(1f))
+                    progress()
+                }
+                ItemsGrid(
+                    items = gameItems,
+                    onItemClick = ::selectItem,
+                    modifier = Modifier.weight(1.2f).fillMaxHeight()
+                )
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(pad)
+                    .widthIn(max = 640.dp)
+                    .align(Alignment.TopCenter),
+                verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp)
+            ) {
+                hud()
+                DiscountInstructionsCard(modifier = Modifier.fillMaxWidth(), compact = compact)
+                info()
+                ItemsGrid(
+                    items = gameItems,
+                    onItemClick = ::selectItem,
+                    modifier = Modifier.fillMaxWidth().weight(1f)
+                )
+                progress()
+            }
+        }
+
         EnhancedUniversalFeedback(feedbackManager)
+    }
+}
+
+/** Single-row HUD for short screens: back, level, hearts, timer. */
+@Composable
+private fun CompactDiscountHud(
+    timer: String,
+    hearts: Int,
+    level: UserLevel,
+    onBack: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().statusBarsPadding(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = stringResource(R.string.back),
+                tint = RvInk
+            )
+        }
+        Text(
+            text = "Level ${level.level}",
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = RvInk,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f)
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+            repeat(hearts) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = null,
+                    tint = RvInk,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+        Text(
+            text = timer,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = RvInk,
+            maxLines = 1,
+            modifier = Modifier.padding(start = 8.dp, end = 8.dp).testTag("hud_timer")
+        )
     }
 }
 
@@ -415,12 +486,12 @@ fun EnhancedDiscountTopGameBar(
                 if (onBack != null) {
                     IconButton(
                         onClick = onBack,
-                        modifier = Modifier.size(44.dp)
+                        modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = stringResource(R.string.back),
-                            tint = Color.White,
+                            tint = RvInk,
                             modifier = Modifier.size(28.dp)
                         )
                     }
@@ -428,7 +499,7 @@ fun EnhancedDiscountTopGameBar(
                     Icon(
                         imageVector = Icons.Default.Pause,
                         contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.7f),
+                        tint = RvInkSoft,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -438,7 +509,7 @@ fun EnhancedDiscountTopGameBar(
                         text = "Level ${level.level}",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     // Level progress bar
@@ -458,7 +529,7 @@ fun EnhancedDiscountTopGameBar(
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = null,
-                        tint = Color.White,
+                        tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -472,7 +543,7 @@ fun EnhancedDiscountTopGameBar(
                     text = timer,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
 
                 // Streak display
@@ -489,25 +560,28 @@ fun EnhancedDiscountTopGameBar(
 
 @Composable
 fun DiscountInstructionsCard(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    compact: Boolean = false
 ) {
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
+            containerColor = RvSurfaceRaised
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(
             text = "TAP THE ITEMS IN ORDER FROM\nLEAST EXPENSIVE TO MOST\nEXPENSIVE.",
-            fontSize = 16.sp,
+            fontSize = if (compact) 14.sp else 16.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF2C3E50),
+            color = RvInk,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(if (compact) 8.dp else 16.dp),
             textAlign = TextAlign.Center,
-            lineHeight = 20.sp
+            lineHeight = if (compact) 18.sp else 20.sp,
+            maxLines = if (compact) 4 else 5,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -518,40 +592,38 @@ fun ItemsGrid(
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Plain Column, not LazyColumn (2026-08-04): item counts here are small
-    // (chunked into rows of 2, no virtualization needed), and LazyColumn
-    // can't be nested inside the outer screen's verticalScroll — Compose
-    // requires bounded height for lazy layouts, which conflicts with an
-    // unbounded scrollable parent. See DiscountPriceOrderingPuzzleScreen's
-    // root Column for the matching scroll-safety fix.
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(20.dp)
-    ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        // Group items into rows of 2
-        val chunkedItems = items.chunked(2)
-        chunkedItems.forEach { rowItems ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(20.dp)
-            ) {
-                rowItems.forEach { item ->
-                    PriceItemCard(
-                        item = item,
-                        onClick = { onItemClick(item.id) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-
-                // Fill remaining space if odd number of items
-                if (rowItems.size == 1) {
-                    Spacer(modifier = Modifier.weight(1f))
+    // Cards are sized from the space the grid is given (no scrolling, no lazy layouts).
+    BoxWithConstraints(modifier = modifier, contentAlignment = Alignment.Center) {
+        val n = items.size.coerceAtLeast(1)
+        val gap = if (maxHeight < 360.dp) 8.dp else 12.dp
+        val cols = if (n <= 4 || maxWidth < 360.dp) 2 else 3
+        val rows = (n + cols - 1) / cols
+        val cardW = ((maxWidth - gap * (cols - 1)) / cols).coerceAtMost(220.dp)
+        val cardH = ((maxHeight - gap * (rows - 1)) / rows).coerceAtMost(240.dp)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(gap),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            items.chunked(cols).forEach { rowItems ->
+                Row(horizontalArrangement = Arrangement.spacedBy(gap)) {
+                    rowItems.forEach { item ->
+                        PriceItemCard(
+                            item = item,
+                            onClick = { onItemClick(item.id) },
+                            modifier = Modifier.size(cardW, cardH)
+                        )
+                    }
                 }
             }
         }
-        Spacer(modifier = Modifier.height(20.dp))
     }
+}
+
+/** Text size that follows the system font scale only up to [cap]; keeps tight cards from overflowing. */
+@Composable
+internal fun aCapSp(base: Float, cap: Float = 1.3f): androidx.compose.ui.unit.TextUnit {
+    val fs = LocalDensity.current.fontScale
+    return (base * minOf(fs, cap) / fs).sp
 }
 
 @Composable
@@ -560,109 +632,113 @@ fun PriceItemCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val cardColor = when {
-        item.isSelected -> Color.White.copy(alpha = 0.3f)
-        else -> Color.Transparent
-    }
-
-    val borderColor = when {
-        item.isSelected -> Color.White
-        else -> Color.White.copy(alpha = 0.3f)
-    }
-
     Card(
-        modifier = modifier
-            .aspectRatio(0.8f)
-            .clickable { onClick() },
+        modifier = modifier.clickable { onClick() }.testTag("price_card"),
         colors = CardDefaults.cardColors(
-            containerColor = cardColor
+            containerColor = if (item.isSelected) RvOutline else RvSurfaceRaised
         ),
         border = androidx.compose.foundation.BorderStroke(
             width = if (item.isSelected) 3.dp else 1.dp,
-            color = borderColor
+            color = if (item.isSelected) RvInk else RvOutline
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Selection order indicator
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val rowLayout = maxHeight < 130.dp
+            val hasDiscount = item.discountPercentage != null && item.discountPercentage > 0
+
+            // Selection order indicator (number badge, so selection is not colour-only)
             if (item.isSelected && item.selectionOrder != null) {
                 Box(
                     modifier = Modifier
-                        .size(24.dp)
-                        .background(
-                            Color.White,
-                            CircleShape
-                        )
-                        .align(Alignment.TopEnd)
-                        .offset((-8).dp, 8.dp),
+                        .padding(6.dp)
+                        .size(28.dp)
+                        .background(RvInk, CircleShape)
+                        .align(Alignment.TopEnd),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = item.selectionOrder.toString(),
-                        fontSize = 12.sp,
+                        fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4A90E2),
+                        color = RvOnTone,
                         textAlign = TextAlign.Center
                     )
                 }
             }
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                // Icon
-                Text(
-                    text = item.icon,
-                    fontSize = 40.sp,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
-
-                // Original price (always shown prominently)
-                Text(
-                    text = "${String.format("%.2f", item.originalPrice)}",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-
-                // Discount tag if applicable
-                if (item.discountPercentage != null && item.discountPercentage > 0) {
-                    Spacer(modifier = Modifier.height(8.dp))
+            val discountTag: @Composable () -> Unit = {
+                if (hasDiscount) {
                     Card(
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFF6B35)
-                        ),
+                        colors = CardDefaults.cardColors(containerColor = RvSun),
                         shape = RoundedCornerShape(6.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
                                 text = "${item.discountPercentage}%",
-                                fontSize = 14.sp,
+                                fontSize = aCapSp(14f),
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = RvInk,
+                                maxLines = 1
                             )
                             Text(
                                 text = "DISCOUNT",
-                                fontSize = 10.sp,
+                                fontSize = aCapSp(12f),
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = RvInk,
+                                maxLines = 1
                             )
                         }
                     }
+                }
+            }
+
+            if (rowLayout) {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
+                ) {
+                    Text(text = item.icon, fontSize = aCapSp(32f))
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = String.format("%.2f", item.originalPrice),
+                            fontSize = aCapSp(20f),
+                            fontWeight = FontWeight.Bold,
+                            color = RvInk,
+                            maxLines = 1
+                        )
+                        discountTag()
                     }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(12.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = item.icon,
+                        fontSize = aCapSp(40f),
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = String.format("%.2f", item.originalPrice),
+                        fontSize = aCapSp(24f),
+                        fontWeight = FontWeight.Bold,
+                        color = RvInk,
+                        maxLines = 1
+                    )
+                    if (hasDiscount) Spacer(modifier = Modifier.height(8.dp))
+                    discountTag()
                 }
             }
         }
     }
+}
 
 @Composable
 fun PriceOrderingPuzzlePreview() {

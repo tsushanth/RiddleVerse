@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,6 +47,69 @@ import coil.compose.AsyncImage
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+
+/**
+ * Local cache of the last successfully-fetched games list, keyed by sort mode. Falls back
+ * to this on fetch failure so a backend/network blip shows stale-but-real games instead of
+ * an empty "no games yet" state (which reads as "there are no community games" rather than
+ * "we couldn't reach the server right now").
+ */
+private object GamesCache {
+    private const val PREFS = "riddleverse_games_cache"
+    private const val KEY_PREFIX = "games_"
+
+    fun save(context: android.content.Context, sortKey: String, games: List<BrowseGameData>) {
+        if (games.isEmpty()) return
+        val prefs = context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+        val arr = org.json.JSONArray()
+        games.forEach { g ->
+            arr.put(org.json.JSONObject().apply {
+                put("id", g.id)
+                put("title", g.title)
+                put("creator_id", g.creatorId)
+                put("creator_name", g.creatorName)
+                put("play_count", g.playCount)
+                put("description", g.initialPrompt)
+                put("created_at", g.createdAt)
+                put("status", g.status)
+                put("initial_screenshot_url", g.thumbnailUrl ?: "")
+                put("series_id", g.seriesId ?: "")
+                put("level_index", g.levelIndex)
+                put("level_count", g.levelCount)
+                put("trending_score", g.trendingScore)
+            })
+        }
+        prefs.edit().putString(KEY_PREFIX + sortKey, arr.toString()).apply()
+    }
+
+    fun load(context: android.content.Context, sortKey: String): List<BrowseGameData>? {
+        val prefs = context.getSharedPreferences(PREFS, android.content.Context.MODE_PRIVATE)
+        val json = prefs.getString(KEY_PREFIX + sortKey, null) ?: return null
+        return try {
+            val arr = org.json.JSONArray(json)
+            (0 until arr.length()).map { i ->
+                val g = arr.getJSONObject(i)
+                BrowseGameData(
+                    id = g.optString("id", ""),
+                    title = g.optString("title", "Untitled"),
+                    creatorId = g.optString("creator_id", ""),
+                    creatorName = g.optString("creator_name", "Anonymous"),
+                    playCount = g.optInt("play_count", 0),
+                    initialPrompt = g.optString("description", ""),
+                    createdAt = g.optString("created_at", ""),
+                    status = g.optString("status", "published"),
+                    thumbnailUrl = g.optString("initial_screenshot_url", "").ifEmpty { null },
+                    seriesId = g.optString("series_id", "").ifEmpty { null },
+                    levelIndex = g.optInt("level_index", 1),
+                    levelCount = g.optInt("level_count", 1),
+                    trendingScore = g.optDouble("trending_score", 0.0)
+                )
+            }
+        } catch (_: Exception) {
+            null
+        }
+    }
+}
 
 data class BrowseGameData(
     val id: String,
@@ -129,10 +193,14 @@ fun GameBrowseContent(context: android.content.Context) {
                         .build()
 
                     val response = HttpClientProvider.client.newCall(request).execute()
+                    val isSuccessful = response.isSuccessful
                     val body = response.body?.string()
                     response.close()
 
-                    if (body != null) {
+                    // A non-2xx status (e.g. a 500 returning a parseable {"error": "..."} body)
+                    // must fall into the cache-fallback path below, same as a null body — otherwise
+                    // it silently renders as an empty games list instead of the last-known-good data.
+                    if (body != null && isSuccessful) {
                         val json = JSONObject(body)
                         val gamesArray = json.optJSONArray("games")
                         val serverHasMore = json.optBoolean("hasMore", false)
@@ -161,6 +229,10 @@ fun GameBrowseContent(context: android.content.Context) {
                             }
                         }
 
+                        if (!loadMore) {
+                            GamesCache.save(context, sortBy, parsed)
+                        }
+
                         withContext(Dispatchers.Main) {
                             if (loadMore) {
                                 games = games + parsed
@@ -169,6 +241,20 @@ fun GameBrowseContent(context: android.content.Context) {
                             }
                             hasMore = serverHasMore
                             currentOffset = offset + parsed.size
+                            isLoading = false
+                            isLoadingMore = false
+                        }
+                    } else if (!loadMore) {
+                        // Empty/failed response on an initial (non-paginated) load — fall back
+                        // to the last successfully-cached list rather than showing "no games".
+                        val cached = GamesCache.load(context, sortBy)
+                        withContext(Dispatchers.Main) {
+                            if (cached != null) {
+                                games = cached
+                                errorMessage = "Showing saved games — couldn't refresh right now"
+                            } else {
+                                errorMessage = "Empty response from server"
+                            }
                             isLoading = false
                             isLoadingMore = false
                         }
@@ -181,8 +267,14 @@ fun GameBrowseContent(context: android.content.Context) {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Fetch games error", e)
+                    val cached = if (!loadMore) GamesCache.load(context, sortBy) else null
                     withContext(Dispatchers.Main) {
-                        errorMessage = "Failed to load games"
+                        if (cached != null) {
+                            games = cached
+                            errorMessage = "Showing saved games — couldn't refresh right now"
+                        } else {
+                            errorMessage = "Failed to load games"
+                        }
                         isLoading = false
                         isLoadingMore = false
                     }
@@ -398,21 +490,37 @@ fun GameBrowseContent(context: android.content.Context) {
                 text = stringResource(R.string.community_games),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            // Manual refresh — the only other trigger for fetchGames() is switching sort/tab
+            // (LaunchedEffect(sortBy, showMyGames) below), so without this there was no way
+            // for a user to force a fresh pull past a cached/stale list.
+            IconButton(
+                onClick = { if (!isLoading) fetchGames() },
+                enabled = !isLoading,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    Icons.Default.Refresh,
+                    contentDescription = stringResource(R.string.refresh),
+                    tint = RvViolet,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
             // My Games filter
             if (currentUserId != null) {
                 Surface(
                     onClick = { showMyGames = !showMyGames },
                     shape = RoundedCornerShape(20.dp),
-                    color = if (showMyGames) Color(0xFFFF8C00) else Color(0xFFFF8C00).copy(alpha = 0.15f)
+                    color = if (showMyGames) RvViolet else RvViolet.copy(alpha = 0.15f)
                 ) {
                     Text(
                         text = stringResource(R.string.my_games),
                         fontSize = 12.sp,
-                        color = if (showMyGames) Color.White else Color(0xFFFF8C00),
+                        color = if (showMyGames) RvOnTone else RvViolet,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
                     )
                 }
@@ -424,7 +532,7 @@ fun GameBrowseContent(context: android.content.Context) {
                 Surface(
                     onClick = { showSortMenu = true },
                     shape = RoundedCornerShape(20.dp),
-                    color = Color(0xFFFF8C00).copy(alpha = 0.15f)
+                    color = RvViolet.copy(alpha = 0.15f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
@@ -433,7 +541,7 @@ fun GameBrowseContent(context: android.content.Context) {
                         Icon(
                             Icons.Default.Sort,
                             contentDescription = stringResource(R.string.sort_by),
-                            tint = Color(0xFFFF8C00),
+                            tint = RvViolet,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -444,7 +552,7 @@ fun GameBrowseContent(context: android.content.Context) {
                                 else       -> stringResource(R.string.newest)
                             },
                             fontSize = 12.sp,
-                            color = Color(0xFFFF8C00),
+                            color = RvViolet,
                             maxLines = 1,
                             softWrap = false
                         )
@@ -482,7 +590,7 @@ fun GameBrowseContent(context: android.content.Context) {
 
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color.White)
+                CircularProgressIndicator(color = RvInk)
             }
         } else if (games.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -490,13 +598,13 @@ fun GameBrowseContent(context: android.content.Context) {
                     Icon(
                         Icons.Default.SportsEsports,
                         contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.3f),
+                        tint = RvInkSoft,
                         modifier = Modifier.size(48.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(stringResource(R.string.no_games_yet), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White.copy(alpha = 0.5f))
+                    Text(stringResource(R.string.no_games_yet), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvInkSoft)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(stringResource(R.string.be_first_to_create), fontSize = 13.sp, color = Color.White.copy(alpha = 0.3f))
+                    Text(stringResource(R.string.be_first_to_create), fontSize = 13.sp, color = RvInkSoft)
                 }
             }
         } else {
@@ -513,7 +621,7 @@ fun GameBrowseContent(context: android.content.Context) {
                                 text = "New Releases",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = RvInk,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             androidx.compose.foundation.lazy.LazyRow(
@@ -533,21 +641,21 @@ fun GameBrowseContent(context: android.content.Context) {
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .height(100.dp)
-                                                    .clip(RoundedCornerShape(8.dp))
+                                                    .clip(RoundedCornerShape(16.dp))
                                             )
                                         } else {
                                             Box(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
                                                     .height(100.dp)
-                                                    .clip(RoundedCornerShape(8.dp))
-                                                    .background(Color.White.copy(alpha = 0.08f)),
+                                                    .clip(RoundedCornerShape(16.dp))
+                                                    .background(RvSurface),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Icon(
                                                     Icons.Default.SportsEsports,
                                                     contentDescription = null,
-                                                    tint = Color.White.copy(alpha = 0.4f)
+                                                    tint = RvInkSoft
                                                 )
                                             }
                                         }
@@ -556,7 +664,7 @@ fun GameBrowseContent(context: android.content.Context) {
                                             text = rel.title,
                                             fontSize = 12.sp,
                                             fontWeight = FontWeight.SemiBold,
-                                            color = Color.White,
+                                            color = RvInk,
                                             maxLines = 2,
                                             overflow = TextOverflow.Ellipsis
                                         )
@@ -590,15 +698,15 @@ fun GameBrowseContent(context: android.content.Context) {
                             if (isLoadingMore) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(24.dp),
-                                    color = Color.White,
+                                    color = RvInk,
                                     strokeWidth = 2.dp
                                 )
                             } else {
                                 OutlinedButton(
                                     onClick = { fetchGames(loadMore = true) },
                                     shape = RoundedCornerShape(20.dp),
-                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFF8C00)),
-                                    border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFF8C00).copy(alpha = 0.3f))
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = RvViolet),
+                                    border = androidx.compose.foundation.BorderStroke(1.dp, RvViolet.copy(alpha = 0.3f))
                                 ) {
                                     Icon(Icons.Default.ExpandMore, contentDescription = null, modifier = Modifier.size(16.dp))
                                     Spacer(modifier = Modifier.width(4.dp))
@@ -621,7 +729,7 @@ fun GameBrowseContent(context: android.content.Context) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.7f)),
+                        .background(RvScrim),
                     contentAlignment = Alignment.Center
                 ) {
                     Card(
@@ -629,7 +737,7 @@ fun GameBrowseContent(context: android.content.Context) {
                             .padding(horizontal = 32.dp)
                             .fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A2E)),
+                        colors = CardDefaults.cardColors(containerColor = RvCanvas),
                         elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
                     ) {
                         Column(
@@ -642,13 +750,13 @@ fun GameBrowseContent(context: android.content.Context) {
                                 text = "Free Plays Used Up",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = RvInk
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 text = "You've used your $FREE_PLAYS_PER_GAME free plays for \"${game.title}\". Spend coins to keep playing!",
                                 fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = RvInkSoft,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -682,17 +790,17 @@ fun GameBrowseContent(context: android.content.Context) {
                                 modifier = Modifier.fillMaxWidth().height(52.dp),
                                 shape = RoundedCornerShape(14.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (coinManager.canContinue) Color(0xFF6C63FF) else Color.Gray.copy(alpha = 0.5f)
+                                    containerColor = if (coinManager.canContinue) RvViolet else RvDisabled.copy(alpha = 0.5f)
                                 )
                             ) {
                                 if (isCoinGateSpending) {
-                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = Color.White, strokeWidth = 2.dp)
+                                    CircularProgressIndicator(modifier = Modifier.size(20.dp), color = RvOnTone, strokeWidth = 2.dp)
                                 } else {
                                     Text(
                                         text = "\uD83D\uDD04  Play — \uD83E\uDE99 ${CoinManager.CONTINUE_COST} coins",
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color.White
+                                        color = RvOnTone
                                     )
                                 }
                             }
@@ -701,13 +809,13 @@ fun GameBrowseContent(context: android.content.Context) {
                                 Text(
                                     text = "Not enough coins — need ${CoinManager.CONTINUE_COST}",
                                     fontSize = 12.sp,
-                                    color = Color(0xFFFF6B6B),
+                                    color = RvError,
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
                                 )
                             }
                             Spacer(modifier = Modifier.height(8.dp))
                             TextButton(onClick = { coinGateGame = null }, enabled = !isCoinGateSpending) {
-                                Text("Maybe Later", color = Color.White.copy(alpha = 0.5f))
+                                Text("Maybe Later", color = RvInkSoft)
                             }
                         }
                     }
@@ -721,13 +829,13 @@ fun GameBrowseContent(context: android.content.Context) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.15f)),
-                shape = RoundedCornerShape(8.dp)
+                colors = CardDefaults.cardColors(containerColor = RvError.copy(alpha = 0.15f)),
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Red, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Warning, contentDescription = null, tint = RvError, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(errorMessage!!, fontSize = 13.sp, color = Color.White.copy(alpha = 0.7f))
+                    Text(errorMessage!!, fontSize = 13.sp, color = RvInkSoft)
                 }
             }
         }
@@ -769,10 +877,10 @@ private fun BrowseGameCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.06f)),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
         shape = RoundedCornerShape(16.dp),
         border = CardDefaults.outlinedCardBorder().copy(
-            brush = Brush.linearGradient(listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.05f)))
+            brush = Brush.linearGradient(listOf(RvSurface, RvSurface))
         )
     ) {
         Column {
@@ -795,13 +903,13 @@ private fun BrowseGameCard(
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color.Black.copy(alpha = 0.2f)),
+                            .background(RvInk.copy(alpha = 0.2f)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.PlayCircle,
                             contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.8f),
+                            tint = RvOnTone.copy(alpha = 0.8f),
                             modifier = Modifier.size(48.dp)
                         )
                     }
@@ -812,13 +920,13 @@ private fun BrowseGameCard(
                                 .align(Alignment.TopEnd)
                                 .padding(8.dp),
                             shape = RoundedCornerShape(20.dp),
-                            color = Color.Black.copy(alpha = 0.65f)
+                            color = RvInk.copy(alpha = 0.65f)
                         ) {
                             Text(
                                 text = "${game.levelCount} levels",
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White,
+                                color = RvOnTone,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                             )
                         }
@@ -833,13 +941,13 @@ private fun BrowseGameCard(
                     Box(
                         modifier = Modifier
                             .size(44.dp)
-                            .background(Color(0xFFFF8C00).copy(alpha = 0.15f), RoundedCornerShape(10.dp)),
+                            .background(RvViolet.copy(alpha = 0.15f), RoundedCornerShape(16.dp)),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             Icons.Default.SportsEsports,
                             contentDescription = null,
-                            tint = Color(0xFFFF8C00),
+                            tint = RvViolet,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -852,7 +960,7 @@ private fun BrowseGameCard(
                             text = game.title,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White,
+                            color = RvInk,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false)
@@ -861,13 +969,13 @@ private fun BrowseGameCard(
                             Spacer(modifier = Modifier.width(6.dp))
                             Surface(
                                 shape = RoundedCornerShape(4.dp),
-                                color = Color(0xFFFF6B6B).copy(alpha = 0.2f)
+                                color = RvError.copy(alpha = 0.2f)
                             ) {
                                 Text(
                                     text = stringResource(R.string.draft),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFFFF6B6B),
+                                    color = RvError,
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                 )
                             }
@@ -877,14 +985,14 @@ private fun BrowseGameCard(
                     Text(
                         text = "by ${game.creatorName}",
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.5f)
+                        color = RvInkSoft
                     )
                 }
 
                 // Play count
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color.White.copy(alpha = 0.08f)
+                    shape = RoundedCornerShape(16.dp),
+                    color = RvSurface
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -893,7 +1001,7 @@ private fun BrowseGameCard(
                         Icon(
                             Icons.Default.PlayArrow,
                             contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.5f),
+                            tint = RvInkSoft,
                             modifier = Modifier.size(12.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -901,7 +1009,7 @@ private fun BrowseGameCard(
                             text = "${game.playCount}",
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
-                            color = Color.White.copy(alpha = 0.5f)
+                            color = RvInkSoft
                         )
                     }
                 }
@@ -922,7 +1030,7 @@ private fun BrowseGameCard(
                 Text(
                     text = game.initialPrompt,
                     fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.4f),
+                    color = RvInkSoft,
                     maxLines = if (promptExpanded) Int.MAX_VALUE else 2,
                     overflow = if (promptExpanded) TextOverflow.Clip else TextOverflow.Ellipsis,
                     modifier = Modifier.clickable { promptExpanded = !promptExpanded }
@@ -943,20 +1051,20 @@ private fun BrowseGameCard(
                         onClick = onPlay,
                         enabled = !isDownloading,
                         modifier = Modifier.height(40.dp),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFF8C00),
-                            disabledContainerColor = Color(0xFFFF8C00).copy(alpha = 0.5f)
+                            containerColor = RvViolet,
+                            disabledContainerColor = RvViolet.copy(alpha = 0.5f)
                         )
                     ) {
                         if (isDownloading) {
-                            CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
+                            CircularProgressIndicator(modifier = Modifier.size(16.dp), color = RvOnTone, strokeWidth = 2.dp)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.loading), color = Color.White, fontSize = 14.sp)
+                            Text(stringResource(R.string.loading), color = RvOnTone, fontSize = 14.sp)
                         } else {
-                            Icon(Icons.Default.PlayCircle, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.PlayCircle, contentDescription = null, tint = RvOnTone, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(R.string.play), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                            Text(stringResource(R.string.play), color = RvOnTone, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                         }
                     }
                 } else {
@@ -971,9 +1079,9 @@ private fun BrowseGameCard(
                             onClick = onEdit,
                             modifier = Modifier
                                 .size(40.dp)
-                                .background(Color(0xFF7B2FBE).copy(alpha = 0.2f), RoundedCornerShape(10.dp))
+                                .background(RvGrape.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
                         ) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = "Edit", tint = Color(0xFFCE93D8), modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.AutoAwesome, contentDescription = "Edit", tint = RvGrape, modifier = Modifier.size(18.dp))
                         }
                     }
 
@@ -984,12 +1092,12 @@ private fun BrowseGameCard(
                             enabled = !isDeleting,
                             modifier = Modifier
                                 .size(40.dp)
-                                .background(Color(0xFFE53935).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                                .background(RvError.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                         ) {
                             if (isDeleting) {
-                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color(0xFFE53935), strokeWidth = 2.dp)
+                                CircularProgressIndicator(modifier = Modifier.size(16.dp), color = RvError, strokeWidth = 2.dp)
                             } else {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color(0xFFE53935), modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = RvError, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -999,9 +1107,9 @@ private fun BrowseGameCard(
                         onClick = { shareGameToTelegram(context, game) },
                         modifier = Modifier
                             .size(40.dp)
-                            .background(Color(0xFF0088CC).copy(alpha = 0.15f), RoundedCornerShape(10.dp))
+                            .background(RvSky.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                     ) {
-                        Icon(Icons.Default.Share, contentDescription = "Share", tint = Color(0xFF0088CC), modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Share, contentDescription = "Share", tint = RvSky, modifier = Modifier.size(18.dp))
                     }
                 }
             }
@@ -1062,12 +1170,12 @@ fun GameCardLeaderboard(gameId: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("🏆 Leaderboard", fontSize = 13.sp, color = Color(0xFFFFD700), fontWeight = FontWeight.SemiBold)
+            Text("🏆 Leaderboard", fontSize = 13.sp, color = RvSunEdge, fontWeight = FontWeight.SemiBold)
             androidx.compose.material3.Icon(
                 if (expanded) androidx.compose.material.icons.Icons.Default.KeyboardArrowUp
                 else androidx.compose.material.icons.Icons.Default.KeyboardArrowDown,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.5f),
+                tint = RvInkSoft,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -1076,20 +1184,20 @@ fun GameCardLeaderboard(gameId: String) {
             if (loading) {
                 androidx.compose.material3.CircularProgressIndicator(
                     modifier = Modifier.size(18.dp).align(Alignment.CenterHorizontally),
-                    color = Color(0xFFFF8C00), strokeWidth = 2.dp
+                    color = RvViolet, strokeWidth = 2.dp
                 )
             } else if (entries.isEmpty()) {
-                Text("No scores yet — be the first!", fontSize = 12.sp, color = Color.White.copy(alpha = 0.4f))
+                Text("No scores yet — be the first!", fontSize = 12.sp, color = RvInkSoft)
             } else {
                 val medals = listOf("🥇","🥈","🥉")
                 entries.take(5).forEachIndexed { i, e ->
                     val isMe = e.userId == currentUserId
                     Row(Modifier.fillMaxWidth().padding(vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
                         Text(medals.getOrElse(i){"${i+1}."}, fontSize = 13.sp, modifier = Modifier.width(24.dp))
-                        Text(e.username, fontSize = 12.sp, color = if(isMe) Color(0xFFFF8C00) else Color.White.copy(alpha=0.85f),
+                        Text(e.username, fontSize = 12.sp, color = if(isMe) RvViolet else RvInk,
                             fontWeight = if(isMe) FontWeight.Bold else FontWeight.Normal,
                             modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text("${e.score}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
+                        Text("${e.score}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
                     }
                 }
             }
@@ -1185,20 +1293,20 @@ fun GameCardEdits(gameId: String) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("✨ Edits", fontSize = 13.sp, color = Color(0xFFCE93D8), fontWeight = FontWeight.SemiBold)
+                Text("✨ Edits", fontSize = 13.sp, color = RvGrape, fontWeight = FontWeight.SemiBold)
                 if (fetched && versions.isNotEmpty()) {
                     Spacer(Modifier.width(6.dp))
                     Text(
                         "(${versions.count { !it.isInitial }})",
                         fontSize = 11.sp,
-                        color = Color.White.copy(alpha = 0.4f)
+                        color = RvInkSoft
                     )
                 }
             }
             Icon(
                 if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = null,
-                tint = Color.White.copy(alpha = 0.5f),
+                tint = RvInkSoft,
                 modifier = Modifier.size(18.dp)
             )
         }
@@ -1209,13 +1317,13 @@ fun GameCardEdits(gameId: String) {
                     modifier = Modifier
                         .size(18.dp)
                         .align(Alignment.CenterHorizontally),
-                    color = Color(0xFFCE93D8),
+                    color = RvGrape,
                     strokeWidth = 2.dp
                 )
                 versions.isEmpty() -> Text(
                     "No edits yet",
                     fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.4f)
+                    color = RvInkSoft
                 )
                 else -> versions.forEach { v ->
                     Row(
@@ -1229,7 +1337,7 @@ fun GameCardEdits(gameId: String) {
                                 .padding(top = 5.dp)
                                 .size(8.dp)
                                 .background(
-                                    if (v.isInitial) Color(0xFF66BB6A) else Color(0xFFCE93D8),
+                                    if (v.isInitial) RvSuccessEdge else RvGrape,
                                     CircleShape
                                 )
                         )
@@ -1238,7 +1346,7 @@ fun GameCardEdits(gameId: String) {
                             Text(
                                 v.displayMessage,
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.85f),
+                                color = RvInk,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -1248,25 +1356,25 @@ fun GameCardEdits(gameId: String) {
                                     Text(
                                         v.shortSha,
                                         fontSize = 10.sp,
-                                        color = Color.White.copy(alpha = 0.3f),
+                                        color = RvInkSoft,
                                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                                     )
                                 }
                                 val ago = relativeTimeFromIso(v.date)
                                 if (ago.isNotEmpty()) {
                                     Spacer(Modifier.width(8.dp))
-                                    Text(ago, fontSize = 10.sp, color = Color.White.copy(alpha = 0.3f))
+                                    Text(ago, fontSize = 10.sp, color = RvInkSoft)
                                 }
                                 if (v.isInitial) {
                                     Spacer(Modifier.width(8.dp))
                                     Surface(
                                         shape = RoundedCornerShape(4.dp),
-                                        color = Color(0xFF66BB6A).copy(alpha = 0.15f)
+                                        color = RvSuccessEdge.copy(alpha = 0.15f)
                                     ) {
                                         Text(
                                             "Original",
                                             fontSize = 9.sp,
-                                            color = Color(0xFF66BB6A),
+                                            color = RvSuccessEdge,
                                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                             fontWeight = FontWeight.Medium
                                         )
@@ -1944,7 +2052,7 @@ fun BrowseGamePlayScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E))
+            .background(RvCanvas)
     ) {
         // Fullscreen WebView — nothing else on screen while playing
         key(webViewKey) {
@@ -1983,10 +2091,10 @@ fun BrowseGamePlayScreen(
             Icon(
                 Icons.Default.Close,
                 contentDescription = stringResource(R.string.close),
-                tint = Color.White,
+                tint = RvOnTone,
                 modifier = Modifier
                     .size(28.dp)
-                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                    .background(RvInk.copy(alpha = 0.5f), CircleShape)
                     .padding(4.dp)
             )
         }
@@ -1995,15 +2103,15 @@ fun BrowseGamePlayScreen(
         if (showHowToPlay) {
             AlertDialog(
                 onDismissRequest = { showHowToPlay = false },
-                title = { Text("How to Play", color = Color.White, fontWeight = FontWeight.Bold) },
-                text = { Text(game.initialPrompt, color = Color.White.copy(alpha = 0.85f), fontSize = 14.sp) },
+                title = { Text("How to Play", color = RvInk, fontWeight = FontWeight.Bold) },
+                text = { Text(game.initialPrompt, color = RvInk, fontSize = 14.sp) },
                 confirmButton = {
                     TextButton(onClick = { showHowToPlay = false }) {
-                        Text("Got it!", color = Color(0xFFFF8C00), fontWeight = FontWeight.SemiBold)
+                        Text("Got it!", color = RvViolet, fontWeight = FontWeight.SemiBold)
                     }
                 },
-                containerColor = Color(0xFF1A1A2E),
-                titleContentColor = Color.White
+                containerColor = RvCanvas,
+                titleContentColor = RvInk
             )
         }
 
@@ -2012,7 +2120,7 @@ fun BrowseGamePlayScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.85f)),
+                    .background(RvCanvas.copy(alpha = 0.95f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -2028,14 +2136,14 @@ fun BrowseGamePlayScreen(
                         text = stringResource(R.string.generating_harder_challenge),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Lv.${currentDifficultyLevel + 1}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF4500)
+                        color = RvError
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -2045,21 +2153,21 @@ fun BrowseGamePlayScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(6.dp),
-                        color = Color(0xFFFF4500),
-                        trackColor = Color.White.copy(alpha = 0.15f)
+                        color = RvError,
+                        trackColor = RvOutline
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = generationPhase,
                         fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.6f)
+                        color = RvInkSoft
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.this_may_take_2_5_minutes),
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.3f)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -2070,7 +2178,7 @@ fun BrowseGamePlayScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.85f)),
+                    .background(RvCanvas.copy(alpha = 0.95f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -2083,28 +2191,28 @@ fun BrowseGamePlayScreen(
                         text = stringResource(R.string.customizing_game),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
                     Spacer(modifier = Modifier.height(24.dp))
 
                     LinearProgressIndicator(
                         progress = { customizeProgress.toFloat().coerceIn(0f, 1f) },
                         modifier = Modifier.fillMaxWidth().height(6.dp),
-                        color = Color(0xFF9C27B0),
-                        trackColor = Color.White.copy(alpha = 0.15f)
+                        color = RvGrape,
+                        trackColor = RvOutline
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = customizePhase,
                         fontSize = 13.sp,
-                        color = Color.White.copy(alpha = 0.6f)
+                        color = RvInkSoft
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(R.string.this_may_take_2_5_minutes),
                         fontSize = 12.sp,
-                        color = Color.White.copy(alpha = 0.3f)
+                        color = RvInkSoft
                     )
                 }
             }
@@ -2114,7 +2222,7 @@ fun BrowseGamePlayScreen(
         // Replay gate — shown when user opens a game they've already played
         if (showReplayGate) {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.85f)),
+                modifier = Modifier.fillMaxSize().background(RvCanvas.copy(alpha = 0.95f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
@@ -2123,25 +2231,25 @@ fun BrowseGamePlayScreen(
                 ) {
                     Text("🎮", fontSize = 48.sp)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Play Again?", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Play Again?", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = RvInk)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         "You've already played this game.\nSpend ${CoinManager.CONTINUE_COST} coins to play again.",
-                        fontSize = 15.sp, color = Color.White.copy(alpha = 0.7f),
+                        fontSize = 15.sp, color = RvInkSoft,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = { handleContinue() },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3366FF))
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = RvViolet)
                     ) {
-                        Icon(Icons.Default.PlayCircle, contentDescription = null, tint = Color.White)
+                        Icon(Icons.Default.PlayCircle, contentDescription = null, tint = RvOnTone)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Play Again", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("Play Again", color = RvOnTone, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
-                        Surface(shape = RoundedCornerShape(8.dp), color = Color.White.copy(alpha = 0.2f)) {
+                        Surface(shape = RoundedCornerShape(16.dp), color = RvOnTone.copy(alpha = 0.2f)) {
                             Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
@@ -2151,7 +2259,7 @@ fun BrowseGamePlayScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     TextButton(onClick = { onClose() }) {
-                        Text("Back", color = Color.White.copy(alpha = 0.6f))
+                        Text("Back", color = RvInkSoft)
                     }
                 }
             }
@@ -2161,7 +2269,7 @@ fun BrowseGamePlayScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.7f)),
+                    .background(RvCanvas.copy(alpha = 0.95f)),
                 contentAlignment = Alignment.TopCenter
             ) {
                 Column(
@@ -2176,7 +2284,7 @@ fun BrowseGamePlayScreen(
                         text = stringResource(R.string.game_over),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -2185,21 +2293,21 @@ fun BrowseGamePlayScreen(
                         text = "$currentScore",
                         fontSize = 64.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFF8C00)
+                        color = RvViolet
                     )
 
                     Text(
                         text = stringResource(R.string.points),
                         fontSize = 18.sp,
-                        color = Color.White.copy(alpha = 0.6f)
+                        color = RvInkSoft
                     )
 
                     if (scoreSubmitted) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.CheckCircle, contentDescription = null, tint = RvSuccessEdge, modifier = Modifier.size(16.dp))
                             Spacer(modifier = Modifier.width(6.dp))
-                            Text(stringResource(R.string.score_submitted), fontSize = 13.sp, color = Color(0xFF4CAF50))
+                            Text(stringResource(R.string.score_submitted), fontSize = 13.sp, color = RvSuccessEdge)
                         }
                     }
 
@@ -2207,17 +2315,17 @@ fun BrowseGamePlayScreen(
                     if (errorMessage != null) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.Red.copy(alpha = 0.15f),
+                            shape = RoundedCornerShape(16.dp),
+                            color = RvError.copy(alpha = 0.15f),
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Row(
                                 modifier = Modifier.padding(10.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Red, modifier = Modifier.size(14.dp))
+                                Icon(Icons.Default.Warning, contentDescription = null, tint = RvError, modifier = Modifier.size(14.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(errorMessage!!, fontSize = 12.sp, color = Color.White.copy(alpha = 0.7f))
+                                Text(errorMessage!!, fontSize = 12.sp, color = RvInkSoft)
                             }
                         }
                     }
@@ -2255,7 +2363,7 @@ fun BrowseGamePlayScreen(
                         Text(
                             stringResource(R.string.earn_coins_tip),
                             fontSize = 11.sp,
-                            color = Color.White.copy(alpha = 0.4f)
+                            color = RvInkSoft
                         )
                     }
 
@@ -2265,20 +2373,20 @@ fun BrowseGamePlayScreen(
                     Button(
                         onClick = { handleContinue() },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF3366FF)
+                            containerColor = RvViolet
                         )
                     ) {
-                        Icon(Icons.Default.PlayCircle, contentDescription = null, tint = Color.White)
+                        Icon(Icons.Default.PlayCircle, contentDescription = null, tint = RvOnTone)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.play_again), color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.play_again), color = RvOnTone, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
                         // Coin cost badge
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .background(Color.White.copy(alpha = 0.2f), RoundedCornerShape(8.dp))
+                                .background(RvOnTone.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Icon(
@@ -2314,7 +2422,7 @@ fun BrowseGamePlayScreen(
                         Button(
                             onClick = { handleHarderChallenge() },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = RoundedCornerShape(16.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Transparent
                             ),
@@ -2325,9 +2433,9 @@ fun BrowseGamePlayScreen(
                                     .fillMaxWidth()
                                     .background(
                                         Brush.horizontalGradient(
-                                            listOf(Color(0xFFFF4500), Color(0xFFFF8C00))
+                                            listOf(RvCoral, RvCoralEdge)
                                         ),
-                                        RoundedCornerShape(12.dp)
+                                        RoundedCornerShape(16.dp)
                                     )
                                     .padding(horizontal = 16.dp, vertical = 12.dp)
                             ) {
@@ -2342,14 +2450,14 @@ fun BrowseGamePlayScreen(
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(
                                         text = difficultyLabel,
-                                        color = Color.White,
+                                        color = RvOnTone,
                                         fontWeight = FontWeight.Bold,
                                         fontSize = 15.sp
                                     )
                                     Spacer(modifier = Modifier.weight(1f))
                                     Surface(
-                                        shape = RoundedCornerShape(8.dp),
-                                        color = Color.Black.copy(alpha = 0.3f)
+                                        shape = RoundedCornerShape(16.dp),
+                                        color = RvInk.copy(alpha = 0.3f)
                                     ) {
                                         Row(
                                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -2358,7 +2466,7 @@ fun BrowseGamePlayScreen(
                                             Icon(
                                                 Icons.Default.Circle,
                                                 contentDescription = null,
-                                                tint = Color(0xFFFFD700),
+                                                tint = RvSunEdge,
                                                 modifier = Modifier.size(8.dp)
                                             )
                                             Spacer(modifier = Modifier.width(3.dp))
@@ -2366,7 +2474,7 @@ fun BrowseGamePlayScreen(
                                                 text = "$harderCost",
                                                 fontSize = 13.sp,
                                                 fontWeight = FontWeight.Bold,
-                                                color = if (coinManager.canAffordDifficulty(nextLevel)) Color(0xFFFFD700) else Color.Red
+                                                color = if (coinManager.canAffordDifficulty(nextLevel)) RvSunEdge else RvError
                                             )
                                         }
                                     }
@@ -2387,7 +2495,7 @@ fun BrowseGamePlayScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent
                         ),
@@ -2398,9 +2506,9 @@ fun BrowseGamePlayScreen(
                                 .fillMaxWidth()
                                 .background(
                                     Brush.horizontalGradient(
-                                        listOf(Color(0xFF9C27B0), Color(0xFF6A1B9A))
+                                        listOf(RvGrape, RvGrapeEdge)
                                     ),
-                                    RoundedCornerShape(12.dp)
+                                    RoundedCornerShape(16.dp)
                                 )
                                 .padding(horizontal = 16.dp, vertical = 12.dp)
                         ) {
@@ -2412,14 +2520,14 @@ fun BrowseGamePlayScreen(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = stringResource(R.string.customize),
-                                    color = Color.White,
+                                    color = RvOnTone,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 15.sp
                                 )
                                 Spacer(modifier = Modifier.weight(1f))
                                 Surface(
-                                    shape = RoundedCornerShape(8.dp),
-                                    color = Color.Black.copy(alpha = 0.3f)
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = RvInk.copy(alpha = 0.3f)
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -2428,7 +2536,7 @@ fun BrowseGamePlayScreen(
                                         Icon(
                                             Icons.Default.Circle,
                                             contentDescription = null,
-                                            tint = Color(0xFFFFD700),
+                                            tint = RvSunEdge,
                                             modifier = Modifier.size(8.dp)
                                         )
                                         Spacer(modifier = Modifier.width(3.dp))
@@ -2436,7 +2544,7 @@ fun BrowseGamePlayScreen(
                                             text = "${CoinManager.CUSTOMIZE_COST}",
                                             fontSize = 13.sp,
                                             fontWeight = FontWeight.Bold,
-                                            color = if (coinManager.canAffordCustomize()) Color(0xFFFFD700) else Color.Red
+                                            color = if (coinManager.canAffordCustomize()) RvSunEdge else RvError
                                         )
                                     }
                                 }
@@ -2452,13 +2560,13 @@ fun BrowseGamePlayScreen(
                         OutlinedButton(
                             onClick = { showCoinStore = true },
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(contentColor = Color(0xFFFFD700)),
-                            border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFFFFD700).copy(alpha = 0.3f))
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = RvSunEdge),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, RvSunEdge.copy(alpha = 0.3f))
                         ) {
-                            Icon(Icons.Default.AddCircle, contentDescription = null, tint = Color(0xFFFFD700))
+                            Icon(Icons.Default.AddCircle, contentDescription = null, tint = RvSunEdge)
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.get_coins), fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
+                            Text(stringResource(R.string.get_coins), fontWeight = FontWeight.Bold, color = RvSunEdge)
                         }
 
                         Spacer(modifier = Modifier.height(12.dp))
@@ -2470,12 +2578,12 @@ fun BrowseGamePlayScreen(
                             fetchLeaderboard()
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8C00))
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = RvViolet)
                     ) {
-                        Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = Color.White)
+                        Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = RvOnTone)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.view_leaderboard), color = Color.White, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.view_leaderboard), color = RvOnTone, fontWeight = FontWeight.Bold)
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -2489,8 +2597,8 @@ fun BrowseGamePlayScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = RvInk)
                     ) {
                         Text(stringResource(R.string.done), fontWeight = FontWeight.Bold)
                     }
@@ -2503,20 +2611,20 @@ fun BrowseGamePlayScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.85f)),
+                    .background(RvCanvas.copy(alpha = 0.95f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    CircularProgressIndicator(color = Color.White)
-                    Text("Fixing game...", color = Color.White, fontWeight = FontWeight.Bold)
+                    CircularProgressIndicator(color = RvInk)
+                    Text("Fixing game...", color = RvInk, fontWeight = FontWeight.Bold)
                     if (fixPhase.isNotEmpty()) {
-                        Text(fixPhase, color = Color.White.copy(alpha = 0.7f), fontSize = 12.sp)
+                        Text(fixPhase, color = RvInkSoft, fontSize = 12.sp)
                     }
                     if (fixProgress > 0f) {
                         LinearProgressIndicator(
                             progress = { fixProgress / 100f },
                             modifier = Modifier.width(200.dp),
-                            color = Color(0xFF6B5CE7)
+                            color = RvViolet
                         )
                     }
                 }
@@ -2560,7 +2668,7 @@ fun BrowseGamePlayScreen(
             title = { Text(stringResource(R.string.whats_wrong)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Brief description — even a couple words helps", fontSize = 13.sp, color = Color.Gray)
+                    Text("Brief description — even a couple words helps", fontSize = 13.sp, color = RvInkSoft)
                     OutlinedTextField(
                         value = feedbackText,
                         onValueChange = { feedbackText = it },
@@ -2764,8 +2872,8 @@ private fun CoinStoreBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Color(0xFF1A1A2E),
-        contentColor = Color.White
+        containerColor = RvCanvas,
+        contentColor = RvInk
     ) {
         Column(
             modifier = Modifier
@@ -2778,7 +2886,7 @@ private fun CoinStoreBottomSheet(
                 text = "Coin Store",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
 
@@ -2790,7 +2898,7 @@ private fun CoinStoreBottomSheet(
                 Icon(
                     Icons.Default.Circle,
                     contentDescription = null,
-                    tint = Color(0xFFFFD700),
+                    tint = RvSunEdge,
                     modifier = Modifier.size(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -2798,13 +2906,13 @@ private fun CoinStoreBottomSheet(
                     text = "${coinManager.balance}",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "coins",
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.5f)
+                    color = RvInkSoft
                 )
             }
 
@@ -2816,7 +2924,7 @@ private fun CoinStoreBottomSheet(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 12.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.06f)),
+                    colors = CardDefaults.cardColors(containerColor = RvSurface),
                     shape = RoundedCornerShape(14.dp)
                 ) {
                     Row(
@@ -2826,7 +2934,7 @@ private fun CoinStoreBottomSheet(
                         Icon(
                             Icons.Default.Circle,
                             contentDescription = null,
-                            tint = Color(0xFFFFD700),
+                            tint = RvSunEdge,
                             modifier = Modifier.size(24.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -2835,14 +2943,14 @@ private fun CoinStoreBottomSheet(
                                 text = pack.label,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = RvInk
                             )
                             if (pack.coins == 1200) {
                                 Text(
                                     text = "Best Value",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF4CAF50)
+                                    color = RvSuccessEdge
                                 )
                             }
                         }
@@ -2854,15 +2962,15 @@ private fun CoinStoreBottomSheet(
                                 }
                             },
                             enabled = !coinManager.isPurchasing,
-                            shape = RoundedCornerShape(8.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8C00)),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
                             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                         ) {
                             Text(
                                 text = price,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                color = RvOnTone
                             )
                         }
                     }
@@ -2873,9 +2981,9 @@ private fun CoinStoreBottomSheet(
             if (coinManager.purchaseMessage != null) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.CheckCircle, contentDescription = null, tint = RvSuccessEdge, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(coinManager.purchaseMessage!!, fontSize = 13.sp, color = Color(0xFF4CAF50))
+                    Text(coinManager.purchaseMessage!!, fontSize = 13.sp, color = RvSuccessEdge)
                 }
             }
 
@@ -2883,7 +2991,7 @@ private fun CoinStoreBottomSheet(
             Text(
                 text = "Coins are used to continue games and support creators.",
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.3f)
+                color = RvInkSoft
             )
         }
     }
@@ -2914,8 +3022,8 @@ private fun LeaderboardBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Color(0xFF1A1A2E),
-        contentColor = Color.White
+        containerColor = RvCanvas,
+        contentColor = RvInk
     ) {
         Column(
             modifier = Modifier
@@ -2927,7 +3035,7 @@ private fun LeaderboardBottomSheet(
                 text = gameTitle,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = RvInk,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -2936,7 +3044,7 @@ private fun LeaderboardBottomSheet(
                     modifier = Modifier.fillMaxWidth().height(screenHeight * 0.22f),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(color = Color.White)
+                    CircularProgressIndicator(color = RvInk)
                 }
             } else if (players.isEmpty()) {
                 Box(
@@ -2947,13 +3055,13 @@ private fun LeaderboardBottomSheet(
                         Icon(
                             Icons.Default.EmojiEvents,
                             contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.3f),
+                            tint = RvInkSoft,
                             modifier = Modifier.size(48.dp)
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text(stringResource(R.string.no_scores_yet), fontSize = 16.sp, color = Color.White.copy(alpha = 0.5f))
+                        Text(stringResource(R.string.no_scores_yet), fontSize = 16.sp, color = RvInkSoft)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text(stringResource(R.string.play_to_set_score), fontSize = 13.sp, color = Color.White.copy(alpha = 0.3f))
+                        Text(stringResource(R.string.play_to_set_score), fontSize = 13.sp, color = RvInkSoft)
                     }
                 }
             } else {
@@ -2961,17 +3069,17 @@ private fun LeaderboardBottomSheet(
                 if (userRank != null) {
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFFFF8C00).copy(alpha = 0.12f)),
-                        shape = RoundedCornerShape(10.dp)
+                        colors = CardDefaults.cardColors(containerColor = RvViolet.copy(alpha = 0.12f)),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Icon(Icons.Default.Person, contentDescription = null, tint = Color(0xFFFF8C00), modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.Person, contentDescription = null, tint = RvViolet, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Your rank: #$userRank", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Color(0xFFFF8C00))
+                            Text("Your rank: #$userRank", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = RvViolet)
                         }
                     }
                 }
@@ -2981,9 +3089,9 @@ private fun LeaderboardBottomSheet(
                     Card(
                         modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (player.isCurrentUser) Color(0xFFFF8C00).copy(alpha = 0.15f) else Color.White.copy(alpha = 0.06f)
+                            containerColor = if (player.isCurrentUser) RvViolet.copy(alpha = 0.15f) else RvSurface
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Row(
                             modifier = Modifier.padding(12.dp),
@@ -3000,7 +3108,7 @@ private fun LeaderboardBottomSheet(
                                     text = player.playerName,
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (player.isCurrentUser) Color(0xFFFF8C00) else Color.White,
+                                    color = if (player.isCurrentUser) RvViolet else RvInk,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -3010,7 +3118,7 @@ private fun LeaderboardBottomSheet(
                                 text = "${player.score}",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF8C00)
+                                color = RvViolet
                             )
                         }
                     }
@@ -3257,7 +3365,7 @@ fun GameTweakScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF1A1A2E))
+            .background(RvCanvas)
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Top bar
@@ -3269,7 +3377,7 @@ fun GameTweakScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onClose) {
-                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close), tint = Color.White)
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close), tint = RvInk)
                 }
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
@@ -3277,7 +3385,7 @@ fun GameTweakScreen(
                         text = "Edit: ${game.title}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = Color.White,
+                        color = RvInk,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -3285,52 +3393,52 @@ fun GameTweakScreen(
                         Text(
                             text = "$freeTweaksRemaining free edit${if (freeTweaksRemaining == 1) "" else "s"} left",
                             fontSize = 11.sp,
-                            color = Color(0xFF4CAF50)
+                            color = RvSuccessEdge
                         )
                     } else {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Circle, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(8.dp))
+                            Icon(Icons.Default.Circle, contentDescription = null, tint = RvSunEdge, modifier = Modifier.size(8.dp))
                             Spacer(modifier = Modifier.width(3.dp))
-                            Text("$tweakCost coins per edit", fontSize = 11.sp, color = Color(0xFFFFD700))
+                            Text("$tweakCost coins per edit", fontSize = 11.sp, color = RvSunEdge)
                         }
                     }
                 }
 
                 // Coin balance
                 Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = Color(0xFFFFD700).copy(alpha = 0.15f)
+                    shape = RoundedCornerShape(16.dp),
+                    color = RvSunEdge.copy(alpha = 0.15f)
                 ) {
                     Row(
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Circle, contentDescription = null, tint = Color(0xFFFFD700), modifier = Modifier.size(10.dp))
+                        Icon(Icons.Default.Circle, contentDescription = null, tint = RvSunEdge, modifier = Modifier.size(10.dp))
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("${coinManager.balance}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
+                        Text("${coinManager.balance}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
                     }
                 }
             }
 
-            HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+            HorizontalDivider(color = RvOutline)
 
             // Version history
             if (isLoadingVersions) {
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        CircularProgressIndicator(color = Color.White)
+                        CircularProgressIndicator(color = RvInk)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Loading version history...", fontSize = 13.sp, color = Color.White.copy(alpha = 0.4f))
+                        Text("Loading version history...", fontSize = 13.sp, color = RvInkSoft)
                     }
                 }
             } else if (versions.isEmpty()) {
                 Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(40.dp)) {
-                        Icon(Icons.Default.Search, contentDescription = null, tint = Color.White.copy(alpha = 0.3f), modifier = Modifier.size(40.dp))
+                        Icon(Icons.Default.Search, contentDescription = null, tint = RvInkSoft, modifier = Modifier.size(40.dp))
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("No version history yet", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White.copy(alpha = 0.5f))
+                        Text("No version history yet", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvInkSoft)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Describe your change below to start editing", fontSize = 13.sp, color = Color.White.copy(alpha = 0.3f))
+                        Text("Describe your change below to start editing", fontSize = 13.sp, color = RvInkSoft)
                     }
                 }
             } else {
@@ -3349,14 +3457,14 @@ fun GameTweakScreen(
             if (errorMessage != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.Red.copy(alpha = 0.15f)),
-                    shape = RoundedCornerShape(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = RvError.copy(alpha = 0.15f)),
+                    shape = RoundedCornerShape(16.dp),
                     onClick = { errorMessage = null }
                 ) {
                     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Red, modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.Warning, contentDescription = null, tint = RvError, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(errorMessage!!, fontSize = 13.sp, color = Color.White.copy(alpha = 0.8f))
+                        Text(errorMessage!!, fontSize = 13.sp, color = RvInk)
                     }
                 }
             }
@@ -3364,41 +3472,41 @@ fun GameTweakScreen(
             if (successMessage != null) {
                 Card(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF4CAF50).copy(alpha = 0.15f)),
-                    shape = RoundedCornerShape(8.dp),
+                    colors = CardDefaults.cardColors(containerColor = RvSuccessEdge.copy(alpha = 0.15f)),
+                    shape = RoundedCornerShape(16.dp),
                     onClick = { successMessage = null }
                 ) {
                     Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = Color(0xFF4CAF50), modifier = Modifier.size(16.dp))
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = RvSuccessEdge, modifier = Modifier.size(16.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(successMessage!!, fontSize = 13.sp, color = Color.White.copy(alpha = 0.8f))
+                        Text(successMessage!!, fontSize = 13.sp, color = RvInk)
                     }
                 }
             }
 
             // Tweak input bar
-            HorizontalDivider(color = Color.White.copy(alpha = 0.1f))
+            HorizontalDivider(color = RvOutline)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFF141422))
+                    .background(RvSurface)
                     .padding(horizontal = 16.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
                     value = tweakText,
                     onValueChange = { tweakText = it },
-                    placeholder = { Text("Describe your change...", color = Color.White.copy(alpha = 0.3f)) },
+                    placeholder = { Text("Describe your change...", color = RvInkSoft) },
                     modifier = Modifier.weight(1f),
                     enabled = !isTweaking,
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent,
-                        focusedContainerColor = Color.White.copy(alpha = 0.08f),
-                        unfocusedContainerColor = Color.White.copy(alpha = 0.08f),
-                        focusedTextColor = Color.White,
-                        unfocusedTextColor = Color.White,
-                        cursorColor = Color(0xFFFF8C00)
+                        focusedContainerColor = RvSurface,
+                        unfocusedContainerColor = RvSurface,
+                        focusedTextColor = RvInk,
+                        unfocusedTextColor = RvInk,
+                        cursorColor = RvViolet
                     ),
                     shape = RoundedCornerShape(20.dp),
                     singleLine = true,
@@ -3414,14 +3522,14 @@ fun GameTweakScreen(
                     modifier = Modifier
                         .size(44.dp)
                         .background(
-                            if (canSend) Color(0xFFFF8C00).copy(alpha = 0.2f) else Color.White.copy(alpha = 0.05f),
+                            if (canSend) RvViolet.copy(alpha = 0.2f) else RvSurface,
                             CircleShape
                         )
                 ) {
                     Icon(
                         Icons.Default.Send,
                         contentDescription = "Send",
-                        tint = if (canSend) Color(0xFFFF8C00) else Color.White.copy(alpha = 0.2f)
+                        tint = if (canSend) RvViolet else RvDisabled
                     )
                 }
             }
@@ -3432,27 +3540,27 @@ fun GameTweakScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.85f)),
+                    .background(RvCanvas.copy(alpha = 0.95f)),
                 contentAlignment = Alignment.Center
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(40.dp)
                 ) {
-                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color(0xFFFF8C00), modifier = Modifier.size(48.dp))
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = RvViolet, modifier = Modifier.size(48.dp))
                     Spacer(modifier = Modifier.height(20.dp))
-                    Text("Applying Edit", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    Text("Applying Edit", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvInk)
                     Spacer(modifier = Modifier.height(24.dp))
                     LinearProgressIndicator(
                         progress = { tweakProgress.coerceIn(0f, 1f) },
                         modifier = Modifier.fillMaxWidth().height(6.dp),
-                        color = Color(0xFFFF8C00),
-                        trackColor = Color.White.copy(alpha = 0.15f)
+                        color = RvViolet,
+                        trackColor = RvOutline
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    Text(tweakPhase, fontSize = 13.sp, color = Color.White.copy(alpha = 0.6f))
+                    Text(tweakPhase, fontSize = 13.sp, color = RvInkSoft)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("This may take a minute...", fontSize = 12.sp, color = Color.White.copy(alpha = 0.3f))
+                    Text("This may take a minute...", fontSize = 12.sp, color = RvInkSoft)
                 }
             }
         }
@@ -3469,8 +3577,8 @@ private fun VersionCard(version: GameVersionData) {
     }
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.04f)),
-        shape = RoundedCornerShape(12.dp)
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
+        shape = RoundedCornerShape(16.dp)
     ) {
         Row(
             modifier = Modifier.padding(12.dp),
@@ -3485,7 +3593,7 @@ private fun VersionCard(version: GameVersionData) {
                     modifier = Modifier
                         .size(10.dp)
                         .background(
-                            if (isInitial) Color(0xFF4CAF50) else Color(0xFFFF8C00),
+                            if (isInitial) RvSuccessEdge else RvViolet,
                             CircleShape
                         )
                 )
@@ -3497,7 +3605,7 @@ private fun VersionCard(version: GameVersionData) {
                 Text(
                     text = displayMsg,
                     fontSize = 14.sp,
-                    color = Color.White,
+                    color = RvInk,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -3506,7 +3614,7 @@ private fun VersionCard(version: GameVersionData) {
                     Text(
                         text = version.shortSha,
                         fontSize = 11.sp,
-                        color = Color.White.copy(alpha = 0.3f),
+                        color = RvInkSoft,
                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                     )
                 }
@@ -3514,14 +3622,14 @@ private fun VersionCard(version: GameVersionData) {
 
             if (isInitial) {
                 Surface(
-                    shape = RoundedCornerShape(6.dp),
-                    color = Color(0xFF4CAF50).copy(alpha = 0.15f)
+                    shape = RoundedCornerShape(16.dp),
+                    color = RvSuccessEdge.copy(alpha = 0.15f)
                 ) {
                     Text(
                         text = "Original",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF4CAF50),
+                        color = RvSuccessEdge,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                     )
                 }
@@ -3546,8 +3654,8 @@ private fun CustomizeGameDialog(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        containerColor = Color(0xFF1A1A2E),
-        contentColor = Color.White
+        containerColor = RvCanvas,
+        contentColor = RvInk
     ) {
         Column(
             modifier = Modifier
@@ -3559,7 +3667,7 @@ private fun CustomizeGameDialog(
                 text = "Customize This Game",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Spacer(modifier = Modifier.height(4.dp))
@@ -3567,13 +3675,13 @@ private fun CustomizeGameDialog(
             Text(
                 text = "Describe what you'd like to change. A new game will be created under your name.",
                 fontSize = 13.sp,
-                color = Color.White.copy(alpha = 0.5f)
+                color = RvInkSoft
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Game name field
-            Text("Game Name", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color.White.copy(alpha = 0.7f))
+            Text("Game Name", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = newTitle,
@@ -3581,21 +3689,21 @@ private fun CustomizeGameDialog(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF9C27B0),
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                    focusedContainerColor = Color.White.copy(alpha = 0.05f),
-                    unfocusedContainerColor = Color.White.copy(alpha = 0.05f),
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    cursorColor = Color(0xFF9C27B0)
+                    focusedBorderColor = RvGrape,
+                    unfocusedBorderColor = RvOutline,
+                    focusedContainerColor = RvSurface,
+                    unfocusedContainerColor = RvSurface,
+                    focusedTextColor = RvInk,
+                    unfocusedTextColor = RvInk,
+                    cursorColor = RvGrape
                 ),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(16.dp)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             // Description field
-            Text("What would you like to change?", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color.White.copy(alpha = 0.7f))
+            Text("What would you like to change?", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = description,
@@ -3603,23 +3711,23 @@ private fun CustomizeGameDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
-                placeholder = { Text("e.g., Make it space-themed with asteroids instead of blocks...", color = Color.White.copy(alpha = 0.3f)) },
+                placeholder = { Text("e.g., Make it space-themed with asteroids instead of blocks...", color = RvInkSoft) },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = Color(0xFF9C27B0),
-                    unfocusedBorderColor = Color.White.copy(alpha = 0.2f),
-                    focusedContainerColor = Color.White.copy(alpha = 0.05f),
-                    unfocusedContainerColor = Color.White.copy(alpha = 0.05f),
-                    focusedTextColor = Color.White,
-                    unfocusedTextColor = Color.White,
-                    cursorColor = Color(0xFF9C27B0)
+                    focusedBorderColor = RvGrape,
+                    unfocusedBorderColor = RvOutline,
+                    focusedContainerColor = RvSurface,
+                    unfocusedContainerColor = RvSurface,
+                    focusedTextColor = RvInk,
+                    unfocusedTextColor = RvInk,
+                    cursorColor = RvGrape
                 ),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(16.dp)
             )
 
             Text(
                 text = "${description.length}/500",
                 fontSize = 11.sp,
-                color = Color.White.copy(alpha = 0.3f),
+                color = RvInkSoft,
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(top = 4.dp)
@@ -3632,10 +3740,10 @@ private fun CustomizeGameDialog(
                 onClick = { onSubmit(description, newTitle) },
                 modifier = Modifier.fillMaxWidth(),
                 enabled = description.trim().isNotEmpty(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Transparent,
-                    disabledContainerColor = Color.White.copy(alpha = 0.1f)
+                    disabledContainerColor = RvSurface
                 ),
                 contentPadding = PaddingValues(0.dp)
             ) {
@@ -3644,10 +3752,10 @@ private fun CustomizeGameDialog(
                         .fillMaxWidth()
                         .background(
                             if (description.trim().isNotEmpty())
-                                Brush.horizontalGradient(listOf(Color(0xFF9C27B0), Color(0xFF6A1B9A)))
+                                Brush.horizontalGradient(listOf(RvGrape, RvGrapeEdge))
                             else
-                                Brush.horizontalGradient(listOf(Color.Gray.copy(alpha = 0.3f), Color.Gray.copy(alpha = 0.3f))),
-                            RoundedCornerShape(12.dp)
+                                Brush.horizontalGradient(listOf(RvDisabled.copy(alpha = 0.3f), RvDisabled.copy(alpha = 0.3f))),
+                            RoundedCornerShape(16.dp)
                         )
                         .padding(vertical = 14.dp),
                     contentAlignment = Alignment.Center
@@ -3655,11 +3763,11 @@ private fun CustomizeGameDialog(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "\u2728", fontSize = 16.sp)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Create Customized Game", fontWeight = FontWeight.Bold, color = Color.White)
+                        Text("Create Customized Game", fontWeight = FontWeight.Bold, color = RvOnTone)
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = Color.Black.copy(alpha = 0.3f)
+                            shape = RoundedCornerShape(16.dp),
+                            color = RvInk.copy(alpha = 0.3f)
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -3668,11 +3776,11 @@ private fun CustomizeGameDialog(
                                 Icon(
                                     Icons.Default.Circle,
                                     contentDescription = null,
-                                    tint = Color(0xFFFFD700),
+                                    tint = RvSunEdge,
                                     modifier = Modifier.size(8.dp)
                                 )
                                 Spacer(modifier = Modifier.width(3.dp))
-                                Text("${CoinManager.CUSTOMIZE_COST}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFFD700))
+                                Text("${CoinManager.CUSTOMIZE_COST}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
                             }
                         }
                     }

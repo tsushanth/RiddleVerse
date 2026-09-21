@@ -1,6 +1,9 @@
 // Simplified ImageQuestionScreenWrapper.kt with 5-second countdown
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.ui.text.style.TextOverflow
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.Canvas
@@ -429,7 +432,7 @@ fun SimpleImageQuestionPuzzleScreen(
                 totalQuestions = puzzleData.totalQuestions,
                 correctCount = answers.count { it.isCorrect },
                 imageRevealCount = imageRevealCount,
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
         }
     }
@@ -451,12 +454,12 @@ fun SimpleImageQuestionHeader(
         modifier = Modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(onClick = onBack) {
-            Icon(Icons.Default.ArrowBack, "Back", tint = Color.White)
+            Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -469,12 +472,7 @@ fun SimpleImageQuestionHeader(
             Text(
                 text = round,
                 color = Color.White,
-                fontSize = 10.sp
-            )
-            Text(
-                text = "Image Questions",
-                color = Color.Cyan,
-                fontSize = 8.sp
+                fontSize = 12.sp
             )
         }
 
@@ -490,20 +488,20 @@ fun SimpleImageQuestionHeader(
                     Text(
                         text = "Memorize the image!",
                         color = Color.Yellow,
-                        fontSize = 10.sp
+                        fontSize = 12.sp
                     )
                 }
                 GamePhase.ANSWERING_QUESTIONS -> {
                     Text(
                         text = formatTime(gameTimeRemaining),
-                        color = if (gameTimeRemaining < 30) Color.Red else Color.White,
-                        fontSize = 14.sp,
+                        color = if (gameTimeRemaining < 30) Color(0xFFFF6B6B) else Color.White,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = "Q: $currentQuestion/$totalQuestions • ✓: $correctCount",
                         color = Color.White,
-                        fontSize = 10.sp
+                        fontSize = 12.sp
                     )
                 }
                 GamePhase.COMPLETED -> {
@@ -530,11 +528,10 @@ fun StudyImagePhase(
     onImageLoaded: () -> Unit = {},
     onImageError: () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+        val compact = maxHeight < 500.dp || wide
+        val statusBlock: @Composable ColumnScope.() -> Unit = {
         // Show loading or countdown based on image state
         if (timeRemaining <= 0) {
             // Loading state
@@ -566,9 +563,9 @@ fun StudyImagePhase(
             Text(
                 text = timeRemaining.toString(),
                 color = Color.Yellow,
-                fontSize = 72.sp,
+                fontSize = if (compact) 48.sp else 72.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = if (compact) 0.dp else 16.dp)
             )
 
             Text(
@@ -584,16 +581,17 @@ fun StudyImagePhase(
                 color = Color.Cyan,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 24.dp)
+                modifier = Modifier.padding(bottom = if (compact) 4.dp else 24.dp)
             )
         }
 
-        // Image with loading handling
+        }
+        val cardModifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp)
+        val imageCard: @Composable () -> Unit = {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .padding(16.dp),
+            modifier = cardModifier,
             colors = CardDefaults.cardColors(containerColor = Color.Gray.copy(alpha = 0.1f))
         ) {
             Box(modifier = Modifier.fillMaxSize()) {
@@ -646,8 +644,8 @@ fun StudyImagePhase(
                         onClick = onToggleGrid,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .padding(8.dp)
-                            .size(40.dp),
+                            .padding(4.dp)
+                            .size(48.dp),
                         containerColor = if (showGrid) Color.Yellow.copy(alpha = 0.8f) else Color.Gray.copy(alpha = 0.8f)
                     ) {
                         Icon(
@@ -661,6 +659,41 @@ fun StudyImagePhase(
             }
         }
 
+        }
+        if (wide) {
+            Row(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = Modifier.weight(0.4f).fillMaxHeight().padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    statusBlock()
+        // Grid instruction (only when countdown is active and grid is shown)
+            if (showGrid && timeRemaining > 0) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color.Yellow.copy(alpha = 0.2f)),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                ) {
+                    Text(
+                        text = "🔍 Grid sections: Top (1,2,3), Middle (4,5,6), Bottom (7,8,9)\nLeft (1,4,7), Center (2,5,6), Right (3,6,9)",
+                        color = Color.Yellow,
+                        fontSize = 12.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            }
+                }
+                Box(modifier = Modifier.weight(1f).fillMaxHeight()) { imageCard() }
+            }
+        } else {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                statusBlock()
+                Box(modifier = Modifier.weight(1f).fillMaxWidth()) { imageCard() }
         // Grid instruction (only when countdown is active and grid is shown)
         if (showGrid && timeRemaining > 0) {
             Card(
@@ -674,6 +707,8 @@ fun StudyImagePhase(
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(8.dp)
                 )
+            }
+        }
             }
         }
     }
@@ -704,16 +739,16 @@ fun AnsweringQuestionsPhase(
                 currentQuestion.question.lowercase().contains("location") ||
                 currentQuestion.options.any { it.contains("top") || it.contains("bottom") || it.contains("left") || it.contains("right") || it.contains("center") }
 
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(horizontal = 12.dp, vertical = 4.dp)
         ) {
-            // Image area - hidden or revealed
+            val wide = maxWidth > maxHeight && maxWidth >= 560.dp
+            val compact = maxHeight < 600.dp
+            val imageArea: @Composable (Modifier) -> Unit = { imageModifier ->
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(if (isLocationQuestion) screenHeight * 0.28f else screenHeight * 0.22f),
+                modifier = imageModifier,
                 colors = CardDefaults.cardColors(
                     containerColor = if (imageRevealed) Color.Transparent else Color.Gray.copy(alpha = 0.3f)
                 )
@@ -750,7 +785,7 @@ fun AnsweringQuestionsPhase(
                             Text(
                                 text = "-${IMAGE_REVEAL_PENALTY * imageRevealCount} pts",
                                 color = Color.White,
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }
@@ -779,15 +814,15 @@ fun AnsweringQuestionsPhase(
                                 onClick = onToggleGrid,
                                 modifier = Modifier
                                     .align(Alignment.TopStart)
-                                    .padding(8.dp)
-                                    .size(32.dp),
+                                    .padding(4.dp)
+                                    .size(48.dp),
                                 containerColor = if (showGrid) Color.Yellow.copy(alpha = 0.8f) else Color.Gray.copy(alpha = 0.8f)
                             ) {
                                 Icon(
                                     imageVector = if (showGrid) Icons.Default.GridOff else Icons.Default.GridOn,
                                     contentDescription = if (showGrid) "Hide Grid" else "Show Grid",
                                     tint = Color.Black,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
                         }
@@ -797,7 +832,8 @@ fun AnsweringQuestionsPhase(
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
-                            .clickable { onRevealImage() },
+                            .clickable { onRevealImage() }
+                            .padding(4.dp),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
@@ -808,7 +844,7 @@ fun AnsweringQuestionsPhase(
                             modifier = Modifier.size(32.dp)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        if (!compact) Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
                             text = "Image Hidden",
@@ -817,16 +853,19 @@ fun AnsweringQuestionsPhase(
                             fontWeight = FontWeight.Bold
                         )
 
-                        Text(
-                            text = if (isLocationQuestion) "Location Question - Use Your Memory!" else "Use Your Memory!",
-                            color = if (isLocationQuestion) Color.Yellow else Color.Cyan,
-                            fontSize = 12.sp
-                        )
+                        if (!compact) {
+                            Text(
+                                text = if (isLocationQuestion) "Location Question - Use Your Memory!" else "Use Your Memory!",
+                                color = if (isLocationQuestion) Color.Yellow else Color.Cyan,
+                                fontSize = 12.sp
+                            )
+                        }
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
                         Button(
                             onClick = onRevealImage,
+                            modifier = Modifier.heightIn(min = 48.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = Color.Red.copy(alpha = 0.8f)
                             )
@@ -834,21 +873,13 @@ fun AnsweringQuestionsPhase(
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Icon(
-                                    Icons.Default.Visibility,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(16.dp),
-                                    tint = Color.White
-                                )
                                 Text(
-                                    text = "Reveal Image",
+                                    text = "Reveal Image  (-$IMAGE_REVEAL_PENALTY points)",
                                     color = Color.White,
-                                    fontSize = 12.sp
-                                )
-                                Text(
-                                    text = "-$IMAGE_REVEAL_PENALTY points",
-                                    color = Color.Yellow,
-                                    fontSize = 10.sp
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    maxLines = 2,
+                                    textAlign = TextAlign.Center
                                 )
                             }
                         }
@@ -856,30 +887,17 @@ fun AnsweringQuestionsPhase(
                 }
             }
 
-            // Location question hint
-            if (isLocationQuestion && !imageRevealed) {
-                Card(
-                    colors = CardDefaults.cardColors(containerColor = Color.Yellow.copy(alpha = 0.1f)),
-                    modifier = Modifier.padding(vertical = 8.dp)
-                ) {
-                    Text(
-                        text = "📍 This is a location question. Try to remember where objects were positioned in the 3x3 grid!",
-                        color = Color.Yellow,
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+            val questionArea: @Composable (Modifier) -> Unit = { questionModifier ->
             // Question card
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = questionModifier,
                 colors = CardDefaults.cardColors(containerColor = Color.Gray.copy(alpha = 0.2f))
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .verticalScroll(rememberScrollState()) // last-resort safety net only
                 ) {
                     // Question header
                     Row(
@@ -890,7 +908,7 @@ fun AnsweringQuestionsPhase(
                         Text(
                             text = "Question ${currentQuestionIndex + 1} of ${questions.size}",
                             color = Color.Cyan,
-                            fontSize = 12.sp,
+                            fontSize = 14.sp,
                             fontWeight = FontWeight.Bold
                         )
 
@@ -902,14 +920,14 @@ fun AnsweringQuestionsPhase(
                                 Text(
                                     text = "LOCATION",
                                     color = Color.Yellow,
-                                    fontSize = 10.sp,
+                                    fontSize = 12.sp,
                                     fontWeight = FontWeight.Bold
                                 )
                             } else {
                                 Text(
                                     text = currentQuestion.type.replaceFirstChar { it.uppercase() }.replace("_", " "),
                                     color = Color.Yellow,
-                                    fontSize = 10.sp
+                                    fontSize = 12.sp
                                 )
                             }
 
@@ -925,7 +943,7 @@ fun AnsweringQuestionsPhase(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
 
                     // Question text
                     Text(
@@ -935,7 +953,7 @@ fun AnsweringQuestionsPhase(
                         fontWeight = FontWeight.Medium
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(if (compact) 8.dp else 16.dp))
 
                     // Answer options
                     currentQuestion.options.forEach { option ->
@@ -946,13 +964,15 @@ fun AnsweringQuestionsPhase(
                             enabled = selectedAnswer == null,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 4.dp),
+                                .heightIn(min = 48.dp)
+                                .padding(vertical = 2.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if (isSelected) Color.Blue else Color.Gray.copy(alpha = 0.4f)
+                                containerColor = if (isSelected) Color(0xFF3D5AFE) else Color.Gray.copy(alpha = 0.4f),
+                                disabledContainerColor = if (isSelected) Color(0xFF3D5AFE) else Color.Gray.copy(alpha = 0.25f)
                             )
                         ) {
                             Text(
-                                text = option,
+                                text = if (isSelected) "✓ $option" else option,
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 modifier = Modifier.fillMaxWidth(),
@@ -976,6 +996,24 @@ fun AnsweringQuestionsPhase(
                             )
                         }
                     }
+                }
+            }
+            }
+            if (wide) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    imageArea(Modifier.weight(1f).fillMaxHeight())
+                    questionArea(Modifier.weight(1.2f).fillMaxHeight())
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxHeight().widthIn(max = 720.dp).fillMaxWidth().align(Alignment.TopCenter),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    imageArea(Modifier.fillMaxWidth().weight(if (compact) 0.3f else 0.4f))
+                    questionArea(Modifier.fillMaxWidth().weight(if (compact) 0.7f else 0.6f))
                 }
             }
         }
@@ -1582,37 +1620,37 @@ fun ProgressIndicator(
     imageRevealCount: Int,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Progress: $answeredCount/$totalQuestions",
+            color = Color.White,
+            fontSize = 14.sp,
+            maxLines = 1
+        )
         LinearProgressIndicator(
             progress = answeredCount.toFloat() / totalQuestions,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.weight(1f),
             color = Color.Cyan,
-            trackColor = Color.Gray
+            trackColor = Color(0xFF444444)
         )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
+        Text(
+            text = "Correct: $correctCount",
+            color = Color(0xFF4CD9A0),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
+        )
+        if (imageRevealCount > 0) {
             Text(
-                text = "Progress: $answeredCount/$totalQuestions",
-                color = Color.White,
-                fontSize = 12.sp
+                text = "-${imageRevealCount * IMAGE_REVEAL_PENALTY}",
+                color = Color(0xFFFF6B6B),
+                fontSize = 14.sp,
+                maxLines = 1
             )
-            Text(
-                text = "Correct: $correctCount",
-                color = Color.Green,
-                fontSize = 12.sp
-            )
-            if (imageRevealCount > 0) {
-                Text(
-                    text = "Reveals: $imageRevealCount (-${imageRevealCount * IMAGE_REVEAL_PENALTY})",
-                    color = Color.Red,
-                    fontSize = 10.sp
-                )
-            }
         }
     }
 }

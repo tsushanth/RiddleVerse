@@ -42,6 +42,22 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import kotlin.math.*
+import com.kreativekoala.riddleverse.ui.theme.RvCanvas
+import com.kreativekoala.riddleverse.ui.theme.RvError
+import com.kreativekoala.riddleverse.ui.theme.RvFlame
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvMint
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvOutline
+import com.kreativekoala.riddleverse.ui.theme.RvSky
+import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSuccess
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvWarning
+import com.kreativekoala.riddleverse.ui.theme.RvScrim
 
 data class WordPrefixWord(
     val word: String,
@@ -522,7 +538,7 @@ fun WordPrefixPuzzleScreen(
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color(0xFF6A5ACD), Color(0xFF483D8B))
+                        colors = listOf(RvCanvas, RvCanvas)
                     )
                 ),
             contentAlignment = Alignment.Center
@@ -532,7 +548,7 @@ fun WordPrefixPuzzleScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Loading dictionary...",
-                    color = Color.White,
+                    color = RvInk,
                     fontSize = 16.sp
                 )
             }
@@ -547,8 +563,8 @@ fun WordPrefixPuzzleScreen(
             .background(
                 Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF6A5ACD),
-                        Color(0xFF483D8B),
+                        RvCanvas,
+                        RvCanvas,
                         Color(0xFF2E8B57)
                     )
                 )
@@ -679,40 +695,40 @@ fun WordPrefixPuzzleScreen(
                             showCompletionDialog = false
                         }
                     ) {
-                        Text("Finish Now", color = Color.White, fontWeight = FontWeight.Bold)
+                        Text("Finish Now", color = RvInk, fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(
                         onClick = { showCompletionDialog = false }
                     ) {
-                        Text("Keep Playing", color = Color.White)
+                        Text("Keep Playing", color = RvInk)
                     }
                 },
                 title = {
-                    Text("Gold Level Reached!", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("Gold Level Reached!", color = RvInk, fontWeight = FontWeight.Bold)
                 },
                 text = {
                     Column {
                         Text(
                             "Congratulations! You've reached the Gold level!",
-                            color = Color.White
+                            color = RvInk
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "Current Score: $totalScore",
-                            color = Color.Yellow,
+                            color = RvSunEdge,
                             fontWeight = FontWeight.Bold
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             "You can continue playing to find more words, or finish now with your current score.",
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = RvInkSoft,
                             fontSize = 14.sp
                         )
                     }
                 },
-                containerColor = Color(0xFF483D8B)
+                containerColor = RvSurface
             )
         }
 
@@ -745,37 +761,37 @@ fun WordPrefixPuzzleScreen(
                 onDismissRequest = { showHint = false },
                 confirmButton = {
                     TextButton(onClick = { showHint = false }) {
-                        Text("Got it!", color = Color.White)
+                        Text("Got it!", color = RvInk)
                     }
                 },
                 title = {
-                    Text("How to Play", color = Color.White, fontWeight = FontWeight.Bold)
+                    Text("How to Play", color = RvInk, fontWeight = FontWeight.Bold)
                 },
                 text = {
                     Column {
                         Text(
                             "Find words starting with \"${gameData?.prefix?.uppercase()}\"\n",
-                            color = Color.White,
+                            color = RvInk,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
                             "Targets:\nBronze: ${gameData?.targets?.get("bronze")} words\nSilver: ${gameData?.targets?.get("silver")} words\nGold: ${gameData?.targets?.get("gold")} words\n",
-                            color = Color.White
+                            color = RvInk
                         )
                         Text(
                             "Scoring:\n• Longer words = more points\n• Rare words = bonus points\n• Word streaks = multiplier bonus\n• Dictionary discoveries = extra bonus\n",
-                            color = Color.White.copy(alpha = 0.9f),
+                            color = RvInkSoft,
                             fontSize = 12.sp
                         )
                         Text(
                             "Tips:\n• Green = puzzle words (full points)\n• Blue = dictionary words (bonus points)\n• Orange = suggestions for typos",
-                            color = Color.Yellow,
+                            color = RvSunEdge,
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium
                         )
                     }
                 },
-                containerColor = Color(0xFF483D8B)
+                containerColor = RvSurface
             )
         }
     }
@@ -793,7 +809,7 @@ fun EnhancedStatsRow(
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.1f)
+            containerColor = RvSurface
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -808,7 +824,7 @@ fun EnhancedStatsRow(
                 text = "${foundWords}/${totalWords}",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -816,14 +832,14 @@ fun EnhancedStatsRow(
                     text = "Score: $totalScore",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Yellow
+                    color = RvSunEdge
                 )
 
                 if (discoveredWords > 0) {
                     Text(
                         text = "+$discoveredWords bonus words",
                         fontSize = 10.sp,
-                        color = Color.Cyan
+                        color = RvSkyEdge
                     )
                 }
             }
@@ -833,14 +849,14 @@ fun EnhancedStatsRow(
                     text = "$streakCount",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFFFF9800)
+                    color = RvWarning
                 )
             }
 
             Button(
                 onClick = onFinish,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF4CAF50)
+                    containerColor = RvSuccess
                 ),
                 modifier = Modifier.height(32.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
@@ -849,7 +865,7 @@ fun EnhancedStatsRow(
                     text = stringResource(R.string.im_done),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
             }
         }
@@ -867,7 +883,7 @@ fun EnhancedWordInputDisplay(
     Card(
         modifier = modifier,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.9f)
+            containerColor = RvSurfaceRaised
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -886,7 +902,7 @@ fun EnhancedWordInputDisplay(
                         text = prefix.uppercase(),
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF483D8B)
+                        color = RvCanvas
                     )
 
                     Text(
@@ -894,10 +910,10 @@ fun EnhancedWordInputDisplay(
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold,
                         color = when {
-                            validation?.isInPuzzleSet == true -> Color(0xFF4CAF50)
-                            validation?.isInDictionary == true -> Color(0xFF2196F3)
-                            validation?.isValid == false && validation.suggestions.isNotEmpty() -> Color(0xFFFF9800)
-                            validation?.isValid == false -> Color(0xFFE53935)
+                            validation?.isInPuzzleSet == true -> RvSuccess
+                            validation?.isInDictionary == true -> RvSky
+                            validation?.isValid == false && validation.suggestions.isNotEmpty() -> RvWarning
+                            validation?.isValid == false -> RvError
                             else -> Color(0xFF2E8B57)
                         }
                     )
@@ -918,8 +934,8 @@ fun EnhancedWordInputDisplay(
                         .size(44.dp)
                         .background(
                             when {
-                                validation?.isInPuzzleSet == true -> Color(0xFF4CAF50)
-                                validation?.isInDictionary == true -> Color(0xFF2196F3)
+                                validation?.isInPuzzleSet == true -> RvSuccess
+                                validation?.isInDictionary == true -> RvSky
                                 else -> Color(0xFF00C851)
                             },
                             CircleShape
@@ -928,7 +944,7 @@ fun EnhancedWordInputDisplay(
                     Icon(
                         imageVector = Icons.Default.Send,
                         contentDescription = stringResource(R.string.submit),
-                        tint = Color.White,
+                        tint = RvOnTone,
                         modifier = Modifier.size(20.dp)
                     )
                 }
@@ -940,10 +956,10 @@ fun EnhancedWordInputDisplay(
                         .fillMaxWidth()
                         .background(
                             when {
-                                validation.isInPuzzleSet -> Color(0xFF4CAF50).copy(alpha = 0.1f)
-                                validation.isInDictionary -> Color(0xFF2196F3).copy(alpha = 0.1f)
-                                validation.suggestions.isNotEmpty() -> Color(0xFFFF9800).copy(alpha = 0.1f)
-                                else -> Color(0xFFE53935).copy(alpha = 0.1f)
+                                validation.isInPuzzleSet -> RvSuccess.copy(alpha = 0.1f)
+                                validation.isInDictionary -> RvSky.copy(alpha = 0.1f)
+                                validation.suggestions.isNotEmpty() -> RvWarning.copy(alpha = 0.1f)
+                                else -> RvError.copy(alpha = 0.1f)
                             }
                         )
                         .padding(horizontal = 20.dp, vertical = 8.dp),
@@ -959,10 +975,10 @@ fun EnhancedWordInputDisplay(
                         },
                         contentDescription = null,
                         tint = when {
-                            validation.isInPuzzleSet -> Color(0xFF4CAF50)
-                            validation.isInDictionary -> Color(0xFF2196F3)
-                            validation.suggestions.isNotEmpty() -> Color(0xFFFF9800)
-                            else -> Color(0xFFE53935)
+                            validation.isInPuzzleSet -> RvSuccess
+                            validation.isInDictionary -> RvSky
+                            validation.suggestions.isNotEmpty() -> RvWarning
+                            else -> RvError
                         },
                         modifier = Modifier.size(16.dp)
                     )
@@ -970,7 +986,7 @@ fun EnhancedWordInputDisplay(
                     Text(
                         text = validation.message,
                         fontSize = 12.sp,
-                        color = Color(0xFF666666),
+                        color = RvInkSoft,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -979,7 +995,7 @@ fun EnhancedWordInputDisplay(
                             text = "+${validation.wordData.points}pts",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF4CAF50)
+                            color = RvSuccess
                         )
                     }
                 }
@@ -996,7 +1012,7 @@ fun SuggestionsRow(
 ) {
     Card(
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFF9800).copy(alpha = 0.1f)
+            containerColor = RvWarning.copy(alpha = 0.1f)
         ),
         shape = RoundedCornerShape(8.dp)
     ) {
@@ -1004,7 +1020,7 @@ fun SuggestionsRow(
             Text(
                 text = "Did you mean:",
                 fontSize = 12.sp,
-                color = Color.White.copy(alpha = 0.8f),
+                color = RvOnTone.copy(alpha = 0.8f),
                 fontWeight = FontWeight.Bold
             )
 
@@ -1017,7 +1033,7 @@ fun SuggestionsRow(
                     Button(
                         onClick = { onSuggestionClick(suggestion) },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFF9800)
+                            containerColor = RvWarning
                         ),
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
@@ -1025,7 +1041,7 @@ fun SuggestionsRow(
                         Text(
                             text = suggestion.uppercase(),
                             fontSize = 12.sp,
-                            color = Color.White,
+                            color = RvOnTone,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -1050,7 +1066,7 @@ fun EnhancedFoundWordsSection(
             text = "Found Words (${puzzleWords.size + discoveryWords.size}):",
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = RvInk
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -1059,7 +1075,7 @@ fun EnhancedFoundWordsSection(
                     text = "${discoveryWords.size} bonus",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.Cyan
+                    color = RvSkyEdge
                 )
             }
 
@@ -1068,7 +1084,7 @@ fun EnhancedFoundWordsSection(
                     text = "Streak: $streakCount",
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color(0xFFFF9800)
+                    color = RvWarning
                 )
             }
         }
@@ -1113,7 +1129,7 @@ fun CompactDiscoveryWordChip(word: String) {
             ) {
                 Text(
                     text = word.uppercase(),
-                    color = Color.White,
+                    color = RvOnTone,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -1121,7 +1137,7 @@ fun CompactDiscoveryWordChip(word: String) {
 
             Text(
                 text = "+${word.length * 5}",
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1142,7 +1158,7 @@ fun EnhancedStatsSection(
 ) {
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.1f)),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -1154,20 +1170,20 @@ fun EnhancedStatsSection(
             StatItem(
                 label = "Found",
                 value = "$foundWords/$totalWords",
-                color = Color.White
+                color = RvInk
             )
 
             StatItem(
                 label = "Score",
                 value = score.toString(),
-                color = Color.Yellow
+                color = RvSunEdge
             )
 
             if (discoveries > 0) {
                 StatItem(
                     label = "Bonus",
                     value = "$discoveries",
-                    color = Color.Cyan
+                    color = RvSkyEdge
                 )
             }
 
@@ -1175,7 +1191,7 @@ fun EnhancedStatsSection(
                 StatItem(
                     label = "Streak",
                     value = "$streak",
-                    color = Color(0xFFFF9800)
+                    color = RvWarning
                 )
             }
 
@@ -1202,8 +1218,8 @@ fun CompactFoundWordChip(word: WordPrefixWord) {
     Card(
         colors = CardDefaults.cardColors(
             containerColor = when (word.rarity) {
-                "rare" -> Color(0xFFFF6B35)
-                "uncommon" -> Color(0xFF4ECDC4)
+                "rare" -> RvFlame
+                "uncommon" -> RvMint
                 else -> Color(0xFF45B7D1)
             }
         ),
@@ -1215,14 +1231,14 @@ fun CompactFoundWordChip(word: WordPrefixWord) {
         ) {
             Text(
                 text = word.word.uppercase(),
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
                 text = "+${word.points}",
-                color = Color.White,
+                color = RvOnTone,
                 fontSize = 9.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -1245,7 +1261,7 @@ fun CustomAlphabetKeyboard(
 
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D1B69)),
+        colors = CardDefaults.cardColors(containerColor = RvSurface),
         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
     ) {
         Column(
@@ -1291,7 +1307,7 @@ fun CustomAlphabetKeyboard(
                     text = "⌫",
                     onClick = onBackspace,
                     modifier = Modifier.weight(1.2f),
-                    backgroundColor = Color(0xFFFF6B35)
+                    backgroundColor = RvFlame
                 )
 
                 KeyboardKey(
@@ -1335,7 +1351,7 @@ fun WordPrefixTopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = stringResource(R.string.back),
-                    tint = Color.White,
+                    tint = RvInk,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -1347,7 +1363,7 @@ fun WordPrefixTopBar(
                 Icon(
                     imageVector = Icons.Default.Lightbulb,
                     contentDescription = stringResource(R.string.hint),
-                    tint = Color.Yellow,
+                    tint = RvSunEdge,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -1357,7 +1373,7 @@ fun WordPrefixTopBar(
                     text = "Level ${level.level}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvInk
                 )
                 LevelProgressBar(
                     level = level,
@@ -1376,7 +1392,7 @@ fun WordPrefixTopBar(
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Heart",
-                        tint = if (index < hearts) Color.Red else Color.White.copy(alpha = 0.3f),
+                        tint = if (index < hearts) Color.Red else RvOutline,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -1388,9 +1404,9 @@ fun WordPrefixTopBar(
                 fontWeight = FontWeight.Bold,
                 color = when {
                     timeRemaining <= 10 -> Color.Red
-                    timeRemaining <= 30 -> Color(0xFFFF6B35)
+                    timeRemaining <= 30 -> RvFlame
                     timeRemaining.toFloat() / totalTime <= 0.25f -> Color.Yellow
-                    else -> Color.White
+                    else -> RvInk
                 },
                 modifier = Modifier.padding(top = 4.dp)
             )
@@ -1403,7 +1419,7 @@ fun WordPrefixTopBar(
                 text = roundLevel,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
             if (streakInfo.currentStreak > 0) {
                 StreakDisplay(
@@ -1441,7 +1457,7 @@ fun KeyboardKey(
             text = text,
             fontSize = fontSize,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = RvOnTone
         )
     }
 }
@@ -1534,7 +1550,7 @@ fun WordTreeProgress(
                 text = "${foundWordsCount} words found",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvInk
             )
 
             Text(
@@ -1550,7 +1566,7 @@ fun WordTreeProgress(
                     "gold" -> Color.Yellow
                     "silver" -> Color(0xFFC0C0C0)
                     "bronze" -> Color(0xFFCD7F32)
-                    else -> Color.White.copy(alpha = 0.7f)
+                    else -> RvInkSoft
                 }
             )
         }
@@ -1575,7 +1591,7 @@ fun StatItem(
         Text(
             text = label,
             fontSize = 12.sp,
-            color = Color.White.copy(alpha = 0.7f)
+            color = RvInkSoft
         )
     }
 }
@@ -1617,7 +1633,7 @@ fun WordPrefixCompletionScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.9f)),
+            .background(RvScrim),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -1626,7 +1642,7 @@ fun WordPrefixCompletionScreen(
                 .fillMaxHeight(0.9f)
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color(0xFF483D8B)
+                containerColor = RvSurface
             ),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -1654,14 +1670,14 @@ fun WordPrefixCompletionScreen(
                                 "gold" -> Color.Yellow
                                 "silver" -> Color(0xFFC0C0C0)
                                 "bronze" -> Color(0xFFCD7F32)
-                                else -> Color.White
+                                else -> RvInk
                             }
                         )
 
                         Text(
                             text = "Words starting with \"${gameData.prefix.uppercase()}\"",
                             fontSize = 16.sp,
-                            color = Color.White.copy(alpha = 0.8f),
+                            color = RvInkSoft,
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
@@ -1670,13 +1686,13 @@ fun WordPrefixCompletionScreen(
                         Text(
                             text = stringResource(R.string.final_score),
                             fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f)
+                            color = RvInkSoft
                         )
                         Text(
                             text = totalScore.toString(),
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.Yellow
+                            color = RvSunEdge
                         )
                     }
                 }
@@ -1685,7 +1701,7 @@ fun WordPrefixCompletionScreen(
 
                 Card(
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
+                        containerColor = RvSurface
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -1698,19 +1714,19 @@ fun WordPrefixCompletionScreen(
                         StatItem(
                             label = stringResource(R.string.found),
                             value = "$wordsFoundCount/${gameData.totalWords}",
-                            color = Color.White
+                            color = RvInk
                         )
 
                         StatItem(
                             label = "Bonus Words",
                             value = "${discoveredWords.size}",
-                            color = Color.Cyan
+                            color = RvSkyEdge
                         )
 
                         StatItem(
                             label = stringResource(R.string.time_used),
                             value = "${timeSpent / 60}:${String.format("%02d", timeSpent % 60)}",
-                            color = Color(0xFFFF9800)
+                            color = RvWarning
                         )
                     }
                 }
@@ -1726,7 +1742,7 @@ fun WordPrefixCompletionScreen(
                         text = "All ${gameData.totalWords} Words",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     Row(
@@ -1739,12 +1755,12 @@ fun WordPrefixCompletionScreen(
                             Box(
                                 modifier = Modifier
                                     .size(12.dp)
-                                    .background(Color(0xFF4CAF50), CircleShape)
+                                    .background(RvSuccess, CircleShape)
                             )
                             Text(
                                 text = "Found ($wordsFoundCount)",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = RvOnTone.copy(alpha = 0.8f)
                             )
                         }
 
@@ -1761,7 +1777,7 @@ fun WordPrefixCompletionScreen(
                                 Text(
                                     text = "Bonus (${discoveredWords.size})",
                                     fontSize = 12.sp,
-                                    color = Color.White.copy(alpha = 0.8f)
+                                    color = RvOnTone.copy(alpha = 0.8f)
                                 )
                             }
                         }
@@ -1778,7 +1794,7 @@ fun WordPrefixCompletionScreen(
                             Text(
                                 text = "Missed (${gameData.totalWords - wordsFoundCount})",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.8f)
+                                color = RvOnTone.copy(alpha = 0.8f)
                             )
                         }
                     }
@@ -1817,7 +1833,7 @@ fun WordPrefixCompletionScreen(
                                 text = stringResource(R.string.bonus_words_found),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Cyan,
+                                color = RvSkyEdge,
                                 modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
                             )
                         }
@@ -1852,7 +1868,7 @@ fun WordPrefixCompletionScreen(
                         .fillMaxWidth()
                         .height(56.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50)
+                        containerColor = RvSuccess
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -1860,7 +1876,7 @@ fun WordPrefixCompletionScreen(
                         text = stringResource(R.string.next_puzzle),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvOnTone
                     )
                 }
             }
@@ -1879,9 +1895,9 @@ fun CompletionWordCard(
         colors = CardDefaults.cardColors(
             containerColor = if (isFound) {
                 when (word.rarity.lowercase()) {
-                    "rare" -> Color(0xFF4CAF50).copy(alpha = 0.9f)
-                    "uncommon" -> Color(0xFF2196F3).copy(alpha = 0.9f)
-                    else -> Color(0xFF4CAF50).copy(alpha = 0.7f)
+                    "rare" -> RvSuccess.copy(alpha = 0.9f)
+                    "uncommon" -> RvSky.copy(alpha = 0.9f)
+                    else -> RvSuccess.copy(alpha = 0.7f)
                 }
             } else {
                 Color.Gray.copy(alpha = 0.3f)
@@ -1899,7 +1915,7 @@ fun CompletionWordCard(
                 text = word.word.uppercase(),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (isFound) Color.White else Color.White.copy(alpha = 0.5f)
+                color = if (isFound) RvOnTone else RvOnTone.copy(alpha = 0.5f)
             )
 
             Row(
@@ -1910,7 +1926,7 @@ fun CompletionWordCard(
                     text = "+${word.points}",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (isFound) Color.Yellow else Color.White.copy(alpha = 0.4f)
+                    color = if (isFound) Color.Yellow else RvOnTone.copy(alpha = 0.4f)
                 )
 
                 if (word.rarity.lowercase() != "common") {
@@ -1921,7 +1937,7 @@ fun CompletionWordCard(
                             else -> ""
                         },
                         fontSize = 12.sp,
-                        color = if (isFound) Color.White else Color.White.copy(alpha = 0.4f)
+                        color = if (isFound) RvOnTone else RvOnTone.copy(alpha = 0.4f)
                     )
                 }
             }
@@ -1929,7 +1945,7 @@ fun CompletionWordCard(
             Text(
                 text = "${word.length} letters",
                 fontSize = 10.sp,
-                color = if (isFound) Color.White.copy(alpha = 0.8f) else Color.White.copy(alpha = 0.4f)
+                color = if (isFound) RvOnTone.copy(alpha = 0.8f) else RvOnTone.copy(alpha = 0.4f)
             )
         }
     }
@@ -1960,13 +1976,13 @@ fun CompletionDiscoveryWordCard(
                 Text(
                     text = "★",
                     fontSize = 10.sp,
-                    color = Color.White
+                    color = RvOnTone
                 )
                 Text(
                     text = word.uppercase(),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = RvOnTone
                 )
             }
 
@@ -1974,7 +1990,7 @@ fun CompletionDiscoveryWordCard(
                 text = "+${word.length * 5}",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = RvOnTone
             )
         }
     }

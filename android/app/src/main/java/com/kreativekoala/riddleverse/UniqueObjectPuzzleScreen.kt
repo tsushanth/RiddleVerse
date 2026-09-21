@@ -1,17 +1,22 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -263,140 +268,137 @@ fun UniqueObjectPuzzleScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF2D1B69))
+                .background(RvCanvas)
         )
 
+        BoxWithConstraints(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.TopCenter
+        ) {
+        val compact = maxHeight < 600.dp
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
+                .fillMaxHeight()
+                .widthIn(max = 720.dp)
+                .fillMaxWidth()
+                .statusBarsPadding()
+                .padding(horizontal = 8.dp)
+                .padding(bottom = 8.dp)
         ) {
-            // Enhanced header with live timer
+            // Single-row HUD: back, level/difficulty, hearts, score, timer
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(
+                        Icons.Default.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        tint = RvInk
+                    )
+                }
+
                 // Level and difficulty
                 Column(horizontalAlignment = Alignment.Start) {
                     Text(
                         text = level,
-                        color = Color.White,
-                        fontSize = 14.sp
+                        color = RvInk,
+                        fontSize = 14.sp,
+                        maxLines = 1
                     )
                     Text(
                         text = difficulty.uppercase(),
-                        color = Color.Yellow,
+                        color = RvInkSoft,
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
+                    )
+                }
+
+                // Hearts
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    modifier = Modifier.weight(1f).wrapContentWidth(Alignment.CenterHorizontally)
+                ) {
+                    repeat(hearts) { index ->
+                        Text(
+                            text = if (index < currentHearts) "❤️" else "🤍",
+                            fontSize = 20.sp
+                        )
+                    }
+                }
+
+                if (totalScore > 0) {
+                    Text(
+                        text = "Score: $totalScore",
+                        color = RvInk,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1
                     )
                 }
 
                 // Timer with color coding
                 Text(
                     text = displayTimer, // Use live countdown
-                    color = if (timeRemaining <= 10) Color.Red else if (timeRemaining <= 30) Color(0xFFFFA500) else Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    color = if (timeRemaining <= 30) RvCoralEdge else RvInk,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    modifier = Modifier.padding(end = 8.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Score and progress display
-            if (totalScore > 0 || attempts > 0) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.1f)
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        if (totalScore > 0) {
-                            Text(
-                                text = "Score: $totalScore",
-                                color = Color.White,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-
-                        if (attempts > 0) {
-                            Text(
-                                text = "Attempt: $attempts",
-                                color = Color.White.copy(alpha = 0.8f),
-                                fontSize = 12.sp
-                            )
-                        }
-
-                        Text(
-                            text = "${parsedData.objects.size} objects",
-                            color = Color.White.copy(alpha = 0.7f),
-                            fontSize = 12.sp
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            // Enhanced hearts display
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                repeat(hearts) { index ->
-                    Text(
-                        text = if (index < currentHearts) "❤️" else "🤍",
-                        fontSize = 20.sp
-                    )
-                    if (index < hearts - 1) Spacer(modifier = Modifier.width(4.dp))
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
 
             // Instruction
             Text(
                 text = parsedData.instruction,
-                color = Color.White,
-                fontSize = 18.sp,
+                color = RvInk,
+                fontSize = if (compact) 16.sp else 18.sp,
+                fontWeight = FontWeight.Medium,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(if (compact) 4.dp else 12.dp))
 
-            // Objects scattered randomly across screen
-            Box(
+            // Objects laid out on the best-fitting grid for the available area
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+                    .testTag("object_area")
             ) {
-                // Generate random positions for each object
-                val objectPositions = remember(parsedData.objects.size) {
-                    generateRandomPositions(parsedData.objects.size)
+                val n = parsedData.objects.size.coerceAtLeast(1)
+                var bestCols = 1
+                var bestSize = 0f
+                for (c in 1..n) {
+                    val r = (n + c - 1) / c
+                    val d = minOf(maxWidth.value / c, maxHeight.value / r) - 8f
+                    if (d > bestSize) { bestSize = d; bestCols = c }
                 }
+                val cols = bestCols
+                val rows = (n + cols - 1) / cols
+                val objectSize = bestSize.coerceIn(48f, 100f).dp
+                val cellW = maxWidth / cols
+                val cellH = maxHeight / rows
 
                 parsedData.objects.forEachIndexed { index, obj ->
-                    val position = objectPositions[index]
-
                     Box(
                         modifier = Modifier
+                            .testTag("unique_object_$index")
                             .offset(
-                                x = (position.first * 100).dp,
-                                y = (position.second * 100).dp
+                                x = cellW * (index % cols) + (cellW - objectSize) / 2,
+                                y = cellH * (index / cols) + (cellH - objectSize) / 2
                             )
                     ) {
                         ObjectItem(
                             uniqueObject = obj,
+                            size = objectSize,
                             shapeMappings = parsedData.shapeMappings,
                             colorMappings = parsedData.colorMappings,
                             isSelected = selectedIndex == index,
@@ -489,22 +491,7 @@ fun UniqueObjectPuzzleScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
         }
-
-        // Back button - positioned as floating action button
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(16.dp)
-                .background(
-                    Color.Black.copy(alpha = 0.3f),
-                    shape = CircleShape
-                )
-                .size(48.dp)
-        ) {
-            Text("←", color = Color.White, fontSize = 24.sp)
         }
 
         // Enhanced Universal Feedback Overlay
@@ -522,7 +509,7 @@ fun UniqueObjectPuzzleScreen(
                     .fillMaxWidth()
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFFF44336)
+                    containerColor = RvError
                 )
             ) {
                 Column(
@@ -531,7 +518,7 @@ fun UniqueObjectPuzzleScreen(
                 ) {
                     Text(
                         text = "❌ Not the unique object",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -540,7 +527,7 @@ fun UniqueObjectPuzzleScreen(
 
                     Text(
                         text = "Keep looking! Hearts remaining: $currentHearts",
-                        color = Color.White,
+                        color = RvInk,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center
                     )
@@ -591,14 +578,15 @@ fun ObjectItem(
     shapeMappings: Map<String, String>,
     colorMappings: Map<String, String>,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    size: androidx.compose.ui.unit.Dp = 100.dp
 ) {
     val shape = shapeMappings[uniqueObject.shape.toString()] ?: "square"
     val colorName = colorMappings[uniqueObject.color.toString()] ?: "blue"
     val color = getColorFromName(colorName)
 
     // Calculate size based on screen space - make objects larger
-    val objectSize = 100.dp
+    val objectSize = size
 
     when (shape.lowercase()) {
         "circle" -> {
@@ -608,7 +596,7 @@ fun ObjectItem(
                     .background(color, CircleShape)
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvInk else RvInkSoft,
                         shape = CircleShape
                     )
                     .clickable { onClick() }
@@ -621,7 +609,7 @@ fun ObjectItem(
                     .background(color, RoundedCornerShape(8.dp))
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvInk else RvInkSoft,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable { onClick() }
@@ -645,7 +633,7 @@ fun ObjectItem(
                         )
                         .border(
                             width = if (isSelected) 4.dp else 2.dp,
-                            color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                            color = if (isSelected) RvInk else RvInkSoft,
                             shape = RoundedCornerShape(topStart = 50.dp, topEnd = 8.dp, bottomStart = 8.dp, bottomEnd = 8.dp)
                         )
                 )
@@ -665,7 +653,7 @@ fun ObjectItem(
                         .background(color, RoundedCornerShape(8.dp))
                         .border(
                             width = if (isSelected) 4.dp else 2.dp,
-                            color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                            color = if (isSelected) RvInk else RvInkSoft,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .graphicsLayer {
@@ -681,7 +669,7 @@ fun ObjectItem(
                     .background(color, RoundedCornerShape(16.dp))
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvInk else RvInkSoft,
                         shape = RoundedCornerShape(16.dp)
                     )
                     .clickable { onClick() }
@@ -715,7 +703,7 @@ fun ObjectItem(
                     .background(color, RoundedCornerShape(8.dp))
                     .border(
                         width = if (isSelected) 4.dp else 2.dp,
-                        color = if (isSelected) Color.Yellow else Color.White.copy(alpha = 0.3f),
+                        color = if (isSelected) RvInk else RvInkSoft,
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable { onClick() }
@@ -728,14 +716,14 @@ fun ObjectItem(
 fun getColorFromName(colorName: String): Color {
     return when (colorName.lowercase()) {
         "red" -> Color(0xFFE91E63)
-        "blue" -> Color(0xFF2196F3)
+        "blue" -> RvSky
         "yellow" -> Color(0xFFFFC107)
-        "green" -> Color(0xFF4CAF50)
-        "purple" -> Color(0xFF9C27B0)
-        "orange" -> Color(0xFFFF9800)
+        "green" -> RvSuccess
+        "purple" -> RvGrape
+        "orange" -> RvSun
         "pink" -> Color(0xFFE91E63)
-        "cyan" -> Color(0xFF00BCD4)
-        else -> Color(0xFF2196F3) // Default blue
+        "cyan" -> RvSky
+        else -> RvSky // Default blue
     }
 }
 

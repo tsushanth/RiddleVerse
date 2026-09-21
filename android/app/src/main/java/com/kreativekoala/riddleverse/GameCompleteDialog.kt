@@ -1,5 +1,17 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.theme.RvDisabled
+import com.kreativekoala.riddleverse.ui.theme.RvErrorEdge
+import com.kreativekoala.riddleverse.ui.theme.RvFlame
+import com.kreativekoala.riddleverse.ui.theme.RvInk
+import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
+import com.kreativekoala.riddleverse.ui.theme.RvOnTone
+import com.kreativekoala.riddleverse.ui.theme.RvScrim
+import com.kreativekoala.riddleverse.ui.theme.RvSun
+import com.kreativekoala.riddleverse.ui.theme.RvSunEdge
+import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,7 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -90,7 +102,7 @@ fun GameCompleteDialog(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.7f)),
+                .background(RvScrim),
             contentAlignment = Alignment.Center
         ) {
             Card(
@@ -99,9 +111,9 @@ fun GameCompleteDialog(
                     .fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF1A1A2E)
+                    containerColor = RvSurfaceRaised
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -115,9 +127,7 @@ fun GameCompleteDialog(
                             .size(72.dp)
                             .clip(CircleShape)
                             .background(
-                                Brush.linearGradient(
-                                    colors = listOf(Color(0xFFFFD700), Color(0xFFFF8C00))
-                                )
+                                SolidColor(RvSun)
                             ),
                         contentAlignment = Alignment.Center
                     ) {
@@ -133,7 +143,7 @@ fun GameCompleteDialog(
                         text = "Game Complete!",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = RvInk
                     )
 
                     Spacer(modifier = Modifier.height(12.dp))
@@ -144,12 +154,7 @@ fun GameCompleteDialog(
                             .scale(scoreScale)
                             .clip(RoundedCornerShape(16.dp))
                             .background(
-                                Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFF6C63FF).copy(alpha = 0.3f),
-                                        Color(0xFF9C27B0).copy(alpha = 0.3f)
-                                    )
-                                )
+                                SolidColor(RvSurface)
                             )
                             .padding(horizontal = 32.dp, vertical = 16.dp),
                         contentAlignment = Alignment.Center
@@ -158,13 +163,13 @@ fun GameCompleteDialog(
                             Text(
                                 text = "Score",
                                 fontSize = 14.sp,
-                                color = Color.White.copy(alpha = 0.7f)
+                                color = RvInkSoft
                             )
                             Text(
                                 text = "${result.score}",
                                 fontSize = 48.sp,
                                 fontWeight = FontWeight.ExtraBold,
-                                color = Color.White
+                                color = RvInk
                             )
                         }
                     }
@@ -176,27 +181,27 @@ fun GameCompleteDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White.copy(alpha = 0.05f))
+                            .background(RvSurface)
                             .padding(12.dp)
                     ) {
                         Text(
                             text = "🏆 Leaderboard",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFFFFD700),
+                            color = RvSunEdge,
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         if (leaderboardLoading) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(20.dp).align(Alignment.CenterHorizontally),
-                                color = Color(0xFFFF8C00),
+                                color = RvFlame,
                                 strokeWidth = 2.dp
                             )
                         } else if (leaderboard.isEmpty()) {
                             Text(
                                 text = "Be the first on the leaderboard!",
                                 fontSize = 12.sp,
-                                color = Color.White.copy(alpha = 0.5f),
+                                color = RvInkSoft,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -218,7 +223,7 @@ fun GameCompleteDialog(
                                     Text(
                                         text = entry.username,
                                         fontSize = 13.sp,
-                                        color = if (isMe) Color(0xFFFF8C00) else Color.White,
+                                        color = if (isMe) RvFlame else RvInk,
                                         fontWeight = if (isMe) FontWeight.Bold else FontWeight.Normal,
                                         modifier = Modifier.weight(1f),
                                         maxLines = 1,
@@ -228,7 +233,7 @@ fun GameCompleteDialog(
                                         text = "${entry.score}",
                                         fontSize = 13.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFFFD700)
+                                        color = RvSunEdge
                                     )
                                 }
                             }
@@ -245,28 +250,28 @@ fun GameCompleteDialog(
                             .height(52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = if (canAfford) Color(0xFF6C63FF) else Color.Gray.copy(alpha = 0.5f)
+                            containerColor = if (canAfford) RvViolet else RvDisabled
                         )
                     ) {
                         Text(
                             text = "\uD83D\uDD04  Play Again",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            color = RvOnTone
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         // Coin cost badge
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White.copy(alpha = 0.2f))
+                                .background(RvOnTone.copy(alpha = 0.2f))
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
                             Text(
                                 text = "\uD83E\uDE99 ${CoinManager.CONTINUE_COST}",
                                 fontSize = 13.sp,
                                 fontWeight = FontWeight.SemiBold,
-                                color = if (canAfford) Color(0xFFFFD700) else Color.Red.copy(alpha = 0.8f)
+                                color = if (canAfford) RvOnTone else RvErrorEdge
                             )
                         }
                     }
@@ -276,7 +281,7 @@ fun GameCompleteDialog(
                         Text(
                             text = "You have $coinBalance coins — need ${CoinManager.CONTINUE_COST}",
                             fontSize = 12.sp,
-                            color = Color(0xFFFF6B6B),
+                            color = RvErrorEdge,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -291,7 +296,7 @@ fun GameCompleteDialog(
                         Text(
                             text = "Back to Home",
                             fontSize = 15.sp,
-                            color = Color.White.copy(alpha = 0.7f)
+                            color = RvInkSoft
                         )
                     }
                 }
