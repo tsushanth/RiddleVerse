@@ -485,92 +485,6 @@ function recordGeneration(userId) {
     generationLimits.set(key, userLimits);
 }
 
-// ============================================
-// Save a completed generation to Supabase.
-// Extracted from the sync /generate handler so both the sync SSE path and
-// the new /jobs poll path can use the same code — single source of truth
-// for game persistence. Returns { gameId, gameTitle, newSeriesId } on
-// success or throws (dbError bubbles up).
-// ============================================
-async function saveGeneratedGame({ parsed, userId, userName, title, prompt, forgeSessionId, source }) {
-    const gameId = crypto.randomUUID();
-    const extractedTitle = extractGameTitleFromBundle(parsed.bundle);
-    const gameTitle = (title && title.trim()) || extractedTitle || prompt.trim().substring(0, 100);
-    const creatorName = userName || 'Player';
-    const criticalCount = parsed.quality?.criticalIssues ?? 0;
-
-    // Feature A: wrap every new game in a series-of-one so the
-    // "Generate Next Level" path can extend it later. Best-effort —
-    // if the game_series table doesn't exist yet (migration not run)
-    // we proceed without it.
-    let newSeriesId = null;
-    try {
-        const { data: seriesRow, error: seriesErr } = await supabase
-            .from('game_series')
-            .insert({
-                creator_id: userId,
-                title: gameTitle,
-                description: prompt.trim().substring(0, 500),
-                level_count: 1
-            })
-            .select('id')
-            .single();
-        if (!seriesErr && seriesRow) newSeriesId = seriesRow.id;
-    } catch (e) {
-        console.warn(`[${source}] series insert skipped:`, e.message);
-    }
-
-    const insertPayload = {
-        id: gameId,
-        title: gameTitle,
-        description: prompt.trim().substring(0, 500),
-        html_content: parsed.bundle,
-        creator_id: userId,
-        creator_name: creatorName,
-        game_type: 'ai_generated',
-        platform_type: 'webview',
-        initial_prompt: prompt.substring(0, 2000),
-        play_count: 0,
-        rating: 0,
-        critical_issues: criticalCount
-    };
-    if (newSeriesId) {
-        insertPayload.series_id = newSeriesId;
-        insertPayload.level_index = 1;
-    }
-
-    const { error: dbError } = await supabase
-        .from('custom_games')
-        .insert(insertPayload);
-
-    if (dbError) {
-        console.error(`[${source}] DB save error:`, dbError.message);
-        if (forgeSessionId) finishForgeSession(forgeSessionId, 'failed');
-        if (userId) recordAnalyticsEvent('forge_session_failed', userId, {
-            session_id: forgeSessionId,
-            reason: 'db_save_error',
-        });
-        const err = new Error(dbError.message);
-        err.code = 'db_save_error';
-        throw err;
-    }
-
-    console.log(`[${source}] Saved: ${gameId} ("${gameTitle}")${newSeriesId ? ` series=${newSeriesId.slice(0,8)}` : ''}`);
-    refreshBrowseCache();
-    // Auto-capture thumbnail (fire-and-forget)
-    captureGameThumbnail(gameId)
-        .then(() => refreshBrowseCache())
-        .catch(err => console.error('[thumbnail] Background error:', err.message));
-    if (forgeSessionId) finishForgeSession(forgeSessionId, 'completed', gameId);
-    if (userId) recordAnalyticsEvent('forge_session_completed', userId, {
-        session_id: forgeSessionId,
-        game_id: gameId,
-        game_title: gameTitle,
-    });
-
-    return { gameId, gameTitle, newSeriesId };
-}
-
 // POST /api/game-creation/generate
 // Streaming endpoint — proxies SSE status events from the worker to the client
 // Client sees: status updates ("Building your game", "Fixing issues", "Polishing")
@@ -676,7 +590,7 @@ router.post('/generate', async (req, res) => {
                 'x-worker-secret': GAME_WORKER_SECRET
             },
             body: JSON.stringify(workerBody),
-            signal: AbortSignal.timeout(1800000) // 30 min — bumped 2026-08-04 after complex prompts (word-connect games) exceeded 10min and lost the result event before Supabase save at line ~715
+            signal: AbortSignal.timeout(600000) // 10 min timeout for full iterative build
         });
 
         if (!workerResponse.ok) {
@@ -877,263 +791,6 @@ router.post('/generate', async (req, res) => {
             res.status(500).json({ error: 'Failed to generate game. Please try again.' });
         }
     }
-});
-
-// ============================================
-// Async job endpoints (submit + poll)  — added 2026-08-04
-// ============================================
-// The sync /generate above holds an HTTP connection for 5-11 min. If any
-// intermediate proxy (Fly router, phone carrier, WiFi handoff) drops the
-// connection, the client sees an error but the worker still finishes the
-// build — and the result event never reaches the Supabase save at
-// saveGeneratedGame(). Games were being built and silently thrown away.
-//
-// The /jobs/* endpoints below are network-resilient:
-//   POST /api/game-creation/jobs/generate → {jobId}       (returns in ~50ms)
-//   GET  /api/game-creation/jobs/:jobId   → {status, ...}  (client polls)
-//   DELETE /api/game-creation/jobs/:jobId → 204            (client cleanup)
-//
-// The client can lose its connection and reconnect freely. The worker keeps
-// the build going; Fly saves to Supabase on the first poll that observes
-// status=succeeded (dedup guarded by an in-memory map).
-//
-// Persistence caveat: if the Fly machine restarts mid-build (deploy or
-// auto-stop when the machine goes fully idle), the flyJobContext map is
-// lost and the game — even if the worker completes it — can't be saved.
-// Mitigation: fly.toml sets min_machines_running=1 so the machine stays
-// warm. TODO(follow-up): persist context in a supabase table so machine
-// restart during backgrounding no longer loses in-flight jobs.
-
-const flyJobContext = new Map(); // jobId -> { userId, userName, title, prompt, forgeSessionId, submittedAt, saved }
-const FLY_JOB_CTX_TTL_MS = 2 * 60 * 60 * 1000; // GC after 2h
-setInterval(() => {
-    const now = Date.now();
-    for (const [id, ctx] of flyJobContext) {
-        if (now - ctx.submittedAt > FLY_JOB_CTX_TTL_MS) flyJobContext.delete(id);
-    }
-}, 60 * 1000);
-
-// POST /api/game-creation/jobs/generate
-// Body: same shape as /generate. Returns {jobId} in ~50ms.
-router.post('/jobs/generate', async (req, res) => {
-    let forgeSessionId = null;
-    try {
-        const { prompt, userId, userName, title, referenceImage } = req.body;
-
-        if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-            return res.status(400).json({ error: 'Game description is required' });
-        }
-        if (prompt.length > 500) {
-            return res.status(400).json({ error: 'Description must be under 500 characters' });
-        }
-
-        // Same paywall / rate-limit / coin-spend gates as sync /generate.
-        // Duplicated deliberately for now — refactor to a helper once both
-        // paths have soaked in prod and the surface is stable.
-        const isSubscriber = await isSubscribedUser(userId);
-        if (!isSubscriber) {
-            const lifetimeCount = await getLifetimeGenerations(userId);
-            if (lifetimeCount >= FREE_LIFETIME_GENERATIONS) {
-                return res.status(403).json({
-                    error: `You've used your ${FREE_LIFETIME_GENERATIONS} free generations. Subscribe to continue creating games!`,
-                    requiresSubscription: true,
-                    freeTrialAvailable: true,
-                    lifetimeUsed: lifetimeCount,
-                    lifetimeLimit: FREE_LIFETIME_GENERATIONS
-                });
-            }
-        }
-        if (!isSubscriber && !checkRateLimit(userId)) {
-            if (req.body.useCoins && userId) {
-                const { data: spendResult, error: spendError } = await supabase.rpc('spend_coins', {
-                    p_user_id: userId,
-                    p_amount: GENERATION_COIN_COST,
-                    p_reason: 'game_generation',
-                    p_game_id: null,
-                    p_creator_id: null,
-                    p_platform: null
-                });
-                if (spendError || !spendResult.success) {
-                    return res.status(402).json({
-                        error: 'Insufficient coins',
-                        balance: spendResult?.balance || 0,
-                        coinCost: GENERATION_COIN_COST,
-                        canUseCoins: true
-                    });
-                }
-                console.log(`[jobs/generate] Rate limit bypassed with ${GENERATION_COIN_COST} coins for user ${userId}`);
-            } else {
-                return res.status(429).json({
-                    error: `You've used all ${MAX_GENERATIONS_PER_HOUR} free generations this hour`,
-                    canUseCoins: true,
-                    coinCost: GENERATION_COIN_COST
-                });
-            }
-        }
-
-        forgeSessionId = await startForgeSession(userId, prompt);
-        recordAnalyticsEvent('forge_session_started', userId, {
-            session_id: forgeSessionId,
-            has_reference_image: !!referenceImage,
-            prompt_length: prompt.length,
-            path: 'jobs',
-        });
-
-        // Submit to worker
-        const workerBody = { prompt: prompt.trim(), userId };
-        if (referenceImage && typeof referenceImage === 'string') {
-            workerBody.referenceImage = referenceImage;
-        }
-
-        const workerResponse = await fetch(`${GAME_WORKER_URL}/jobs/generate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-worker-secret': GAME_WORKER_SECRET,
-            },
-            body: JSON.stringify(workerBody),
-            signal: AbortSignal.timeout(15000), // submit is instant
-        });
-
-        if (!workerResponse.ok) {
-            const errText = await workerResponse.text().catch(() => '');
-            console.error(`[jobs/generate] worker returned ${workerResponse.status}: ${errText}`);
-            if (forgeSessionId) finishForgeSession(forgeSessionId, 'failed');
-            return res.status(workerResponse.status === 429 ? 429 : 502).json({
-                error: workerResponse.status === 429 ? 'Worker busy. Try again in a moment.' : 'Build server unavailable',
-            });
-        }
-
-        const workerJson = await workerResponse.json();
-        const jobId = workerJson.jobId;
-
-        // Stash the client-side context we'll need at save time (title, userName,
-        // prompt, forgeSessionId aren't stored on the worker).
-        flyJobContext.set(jobId, {
-            userId, userName, title, prompt,
-            forgeSessionId,
-            submittedAt: Date.now(),
-            saved: false,
-        });
-
-        recordGeneration(userId);
-        return res.json({ jobId, status: 'running', startedAt: workerJson.startedAt });
-
-    } catch (error) {
-        console.error('[jobs/generate] Error:', error.message);
-        if (forgeSessionId) finishForgeSession(forgeSessionId, 'failed');
-        return res.status(500).json({ error: 'Failed to submit job. Please try again.' });
-    }
-});
-
-// GET /api/game-creation/jobs/:jobId
-// Client polls this every 2-5s. Handles the Supabase save on the FIRST
-// observation of status=succeeded (dedup via ctx.saved flag).
-router.get('/jobs/:jobId', async (req, res) => {
-    const { jobId } = req.params;
-    let workerResponse;
-    try {
-        workerResponse = await fetch(`${GAME_WORKER_URL}/jobs/${encodeURIComponent(jobId)}`, {
-            method: 'GET',
-            headers: { 'x-worker-secret': GAME_WORKER_SECRET },
-            signal: AbortSignal.timeout(10000),
-        });
-    } catch (err) {
-        console.error(`[jobs/${jobId}] worker fetch failed:`, err.message);
-        return res.status(502).json({ error: 'Build server unreachable' });
-    }
-    if (workerResponse.status === 404) {
-        return res.status(404).json({ error: 'Unknown or expired jobId' });
-    }
-    if (!workerResponse.ok) {
-        return res.status(502).json({ error: `Worker returned ${workerResponse.status}` });
-    }
-
-    const workerJob = await workerResponse.json();
-
-    // On succeeded — save the game if we haven't already
-    if (workerJob.status === 'succeeded') {
-        const ctx = flyJobContext.get(jobId);
-        if (ctx && !ctx.saved) {
-            try {
-                const { gameId, gameTitle } = await saveGeneratedGame({
-                    parsed: workerJob.result,
-                    userId: ctx.userId,
-                    userName: ctx.userName,
-                    title: ctx.title,
-                    prompt: ctx.prompt,
-                    forgeSessionId: ctx.forgeSessionId,
-                    source: `jobs/${jobId}`,
-                });
-                ctx.saved = true;
-                ctx.gameId = gameId;
-                ctx.gameTitle = gameTitle;
-            } catch (err) {
-                console.error(`[jobs/${jobId}] save failed:`, err.message);
-                // Report to client but don't crash the poll loop
-                return res.status(500).json({
-                    status: 'failed',
-                    reason: 'save_failed',
-                    error: err.message,
-                });
-            }
-        } else if (!ctx) {
-            // Fly restart lost our context. Worker still has the result but
-            // we can't reconstruct title/userName/forgeSessionId. Client should
-            // treat this as a soft failure and (in practice) the auto-thumbnail
-            // path etc doesn't fire.
-            console.warn(`[jobs/${jobId}] succeeded but no fly context — likely a Fly restart during build`);
-        }
-    } else if (workerJob.status === 'failed') {
-        const ctx = flyJobContext.get(jobId);
-        if (ctx && ctx.forgeSessionId && !ctx.saved) {
-            finishForgeSession(ctx.forgeSessionId, 'failed');
-            ctx.saved = true; // dedup the finishForgeSession call
-        }
-    }
-
-    // Build client-facing response — merge worker status with the saved gameId
-    const ctx = flyJobContext.get(jobId);
-    const body = {
-        jobId: workerJob.jobId,
-        status: workerJob.status,
-        phase: workerJob.phase,
-        message: workerJob.message,
-        detail: workerJob.detail,
-        progressPercent: workerJob.progressPercent,
-        progressEndPct: workerJob.progressEndPct,
-        estimatedSecondsRemaining: workerJob.estimatedSecondsRemaining,
-        startedAt: workerJob.startedAt,
-        updatedAt: workerJob.updatedAt,
-    };
-    if (workerJob.status === 'succeeded') {
-        body.gameId = ctx?.gameId;
-        body.gameTitle = ctx?.gameTitle;
-        body.result = workerJob.result;
-    }
-    if (workerJob.status === 'failed') {
-        body.error = workerJob.error;
-        body.reason = workerJob.reason;
-        if (workerJob.quotaExhausted) {
-            body.quotaExhausted = true;
-            body.resetTime = workerJob.resetTime;
-        }
-    }
-    res.json(body);
-});
-
-// DELETE /api/game-creation/jobs/:jobId — client tells us it has the result
-router.delete('/jobs/:jobId', async (req, res) => {
-    const { jobId } = req.params;
-    flyJobContext.delete(jobId);
-    try {
-        await fetch(`${GAME_WORKER_URL}/jobs/${encodeURIComponent(jobId)}`, {
-            method: 'DELETE',
-            headers: { 'x-worker-secret': GAME_WORKER_SECRET },
-            signal: AbortSignal.timeout(5000),
-        });
-    } catch {}
-    res.status(204).end();
 });
 
 // POST /api/game-creation/save
@@ -1552,7 +1209,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                 repoName,
                 stream: true
             }),
-            signal: AbortSignal.timeout(1800000)
+            signal: AbortSignal.timeout(600000)
         });
 
         if (!workerResponse.ok) {
@@ -1850,7 +1507,7 @@ router.post('/:gameId/tweak', async (req, res) => {
                 tweakDescription: tweakDescription.trim(),
                 stream: true
             }),
-            signal: AbortSignal.timeout(1800000)
+            signal: AbortSignal.timeout(600000)
         });
 
         if (!workerResponse.ok) {
@@ -2061,7 +1718,7 @@ router.post('/:gameId/customize', async (req, res) => {
                 newTitle: effectiveTitle,
                 stream: true
             }),
-            signal: AbortSignal.timeout(1800000)
+            signal: AbortSignal.timeout(600000)
         });
 
         if (!workerResponse.ok) {
@@ -2600,7 +2257,7 @@ Requirements:
                 'x-worker-secret': GAME_WORKER_SECRET
             },
             body: JSON.stringify({ prompt, userId, stream: true }),
-            signal: AbortSignal.timeout(1800000)
+            signal: AbortSignal.timeout(600000)
         });
 
         if (!workerResponse.ok) {
@@ -3427,7 +3084,7 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'x-worker-secret': GAME_WORKER_SECRET },
             body: JSON.stringify(workerBody),
-            signal: AbortSignal.timeout(1800000)
+            signal: AbortSignal.timeout(600000)
         });
     } catch (fetchErr) {
         res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server unreachable' })}\n\n`);
