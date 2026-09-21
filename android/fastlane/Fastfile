@@ -30,14 +30,16 @@ platform :android do
     )
   end
 
-  desc "Push current AAB to Production at a staged rollout percentage (default 20%). Pass rollout:'0.5' etc to override. Increase later with `fastlane run upload_to_play_store track:production rollout:'1.0'` (no new aab needed) once ready for 100%."
-  lane :upload_staged_production do |options|
+  desc "Promote the build currently on Beta to Production at a staged rollout percentage (default 20%), without re-uploading a binary. Pass rollout:'0.5' etc to override. Raise later with `fastlane run upload_to_play_store track:production track_promote_to:production rollout:'1.0' skip_upload_aab:true skip_upload_apk:true` once ready for 100%."
+  lane :promote_beta_to_staged_production do |options|
     rollout = options[:rollout] || "0.2"
     upload_to_play_store(
-      track: "production",
-      aab: "app/build/outputs/bundle/release/app-release.aab",
+      track: "beta",
+      track_promote_to: "production",
       json_key: "/Users/sushanthtiruvaipati/Documents/apple_dev/cloud_credentials/summaryai-483115-a27fc5121150.json",
       package_name: "com.kreativekoala.riddleverse",
+      skip_upload_aab: true,
+      skip_upload_apk: true,
       skip_upload_metadata: true,
       skip_upload_changelogs: true,
       skip_upload_images: true,
