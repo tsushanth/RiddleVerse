@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App'
 import { AuthProvider } from './context/AuthContext'
 import './index.css'
+import { installFailureReporter } from './utils/failureReporter'
+
+installFailureReporter()
 
 const queryClient = new QueryClient({
   defaultOptions: {

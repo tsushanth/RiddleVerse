@@ -54,6 +54,7 @@ import { firebaseStreakNotificationService } from './services/firebaseStreakNoti
 import { remixDigestService } from './services/remixDigestService.js';
 import { wordFrequencyManager } from './services/wordFrequencyManager.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { reportCrash } from './utils/failureReporter.js';
 
 // New simple daily puzzle system (in-memory, no Redis)
 import { refreshDailyPuzzles } from './services/dailyPuzzles.js';
@@ -602,6 +603,14 @@ app.post('/api/game-score/:gameId', async (req, res) => {
 app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "public", "index.html"));
 });
+
+// Process-level failures: log, report (awaited so the email goes out), then exit like Node's default.
+for (const evt of ['uncaughtException', 'unhandledRejection']) {
+    process.on(evt, (err) => {
+        console.error(evt, err);
+        reportCrash(evt, err).finally(() => process.exit(1));
+    });
+}
 
 const PORT = process.env.PORT || 8080;
 

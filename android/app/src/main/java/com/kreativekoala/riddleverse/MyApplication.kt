@@ -33,6 +33,7 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        FailureReporter.init(this, "riddleverse", "afr_2380403b6807a34c833fa412468daee3", BuildConfig.VERSION_NAME)
 
         // Initialize Firebase first (required early)
         FirebaseApp.initializeApp(this)
