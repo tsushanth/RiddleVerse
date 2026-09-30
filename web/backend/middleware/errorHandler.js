@@ -1,3 +1,4 @@
+import { reportBackendError } from '../utils/failureReporter.js';
 /**
  * Centralized error handling middleware
  */
@@ -97,6 +98,8 @@ export const errorHandler = (err, req, res, next) => {
         statusCode = 504;
         message = 'Request timeout';
     }
+
+    if (statusCode >= 500) reportBackendError(req, err, statusCode);
 
     // Log error for debugging (only log 5xx errors or unexpected errors)
     if (statusCode >= 500 || !err.isOperational) {
