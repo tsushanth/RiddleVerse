@@ -24,6 +24,7 @@ import ltvRoutes from './routes/ltv.routes.js';
 import gamesRoutes from './routes/games.routes.js';
 import userConfigRoutes from './routes/simpleUserConfig.js';
 import adminRoutes from './routes/admin.routes.js';
+import dashProxyRoutes from './routes/dashProxy.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import dailyPuzzlesRoutes from './routes/dailyPuzzles.routes.js';
@@ -228,6 +229,7 @@ app.use('/', generationRoutes);
 // Existing route modules
 app.use('/api/ltv', ltvRoutes);
 app.use('/api/daily-puzzle-cache', dailyPuzzleCacheRoutes);
+app.use('/api/dash', dashProxyRoutes);
 app.use('/api/games', gamesRoutes);
 app.use('/api/game-creation', gameCreationRoutes);
 app.use('/api/chat-scores', chatScoresRoutes);

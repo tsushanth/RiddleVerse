@@ -15,6 +15,7 @@ import GameLeaderboardPage from './pages/GameLeaderboardPage'
 import CoinShopPage from './pages/CoinShopPage'
 import GameSessionPage from './pages/GameSessionPage'
 import LoadingSpinner from './components/LoadingSpinner'
+import AdminPage from './pages/AdminPage'
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -50,6 +51,8 @@ export default function App() {
   return (
     <GameProvider>
     <Routes>
+      <Route path="/admin" element={<AdminPage />} />
+
       <Route path="/welcome" element={
         <PublicRoute>
           <WelcomePage />
