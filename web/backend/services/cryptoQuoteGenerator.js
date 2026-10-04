@@ -13,7 +13,7 @@ class SimplifiedCryptoQuoteGenerator {
       // API configuration (same as before)
       this.zenQuotesURL = 'https://zenquotes.io/api/random';
       this.apiNinjasURL = 'https://api.api-ninjas.com/v1/quotes';  
-      this.apiKey = 'REDACTED_SECRET';
+      this.apiKey = process.env.API_NINJAS_KEY || '';
       
       // Simplified difficulty config - only for quote selection
       this.difficultyConfig = {

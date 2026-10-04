@@ -4,7 +4,7 @@
 
 import https from 'https';
 
-const PIXABAY_KEY = "REDACTED_SECRET";
+const PIXABAY_KEY = process.env.PIXABAY_API_KEY;
 
 // Test queries - same ones from the generator
 const TEST_QUERIES = [

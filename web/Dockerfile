@@ -44,17 +44,12 @@ COPY local_all-MiniLM-L6-v2 /backend/model-cache/Xenova/all-MiniLM-L6-v2
 COPY local_all-MiniLM-L6-v2 /backend/node_modules/@xenova/transformers/models/Xenova/all-MiniLM-L6-v2
 
 # Set environment variables
-ENV DEEPSEEK_API_KEY="REDACTED_SECRET"
-ENV PIXABAY_API_KEY="REDACTED_SECRET"
-ENV UNSPLASH_ACCESS_KEY="REDACTED_SECRET"
-ENV REPLICATE_API_TOKEN="REDACTED_SECRET"
+# Secrets (DEEPSEEK_API_KEY, PIXABAY_API_KEY, UNSPLASH_ACCESS_KEY, REPLICATE_API_TOKEN, ADMIN_KEY,
+# STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET) are injected at runtime (Fly/Cloud Run secrets) - never bake them into the image.
 ENV ALERT_EMAIL=puzzleverseai@gmail.com
 ENV PORT=8080
 ENV DOCKER_BUILD=true
 ENV REDIS_URL=redis://localhost:6379
-ENV ADMIN_KEY=REDACTED_SECRET
-ENV STRIPE_SECRET_KEY=REDACTED_SECRET
-ENV STRIPE_WEBHOOK_SECRET=REDACTED_SECRET
 # FORGE_WORKER_URL should be set via GCP Cloud Run environment variables
 # ENV FORGE_WORKER_URL=https://claude-forge-worker.fly.dev
 ENV SCREENSHOT_SERVICE_URL=http://178.156.231.255:3465

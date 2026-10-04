@@ -7,7 +7,7 @@ import http from 'http';
 export class WhichIsRealGenerator {
     constructor() {
         this.debugMode = false;
-        this.pixabayKey = process.env.PIXABAY_API_KEY || "REDACTED_SECRET";
+        this.pixabayKey = process.env.PIXABAY_API_KEY || "";
         this.openaiKey = process.env.OPENAI_API_KEY || "YOUR_OPENAI_KEY_HERE";
         
         // Category themes for diverse puzzles - expanded query pool for variety
