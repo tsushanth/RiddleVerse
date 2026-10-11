@@ -26,7 +26,8 @@ RUN apt-get update && apt-get install -y \
 
 # Copy backend dependencies & install
 COPY backend/package*.json ./
-RUN npm install
+# npm ci: the committed lockfile pins the exact tree that runs on Node 18 (a fresh `npm install` pulls a supabase-js that needs Node 22 and crash-loops).
+RUN npm ci
 
 # Copy backend source code
 COPY backend ./

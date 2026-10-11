@@ -12,6 +12,14 @@ primary_region = "iad"
   min_machines_running = 0
   processes = ["app"]
 
+  # A release that crash-loops must not replace healthy machines: the rolling deploy waits for this check.
+  [[http_service.checks]]
+    grace_period = "60s"
+    interval = "30s"
+    method = "GET"
+    path = "/api/health"
+    timeout = "10s"
+
 [[vm]]
   cpu_kind = "shared"
   cpus = 2
