@@ -4,7 +4,6 @@ backend/node_modules/
 
 # ✅ Ignore dependency lock files (optional)
 frontend/package-lock.json
-backend/package-lock.json
 
 # ✅ Ignore environment variables (Secrets & API keys)
 .env
