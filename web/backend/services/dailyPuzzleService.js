@@ -444,7 +444,8 @@ Make it interesting and unique - avoid common textbook questions. Respond with v
                 const response = await callAI(prompt, null, 2, {
                     category: USAGE_CATEGORIES.CUSTOM_PUZZLE_GENERATION,
                     puzzleType: topic,
-                    difficulty: 'medium'
+                    difficulty: 'medium',
+                    feature: 'daily_puzzle'
                 });
                 if (!response || response.startsWith("Error")) {
                     console.warn(`⚠️ AI generation failed for ${topic}: ${response}`);
@@ -504,7 +505,8 @@ Make it interesting and unique - avoid common textbook questions. Respond with v
                 const validationResponse = await callAI(validationPrompt, null, 2, {
                     category: USAGE_CATEGORIES.CONTENT_VALIDATION,
                     puzzleType: topic,
-                    difficulty: puzzle.difficulty || 'medium'
+                    difficulty: puzzle.difficulty || 'medium',
+                    feature: 'daily_puzzle'
                 });
 
                 let validationResult = {

@@ -25,13 +25,21 @@ let pendingErrors = [];
 let batchTimeout = null;
 
 // Email transporter
+// EMAIL_USER and EMAIL_PASSWORD come only from the environment; without them alert emails are skipped.
+let missingEmailConfigLogged = false;
 const getTransporter = () => {
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASSWORD;
+    if (!user || !pass) {
+        if (!missingEmailConfigLogged) {
+            missingEmailConfigLogged = true;
+            console.warn('Error alert emails disabled: set EMAIL_USER and EMAIL_PASSWORD');
+        }
+        return null;
+    }
     return nodemailer.createTransport({
         service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER || 'puzzleverseai@gmail.com',
-            pass: process.env.EMAIL_PASSWORD || 'duoo ukes bjkx nanj'
-        }
+        auth: { user, pass }
     });
 };
 
@@ -169,6 +177,7 @@ async function sendBatchedErrors() {
 
     try {
         const transporter = getTransporter();
+        if (!transporter) return;
         const alertEmail = process.env.ALERT_EMAIL || 'puzzleverseai@gmail.com';
 
         const subject = `🚨 RiddleVerse: ${errors.length} Server Error${errors.length > 1 ? 's' : ''}`;

@@ -1,6 +1,7 @@
 // services/findDifferencesGeneratorService.js
 // REFACTORED VERSION - Method 3 (Split-Scene + Vision API) with Original Names
 
+import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import { supabase } from '../config/database.js';
 import { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import axios from 'axios';
@@ -259,6 +260,7 @@ Return ONLY a JSON array like this:
                 },
                 timeout: 60000
             });
+            recordAnthropicResponse(response.data, 'find_differences', 'claude-sonnet-4-6');
 
             const visionAnalysis = response.data.content?.[0]?.type === 'text' ? response.data.content[0].text : '';
             this.debugLog(`📝 Vision API response received (${visionAnalysis.length} chars)`);
@@ -300,6 +302,7 @@ Return ONLY a JSON array like this:
             return this.parseVisionTextResponse(visionAnalysis);
             
         } catch (error) {
+            recordAnthropicAxiosError(error, 'claude-sonnet-4-6', 'find_differences');
             this.debugLog(`❌ Vision API analysis failed: ${error.message}`, 'error');
             this.stats.visionApiFallbacks++;
             return [];

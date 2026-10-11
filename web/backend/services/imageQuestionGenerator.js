@@ -5,6 +5,7 @@
 // Requires: npm i axios
 // Env: OPENAI_API_KEY must be set
 
+import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import axios from 'axios';
 
 // ⚙️ Tunables (defaults prioritize accuracy > volume)
@@ -368,6 +369,11 @@ export class ImageQuestionGenerator {
       },
       timeout: 120000
     });
+    // Spend accounting for all four vision/text calls made through this client.
+    this.anthropicHttp.interceptors.response.use(
+      (res) => { recordAnthropicResponse(res.data, 'image_question', 'claude-sonnet-4-6'); return res; },
+      (err) => { recordAnthropicAxiosError(err, 'claude-sonnet-4-6', 'image_question'); return Promise.reject(err); }
+    );
   }
 
   setDebugMode(enabled) { this.debugMode = !!enabled; }

@@ -1,5 +1,6 @@
 // services/waldoPuzzleGenerator.js - Enhanced with Expanded Scenarios
 
+import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import axios from 'axios';
 
 export class WaldoPuzzleGenerator {
@@ -919,6 +920,7 @@ Please analyze the image now and report your findings for each object.`;
                 },
                 timeout: 90000
             });
+            recordAnthropicResponse(response.data, 'waldo_puzzle', 'claude-sonnet-4-6');
 
             const content = response.data.content?.[0]?.type === 'text' ? response.data.content[0].text : '';
             this.debugLog(`👁️ Vision response preview: ${content.substring(0, 200)}...`);
@@ -934,6 +936,7 @@ Please analyze the image now and report your findings for each object.`;
             return { success: true, objects: detectedObjects };
 
         } catch (error) {
+            recordAnthropicAxiosError(error, 'claude-sonnet-4-6', 'waldo_puzzle');
             this.debugLog(`❌ Error detecting objects: ${error.message}`, 'error');
             return { success: false, error: error.message };
         }

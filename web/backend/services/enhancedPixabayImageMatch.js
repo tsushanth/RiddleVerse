@@ -1,6 +1,7 @@
 // Enhanced Pixabay Image Match Puzzle System
 // AI-First Generation with Full API Compatibility
 
+import { recordAnthropicResponse, recordAnthropicFailure } from '../utils/llmUsageInstance.js';
 import https from 'https';
 import http from 'http';
 import crypto from 'crypto';
@@ -844,10 +845,12 @@ Return JSON only:
             });
 
             if (!response.ok) {
+                recordAnthropicFailure(model, 'image_match');
                 throw new Error(`Anthropic API error: ${response.status}`);
             }
 
             const data = await response.json();
+            recordAnthropicResponse(data, 'image_match', model);
             return data.content[0]?.type === 'text' ? data.content[0].text : '';
 
         } catch (error) {
@@ -885,10 +888,12 @@ Return JSON only:
             });
 
             if (!response.ok) {
+                recordAnthropicFailure('claude-sonnet-4-6', 'image_match');
                 throw new Error(`Anthropic Vision API error: ${response.status}`);
             }
 
             const data = await response.json();
+            recordAnthropicResponse(data, 'image_match', 'claude-sonnet-4-6');
             return data.content[0]?.type === 'text' ? data.content[0].text : '';
 
         } catch (error) {
