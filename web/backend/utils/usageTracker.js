@@ -15,14 +15,28 @@ const MODEL_PRICING = {
   'gemini-pro': { input: 0.00025, output: 0.0005 }
 };
 
-// Email configuration (using same settings as server.js)
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: "puzzleverseai@gmail.com",
-        pass: "duoo ukes bjkx nanj"
-    }
-});
+// Email configuration: credentials come ONLY from the environment (no defaults in code).
+// USAGE_ALERT_SMTP_USER, USAGE_ALERT_SMTP_PASS and USAGE_ALERT_TO must all be set, otherwise alert emails are skipped.
+let transporter = null;
+let missingConfigLogged = false;
+
+function getUsageAlertConfig() {
+  const user = process.env.USAGE_ALERT_SMTP_USER;
+  const pass = process.env.USAGE_ALERT_SMTP_PASS;
+  const to = process.env.USAGE_ALERT_TO;
+  if (!user || !pass || !to) return null;
+  return { user, pass, to };
+}
+
+function getTransporter(cfg) {
+  if (!transporter) {
+    transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: cfg.user, pass: cfg.pass }
+    });
+  }
+  return transporter;
+}
 
 // Usage thresholds for email alerts
 const USAGE_THRESHOLDS = {
@@ -250,6 +264,14 @@ class SimpleUsageTracker {
    */
   async sendEmailAlert(alerts, context) {
     try {
+      const cfg = getUsageAlertConfig();
+      if (!cfg) {
+        if (!missingConfigLogged) {
+          missingConfigLogged = true;
+          console.warn('Usage alert emails disabled: set USAGE_ALERT_SMTP_USER, USAGE_ALERT_SMTP_PASS and USAGE_ALERT_TO to enable');
+        }
+        return;
+      }
       const topActivities = this.getTopCostDrivers(5);
       
       const subject = `🚨 AI Usage Alert - ${alerts.map(a => a.type).join(', ')}`;
@@ -257,13 +279,13 @@ class SimpleUsageTracker {
       const htmlContent = this.generateEmailHTML(alerts, topActivities, context);
       
       const mailOptions = {
-        from: '"AI Usage Monitor" <puzzleverseai@gmail.com>',
-        to: 'puzzleverseai@gmail.com',
+        from: `"AI Usage Monitor" <${cfg.user}>`,
+        to: cfg.to,
         subject: subject,
         html: htmlContent
       };
 
-      await transporter.sendMail(mailOptions);
+      await getTransporter(cfg).sendMail(mailOptions);
       console.log('📧 Usage alert email sent successfully');
       
     } catch (error) {
