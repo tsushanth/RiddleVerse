@@ -2,6 +2,7 @@
 import express from 'express';
 import axios from 'axios';
 import usageTracker, { USAGE_CATEGORIES } from '../utils/usageTracker.js';
+import { recordAnthropicResponse, recordAnthropicAxiosError, createStreamUsageRecorder } from '../utils/llmUsageInstance.js';
 import { extractTopicFromPrompt, determineCategory } from '../utils/puzzleUtils.js';
 
 const router = express.Router();
@@ -253,6 +254,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
 
         let fullResponse = '';
         let chunkCount = 0;
+        const streamUsage = createStreamUsageRecorder(model, 'llm_route_stream');
 
         response.data.on('data', (chunk) => {
             const lines = chunk.toString().split('\n').filter(line => line.trim() !== '');
@@ -263,6 +265,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
 
                     try {
                         const parsed = JSON.parse(data);
+                        streamUsage.onEvent(parsed);
 
                         if (parsed.type === 'content_block_delta' && parsed.delta?.type === 'text_delta') {
                             const content = parsed.delta.text;
@@ -279,6 +282,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
 
         response.data.on('end', async () => {
             clearInterval(keepAliveInterval);
+            streamUsage.finish(true);
             const responseTime = Date.now() - startTime;
 
             await usageTracker.trackRequest({
@@ -310,6 +314,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
         response.data.on('error', async (error) => {
             clearInterval(keepAliveInterval);
             console.error('Stream error:', error.message);
+            streamUsage.finish(false);
 
             await usageTracker.trackRequest({
                 modelName: model,
@@ -330,6 +335,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
 
     } catch (error) {
         console.error("Error in streaming endpoint:", error.response ? error.response.data : error.message);
+        recordAnthropicAxiosError(error, 'claude-haiku-4-5-20251001', 'llm_route_stream');
 
         if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/event-stream');
@@ -439,6 +445,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
                 'anthropic-version': '2023-06-01'
             }
         });
+        recordAnthropicResponse(response.data, 'llm_route', model);
 
         const aiResponse = (response.data.content?.[0]?.type === 'text' ? response.data.content[0].text.trim() : "") || "Call to Anthropic failed.";
 
@@ -462,6 +469,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
 
     } catch (error) {
         console.error("Error calling Anthropic API:", error.response ? error.response.data : error.message);
+        recordAnthropicAxiosError(error, 'claude-haiku-4-5-20251001', 'llm_route');
 
         if (error.response && error.response.status === 429) {
             return res.status(429).json({

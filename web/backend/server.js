@@ -61,6 +61,7 @@ import { reportCrash } from './utils/failureReporter.js';
 import { refreshDailyPuzzles } from './services/dailyPuzzles.js';
 import dailyPuzzlesBulkRoutes from './routes/dailyPuzzlesBulk.routes.js';
 import cron from 'node-cron';
+import { llm } from './utils/llmUsageInstance.js';
 
 const __dirname = path.resolve();
 
@@ -137,7 +138,7 @@ async function initializeServer() {
         setTimeout(async () => {
             try {
                 console.log('[DailyPuzzles] Warming cache on startup...');
-                await refreshDailyPuzzles();
+                await llm.withFeature('daily_warm', () => refreshDailyPuzzles());
             } catch (err) {
                 console.error('[DailyPuzzles] Startup warm failed:', err.message);
             }
@@ -147,7 +148,7 @@ async function initializeServer() {
         cron.schedule('0 2 * * *', async () => {
             try {
                 console.log('[DailyPuzzles] Running daily 2AM UTC refresh...');
-                await refreshDailyPuzzles();
+                await llm.withFeature('daily_warm', () => refreshDailyPuzzles());
             } catch (err) {
                 console.error('[DailyPuzzles] Cron refresh failed:', err.message);
             }
@@ -613,6 +614,12 @@ for (const evt of ['uncaughtException', 'unhandledRejection']) {
         reportCrash(evt, err).finally(() => process.exit(1));
     });
 }
+
+// Graceful shutdown (Fly sends SIGTERM when stopping the machine): flush pending spend rows, capped at 2.5 s, then exit.
+process.on('SIGTERM', () => {
+    const cap = new Promise((resolve) => setTimeout(resolve, 2500));
+    Promise.race([llm.flush().catch(() => {}), cap]).finally(() => process.exit(0));
+});
 
 const PORT = process.env.PORT || 8080;
 

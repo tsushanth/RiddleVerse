@@ -1,3 +1,4 @@
+import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import express from 'express';
 import nodemailer from 'nodemailer';
 import axios from 'axios';
@@ -331,10 +332,12 @@ router.post('/call-llm', async (req, res) => {
                 'anthropic-version': '2023-06-01'
             }
         });
+        recordAnthropicResponse(response.data, 'user_route', reqBody.model);
 
         res.json({ message: (response.data.content?.[0]?.type === 'text' ? response.data.content[0].text.trim() : "") || "Call to Anthropic failed." });
     } catch (error) {
         console.error("Error calling Anthropic API:", error.response ? error.response.data : error.message);
+        recordAnthropicAxiosError(error, 'claude-haiku-4-5-20251001', 'user_route');
         res.status(500).json({ error: "Failed to fetch response from AI API." });
     }
 });
