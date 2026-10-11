@@ -21,8 +21,10 @@ const OPTIONAL_BUT_RECOMMENDED = [
 
 // Email configuration for alerts
 const getTransporter = () => {
-    const user = process.env.EMAIL_USER || 'puzzleverseai@gmail.com';
-    const pass = process.env.EMAIL_PASSWORD || 'duoo ukes bjkx nanj';
+    // Credentials come only from the environment; without them deployment alert emails are skipped.
+    const user = process.env.EMAIL_USER;
+    const pass = process.env.EMAIL_PASSWORD;
+    if (!user || !pass) return null;
 
     return nodemailer.createTransport({
         service: 'gmail',
@@ -106,6 +108,10 @@ export async function validateConnections() {
 export async function sendDeploymentAlert(status, details) {
     try {
         const transporter = getTransporter();
+        if (!transporter) {
+            console.warn('Deployment alert email skipped: EMAIL_USER / EMAIL_PASSWORD not set');
+            return;
+        }
         const alertEmail = process.env.ALERT_EMAIL || 'puzzleverseai@gmail.com';
 
         const statusEmoji = status === 'success' ? '✅' : '❌';

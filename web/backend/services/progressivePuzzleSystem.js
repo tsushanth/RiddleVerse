@@ -1,3 +1,4 @@
+import { recordAnthropicResponse, recordAnthropicFailure } from '../utils/llmUsageInstance.js';
 import https from 'https';
 import http from 'http';
 import crypto from 'crypto';
@@ -713,7 +714,8 @@ Return ONLY valid JSON in this exact format:
         try {
             const response = await callAI(prompt, model, 2, {
                 category: 'puzzle_generation',
-                puzzleType: 'progressiverevelation'
+                puzzleType: 'progressiverevelation',
+                feature: 'progressive_puzzle'
             });
             return response;
         } catch (error) {
@@ -861,6 +863,7 @@ JSON only:
                     res.on('end', () => {
                         try {
                             const response = JSON.parse(data);
+                            recordAnthropicResponse(response, 'progressive_puzzle', 'claude-haiku-4-5-20251001');
                             if (response.error) {
                                 reject(new Error(`Anthropic error: ${response.error.message}`));
                                 return;
@@ -876,7 +879,7 @@ JSON only:
                     });
                 });
 
-                req.on('error', reject);
+                req.on('error', (err) => { recordAnthropicFailure('claude-haiku-4-5-20251001', 'progressive_puzzle'); reject(err); });
                 req.write(requestBody);
                 req.end();
             });

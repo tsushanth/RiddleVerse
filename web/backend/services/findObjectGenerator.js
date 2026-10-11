@@ -1,5 +1,6 @@
 // services/findObjectGenerator.js - Simplified Natural Discovery Approach
 
+import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import axios from 'axios';
 import { generateImage } from '../utils/aiClient.js';
 
@@ -594,6 +595,9 @@ Respond with ONLY valid JSON.`
                     }
                 });
      
+                // validateStatus lets 4xx through: a body without a usage block is recorded as an error call.
+                recordAnthropicResponse(response.data, 'find_object', 'claude-sonnet-4-6');
+
                 if (response.status === 502) {
                     throw new Error('API server temporarily unavailable (502)');
                 }
@@ -718,6 +722,7 @@ Respond with ONLY valid JSON.`
      
             } catch (error) {
                 lastError = error;
+                recordAnthropicAxiosError(error, 'claude-sonnet-4-6', 'find_object');
                 
                 if (error.response?.status === 502 || error.message.includes('502')) {
                     this.debugLog(`502 error on object discovery attempt ${attempt + 1}, retrying...`, 'warning');

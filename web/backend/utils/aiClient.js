@@ -2,6 +2,7 @@
 
 import axios from 'axios';
 import usageTracker, { USAGE_CATEGORIES } from './usageTracker.js';
+import { recordAnthropicResponse, recordAnthropicAxiosError } from './llmUsageInstance.js';
 
 /**
  * Enhanced AI client with automatic model rotation and proper error handling
@@ -139,6 +140,8 @@ export async function callAI(prompt, requestedModel = null, maxRetries = 2, opti
         max_tokens = 1500,
         rawResponse = false
     } = options;
+    // Spend-accounting label (low cardinality). Explicit options.feature wins, else the usageTracker category.
+    const llmFeature = options.feature || (category && category !== USAGE_CATEGORIES.OTHER ? category : 'ai_other');
 
     // If no specific model requested, use rotation
     let modelsToTry = [getNextModel()];
@@ -203,6 +206,9 @@ export async function callAI(prompt, requestedModel = null, maxRetries = 2, opti
                     headers,
                     timeout: 90000,
                 });
+
+                // Spend accounting: every attempt that returns a usage block costs money, including ones whose body we reject below.
+                if (apiConfig.isAnthropic) recordAnthropicResponse(response.data, llmFeature, apiConfig.model);
     
                 // Parse response based on API type
                 let aiResponse;
@@ -250,6 +256,7 @@ export async function callAI(prompt, requestedModel = null, maxRetries = 2, opti
             } catch (error) {
                 lastError = error;
                 console.error(`❌ ${modelName} API Error (attempt ${attempt}/${maxRetries}):`, error.message);
+                if (apiConfig.isAnthropic) recordAnthropicAxiosError(error, apiConfig.model, llmFeature);
                 
                 // Track failed attempt
                 await usageTracker.trackRequest({

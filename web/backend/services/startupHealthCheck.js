@@ -122,7 +122,7 @@ async function checkAIServices(result) {
         // Test Anthropic (Claude)
         let openaiWorking = false;
         try {
-            const anthropicResponse = await callAI(testPrompt, 'claude-3-sonnet');
+            const anthropicResponse = await callAI(testPrompt, 'claude-3-sonnet', 2, { feature: 'health_check' });
             openaiWorking = anthropicResponse && anthropicResponse.toLowerCase().includes('ok');
         } catch (error) {
             console.warn('⚠️ Anthropic test failed:', error.message);
@@ -131,7 +131,7 @@ async function checkAIServices(result) {
         // Test DeepSeek  
         let deepseekWorking = false;
         try {
-            const deepseekResponse = await callAI(testPrompt, 'deepseek');
+            const deepseekResponse = await callAI(testPrompt, 'deepseek', 2, { feature: 'health_check' });
             deepseekWorking = deepseekResponse && deepseekResponse.toLowerCase().includes('ok');
         } catch (error) {
             console.warn('⚠️ DeepSeek test failed:', error.message);
