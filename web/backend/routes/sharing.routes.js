@@ -7,13 +7,15 @@ import { admin, db } from '../config/firebaseAdmin.js';
 const router = express.Router();
 const __dirname = path.resolve();
 
-const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-        user: "puzzleverseai@gmail.com",
-        pass: "duoo ukes bjkx nanj"
-    }
-});
+// SMTP credentials come only from the environment (SHARE_SMTP_USER, SHARE_SMTP_PASS); no defaults in code.
+let transporter = null;
+function getTransporter() {
+    const user = process.env.SHARE_SMTP_USER;
+    const pass = process.env.SHARE_SMTP_PASS;
+    if (!user || !pass) return null;
+    if (!transporter) transporter = nodemailer.createTransport({ service: "gmail", auth: { user, pass } });
+    return transporter;
+}
 
 /**
  * Share riddle via email
@@ -24,6 +26,12 @@ router.post('/share-riddle', async (req, res) => {
 
         if (!puzzleId || !recipientEmail || !recipientName || !senderId) {
             return res.status(400).json({ error: "Missing required fields" });
+        }
+
+        const mailer = getTransporter();
+        if (!mailer) {
+            console.warn('Riddle share email disabled: set SHARE_SMTP_USER and SHARE_SMTP_PASS');
+            return res.status(503).json({ error: "Email sharing is not configured" });
         }
 
         await db.collection('sharedRiddles').add({
@@ -38,7 +46,7 @@ router.post('/share-riddle', async (req, res) => {
         const deepLink = `https://puzzleverseai.com/open-riddle?puzzleId=${puzzleId}`;
 
         const mailOptions = {
-            from: `"Puzzleverse" <puzzleverseai@gmail.com>`,
+            from: `"Puzzleverse" <${process.env.SHARE_SMTP_USER}>`,
             to: recipientEmail,
             subject: `🧩 You've Been Invited to Solve a Riddle!`,
             html: `
@@ -51,7 +59,7 @@ router.post('/share-riddle', async (req, res) => {
             `
         };
 
-        await transporter.sendMail(mailOptions);
+        await mailer.sendMail(mailOptions);
 
         res.json({ message: "Riddle shared successfully, email sent!" });
 
