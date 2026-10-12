@@ -9,7 +9,8 @@
 // Env (Supabase path only; the Firebase path needs nothing new):
 //   SUPABASE_URL                 already set
 //   SUPABASE_ANON_KEY            already set (used for auth.getUser)
-//   SUPABASE_SERVICE_ROLE_KEY    NEW, required to read/write auth_identity_map
+//   SUPABASE_SERVICE_KEY         set on Fly; required to read/write auth_identity_map
+//                                (SUPABASE_SERVICE_ROLE_KEY is accepted as an alias)
 import { createClient } from '@supabase/supabase-js';
 
 export class IdentityError extends Error {
@@ -34,7 +35,7 @@ const defaultDeps = {
     // Validates the JWT server-side against Supabase Auth (honours revocation).
     async getSupabaseUser(jwt) {
         const url = process.env.SUPABASE_URL;
-        const key = process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+        const key = process.env.SUPABASE_ANON_KEY || supabaseServiceKey();
         if (!url || !key) throw new IdentityError('not_configured', 'Supabase auth not configured', 503);
         const c = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
         const { data, error } = await c.auth.getUser(jwt);
@@ -51,10 +52,15 @@ export function __setDeps(overrides) {
     mapCache.clear();
 }
 
+/** Fly names the secret SUPABASE_SERVICE_KEY; accept the Supabase-standard name too. */
+export function supabaseServiceKey() {
+    return process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+}
+
 let _svc = null;
 export function serviceClient() {
     const url = process.env.SUPABASE_URL;
-    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const key = supabaseServiceKey();
     if (!url || !key) throw new IdentityError('not_configured', 'Identity bridge not configured', 503);
     if (!_svc) _svc = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
     return _svc;

@@ -76,4 +76,69 @@ router.post('/link-supabase', limiter, async (req, res) => {
     }
 });
 
+// POST /api/auth/supabase-exchange
+//   Authorization: Bearer <Supabase access token>   (body ignored)
+// Returns a Firebase custom token for the canonical uid so clients keep using
+// FirebaseAuth.currentUser.uid unchanged. Existing mappings are honoured as-is
+// (including legacy Firebase uids); unmapped users get a NEW uid `sb_<uuid>`.
+// Never touches user data, never re-keys, never merges by email.
+const exchangeLimiter = rateLimit({ windowMs: 60_000, max: 30, standardHeaders: true, legacyHeaders: false });
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+router.post('/supabase-exchange', exchangeLimiter, async (req, res) => {
+    const header = req.headers.authorization || '';
+    const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
+    if (!token) return res.status(401).json({ error: 'invalid_token' });
+
+    let sbUser;
+    try {
+        sbUser = await verifySupabaseToken(token);
+    } catch (e) {
+        if (e instanceof IdentityError && e.code === 'not_configured') return res.status(503).json({ error: 'auth_bridge_unavailable' });
+        return res.status(401).json({ error: 'invalid_token' });
+    }
+    if (typeof sbUser?.id !== 'string' || !UUID_RE.test(sbUser.id)) return res.status(401).json({ error: 'invalid_token' });
+    const sbId = sbUser.id.toLowerCase();
+
+    let db;
+    let fbAuth;
+    try {
+        db = __getDeps().getServiceClient();
+        fbAuth = await __getDeps().getFirebaseAuth();
+        if (!fbAuth || typeof fbAuth.createCustomToken !== 'function') throw new Error('firebase admin unavailable');
+    } catch {
+        return res.status(503).json({ error: 'auth_bridge_unavailable' });
+    }
+
+    try {
+        let canonicalUid;
+        let isNew = false;
+        const found = await db.from('auth_identity_map').select('supabase_user_id, canonical_uid').eq('supabase_user_id', sbId).maybeSingle();
+        if (found.error) throw found.error;
+        if (found.data?.canonical_uid) {
+            canonicalUid = found.data.canonical_uid;
+        } else {
+            canonicalUid = `sb_${sbId}`; // 3 + 36 chars, [a-z0-9_-] only: valid Firebase uid
+            const ins = await db.from('auth_identity_map').insert({
+                supabase_user_id: sbId, canonical_uid: canonicalUid, firebase_uid: null, provider: 'supabase',
+            });
+            if (ins.error) {
+                if (ins.error.code !== '23505') throw ins.error;
+                // Lost a race (or uid collision): use whatever row now exists for this user.
+                const again = await db.from('auth_identity_map').select('canonical_uid').eq('supabase_user_id', sbId).maybeSingle();
+                if (again.error || !again.data?.canonical_uid) throw ins.error;
+                canonicalUid = again.data.canonical_uid;
+            } else {
+                isNew = true;
+            }
+            forgetMapping(sbId);
+        }
+        const firebaseCustomToken = await fbAuth.createCustomToken(canonicalUid, { provider: 'supabase' });
+        return res.json({ firebaseCustomToken, canonicalUid, isNew });
+    } catch (e) {
+        console.error('[supabase-exchange] failed:', e?.message);
+        return res.status(500).json({ error: 'exchange_failed' });
+    }
+});
+
 export default router;
