@@ -1,6 +1,7 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
 import { admin, db } from '../config/firebaseAdmin.js';
+import { verifyToken } from '../auth/verifyIdentity.js';
 import { JWT_SECRET } from '../config/constants.js';
 
 const router = express.Router();
@@ -13,7 +14,9 @@ router.post("/google", async (req, res) => {
         console.log("Received ID Token:", idToken);
         
         // Verify Google ID Token (From Firebase Auth)
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const identity = await verifyToken(idToken);
+        // Firebase: raw is the decoded token (unchanged). Supabase: uid is the canonical uid.
+        const decodedToken = identity.provider === 'firebase' ? identity.raw : { ...identity.raw, uid: identity.uid };
         console.log("✅ Decoded Token:", decodedToken);
 
         const email = decodedToken.email;

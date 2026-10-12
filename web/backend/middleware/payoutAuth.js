@@ -1,5 +1,5 @@
 // payoutAuth.js - Firebase token verification for payout routes
-import { admin } from '../config/firebaseAdmin.js';
+import { verifyToken } from '../auth/verifyIdentity.js';
 
 /**
  * Middleware that verifies the Firebase ID token and ensures
@@ -18,7 +18,7 @@ export async function verifyCreator(req, res, next) {
     }
 
     try {
-        const decoded = await admin.auth().verifyIdToken(idToken);
+        const decoded = await verifyToken(idToken); // { uid (canonical), provider, raw }
         const creatorId = req.body.creatorId || req.query.creatorId;
 
         if (!creatorId) {
@@ -33,6 +33,10 @@ export async function verifyCreator(req, res, next) {
         req.verifiedUserId = decoded.uid;
         next();
     } catch (error) {
+        if (error.code === 'unlinked') {
+            // Only reachable for Supabase tokens; Firebase tokens never hit this.
+            return res.status(403).json({ error: 'Account not linked' });
+        }
         console.error('[PayoutAuth] Token verification failed:', error.message);
         return res.status(401).json({ error: 'Invalid or expired token' });
     }

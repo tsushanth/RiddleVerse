@@ -2,7 +2,7 @@
 // then proxies the central app-failure-reporter Worker with a server-side secret.
 // Requires env: ADMIN_DASH_SECRET (same value as the Worker's DASH_SECRET). Optional: ADMIN_EMAILS.
 import express from 'express';
-import { admin } from '../config/firebaseAdmin.js';
+import { verifyFirebaseToken } from '../auth/verifyIdentity.js';
 
 const router = express.Router();
 const APP = 'riddleverse';
@@ -13,7 +13,8 @@ export async function isAdminRequest(req) {
     const header = req.headers.authorization || '';
     if (!header.startsWith('Bearer ')) return false;
     try {
-        const decoded = await admin.auth().verifyIdToken(header.slice(7));
+        // Admin access stays Firebase/Google-only by design.
+        const decoded = (await verifyFirebaseToken(header.slice(7))).raw;
         if (!decoded.email || decoded.email_verified !== true) return false;
         if (decoded.firebase?.sign_in_provider !== 'google.com') return false;
         const allowed = (process.env.ADMIN_EMAILS || 't.sushanth@gmail.com').split(',').map((e) => e.trim().toLowerCase());

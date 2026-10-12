@@ -27,6 +27,7 @@ import adminRoutes from './routes/admin.routes.js';
 import dashProxyRoutes from './routes/dashProxy.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import authLinkRoutes from './routes/authLink.routes.js';
 import dailyPuzzlesRoutes from './routes/dailyPuzzles.routes.js';
 
 // New refactored routes
@@ -242,6 +243,7 @@ app.use('/api', userConfigRoutes);
 app.use('/', adminRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/auth', authRoutes);
+app.use('/api/auth', authLinkRoutes);
 app.use('/api/daily-puzzles', dailyPuzzlesRoutes);
 app.use("/api/puzzles", puzzleRoutes);
 app.use("/api/puzzles", dailyPuzzlesBulkRoutes); // GET /api/puzzles/daily
