@@ -6,6 +6,7 @@ import https from 'https';
 import http from 'http';
 import crypto from 'crypto';
 import { URL } from 'url';
+import { generateImageB64, getImageModel } from '../utils/openaiImage.js';
 
 class EnhancedPixabayPuzzleSystem {
     constructor(config = {}) {
@@ -272,25 +273,25 @@ Be creative but factually accurate!`;
             const aiImage = await this.generateAIImage(imagePrompt);
             
             if (!aiImage) {
-                return { success: false, error: 'AI image generation failed' };
+                return { success: false, error: this.lastAIImageError || 'AI image generation failed' };
             }
             
-            const imageBuffer = await this.downloadImage(aiImage.url);
+            // gpt-image models return base64 directly (no URL to download)
+            const imageBuffer = aiImage.buffer;
             
             const uploadResult = await this.uploadImageToSupabase(
                 `ai-${topic.category}-${puzzleId}`, 
-                imageBuffer,
-                aiImage.url
+                imageBuffer
             );
             
             if (uploadResult.success) {
                 return {
                     success: true,
-                    source: 'dall-e-3',
+                    source: getImageModel(),
                     url: uploadResult.supabaseUrl,
                     fileName: uploadResult.fileName,
                     originalPrompt: imagePrompt,
-                    generatedBy: 'dall-e-3',
+                    generatedBy: getImageModel(),
                     uploadedAt: uploadResult.uploadedAt,
                     isGenerated: true
                 };
@@ -334,37 +335,26 @@ Be creative but factually accurate!`;
 
     async generateAIImage(prompt) {
         if (!this.useAIFallback || !this.openaiKey) {
-            return null; // DALL-E requires OpenAI key
+            return null; // image generation requires OpenAI key
         }
 
         try {
-            const response = await fetch('https://api.openai.com/v1/images/generations', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${this.openaiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: "dall-e-3",
-                    prompt: prompt,
-                    size: "1024x1024",
-                    quality: "standard",
-                    n: 1
-                })
+            this.lastAIImageError = null;
+            const buffer = await generateImageB64({
+                prompt,
+                size: "1024x1024",
+                apiKey: this.openaiKey,
+                timeoutMs: 120000
             });
-
-            if (!response.ok) {
-                throw new Error(`DALL-E API error: ${response.status}`);
-            }
-
-            const data = await response.json();
             return {
-                url: data.data[0].url,
+                buffer,
                 prompt: prompt,
-                model: 'dall-e-3'
+                model: getImageModel()
             };
 
         } catch (error) {
+            // Keep the real reason (e.g. content policy block) so callers can surface it
+            this.lastAIImageError = error.message;
             this.log(`AI image generation error: ${error.message}`, 'error');
             return null;
         }

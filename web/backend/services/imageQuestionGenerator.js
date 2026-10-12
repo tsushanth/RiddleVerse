@@ -7,6 +7,7 @@
 
 import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import axios from 'axios';
+import { generateImageB64 } from '../utils/openaiImage.js';
 
 // ⚙️ Tunables (defaults prioritize accuracy > volume)
 const DEFAULT_OPTIONS = {
@@ -456,16 +457,7 @@ export class ImageQuestionGenerator {
   }
 
   async generateImage(prompt) {
-    const res = await this.openaiHttp.post('/images/generations', {
-      model: 'dall-e-3',
-      prompt,
-      n: 1,
-      size: '1024x1024',
-      response_format: 'b64_json'
-    }, { timeout: 60000 });
-    const b64 = res.data?.data?.[0]?.b64_json;
-    if (!b64) throw new Error('No image data from DALL·E');
-    return Buffer.from(b64, 'base64');
+    return generateImageB64({ prompt, size: '1024x1024', apiKey: this.openaiKey, timeoutMs: 120000 });
   }
 
   // ── Analysis (strict → soft fallback → grid sweep → container sweep → consensus) ──

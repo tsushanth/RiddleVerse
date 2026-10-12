@@ -3,6 +3,7 @@ import https from 'https';
 import http from 'http';
 import crypto from 'crypto';
 import { callAI } from '../utils/aiClient.js';
+import { generateImageB64, getImageModel } from '../utils/openaiImage.js';
 
 class ProgressivePuzzleSystem {
     constructor(config = {}) {
@@ -904,105 +905,52 @@ JSON only:
 Professional photography, studio lighting, sharp focus, centered composition, 
 recognizable and iconic representation. Photorealistic style.`.trim();
             
+            const model = getImageModel();
             this.debugLog('dalle_generation_start', {
                 answer,
                 prompt,
-                model: 'dall-e-3'
+                model
             }, 'info');
-            
-            const requestBody = JSON.stringify({
-                model: "dall-e-3",
-                prompt: prompt,
-                n: 1,
-                size: "1024x1024",
-                quality: "standard",
-                style: "natural",
-                response_format: "b64_json"
-            });
 
-            return new Promise((resolve, reject) => {
-                const options = {
-                    hostname: 'api.openai.com',
-                    port: 443,
-                    path: '/v1/images/generations',
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.openaiKey}`,
-                        'Content-Length': Buffer.byteLength(requestBody)
-                    },
-                    timeout: 60000 // 60 second timeout for DALL-E
-                };
-
-                const req = https.request(options, (res) => {
-                    let data = '';
-                    res.on('data', (chunk) => data += chunk);
-                    res.on('end', () => {
-                        try {
-                            const response = JSON.parse(data);
-                            
-                            if (response.error) {
-                                this.debugLog('dalle_error', {
-                                    error: response.error,
-                                    answer
-                                }, 'error');
-                                reject(new Error(`DALL-E error: ${response.error.message}`));
-                                return;
-                            }
-
-                            const imageData = response.data[0];
-                            const imageBuffer = Buffer.from(imageData.b64_json, 'base64');
-                            
-                            this.debugLog('dalle_generation_success', {
-                                answer,
-                                imageSizeKB: Math.round(imageBuffer.length / 1024),
-                                revisedPrompt: imageData.revised_prompt
-                            }, 'success');
-                            
-                            resolve({
-                                source: 'dall-e-3',
-                                buffer: imageBuffer,
-                                metadata: {
-                                    prompt: prompt,
-                                    model: "dall-e-3",
-                                    generated: new Date().toISOString(),
-                                    revised_prompt: imageData.revised_prompt
-                                },
-                                validation: {
-                                    score: 10,
-                                    isRelevant: true,
-                                    confidence: "high",
-                                    description: "AI-generated image",
-                                    reasoning: "Generated specifically for this answer"
-                                }
-                            });
-
-                        } catch (error) {
-                            this.debugLog('dalle_parse_error', {
-                                error: error.message,
-                                response: data.substring(0, 200)
-                            }, 'error');
-                            reject(new Error(`DALL-E parse error: ${error.message}`));
-                        }
-                    });
+            let imageBuffer;
+            try {
+                imageBuffer = await generateImageB64({
+                    prompt,
+                    size: "1024x1024",
+                    apiKey: this.openaiKey,
+                    timeoutMs: 120000
                 });
+            } catch (genError) {
+                this.debugLog('dalle_error', {
+                    error: genError.message,
+                    status: genError.status,
+                    code: genError.code,
+                    answer
+                }, 'error');
+                throw genError;
+            }
 
-                req.on('error', (error) => {
-                    this.debugLog('dalle_request_error', {
-                        error: error.message,
-                        answer
-                    }, 'error');
-                    reject(error);
-                });
-                
-                req.on('timeout', () => {
-                    req.destroy();
-                    reject(new Error('DALL-E request timeout after 60 seconds'));
-                });
+            this.debugLog('dalle_generation_success', {
+                answer,
+                imageSizeKB: Math.round(imageBuffer.length / 1024)
+            }, 'success');
 
-                req.write(requestBody);
-                req.end();
-            });
+            return {
+                source: model,
+                buffer: imageBuffer,
+                metadata: {
+                    prompt: prompt,
+                    model,
+                    generated: new Date().toISOString()
+                },
+                validation: {
+                    score: 10,
+                    isRelevant: true,
+                    confidence: "high",
+                    description: "AI-generated image",
+                    reasoning: "Generated specifically for this answer"
+                }
+            };
 
         } catch (error) {
             this.debugLog('dalle_generation_failed', {

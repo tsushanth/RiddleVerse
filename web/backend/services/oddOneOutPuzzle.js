@@ -6,6 +6,7 @@ import axios from 'axios';
 import https from 'https';
 import http from 'http';
 import { callAI, callAIWithRetry } from '../utils/aiClient.js';
+import { isAIImageSource } from '../utils/openaiImage.js';
 
 class OddOneOutPuzzleSystem {
     constructor(config = {}) {
@@ -862,7 +863,7 @@ Return as JSON:
                     apiStats: {
                         scenario: scenario.name,
                         pixabayImages: images.filter(img => img.source === 'pixabay').length,
-                        aiImages: images.filter(img => img.source === 'dall-e-3').length,
+                        aiImages: images.filter(img => isAIImageSource(img.source)).length,
                         storageProvider: 'supabase',
                         modelUsed: 'gpt-3.5-turbo',
                         patternType: patternType.name,

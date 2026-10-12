@@ -5,6 +5,7 @@ import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llm
 import { supabase } from '../config/database.js';
 import { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import axios from 'axios';
+import { generateImageB64, detailQuality } from '../utils/openaiImage.js';
 
 /**
  * Enhanced Find Differences Generator with Method 3 (Split-Scene + Vision API)
@@ -165,26 +166,14 @@ IMPORTANT:
 - Make differences very obvious and high-contrast`;
 
         try {
-            const response = await axios.post('https://api.openai.com/v1/images/generations', {
-                model: "dall-e-3",
+            // Wide horizontal format (1792x1024 maps to 1536x1024); fine detail needed.
+            const imageBuffer = await generateImageB64({
                 prompt: enhancedPrompt,
-                n: 1,
-                size: "1792x1024", // Wide horizontal format
-                quality: "hd",
-                response_format: "b64_json"
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                timeout: 120000
+                size: "1792x1024",
+                quality: detailQuality(),
+                apiKey: this.apiKey,
+                timeoutMs: 120000
             });
-
-            if (!response.data?.data?.[0]?.b64_json) {
-                throw new Error('Failed to generate split-screen image');
-            }
-
-            const imageBuffer = Buffer.from(response.data.data[0].b64_json, 'base64');
             
             this.debugLog(`✅ Generated split-screen image (${imageBuffer.length} bytes)`);
 

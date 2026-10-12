@@ -1,6 +1,7 @@
 // services/imagePuzzleGenerator.js - Enhanced AI Image Puzzle Generator
 
 import axios from 'axios';
+import { generateImageB64 } from '../utils/openaiImage.js';
 
 export class ImagePuzzleGenerator {
     constructor() {
@@ -507,25 +508,12 @@ Style: Premium digital artwork, highly detailed, vibrant colors, perfect for hig
             
             // Step 2: Generate image with DALL-E
             this.debugLog('🎨 Generating image with DALL-E...');
-            const imageResponse = await axios.post('https://api.openai.com/v1/images/generations', {
-                model: "dall-e-3",
+            const imageBuffer = await generateImageB64({
                 prompt: imagePrompt,
-                n: 1,
                 size: "1024x1024",
-                response_format: "b64_json"
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                timeout: 60000
+                apiKey: this.apiKey,
+                timeoutMs: 120000
             });
-
-            if (!imageResponse.data?.data?.[0]?.b64_json) {
-                throw new Error('No image data received from DALL-E');
-            }
-
-            const imageBuffer = Buffer.from(imageResponse.data.data[0].b64_json, 'base64');
             this.debugLog(`📦 Generated image: ${imageBuffer.length} bytes`);
 
             // Step 3: Upload image to storage and validate URL

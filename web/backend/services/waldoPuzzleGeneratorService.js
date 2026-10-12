@@ -2,6 +2,7 @@
 
 import { recordAnthropicResponse, recordAnthropicAxiosError } from '../utils/llmUsageInstance.js';
 import axios from 'axios';
+import { generateImageB64, detailQuality } from '../utils/openaiImage.js';
 
 export class WaldoPuzzleGenerator {
     constructor() {
@@ -683,25 +684,14 @@ export class WaldoPuzzleGenerator {
             
             // Step 2: Generate image with DALL-E
             this.debugLog('🎨 Generating scene with DALL-E...');
-            const imageResponse = await axios.post('https://api.openai.com/v1/images/generations', {
-                model: "dall-e-3",
+            // Fine detail matters for hidden-object scenes: use the 'detail' quality tier.
+            const imageBuffer = await generateImageB64({
                 prompt: imagePrompt,
-                n: 1,
                 size: "1024x1024",
-                response_format: "b64_json"
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${this.apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                timeout: 60000
+                quality: detailQuality(),
+                apiKey: this.apiKey,
+                timeoutMs: 120000
             });
-
-            if (!imageResponse.data?.data?.[0]?.b64_json) {
-                throw new Error('No image data received from DALL-E');
-            }
-
-            const imageBuffer = Buffer.from(imageResponse.data.data[0].b64_json, 'base64');
             this.debugLog(`📦 Generated image: ${imageBuffer.length} bytes`);
 
             // Step 3: Upload image to storage and validate URL
@@ -724,7 +714,7 @@ export class WaldoPuzzleGenerator {
 
             // Step 4: ✅ Use improved Vision API detection with percentage positions
             this.debugLog('👁️ Detecting object locations with improved Vision API...');
-            const detectionResults = await this.detectObjectLocationsWithPercentages(imageResponse.data.data[0].b64_json, hiddenObjects);
+            const detectionResults = await this.detectObjectLocationsWithPercentages(imageBuffer.toString('base64'), hiddenObjects);
 
             if (!detectionResults.success || detectionResults.objects.length === 0) {
                 this.debugLog(`⚠️ ${detectionResults.error || 'No objects detected'}`, 'warning');

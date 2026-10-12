@@ -3,6 +3,7 @@
 import axios from 'axios';
 import https from 'https';
 import http from 'http';
+import { generateImageB64, detailQuality } from '../utils/openaiImage.js';
 
 export class WhichIsRealGenerator {
     constructor() {
@@ -310,42 +311,28 @@ export class WhichIsRealGenerator {
         }
     }
 
-    // Generate AI variation using DALL-E 3 (prompt-based)
+    // Generate AI variation using the OpenAI image model (prompt-based text-to-image)
     // The old DALL-E 2 variations endpoint (/v1/images/variations) returns 502.
-    // Instead, we use DALL-E 3 with a descriptive prompt based on the subject.
+    // Instead, we use the gpt-image model with a descriptive prompt based on the subject.
     async generateAIVariation(pngBuffer, subjectDescription) {
         const prompt = `A photorealistic photograph of ${subjectDescription || 'the subject'}. ` +
             'Shot with a professional DSLR camera, natural lighting, realistic details, ' +
             'high resolution. The image should look like an authentic photograph taken by a skilled photographer.';
 
         try {
-            const response = await axios.post(
-                'https://api.openai.com/v1/images/generations',
-                {
-                    model: 'dall-e-3',
-                    prompt,
-                    n: 1,
-                    size: '1024x1024',
-                    response_format: 'b64_json',
-                    quality: 'standard'
-                },
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${this.openaiKey}`
-                    },
-                    timeout: 120000
-                }
-            );
-
-            if (!response.data?.data?.[0]?.b64_json) {
-                throw new Error('No image data received from DALL-E 3');
-            }
-
-            return Buffer.from(response.data.data[0].b64_json, 'base64');
+            // Photorealism is the point of this puzzle, but 'low' is the configured default;
+            // OPENAI_IMAGE_QUALITY_DETAIL (default 'medium') is used for the realistic fake.
+            return await generateImageB64({
+                prompt,
+                size: '1024x1024',
+                quality: detailQuality(),
+                apiKey: this.openaiKey,
+                timeoutMs: 120000
+            });
         } catch (error) {
-            if (error.response?.status === 400) {
-                throw new Error(`DALL-E 3 rejected prompt: ${error.response?.data?.error?.message || 'unknown'}`);
+            if (error.status === 400) {
+                // helper message already includes OpenAI's error text (content policy is distinct)
+                throw new Error(`Image prompt rejected: ${error.message}`);
             }
             throw error;
         }
