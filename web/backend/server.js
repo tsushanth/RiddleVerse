@@ -25,6 +25,7 @@ import gamesRoutes from './routes/games.routes.js';
 import userConfigRoutes from './routes/simpleUserConfig.js';
 import adminRoutes from './routes/admin.routes.js';
 import dashProxyRoutes from './routes/dashProxy.js';
+import { puzzleEventsRouter, puzzleAdminRouter } from './routes/puzzleMonitoring.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 import authRoutes from './routes/auth.routes.js';
 import authLinkRoutes from './routes/authLink.routes.js';
@@ -79,6 +80,9 @@ app.use(cors());
 app.post('/api/payouts/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
     await handleStripeWebhook(req, res);
 });
+
+// Puzzle event ingest has its own 64kb parser; must come before the global 50mb parser.
+app.use('/api/puzzle-events', puzzleEventsRouter);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -232,6 +236,7 @@ app.use('/', generationRoutes);
 app.use('/api/ltv', ltvRoutes);
 app.use('/api/daily-puzzle-cache', dailyPuzzleCacheRoutes);
 app.use('/api/dash', dashProxyRoutes);
+app.use('/api/dash', puzzleAdminRouter);
 app.use('/api/games', gamesRoutes);
 app.use('/api/game-creation', gameCreationRoutes);
 app.use('/api/chat-scores', chatScoresRoutes);
