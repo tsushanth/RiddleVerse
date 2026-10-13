@@ -1,2 +1,3 @@
 # Fake key literal in a unit test (sk-test-..., 30 chars); replaced by a runtime-built value in a later commit
 
+816e584bc67153edde3d5d26efaab028040137c9:web/backend/test/openaiImage.test.js:generic-api-key:21

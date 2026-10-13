@@ -1,3 +1,4 @@
+const KEY = ['sk', 'test', 'fake'].join('-') + '0123456789abcdefghij'; // built at runtime so secret scanners do not flag a fake key
 // Tests for utils/openaiImage.js and the request each migrated service builds.
 // No network: an injectable http fn (helper) or a stubbed global fetch (services).
 import { test, beforeEach, afterEach } from 'node:test';
@@ -18,7 +19,6 @@ process.env.SUPABASE_ANON_KEY ||= 'fake-anon';
 process.env.SUPABASE_SERVICE_ROLE_KEY ||= 'fake-service';
 
 const PNG_B64 = Buffer.from('fake-png-bytes').toString('base64');
-const KEY = ['sk', 'test', 'fake'].join('-') + '0123456789abcdefghij'; // built at runtime so secret scanners do not flag a fake key
 const okHttp = (calls) => async (req) => { calls.push(req); return { status: 200, data: { data: [{ b64_json: PNG_B64 }] } }; };
 const errHttp = (status, error) => async () => ({ status, data: { error } });
 
