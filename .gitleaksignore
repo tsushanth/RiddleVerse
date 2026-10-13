@@ -1,0 +1,2 @@
+# Fake key literal in a unit test (sk-test-..., 30 chars); replaced by a runtime-built value in a later commit
+
