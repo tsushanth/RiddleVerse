@@ -1,3 +1,5 @@
 # Fake key literal in a unit test (sk-test-..., 30 chars); replaced by a runtime-built value in a later commit
 
 816e584bc67153edde3d5d26efaab028040137c9:web/backend/test/openaiImage.test.js:generic-api-key:21
+# Supabase publishable (public by design) client key in the Android auth core; not a secret
+e461bcc665fd2514cfbb2021563ec4a18829ee29:android/app/src/main/java/com/kreativekoala/riddleverse/auth/SupabaseAuthCore.kt:generic-api-key:14
