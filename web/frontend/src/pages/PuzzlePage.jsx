@@ -59,6 +59,9 @@ const puzzleTypeNames = {
   colortextmatching: 'Color Match',
 }
 
+// --- web spatial puzzles (feat/web-puzzles-spatial) ---
+Object.assign(puzzleTypeNames, { pixellogic: 'Pixel Logic', tubetint: 'Tube Tint', piecepack: 'Piece Pack', crateshift: 'Crate Shift', conduit: 'Conduit' })
+
 // ---------------------------------------------------------------------------
 // Daily puzzle helpers — localStorage-based progress tracking
 // ---------------------------------------------------------------------------

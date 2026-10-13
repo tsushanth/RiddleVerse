@@ -202,6 +202,11 @@ const renderers = {
   dualcard: DualCardPuzzle,
 }
 
+// --- web spatial puzzles (feat/web-puzzles-spatial) ---
+import { spatialTypeMap, spatialRenderers } from './spatial/registry'
+Object.assign(typeMap, spatialTypeMap)
+Object.assign(renderers, spatialRenderers)
+
 /**
  * Determines which renderer to use based on puzzle type and data shape.
  */
