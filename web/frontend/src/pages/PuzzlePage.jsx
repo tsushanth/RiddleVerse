@@ -73,6 +73,9 @@ Object.assign(puzzleTypeNames, wordPuzzleNames)
 import { classicTypeNames, isClassicType } from '../components/puzzles/classic/classicRegistry'
 Object.assign(puzzleTypeNames, classicTypeNames)
 
+// --- web spatial puzzles (feat/web-puzzles-spatial) ---
+Object.assign(puzzleTypeNames, { pixellogic: 'Pixel Logic', tubetint: 'Tube Tint', piecepack: 'Piece Pack', crateshift: 'Crate Shift', conduit: 'Conduit' })
+
 // ---------------------------------------------------------------------------
 // Daily puzzle helpers — localStorage-based progress tracking
 // ---------------------------------------------------------------------------

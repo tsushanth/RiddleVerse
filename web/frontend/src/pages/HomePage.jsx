@@ -100,6 +100,18 @@ const puzzleCategories = [
       { type: 'realorai', name: 'Real or AI?', icon: Globe, color: '#f43f5e', description: 'Spot AI content' },
     ]
   },
+  // --- web spatial puzzles (feat/web-puzzles-spatial) ---
+  {
+    id: 'spatial',
+    title: 'Spatial & Path Logic',
+    puzzles: [
+      { type: 'pixellogic', name: 'Pixel Logic', icon: Grid3X3, color: '#3b82f6', description: 'Reveal the picture from number clues' },
+      { type: 'tubetint', name: 'Tube Tint', icon: Layers, color: '#10b981', description: 'Pour colours until each tube is one colour' },
+      { type: 'piecepack', name: 'Piece Pack', icon: SquareStack, color: '#f59e0b', description: 'Fit pieces and clear lines' },
+      { type: 'crateshift', name: 'Crate Shift', icon: Shapes, color: '#8b5cf6', description: 'Push every crate onto a target' },
+      { type: 'conduit', name: 'Conduit', icon: Zap, color: '#0ea5e9', description: 'Rotate pipes to power every lamp' },
+    ]
+  },
 ]
 
 // --- web classic puzzles (feat/web-puzzles-classic) ---
