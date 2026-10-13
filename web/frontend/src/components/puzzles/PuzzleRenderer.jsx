@@ -236,3 +236,9 @@ export default function PuzzleRenderer({ puzzleType, puzzle, onAnswer, onSubmitT
 
 // Export for testing / direct use
 export { resolveRenderer, typeMap, renderers }
+
+// --- web word puzzles (feat/web-puzzles-word) ---
+import { wordPuzzleTypeMap, wordPuzzleRenderers } from './word/wordPuzzleRegistry.js'
+Object.assign(typeMap, wordPuzzleTypeMap)
+Object.assign(renderers, wordPuzzleRenderers)
+// --- end web word puzzles ---

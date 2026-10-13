@@ -33,6 +33,13 @@ const puzzleCategories = [
       { type: 'cryptoword', name: 'Crypto Word', icon: Key, color: '#0ea5e9', description: 'Decode the cipher' },
       { type: 'contextswitch', name: 'Context Switch', icon: RefreshCw, color: '#7c3aed', description: 'Pick the right meaning' },
       { type: 'progressivereveal', name: 'Progressive', icon: Eye, color: '#d946ef', description: 'Guess from clues' },
+      // --- web word puzzles (feat/web-puzzles-word) ---
+      { type: 'wordguess', name: 'Word Guess', icon: Grid3X3, color: '#16a34a', description: 'Guess the 5-letter word' },
+      { type: 'wordladder', name: 'Word Ladder', icon: ListOrdered, color: '#3b82f6', description: 'Change one letter at a time' },
+      { type: 'letterballoons', name: 'Letter Balloons', icon: Shuffle, color: '#ef4444', description: 'Save the balloons' },
+      { type: 'wordhive', name: 'Word Hive', icon: Layers, color: '#f59e0b', description: 'Build words from 7 letters' },
+      { type: 'codecracker', name: 'Code Cracker', icon: Key, color: '#9b5de5', description: 'Deduce the hidden code' },
+      // --- end web word puzzles ---
     ]
   },
   {
