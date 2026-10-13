@@ -83,6 +83,10 @@ const puzzleCategories = [
   },
 ]
 
+// --- web classic puzzles (feat/web-puzzles-classic) ---
+import { classicCategory } from '../components/puzzles/classic/classicRegistry'
+puzzleCategories.push(classicCategory)
+
 function getGreeting() {
   const hour = new Date().getHours()
   if (hour >= 5 && hour < 12) return 'Good Morning'
