@@ -57,6 +57,12 @@ const puzzleTypeNames = {
   progressivereveal: 'Progressive Reveal',
   realorai: 'Real or AI?',
   colortextmatching: 'Color Match',
+  // --- web grid puzzles (feat/web-puzzles-grid) ---
+  sudoku: 'Sudoku',
+  binarygrid: 'Binary Grid',
+  cagemath: 'Cage Math',
+  signgrid: 'Sign Grid',
+  // --- end web grid puzzles ---
 }
 
 // ---------------------------------------------------------------------------

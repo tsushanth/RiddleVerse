@@ -202,6 +202,12 @@ const renderers = {
   dualcard: DualCardPuzzle,
 }
 
+// --- web grid puzzles (feat/web-puzzles-grid) ---
+import { gridRenderers, gridTypeMap } from './grid/gridRegistry'
+Object.assign(typeMap, gridTypeMap)
+Object.assign(renderers, gridRenderers)
+// --- end web grid puzzles ---
+
 /**
  * Determines which renderer to use based on puzzle type and data shape.
  */

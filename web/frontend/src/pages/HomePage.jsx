@@ -56,6 +56,18 @@ const puzzleCategories = [
       { type: 'dualcard', name: 'Dual Card', icon: CopySlash, color: '#f43f5e', description: 'Compare two cards' },
     ]
   },
+  // --- web grid puzzles (feat/web-puzzles-grid) ---
+  {
+    id: 'grid',
+    title: 'Grid Logic',
+    puzzles: [
+      { type: 'sudoku', name: 'Sudoku', icon: Grid3X3, color: '#6366f1', description: '4x4, 6x6 and 9x9 grids' },
+      { type: 'binarygrid', name: 'Binary Grid', icon: SquareStack, color: '#14b8a6', description: 'Balance the 0s and 1s' },
+      { type: 'cagemath', name: 'Cage Math', icon: Calculator, color: '#f59e0b', description: 'Cages hit their targets' },
+      { type: 'signgrid', name: 'Sign Grid', icon: SplitSquareHorizontal, color: '#ec4899', description: 'Respect every < and >' },
+    ]
+  },
+  // --- end web grid puzzles ---
   {
     id: 'memory',
     title: 'Memory & Focus',
