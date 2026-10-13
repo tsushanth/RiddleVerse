@@ -79,6 +79,18 @@ object QuizCategories {
         QuizCategory("Color Shape Match", "Does the text match the shape color?", Icons.Default.Palette, "colormatching", "Focus"),
 
         QuizCategory("Symmetry", "Copy patterns from left grid to right grid", Icons.Default.GridOn, "symmetry", "Visual"),
+        // --- grid puzzles (feat/puzzles-grid) ---
+        QuizCategory("Sudoku", "Fill the grid so every row, column and box has each digit once", Icons.Default.GridOn, "sudoku", "Logic"),
+        QuizCategory("Binary Grid", "Fill in 0s and 1s with no three in a row", Icons.Default.GridOn, "binarygrid", "Logic"),
+        QuizCategory("Cage Math", "Fill the grid so each cage hits its target", Icons.Default.GridOn, "cagemath", "Logic"),
+        QuizCategory("Sign Grid", "Fill the grid and obey every greater/less sign", Icons.Default.GridOn, "signgrid", "Logic"),
+
+        // --- classic puzzles (feat/puzzles-classic) ---
+        QuizCategory("Tile Merge", "Swipe and merge tiles to reach the goal", Icons.Default.Apps, "tilemerge", "Logic"),
+        QuizCategory("Slide Tiles", "Slide the numbered tiles back into order", Icons.Default.ViewModule, "slidetiles", "Logic"),
+        QuizCategory("Light Flip", "Turn off every light in as few taps as possible", Icons.Default.Lightbulb, "lightflip", "Logic"),
+        QuizCategory("Safe Sweep", "Find the mines and open every safe square", Icons.Default.Flag, "safesweep", "Logic"),
+        QuizCategory("Disc Tower", "Move the stack of discs to the far peg", Icons.Default.Layers, "disctower", "Logic"),
 
         // Logic
         QuizCategory("Dual Card Logic", "Check if numbers are even or letters are vowels", Icons.Default.CheckCircle, "dualcard", "Logic"),
@@ -102,8 +114,11 @@ object QuizCategories {
         QuizCategory("Real or AI", "Real or AI", Icons.Default.CheckCircle, "realorai", "General"),
 
 
+        // --- word puzzles (feat/puzzles-word) ---
+        *WordPuzzleRegistry.quizCategories.toTypedArray(),
+
         QuizCategory("Trivia", "General Knowledge", Icons.Default.Quiz, "trivia", "General")
-    )
+    ) + SpatialPuzzles.categories  // --- spatial puzzles (feat/puzzles-spatial) ---
 
     /**
      * Get all available puzzle types as a list of category strings
@@ -226,7 +241,13 @@ object QuizCategories {
             "geography_countries"  // Geography puzzles are new
             // Add other new types here
         )
-        return puzzleType in newPuzzleTypes
+        // New game wave (grid, classic, word, spatial): flag them so they stand out in the list
+        val newGridTypes = listOf("sudoku", "binarygrid", "cagemath", "signgrid")
+        return puzzleType in newPuzzleTypes ||
+            puzzleType in newGridTypes ||
+            ClassicPuzzles.isClassic(puzzleType) ||
+            WordPuzzleRegistry.isWordPuzzleType(puzzleType) ||
+            SpatialPuzzles.isSpatial(puzzleType)
     }
 
     fun isOfflinePuzzleType(puzzleType: String): Boolean {
@@ -239,6 +260,8 @@ object QuizCategories {
             "contextswitch",
             "mathcrossword",
             "symmetry",
+            // --- grid puzzles (feat/puzzles-grid) ---
+            "sudoku", "binarygrid", "cagemath", "signgrid",
             "trainrouting",
             "pinballdeflector",
             "memorypreviouspair",
@@ -264,6 +287,10 @@ object QuizCategories {
             "mathcomparison"
         )
 
-        return offlinePuzzleTypes.contains(puzzleType)
+        // classic + word + spatial puzzles are fully local
+        return offlinePuzzleTypes.contains(puzzleType) ||
+            ClassicPuzzles.isClassic(puzzleType) ||
+            WordPuzzleRegistry.isWordPuzzleType(puzzleType) ||
+            SpatialPuzzles.isSpatial(puzzleType)
     }
 }

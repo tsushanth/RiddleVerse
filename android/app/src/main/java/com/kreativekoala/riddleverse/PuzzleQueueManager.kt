@@ -567,7 +567,8 @@ class PuzzleQueueManager private constructor(internal val context: Context) {
                 "symbolswipe", "colormatching", "imagevortex", "memorysquares",
                 "mathexpression", "purchasing", "subtraction", "mathcomparison"
             )
-            offlineTypes.contains(puzzleType)
+            // --- spatial puzzles (feat/puzzles-spatial) ---
+            offlineTypes.contains(puzzleType) || SpatialPuzzles.isSpatial(puzzleType)
         }
     }
 

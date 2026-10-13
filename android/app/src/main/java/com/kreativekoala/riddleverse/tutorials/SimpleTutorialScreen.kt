@@ -50,6 +50,7 @@ fun SimpleTutorialScreen(
             onClick = onSkip,
             modifier = Modifier
                 .align(Alignment.TopEnd)
+                .statusBarsPadding()
                 .padding(16.dp)
         ) {
             Icon(
@@ -62,6 +63,8 @@ fun SimpleTutorialScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
                 .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center

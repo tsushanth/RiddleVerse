@@ -199,7 +199,15 @@ class StartPuzzleActivity : AppCompatActivity() {
                         "crypto" -> listOf("Crypto Word Screen")
                         "geography_countries" -> listOf("Geography Country Selection Screen")
                         "sentenceTransitions" -> listOf("Sentence Transitions Screen")
+                        // --- word puzzles (feat/puzzles-word) ---
+                        in WordPuzzleRegistry.TYPES -> WordPuzzleRegistry.screenOptions(puzzleType)
                         "symmetry" -> listOf("Symmetry Screen")
+                        // --- grid puzzles (feat/puzzles-grid) ---
+                        "sudoku", "binarygrid", "cagemath", "signgrid" -> listOf("Grid Puzzle Screen")
+                        // --- classic puzzles (feat/puzzles-classic) ---
+                        in ClassicPuzzles.types -> listOf(ClassicPuzzles.screenName(puzzleType))
+                        // --- spatial puzzles (feat/puzzles-spatial) ---
+                        in SpatialPuzzles.TYPES -> listOf(SpatialPuzzles.screenOption(puzzleType))
                         "wordsnake", "word snake" -> listOf("Word Snake Screen")
                         "imagequestion" -> listOf("Image Question Screen")
                         "find_differences" -> listOf("Find Differences Screen")
@@ -821,6 +829,14 @@ fun StartPuzzleScreen(
     // Existing tutorial logic
     if (showTutorial) {
         when (type.lowercase()) {
+            // --- word puzzles (feat/puzzles-word) ---
+            in WordPuzzleRegistry.TYPES -> {
+                WordPuzzleTutorialScreen(
+                    type = type,
+                    onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
+                    onTutorialSkipped = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) }
+                )
+            }
 
             "imagepuzzle", "image puzzle", "\uD83D\uDDBC\uFE0F image puzzle" -> {
                 ImagePuzzleTutorialScreen(
@@ -1025,7 +1041,24 @@ fun StartPuzzleScreen(
                 )
             }
 
+            // --- classic puzzles (feat/puzzles-classic) ---
+            in ClassicPuzzles.types -> {
+                ClassicTutorialScreen(
+                    type = type,
+                    onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
+                    onTutorialSkipped = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) }
+                )
+            }
+
             // Wave 2: Symmetry, Color Text Matching, Number Sequence, Percentage
+            // --- grid puzzles (feat/puzzles-grid) ---
+            "sudoku", "binarygrid", "cagemath", "signgrid" -> {
+                GridTutorialScreen(
+                    type = type,
+                    onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
+                    onTutorialSkipped = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) }
+                )
+            }
             "symmetry" -> {
                 SymmetryTutorialScreen(
                     onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
@@ -1254,6 +1287,15 @@ fun StartPuzzleScreen(
                 )
             }
 
+            // --- spatial puzzles (feat/puzzles-spatial) ---
+            in SpatialPuzzles.TYPES -> {
+                SpatialTutorialScreen(
+                    type = type,
+                    onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
+                    onTutorialSkipped = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) }
+                )
+            }
+
             // Wave 3: Logic/Other puzzles
             "flowpuzzle" -> {
                 FlowPuzzleTutorialScreen(
@@ -1396,10 +1438,14 @@ fun StartPuzzleScreen(
                                 }
 
                                 when (type.lowercase()) {
+                                    // --- word puzzles (feat/puzzles-word) ---
+                                    in WordPuzzleRegistry.TYPES -> showTutorial = true
                                     "\\uD83D\\uDDBC\\uFE0F image puzzle", "imagepuzzle", "crypto","wordsnake","division", "antonyms", "antonymballoon", "memorysquares", "synonyms",
                                     "mathestimation", "discounts", "conversion", "crossword", "pinballdeflector" -> {
                                         showTutorial = true
                                     }
+                                    // --- grid puzzles (feat/puzzles-grid) ---
+                                    "sudoku", "binarygrid", "cagemath", "signgrid" -> showTutorial = true
                                     else -> {
                                         try {
                                             AnalyticsManager.getInstance()?.track(AnalyticsEvent("tutorial_not_available_clicked", mapOf(
@@ -1514,10 +1560,14 @@ fun StartPuzzleScreen(
                         }
 
                         when (type.lowercase()) {
+                            // --- word puzzles (feat/puzzles-word) ---
+                            in WordPuzzleRegistry.TYPES -> showTutorial = true
                             "crypto","wordsnake","division", "antonyms", "antonymballoon", "memorysquares", "synonyms",
                             "mathestimation", "discounts", "conversion", "crossword", "pinballdeflector" -> {
                                 showTutorial = true
                             }
+                            // --- grid puzzles (feat/puzzles-grid) ---
+                            "sudoku", "binarygrid", "cagemath", "signgrid" -> showTutorial = true
                             else -> {
                                 Toast.makeText(
                                     context,
@@ -1736,6 +1786,10 @@ fun StartPuzzleScreen(
 
                     // Create a simple local puzzle instead of fetching from server
                     val localPuzzle = when (type) {
+                        // --- word puzzles (feat/puzzles-word) ---
+                        in WordPuzzleRegistry.TYPES -> WordPuzzleRegistry.createPuzzle(type, selectedDifficulty, context)
+                        // --- spatial puzzles (feat/puzzles-spatial) ---
+                        in SpatialPuzzles.TYPES -> SpatialPuzzles.generatePuzzle(type, selectedDifficulty)
                         "pinballdeflector" -> {
                             Log.d(TAG, "🎯 Generating local Pinball Deflector puzzle")
 
@@ -1939,6 +1993,8 @@ fun StartPuzzleScreen(
                             difficulty = selectedDifficulty,
                             options = emptyList()
                         )
+                        // --- grid puzzles (feat/puzzles-grid) ---
+                        "sudoku", "binarygrid", "cagemath", "signgrid" -> GridPuzzleFactory.createPuzzle(GridGame.fromKey(type)!!, selectedDifficulty)
                         "symmetry" -> {
                             Log.d(TAG, "🔄 Generating local Symmetry puzzle")
 
@@ -2186,6 +2242,10 @@ fun StartPuzzleScreen(
 
                                     // Create local puzzle immediately
                                     val localPuzzle = when (type) {
+                                        // --- word puzzles (feat/puzzles-word) ---
+                                        in WordPuzzleRegistry.TYPES -> WordPuzzleRegistry.createPuzzle(type, selectedDifficulty, context)
+                                        // --- spatial puzzles (feat/puzzles-spatial) ---
+                                        in SpatialPuzzles.TYPES -> SpatialPuzzles.generatePuzzle(type, selectedDifficulty)
                                         "memoryprevioussingle" -> {
                                             Log.d("StartPuzzle", "Generating local Memory Previous Single puzzle")
                                             val (questionJson, answerJson) = MemoryPreviousSingleGenerator.generatePuzzle(selectedDifficulty)
@@ -2256,6 +2316,8 @@ fun StartPuzzleScreen(
                                                 options = emptyList()
                                             )
                                         }
+                                        // --- grid puzzles (feat/puzzles-grid) ---
+                                        "sudoku", "binarygrid", "cagemath", "signgrid" -> GridPuzzleFactory.createPuzzle(GridGame.fromKey(type)!!, selectedDifficulty)
                                         "symmetry" -> {
                                             Log.d("StartPuzzle", "Generating local Symmetry puzzle")
                                             val (questionJson, answerJson) = SymmetryPuzzleGenerator.generatePuzzle(selectedDifficulty, context)
@@ -4063,6 +4125,7 @@ private fun MinimalSubscriptionPrompt(
 
 // Helper functions
 fun getPuzzleCategory(puzzleType: String): String {
+    NewGameInfo.of(puzzleType)?.let { return it.category }
     return when (puzzleType.lowercase()) {
         "wordassociation", "synonyms", "anagram", "connotationwords" -> "Speaking"
         "math", "mathestimation", "division", "subtraction" -> "Mathematics"
@@ -4073,6 +4136,7 @@ fun getPuzzleCategory(puzzleType: String): String {
 }
 
 fun getPuzzleBenefits(puzzleType: String): List<String> {
+    NewGameInfo.of(puzzleType)?.let { return it.benefits }
     return when (puzzleType.lowercase()) {
         "wordassociation" -> listOf(
             "Stop mixing up commonly confused words.",

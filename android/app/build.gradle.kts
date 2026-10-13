@@ -13,10 +13,10 @@ android {
 
     signingConfigs {
         create("release") {
-            storeFile = file(project.property("RELEASE_STORE_FILE") as String)
-            storePassword = project.property("RELEASE_STORE_PASSWORD") as String
-            keyAlias = project.property("RELEASE_KEY_ALIAS") as String
-            keyPassword = project.property("RELEASE_KEY_PASSWORD") as String
+            storeFile = file(providers.gradleProperty("ANDROID_UPLOAD_STORE_FILE").get())
+            storePassword = providers.gradleProperty("ANDROID_UPLOAD_STORE_PASSWORD").get()
+            keyAlias = providers.gradleProperty("ANDROID_UPLOAD_KEY_ALIAS").get()
+            keyPassword = providers.gradleProperty("ANDROID_UPLOAD_KEY_PASSWORD").get()
         }
     }
 
@@ -24,8 +24,8 @@ android {
         applicationId = "com.kreativekoala.riddleverse"
         minSdk = 26
         targetSdk = 36
-        versionCode = 175
-        versionName = "175.0"
+        versionCode = 176
+        versionName = "176.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL for sharing games

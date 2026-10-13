@@ -13,6 +13,7 @@ class PuzzleCompletionHandler(
 
     fun handlePuzzleCompletion(isCorrect: Boolean, inTime: Boolean = true, score: Int = 0) {
         Log.d(TAG, "🎯 Puzzle completed - correct: $isCorrect, inTime: $inTime")
+        PuzzleEvents.puzzleFinished(viewModel.getCurrentPuzzle(), viewModel.screenType.typeName, isCorrect, score)
 
         // Track answer in viewModel for ALL answers (correct AND incorrect)
         // This handles: media cleanup, timing, score, stats recording, streaks, analytics

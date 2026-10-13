@@ -40,6 +40,8 @@ enum class PuzzleScreenType(val typeName: String) {
     COLOR_SHAPE_MATCHING_SCREEN("Color Shape Matching Screen"),
     SYMBOL_SWIPE_SCREEN("Symbol Swipe Screen"),
     SYMMETRY_SCREEN("Symmetry Screen"),
+    // --- grid puzzles (feat/puzzles-grid) ---
+    GRID_PUZZLE_SCREEN("Grid Puzzle Screen"),
     NUMBER_SUM_SCREEN("Number Sum Screen"),
     IMAGE_VORTEX_SCREEN("Image Vortex Screen"),
     MATH_EXPRESSION_SCREEN("Math Expression Screen"),
@@ -57,8 +59,27 @@ enum class PuzzleScreenType(val typeName: String) {
     WALDO_PUZZLE_SCREEN("Waldo Puzzle Screen"),
     IMAGE_QUESTION_SCREEN("Image Question Screen"),
     FLOW_SCREEN("Flow Puzzle Screen"),
+    // --- spatial puzzles (feat/puzzles-spatial) ---
+    PIXEL_LOGIC_SCREEN("Pixel Logic Screen"),
+    TUBE_TINT_SCREEN("Tube Tint Screen"),
+    PIECE_PACK_SCREEN("Piece Pack Screen"),
+    CRATE_SHIFT_SCREEN("Crate Shift Screen"),
+    CONDUIT_SCREEN("Conduit Screen"),
     PROGRESSIVE_REVEAL("Progressive Reveal Screen"),
     REAL_OR_AI("Real or AI"),
+    // --- classic puzzles (feat/puzzles-classic) ---
+    TILE_MERGE_SCREEN("Tile Merge Screen"),
+    SLIDE_TILES_SCREEN("Slide Tiles Screen"),
+    LIGHT_FLIP_SCREEN("Light Flip Screen"),
+    SAFE_SWEEP_SCREEN("Safe Sweep Screen"),
+    DISC_TOWER_SCREEN("Disc Tower Screen"),
+    // --- word puzzles (feat/puzzles-word) ---
+    WORD_GUESS_SCREEN("Word Guess Screen"),
+    WORD_LADDER_SCREEN("Word Ladder Screen"),
+    LETTER_BALLOONS_SCREEN("Letter Balloons Screen"),
+    WORD_HIVE_SCREEN("Word Hive Screen"),
+    CODE_CRACKER_SCREEN("Code Cracker Screen"),
+    // --- end word puzzles ---
     WORD_SEARCH_SCREEN("Word Search Screen");
 
     companion object {

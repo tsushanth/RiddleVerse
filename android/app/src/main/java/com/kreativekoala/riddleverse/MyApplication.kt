@@ -35,6 +35,8 @@ class MyApplication : Application() {
         super.onCreate()
         FailureReporter.init(this, "riddleverse", "afr_2380403b6807a34c833fa412468daee3", BuildConfig.VERSION_NAME)
 
+        PuzzleEvents.init(this)
+
         // Initialize Firebase first (required early)
         FirebaseApp.initializeApp(this)
 

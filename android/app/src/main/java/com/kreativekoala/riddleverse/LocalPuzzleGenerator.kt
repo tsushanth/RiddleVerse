@@ -11,6 +11,11 @@ object LocalPuzzleGenerator {
         Log.d(TAG, "🔄 Generating local puzzle: type=$puzzleType, difficulty=$difficulty")
 
         return when (puzzleType) {
+            // --- word puzzles (feat/puzzles-word) ---
+            in WordPuzzleRegistry.TYPES -> WordPuzzleRegistry.createPuzzle(puzzleType, difficulty, context)
+            // --- spatial puzzles (feat/puzzles-spatial) ---
+            in SpatialPuzzles.TYPES -> SpatialPuzzles.generatePuzzle(puzzleType, difficulty)
+
             "memorypreviouspair" -> {
                 Log.d(TAG, "🧠 Generating local Memory Previous Pair puzzle")
                 val (questionJson, answerJson) = MemoryPreviousPairGenerator.generatePuzzle(difficulty)
@@ -70,6 +75,9 @@ object LocalPuzzleGenerator {
                     options = emptyList()
                 )
             }
+
+            // --- grid puzzles (feat/puzzles-grid) ---
+            "sudoku", "binarygrid", "cagemath", "signgrid" -> GridPuzzleFactory.createPuzzle(GridGame.fromKey(puzzleType)!!, difficulty)
 
             "symmetry" -> {
                 Log.d(TAG, "🔄 Generating local Symmetry puzzle")

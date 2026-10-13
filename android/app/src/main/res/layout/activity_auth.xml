@@ -1,14 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:padding="20dp">
+
+        <TextView
+            android:id="@+id/previewHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:text="@string/auth_preview_hint"
+            android:textColor="#B26A00"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/authTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/auth_title_sign_in"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:accessibilityHeading="true" />
+
+        <EditText
+            android:id="@+id/emailInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:hint="@string/auth_email_hint"
+            android:autofillHints="emailAddress"
+            android:inputType="textEmailAddress"
+            android:imeOptions="actionNext"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/passwordInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginTop="8dp"
+            android:hint="@string/auth_password_hint"
+            android:autofillHints="password"
+            android:inputType="textPassword"
+            android:imeOptions="actionDone"
+            android:maxLines="1" />
+
+        <CheckBox
+            android:id="@+id/showPasswordCheck"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/auth_show_password" />
+
+        <TextView
+            android:id="@+id/authError"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="#B00020"
+            android:textSize="14sp"
+            android:visibility="gone" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/emailSubmitButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:text="@string/auth_sign_in" />
+
+            <ProgressBar
+                android:id="@+id/authProgress"
+                style="?android:attr/progressBarStyleSmall"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/auth_loading"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <Button
+            android:id="@+id/toggleModeButton"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:text="@string/auth_toggle_to_create" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/auth_or" />
 
         <Button
             android:id="@+id/googleSignInButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:text="Sign in with Google" />
     </LinearLayout>
+</ScrollView>

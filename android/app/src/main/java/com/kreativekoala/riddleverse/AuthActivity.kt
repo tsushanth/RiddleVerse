@@ -17,6 +17,20 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.messaging.FirebaseMessaging
 import com.revenuecat.purchases.Purchases
+import android.text.InputType
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
+import com.kreativekoala.riddleverse.auth.AuthException
+import com.kreativekoala.riddleverse.auth.AuthFailure
+import com.kreativekoala.riddleverse.auth.SignUpResult
+import com.kreativekoala.riddleverse.auth.SupabaseAuth
+import com.kreativekoala.riddleverse.auth.SupabaseAuthCore
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +44,8 @@ class AuthActivity : AppCompatActivity() {
     private var analyticsManager: AnalyticsManager? = null
     private var sessionManager: AnalyticsSessionManager? = null
     private var signInStartTime: Long = 0
+    private var createMode = false
+    private var emailBusy = false
 
     companion object {
         private const val TAG = "GoogleSignIn"
@@ -109,6 +125,11 @@ class AuthActivity : AppCompatActivity() {
             return
         }
 
+        setupEmailAuthUi()
+        if (SupabaseAuth.repository(this).hasStoredSession()) {
+            trySilentSupabaseRestore()
+        }
+
         // Configure Google Sign-In with proper error handling
         try {
             val webClientId = getString(R.string.default_web_client_id).takeIf { it.isNotBlank() }
@@ -122,8 +143,9 @@ class AuthActivity : AppCompatActivity() {
             googleSignInClient = GoogleSignIn.getClient(this, gso)
         } catch (e: Exception) {
             Log.e(TAG, "Google Sign-In configuration failed", e)
-            Toast.makeText(this, "Sign-in configuration error", Toast.LENGTH_LONG).show()
-            finish()
+            // Not fatal any more: email sign-in still works.
+            showAuthError(getString(R.string.auth_google_config_error))
+            findViewById<Button>(R.id.googleSignInButton).isEnabled = false
             return
         }
 
@@ -198,8 +220,20 @@ class AuthActivity : AppCompatActivity() {
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
+                    completeSignIn("google", task.result?.additionalUserInfo?.isNewUser ?: false)
+                } else {
+                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    Toast.makeText(this, "Firebase authentication failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+    }
+
+    /**
+     * Shared completion for every sign-in method once FirebaseAuth.currentUser is set:
+     * analytics, RevenueCat login + attributes, navigation.
+     */
+    private fun completeSignIn(method: String, isNewUser: Boolean) {
                     val user = auth.currentUser
-                    val isNewUser = task.result?.additionalUserInfo?.isNewUser ?: false
 
                     // SET USER ID FOR ANALYTICS
                     safeTrackAnalytics {
@@ -212,7 +246,7 @@ class AuthActivity : AppCompatActivity() {
                         analyticsManager?.track(AnalyticsEvent("active_user", mapOf(
                             "user_id" to (user?.uid ?: "unknown"),
                             "user_email" to (user?.email ?: "unknown"),
-                            "method" to "google",
+                            "method" to method,
                             "is_new_user" to isNewUser,
                             "auth_duration_ms" to 5,
                             "session_id" to (sessionManager?.getCurrentSessionId() ?: "unknown"),
@@ -223,23 +257,23 @@ class AuthActivity : AppCompatActivity() {
 
                         // Track user type specifically
                         if (isNewUser) {
-                            analyticsManager?.track(AnalyticsEvent.userRegistration("google"))
+                            analyticsManager?.track(AnalyticsEvent.userRegistration(method))
                             analyticsManager?.track(AnalyticsEvent("new_active_user", mapOf(
                                 "user_id" to (user?.uid ?: "unknown"),
-                                "registration_method" to "google",
+                                "registration_method" to method,
                                 "onboarding_required" to true
                             )))
                         } else {
                             analyticsManager?.track(AnalyticsEvent("returning_active_user", mapOf(
                                 "user_id" to (user?.uid ?: "unknown"),
-                                "method" to "google",
+                                "method" to method,
                                 "last_sign_in" to (user?.metadata?.lastSignInTimestamp ?: 0),
                                 "days_since_last_login" to calculateDaysSinceLastLogin(user)
                             )))
                         }
 
                         // Track successful login
-                        analyticsManager?.track(AnalyticsEvent.userLogin("google"))
+                        analyticsManager?.track(AnalyticsEvent.userLogin(method))
                     }
 
                     // Set RevenueCat subscriber attributes for segmentation
@@ -255,15 +289,10 @@ class AuthActivity : AppCompatActivity() {
                                 }
                             }
                         )
-                        setRevenueCatAttributes(isNewUser)
+                        setRevenueCatAttributes(isNewUser, method)
                     }
 
-                    navigateToMainWithOnboardingCheck()
-                } else {
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    Toast.makeText(this, "Firebase authentication failed", Toast.LENGTH_SHORT).show()
-                }
-            }
+        navigateToMainWithOnboardingCheck()
     }
 
     private fun isReturningUser(): Boolean {
@@ -309,7 +338,8 @@ class AuthActivity : AppCompatActivity() {
             }
             CommonStatusCodes.DEVELOPER_ERROR -> {
                 // Status code 10 - Configuration error
-                Toast.makeText(this, "Configuration error. Please check:\n1. Web Client ID\n2. SHA-1 fingerprints\n3. Firebase configuration", Toast.LENGTH_LONG).show()
+                // Package/SHA not registered for Google Sign-In (e.g. preview/.dev builds).
+                showAuthError("Google sign-in isn't available for this build. Please use email sign-in below.")
                 Log.e(TAG, "DEVELOPER_ERROR (10) - Check configuration:\n" +
                         "1. Verify R.string.default_web_client_id matches Firebase Console\n" +
                         "2. Ensure SHA-1 fingerprints are registered\n" +
@@ -349,7 +379,7 @@ class AuthActivity : AppCompatActivity() {
      * These are used by RevenueCat Experiments, Charts, and the ad-optimizer
      * to correlate ad spend with actual revenue per campaign/source.
      */
-    private fun setRevenueCatAttributes(isNewUser: Boolean) {
+    private fun setRevenueCatAttributes(isNewUser: Boolean, method: String = "google") {
         try {
             val purchases = Purchases.sharedInstance
             val user = auth.currentUser
@@ -375,7 +405,7 @@ class AuthActivity : AppCompatActivity() {
 
             // Custom attributes for our ad-optimizer integration
             attrs["is_new_user"] = isNewUser.toString()
-            attrs["auth_method"] = "google"
+            attrs["auth_method"] = method
             attrs["app_version"] = getAppVersion()
 
             purchases.setAttributes(attrs)
@@ -385,8 +415,129 @@ class AuthActivity : AppCompatActivity() {
         }
     }
 
+    // ---------------------------------------------------------------------
+    // Email / password (Supabase) -> Firebase custom token bridge
+    // ---------------------------------------------------------------------
+
+    private fun showAuthError(msg: String?) {
+        val tv = findViewById<TextView>(R.id.authError)
+        tv.text = msg.orEmpty()
+        tv.visibility = if (msg.isNullOrEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun setEmailBusy(busy: Boolean) {
+        emailBusy = busy
+        findViewById<ProgressBar>(R.id.authProgress).visibility = if (busy) View.VISIBLE else View.GONE
+        val submit = findViewById<Button>(R.id.emailSubmitButton)
+        submit.isEnabled = !busy
+        submit.text = if (busy) "" else getString(if (createMode) R.string.auth_create else R.string.auth_sign_in)
+        findViewById<Button>(R.id.toggleModeButton).isEnabled = !busy
+        findViewById<EditText>(R.id.emailInput).isEnabled = !busy
+        findViewById<EditText>(R.id.passwordInput).isEnabled = !busy
+    }
+
+    private fun applyMode() {
+        findViewById<TextView>(R.id.authTitle).setText(if (createMode) R.string.auth_title_create else R.string.auth_title_sign_in)
+        findViewById<Button>(R.id.emailSubmitButton).setText(if (createMode) R.string.auth_create else R.string.auth_sign_in)
+        findViewById<Button>(R.id.toggleModeButton).setText(if (createMode) R.string.auth_toggle_to_sign_in else R.string.auth_toggle_to_create)
+        showAuthError(null)
+    }
+
+    private fun setupEmailAuthUi() {
+        if (BuildConfig.DEBUG) findViewById<TextView>(R.id.previewHint).visibility = View.VISIBLE
+        val password = findViewById<EditText>(R.id.passwordInput)
+        findViewById<CheckBox>(R.id.showPasswordCheck).setOnCheckedChangeListener { _, show ->
+            password.inputType = InputType.TYPE_CLASS_TEXT or
+                if (show) InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD else InputType.TYPE_TEXT_VARIATION_PASSWORD
+            password.setSelection(password.text.length)
+        }
+        findViewById<Button>(R.id.toggleModeButton).setOnClickListener {
+            if (!emailBusy) { createMode = !createMode; applyMode() }
+        }
+        findViewById<Button>(R.id.emailSubmitButton).setOnClickListener { submitEmailAuth() }
+        password.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) { submitEmailAuth(); true } else false
+        }
+    }
+
+    private fun submitEmailAuth() {
+        if (emailBusy) return
+        val email = findViewById<EditText>(R.id.emailInput).text.toString()
+        val pw = findViewById<EditText>(R.id.passwordInput).text.toString()
+        val invalid = SupabaseAuthCore.validateInput(email, pw)
+        if (invalid != null) { showAuthError(invalid); return }
+        showAuthError(null)
+        setEmailBusy(true)
+        val repo = SupabaseAuth.repository(this)
+        val creating = createMode
+        lifecycleScope.launch {
+            try {
+                val exchange = withContext(Dispatchers.IO) {
+                    val session = if (creating) {
+                        when (val r = repo.signUp(email, pw)) {
+                            is SignUpResult.SignedIn -> r.session
+                            SignUpResult.ConfirmationRequired -> null
+                        }
+                    } else repo.signIn(email, pw)
+                    session?.let { repo.exchange(it) }
+                }
+                if (exchange == null) {
+                    setEmailBusy(false)
+                    createMode = false
+                    applyMode()
+                    showAuthError(getString(R.string.auth_confirm_email))
+                    return@launch
+                }
+                signInFirebaseWithCustomToken(exchange.firebaseCustomToken, exchange.isNew, creating)
+            } catch (e: AuthException) {
+                setEmailBusy(false)
+                Log.w(TAG, "email auth failed: ${e.failure}")
+                showAuthError(SupabaseAuthCore.userMessage(e))
+            } catch (e: Exception) {
+                setEmailBusy(false)
+                Log.w(TAG, "email auth failed unexpectedly: ${e.javaClass.simpleName}")
+                showAuthError(SupabaseAuthCore.userMessage(AuthException(AuthFailure.UNKNOWN)))
+            }
+        }
+    }
+
+    private fun signInFirebaseWithCustomToken(token: String, isNew: Boolean, @Suppress("UNUSED_PARAMETER") fromSignUp: Boolean) {
+        auth.signInWithCustomToken(token).addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                completeSignIn("email", isNew)
+            } else {
+                setEmailBusy(false)
+                Log.w(TAG, "signInWithCustomToken failed: ${task.exception?.javaClass?.simpleName}")
+                showAuthError("Couldn't finish signing in. Please try again.")
+            }
+        }
+    }
+
+    /** Firebase session is gone but a Supabase one is stored: silently re-exchange. */
+    private fun trySilentSupabaseRestore() {
+        setEmailBusy(true)
+        val repo = SupabaseAuth.repository(this)
+        lifecycleScope.launch {
+            try {
+                val ex = withContext(Dispatchers.IO) { repo.silentExchange() }
+                if (ex == null) {
+                    setEmailBusy(false)
+                } else {
+                    signInFirebaseWithCustomToken(ex.firebaseCustomToken, false, false)
+                }
+            } catch (e: Exception) {
+                // Network/503/etc: fall back to the manual form; stored session is kept for next time.
+                setEmailBusy(false)
+                val msg = (e as? AuthException)?.let { SupabaseAuthCore.userMessage(it) }
+                Log.w(TAG, "silent restore failed: ${(e as? AuthException)?.failure ?: e.javaClass.simpleName}")
+                showAuthError(msg)
+            }
+        }
+    }
+
     fun signOut() {
         auth.signOut()
+        SupabaseAuth.clearSession(this)
         googleSignInClient.signOut().addOnCompleteListener(this) {
             // Restart auth activity
             val intent = Intent(this, AuthActivity::class.java)

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.NewGameInfo
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -127,6 +128,7 @@ fun TutorialBanner(
  * Utility function to get display names for different puzzle types
  */
 fun getPuzzleDisplayName(puzzleType: String): String {
+    NewGameInfo.of(puzzleType)?.let { return it.name }
     return when (puzzleType.lowercase()) {
         "division" -> "Division Puzzles"
         "subtraction" -> "Subtraction Puzzles"

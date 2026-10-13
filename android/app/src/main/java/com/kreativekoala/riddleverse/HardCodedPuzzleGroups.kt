@@ -7,6 +7,18 @@ object HardcodedPuzzleGroups {
 
     fun getAllGroups(context: Context? = null, userId: String? = null): List<PuzzleGroup> {
         val baseGroups = listOf(
+            // --- spatial puzzles (feat/puzzles-spatial) ---
+            PuzzleGroup(
+                id = "spatial_lab",
+                name = "Spatial Lab",
+                description = "Grid logic, sorting, packing and path puzzles",
+                puzzleTypes = SpatialPuzzles.TYPES.toList(),
+                completedTypes = emptySet(),
+                category = "Logic",
+                difficulty = "Medium",
+                totalTypes = SpatialPuzzles.TYPES.size
+            ),
+
 
 
 
@@ -77,6 +89,18 @@ object HardcodedPuzzleGroups {
                 category = "English",
                 difficulty = "Easy",
                 totalTypes = 4
+            ),
+
+            // --- word puzzles (feat/puzzles-word) ---
+            PuzzleGroup(
+                id = "word_games_plus",
+                name = "Word Games Plus",
+                description = "Guess, climb, build and crack with words and codes",
+                puzzleTypes = listOf("wordguess", "wordladder", "letterballoons", "wordhive", "codecracker"),
+                completedTypes = emptySet(),
+                category = "English",
+                difficulty = "Mixed",
+                totalTypes = 5
             ),
 
             PuzzleGroup(

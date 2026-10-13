@@ -90,7 +90,11 @@ class TutorialPreferences(private val context: Context) {
             // Basic types
             "qa", "multiplechoice"
         )
-        return puzzleType.lowercase().replace(" ", "").replace("_", "") in supportedTypes
+        // classic + word + spatial puzzles ship their own tutorials
+        return puzzleType.lowercase().replace(" ", "").replace("_", "") in supportedTypes ||
+            ClassicPuzzles.isClassic(puzzleType) ||
+            WordPuzzleRegistry.isWordPuzzleType(puzzleType) ||
+            SpatialPuzzles.isSpatial(puzzleType)
     }
 
     /**

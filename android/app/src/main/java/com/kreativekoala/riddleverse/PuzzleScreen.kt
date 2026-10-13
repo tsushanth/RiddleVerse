@@ -58,6 +58,15 @@ fun PuzzleScreen(
         PuzzleCompletionHandler(viewModel, context, onComplete)
     }
 
+    // Puzzle telemetry: start on first compose, abandon when the screen is left without a result.
+    DisposableEffect(currentPuzzle.puzzleId) {
+        PuzzleEvents.puzzleShown(currentPuzzle, viewModel.screenType.typeName)
+        onDispose {
+            val changing = (context as? android.app.Activity)?.isChangingConfigurations == true
+            PuzzleEvents.puzzleLeft(currentPuzzle, viewModel.screenType.typeName, changing)
+        }
+    }
+
     // Route to appropriate screen based on puzzle type
     when (viewModel.screenType) {
         PuzzleScreenType.SENTENCE_TRANSITIONS_SCREEN -> {
@@ -124,11 +133,33 @@ fun PuzzleScreen(
             )
         }
 
+        // --- word puzzles (feat/puzzles-word) ---
+        PuzzleScreenType.WORD_GUESS_SCREEN, PuzzleScreenType.WORD_LADDER_SCREEN, PuzzleScreenType.LETTER_BALLOONS_SCREEN,
+        PuzzleScreenType.WORD_HIVE_SCREEN, PuzzleScreenType.CODE_CRACKER_SCREEN -> {
+            WordPuzzleScreenWrapper(
+                currentPuzzle = currentPuzzle,
+                viewModel = viewModel,
+                onBack = onBack,
+                handlePuzzleCompletion = completionHandler::handlePuzzleCompletion
+            )
+        }
+        // --- end word puzzles ---
+
         PuzzleScreenType.SYMMETRY_SCREEN -> {
             SymmetryScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,
                 context = context,
+                onBack = onBack,
+                handlePuzzleCompletion = completionHandler::handlePuzzleCompletion
+            )
+        }
+
+        // --- grid puzzles (feat/puzzles-grid) ---
+        PuzzleScreenType.GRID_PUZZLE_SCREEN -> {
+            GridPuzzleScreenWrapper(
+                currentPuzzle = currentPuzzle,
+                viewModel = viewModel,
                 onBack = onBack,
                 handlePuzzleCompletion = completionHandler::handlePuzzleCompletion
             )
@@ -299,6 +330,20 @@ fun PuzzleScreen(
 
         PuzzleScreenType.FLOW_SCREEN -> {
             FlowPuzzleScreenWrapper(
+                currentPuzzle = currentPuzzle,
+                viewModel = viewModel,
+                onBack = onBack,
+                handlePuzzleCompletion = completionHandler::handlePuzzleCompletion
+            )
+        }
+
+        // --- spatial puzzles (feat/puzzles-spatial) ---
+        PuzzleScreenType.PIXEL_LOGIC_SCREEN,
+        PuzzleScreenType.TUBE_TINT_SCREEN,
+        PuzzleScreenType.PIECE_PACK_SCREEN,
+        PuzzleScreenType.CRATE_SHIFT_SCREEN,
+        PuzzleScreenType.CONDUIT_SCREEN -> {
+            SpatialPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,
                 onBack = onBack,
@@ -573,6 +618,17 @@ fun PuzzleScreen(
 
         PuzzleScreenType.MEMORY_RETENTION_SCREEN -> {
             MemoryRetentionScreenWrapper(
+                currentPuzzle = currentPuzzle,
+                viewModel = viewModel,
+                onBack = onBack,
+                handlePuzzleCompletion = completionHandler::handlePuzzleCompletion
+            )
+        }
+
+        // --- classic puzzles (feat/puzzles-classic) ---
+        PuzzleScreenType.TILE_MERGE_SCREEN, PuzzleScreenType.SLIDE_TILES_SCREEN, PuzzleScreenType.LIGHT_FLIP_SCREEN,
+        PuzzleScreenType.SAFE_SWEEP_SCREEN, PuzzleScreenType.DISC_TOWER_SCREEN -> {
+            ClassicPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,
                 onBack = onBack,

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_preview_hint">Preview build</string>
+    <string name="auth_title_sign_in">Sign in</string>
+    <string name="auth_title_create">Create account</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Password</string>
+    <string name="auth_show_password">Show password</string>
+    <string name="auth_sign_in">Sign in</string>
+    <string name="auth_create">Create account</string>
+    <string name="auth_toggle_to_create">New here? Create an account</string>
+    <string name="auth_toggle_to_sign_in">Already have an account? Sign in</string>
+    <string name="auth_or">or</string>
+    <string name="auth_loading">Loading</string>
+    <string name="auth_google_config_error">Google sign-in isn\'t available in this build. Please sign in with your email and password instead.</string>
+    <string name="auth_confirm_email">Account created. Check your email to confirm it, then sign in.</string>
+</resources>

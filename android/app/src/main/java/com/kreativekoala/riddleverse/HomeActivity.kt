@@ -510,6 +510,7 @@ fun HomeScreen(navController: NavHostController,
                     },
                     onSignOut = {
                         FirebaseAuth.getInstance().signOut()
+                        com.kreativekoala.riddleverse.auth.SupabaseAuth.clearSession(context)
                         val intent = Intent(context, WelcomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         context.startActivity(intent)
@@ -748,6 +749,7 @@ fun CategoriesTab(
         "English" to allCategories.count { it.filterCategory == "English" },
         "Memory" to allCategories.count { it.filterCategory == "Memory" },
         "Visual" to allCategories.count { it.filterCategory == "Visual" },
+        "Logic" to allCategories.count { it.filterCategory == "Logic" },
         "General" to allCategories.count { it.filterCategory == "General" }
     )
 
@@ -1131,6 +1133,8 @@ fun isOfflinePuzzleType(puzzleType: String): Boolean {
         "contextswitch",
         "mathcrossword",
         "symmetry",
+        // --- grid puzzles (feat/puzzles-grid) ---
+        "sudoku", "binarygrid", "cagemath", "signgrid",
         "trainrouting",
         "pinballdeflector",
         "memorypreviouspair",
@@ -1156,7 +1160,11 @@ fun isOfflinePuzzleType(puzzleType: String): Boolean {
         "mathcomparison"
     )
 
-    return offlinePuzzleTypes.contains(puzzleType)
+    // classic + word + spatial puzzles are fully local
+    return offlinePuzzleTypes.contains(puzzleType) ||
+        ClassicPuzzles.isClassic(puzzleType) ||
+        WordPuzzleRegistry.isWordPuzzleType(puzzleType) ||
+        SpatialPuzzles.isSpatial(puzzleType)
 }
 
 fun getImageResourceForCategory(categoryType: String): Int? {
