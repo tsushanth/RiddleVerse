@@ -64,6 +64,10 @@ const puzzleTypeNames = {
   signgrid: 'Sign Grid',
   // --- end web grid puzzles ---
 }
+// --- web word puzzles (feat/web-puzzles-word) ---
+import { wordPuzzleNames, WORD_PUZZLE_TYPES } from '../components/puzzles/word/wordPuzzleRegistry.js'
+Object.assign(puzzleTypeNames, wordPuzzleNames)
+// --- end web word puzzles ---
 
 // --- web classic puzzles (feat/web-puzzles-classic) ---
 import { classicTypeNames, isClassicType } from '../components/puzzles/classic/classicRegistry'
@@ -461,7 +465,7 @@ export default function PuzzlePage() {
                     )}
                     {(() => {
                       // Don't show raw JSON answers for complex puzzle types that handle their own feedback
-                      const selfHandledTypes = ['realorai','which_is_real','synonyms','antonyms','synonymgrouping','antonymballoon','memorystory','memoryretention','memorysquares','memorypreviouspair','memoryprevioussingle','memorysequencing','uniqueobject','colorshapematching','triangledotmemory','symmetry','imagepuzzle','wordsearch','crossword','wordsnake','letterset','wordprefix']
+                      const selfHandledTypes = ['realorai','which_is_real','synonyms','antonyms','synonymgrouping','antonymballoon','memorystory','memoryretention','memorysquares','memorypreviouspair','memoryprevioussingle','memorysequencing','uniqueobject','colorshapematching','triangledotmemory','symmetry','imagepuzzle','wordsearch','crossword','wordsnake','letterset','wordprefix', ...WORD_PUZZLE_TYPES /* web word puzzles */]
                       const answerStr = typeof puzzle.answer === 'string' ? puzzle.answer : JSON.stringify(puzzle.answer)
                       const isSelfHandled = selfHandledTypes.includes(type) || selfHandledTypes.includes(puzzle.puzzleType) || isClassicType(type) // web classic puzzles
                       const isJsonAnswer = answerStr.startsWith('{') || answerStr.startsWith('[')
@@ -477,7 +481,7 @@ export default function PuzzlePage() {
                 ) : (
                   <div className="space-y-2">
                     {(() => {
-                      const selfHandledTypes = ['realorai','which_is_real','synonyms','antonyms','synonymgrouping','antonymballoon','memorystory','memoryretention','memorysquares','memorypreviouspair','memoryprevioussingle','memorysequencing','uniqueobject','colorshapematching','triangledotmemory','symmetry','imagepuzzle','wordsearch','crossword','wordsnake','letterset','wordprefix']
+                      const selfHandledTypes = ['realorai','which_is_real','synonyms','antonyms','synonymgrouping','antonymballoon','memorystory','memoryretention','memorysquares','memorypreviouspair','memoryprevioussingle','memorysequencing','uniqueobject','colorshapematching','triangledotmemory','symmetry','imagepuzzle','wordsearch','crossword','wordsnake','letterset','wordprefix', ...WORD_PUZZLE_TYPES /* web word puzzles */]
                       const answerStr = typeof puzzle.answer === 'string' ? puzzle.answer : JSON.stringify(puzzle.answer)
                       const isSelfHandled = selfHandledTypes.includes(type) || selfHandledTypes.includes(puzzle.puzzleType) || isClassicType(type) // web classic puzzles
                       const isJsonAnswer = answerStr.startsWith('{') || answerStr.startsWith('[')
