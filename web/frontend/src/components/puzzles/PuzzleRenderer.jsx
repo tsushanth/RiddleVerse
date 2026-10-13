@@ -207,6 +207,10 @@ import { gridRenderers, gridTypeMap } from './grid/gridRegistry'
 Object.assign(typeMap, gridTypeMap)
 Object.assign(renderers, gridRenderers)
 // --- end web grid puzzles ---
+// --- web classic puzzles (feat/web-puzzles-classic) ---
+import { classicTypeMap, classicRenderers } from './classic/classicRegistry'
+Object.assign(typeMap, classicTypeMap)
+Object.assign(renderers, classicRenderers)
 
 /**
  * Determines which renderer to use based on puzzle type and data shape.
