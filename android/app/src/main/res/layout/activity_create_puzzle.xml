@@ -12,10 +12,10 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Top spacing to push content below status bar -->
+        <!-- Small top gap; the status bar inset is added by applyRvEdgeToEdge() (no hard-coded status bar height) -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="40dp" />
+            android:layout_height="12dp" />
 
         <!-- Modern Header Section with Card Design -->
         <androidx.cardview.widget.CardView
@@ -147,7 +147,8 @@
                 <EditText
                     android:id="@+id/topicInput"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
                     android:hint="Enter your custom topic..."
                     android:textSize="16sp"
                     android:paddingStart="24dp"
@@ -267,7 +268,8 @@
                 <Spinner
                     android:id="@+id/formatDropdown"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="60dp"
                     android:background="#F8F9FA"
                     android:layout_marginBottom="8dp" />
 
@@ -324,7 +326,8 @@
             <Button
                 android:id="@+id/generateButton"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="wrap_content"
+                    android:minHeight="60dp"
                 android:text="🚀 Generate Puzzle"
                 android:textSize="18sp"
                 android:textStyle="bold"

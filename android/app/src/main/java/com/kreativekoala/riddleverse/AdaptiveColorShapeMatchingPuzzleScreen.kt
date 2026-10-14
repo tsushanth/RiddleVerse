@@ -474,7 +474,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                     onClick = { handleAnswer(false) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .heightIn(min = 60.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = RvError
                     ),
@@ -502,7 +502,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                     onClick = { handleAnswer(true) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
+                        .heightIn(min = 60.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = RvSuccess
                     ),

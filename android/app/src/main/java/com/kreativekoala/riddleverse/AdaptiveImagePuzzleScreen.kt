@@ -1296,7 +1296,7 @@ private fun AdaptiveImagePuzzleInstructions(
             onClick = onStartGame,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp)
+                .heightIn(min = 56.dp)
                 .testTag("image_start"),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0B7A57))
         ) {
@@ -2309,7 +2309,7 @@ private fun AdaptiveImagePuzzleCompletionScreen(
             onClick = onContinue,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
         ) {
             Text(

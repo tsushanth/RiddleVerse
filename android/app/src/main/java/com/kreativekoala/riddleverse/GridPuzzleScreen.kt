@@ -144,7 +144,9 @@ fun GridPuzzleContent(
         val controlsH = 56.dp
         val padH = 52.dp * padRows + 8.dp * (padRows - 1)
         val gaps = 8.dp * 4 + 12.dp
-        val side = minOf(maxWidth - 24.dp, maxHeight - headerH - controlsH - padH - gaps).coerceAtLeast(200.dp)
+        val side = com.kreativekoala.riddleverse.ui.BoardFit.squareSide(
+            maxWidth.value, maxHeight.value, (headerH + controlsH + padH + gaps).value, hPad = 24f, minSide = 200f
+        ).dp
 
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 12.dp),
@@ -173,7 +175,9 @@ fun GridPuzzleContent(
     if (state.status != GridStatus.PLAYING && !finished) {
         val won = state.status == GridStatus.WON
         AlertDialog(
-            onDismissRequest = {},
+            // Back = Continue; tapping outside is ignored.
+            onDismissRequest = { finished = true; onGameComplete(won, if (won) state.score() else 0) },
+            properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
             title = { Text(if (won) "Solved!" else "Out of lives") },
             text = {
                 Text(

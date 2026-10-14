@@ -631,7 +631,7 @@ private fun GroupEAnswerButton(text: String, enabled: Boolean, onClick: () -> Un
     Button(
         onClick = onClick,
         enabled = enabled,
-        modifier = modifier.height(64.dp),
+        modifier = modifier.heightIn(min = 64.dp),
         shape = RoundedCornerShape(18.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = RvViolet,

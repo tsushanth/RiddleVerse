@@ -218,7 +218,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">Earn coins when players enjoy your games!</string>
-    <string name="creator_revenue_share">You get 55%% of coins spent on your games</string>
+    <string name="creator_revenue_share" formatted="false">You get 55% of coins spent on your games</string>
     <string name="coins_earned">Coins Earned</string>
     <string name="plays_monetized">Plays Monetized</string>
     <string name="per_game">Per Game</string>

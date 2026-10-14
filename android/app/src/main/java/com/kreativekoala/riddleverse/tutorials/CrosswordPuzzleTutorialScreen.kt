@@ -536,7 +536,7 @@ fun TutorialKeyboardButton(
         onClick = onClick,
         modifier = modifier
             .padding(horizontal = 3.dp)
-            .height(56.dp)
+            .heightIn(min = 56.dp)
             .scale(scale),
         colors = ButtonDefaults.buttonColors(
             containerColor = backgroundColor

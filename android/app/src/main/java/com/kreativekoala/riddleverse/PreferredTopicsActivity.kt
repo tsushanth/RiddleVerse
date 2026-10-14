@@ -43,8 +43,10 @@ class PreferredTopicsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             MaterialTheme {
-                PreferredTopicsScreen {
-                    finish() // Close activity and return to previous screen
+                com.kreativekoala.riddleverse.ui.RvScreenHost {
+                    PreferredTopicsScreen {
+                        finish() // Close activity and return to previous screen
+                    }
                 }
             }
         }

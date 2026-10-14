@@ -168,7 +168,7 @@
     <string name="unable_to_load_progress">Tidak dapat memuat data progres</string>
     <string name="custom_puzzles">Puzzle Kustom</string>
     <string name="earn_coins_from_games">Dapatkan koin saat pemain menikmati permainan Anda!</string>
-    <string name="creator_revenue_share">Anda mendapat 55%% koin yang dihabiskan di permainan Anda</string>
+    <string name="creator_revenue_share" formatted="false">Anda mendapat 55% koin yang dihabiskan di permainan Anda</string>
     <string name="coins_earned">Koin Diperoleh</string>
     <string name="plays_monetized">Permainan yang Dimonetisasi</string>
     <string name="per_game">Per Permainan</string>

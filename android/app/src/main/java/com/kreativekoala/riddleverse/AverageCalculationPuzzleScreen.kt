@@ -437,7 +437,7 @@ fun CalculatorGrid(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = RvViolet,
                 disabledContainerColor = RvDisabled
@@ -465,7 +465,7 @@ fun AverageCalculatorButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(56.dp),
+        modifier = modifier.heightIn(min = 56.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = when {
                 isSpecial -> RvError.copy(alpha = 0.25f)

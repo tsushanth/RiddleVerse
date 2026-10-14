@@ -125,7 +125,18 @@ fun WaldoPuzzleScreenWrapper(
     var errorMessage by remember { mutableStateOf("") }
 
     // Parse puzzle data on first composition
-    LaunchedEffect(currentPuzzle.puzzleId) {
+    var loadAttempt by remember { mutableStateOf(0) }
+    // Never sit on an endless loading screen: after 20s with no puzzle, show the error screen (retry / skip).
+    LaunchedEffect(currentPuzzle.puzzleId, loadAttempt) {
+        kotlinx.coroutines.delay(20_000)
+        if (isLoading && puzzleData == null) {
+            errorMessage = "This puzzle is taking too long to load. Please try again."
+            hasError = true
+            isLoading = false
+        }
+    }
+
+    LaunchedEffect(currentPuzzle.puzzleId, loadAttempt) {
         try {
             Log.d(TAG, "📄 Raw question data: ${currentPuzzle.question}")
 
@@ -282,6 +293,7 @@ fun WaldoPuzzleScreenWrapper(
                     Log.d(TAG, "🔄 Retrying puzzle load")
                     isLoading = true
                     hasError = false
+                    loadAttempt++
                 },
                 onSkip = {
                     Log.d(TAG, "⭐ Skipping puzzle due to error")
@@ -301,6 +313,19 @@ fun WaldoPuzzleScreenWrapper(
                     handlePuzzleCompletion(isComplete, isComplete, score)
                 },
                 onBack = onBack
+            )
+        }
+
+        else -> {
+            // Not loading, no error, no data: previously rendered nothing (blank white screen).
+            WaldoErrorScreen(
+                message = "The puzzle could not be loaded. Please try again.",
+                onRetry = {
+                    isLoading = true
+                    hasError = false
+                    loadAttempt++
+                },
+                onSkip = { handlePuzzleCompletion(false, false, 0) }
             )
         }
     }

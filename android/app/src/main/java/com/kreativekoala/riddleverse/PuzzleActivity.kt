@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.RvCanvas
 import com.kreativekoala.riddleverse.ui.theme.RvError
 import com.kreativekoala.riddleverse.ui.theme.RvInk
@@ -172,7 +173,7 @@ class PuzzleActivity : AppCompatActivity() {
         // FIXED: PuzzleActivity.kt - Update the completion LaunchedEffect in onCreate()
 
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 var showCompletion by remember { mutableStateOf(false) }
 
                 if (showCompletion) {

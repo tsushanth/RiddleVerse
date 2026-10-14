@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -56,7 +57,7 @@ class LeaderboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 LeaderboardScreen()
             }
         }

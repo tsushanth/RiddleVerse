@@ -869,7 +869,7 @@ private fun SimpleInstructionsScreen(
             onClick = onStartGame,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(
@@ -1015,7 +1015,7 @@ private fun SimpleGameScreen(
                 enabled = enabled,
                 modifier = Modifier
                     .weight(1f)
-                    .height(64.dp),
+                    .heightIn(min = 64.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvSky,
                     disabledContainerColor = RvSky.copy(alpha = 0.35f)
@@ -1029,7 +1029,7 @@ private fun SimpleGameScreen(
                 enabled = enabled,
                 modifier = Modifier
                     .weight(1f)
-                    .height(64.dp),
+                    .heightIn(min = 64.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvSky,
                     disabledContainerColor = RvSky.copy(alpha = 0.35f)

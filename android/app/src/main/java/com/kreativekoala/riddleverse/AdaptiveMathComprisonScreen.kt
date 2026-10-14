@@ -1600,7 +1600,7 @@ fun AdaptiveAnswerButton(
         enabled = enabled,
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp),
+            .heightIn(min = 56.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = animatedColor,
             disabledContainerColor = animatedColor.copy(alpha = 0.6f)

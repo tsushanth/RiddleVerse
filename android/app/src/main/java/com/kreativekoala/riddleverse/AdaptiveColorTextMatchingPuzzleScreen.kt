@@ -911,7 +911,7 @@ private fun AdaptiveColorTextInstructionsScreen(
             onClick = onStartGame,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
         ) {
             Text(
@@ -1157,7 +1157,7 @@ private fun AdaptiveColorTextGameScreen(
                     onClick = { onAnswer(false) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(64.dp),
+                        .heightIn(min = 64.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (adaptiveConfig.visualHints && !currentStep.isMatch)
                             Color(0xFF4CAF50) else Color(0xFF3B82F6)
@@ -1170,7 +1170,7 @@ private fun AdaptiveColorTextGameScreen(
                     onClick = { onAnswer(true) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(64.dp),
+                        .heightIn(min = 64.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (adaptiveConfig.visualHints && currentStep.isMatch)
                             Color(0xFF4CAF50) else Color(0xFF3B82F6)
@@ -1305,7 +1305,7 @@ private fun AdaptiveColorTextCompletionScreen(
             onClick = onContinue,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981))
         ) {
             Text(

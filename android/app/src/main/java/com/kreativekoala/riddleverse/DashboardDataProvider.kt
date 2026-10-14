@@ -150,10 +150,7 @@ class DashboardDataProvider(
      * Format puzzle type name for display
      */
     private fun formatPuzzleTypeName(puzzleType: String): String {
-        return puzzleType.split("(?=[A-Z])".toRegex())
-            .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
-            .replace("wordsearch", "Word Search")
-            .replace("wordsnake", "Word Snake")
+        return PuzzleTypeNames.display(puzzleType)
     }
 
     /**

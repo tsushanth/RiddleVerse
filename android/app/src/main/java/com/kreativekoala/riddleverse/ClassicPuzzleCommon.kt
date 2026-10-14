@@ -182,7 +182,9 @@ fun ClassicResultDialog(
     onContinue: () -> Unit,
 ) {
     AlertDialog(
-        onDismissRequest = {},
+        // Back = the same as the button (Continue / Next puzzle). Tapping outside stays ignored so a stray touch cannot skip the result.
+        onDismissRequest = onContinue,
+        properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         title = { Text(headline, fontWeight = FontWeight.Bold) },
         text = {
             Column {

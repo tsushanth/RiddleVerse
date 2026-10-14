@@ -520,7 +520,7 @@ fun TutorialContinueButton(
     Button(
         onClick = onClick,
         modifier = modifier
-            .height(56.dp)
+            .heightIn(min = 56.dp)
             .alpha(pulseAlpha)
             .then(
                 if (isHighlighted) {

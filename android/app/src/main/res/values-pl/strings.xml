@@ -212,7 +212,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">Zdobywaj monety, gdy gracze cieszą się Twoimi grami!</string>
-    <string name="creator_revenue_share">Otrzymujesz 55%% monet wydanych na Twoje gry</string>
+    <string name="creator_revenue_share" formatted="false">Otrzymujesz 55% monet wydanych na Twoje gry</string>
     <string name="coins_earned">Zdobyte monety</string>
     <string name="plays_monetized">Zmonetyzowane rozgrywki</string>
     <string name="per_game">Na grę</string>

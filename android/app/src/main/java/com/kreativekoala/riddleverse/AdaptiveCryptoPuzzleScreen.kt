@@ -476,7 +476,8 @@ fun AdaptiveCryptoWordScreenWithTimer(
     // Game Over dialog
     if (gameOver) {
         AlertDialog(
-            onDismissRequest = { },
+            onDismissRequest = onBack, // Back = the Back button
+            properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
             confirmButton = {
                 Button(
                     onClick = {
@@ -888,7 +889,7 @@ fun AdaptiveLetterSelectionKeyboard(
                         onClick = { onLetterSelected(letter) },
                         enabled = selectedNumber != null && (!isUsed || isCorrectMapping),
                         // 10 keys share the width (a fixed 32dp key overflowed 320-360dp phones).
-                        modifier = Modifier.weight(1f).height(48.dp),
+                        modifier = Modifier.weight(1f).heightIn(min = 48.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = when {
                                 !isUsed && selectedNumber != null -> RvSkyEdge
@@ -934,7 +935,8 @@ private fun AdaptiveQuoteRevealDialog(
     }
 
     AlertDialog(
-        onDismissRequest = { },
+        onDismissRequest = onContinue, // Back = Continue
+        properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         confirmButton = {
             Button(
                 onClick = onContinue,

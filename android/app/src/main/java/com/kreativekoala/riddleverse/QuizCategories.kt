@@ -163,15 +163,15 @@ object QuizCategories {
                 // Fallback for new/unmapped puzzle types
                 when {
                     puzzleType.contains("math", ignoreCase = true) ->
-                        QuizCategory(puzzleType.replaceFirstChar { it.uppercase() }, "Mathematical Challenge", Icons.Default.Calculate, puzzleType, "Math")
+                        QuizCategory(PuzzleTypeNames.display(puzzleType), "Mathematical Challenge", Icons.Default.Calculate, puzzleType, "Math")
                     puzzleType.contains("memory", ignoreCase = true) ->
-                        QuizCategory(puzzleType.replaceFirstChar { it.uppercase() }, "Memory Challenge", Icons.Default.Psychology, puzzleType, "Memory")
+                        QuizCategory(PuzzleTypeNames.display(puzzleType), "Memory Challenge", Icons.Default.Psychology, puzzleType, "Memory")
                     puzzleType.contains("word", ignoreCase = true) ->
-                        QuizCategory(puzzleType.replaceFirstChar { it.uppercase() }, "Word Challenge", Icons.Default.TextFields, puzzleType, "English")
+                        QuizCategory(PuzzleTypeNames.display(puzzleType), "Word Challenge", Icons.Default.TextFields, puzzleType, "English")
                     puzzleType.contains("geography", ignoreCase = true) ->
-                        QuizCategory(puzzleType.replaceFirstChar { it.uppercase() }, "Geography Challenge", Icons.Default.Public, puzzleType, "Geography")
+                        QuizCategory(PuzzleTypeNames.display(puzzleType), "Geography Challenge", Icons.Default.Public, puzzleType, "Geography")
                     else ->
-                        QuizCategory(puzzleType.replaceFirstChar { it.uppercase() }, "Brain Challenge", Icons.Default.Extension, puzzleType, "General")
+                        QuizCategory(PuzzleTypeNames.display(puzzleType), "Brain Challenge", Icons.Default.Extension, puzzleType, "General")
                 }
             }
         }

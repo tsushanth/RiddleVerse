@@ -490,7 +490,7 @@ fun DualCardPuzzleScreen(
                     ) {
                         Button(
                             onClick = { handleAnswer(false) },
-                            modifier = Modifier.weight(1f).height(56.dp),
+                            modifier = Modifier.weight(1f).heightIn(min = 56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = RvSkyEdge),
                             shape = RoundedCornerShape(28.dp)
                         ) {
@@ -498,7 +498,7 @@ fun DualCardPuzzleScreen(
                         }
                         Button(
                             onClick = { handleAnswer(true) },
-                            modifier = Modifier.weight(1f).height(56.dp),
+                            modifier = Modifier.weight(1f).heightIn(min = 56.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = RvSkyEdge),
                             shape = RoundedCornerShape(28.dp)
                         ) {

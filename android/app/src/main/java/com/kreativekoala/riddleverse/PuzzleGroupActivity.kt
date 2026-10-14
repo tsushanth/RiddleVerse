@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.app.Activity
 import android.content.Context
@@ -76,7 +77,7 @@ class PuzzleGroupActivity : AppCompatActivity() {
         }
 
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 PuzzleGroupScreen(
                     groupId = groupId,
                     groupName = groupName,
@@ -88,7 +89,7 @@ class PuzzleGroupActivity : AppCompatActivity() {
                         // Use launcher instead of direct startActivity
                         val intent = Intent(this@PuzzleGroupActivity, StartPuzzleActivity::class.java).apply {
                             putExtra("puzzleType", puzzleType)
-                            putExtra("title", NewGameInfo.of(puzzleType)?.name ?: puzzleType.replaceFirstChar { it.uppercaseChar() })
+                            putExtra("title", PuzzleTypeNames.display(puzzleType))
                             putExtra("sourceGroupId", groupId)
                             putExtra("sourceGroupName", groupName)
                         }
@@ -606,7 +607,7 @@ fun getPuzzleTypeDisplayInfo(puzzleType: String): PuzzleTypeDisplayInfo {
         "connotationwords" -> PuzzleTypeDisplayInfo("Word Connotations", Icons.Default.Psychology)
         "subtraction" -> PuzzleTypeDisplayInfo("Subtraction", Icons.Default.Remove)
         "mathtipping" -> PuzzleTypeDisplayInfo("Tip Calculation", Icons.Default.RestaurantMenu)
-        else -> PuzzleTypeDisplayInfo(NewGameInfo.of(puzzleType)?.name ?: puzzleType.replaceFirstChar { it.uppercaseChar() }, Icons.Default.Extension)
+        else -> PuzzleTypeDisplayInfo(PuzzleTypeNames.display(puzzleType), Icons.Default.Extension)
     }
 }
 

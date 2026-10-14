@@ -214,7 +214,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">玩家喜欢您的游戏时，您就能赚取金币！</string>
-    <string name="creator_revenue_share">您获得游戏中消耗金币的55%%</string>
+    <string name="creator_revenue_share" formatted="false">您获得游戏中消耗金币的55%</string>
     <string name="coins_earned">已赚取金币</string>
     <string name="plays_monetized">已变现次数</string>
     <string name="per_game">每个游戏</string>

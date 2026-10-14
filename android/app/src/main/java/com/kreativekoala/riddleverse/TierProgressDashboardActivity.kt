@@ -32,7 +32,9 @@ class TierProgressDashboardActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RealDataTierProgressDashboard(onBackClick = { finish() })
+            com.kreativekoala.riddleverse.ui.RvScreenHost {
+                RealDataTierProgressDashboard(onBackClick = { finish() })
+            }
         }
     }
 }

@@ -1275,7 +1275,7 @@ fun ResultsPhase(
                         // Grid toggle button
                         Button(
                             onClick = { showResultsGrid = !showResultsGrid },
-                            modifier = Modifier.height(32.dp),
+                            modifier = Modifier.heightIn(min = 32.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = if (showResultsGrid) Color.Yellow.copy(alpha = 0.8f) else Color.Gray.copy(alpha = 0.6f)
                             ),
@@ -1593,7 +1593,7 @@ fun ResultsPhase(
                 onClick = onContinue,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Cyan)
             ) {
                 Text(

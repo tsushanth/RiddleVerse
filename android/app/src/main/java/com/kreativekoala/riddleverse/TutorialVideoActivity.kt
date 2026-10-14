@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import android.content.Context
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -32,7 +33,7 @@ class TutorialVideoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 TutorialVideoScreen(
                     onClose = { finish() }
                 )

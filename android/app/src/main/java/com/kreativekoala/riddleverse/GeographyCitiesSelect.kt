@@ -707,6 +707,7 @@ private fun GeographyInstructionsScreen(
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
+            .padding(bottom = 12.dp) // breathing room above the gesture bar / 3-button bar
     ) {
         Column(
             modifier = Modifier
@@ -788,7 +789,7 @@ private fun GeographyInstructionsScreen(
                 onClick = onStartGame,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
             ) {
                 Text(
@@ -806,7 +807,7 @@ private fun GeographyInstructionsScreen(
                     onClick = onEnterTestingMode,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .heightIn(min = 48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9500))
                 ) {
                     Text(
@@ -1711,7 +1712,7 @@ private fun GeographyCompletionScreen(
             onClick = onContinue,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(

@@ -426,7 +426,7 @@ fun JumbleInputScreen(
                 Button(
                     onClick = onSkipClick,
                     enabled = !isAnswered,
-                    modifier = Modifier.weight(1f).height(56.dp),
+                    modifier = Modifier.weight(1f).heightIn(min = 56.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = RvSurfaceRaised,
@@ -440,7 +440,7 @@ fun JumbleInputScreen(
                 Button(
                     onClick = onSubmitClick,
                     enabled = !isAnswered && currentInput.isNotEmpty(),
-                    modifier = Modifier.weight(1.6f).height(56.dp),
+                    modifier = Modifier.weight(1.6f).heightIn(min = 56.dp),
                     contentPadding = PaddingValues(horizontal = 8.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = RvViolet,
@@ -459,7 +459,7 @@ fun JumbleInputScreen(
                 Button(
                     onClick = onBackspaceClick,
                     enabled = !isAnswered && currentInput.isNotEmpty(),
-                    modifier = Modifier.width(56.dp).height(56.dp),
+                    modifier = Modifier.width(56.dp).heightIn(min = 56.dp),
                     contentPadding = PaddingValues(0.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = RvSurfaceRaised,

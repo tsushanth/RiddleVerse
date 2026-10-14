@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
@@ -45,7 +46,7 @@ class WelcomeOnboardingActivity : AppCompatActivity() {
         AnalyticsManager.getInstance()?.track(AnalyticsEvent.tutorialStart())
         trackScreenView("onboarding_welcome")
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 WelcomeOnboardingScreen(
                     onComplete = {
                         val duration = (System.currentTimeMillis() - tutorialStartTime) / 1000.0
@@ -416,7 +417,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
                 onClick = onComplete,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvSurfaceRaised,
                     contentColor = Color(0xFF667EEA)
@@ -481,7 +482,7 @@ fun OnboardingBottomBar(
                 onClick = onNext,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvSurface,
                     contentColor = RvInk

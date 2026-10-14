@@ -168,7 +168,7 @@
     <string name="unable_to_load_progress">İlerleme verileri yüklenemedi</string>
     <string name="custom_puzzles">Özel Bulmacalar</string>
     <string name="earn_coins_from_games">Oyuncular oyunlarınızı beğendiğinde jeton kazanın!</string>
-    <string name="creator_revenue_share">Oyunlarınızda harcanan jetonların 55%%\'ini alırsınız</string>
+    <string name="creator_revenue_share" formatted="false">Oyunlarınızda harcanan jetonların 55%\'ini alırsınız</string>
     <string name="coins_earned">Kazanılan Jetonlar</string>
     <string name="plays_monetized">Para Kazandıran Oynanmalar</string>
     <string name="per_game">Oyun Başına</string>

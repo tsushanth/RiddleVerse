@@ -1,6 +1,7 @@
 package com.kreativekoala.riddleverse
 
 import com.kreativekoala.riddleverse.NewGameInfo
+import com.kreativekoala.riddleverse.PuzzleTypeNames
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
@@ -151,6 +152,6 @@ fun getPuzzleDisplayName(puzzleType: String): String {
         "storypuzzle" -> "Story Puzzles"
         "antonyms" -> "Antonym Puzzles"
         "find_object" -> "Find Objects"
-        else -> "This Puzzle"
+        else -> PuzzleTypeNames.display(puzzleType)
     }
 }

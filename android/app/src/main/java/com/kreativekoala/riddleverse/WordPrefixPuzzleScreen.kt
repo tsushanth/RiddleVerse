@@ -858,7 +858,7 @@ fun EnhancedStatsRow(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvSuccess
                 ),
-                modifier = Modifier.height(32.dp),
+                modifier = Modifier.heightIn(min = 32.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
             ) {
                 Text(
@@ -1866,7 +1866,7 @@ fun WordPrefixCompletionScreen(
                     onClick = onContinue,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .heightIn(min = 56.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = RvSuccess
                     ),

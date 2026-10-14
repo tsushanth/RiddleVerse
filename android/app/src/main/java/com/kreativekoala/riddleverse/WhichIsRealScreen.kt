@@ -559,7 +559,7 @@ fun WhichIsRealScreen(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(56.dp),
+                                        .heightIn(min = 56.dp),
                                     colors = ButtonDefaults.buttonColors(
                                         containerColor = RvViolet
                                     ),
@@ -717,7 +717,7 @@ fun WhichIsRealWelcomeScreen(
                 onClick = onStart,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvViolet
                 ),
@@ -1170,7 +1170,7 @@ fun ReasoningDialog(
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Text(

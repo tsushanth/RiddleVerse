@@ -137,7 +137,9 @@ fun SpatialResultDialog(
     onSecondary: () -> Unit = {}
 ) {
     AlertDialog(
-        onDismissRequest = {},
+        // Back = the primary button; tapping outside is ignored.
+        onDismissRequest = onPrimary,
+        properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 if (success && stars > 0) {

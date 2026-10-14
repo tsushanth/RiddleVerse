@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.CappedFontScale
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -391,6 +392,8 @@ fun QuickActionsRow(
             )
         }
 
+        // Fixed-size tiles: let text follow the system font size up to 1.15x, beyond that wrap/ellipsis inside the tile.
+        CappedFontScale(1.15f) {
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -431,6 +434,7 @@ fun QuickActionsRow(
                     onClick = { onPuzzleSelected(recent.puzzleType) }
                 )
             }
+        }
         }
     }
 }
@@ -753,7 +757,7 @@ fun PuzzleCard(
                     .padding(8.dp)
             ) {
                 Text(
-                    text = category?.title ?: puzzleType,
+                    text = category?.title ?: PuzzleTypeNames.display(puzzleType),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
@@ -783,7 +787,7 @@ fun FavoriteQuickCard(
 
     Card(
         modifier = Modifier
-            .size(80.dp)
+            .size(88.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = RvSurface),
@@ -837,11 +841,12 @@ fun FavoriteQuickCard(
 
                     if (imageResource == null) {
                     Text(
-                            text = category?.title?.split(" ")?.firstOrNull() ?: favorite.puzzleType,
-                            fontSize = 9.sp,
+                            text = category?.title ?: PuzzleTypeNames.display(favorite.puzzleType),
+                            fontSize = 10.sp,
+                            lineHeight = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.Center
                         )
@@ -851,11 +856,12 @@ fun FavoriteQuickCard(
             // Clean label band under the image
             if (imageResource != null) {
                 Text(
-                    text = category?.title?.split(" ")?.firstOrNull() ?: favorite.puzzleType,
-                    fontSize = 9.sp,
+                    text = category?.title ?: PuzzleTypeNames.display(favorite.puzzleType),
+                    fontSize = 10.sp,
+                    lineHeight = 11.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = RvInk,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
@@ -876,7 +882,7 @@ fun RandomChallengeCard(
 ) {
     Card(
         modifier = Modifier
-            .size(80.dp)
+            .size(88.dp)
             .clickable(enabled = isEnabled) { onClick() },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
@@ -1211,7 +1217,7 @@ suspend fun getPersonalizedRecommendations(
                         val category = getQuizCategoryForType(favorite.puzzleType)
                         recommendations.add(RecommendedPuzzle(
                             puzzleType = suggestedType,
-                            reason = "Based on ${category?.title ?: favorite.puzzleType}",
+                            reason = "Based on ${category?.title ?: PuzzleTypeNames.display(favorite.puzzleType)}",
                             similarityScore = 0.8
                         ))
                     }
@@ -1251,7 +1257,7 @@ fun DailyQuickActionCard(
 
     Card(
         modifier = Modifier
-            .size(80.dp)
+            .size(88.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = RvSurface),
@@ -1319,11 +1325,12 @@ fun DailyQuickActionCard(
 
                     if (imageResource == null) {
                     Text(
-                            text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
-                            fontSize = 8.sp,
+                            text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                            fontSize = 10.sp,
+                            lineHeight = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.Center
                         )
@@ -1344,7 +1351,7 @@ fun RecentQuickCard(
 
     Card(
         modifier = Modifier
-            .size(80.dp)
+            .size(88.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = RvSurface),
@@ -1412,11 +1419,12 @@ fun RecentQuickCard(
 
                     if (imageResource == null) {
                     Text(
-                            text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
-                            fontSize = 8.sp,
+                            text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                            fontSize = 10.sp,
+                            lineHeight = 11.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.Center
                         )
@@ -1426,11 +1434,12 @@ fun RecentQuickCard(
             // Clean label band under the image
             if (imageResource != null) {
                 Text(
-                    text = category?.title?.split(" ")?.firstOrNull() ?: puzzleType,
-                    fontSize = 8.sp,
+                    text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                    fontSize = 10.sp,
+                    lineHeight = 11.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = RvInk,
-                    maxLines = 1,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     textAlign = TextAlign.Center,
                     modifier = Modifier

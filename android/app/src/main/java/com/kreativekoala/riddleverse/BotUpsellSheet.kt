@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.verticalScroll
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Context
 import android.content.Intent
@@ -44,7 +45,7 @@ fun BotUpsellSheet(
             colors = CardDefaults.cardColors(containerColor = RvCanvas)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Close button row
@@ -92,7 +93,7 @@ fun BotUpsellSheet(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .heightIn(min = 48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF0088CC)),
                     shape = RoundedCornerShape(12.dp)
                 ) {
@@ -109,7 +110,7 @@ fun BotUpsellSheet(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .heightIn(min = 48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
                     shape = RoundedCornerShape(12.dp)
                 ) {

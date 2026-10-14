@@ -1010,7 +1010,7 @@ fun ContinueButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(56.dp),
+        modifier = modifier.heightIn(min = 56.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = RvSuccess
         ),

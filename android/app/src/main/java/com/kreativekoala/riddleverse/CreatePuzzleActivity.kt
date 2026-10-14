@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.applyRvEdgeToEdge
 import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
@@ -303,6 +304,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_create_puzzle)
+        applyRvEdgeToEdge()
 
         supportActionBar?.hide()
 

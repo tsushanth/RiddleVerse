@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import android.content.Intent
 import android.os.Handler
 import android.os.Looper
@@ -172,7 +173,7 @@ class DailyCompletionActivity : AppCompatActivity() {
         }
 
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 DailyCompletionScreen(
                     completionType = completionType,
                     isCustomPuzzle = isCustomPuzzle,
@@ -485,7 +486,7 @@ class DailyCompletionActivity : AppCompatActivity() {
             "math" -> "Math Puzzles"
             "trivia" -> "Trivia"
             "brainteaser" -> "Brain Teasers"
-            else -> puzzleType.replaceFirstChar { it.uppercase() }
+            else -> PuzzleTypeNames.display(puzzleType)
         }
     }
 }

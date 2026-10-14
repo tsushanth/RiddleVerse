@@ -212,7 +212,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">Dapatkan syiling apabila pemain menikmati permainan anda!</string>
-    <string name="creator_revenue_share">Anda mendapat 55%% syiling yang dibelanjakan untuk permainan anda</string>
+    <string name="creator_revenue_share" formatted="false">Anda mendapat 55% syiling yang dibelanjakan untuk permainan anda</string>
     <string name="coins_earned">Syiling Diperoleh</string>
     <string name="plays_monetized">Permainan Dimonetisasi</string>
     <string name="per_game">Setiap Permainan</string>

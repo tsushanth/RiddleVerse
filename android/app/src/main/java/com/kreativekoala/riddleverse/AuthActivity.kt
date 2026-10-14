@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.applyRvEdgeToEdge
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -87,6 +88,7 @@ class AuthActivity : AppCompatActivity() {
         }
         Timber.d("Firebase apps: ${FirebaseApp.getApps(this)}")
         setContentView(R.layout.activity_auth)
+        applyRvEdgeToEdge()
 
         auth = FirebaseAuth.getInstance()
 

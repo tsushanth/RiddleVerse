@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.layout.onSizeChanged
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.RvCanvas
 import com.kreativekoala.riddleverse.ui.theme.RvError
 import com.kreativekoala.riddleverse.ui.theme.RvGrape
@@ -115,7 +117,7 @@ class StartPuzzleActivity : AppCompatActivity() {
         val dailyTopic = intent.getStringExtra("dailyTopic") // NEW
         val userEmail = intent.getStringExtra("userEmail") // NEW
         val puzzleType = intent.getStringExtra("puzzleType") ?: "Unknown"
-        val title = intent.getStringExtra("title") ?: "Unknown"
+        val title = intent.getStringExtra("title")?.takeIf { it.isNotBlank() } ?: PuzzleTypeNames.display(puzzleType)
         val isCustomPuzzle = intent.getBooleanExtra("isCustomPuzzle", false)
         val customPuzzleId = intent.getStringExtra("customPuzzleId")
 
@@ -138,7 +140,7 @@ class StartPuzzleActivity : AppCompatActivity() {
 
 
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 StartPuzzleScreen(
                     quizTitle = title,
                     type = puzzleType,
@@ -1393,6 +1395,11 @@ fun StartPuzzleScreen(
     val actualUserName = currentUser?.displayName ?: userName
     val localScore = remember { UserScoreStore.load(context) }
 
+    // Measured height of the floating button bar, so the scrolling content always ends above it
+    // (a fixed 140dp was too short with large fonts or a second button row).
+    val floatingBarDensity = androidx.compose.ui.platform.LocalDensity.current
+    var floatingBarHeight by remember { mutableStateOf(140.dp) }
+
     // 🚀 MAIN UI WITH FLOATING BUTTONS
     Box(
         modifier = Modifier.fillMaxSize()
@@ -1406,7 +1413,7 @@ fun StartPuzzleScreen(
                 )
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp)
-                .padding(bottom = 140.dp) // 🚀 CRITICAL: Add bottom padding for floating buttons
+                .padding(bottom = maxOf(140.dp, floatingBarHeight)) // keep content scrollable above the floating buttons
         ) {
             // Header with close button and actions
             Row(
@@ -2195,6 +2202,7 @@ fun StartPuzzleScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
+                .onSizeChanged { floatingBarHeight = with(floatingBarDensity) { it.height.toDp() } }
                 .background(
                     Brush.verticalGradient(
                         colors = listOf(
@@ -2489,7 +2497,7 @@ fun StartPuzzleScreen(
                     onClick = { showRemixSheet = true },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .heightIn(min = 48.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
                     shape = RoundedCornerShape(28.dp),
                     contentPadding = PaddingValues(0.dp)
@@ -2538,7 +2546,7 @@ fun StartPuzzleScreen(
                     shape = RoundedCornerShape(28.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp),
+                        .heightIn(min = 48.dp),
                     border = BorderStroke(1.dp, RvViolet.copy(alpha = 0.5f)),
                     colors = ButtonDefaults.outlinedButtonColors(
                         contentColor = RvViolet
@@ -3838,7 +3846,7 @@ private fun ActionButtonsSection(
             onClick = onRetry,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
+                .heightIn(min = 48.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = RvViolet
             ),
@@ -3864,7 +3872,7 @@ private fun ActionButtonsSection(
             onClick = onBack,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp),
+                .heightIn(min = 48.dp),
             border = BorderStroke(1.dp, RvViolet.copy(alpha = 0.5f)),
             shape = RoundedCornerShape(24.dp)
         ) {
@@ -4126,6 +4134,7 @@ private fun MinimalSubscriptionPrompt(
 // Helper functions
 fun getPuzzleCategory(puzzleType: String): String {
     NewGameInfo.of(puzzleType)?.let { return it.category }
+    PuzzleTypeNames.categoryLabel(puzzleType)?.let { return it }
     return when (puzzleType.lowercase()) {
         "wordassociation", "synonyms", "anagram", "connotationwords" -> "Speaking"
         "math", "mathestimation", "division", "subtraction" -> "Mathematics"

@@ -168,7 +168,7 @@
     <string name="unable_to_load_progress">ไม่สามารถโหลดข้อมูลความคืบหน้าได้</string>
     <string name="custom_puzzles">ปริศนากำหนดเอง</string>
     <string name="earn_coins_from_games">รับเหรียญเมื่อผู้เล่นสนุกกับเกมของคุณ!</string>
-    <string name="creator_revenue_share">คุณได้รับ 55%% ของเหรียญที่ใช้ในเกมของคุณ</string>
+    <string name="creator_revenue_share" formatted="false">คุณได้รับ 55% ของเหรียญที่ใช้ในเกมของคุณ</string>
     <string name="coins_earned">เหรียญที่ได้รับ</string>
     <string name="plays_monetized">การเล่นที่สร้างรายได้</string>
     <string name="per_game">ต่อเกม</string>

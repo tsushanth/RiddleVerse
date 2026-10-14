@@ -436,7 +436,7 @@ private fun ColorTextInstructionsScreen(
             onClick = onStartGame,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(
@@ -629,7 +629,7 @@ private fun ColorTextGameScreen(
                     onClick = { onAnswer(false) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(64.dp),
+                        .heightIn(min = 64.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = RvSky)
                 ) {
                     Text("NO", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvOnTone)
@@ -639,7 +639,7 @@ private fun ColorTextGameScreen(
                     onClick = { onAnswer(true) },
                     modifier = Modifier
                         .weight(1f)
-                        .height(64.dp),
+                        .heightIn(min = 64.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = RvSky)
                 ) {
                     Text("YES", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvOnTone)
@@ -718,7 +718,7 @@ private fun ColorTextCompletionScreen(
             onClick = onContinue,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .heightIn(min = 56.dp),
             colors = ButtonDefaults.buttonColors(containerColor = RvSuccess)
         ) {
             Text(

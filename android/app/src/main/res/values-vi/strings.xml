@@ -168,7 +168,7 @@
     <string name="unable_to_load_progress">Không thể tải dữ liệu tiến trình</string>
     <string name="custom_puzzles">Câu đố tùy chỉnh</string>
     <string name="earn_coins_from_games">Kiếm xu khi người chơi thích trò chơi của bạn!</string>
-    <string name="creator_revenue_share">Bạn nhận 55%% xu chi tiêu trên trò chơi của bạn</string>
+    <string name="creator_revenue_share" formatted="false">Bạn nhận 55% xu chi tiêu trên trò chơi của bạn</string>
     <string name="coins_earned">Xu đã kiếm</string>
     <string name="plays_monetized">Lượt chơi kiếm tiền</string>
     <string name="per_game">Mỗi trò chơi</string>

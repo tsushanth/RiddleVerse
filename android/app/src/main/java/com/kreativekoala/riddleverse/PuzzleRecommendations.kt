@@ -138,7 +138,7 @@ object PuzzleRecommendations {
             val neverPlayed = statsManager?.getPuzzleStats(recommendedType)?.totalPlays == 0
             RecommendationData(
                 puzzleType = recommendedType,
-                displayName = category?.title ?: recommendedType.replaceFirstChar { it.uppercase() },
+                displayName = category?.title ?: PuzzleTypeNames.display(recommendedType),
                 subtitle = if (neverPlayed) "You've never tried this!" else (category?.subtitle ?: "Brain Challenge"),
                 isNew = neverPlayed || QuizCategories.isPuzzleTypeNew(recommendedType),
                 neverPlayed = neverPlayed

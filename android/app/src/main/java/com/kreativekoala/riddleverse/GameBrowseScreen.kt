@@ -741,7 +741,7 @@ fun GameBrowseContent(context: android.content.Context) {
                         elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
                     ) {
                         Column(
-                            modifier = Modifier.padding(24.dp).fillMaxWidth(),
+                            modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp).fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text("\uD83C\uDFAE", fontSize = 40.sp)
@@ -1050,7 +1050,7 @@ private fun BrowseGameCard(
                     Button(
                         onClick = onPlay,
                         enabled = !isDownloading,
-                        modifier = Modifier.height(40.dp),
+                        modifier = Modifier.heightIn(min = 40.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = RvViolet,

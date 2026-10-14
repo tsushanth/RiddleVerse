@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.os.Bundle
 import android.util.Log
@@ -89,7 +90,7 @@ class PuzzleLeaderboardActivity : AppCompatActivity() {
         } else null
 
         setContent {
-            RiddleVerseTheme {
+            RvActivityTheme {
                 PuzzleLeaderboardScreen(
                     puzzleId = puzzleId,
                     puzzleName = puzzleName,

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Intent
 import com.revenuecat.purchases.Purchases
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         if (!magicLinkToken.isNullOrBlank()) {
             Log.d("MainActivity", "Magic link auth token received")
             setContent {
-                RiddleVerseTheme {
+                RvActivityTheme {
                     DeepLinkLoadingScreen()
                 }
             }
@@ -156,7 +157,7 @@ class MainActivity : AppCompatActivity() {
         if (!puzzleId.isNullOrBlank()) {
             // Show loading state immediately
             setContent {
-                RiddleVerseTheme {
+                RvActivityTheme {
                     DeepLinkLoadingScreen()
                 }
             }
@@ -210,7 +211,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             Log.d("MainActivity", "No user logged in, showing welcome screen")
             setContent {
-                RiddleVerseTheme {
+                RvActivityTheme {
                     WelcomeScreen(onGetStartedClick = {
                         startActivity(Intent(this@MainActivity, WelcomeActivity::class.java))
                         finish()

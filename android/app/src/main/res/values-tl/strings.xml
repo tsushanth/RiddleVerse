@@ -212,7 +212,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">Kumita ng barya kapag nag-eenjoy ang mga manlalaro sa iyong mga laro!</string>
-    <string name="creator_revenue_share">Makukuha mo ang 55%% ng barya na ginastos sa iyong mga laro</string>
+    <string name="creator_revenue_share" formatted="false">Makukuha mo ang 55% ng barya na ginastos sa iyong mga laro</string>
     <string name="coins_earned">Baryang Nakuha</string>
     <string name="plays_monetized">Mga Laro na Namonetize</string>
     <string name="per_game">Bawat Laro</string>

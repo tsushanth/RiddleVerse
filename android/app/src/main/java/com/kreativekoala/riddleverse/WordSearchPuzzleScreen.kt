@@ -985,7 +985,7 @@ fun CompactWordHintItem(
             Button(
                 onClick = onRevealWord,
                 modifier = Modifier
-                    .height(24.dp)
+                    .heightIn(min = 24.dp)
                     .padding(horizontal = 4.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvFlame.copy(alpha = 0.1f),
@@ -1027,7 +1027,7 @@ fun EnhancedWordSearchCompletionDialog(
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -1304,7 +1304,7 @@ fun DoubleTapInfoDialog(
             shape = RoundedCornerShape(16.dp)
         ) {
             Column(
-                modifier = Modifier.padding(24.dp),
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
@@ -1536,7 +1536,7 @@ fun WordHintItem(
             // Show button for words that haven't been found or revealed
             Button(
                 onClick = onRevealWord,
-                modifier = Modifier.height(32.dp),
+                modifier = Modifier.heightIn(min = 32.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvFlame.copy(alpha = 0.1f),
                     contentColor = RvFlame

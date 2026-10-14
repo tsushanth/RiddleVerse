@@ -1,6 +1,9 @@
 // AdaptiveTipBubblePuzzleScreen.kt - Enhanced with adaptive difficulty
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.draw.clipToBounds
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -92,6 +95,10 @@ fun TipBubblePuzzleScreen(
     var gamesPlayedThisSession by remember { mutableStateOf(0) }
 
     var bubbles by remember { mutableStateOf(listOf<TipBubble>()) }
+    // Bubbles float only below the header/bill card (never over the status bar or the top bar), and are
+    // sized so four columns always fit the width (120dp x 4 does not fit any phone narrower than ~520dp).
+    var playTop by remember { mutableStateOf(0.dp) }
+    val bubbleSizeDp = TipBubbleLayout.bubbleSizeDp(screenWidth.value)
     var gameActive by remember { mutableStateOf(true) }
     var hasAnswered by remember { mutableStateOf(false) }
     var selectedBubbleId by remember { mutableStateOf<String?>(null) }
@@ -288,9 +295,9 @@ fun TipBubblePuzzleScreen(
 
             // Shuffle and assign X positions for 4 columns with proper spacing
             val shuffledBubbles = newBubbles.shuffled()
-            val bubbleSize = 120f
+            val bubbleSize = bubbleSizeDp
             val totalWidth = screenWidth.value
-            val padding = 20f
+            val padding = TipBubbleLayout.SIDE_PADDING_DP
             val availableWidth = totalWidth - (2 * padding) - (4 * bubbleSize)
             val spacingBetween = availableWidth / 3f
 
@@ -338,7 +345,7 @@ fun TipBubblePuzzleScreen(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             // Enhanced Top Bar with adaptive difficulty info
             AdaptiveTipBubbleTopGameBar(
@@ -426,7 +433,10 @@ fun TipBubblePuzzleScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 40.dp),
+                    .padding(horizontal = 24.dp)
+                    .onGloballyPositioned { c ->
+                        playTop = with(density) { (c.positionInParent().y + c.size.height).toDp() } + 8.dp
+                    },
                 colors = CardDefaults.cardColors(
                     containerColor = RvSurface
                 ),
@@ -501,10 +511,13 @@ fun TipBubblePuzzleScreen(
         }
 
         // Bubbles Layer
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().padding(top = playTop).clipToBounds()) {
+            // Bubble text is sized from the bubble, so ignore the system font scale inside the circles.
+            com.kreativekoala.riddleverse.ui.CappedFontScale(1.0f) {
             bubbles.forEach { bubble ->
                 TipBubbleComponent(
                     bubble = bubble,
+                    sizeDp = bubbleSizeDp,
                     isSelected = selectedBubbleId == bubble.id,
                     onBubbleTapped = { tappedBubble ->
                         if (!hasAnswered) {
@@ -599,6 +612,7 @@ fun TipBubblePuzzleScreen(
                         )
                 )
             }
+            }
         }
 
         EnhancedUniversalFeedback(feedbackManager)
@@ -608,6 +622,7 @@ fun TipBubblePuzzleScreen(
 @Composable
 fun TipBubbleComponent(
     bubble: TipBubble,
+    sizeDp: Float = 120f,
     isSelected: Boolean,
     onBubbleTapped: (TipBubble) -> Unit,
     modifier: Modifier = Modifier
@@ -621,7 +636,7 @@ fun TipBubbleComponent(
 
     Card(
         modifier = modifier
-            .size(120.dp)
+            .size(sizeDp.dp)
             .scale(scale)
             .shadow(8.dp, CircleShape)
             .clickable { onBubbleTapped(bubble) },
@@ -652,13 +667,14 @@ fun TipBubbleComponent(
             ) {
                 Text(
                     text = "$",
-                    fontSize = 16.sp,
+                    fontSize = (sizeDp * 0.13f).sp,
                     color = if (isSelected) RvInk else RvInk,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = String.format("%.2f", bubble.tipAmount),
-                    fontSize = 18.sp,
+                    fontSize = (sizeDp * 0.15f).sp,
+                    maxLines = 1,
                     fontWeight = FontWeight.Bold,
                     color = if (isSelected) RvInk else RvInk,
                     textAlign = TextAlign.Center
@@ -891,4 +907,15 @@ fun generateTipCalculationFromDifficulty(
     difficultyLevel: DifficultyManager.DifficultyLevel
 ): TipCalculation {
     return generator.generateForLevel(difficultyLevel)
+}
+
+/** Pure sizing for the tip bubbles so four columns always fit across [widthDp]. */
+object TipBubbleLayout {
+    const val SIDE_PADDING_DP = 12f
+    const val MIN_GAP_DP = 6f
+    const val MAX_SIZE_DP = 120f
+    const val MIN_SIZE_DP = 56f
+
+    fun bubbleSizeDp(widthDp: Float): Float =
+        ((widthDp - 2 * SIDE_PADDING_DP - 3 * MIN_GAP_DP) / 4f).coerceIn(MIN_SIZE_DP, MAX_SIZE_DP)
 }

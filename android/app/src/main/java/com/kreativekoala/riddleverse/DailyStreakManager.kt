@@ -634,7 +634,7 @@ fun DailyStreakGiftDialog(
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp)
+                            .heightIn(min = 48.dp)
                             .scale(closeButtonScale),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = RvSuccess

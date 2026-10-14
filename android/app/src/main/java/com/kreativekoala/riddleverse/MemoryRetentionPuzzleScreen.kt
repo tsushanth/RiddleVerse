@@ -645,7 +645,7 @@ private fun AudioIntroScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = if (compact) 4.dp else 16.dp)
-                    .height(56.dp),
+                    .heightIn(min = 56.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = RvViolet
                 ),

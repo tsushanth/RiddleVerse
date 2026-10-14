@@ -1,5 +1,8 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.verticalScroll
+import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.Intent
@@ -43,6 +46,7 @@ import okio.IOException
 import org.json.JSONObject
 import com.google.gson.Gson
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -239,7 +243,7 @@ fun HomeScreen(navController: NavHostController,
         // Navigate to puzzle
         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
             putExtra("puzzleType", puzzleType)
-            putExtra("title", NewGameInfo.of(puzzleType)?.name ?: puzzleType.replaceFirstChar { it.uppercaseChar() })
+            putExtra("title", PuzzleTypeNames.display(puzzleType))
         }
         context.startActivity(intent)
     }
@@ -331,6 +335,7 @@ fun HomeScreen(navController: NavHostController,
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal))
+            .imePadding()
     ) {
         // Header with greeting and user info
         HeaderSection()
@@ -361,7 +366,7 @@ fun HomeScreen(navController: NavHostController,
                     onCategorySelected = { category ->
                         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
                             putExtra("puzzleType", category)
-                            putExtra("title", NewGameInfo.of(category)?.name ?: category.replaceFirstChar { it.uppercaseChar() })
+                            putExtra("title", PuzzleTypeNames.display(category))
                         }
                         context.startActivity(intent)
                     }
@@ -526,12 +531,15 @@ fun HomeScreen(navController: NavHostController,
             }
         }
 
-        // Bottom Tab Bar
-        BottomTabBar(
-            selectedTab = selectedTab,
-            onTabSelected = { selectedTab = it },
-            isGenerating = gameGenerationVM.isGenerating
-        )
+        // Bottom Tab Bar (hidden while the keyboard is open so it cannot eat the space above the keyboard)
+        val keyboardOpen = WindowInsets.ime.getBottom(LocalDensity.current) > 0
+        if (!keyboardOpen) {
+            BottomTabBar(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it },
+                isGenerating = gameGenerationVM.isGenerating
+            )
+        }
     }
 
     // Game generation completion banner (overlaid on top)
@@ -877,9 +885,9 @@ fun CategoriesTab(
             )
         }
 
-        // Categories grid
-        item {
-            if (filteredCategories.isEmpty()) {
+        // Categories: rows of two in this page's own LazyColumn (one scroll; the old fixed 800dp grid scrolled inside the page and hid rows)
+        if (filteredCategories.isEmpty()) {
+            item {
                 // Empty state
                 Column(
                     modifier = Modifier
@@ -903,18 +911,17 @@ fun CategoriesTab(
                         textAlign = TextAlign.Center
                     )
                 }
-            } else {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    modifier = Modifier.height(800.dp)
-                ) {
-                    items(filteredCategories) { category ->
-                        CategoryCard(
-                            category = category,
-                            isOffline = isOfflinePuzzleType(category.category),
-                            isReady = availablePuzzleTypes.contains(category.category),
+            }
+        } else {
+            items(filteredCategories.chunked(2)) { pair ->
+                com.kreativekoala.riddleverse.ui.CappedFontScale(1.3f) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
+                        pair.forEach { category ->
+                            Box(Modifier.weight(1f)) {
+                                CategoryCard(
+                                    category = category,
+                                    isOffline = isOfflinePuzzleType(category.category),
+                                    isReady = availablePuzzleTypes.contains(category.category),
                             onClick = {
                                 // Always allow selection - PuzzleQueueManager will handle on-demand fetching
                                 coroutineScope.launch {
@@ -926,7 +933,10 @@ fun CategoriesTab(
                                     onCategorySelected(category.category)
                                 }
                             }
-                        )
+                                )
+                            }
+                        }
+                        if (pair.size == 1) Spacer(Modifier.weight(1f))
                     }
                 }
             }
@@ -1591,7 +1601,7 @@ fun SettingsTab(
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
-                ProfileSection()
+                ProfileSection(onSignIn = onSignIn)
             }
 
             if (isSignedIn.value) {
@@ -1898,7 +1908,8 @@ fun ProgressStatsSection() {
 }
 
 @Composable
-fun ProfileSection() {
+fun ProfileSection(onSignIn: () -> Unit = {}) {
+    val user = FirebaseAuth.getInstance().currentUser
     SettingsSection(title = "Profile") {
         Row(
             modifier = Modifier
@@ -1915,21 +1926,41 @@ fun ProfileSection() {
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            Column {
-                FirebaseAuth.getInstance().currentUser?.displayName?.let {
+            Column(modifier = Modifier.weight(1f)) {
+                if (user == null) {
+                    // Guest: say so, and give a visible way into email sign-in / sign-up (AuthActivity)
                     Text(
-                        text = it, // Replace with actual user name
+                        text = "Guest",
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp
                     )
-                }
+                    TextButton(
+                        onClick = onSignIn,
+                        contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    ) {
+                        Text("Sign in or create account", fontSize = 14.sp)
+                    }
+                } else {
+                    user.displayName?.let {
+                        Text(
+                            text = it,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 16.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
 
-                FirebaseAuth.getInstance().currentUser?.email?.let {
-                    Text(
-                        text = it, // Replace with actual email
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    user.email?.let {
+                        Text(
+                            text = it,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }
@@ -2104,7 +2135,7 @@ fun PayoutDialog(onDismiss: () -> Unit) {
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
+                modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()).padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 // Header
@@ -2548,6 +2579,7 @@ fun BottomTabBar(
     onTabSelected: (TabSelection) -> Unit,
     isGenerating: Boolean = false
 ) {
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.2f) { // fixed-height bar: wrap/ellipsis labels instead of growing past 1.2x
     Column(modifier = Modifier.fillMaxWidth().background(RvCanvas)) {
         Box(modifier = Modifier.fillMaxWidth().height(2.dp).background(RvOutline))
         Row(
@@ -2645,6 +2677,7 @@ fun BottomTabBar(
             }
         }
     }
+    }
 }
 
 class HomeActivity : AppCompatActivity() {
@@ -2674,7 +2707,8 @@ class HomeActivity : AppCompatActivity() {
         val shouldShowOnboarding = !tutorialPrefs.hasCompletedOnboarding()
 
         setContent {
-            RiddleVerseTheme {
+            // includeIme = false: the bottom tab bar must not ride up on the keyboard; HomeScreen pads for it itself.
+            RvActivityTheme(includeIme = false) {
                 var showOnboarding by remember { mutableStateOf(shouldShowOnboarding) }
                 val navController = rememberNavController()
                 var showStreakDialog by remember { mutableStateOf(dailyStreakReward != null) }

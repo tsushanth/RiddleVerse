@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.verticalScroll
 import com.kreativekoala.riddleverse.ui.theme.RvDisabled
 import com.kreativekoala.riddleverse.ui.theme.RvErrorEdge
 import com.kreativekoala.riddleverse.ui.theme.RvFlame
@@ -116,7 +117,7 @@ fun GameCompleteDialog(
                 elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
             ) {
                 Column(
-                    modifier = Modifier
+                    modifier = Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState())
                         .padding(24.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -247,7 +248,7 @@ fun GameCompleteDialog(
                         onClick = { onPlayAgain(result) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(52.dp),
+                            .heightIn(min = 52.dp),
                         shape = RoundedCornerShape(14.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = if (canAfford) RvViolet else RvDisabled

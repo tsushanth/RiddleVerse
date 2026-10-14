@@ -309,7 +309,8 @@ fun CryptoWordScreenWithTimer(
     // Game Over dialog
     if (gameOver) {
         AlertDialog(
-            onDismissRequest = { },
+            onDismissRequest = onBack, // Back = the Back button
+            properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
             confirmButton = {
                 Button(
                     onClick = {
@@ -349,7 +350,8 @@ private fun QuoteRevealDialog(
     }
 
     AlertDialog(
-        onDismissRequest = { },
+        onDismissRequest = onContinue, // Back = Continue
+        properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
         confirmButton = {
             Button(
                 onClick = onContinue,

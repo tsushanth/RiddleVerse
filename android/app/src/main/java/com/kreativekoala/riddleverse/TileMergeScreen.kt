@@ -121,7 +121,8 @@ fun TileMergeScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
 
     if (showWin) {
         AlertDialog(
-            onDismissRequest = {},
+            onDismissRequest = { continuing = true }, // Back = Keep going
+            properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
             title = { Text("You made ${cfg.target}!", fontWeight = FontWeight.Bold) },
             text = { Text("Finish now, or keep going to push your score higher (the move limit no longer applies).") },
             confirmButton = { Button(onClick = { ended = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Finish") } },

@@ -214,7 +214,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">플레이어가 게임을 즐기면 코인을 획득하세요!</string>
-    <string name="creator_revenue_share">게임에서 사용된 코인의 55%%를 획득</string>
+    <string name="creator_revenue_share" formatted="false">게임에서 사용된 코인의 55%를 획득</string>
     <string name="coins_earned">획득 코인</string>
     <string name="plays_monetized">수익화된 플레이</string>
     <string name="per_game">게임당</string>

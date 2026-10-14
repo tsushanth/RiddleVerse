@@ -23,4 +23,15 @@ class WordPuzzleStatsTest {
         assertEquals(75, snap.winPercent)
         assertEquals(0, s.snapshot("other").played)
     }
+
+    /** The result card reads snapshot() in the same pass that first shows it, before the LaunchedEffect records the game. */
+    @Test fun snapshotSubscribesCallerToRecord() {
+        val s = WordPuzzleStats(Fake())
+        val reads = mutableSetOf<Any>()
+        val snap = androidx.compose.runtime.snapshots.Snapshot.takeSnapshot { reads.add(it) }
+        try { snap.enter { s.snapshot("wordguess", 6) } } finally { snap.dispose() }
+        assertTrue("snapshot() must read observable state so the card recomposes after record()", reads.isNotEmpty())
+        s.record("wordguess", true, 2, 6)
+        assertEquals(1, s.snapshot("wordguess", 6).played)
+    }
 }

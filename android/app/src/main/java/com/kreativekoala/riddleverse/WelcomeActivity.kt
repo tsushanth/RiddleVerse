@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import com.kreativekoala.riddleverse.ui.applyRvEdgeToEdge
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -23,6 +24,7 @@ class WelcomeActivity : AppCompatActivity() {
             return
         }
         setContentView(R.layout.welcome_activity)
+        applyRvEdgeToEdge()
 
         val getStartedButton = findViewById<Button>(R.id.getStartedButton)
         val loginLink = findViewById<TextView>(R.id.loginLink)

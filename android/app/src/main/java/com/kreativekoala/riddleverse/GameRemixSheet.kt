@@ -64,10 +64,7 @@ fun GameRemixSheet(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val displayName = puzzleType
-        .replace("_", " ")
-        .split(" ")
-        .joinToString(" ") { it.replaceFirstChar { c -> c.uppercase() } }
+    val displayName = PuzzleTypeNames.display(puzzleType)
 
     val currentUserName = FirebaseAuth.getInstance().currentUser?.displayName
         ?: FirebaseAuth.getInstance().currentUser?.email?.substringBefore("@")

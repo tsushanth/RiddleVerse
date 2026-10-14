@@ -218,7 +218,7 @@
 
     <!-- Creator Monetization -->
     <string name="earn_coins_from_games">जब खिलाड़ी आपके खेल का आनंद लें तो सिक्के कमाएँ!</string>
-    <string name="creator_revenue_share">आपको अपने खेलों पर ख़र्च किए गए सिक्कों का 55%% मिलता है</string>
+    <string name="creator_revenue_share" formatted="false">आपको अपने खेलों पर ख़र्च किए गए सिक्कों का 55% मिलता है</string>
     <string name="coins_earned">कमाए गए सिक्के</string>
     <string name="plays_monetized">मुद्रीकृत प्ले</string>
     <string name="per_game">प्रति खेल</string>
