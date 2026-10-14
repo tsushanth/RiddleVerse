@@ -31,6 +31,9 @@ private val balloonColors = listOf(
     Color(0xFF2DC98E), Color(0xFFFF8C00), Color(0xFFE0569B), Color(0xFF5C6BC0)
 )
 
+/** Category + hint text + word tiles + status line + hint button + spacers, excluding the balloon bunch and the keyboard. */
+private const val BALLOONS_FIXED_DP = 230f
+
 @Composable
 fun LetterBalloonsScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
@@ -58,7 +61,7 @@ fun LetterBalloonsScreen(
     WordPuzzleScaffold("Letter Balloons", levelLabel, onBack) {
         Text("Category: $category", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Text("Guess the word before the balloons are all popped", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        BalloonBunch(game.livesLeft, lives)
+        BalloonBunch(game.livesLeft, lives, WordFit.fitEach(LocalWordViewport.current.value, BALLOONS_FIXED_DP, 1, 0f, 70f, 130f).dp)
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val groups = word.split(" ")
             val longest = groups.maxOf { it.length }
@@ -95,7 +98,7 @@ fun LetterBalloonsScreen(
             Spacer(Modifier.height(6.dp))
             val states = HashMap<Char, LetterState>()
             game.guessed.forEach { states[it] = if (it in word) LetterState.CORRECT else LetterState.ABSENT }
-            WordKeyboard(keyStates = states, enabled = true, onLetter = { apply(game.guess(it)) }, onDelete = {}, onEnter = {}, showActions = false)
+            WordKeyboard(keyHeight = WordFit.keyHeight(LocalWordViewport.current.value, BALLOONS_FIXED_DP + 80f).dp, keyStates = states, enabled = true, onLetter = { apply(game.guess(it)) }, onDelete = {}, onEnter = {}, showActions = false)
         } else {
             WordPuzzleResultCard(
                 success = game.isWon,
@@ -108,9 +111,9 @@ fun LetterBalloonsScreen(
 }
 
 @Composable
-private fun BalloonBunch(left: Int, total: Int) {
+private fun BalloonBunch(left: Int, total: Int, height: androidx.compose.ui.unit.Dp = 130.dp) {
     Canvas(
-        Modifier.fillMaxWidth().height(130.dp).padding(vertical = 4.dp)
+        Modifier.fillMaxWidth().height(height).padding(vertical = 4.dp)
             .semantics { contentDescription = "$left of $total balloons left" }
     ) {
         val basket = Offset(size.width / 2f, size.height - 14.dp.toPx())

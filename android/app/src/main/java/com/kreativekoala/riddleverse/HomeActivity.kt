@@ -774,10 +774,12 @@ fun CategoriesTab(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
-                    Text(
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
+                    com.kreativekoala.riddleverse.ui.AutoShrinkText(
                         text = stringResource(R.string.quiz_categories),
-                        fontSize = 30.sp,
+                        maxSize = 30.sp,
+                        minSize = 20.sp,
+                        maxLines = 2,
                         fontWeight = FontWeight.ExtraBold,
                         color = RvInk
                     )
@@ -2933,20 +2935,25 @@ fun CustomPuzzlesHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        // Title takes what the three 48dp actions leave (wraps / shrinks instead of running under them)
+        com.kreativekoala.riddleverse.ui.AutoShrinkText(
             text = stringResource(R.string.custom_puzzles),
-            fontSize = 28.sp,
+            maxSize = 28.sp,
+            minSize = 18.sp,
+            maxLines = 2,
             fontWeight = FontWeight.ExtraBold,
-            color = RvInk
+            color = RvInk,
+            modifier = Modifier.weight(1f).padding(end = 8.dp)
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             IconButton(
                 onClick = onSortClick, // Now actually does something
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .padding(4.dp)
                     .background(
                         color = RvGrape,
                         shape = RoundedCornerShape(20.dp)
@@ -2962,7 +2969,8 @@ fun CustomPuzzlesHeader(
             IconButton(
                 onClick = onRefresh,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .padding(4.dp)
                     .background(
                         color = RvMint,
                         shape = RoundedCornerShape(20.dp)
@@ -2978,7 +2986,8 @@ fun CustomPuzzlesHeader(
             IconButton(
                 onClick = onCreatePuzzle,
                 modifier = Modifier
-                    .size(40.dp)
+                    .size(48.dp)
+                    .padding(4.dp)
                     .background(
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(20.dp)

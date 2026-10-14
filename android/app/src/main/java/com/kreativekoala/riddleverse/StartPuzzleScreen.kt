@@ -1498,9 +1498,12 @@ fun StartPuzzleScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
+                // Every word must show on a 320dp phone: wrap to 2 lines, shrink 36sp -> 22sp if still too wide.
+                com.kreativekoala.riddleverse.ui.AutoShrinkText(
                     text = if (isDailyPuzzle) "Daily $quizTitle" else quizTitle,
-                    fontSize = 36.sp,
+                    maxSize = 36.sp,
+                    minSize = 22.sp,
+                    maxLines = 2,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
                     textAlign = TextAlign.Center

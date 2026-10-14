@@ -150,6 +150,7 @@ fun ClassicScaffold(
         }
         Text(
             subtitle, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // keeps the board area from collapsing on short phones
             modifier = Modifier.padding(bottom = 8.dp),
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {

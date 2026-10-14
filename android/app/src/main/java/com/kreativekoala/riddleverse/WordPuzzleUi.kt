@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextOverflow
 import android.content.Context
 import android.content.Intent
 import androidx.compose.foundation.BorderStroke
@@ -78,29 +80,33 @@ fun WordPuzzleScaffold(
     onBack: () -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(Modifier.fillMaxWidth().heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.onSurface)
+    // The page scrolls only as a last resort: games size themselves from LocalWordViewport (height under the header).
+    BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) {
+        val headerH = 52.dp
+        val viewport = (maxHeight - headerH - 8.dp).coerceAtLeast(200.dp)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(Modifier.fillMaxWidth().heightIn(min = headerH), verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.onSurface)
+                }
+                Text(
+                    title, modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
+                    fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(levelLabel, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
             }
-            Text(
-                title, modifier = Modifier.weight(1f).padding(horizontal = 8.dp),
-                fontSize = 20.sp, fontWeight = FontWeight.Bold, maxLines = 1,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(levelLabel, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
+            androidx.compose.runtime.CompositionLocalProvider(LocalWordViewport provides viewport) { content() }
+            Spacer(Modifier.height(8.dp))
         }
-        content()
-        Spacer(Modifier.height(16.dp))
     }
 }
 
@@ -109,13 +115,13 @@ fun WordPuzzleScaffold(
 fun WordKey(
     label: String, description: String, weight: Float, enabled: Boolean,
     container: Color, contentColor: Color, onClick: () -> Unit, rowModifier: Modifier = Modifier,
-    scope: RowScope
+    scope: RowScope, height: Dp = 54.dp
 ) {
     with(scope) {
         Box(
             modifier = rowModifier
                 .weight(weight)
-                .height(54.dp)
+                .height(height)
                 .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
                 .padding(horizontal = 2.dp, vertical = 3.dp)
                 .semantics { contentDescription = description },
@@ -138,7 +144,8 @@ fun WordKey(
 @Composable
 fun WordKeyboard(
     keyStates: Map<Char, LetterState>, enabled: Boolean,
-    onLetter: (Char) -> Unit, onDelete: () -> Unit, onEnter: () -> Unit, enterLabel: String = "ENTER", showActions: Boolean = true
+    onLetter: (Char) -> Unit, onDelete: () -> Unit, onEnter: () -> Unit, enterLabel: String = "ENTER", showActions: Boolean = true,
+    keyHeight: Dp = 54.dp
 ) {
     val neutral = MaterialTheme.colorScheme.surface
     val onNeutral = MaterialTheme.colorScheme.onSurface
@@ -147,16 +154,16 @@ fun WordKeyboard(
         rows.forEachIndexed { idx, letters ->
             Row(Modifier.fillMaxWidth().padding(horizontal = if (idx == 1) 14.dp else 0.dp)) {
                 if (idx == 2 && showActions) WordKey(enterLabel, "Submit", 1.6f, enabled, MaterialTheme.colorScheme.primary,
-                    MaterialTheme.colorScheme.onPrimary, onEnter, scope = this)
+                    MaterialTheme.colorScheme.onPrimary, onEnter, scope = this, height = keyHeight)
                 letters.forEach { c ->
                     val st = keyStates[c] ?: LetterState.UNKNOWN
                     WordKey(
                         c.uppercase(), "${c.uppercase()}, ${WordPuzzleColors.describe(st)}", 1f, enabled,
                         WordPuzzleColors.container(st, neutral), WordPuzzleColors.content(st, onNeutral),
-                        { onLetter(c) }, scope = this
+                        { onLetter(c) }, scope = this, height = keyHeight
                     )
                 }
-                if (idx == 2 && showActions) WordKey("⌫", "Delete", 1.6f, enabled, neutral, onNeutral, onDelete, scope = this)
+                if (idx == 2 && showActions) WordKey("⌫", "Delete", 1.6f, enabled, neutral, onNeutral, onDelete, scope = this, height = keyHeight)
             }
         }
     }
@@ -164,7 +171,7 @@ fun WordKeyboard(
 
 @Composable
 fun WordPuzzleMessage(text: String) {
-    Box(Modifier.fillMaxWidth().heightIn(min = 36.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().heightIn(min = 28.dp), contentAlignment = Alignment.Center) {
         if (text.isNotEmpty()) {
             Text(
                 text, textAlign = TextAlign.Center, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,

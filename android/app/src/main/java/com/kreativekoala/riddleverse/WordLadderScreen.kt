@@ -24,6 +24,9 @@ import org.json.JSONObject
 
 // --- word puzzles (feat/puzzles-word) --- "Word Ladder"
 
+/** Instruction (2 lines) + par line + start row + candidate row + goal + message + buttons: what sits above the keyboard on a fresh ladder. */
+private const val WORD_LADDER_FIXED_DP = 330f
+
 @Composable
 fun WordLadderScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
@@ -92,8 +95,9 @@ fun WordLadderScreen(
                         }
                         WordActionButton("Give up", "Reveal the solution and end this puzzle") { gaveUp = true }
                     }
-                    Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(4.dp))
                     WordKeyboard(
+                        keyHeight = WordFit.keyHeight(LocalWordViewport.current.value, WORD_LADDER_FIXED_DP).dp,
                         keyStates = emptyMap(), enabled = true, enterLabel = "ADD",
                         onLetter = { c ->
                             if (selected < 0) message = "Tap a tile to choose which letter to change"

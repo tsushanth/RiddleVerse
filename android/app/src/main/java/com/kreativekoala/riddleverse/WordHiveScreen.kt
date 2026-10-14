@@ -43,6 +43,9 @@ private val HexShape = GenericShape { size, _ ->
     close()
 }
 
+/** Everything on the Hive page except the honeycomb: instructions, rank, progress, goal, entry, message and two button rows. */
+private const val HIVE_FIXED_DP = 300f
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun WordHiveScreen(
@@ -111,7 +114,7 @@ fun WordHiveScreen(
                 }
             }
             WordPuzzleMessage(message)
-            HexBoard(puzzle.center, outer) { entry += it }
+            HexBoard(puzzle.center, outer, WordFit.boardScale(LocalWordViewport.current.value - HIVE_FIXED_DP, 222f + 70f)) { entry += it }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 WordActionButton("Delete", "Delete last letter", enabled = entry.isNotEmpty()) { entry = entry.dropLast(1) }
@@ -162,9 +165,9 @@ fun WordHiveScreen(
 }
 
 @Composable
-private fun HexBoard(center: Char, outer: List<Char>, onLetter: (Char) -> Unit) {
-    val hex = 70.dp
-    val radius = 76.dp
+private fun HexBoard(center: Char, outer: List<Char>, scale: Float = 1f, onLetter: (Char) -> Unit) {
+    val hex = 70.dp * scale
+    val radius = 76.dp * scale
     val density = LocalDensity.current
     Box(Modifier.size(radius * 2 + hex, radius * 2 + hex)) {
         @Composable

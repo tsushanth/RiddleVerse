@@ -30,6 +30,9 @@ private fun decodeGuess(answer: String, hard: Boolean, s: String): WordGuessGame
     return WordGuessGame(answer, hard, p[0].split(",").filter { it.isNotEmpty() }, p[1], p[2] == "1")
 }
 
+/** Message line (28) + hint row (48) + spacers (8) + slack: everything on the Word Guess page that is not a tile row or a key row. */
+private const val WORD_GUESS_FIXED_DP = 88f
+
 @Composable
 fun WordGuessScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
@@ -64,7 +67,13 @@ fun WordGuessScreen(
 
     WordPuzzleScaffold("Word Guess" + if (hard) " (hard)" else "", levelLabel, onBack) {
         BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val tile: Dp = minOf(58.dp, (maxWidth - 6.dp * 4 - 16.dp) / 5)
+            // Tile and key sizes come from the height we really have, so the 3 keyboard rows incl. ENTER / backspace stay on screen.
+            val fit = WordFit.guessLayout(
+                availW = maxWidth.value, availH = LocalWordViewport.current.value,
+                tileRows = WordGuessRules.MAX_TRIES, tileCols = WordGuessRules.WORD_LENGTH, gap = 6f,
+                fixedH = WORD_GUESS_FIXED_DP
+            )
+            val tile: Dp = fit.tile.dp
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     for (row in 0 until WordGuessRules.MAX_TRIES) {
@@ -93,8 +102,9 @@ fun WordGuessScreen(
                         Text("${WordGuessRules.MAX_TRIES - game.guesses.size} tries left", fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
-                    Spacer(Modifier.height(6.dp))
+                    Spacer(Modifier.height(4.dp))
                     WordKeyboard(
+                        keyHeight = fit.key.dp,
                         keyStates = WordGuessRules.keyboardStates(game.guesses, answer), enabled = true,
                         onLetter = { update(game.type(it)) },
                         onDelete = { update(game.backspace()) },

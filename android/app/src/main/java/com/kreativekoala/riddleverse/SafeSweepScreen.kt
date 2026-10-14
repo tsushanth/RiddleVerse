@@ -40,6 +40,24 @@ object SweepLayout {
 
     fun fitsWidth(availWidthDp: Float, cols: Int): Boolean = (availWidthDp - BOARD_PADDING_DP) / cols >= MIN_FIT_DP
 
+    const val MIN_FIT_HEIGHT_DP = 26f
+
+    /**
+     * Cell size that fits BOTH the width and the height left above the controls, so the last row is never
+     * hidden behind the Flag-mode button. When the height cannot be met at >= [MIN_FIT_HEIGHT_DP] but the width
+     * still fits, keep the width-fit size and let the board scroll vertically inside its own area.
+     */
+    fun cellDp(availWidthDp: Float, availHeightDp: Float, cols: Int, rows: Int): Float {
+        val fitW = (availWidthDp - BOARD_PADDING_DP) / cols
+        val fitH = (availHeightDp - BOARD_PADDING_DP) / rows
+        val both = minOf(fitW, fitH)
+        return when {
+            both >= MIN_FIT_HEIGHT_DP && fitW >= MIN_FIT_HEIGHT_DP -> minOf(both, MAX_CELL_DP)
+            fitW >= MIN_FIT_DP -> minOf(fitW, MAX_CELL_DP)
+            else -> SCROLL_CELL_DP
+        }
+    }
+
     fun cellDp(availWidthDp: Float, cols: Int): Float {
         val fit = (availWidthDp - BOARD_PADDING_DP) / cols
         return if (fit >= MIN_FIT_DP) minOf(fit, MAX_CELL_DP) else SCROLL_CELL_DP
@@ -81,7 +99,7 @@ fun SafeSweepScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
         onBack = onBack,
     ) {
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-            val cell: Dp = SweepLayout.cellDp(maxWidth.value, game.cols).dp
+            val cell: Dp = SweepLayout.cellDp(maxWidth.value, maxHeight.value, game.cols, game.rows).dp
             Box(
                 Modifier
                     .widthIn(max = maxWidth)

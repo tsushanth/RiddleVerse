@@ -31,6 +31,9 @@ private val pegColors = listOf(
 private val pegSymbols = listOf("▲", "■", "●", "◆", "★", "✚") // triangle square circle diamond star plus
 private val pegInk = Color(0xFF231B4A)
 
+/** Rules text (3 lines) + current-try row (48) + label + message + palette (48) + gap + buttons (48) + slack. */
+private const val CODE_CRACKER_FIXED_DP = 270f
+
 @Composable
 fun CodeCrackerScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
@@ -77,10 +80,12 @@ fun CodeCrackerScreen(
             fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp)
         )
         val slot: Dp = 48.dp
+        // Past-guess pegs shrink (36 -> 24dp) so the colour palette and Check stay on screen; the page scrolls only below that.
+        val pastPeg: Dp = WordFit.fitEach(LocalWordViewport.current.value, CODE_CRACKER_FIXED_DP, cfg.maxTries, 6f, 24f, 36f).dp
         Column(verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             guesses.forEachIndexed { r, g ->
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    g.forEachIndexed { c, color -> Peg(color, 36.dp, "Try ${r + 1}, position ${c + 1}", false, null) }
+                    g.forEachIndexed { c, color -> Peg(color, pastPeg, "Try ${r + 1}, position ${c + 1}", false, null) }
                     FeedbackPegs(feedbacks[r], cfg.positions, "Try ${r + 1}")
                 }
             }
