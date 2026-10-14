@@ -79,7 +79,14 @@ fun WordLadderScreen(
                 val keyH = WordFit.keyHeight(LocalWordViewport.current.value, WORD_LADDER_FIXED_DP).dp
                 val chainScroll = rememberScrollState()
                 LaunchedEffect(chain.size) { chainScroll.animateScrollTo(chainScroll.maxValue) }
-                val chainMax = (LocalWordViewport.current - 200.dp - keyH * 3).coerceAtLeast(110.dp)
+                // Show a whole number of rows (never a clipped one at the top); newest row scrolls into view.
+                val rowH = tile + 6.dp
+                val chainAvail = LocalWordViewport.current - 224.dp - keyH * 3
+                val visibleRows = ((chainAvail + 6.dp) / rowH).toInt().coerceAtLeast(2)
+                val chainMax = rowH * visibleRows - 6.dp
+                if (!over) {
+                    Text("Goal: ${puzzle.target.uppercase()}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
                 Column(
                     (if (!over) Modifier.heightIn(max = chainMax).verticalScroll(chainScroll) else Modifier),
                     horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -90,7 +97,6 @@ fun WordLadderScreen(
                 }
                 if (!over) {
                     LadderCandidateRow(candidate, chain.last(), selected, tile) { selected = it }
-                    Text("Goal: ${puzzle.target.uppercase()}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else if (gaveUp && !solved) {
                     Text("One shortest path:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                     puzzle.solution.forEachIndexed { i, w -> LadderRow(w, puzzle.solution.getOrNull(i - 1), tile, "Solution step $i", null) }

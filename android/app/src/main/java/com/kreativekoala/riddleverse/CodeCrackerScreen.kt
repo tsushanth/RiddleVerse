@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -93,7 +94,7 @@ fun CodeCrackerScreen(
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     for (i in 0 until cfg.positions) {
                         val ch = currentEnc[i]
-                        Peg(if (ch == '-') -1 else ch - '0', slot, "Your try, position ${i + 1}", i == selected) { selected = i }
+                        Peg(if (ch == '-') -1 else ch - '0', ((LocalConfiguration.current.screenWidthDp.dp - 24.dp - 6.dp * (cfg.positions - 1)) / cfg.positions).coerceIn(36.dp, slot), "Your try, position ${i + 1}", i == selected) { selected = i }
                     }
                 }
                 Text("Try ${guesses.size + 1} of ${cfg.maxTries}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -105,9 +106,12 @@ fun CodeCrackerScreen(
         }
         WordPuzzleMessage(message)
         if (!over) {
+            // Palette pegs shrink (48 -> 36dp) so every colour fits one row at 320dp.
+            val paletteW = LocalConfiguration.current.screenWidthDp.dp - 24.dp
+            val palettePeg: Dp = ((paletteW - 8.dp * (cfg.colors - 1)) / cfg.colors).coerceIn(36.dp, 48.dp)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 for (color in 0 until cfg.colors) {
-                    Peg(color, 48.dp, "Choose ${CodeCrackerRules.colorNames[color]}", false) { place(color) }
+                    Peg(color, palettePeg, "Choose ${CodeCrackerRules.colorNames[color]}", false) { place(color) }
                 }
             }
             Spacer(Modifier.height(8.dp))
@@ -117,6 +121,10 @@ fun CodeCrackerScreen(
                     val unsolved = (0 until cfg.positions).filter { p -> guesses.none { it[p] == puzzle.secret[p] } }.ifEmpty { listOf(0) }
                     hintPos = unsolved.first(); hints++
                 }
+            }
+            Spacer(Modifier.height(8.dp))
+            // Check gets its own full-width row so it can never be squeezed into a vertical pill.
+            Row(Modifier.fillMaxWidth()) {
                 Button(onClick = {
                     if (currentEnc.contains('-')) message = "Fill every peg"
                     else {
@@ -127,7 +135,7 @@ fun CodeCrackerScreen(
                             currentEnc = "-".repeat(cfg.positions); selected = 0
                         }
                     }
-                }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Check") }
+                }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Check", maxLines = 1, softWrap = false) }
             }
         } else {
             if (lost) {

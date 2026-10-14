@@ -2525,8 +2525,11 @@ fun StartPuzzleScreen(
                     contentPadding = PaddingValues(0.dp)
                 ) {
                     Row(
+                        // NOT fillMaxSize: the button only has a minimum height now, and fillMaxSize here stretched this
+                        // row to the whole screen height (giant purple block).
                         modifier = Modifier
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .heightIn(min = 48.dp)
                             .background(
                                 SolidColor(RvGrape),
                                 RoundedCornerShape(28.dp)
