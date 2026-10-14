@@ -131,7 +131,14 @@ fun WordKey(
                 Modifier.fillMaxSize().clip(RoundedCornerShape(8.dp)).background(container),
                 contentAlignment = Alignment.Center
             ) {
-                Text(label, color = contentColor, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1)
+                // Keys have a fixed size: ignore the system font scale, and use a smaller face for words (ENTER, ADD)
+                // so the label is never cut to "ENT".
+                com.kreativekoala.riddleverse.ui.CappedFontScale(1.0f) {
+                    Text(
+                        label, color = contentColor, fontWeight = FontWeight.Bold,
+                        fontSize = if (label.length > 1) 12.sp else 16.sp, maxLines = 1, softWrap = false
+                    )
+                }
             }
         }
     }

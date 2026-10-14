@@ -66,6 +66,7 @@ fun RvScreenHost(
     background: Color = RvCanvas,
     includeIme: Boolean = true,
     maxContentWidth: Dp = MAX_CONTENT_WIDTH_DP.dp,
+    maxFontScale: Float? = null,
     content: @Composable () -> Unit
 ) {
     Box(
@@ -88,15 +89,17 @@ fun RvScreenHost(
                     screenHeightDp = h
                 }
             }
-            CompositionLocalProvider(LocalConfiguration provides adjusted) { content() }
+            CompositionLocalProvider(LocalConfiguration provides adjusted) {
+                if (maxFontScale != null) CappedFontScale(maxFontScale, content) else content()
+            }
         }
     }
 }
 
 /** Theme + [RvScreenHost]: what every Compose activity passes to `setContent`. */
 @Composable
-fun RvActivityTheme(includeIme: Boolean = true, content: @Composable () -> Unit) {
-    RiddleVerseTheme { RvScreenHost(includeIme = includeIme, content = content) }
+fun RvActivityTheme(includeIme: Boolean = true, maxFontScale: Float? = null, content: @Composable () -> Unit) {
+    RiddleVerseTheme { RvScreenHost(includeIme = includeIme, maxFontScale = maxFontScale, content = content) }
 }
 
 /** Pure width rule used by [RvScreenHost]: the content width for a window of [availableWidthDp]. */
@@ -124,6 +127,10 @@ fun View.applyRvSystemBarPadding(includeIme: Boolean = true) {
             right + maxOf(i.right, stable.right),
             bottom + maxOf(i.bottom, stable.bottom)
         )
+        // Keyboard just opened: keep the focused field visible (the ScrollView was shrunk by the padding above).
+        if (includeIme && insets.isVisible(WindowInsetsCompat.Type.ime())) {
+            v.post { (v.findFocus())?.let { f -> f.requestRectangleOnScreen(android.graphics.Rect(0, 0, f.width, f.height), false) } }
+        }
         WindowInsetsCompat.CONSUMED
     }
     ViewCompat.requestApplyInsets(this)

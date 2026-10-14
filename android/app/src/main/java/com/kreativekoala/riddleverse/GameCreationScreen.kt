@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.ui.focus.onFocusEvent
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -51,6 +53,7 @@ import okhttp3.Request
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun GameCreationScreen(
     context: android.content.Context,
@@ -303,14 +306,19 @@ fun GameCreationScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Input field
+            // Input field: scrolls itself above the keyboard when focused
+            val promptBringIntoView = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
             OutlinedTextField(
                 value = promptText,
                 onValueChange = { if (it.length <= 500) promptText = it },
                 placeholder = { Text(stringResource(R.string.describe_game_placeholder), color = RvInkSoft) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(min = 120.dp),
+                    .heightIn(min = 120.dp)
+                    .bringIntoViewRequester(promptBringIntoView)
+                    .onFocusEvent { f ->
+                        if (f.isFocused) coroutineScope.launch { kotlinx.coroutines.delay(300); promptBringIntoView.bringIntoView() }
+                    },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = RvInk,
                     unfocusedTextColor = RvInk,

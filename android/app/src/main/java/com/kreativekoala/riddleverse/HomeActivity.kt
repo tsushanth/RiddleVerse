@@ -806,6 +806,8 @@ fun CategoriesTab(
                 ) {
                     Text(
                         text = "ALL SHOWN",
+                        maxLines = 1,
+                        softWrap = false,
                         color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
@@ -2581,7 +2583,7 @@ fun BottomTabBar(
     onTabSelected: (TabSelection) -> Unit,
     isGenerating: Boolean = false
 ) {
-    com.kreativekoala.riddleverse.ui.CappedFontScale(1.2f) { // fixed-height bar: wrap/ellipsis labels instead of growing past 1.2x
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.0f) { // fixed-height bar: labels stay 11sp and shrink to fit instead of growing / truncating
     Column(modifier = Modifier.fillMaxWidth().background(RvCanvas)) {
         Box(modifier = Modifier.fillMaxWidth().height(2.dp).background(RvOutline))
         Row(
@@ -2656,7 +2658,7 @@ fun BottomTabBar(
 
                     Spacer(modifier = Modifier.height(4.dp))
 
-                    Text(
+                    com.kreativekoala.riddleverse.ui.AutoShrinkText(
                         text = when (tab) {
                             TabSelection.FOR_YOU -> stringResource(R.string.tab_for_you)
                             TabSelection.CATEGORIES -> stringResource(R.string.tab_categories)
@@ -2664,10 +2666,10 @@ fun BottomTabBar(
                             TabSelection.CUSTOM_PUZZLES -> stringResource(R.string.tab_puzzles)
                             TabSelection.SETTINGS -> stringResource(R.string.tab_settings)
                         },
-                        fontSize = 11.sp,
-                        textAlign = TextAlign.Center,
+                        maxSize = 11.sp,
+                        minSize = 8.sp,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
+                        textAlign = TextAlign.Center,
                         fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Medium,
                         color = if (selectedTab == tab) {
                             RvViolet

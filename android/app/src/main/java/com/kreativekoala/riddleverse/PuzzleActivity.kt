@@ -173,7 +173,9 @@ class PuzzleActivity : AppCompatActivity() {
         // FIXED: PuzzleActivity.kt - Update the completion LaunchedEffect in onCreate()
 
         setContent {
-            RvActivityTheme {
+            // Gameplay chrome (HUDs, boards, key rows) is sized in dp: cap the system font at 1.3x here so every
+            // primary action stays on screen. Start screens, home and settings still follow the full font size.
+            RvActivityTheme(maxFontScale = 1.3f) {
                 var showCompletion by remember { mutableStateOf(false) }
 
                 if (showCompletion) {

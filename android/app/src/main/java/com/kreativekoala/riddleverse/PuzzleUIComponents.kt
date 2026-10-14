@@ -48,6 +48,7 @@ fun LevelProgressBar(
     showLabel: Boolean = true,
     compact: Boolean = false
 ) {
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.3f) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
@@ -67,6 +68,8 @@ fun LevelProgressBar(
                 if (!compact) {
                     Text(
                         text = "${level.currentXP}/${level.xpToNextLevel} XP",
+                        maxLines = 1,
+                        softWrap = false,
                         fontSize = 10.sp,
                         color = RvInkSoft
                     )
@@ -89,10 +92,13 @@ fun LevelProgressBar(
         if (compact && showLabel) {
             Text(
                 text = "${level.currentXP}/${level.xpToNextLevel}",
+                maxLines = 1,
+                softWrap = false,
                 fontSize = 8.sp,
                 color = RvInkSoft
             )
         }
+    }
     }
 }
 
@@ -108,6 +114,7 @@ fun StreakDisplay(
     showDailyStreak: Boolean = false,
     compact: Boolean = false
 ) {
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.3f) {
     if (streakInfo.currentStreak > 0 || (showDailyStreak && streakInfo.dailyStreak > 0)) {
         Row(
             modifier = modifier,
@@ -161,6 +168,7 @@ fun StreakDisplay(
             }
         }
     }
+    }
 }
 
 // ================================
@@ -174,6 +182,7 @@ fun EnhancedStreakDisplay(
     modifier: Modifier = Modifier,
     showBonusInfo: Boolean = false
 ) {
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.3f) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -198,6 +207,7 @@ fun EnhancedStreakDisplay(
                 color = RvCoralEdge
             )
         }
+    }
     }
 }
 
@@ -245,6 +255,7 @@ fun PuzzleHeader(
     onBack: (() -> Unit)? = null,
     title: String? = null
 ) {
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.3f) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -317,6 +328,7 @@ fun PuzzleHeader(
             }
         }
     }
+    }
 }
 
 // ================================
@@ -332,6 +344,7 @@ fun PuzzleProgressCard(
     currentScore: Int,
     modifier: Modifier = Modifier
 ) {
+    com.kreativekoala.riddleverse.ui.CappedFontScale(1.3f) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -379,6 +392,7 @@ fun PuzzleProgressCard(
                 color = RvGrape
             )
         }
+    }
     }
 }
 

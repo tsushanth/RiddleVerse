@@ -359,10 +359,10 @@ fun CoinPurchaseSection() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text("💰", fontSize = 24.sp)
                     Spacer(modifier = Modifier.width(12.dp))
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text("Coins", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
                         Text("Balance: ${coinManager.balance} coins", fontSize = 14.sp, color = RvSunEdge)
                     }
@@ -372,7 +372,7 @@ fun CoinPurchaseSection() {
                     colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text("Buy Coins", fontSize = 12.sp)
+                    Text("Buy Coins", fontSize = 12.sp, maxLines = 1, softWrap = false)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))

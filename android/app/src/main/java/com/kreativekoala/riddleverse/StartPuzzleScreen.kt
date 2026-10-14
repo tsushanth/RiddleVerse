@@ -1498,12 +1498,12 @@ fun StartPuzzleScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Every word must show on a 320dp phone: wrap to 2 lines, shrink 36sp -> 22sp if still too wide.
+                // Every word must show on a 320dp phone even at font scale 2.0: wrap to 3 lines, shrink 36sp -> 18sp if still too wide.
                 com.kreativekoala.riddleverse.ui.AutoShrinkText(
                     text = if (isDailyPuzzle) "Daily $quizTitle" else quizTitle,
                     maxSize = 36.sp,
-                    minSize = 22.sp,
-                    maxLines = 2,
+                    minSize = 18.sp,
+                    maxLines = 3,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
                     textAlign = TextAlign.Center
@@ -2526,12 +2526,17 @@ fun StartPuzzleScreen(
                             stringResource(R.string.create_your_version),
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp,
-                            color = RvOnTone
+                            color = RvOnTone,
+                            maxLines = 2,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.weight(1f))
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Earn coins",
                             fontSize = 11.sp,
+                            maxLines = 1,
+                            softWrap = false,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
                         Icon(

@@ -144,7 +144,7 @@ fun ForYouTab(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = stringResource(R.string.tab_for_you),
                         fontSize = 28.sp,
@@ -456,7 +456,7 @@ fun FavoritesSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = stringResource(R.string.your_favorites),
                         fontSize = 20.sp,
@@ -477,6 +477,8 @@ fun FavoritesSection(
                 ) {
                     Text(
                         text = "FAVORITES",
+                        maxLines = 1,
+                        softWrap = false,
                         color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
@@ -526,7 +528,7 @@ fun TrendingSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                 Text(
                     text = stringResource(R.string.trending_now),
                     fontSize = 20.sp,
@@ -551,6 +553,8 @@ fun TrendingSection(
                 ) {
                     Text(
                         text = "TRENDING",
+                        maxLines = 1,
+                        softWrap = false,
                         color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
@@ -600,7 +604,7 @@ fun RecommendedSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = stringResource(R.string.recommended_for_you),
                         fontSize = 20.sp,
@@ -621,6 +625,8 @@ fun RecommendedSection(
                 ) {
                     Text(
                         text = "FOR YOU",
+                        maxLines = 1,
+                        softWrap = false,
                         color = RvOnTone,
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold
@@ -963,7 +969,7 @@ fun PuzzleGroupsSection(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f).padding(end = 8.dp)) {
                     Text(
                         text = stringResource(R.string.puzzle_collections),
                         fontSize = 20.sp,
@@ -988,6 +994,8 @@ fun PuzzleGroupsSection(
                     ) {
                         Text(
                             text = "COLLECTIONS",
+                        maxLines = 1,
+                        softWrap = false,
                             color = RvOnTone,
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold

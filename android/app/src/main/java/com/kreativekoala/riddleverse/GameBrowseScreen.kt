@@ -129,6 +129,7 @@ data class BrowseGameData(
 )
 
 @Composable
+@OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
 fun GameBrowseContent(context: android.content.Context) {
     val TAG = "GameBrowse"
     val PAGE_SIZE = 20
@@ -478,19 +479,22 @@ fun GameBrowseContent(context: android.content.Context) {
     LaunchedEffect(Unit) { fetchNewReleases() }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Header with sort
-        Row(
+        // Header with sort. FlowRow: when the title and the My Games / sort chips do not fit side by side
+        // (320dp, large fonts) the chips move to a second line instead of squeezing each other.
+        FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = stringResource(R.string.community_games),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = RvInk
+                color = RvInk,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -519,6 +523,8 @@ fun GameBrowseContent(context: android.content.Context) {
                 ) {
                     Text(
                         text = stringResource(R.string.my_games),
+                        maxLines = 1,
+                        softWrap = false,
                         fontSize = 12.sp,
                         color = if (showMyGames) RvOnTone else RvViolet,
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
