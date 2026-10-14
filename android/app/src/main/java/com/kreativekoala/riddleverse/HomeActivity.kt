@@ -361,7 +361,7 @@ fun HomeScreen(navController: NavHostController,
                     onCategorySelected = { category ->
                         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
                             putExtra("puzzleType", category)
-                            putExtra("title", category.replaceFirstChar { it.uppercaseChar() })
+                            putExtra("title", NewGameInfo.of(category)?.name ?: category.replaceFirstChar { it.uppercaseChar() })
                         }
                         context.startActivity(intent)
                     }

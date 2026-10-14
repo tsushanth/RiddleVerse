@@ -606,7 +606,7 @@ fun getPuzzleTypeDisplayInfo(puzzleType: String): PuzzleTypeDisplayInfo {
         "connotationwords" -> PuzzleTypeDisplayInfo("Word Connotations", Icons.Default.Psychology)
         "subtraction" -> PuzzleTypeDisplayInfo("Subtraction", Icons.Default.Remove)
         "mathtipping" -> PuzzleTypeDisplayInfo("Tip Calculation", Icons.Default.RestaurantMenu)
-        else -> PuzzleTypeDisplayInfo(puzzleType.replaceFirstChar { it.uppercaseChar() }, Icons.Default.Extension)
+        else -> PuzzleTypeDisplayInfo(NewGameInfo.of(puzzleType)?.name ?: puzzleType.replaceFirstChar { it.uppercaseChar() }, Icons.Default.Extension)
     }
 }
 

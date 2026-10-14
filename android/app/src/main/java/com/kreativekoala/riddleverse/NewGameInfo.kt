@@ -4,10 +4,13 @@ package com.kreativekoala.riddleverse
 object NewGameInfo {
     class Info(val name: String, val category: String, val benefits: List<String>)
 
+    // Labels follow the home-screen filter chips: the grid, classic and spatial games all sit under "Logic",
+    // the word games under "English" (shown as Word Games) and Code Cracker under "Focus".
     private val logic = "Logic Games"
-    private val spatial = "Spatial Games"
+    private val spatial = logic
+    private val classic = logic
     private val word = "Word Games"
-    private val classic = "Classic Games"
+    private val focus = "Focus Games"
 
     private val table: Map<String, Info> = mapOf(
         "sudoku" to Info("Sudoku", logic, listOf("Sharpen deductive reasoning.", "Build focus and patience.")),
@@ -28,7 +31,7 @@ object NewGameInfo {
         "wordladder" to Info("Word Ladder", word, listOf("Expand vocabulary and spelling.", "Improve flexible thinking.")),
         "letterballoons" to Info("Letter Balloons", word, listOf("Improve spelling recall.", "Practice smart letter guessing.")),
         "wordhive" to Info("Word Hive", word, listOf("Grow your vocabulary.", "Spot word patterns faster.")),
-        "codecracker" to Info("Code Cracker", logic, listOf("Practice deductive reasoning.", "Improve systematic thinking."))
+        "codecracker" to Info("Code Cracker", focus, listOf("Practice deductive reasoning.", "Improve systematic thinking."))
     )
 
     fun of(type: String): Info? = table[type.lowercase()]
