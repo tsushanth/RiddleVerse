@@ -133,7 +133,7 @@ fun ClassicScaffold(
 ) {
     // Short screens (landscape): the page scrolls as a whole at a minimum height, so the board and all controls stay reachable.
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-    val tooShort = maxHeight < com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT
+    val tooShort = com.kreativekoala.riddleverse.ui.rvIsShort(maxHeight.value)
     Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
     Column(
         Modifier

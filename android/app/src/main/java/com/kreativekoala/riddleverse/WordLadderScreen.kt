@@ -66,31 +66,59 @@ fun WordLadderScreen(
 
     fun resetCandidate() { candidate = chain.last(); selected = -1 }
 
-    WordPuzzleScaffold("Word Ladder", levelLabel, onBack) {
+    val pageScroll = rememberScrollState()
+    // Newest row stays in view as the chain grows (the page scrolls; the keyboard is pinned and never moves).
+    LaunchedEffect(chain.size) { pageScroll.animateScrollTo(pageScroll.maxValue) }
+
+    WordPuzzleScaffold(
+        "Word Ladder", levelLabel, onBack, scrollState = pageScroll,
+        bottomBar = if (over) null else ({
+            // Pinned: message, actions and keyboard are measured by layout, never estimated.
+            val vp = LocalWordViewport.current.value
+            val keyH = (if (LocalWordSideBySide.current) WordFit.keyHeight(vp, 110f) else ((vp - 230f - 56f) / 3f).coerceIn(36f, 54f)).dp
+            WordPuzzleMessage(message)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WordActionButton("Undo", "Remove the last word", enabled = chain.size > 1) {
+                    chainEnc = chain.dropLast(1).joinToString(","); candidate = chain[chain.size - 2]; selected = -1
+                }
+                WordActionButton("Hint", "Show the next word on a shortest path") {
+                    val path = graph.shortestPath(chain.last(), puzzle.target)
+                    if (path != null && path.size > 1) {
+                        val nxt = path[1]
+                        val pos = nxt.indices.first { nxt[it] != chain.last()[it] }
+                        hints++
+                        message = "Change letter ${pos + 1} to ${nxt[pos].uppercaseChar()}"
+                    } else message = "No path from here - undo a step"
+                }
+                WordActionButton("Give up", "Reveal the solution and end this puzzle") { gaveUp = true }
+            }
+            Spacer(Modifier.height(4.dp))
+            WordKeyboard(
+                keyHeight = keyH,
+                keyStates = emptyMap(), enabled = true, enterLabel = "ADD",
+                onLetter = { c ->
+                    if (selected < 0) message = "Tap a tile to choose which letter to change"
+                    else candidate = candidate.replaceRange(selected, selected + 1, c.toString())
+                },
+                onDelete = { resetCandidate() },
+                onEnter = {
+                    val why = WordLadderRules.rejection(graph, chain, candidate)
+                    if (why != null) message = why
+                    else { chainEnc = (chain + candidate).joinToString(","); selected = -1 }
+                }
+            )
+        })
+    ) {
         Text("Change one letter at a time to turn ${puzzle.start.uppercase()} into ${puzzle.target.uppercase()}",
             fontSize = 14.sp, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text("Par ${puzzle.par} steps   You: $steps", fontSize = 15.sp, fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(vertical = 6.dp))
         BoxWithConstraints(Modifier.fillMaxWidth()) {
-            val tile: Dp = minOf(54.dp, (maxWidth - 16.dp - 6.dp * (puzzle.length - 1)) / puzzle.length).coerceAtLeast(48.dp)
+            val tile: Dp = minOf(54.dp, (maxWidth - 16.dp - 6.dp * (puzzle.length - 1)) / puzzle.length).coerceAtLeast(44.dp)
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                // The chain grows by a row per step: keep it in its own scroll area (newest row in view) so the
-                // keyboard, ADD included, stays pinned on screen instead of being pushed below the fold.
-                val keyH = WordFit.keyHeight(LocalWordViewport.current.value, WORD_LADDER_FIXED_DP).dp
-                val chainScroll = rememberScrollState()
-                LaunchedEffect(chain.size) { chainScroll.animateScrollTo(chainScroll.maxValue) }
-                // Show a whole number of rows (never a clipped one at the top); newest row scrolls into view.
-                val rowH = tile + 6.dp
-                val chainAvail = LocalWordViewport.current - 224.dp - keyH * 3
-                val visibleRows = ((chainAvail + 6.dp) / rowH).toInt().coerceAtLeast(2)
-                val chainMax = rowH * visibleRows - 6.dp
                 if (!over) {
                     Text("Goal: ${puzzle.target.uppercase()}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                Column(
-                    (if (!over) Modifier.heightIn(max = chainMax).verticalScroll(chainScroll) else Modifier),
-                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
                 chain.forEachIndexed { i, w ->
                     val prev = chain.getOrNull(i - 1)
                     LadderRow(w, prev, tile, if (i == 0) "Start word" else "Step $i", tint = if (w == puzzle.target) WordPuzzleColors.correct else null)
@@ -101,40 +129,8 @@ fun WordLadderScreen(
                     Text("One shortest path:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                     puzzle.solution.forEachIndexed { i, w -> LadderRow(w, puzzle.solution.getOrNull(i - 1), tile, "Solution step $i", null) }
                 }
-                }
-                WordPuzzleMessage(message)
-                if (!over) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        WordActionButton("Undo", "Remove the last word", enabled = chain.size > 1) {
-                            chainEnc = chain.dropLast(1).joinToString(","); candidate = chain[chain.size - 2]; selected = -1
-                        }
-                        WordActionButton("Hint", "Show the next word on a shortest path") {
-                            val path = graph.shortestPath(chain.last(), puzzle.target)
-                            if (path != null && path.size > 1) {
-                                val nxt = path[1]
-                                val pos = nxt.indices.first { nxt[it] != chain.last()[it] }
-                                hints++
-                                message = "Change letter ${pos + 1} to ${nxt[pos].uppercaseChar()}"
-                            } else message = "No path from here - undo a step"
-                        }
-                        WordActionButton("Give up", "Reveal the solution and end this puzzle") { gaveUp = true }
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    WordKeyboard(
-                        keyHeight = keyH,
-                        keyStates = emptyMap(), enabled = true, enterLabel = "ADD",
-                        onLetter = { c ->
-                            if (selected < 0) message = "Tap a tile to choose which letter to change"
-                            else candidate = candidate.replaceRange(selected, selected + 1, c.toString())
-                        },
-                        onDelete = { resetCandidate() },
-                        onEnter = {
-                            val why = WordLadderRules.rejection(graph, chain, candidate)
-                            if (why != null) message = why
-                            else { chainEnc = (chain + candidate).joinToString(","); selected = -1 }
-                        }
-                    )
-                } else {
+                if (over) {
+                    WordPuzzleMessage(message)
                     WordPuzzleResultCard(
                         success = solved,
                         headline = if (solved) "Ladder complete in $steps! ${"★".repeat(WordLadderRules.stars(steps, puzzle.par))}" else "Better luck next time",

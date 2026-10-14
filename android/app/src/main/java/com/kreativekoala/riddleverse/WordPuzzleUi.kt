@@ -73,27 +73,31 @@ object WordPuzzleColors {
     }
 }
 
+/** True when the word page is laid out board-left / controls-right (short, wide screens: landscape phones). */
+val LocalWordSideBySide = androidx.compose.runtime.compositionLocalOf { false }
+
+/**
+ * Page shell for the word games.
+ *
+ * [bottomBar] (keyboard + action rows) is PINNED: below the content on portrait, in a right-hand pane on landscape
+ * phones. It is measured, not estimated, so it can never be pushed off screen; the [content] gets what is left and
+ * scrolls on its own. Without [bottomBar] the whole page scrolls as before.
+ */
 @Composable
 fun WordPuzzleScaffold(
     title: String,
     levelLabel: String,
     onBack: () -> Unit,
+    scrollState: androidx.compose.foundation.ScrollState = rememberScrollState(),
+    bottomBar: (@Composable ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    // The page scrolls only as a last resort: games size themselves from LocalWordViewport (height under the header).
     BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surfaceVariant)) {
         val headerH = 52.dp
         val viewport = (maxHeight - headerH - 8.dp).coerceAtLeast(200.dp)
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .statusBarsPadding()
-                .navigationBarsPadding()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(Modifier.fillMaxWidth().heightIn(min = headerH), verticalAlignment = Alignment.CenterVertically) {
+        val sideBySide = bottomBar != null && maxHeight < 420.dp && maxWidth > maxHeight * 1.3f
+        Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp).heightIn(min = headerH), verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                     Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = MaterialTheme.colorScheme.onSurface)
                 }
@@ -104,8 +108,28 @@ fun WordPuzzleScaffold(
                 )
                 Text(levelLabel, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1)
             }
-            androidx.compose.runtime.CompositionLocalProvider(LocalWordViewport provides viewport) { content() }
-            Spacer(Modifier.height(8.dp))
+            androidx.compose.runtime.CompositionLocalProvider(
+                LocalWordViewport provides viewport,
+                LocalWordSideBySide provides sideBySide
+            ) {
+                when {
+                    bottomBar == null -> Column(
+                        Modifier.weight(1f).fillMaxWidth().verticalScroll(scrollState).padding(horizontal = 12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) { content(); Spacer(Modifier.height(8.dp)) }
+                    sideBySide -> Row(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(scrollState), horizontalAlignment = Alignment.CenterHorizontally) { content(); Spacer(Modifier.height(8.dp)) }
+                        Column(Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally) { bottomBar(); Spacer(Modifier.height(8.dp)) }
+                    }
+                    else -> {
+                        Column(
+                            Modifier.weight(1f).fillMaxWidth().verticalScroll(scrollState).padding(horizontal = 12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) { content(); Spacer(Modifier.height(4.dp)) }
+                        Column(Modifier.fillMaxWidth().padding(start = 12.dp, end = 12.dp, bottom = 8.dp), horizontalAlignment = Alignment.CenterHorizontally) { bottomBar() }
+                    }
+                }
+            }
         }
     }
 }

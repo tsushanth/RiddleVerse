@@ -94,7 +94,7 @@ class AuthActivity : AppCompatActivity() {
 
         // Only auto-redirect if NOT coming from a specific activity
         val isComingFromLogin = intent?.getBooleanExtra("from_login", false) == true
-        if (auth.currentUser != null) {
+        if (auth.currentUser != null && auth.currentUser?.isAnonymous != true) { // anonymous guests must be able to reach sign-in
             val user = auth.currentUser
 
             safeTrackAnalytics {
@@ -122,7 +122,7 @@ class AuthActivity : AppCompatActivity() {
 
 
         // Check for cached sign-in
-        if (auth.currentUser != null) {
+        if (auth.currentUser != null && auth.currentUser?.isAnonymous != true) { // anonymous guests must be able to reach sign-in
             navigateToMainWithOnboardingCheck()
             return
         }

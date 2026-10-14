@@ -78,6 +78,11 @@ fun RvScreenHost(
     val navBottom = WindowInsets.navigationBarsIgnoringVisibility.getBottom(density)
     val imeBottom = WindowInsets.ime.getBottom(density)
     val extraBottom = if (navBottom > 0 && imeBottom == 0) bottomClearance else 0.dp
+    // The strips behind the bars are drawn in [background]: icons must contrast with it (light strip = dark icons).
+    val hostView = androidx.compose.ui.platform.LocalView.current
+    androidx.compose.runtime.SideEffect {
+        hostView.context.findActivity()?.setRvBarIconAppearance(rvUseDarkBarIcons(background))
+    }
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -146,7 +151,32 @@ fun View.applyRvSystemBarPadding(includeIme: Boolean = true) {
 }
 
 /** Call right after `setContentView` in an XML-layout activity: edge-to-edge with the content padded by the system bars. */
-fun android.app.Activity.applyRvEdgeToEdge(includeIme: Boolean = true) {
+fun android.app.Activity.applyRvEdgeToEdge(includeIme: Boolean = true, stripColor: Color = RvCanvas) {
     androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+    setRvBarIconAppearance(rvUseDarkBarIcons(stripColor))
     findViewById<View>(android.R.id.content).applyRvSystemBarPadding(includeIme)
+}
+
+/** WCAG relative luminance of an sRGB colour (components 0..1). */
+fun rvRelativeLuminance(r: Float, g: Float, b: Float): Float {
+    fun lin(c: Float) = if (c <= 0.03928f) c / 12.92f else Math.pow(((c + 0.055f) / 1.055f).toDouble(), 2.4).toFloat()
+    return 0.2126f * lin(r) + 0.7152f * lin(g) + 0.0722f * lin(b)
+}
+
+/** True when the system bar icons (clock, battery, nav handle) must be DARK to be readable on the given strip colour. */
+fun rvUseDarkBarIcons(r: Float, g: Float, b: Float): Boolean = rvRelativeLuminance(r, g, b) > 0.179f
+
+fun rvUseDarkBarIcons(strip: Color): Boolean = rvUseDarkBarIcons(strip.red, strip.green, strip.blue)
+
+private fun android.content.Context.findActivity(): android.app.Activity? {
+    var c = this
+    while (c is android.content.ContextWrapper) { if (c is android.app.Activity) return c; c = c.baseContext }
+    return null
+}
+
+/** Applies dark/light system bar icons to match the strip colour the host really draws behind them. */
+fun android.app.Activity.setRvBarIconAppearance(darkIcons: Boolean) {
+    val controller = androidx.core.view.WindowCompat.getInsetsController(window, window.decorView)
+    controller.isAppearanceLightStatusBars = darkIcons
+    controller.isAppearanceLightNavigationBars = darkIcons
 }

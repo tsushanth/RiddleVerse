@@ -142,6 +142,28 @@ fun GridPuzzleContent(
     BoxWithConstraints(Modifier.fillMaxSize().background(RvCanvas).statusBarsPadding().navigationBarsPadding()) {
         val headerH = 52.dp
         val controlsH = 56.dp
+        // Landscape phone: board on the left, controls + number pad on the right, so nothing is cut off at the bottom.
+        val sideBySide = maxHeight < 420.dp && maxWidth > maxHeight * 1.3f
+        if (sideBySide) {
+            val side = com.kreativekoala.riddleverse.ui.BoardFit.squareSide(
+                maxWidth.value / 2f, maxHeight.value, reservedH = headerH.value + 16f, hPad = 12f, minSide = 120f
+            ).dp
+            Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
+                GridHeader(spec, state, level, onBack, headerH) { showRules = true }
+                Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) { GridBoard(spec, state, side) }
+                    Column(
+                        Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        GridControls(state, controlsH)
+                        Spacer(Modifier.height(8.dp))
+                        GridPad(spec, state)
+                        Spacer(Modifier.height(4.dp))
+                    }
+                }
+            }
+        } else {
         val padH = 52.dp * padRows + 8.dp * (padRows - 1)
         val gaps = 8.dp * 4 + 12.dp
         val side = com.kreativekoala.riddleverse.ui.BoardFit.squareSide(
@@ -160,6 +182,7 @@ fun GridPuzzleContent(
             Spacer(Modifier.height(8.dp))
             GridPad(spec, state)
             Spacer(Modifier.height(4.dp))
+        }
         }
     }
 

@@ -34,6 +34,14 @@ private val balloonColors = listOf(
 /** Category + hint text + word tiles + status line + hint button + spacers, excluding the balloon bunch and the keyboard. */
 private const val BALLOONS_FIXED_DP = 240f
 
+/** (balloon bunch dp, key dp): keys shrink to 36dp first, the bunch to 70dp; side-by-side (landscape) gets roomy keys. */
+internal fun balloonSizes(viewportDp: Float, sideBySide: Boolean): Pair<Float, Float> =
+    if (sideBySide) WordFit.keyHeight(viewportDp, 60f).let { k -> (viewportDp - 150f).coerceIn(70f, 130f) to k }
+    else {
+        val key = ((viewportDp - 150f - 70f - 54f) / 3f).coerceIn(WordFit.KEY_MIN - 4f, WordFit.KEY_MAX)
+        (viewportDp - 150f - 54f - 3f * key).coerceIn(70f, 130f) to key
+    }
+
 @Composable
 fun LetterBalloonsScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
@@ -58,10 +66,21 @@ fun LetterBalloonsScreen(
 
     fun apply(g: LetterBalloonsGame) { guessedEnc = g.guessed.sorted().joinToString(""); hints = g.hintsUsed }
 
-    WordPuzzleScaffold("Letter Balloons", levelLabel, onBack) {
+    WordPuzzleScaffold(
+        "Letter Balloons", levelLabel, onBack,
+        // Pinned (measured, never pushed off screen): hint button + keyboard.
+        bottomBar = if (game.isOver) null else ({
+            val (_, keyH) = balloonSizes(LocalWordViewport.current.value, LocalWordSideBySide.current)
+            WordActionButton("Hint (-20 pts)", "Reveal one letter for a score penalty") { apply(game.hint()) }
+            Spacer(Modifier.height(4.dp))
+            val states = HashMap<Char, LetterState>()
+            game.guessed.forEach { states[it] = if (it in word) LetterState.CORRECT else LetterState.ABSENT }
+            WordKeyboard(keyHeight = keyH.dp, keyStates = states, enabled = true, onLetter = { apply(game.guess(it)) }, onDelete = {}, onEnter = {}, showActions = false)
+        })
+    ) {
         Text("Category: $category", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Text("Guess the word before the balloons are all popped", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        val (bunchH, keyH) = WordFit.bunchAndKey(LocalWordViewport.current.value, BALLOONS_FIXED_DP)
+        val (bunchH, _) = balloonSizes(LocalWordViewport.current.value, LocalWordSideBySide.current)
         BalloonBunch(game.livesLeft, lives, bunchH.dp)
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val groups = word.split(" ")
@@ -94,13 +113,7 @@ fun LetterBalloonsScreen(
         Spacer(Modifier.height(4.dp))
         Text("Balloons left: ${game.livesLeft}/$lives" + if (game.wrongLetters.isNotEmpty()) "   Missed: ${game.wrongLetters.joinToString(" ") { it.uppercase() }}" else "",
             fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.padding(vertical = 4.dp))
-        if (!game.isOver) {
-            WordActionButton("Hint (-20 pts)", "Reveal one letter for a score penalty") { apply(game.hint()) }
-            Spacer(Modifier.height(6.dp))
-            val states = HashMap<Char, LetterState>()
-            game.guessed.forEach { states[it] = if (it in word) LetterState.CORRECT else LetterState.ABSENT }
-            WordKeyboard(keyHeight = keyH.dp, keyStates = states, enabled = true, onLetter = { apply(game.guess(it)) }, onDelete = {}, onEnter = {}, showActions = false)
-        } else {
+        if (game.isOver) {
             WordPuzzleResultCard(
                 success = game.isWon,
                 headline = if (game.isWon) "You saved the balloons!" else "The word was ${word.uppercase()}",

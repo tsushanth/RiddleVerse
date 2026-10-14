@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +30,15 @@ private fun decodeGuess(answer: String, hard: Boolean, s: String): WordGuessGame
     if (p.size < 3) return WordGuessGame(answer, hard)
     return WordGuessGame(answer, hard, p[0].split(",").filter { it.isNotEmpty() }, p[1], p[2] == "1")
 }
+
+/** Tile / key sizes: stacked (portrait) or tiles-only with roomy keys (side-by-side landscape). */
+internal fun guessFit(widthDp: Float, viewportDp: Float, sideBySide: Boolean): WordFit.Sizes =
+    if (sideBySide) {
+        val tiles = WordFit.guessLayout((widthDp - 12f) / 2f, viewportDp, WordGuessRules.MAX_TRIES, WordGuessRules.WORD_LENGTH, 6f, 40f, keyRows = 0)
+        WordFit.Sizes(tiles.tile, WordFit.keyHeight(viewportDp, 60f), tiles.needsScroll)
+    } else {
+        WordFit.guessLayout(widthDp, viewportDp, WordGuessRules.MAX_TRIES, WordGuessRules.WORD_LENGTH, 6f, WORD_GUESS_FIXED_DP)
+    }
 
 /** Message line (28) + hint row (48) + spacers (8) + slack: everything on the Word Guess page that is not a tile row or a key row. */
 private const val WORD_GUESS_FIXED_DP = 88f
@@ -65,15 +75,41 @@ fun WordGuessScreen(
     }
     val score = if (status == GuessStatus.WON) WordGuessRules.score(game.guesses.size, game.hintUsed, hard) else 0
 
-    WordPuzzleScaffold("Word Guess" + if (hard) " (hard)" else "", levelLabel, onBack) {
+    WordPuzzleScaffold(
+        "Word Guess" + if (hard) " (hard)" else "", levelLabel, onBack,
+        // Pinned (measured): hint row + keyboard stay at the bottom (right-hand pane in landscape).
+        bottomBar = if (status != GuessStatus.PLAYING) null else ({
+            val fit = guessFit(LocalConfiguration.current.screenWidthDp.toFloat() - 24f, LocalWordViewport.current.value, LocalWordSideBySide.current)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                WordActionButton("Hint (-30 pts)", "Reveal one letter for a score penalty", enabled = hintPos < 0) {
+                    val p = game.hintPosition()
+                    if (p >= 0) { hintPos = p; update(game.copy(hintUsed = true)) }
+                }
+                Text("${WordGuessRules.MAX_TRIES - game.guesses.size} tries left", fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Spacer(Modifier.height(4.dp))
+            WordKeyboard(
+                keyHeight = fit.key.dp,
+                keyStates = WordGuessRules.keyboardStates(game.guesses, answer), enabled = true,
+                onLetter = { update(game.type(it)) },
+                onDelete = { update(game.backspace()) },
+                onEnter = {
+                    val (next, outcome) = game.submit { lists.valid5.contains(it) }
+                    when (outcome) {
+                        SubmitOutcome.Accepted -> update(next)
+                        SubmitOutcome.TooShort -> message = "Not enough letters"
+                        SubmitOutcome.NotInList -> message = "Not in word list"
+                        is SubmitOutcome.HardMode -> message = outcome.message
+                        SubmitOutcome.GameOver -> {}
+                    }
+                }
+            )
+        })
+    ) {
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             // Tile and key sizes come from the height we really have, so the 3 keyboard rows incl. ENTER / backspace stay on screen.
-            val fit = WordFit.guessLayout(
-                availW = maxWidth.value, availH = LocalWordViewport.current.value,
-                tileRows = WordGuessRules.MAX_TRIES, tileCols = WordGuessRules.WORD_LENGTH, gap = 6f,
-                fixedH = WORD_GUESS_FIXED_DP
-            )
-            val tile: Dp = fit.tile.dp
+            val tile: Dp = guessFit(maxWidth.value, LocalWordViewport.current.value, LocalWordSideBySide.current).tile.dp
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     for (row in 0 until WordGuessRules.MAX_TRIES) {
@@ -93,33 +129,7 @@ fun WordGuessScreen(
                     Text("Hint: letter ${hintPos + 1} is ${answer[hintPos].uppercaseChar()}", fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
                 }
-                if (status == GuessStatus.PLAYING) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                        WordActionButton("Hint (-30 pts)", "Reveal one letter for a score penalty", enabled = hintPos < 0) {
-                            val p = game.hintPosition()
-                            if (p >= 0) { hintPos = p; update(game.copy(hintUsed = true)) }
-                        }
-                        Text("${WordGuessRules.MAX_TRIES - game.guesses.size} tries left", fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Spacer(Modifier.height(4.dp))
-                    WordKeyboard(
-                        keyHeight = fit.key.dp,
-                        keyStates = WordGuessRules.keyboardStates(game.guesses, answer), enabled = true,
-                        onLetter = { update(game.type(it)) },
-                        onDelete = { update(game.backspace()) },
-                        onEnter = {
-                            val (next, outcome) = game.submit { lists.valid5.contains(it) }
-                            when (outcome) {
-                                SubmitOutcome.Accepted -> update(next)
-                                SubmitOutcome.TooShort -> message = "Not enough letters"
-                                SubmitOutcome.NotInList -> message = "Not in word list"
-                                is SubmitOutcome.HardMode -> message = outcome.message
-                                SubmitOutcome.GameOver -> {}
-                            }
-                        }
-                    )
-                } else {
+                if (status != GuessStatus.PLAYING) {
                     WordPuzzleResultCard(
                         success = status == GuessStatus.WON,
                         headline = if (status == GuessStatus.WON) "Solved in ${game.guesses.size}!" else "The word was ${answer.uppercase()}",

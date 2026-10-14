@@ -1587,7 +1587,8 @@ fun SettingsTab(
     onSignUp: () -> Unit,
     onShowRatingDialog: () -> Unit
 ) {
-    val isSignedIn = remember { mutableStateOf(FirebaseAuth.getInstance().currentUser != null) }
+    // Anonymous / identity-less users count as guests (Guest label + sign-in button), not as signed in.
+    val isSignedIn = remember { mutableStateOf(!isGuestProfile(FirebaseAuth.getInstance().currentUser)) }
 
     Column(
         modifier = Modifier
@@ -1914,10 +1915,12 @@ fun ProgressStatsSection() {
 @Composable
 fun ProfileSection(onSignIn: () -> Unit = {}) {
     val user = FirebaseAuth.getInstance().currentUser
+    val guest = isGuestProfile(user)
     SettingsSection(title = "Profile") {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .then(if (guest) Modifier.clickable(onClickLabel = "Sign in or create account") { onSignIn() } else Modifier)
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -1931,7 +1934,7 @@ fun ProfileSection(onSignIn: () -> Unit = {}) {
             Spacer(modifier = Modifier.width(12.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                if (user == null) {
+                if (guest || user == null) {
                     // Guest: say so, and give a visible way into email sign-in / sign-up (AuthActivity)
                     Text(
                         text = "Guest",

@@ -117,3 +117,37 @@ class WordFitSmallPhoneTest {
         }
     }
 }
+
+class PinnedLayoutTest {
+    private fun vp(h: Int, bottom: Float) = h - 24f - bottom - 52f - 8f
+
+    @Test fun pinnedKeysNeverBelow36AndLandscapeGetsSideBySide() {
+        for (bottom in listOf(24f, 48f)) {
+            val v = vp(568, bottom)
+            val ladderKey = ((v - 230f - 56f) / 3f).coerceIn(36f, 54f)
+            val (bunch, balloonKey) = balloonSizes(v, false)
+            println("Pinned 320x568 bottom=${bottom.toInt()}: ladderKey=${"%.0f".format(ladderKey)} balloonKey=${"%.0f".format(balloonKey)} bunch=${"%.0f".format(bunch)}")
+            assertTrue(ladderKey >= 36f && balloonKey >= 36f && bunch >= 70f)
+        }
+        // landscape 760x333 usable (side-by-side): viewport = 333 - 52 - 8
+        val land = 333f - 52f - 8f
+        val g = guessFit(760f - 24f, land, true)
+        println("Landscape 760x333: guess tile=${"%.0f".format(g.tile)} key=${"%.0f".format(g.key)} scroll=${g.needsScroll}")
+        assertTrue(g.key >= 36f && g.tile >= 32f)
+        val (bunchL, keyL) = balloonSizes(land, true)
+        assertTrue(keyL >= 36f && bunchL >= 70f)
+    }
+
+    @Test fun gridBoardSideBySideIsReadable() {
+        // 9x9 sudoku board in landscape: left half of 760dp, height 333 - header 52 - 16
+        val side = com.kreativekoala.riddleverse.ui.BoardFit.squareSide(380f, 333f, 68f, 12f, 120f)
+        println("Landscape Sudoku board side=${"%.0f".format(side)} cell=${"%.1f".format(side / 9)}")
+        assertTrue(side >= 200f && side / 9 >= 22f)
+        assertTrue(side + 68f <= 333f + 0.5f)
+    }
+
+    @Test fun shortScreenRule() {
+        assertTrue(com.kreativekoala.riddleverse.ui.rvIsShort(333f))
+        assertFalse(com.kreativekoala.riddleverse.ui.rvIsShort(496f)) // 320x568 portrait stays on the normal path
+    }
+}

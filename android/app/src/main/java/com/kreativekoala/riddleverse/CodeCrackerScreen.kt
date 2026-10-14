@@ -74,38 +74,10 @@ fun CodeCrackerScreen(
         if (next != null) selected = next
     }
 
-    WordPuzzleScaffold("Code Cracker", levelLabel, onBack) {
-        Text(
-            "Crack the ${cfg.positions}-peg code in ${cfg.maxTries} tries. Dark peg = right colour and place; light peg = right colour, wrong place." +
-                if (cfg.allowRepeats) " Colours can repeat." else " No colour repeats.",
-            fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp)
-        )
-        val slot: Dp = 48.dp
-        // Past-guess pegs shrink (36 -> 24dp) so the colour palette and Check stay on screen; the page scrolls only below that.
-        val pastPeg: Dp = WordFit.fitEach(LocalWordViewport.current.value, CODE_CRACKER_FIXED_DP, cfg.maxTries, 6f, 24f, 36f).dp
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            guesses.forEachIndexed { r, g ->
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    g.forEachIndexed { c, color -> Peg(color, pastPeg, "Try ${r + 1}, position ${c + 1}", false, null) }
-                    FeedbackPegs(feedbacks[r], cfg.positions, "Try ${r + 1}")
-                }
-            }
-            if (!over) {
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    for (i in 0 until cfg.positions) {
-                        val ch = currentEnc[i]
-                        Peg(if (ch == '-') -1 else ch - '0', ((LocalConfiguration.current.screenWidthDp.dp - 24.dp - 6.dp * (cfg.positions - 1)) / cfg.positions).coerceIn(36.dp, slot), "Your try, position ${i + 1}", i == selected) { selected = i }
-                    }
-                }
-                Text("Try ${guesses.size + 1} of ${cfg.maxTries}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-        if (hintPos >= 0 && !over) {
-            Text("Hint: position ${hintPos + 1} is ${CodeCrackerRules.colorNames[puzzle.secret[hintPos]]} ${pegSymbols[puzzle.secret[hintPos]]}",
-                fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
-        }
-        WordPuzzleMessage(message)
-        if (!over) {
+    WordPuzzleScaffold(
+        "Code Cracker", levelLabel, onBack,
+        // Pinned (measured): colour palette, Clear / Hint and Check are always on screen.
+        bottomBar = if (over) null else ({
             // Palette pegs shrink (48 -> 36dp) so every colour fits one row at 320dp.
             val paletteW = LocalConfiguration.current.screenWidthDp.dp - 24.dp
             val palettePeg: Dp = ((paletteW - 8.dp * (cfg.colors - 1)) / cfg.colors).coerceIn(36.dp, 48.dp)
@@ -137,7 +109,39 @@ fun CodeCrackerScreen(
                     }
                 }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Check", maxLines = 1, softWrap = false) }
             }
-        } else {
+        })
+    ) {
+        Text(
+            "Crack the ${cfg.positions}-peg code in ${cfg.maxTries} tries. Dark peg = right colour and place; light peg = right colour, wrong place." +
+                if (cfg.allowRepeats) " Colours can repeat." else " No colour repeats.",
+            fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(bottom = 6.dp)
+        )
+        val slot: Dp = 48.dp
+        // Past-guess pegs shrink (36 -> 24dp) so the colour palette and Check stay on screen; the page scrolls only below that.
+        val pastPeg: Dp = WordFit.fitEach(LocalWordViewport.current.value, CODE_CRACKER_FIXED_DP, cfg.maxTries, 6f, 24f, 36f).dp
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            guesses.forEachIndexed { r, g ->
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    g.forEachIndexed { c, color -> Peg(color, pastPeg, "Try ${r + 1}, position ${c + 1}", false, null) }
+                    FeedbackPegs(feedbacks[r], cfg.positions, "Try ${r + 1}")
+                }
+            }
+            if (!over) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    for (i in 0 until cfg.positions) {
+                        val ch = currentEnc[i]
+                        Peg(if (ch == '-') -1 else ch - '0', ((LocalConfiguration.current.screenWidthDp.dp - 24.dp - 6.dp * (cfg.positions - 1)) / cfg.positions).coerceIn(36.dp, slot), "Your try, position ${i + 1}", i == selected) { selected = i }
+                    }
+                }
+                Text("Try ${guesses.size + 1} of ${cfg.maxTries}", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+        if (hintPos >= 0 && !over) {
+            Text("Hint: position ${hintPos + 1} is ${CodeCrackerRules.colorNames[puzzle.secret[hintPos]]} ${pegSymbols[puzzle.secret[hintPos]]}",
+                fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+        }
+        WordPuzzleMessage(message)
+        if (over) {
             if (lost) {
                 Text("The code was:", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface)
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {

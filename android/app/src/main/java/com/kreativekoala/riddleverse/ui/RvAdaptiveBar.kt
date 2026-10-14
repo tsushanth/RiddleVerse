@@ -9,8 +9,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-/** Pages shorter than this (landscape phones) scroll as a whole instead of squeezing their board/controls. */
-val RV_MIN_PAGE_HEIGHT: Dp = 460.dp
+/** On short screens (rvIsShort, landscape phones) pages use at least this height scroll as a whole instead of squeezing their board/controls. */
+val RV_MIN_PAGE_HEIGHT: Dp = 500.dp
 
 /** True when [heightDp] is too short for a stacked button bar / fixed chrome (landscape phones). */
 fun rvIsShort(heightDp: Float): Boolean = heightDp < 420f

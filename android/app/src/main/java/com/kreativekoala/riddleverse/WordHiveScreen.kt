@@ -91,7 +91,31 @@ fun WordHiveScreen(
         entry = ""
     }
 
-    WordPuzzleScaffold("Word Hive", levelLabel, onBack) {
+    WordPuzzleScaffold(
+        "Word Hive", levelLabel, onBack,
+        // Pinned (measured): action rows are always on screen; the honeycomb scales into what is left.
+        bottomBar = if (finished) null else ({
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WordActionButton("Delete", "Delete last letter", enabled = entry.isNotEmpty()) { entry = entry.dropLast(1) }
+                WordActionButton("Shuffle", "Shuffle outer letters") { shuffleSeed += 1 }
+                Button(onClick = { submit() }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Enter") }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WordActionButton("Hint (-10 pts)", "Show the start of a word you have not found") {
+                    val missing = puzzle.words.filter { it !in found }
+                    if (missing.isEmpty()) message = "You found them all!"
+                    else {
+                        val w = missing.first { it.length == missing.minOf { m -> m.length } }
+                        hints++
+                        message = "Try: ${w.take(2).uppercase()}... (${w.length} letters)"
+                    }
+                }
+                WordActionButton(if (success) "Finish" else "Give up", if (success) "Finish with your rank" else "Give up and see results") { finished = true }
+            }
+            if (success) Text("Goal reached! Keep going for a higher rank or finish.", fontSize = 13.sp,
+                color = WordPuzzleColors.correct, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
+        })
+    ) {
         // On short screens (< 520dp under the header) drop the instruction line so the honeycomb and the button rows fit.
         val hiveCompact = LocalWordViewport.current < 520.dp
         if (!hiveCompact) {
@@ -118,27 +142,7 @@ fun WordHiveScreen(
                 }
             }
             WordPuzzleMessage(message)
-            HexBoard(puzzle.center, outer, WordFit.boardScale(LocalWordViewport.current.value - (if (hiveCompact) HIVE_FIXED_DP - 36f else HIVE_FIXED_DP), 222f)) { entry += it }
-            Spacer(Modifier.height(8.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                WordActionButton("Delete", "Delete last letter", enabled = entry.isNotEmpty()) { entry = entry.dropLast(1) }
-                WordActionButton("Shuffle", "Shuffle outer letters") { shuffleSeed += 1 }
-                Button(onClick = { submit() }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Enter") }
-            }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                WordActionButton("Hint (-10 pts)", "Show the start of a word you have not found") {
-                    val missing = puzzle.words.filter { it !in found }
-                    if (missing.isEmpty()) message = "You found them all!"
-                    else {
-                        val w = missing.first { it.length == missing.minOf { m -> m.length } }
-                        hints++
-                        message = "Try: ${w.take(2).uppercase()}... (${w.length} letters)"
-                    }
-                }
-                WordActionButton(if (success) "Finish" else "Give up", if (success) "Finish with your rank" else "Give up and see results") { finished = true }
-            }
-            if (success) Text("Goal reached! Keep going for a higher rank or finish.", fontSize = 13.sp,
-                color = WordPuzzleColors.correct, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
+            HexBoard(puzzle.center, outer, WordFit.boardScale(LocalWordViewport.current.value - (if (LocalWordSideBySide.current) 160f else 260f) - (if (hiveCompact) 0f else 36f), 222f)) { entry += it }
         } else {
             val missedPangrams = puzzle.pangrams.filter { it !in found }
             WordPuzzleResultCard(
