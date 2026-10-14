@@ -1,3 +1,4 @@
+import { createJobStore, pumpJob, publicJob } from '../services/gameCreationJobs.js';
 import express from 'express';
 import crypto from 'crypto';
 import zlib from 'zlib';
@@ -833,6 +834,54 @@ router.post('/generate', async (req, res) => {
             res.status(500).json({ error: 'Failed to generate game. Please try again.' });
         }
     }
+});
+
+// ============================================
+// Async job endpoints (submit + poll), built on the sync /generate above.
+// POST   /api/game-creation/jobs/generate -> {jobId}   (same body as /generate; gate errors are returned as-is)
+// GET    /api/game-creation/jobs/:jobId   -> {status: running|succeeded|failed, phase, message, progressPercent, gameId, result}
+// DELETE /api/game-creation/jobs/:jobId   -> 204
+// See services/gameCreationJobs.js and docs/game-creation-jobs.md.
+// ============================================
+const jobStore = createJobStore();
+
+router.post('/jobs/generate', async (req, res) => {
+    try {
+        const upstream = await fetch(`http://127.0.0.1:${process.env.PORT || 8080}/api/game-creation/generate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-platform': req.get('x-platform') || 'android',
+                ...(req.get('authorization') ? { authorization: req.get('authorization') } : {}),
+            },
+            body: JSON.stringify(req.body || {}),
+        });
+        const isStream = (upstream.headers.get('content-type') || '').includes('text/event-stream');
+        if (!upstream.ok || !isStream) {
+            // Validation, paywall (403), rate limit (429) and coin (402) errors: hand them to the client unchanged.
+            const text = await upstream.text().catch(() => '');
+            let body;
+            try { body = JSON.parse(text); } catch { body = { error: text.slice(0, 200) || 'Build server unavailable' }; }
+            return res.status(upstream.ok ? 502 : upstream.status).json(body);
+        }
+        const job = jobStore.create();
+        pumpJob(job, upstream.body).catch(err => console.error(`[jobs/${job.jobId}] pump crashed:`, err.message));
+        return res.json({ jobId: job.jobId, status: 'running', startedAt: job.startedAt });
+    } catch (error) {
+        console.error('[jobs/generate] Error:', error.message);
+        return res.status(500).json({ error: 'Failed to submit job. Please try again.' });
+    }
+});
+
+router.get('/jobs/:jobId', (req, res) => {
+    const job = jobStore.get(req.params.jobId);
+    if (!job) return res.status(404).json({ error: 'Unknown or expired jobId' });
+    return res.json(publicJob(job));
+});
+
+router.delete('/jobs/:jobId', (req, res) => {
+    jobStore.delete(req.params.jobId);
+    res.status(204).end();
 });
 
 // POST /api/game-creation/save
