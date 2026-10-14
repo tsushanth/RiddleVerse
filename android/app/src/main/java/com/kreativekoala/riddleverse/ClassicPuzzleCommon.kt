@@ -131,17 +131,12 @@ fun ClassicScaffold(
     onBack: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    // Short screens (landscape): the page scrolls as a whole at a minimum height, so the board and all controls stay reachable.
     androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    val sideBySide = com.kreativekoala.riddleverse.ui.rvSideBySide(maxWidth.value, maxHeight.value)
     val tooShort = com.kreativekoala.riddleverse.ui.rvIsShort(maxHeight.value)
-    Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
-    Column(
-        Modifier
-            .then(if (tooShort) Modifier.height(com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT) else Modifier.fillMaxSize())
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .padding(horizontal = 16.dp)
-    ) {
+
+    // Title row, description and stat chips.
+    val chrome: @Composable ColumnScope.(Boolean) -> Unit = { side ->
         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -154,7 +149,7 @@ fun ClassicScaffold(
         }
         Text(
             subtitle, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurfaceVariant,
-            maxLines = 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // keeps the board area from collapsing on short phones
+            maxLines = if (side) 6 else 2, overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // keeps the board area from collapsing on short phones
             modifier = Modifier.padding(bottom = 8.dp),
         )
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -172,9 +167,33 @@ fun ClassicScaffold(
                 }
             }
         }
+    }
+
+    if (sideBySide) {
+        // Landscape phone: board + its controls on the left (never scrolled: swipes and drags are the game's input),
+        // title / description / stats in a scrolling pane on the right.
+        Row(
+            Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Column(Modifier.weight(1f).fillMaxHeight()) { content(); Spacer(Modifier.height(4.dp)) }
+            Column(Modifier.width(com.kreativekoala.riddleverse.ui.RV_SIDE_PANE_WIDTH).fillMaxHeight().verticalScroll(androidx.compose.foundation.rememberScrollState())) { chrome(true) }
+        }
+    } else {
+    // Short but narrow (rare): the page scrolls as a whole at a minimum height.
+    Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
+    Column(
+        Modifier
+            .then(if (tooShort) Modifier.height(com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT) else Modifier.fillMaxSize())
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(horizontal = 16.dp)
+    ) {
+        chrome(false)
         Spacer(Modifier.height(8.dp))
         content()
         Spacer(Modifier.height(8.dp))
+    }
     }
     }
     }

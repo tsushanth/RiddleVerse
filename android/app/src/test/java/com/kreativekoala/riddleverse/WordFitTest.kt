@@ -151,3 +151,26 @@ class PinnedLayoutTest {
         assertFalse(com.kreativekoala.riddleverse.ui.rvIsShort(496f)) // 320x568 portrait stays on the normal path
     }
 }
+
+class LandscapeBoardFitTest {
+    private val phones = listOf(640 to 320, 760 to 333, 851 to 393, 915 to 412, 960 to 360)
+
+    @Test fun boardLeftOfPaneFitsEveryLandscapePhoneWithoutScrolling() {
+        for ((w, h) in phones) {
+            assertTrue("$w x $h should be side-by-side", com.kreativekoala.riddleverse.ui.rvSideBySide(w.toFloat(), h.toFloat()))
+            for (controlsH in listOf(0f, 56f, 64f)) {
+                val side = com.kreativekoala.riddleverse.ui.rvLandscapeBoardSide(w.toFloat(), h - 24f /*status+cutout slack*/, 240f, controlsH)
+                println("Landscape ${w}x$h controls=${controlsH.toInt()}: board=${"%.0f".format(side)}")
+                assertTrue("$w x $h board $side too small", side >= 120f)
+                assertTrue(side + controlsH <= h - 24f + 0.5f || side == 120f)
+                assertTrue(side <= w - 240f - 12f + 0.5f || side == 120f)
+            }
+        }
+    }
+
+    @Test fun portraitAndTabletsKeepTheNormalPath() {
+        assertFalse(com.kreativekoala.riddleverse.ui.rvSideBySide(360f, 640f))
+        assertFalse(com.kreativekoala.riddleverse.ui.rvSideBySide(1280f, 800f))   // tablet landscape is not short
+        assertFalse(com.kreativekoala.riddleverse.ui.rvSideBySide(330f, 400f))    // short but not wide
+    }
+}

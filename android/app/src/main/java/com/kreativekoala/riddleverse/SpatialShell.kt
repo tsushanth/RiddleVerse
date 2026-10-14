@@ -60,16 +60,11 @@ fun SpatialGameShell(
     controls: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    // Short screens (landscape): the page scrolls as a whole at a minimum height, so the board and all controls stay reachable.
     BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    val sideBySide = com.kreativekoala.riddleverse.ui.rvSideBySide(maxWidth.value, maxHeight.value)
     val tooShort = com.kreativekoala.riddleverse.ui.rvIsShort(maxHeight.value)
-    Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
-    Column(
-        Modifier
-            .then(if (tooShort) Modifier.height(com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT) else Modifier.fillMaxSize())
-            .statusBarsPadding()
-            .navigationBarsPadding()
-    ) {
+
+    val headerRow: @Composable () -> Unit = {
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -91,6 +86,35 @@ fun SpatialGameShell(
                 maxLines = 1
             )
         }
+    }
+
+    if (sideBySide) {
+        // Landscape phone: the board gets the whole height on the left (drags/swipes are the game's input, so it must
+        // never sit in a scrolling page); header and controls live in a scrolling pane on the right.
+        Row(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding()) {
+            Column(Modifier.weight(1f).fillMaxHeight(), content = content)
+            Column(
+                Modifier.width(com.kreativekoala.riddleverse.ui.RV_SIDE_PANE_WIDTH).fillMaxHeight().verticalScroll(androidx.compose.foundation.rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                headerRow()
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically,
+                    content = controls
+                )
+            }
+        }
+    } else {
+    Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
+    Column(
+        Modifier
+            .then(if (tooShort) Modifier.height(com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT) else Modifier.fillMaxSize())
+            .statusBarsPadding()
+            .navigationBarsPadding()
+    ) {
+        headerRow()
         Column(Modifier.weight(1f).fillMaxWidth(), content = content)
         Row(
             Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 6.dp),
@@ -98,6 +122,7 @@ fun SpatialGameShell(
             verticalAlignment = Alignment.CenterVertically,
             content = controls
         )
+    }
     }
     }
     }

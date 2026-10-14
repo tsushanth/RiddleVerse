@@ -15,6 +15,16 @@ val RV_MIN_PAGE_HEIGHT: Dp = 500.dp
 /** True when [heightDp] is too short for a stacked button bar / fixed chrome (landscape phones). */
 fun rvIsShort(heightDp: Float): Boolean = heightDp < 420f
 
+/** Landscape phone: short AND clearly wider than tall. Swipe/drag games then use board-left / controls-right. */
+fun rvSideBySide(widthDp: Float, heightDp: Float): Boolean = rvIsShort(heightDp) && widthDp > heightDp * 1.3f
+
+/** Width of the right-hand info/controls pane in side-by-side layouts. */
+val RV_SIDE_PANE_WIDTH: Dp = 240.dp
+
+/** Pure: side of the largest square board that fits left of the pane, above [controlsH] of controls. */
+fun rvLandscapeBoardSide(totalW: Float, totalH: Float, paneW: Float = 240f, controlsH: Float = 0f, gap: Float = 12f, minSide: Float = 120f): Float =
+    minOf(totalW - paneW - gap, totalH - controlsH).coerceAtLeast(minSide)
+
 /**
  * Button bar that stacks vertically on normal screens and becomes one row of equal-width buttons when the
  * screen is short (landscape), so it no longer covers most of the page.
