@@ -239,7 +239,7 @@ fun HomeScreen(navController: NavHostController,
         // Navigate to puzzle
         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
             putExtra("puzzleType", puzzleType)
-            putExtra("title", puzzleType.replaceFirstChar { it.uppercaseChar() })
+            putExtra("title", NewGameInfo.of(puzzleType)?.name ?: puzzleType.replaceFirstChar { it.uppercaseChar() })
         }
         context.startActivity(intent)
     }

@@ -88,7 +88,7 @@ class PuzzleGroupActivity : AppCompatActivity() {
                         // Use launcher instead of direct startActivity
                         val intent = Intent(this@PuzzleGroupActivity, StartPuzzleActivity::class.java).apply {
                             putExtra("puzzleType", puzzleType)
-                            putExtra("title", puzzleType.replaceFirstChar { it.uppercaseChar() })
+                            putExtra("title", NewGameInfo.of(puzzleType)?.name ?: puzzleType.replaceFirstChar { it.uppercaseChar() })
                             putExtra("sourceGroupId", groupId)
                             putExtra("sourceGroupName", groupName)
                         }
