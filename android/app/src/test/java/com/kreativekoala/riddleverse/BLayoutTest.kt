@@ -238,8 +238,14 @@ class BLayoutTest : LayoutMatrixBase() {
         val pz = com.google.gson.Gson().fromJson(letterJson, LetterSetPuzzle::class.java)
         render(fs) { EnhancedLetterSetGameScreen(pz, ctx, {}, { _, _ -> }) }
         compose.waitUntil(30_000) { compose.onAllNodes(hasText("Loading", substring = true)).fetchSemanticsNodes().isEmpty() }
+        // The 120s countdown runs on the test clock while we wait for the real (IO-thread) dictionary load, so on a
+        // busy JVM the load can take several virtual seconds and the timer is 01:59 (or mid-recompose, "not displayed")
+        // at the assertion. Freeze the clock now that loading is done and match the timer by format, not by value.
+        compose.mainClock.autoAdvance = false
         settle()
-        assertOnScreen(compose.onNodeWithText("02:00"))
+        assertOnScreen(compose.onNode(SemanticsMatcher("countdown timer 0M:SS") { n ->
+            n.config.getOrElse(SemanticsProperties.Text) { emptyList() }.any { t -> Regex("0[12]:[0-5]\\d").matches(t.text) }
+        }))
         assertOnScreen(compose.onNodeWithTag("ls_word"))
         assertOnScreen(compose.onNodeWithContentDescription("Submit"))
         compose.onAllNodesWithTag("ls_key").assertCountEquals(9)

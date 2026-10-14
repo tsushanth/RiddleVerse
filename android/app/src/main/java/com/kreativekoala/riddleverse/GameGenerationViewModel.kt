@@ -462,6 +462,13 @@ class GameGenerationViewModel : ViewModel() {
 
                 Log.d(TAG, "$logPrefix submit to: $jobsSubmitUrl")
                 val submitResp = client.newCall(submitRequest).execute()
+                if (submitResp.code == 404 || submitResp.code == 405) {
+                    // The deployed backend has no async jobs route (it was reverted server-side): use the synchronous
+                    // generate path instead of failing with "Server error (404)".
+                    Log.w(TAG, "$logPrefix jobs route missing (HTTP ${submitResp.code}); falling back to sync generate")
+                    submitResp.close()
+                    return@withContext streamInternal(mode, context)
+                }
                 if (!submitResp.isSuccessful) {
                     Log.e(TAG, "$logPrefix submit HTTP ${submitResp.code}")
                     val handled = handleSubmitError(submitResp)

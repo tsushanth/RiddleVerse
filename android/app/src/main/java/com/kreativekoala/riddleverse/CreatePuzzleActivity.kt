@@ -1289,8 +1289,12 @@ class CreatePuzzleActivity : AppCompatActivity() {
         }
 
         val selectedFormat = formatDropdown.selectedItem.toString()
-        val currentUser = FirebaseAuth.getInstance().currentUser?.displayName ?: "Guest"
-        val userId = FirebaseAuth.getInstance().currentUser?.displayName ?: "guest_user"
+        val fbUser = FirebaseAuth.getInstance().currentUser
+        // Anonymous users have an EMPTY (not null) display name; the server rejects an empty userId with 400, which
+        // this screen used to hide. Fall back to the Firebase uid, then to "guest_user".
+        val userId = fbUser?.displayName?.takeIf { it.isNotBlank() }
+            ?: fbUser?.uid?.takeIf { it.isNotBlank() }
+            ?: "guest_user"
 
         val mediaType = "application/json".toMediaTypeOrNull()
 
@@ -1332,19 +1336,41 @@ class CreatePuzzleActivity : AppCompatActivity() {
             .post(RequestBody.create(mediaType, requestBody.toString()))
             .build()
 
-        val client = OkHttpClient()
+        // The screen stays open (button shows "Creating...") until the server answers or 10s pass.
+        val appContext = applicationContext
+        val client = OkHttpClient.Builder().callTimeout(10, java.util.concurrent.TimeUnit.SECONDS).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
+                Log.w("CreatePuzzle", "generate-riddle failed: ${e.javaClass.simpleName}: ${e.message}")
                 runOnUiThread {
-                    Toast.makeText(this@CreatePuzzleActivity, "⌛ Error generating puzzle", Toast.LENGTH_SHORT).show()
-                    resetGenerateButton()
+                    val msg = if (e is java.io.InterruptedIOException) "The server did not answer in time. Please try again."
+                    else "Could not reach the server. Check your connection and try again."
+                    Toast.makeText(appContext, msg, Toast.LENGTH_LONG).show()
+                    if (!isFinishing && !isDestroyed) resetGenerateButton()
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string()
-                val json = JSONObject(responseBody)
-                val jobId = json.optString("jobId", "")
+                var jobId = ""
+                var serverError: String? = null
+                try {
+                    val json = JSONObject(responseBody ?: "{}")
+                    jobId = json.optString("jobId", "")
+                    serverError = json.optString("error", "").ifBlank { json.optString("message", "") }.ifBlank { null }
+                } catch (e: Exception) {
+                    Log.w("CreatePuzzle", "generate-riddle returned a non-JSON body (HTTP ${response.code})")
+                }
+                // Success only for a 2xx WITH a job id; anything else is shown to the user, never reported as "started".
+                if (!response.isSuccessful || jobId.isBlank()) {
+                    Log.w("CreatePuzzle", "generate-riddle not accepted: HTTP ${response.code} body=${responseBody?.take(200)}")
+                    runOnUiThread {
+                        val msg = serverError ?: if (response.isSuccessful) "The server did not start your puzzle. Please try again." else "Server error (${response.code}). Please try again."
+                        Toast.makeText(appContext, msg, Toast.LENGTH_LONG).show()
+                        if (!isFinishing && !isDestroyed) resetGenerateButton()
+                    }
+                    return
+                }
 
                 val resultIntent = Intent().apply {
                     putExtra("jobId", jobId)
@@ -1359,9 +1385,11 @@ class CreatePuzzleActivity : AppCompatActivity() {
                         selectedFormat.contains("Music Puzzle") -> "🎵 Music Quiz creation started!"
                         else -> "🎉 Puzzle creation started!"
                     }
-                    Toast.makeText(this@CreatePuzzleActivity, successMessage, Toast.LENGTH_LONG).show()
-                    setResult(RESULT_OK, resultIntent)
-                    finish()
+                    Toast.makeText(appContext, successMessage, Toast.LENGTH_LONG).show()
+                    if (!isFinishing && !isDestroyed) {
+                        setResult(RESULT_OK, resultIntent)
+                        finish()
+                    }
                 }
             }
         })
