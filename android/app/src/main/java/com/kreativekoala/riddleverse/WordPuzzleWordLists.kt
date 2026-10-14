@@ -1,6 +1,9 @@
 package com.kreativekoala.riddleverse
 
 import android.content.Context
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import java.io.InputStream
 
 /**
@@ -59,6 +62,9 @@ class WordPuzzleLists(commonRaw: List<String>, valid5Raw: Collection<String>) {
 
         @Volatile private var cached: WordPuzzleLists? = null
 
+        /** The parsed lists if they were already loaded (never blocks). */
+        fun peek(): WordPuzzleLists? = cached
+
         fun get(context: Context): WordPuzzleLists {
             cached?.let { return it }
             synchronized(this) {
@@ -96,5 +102,32 @@ object WordBlocklist {
             if (w.endsWith(suffix) && w.length - suffix.length >= 3 && w.dropLast(suffix.length) in blocked) return true
         }
         return false
+    }
+}
+
+/**
+ * Word lists for a composable, loaded once off the main thread (parsing ~42k words used to run inside composition
+ * and cost ~1-2s of skipped frames on a Pixel 9 Pro). Null while loading; instant when already cached.
+ */
+@androidx.compose.runtime.Composable
+fun rememberWordLists(): WordPuzzleLists? {
+    val ctx = androidx.compose.ui.platform.LocalContext.current.applicationContext
+    return androidx.compose.runtime.produceState<WordPuzzleLists?>(WordPuzzleLists.peek(), ctx) {
+        if (value == null) value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { WordPuzzleLists.get(ctx) }
+    }.value
+}
+
+/** Lightweight placeholder shown while a puzzle is being built off the main thread. */
+@androidx.compose.runtime.Composable
+fun WordPuzzleLoading() {
+    androidx.compose.foundation.layout.Box(
+        androidx.compose.ui.Modifier.fillMaxSize(),
+        contentAlignment = androidx.compose.ui.Alignment.Center
+    ) {
+        androidx.compose.foundation.layout.Column(horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally) {
+            androidx.compose.material3.CircularProgressIndicator()
+            androidx.compose.foundation.layout.Spacer(androidx.compose.ui.Modifier.height(12.dp))
+            androidx.compose.material3.Text("Building your puzzle...")
+        }
     }
 }

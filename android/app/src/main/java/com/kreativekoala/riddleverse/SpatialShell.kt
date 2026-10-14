@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,10 +60,13 @@ fun SpatialGameShell(
     controls: @Composable RowScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    // Short screens (landscape): the page scrolls as a whole at a minimum height, so the board and all controls stay reachable.
+    BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    val tooShort = maxHeight < com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT
+    Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
     Column(
         Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .then(if (tooShort) Modifier.height(com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT) else Modifier.fillMaxSize())
             .statusBarsPadding()
             .navigationBarsPadding()
     ) {
@@ -94,6 +98,8 @@ fun SpatialGameShell(
             verticalAlignment = Alignment.CenterVertically,
             content = controls
         )
+    }
+    }
     }
 }
 

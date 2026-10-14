@@ -2,6 +2,8 @@ package com.kreativekoala.riddleverse
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -32,10 +34,15 @@ fun WordLadderScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
 ) {
     val context = LocalContext.current
-    val lists = remember { WordPuzzleLists.get(context) }
+    val lists = rememberWordLists() ?: run { WordPuzzleLoading(); return }
     val stats = remember { WordPuzzleStats(PrefsKeyValueStore(context)) }
     val puzzle = remember(puzzleJson) { WordLadderPuzzle.fromJson(JSONObject(puzzleJson)) }
-    val graph = remember(puzzle) { WordLadderGraph(WordLadderGenerator.poolFor(lists, puzzle.length) + puzzle.solution) }
+    // The word graph is the expensive part of a ladder: build it off the main thread.
+    val graph = produceState<WordLadderGraph?>(null, puzzle, lists) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            WordLadderGraph(WordLadderGenerator.poolFor(lists, puzzle.length) + puzzle.solution)
+        }
+    }.value ?: run { WordPuzzleLoading(); return }
 
     var chainEnc by rememberSaveable(puzzleJson) { mutableStateOf(puzzle.start) }
     var candidate by rememberSaveable(puzzleJson) { mutableStateOf(puzzle.start) }
@@ -67,6 +74,16 @@ fun WordLadderScreen(
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val tile: Dp = minOf(54.dp, (maxWidth - 16.dp - 6.dp * (puzzle.length - 1)) / puzzle.length).coerceAtLeast(48.dp)
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                // The chain grows by a row per step: keep it in its own scroll area (newest row in view) so the
+                // keyboard, ADD included, stays pinned on screen instead of being pushed below the fold.
+                val keyH = WordFit.keyHeight(LocalWordViewport.current.value, WORD_LADDER_FIXED_DP).dp
+                val chainScroll = rememberScrollState()
+                LaunchedEffect(chain.size) { chainScroll.animateScrollTo(chainScroll.maxValue) }
+                val chainMax = (LocalWordViewport.current - 200.dp - keyH * 3).coerceAtLeast(110.dp)
+                Column(
+                    (if (!over) Modifier.heightIn(max = chainMax).verticalScroll(chainScroll) else Modifier),
+                    horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
                 chain.forEachIndexed { i, w ->
                     val prev = chain.getOrNull(i - 1)
                     LadderRow(w, prev, tile, if (i == 0) "Start word" else "Step $i", tint = if (w == puzzle.target) WordPuzzleColors.correct else null)
@@ -77,6 +94,7 @@ fun WordLadderScreen(
                 } else if (gaveUp && !solved) {
                     Text("One shortest path:", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                     puzzle.solution.forEachIndexed { i, w -> LadderRow(w, puzzle.solution.getOrNull(i - 1), tile, "Solution step $i", null) }
+                }
                 }
                 WordPuzzleMessage(message)
                 if (!over) {
@@ -97,7 +115,7 @@ fun WordLadderScreen(
                     }
                     Spacer(Modifier.height(4.dp))
                     WordKeyboard(
-                        keyHeight = WordFit.keyHeight(LocalWordViewport.current.value, WORD_LADDER_FIXED_DP).dp,
+                        keyHeight = keyH,
                         keyStates = emptyMap(), enabled = true, enterLabel = "ADD",
                         onLetter = { c ->
                             if (selected < 0) message = "Tap a tile to choose which letter to change"

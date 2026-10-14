@@ -84,3 +84,36 @@ class WordFitTest {
         assertNull(nextShrinkSize(22f, 22f))
     }
 }
+
+class WordFitSmallPhoneTest {
+    private fun vp(h: Int, bottom: Float) = h - 24f - bottom - 52f - 8f
+
+    @Test fun balloonsBunchShrinksBeforeKeysAndTheyFit() {
+        for (bottom in listOf(24f, 48f)) {
+            val v = vp(568, bottom)
+            val (bunch, key) = WordFit.bunchAndKey(v, 240f)
+            println("Balloons 320x568 bottom=${bottom.toInt()}: viewport=$v bunch=${"%.0f".format(bunch)} key=${"%.0f".format(key)}")
+            assertTrue(key >= 40f && bunch >= 70f)
+            assertTrue(240f + bunch + 3 * key <= v + 0.5f)
+        }
+        val (b, k) = WordFit.bunchAndKey(vp(952, 24f), 240f)
+        assertEquals(130f, b, 0f); assertEquals(54f, k, 0f)
+    }
+
+    @Test fun ladderKeysAtSmallestPhone() {
+        for (bottom in listOf(24f, 48f)) {
+            val k = WordFit.keyHeight(vp(568, bottom), 330f)
+            println("Ladder 320x568 bottom=${bottom.toInt()}: key=${"%.0f".format(k)}")
+            assertTrue(k >= 40f)
+        }
+    }
+
+    @Test fun hiveBoardScaleAtSmallestPhone() {
+        for (bottom in listOf(24f, 48f)) {
+            val v = vp(568, bottom)
+            val s = WordFit.boardScale(v - (300f - 36f), 222f)
+            println("Hive 320x568 bottom=${bottom.toInt()}: scale=${"%.2f".format(s)} hex=${"%.0f".format(70 * s)}dp board=${"%.0f".format(222 * s)}dp total=${"%.0f".format(264 + 222 * s)} of $v")
+            assertTrue(70 * s >= 48f) // hex taps stay >= 48dp
+        }
+    }
+}

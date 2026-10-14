@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.foundation.verticalScroll
 import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -130,10 +131,13 @@ fun ClassicScaffold(
     onBack: () -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    // Short screens (landscape): the page scrolls as a whole at a minimum height, so the board and all controls stay reachable.
+    androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+    val tooShort = maxHeight < com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT
+    Column(Modifier.fillMaxSize().then(if (tooShort) Modifier.verticalScroll(androidx.compose.foundation.rememberScrollState()) else Modifier)) {
     Column(
         Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .then(if (tooShort) Modifier.height(com.kreativekoala.riddleverse.ui.RV_MIN_PAGE_HEIGHT) else Modifier.fillMaxSize())
             .statusBarsPadding()
             .navigationBarsPadding()
             .padding(horizontal = 16.dp)
@@ -171,6 +175,8 @@ fun ClassicScaffold(
         Spacer(Modifier.height(8.dp))
         content()
         Spacer(Modifier.height(8.dp))
+    }
+    }
     }
 }
 

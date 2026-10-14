@@ -485,8 +485,33 @@ class CreatePuzzleActivity : AppCompatActivity() {
 
 
 
+    private var imageHintView: TextView? = null
+
+    /**
+     * Inline hint under the format dropdown instead of a Toast (a Toast floats wherever the system puts it and covered
+     * the topic field at 360x640 / large fonts). Tap to dismiss; never shown while the topic field has focus.
+     */
     private fun showImagePuzzleHint() {
-        Toast.makeText(this, "🖼️ Image puzzles create beautiful jigsaw puzzles from AI-generated images!", Toast.LENGTH_LONG).show()
+        if (topicInput.hasFocus()) return
+        imageHintView?.let { (it.parent as? ViewGroup)?.removeView(it) }
+        val hint = TextView(this).apply {
+            text = "🖼️ Image puzzles create beautiful jigsaw puzzles from AI-generated images! (tap to hide)"
+            textSize = 12f
+            setTextColor(Color.parseColor("#1976D2"))
+            setPadding(20, 12, 20, 12)
+            minHeight = (48 * resources.displayMetrics.density).toInt()
+            gravity = Gravity.CENTER_VERTICAL
+            background = createElevatedCard(Color.parseColor("#E3F2FD"), 8)
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply { setMargins(20, 8, 20, 8) }
+            setOnClickListener { visibility = View.GONE }
+        }
+        val parent = formatDropdown.parent as? ViewGroup ?: return
+        parent.addView(hint, parent.indexOfChild(formatDropdown) + 1)
+        imageHintView = hint
+        topicInput.setOnFocusChangeListener { _, focused -> if (focused) imageHintView?.visibility = View.GONE }
     }
 
     private fun setupKeyboardHandling() {

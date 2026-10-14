@@ -47,6 +47,16 @@ object WordFit {
     fun keyHeight(availH: Float, fixedH: Float, keyRows: Int = 3): Float =
         ((availH - fixedH) / keyRows).coerceIn(KEY_MIN, KEY_MAX)
 
+    /**
+     * Balloon bunch height and key height that together fit: the bunch gives up space first (130 down to 70dp),
+     * keys keep >= 40dp. [fixedH] excludes both.
+     */
+    fun bunchAndKey(availH: Float, fixedH: Float): Pair<Float, Float> {
+        val key = ((availH - fixedH - 70f) / 3f).coerceIn(KEY_MIN, KEY_MAX)
+        val bunch = (availH - fixedH - 3f * key).coerceIn(70f, 130f)
+        return bunch to key
+    }
+
     /** Size for each of [count] repeated items (rows of pegs, balloons...) sharing what is left after [fixedH]. */
     fun fitEach(availH: Float, fixedH: Float, count: Int, gap: Float, min: Float, max: Float): Float =
         ((availH - fixedH - gap * (count - 1).coerceAtLeast(0)) / count.coerceAtLeast(1)).coerceIn(min, max)

@@ -2712,7 +2712,7 @@ class HomeActivity : AppCompatActivity() {
 
         setContent {
             // includeIme = false: the bottom tab bar must not ride up on the keyboard; HomeScreen pads for it itself.
-            RvActivityTheme(includeIme = false) {
+            RvActivityTheme(includeIme = false, bottomClearance = 0.dp) {
                 var showOnboarding by remember { mutableStateOf(shouldShowOnboarding) }
                 val navController = rememberNavController()
                 var showStreakDialog by remember { mutableStateOf(dailyStreakReward != null) }

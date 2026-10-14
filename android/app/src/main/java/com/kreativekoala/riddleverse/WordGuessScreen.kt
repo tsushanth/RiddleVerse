@@ -38,7 +38,7 @@ fun WordGuessScreen(
     puzzleJson: String, levelLabel: String, onBack: () -> Unit, onFinished: (success: Boolean, score: Int) -> Unit
 ) {
     val context = LocalContext.current
-    val lists = remember { WordPuzzleLists.get(context) }
+    val lists = rememberWordLists() ?: run { WordPuzzleLoading(); return }
     val stats = remember { WordPuzzleStats(PrefsKeyValueStore(context)) }
     val data = remember(puzzleJson) { JSONObject(puzzleJson) }
     val answer = remember(data) { data.getString("answer") }

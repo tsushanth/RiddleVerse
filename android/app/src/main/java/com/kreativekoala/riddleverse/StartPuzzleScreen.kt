@@ -611,6 +611,7 @@ fun StartPuzzleScreen(
     onBackHome: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val startScope = androidx.compose.runtime.rememberCoroutineScope()
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val gameGenVM: GameGenerationViewModel = viewModel()
 
@@ -1795,7 +1796,9 @@ fun StartPuzzleScreen(
                     Log.d("RedesignedStartPuzzle", "🏠 Creating local puzzle for type: $type")
 
                     // Create a simple local puzzle instead of fetching from server
-                    val localPuzzle = when (type) {
+                    startScope.launch {
+                        // Generators, solvers and word-list loading can take seconds on a slow phone: never on the main thread.
+                        val localPuzzle = try { kotlinx.coroutines.withContext(Dispatchers.Default) { when (type) {
                         // --- word puzzles (feat/puzzles-word) ---
                         in WordPuzzleRegistry.TYPES -> WordPuzzleRegistry.createPuzzle(type, selectedDifficulty, context)
                         // --- spatial puzzles (feat/puzzles-spatial) ---
@@ -2103,6 +2106,11 @@ fun StartPuzzleScreen(
                             difficulty = selectedDifficulty,
                             options = emptyList()
                         )
+                    } } } catch (e: Exception) {
+                        Log.e("RedesignedStartPuzzle", "Local puzzle generation failed for $type", e)
+                        errorMessage = "Could not build this puzzle. Please try again."
+                        isLoading = false
+                        return@launch
                     }
 
                     // 🔧 FIXED: Create intent with group context
@@ -2118,6 +2126,7 @@ fun StartPuzzleScreen(
 
                     context.startActivity(intent)
                     isLoading = false
+                    }
                 }
 
                 when {
@@ -2219,8 +2228,10 @@ fun StartPuzzleScreen(
                 )
                 .padding(20.dp)
         ) {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+            // Landscape / short screens: one row of three buttons instead of a tall stack covering the page.
+            com.kreativekoala.riddleverse.ui.AdaptiveButtonBar(
+                horizontal = com.kreativekoala.riddleverse.ui.rvIsShort(screenHeight.value),
+                spacing = if (com.kreativekoala.riddleverse.ui.rvIsShort(screenHeight.value)) 8.dp else 12.dp
             ) {
                 // Main Play Button - Prominent
                 Button(
@@ -2252,7 +2263,9 @@ fun StartPuzzleScreen(
                                     Log.d("RedesignedStartPuzzle", "Creating local puzzle for type: $type")
 
                                     // Create local puzzle immediately
-                                    val localPuzzle = when (type) {
+                                    startScope.launch {
+                                        // Generators, solvers and word-list loading can take seconds on a slow phone: never on the main thread.
+                                        val localPuzzle = try { kotlinx.coroutines.withContext(Dispatchers.Default) { when (type) {
                                         // --- word puzzles (feat/puzzles-word) ---
                                         in WordPuzzleRegistry.TYPES -> WordPuzzleRegistry.createPuzzle(type, selectedDifficulty, context)
                                         // --- spatial puzzles (feat/puzzles-spatial) ---
@@ -2353,6 +2366,11 @@ fun StartPuzzleScreen(
                                             difficulty = selectedDifficulty,
                                             options = emptyList()
                                         )
+                                    } } } catch (e: Exception) {
+                                        Log.e("RedesignedStartPuzzle", "Local puzzle generation failed for $type", e)
+                                        errorMessage = "Could not build this puzzle. Please try again."
+                                        isLoading = false
+                                        return@launch
                                     }
 
                                     // Create intent and start activity immediately
@@ -2368,6 +2386,7 @@ fun StartPuzzleScreen(
 
                                     context.startActivity(intent)
                                     isLoading = false
+                                    }
                                 }
 
                                 // Use prefetched AI puzzle if available

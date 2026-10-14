@@ -32,7 +32,7 @@ private val balloonColors = listOf(
 )
 
 /** Category + hint text + word tiles + status line + hint button + spacers, excluding the balloon bunch and the keyboard. */
-private const val BALLOONS_FIXED_DP = 230f
+private const val BALLOONS_FIXED_DP = 240f
 
 @Composable
 fun LetterBalloonsScreen(
@@ -61,7 +61,8 @@ fun LetterBalloonsScreen(
     WordPuzzleScaffold("Letter Balloons", levelLabel, onBack) {
         Text("Category: $category", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
         Text("Guess the word before the balloons are all popped", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        BalloonBunch(game.livesLeft, lives, WordFit.fitEach(LocalWordViewport.current.value, BALLOONS_FIXED_DP, 1, 0f, 70f, 130f).dp)
+        val (bunchH, keyH) = WordFit.bunchAndKey(LocalWordViewport.current.value, BALLOONS_FIXED_DP)
+        BalloonBunch(game.livesLeft, lives, bunchH.dp)
         BoxWithConstraints(Modifier.fillMaxWidth()) {
             val groups = word.split(" ")
             val longest = groups.maxOf { it.length }
@@ -98,7 +99,7 @@ fun LetterBalloonsScreen(
             Spacer(Modifier.height(6.dp))
             val states = HashMap<Char, LetterState>()
             game.guessed.forEach { states[it] = if (it in word) LetterState.CORRECT else LetterState.ABSENT }
-            WordKeyboard(keyHeight = WordFit.keyHeight(LocalWordViewport.current.value, BALLOONS_FIXED_DP + 80f).dp, keyStates = states, enabled = true, onLetter = { apply(game.guess(it)) }, onDelete = {}, onEnter = {}, showActions = false)
+            WordKeyboard(keyHeight = keyH.dp, keyStates = states, enabled = true, onLetter = { apply(game.guess(it)) }, onDelete = {}, onEnter = {}, showActions = false)
         } else {
             WordPuzzleResultCard(
                 success = game.isWon,

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBarsIgnoringVisibility
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.waterfall
@@ -60,6 +62,7 @@ fun rvHostInsets(includeIme: Boolean): WindowInsets {
     return if (includeIme) bars.union(WindowInsets.ime) else bars
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun RvScreenHost(
     modifier: Modifier = Modifier,
@@ -67,8 +70,14 @@ fun RvScreenHost(
     includeIme: Boolean = true,
     maxContentWidth: Dp = MAX_CONTENT_WIDTH_DP.dp,
     maxFontScale: Float? = null,
+    bottomClearance: Dp = 12.dp,
     content: @Composable () -> Unit
 ) {
+    // Primary buttons that sit on the bottom edge touched the gesture bar: keep a little clear space above a system bar.
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val navBottom = WindowInsets.navigationBarsIgnoringVisibility.getBottom(density)
+    val imeBottom = WindowInsets.ime.getBottom(density)
+    val extraBottom = if (navBottom > 0 && imeBottom == 0) bottomClearance else 0.dp
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -77,7 +86,7 @@ fun RvScreenHost(
         contentAlignment = Alignment.TopCenter
     ) {
         BoxWithConstraints(
-            modifier = Modifier.fillMaxHeight().widthIn(max = maxContentWidth).fillMaxWidth(),
+            modifier = Modifier.fillMaxHeight().widthIn(max = maxContentWidth).fillMaxWidth().padding(bottom = extraBottom),
             propagateMinConstraints = true
         ) {
             val base = LocalConfiguration.current
@@ -98,8 +107,8 @@ fun RvScreenHost(
 
 /** Theme + [RvScreenHost]: what every Compose activity passes to `setContent`. */
 @Composable
-fun RvActivityTheme(includeIme: Boolean = true, maxFontScale: Float? = null, content: @Composable () -> Unit) {
-    RiddleVerseTheme { RvScreenHost(includeIme = includeIme, maxFontScale = maxFontScale, content = content) }
+fun RvActivityTheme(includeIme: Boolean = true, maxFontScale: Float? = null, bottomClearance: Dp = 12.dp, content: @Composable () -> Unit) {
+    RiddleVerseTheme { RvScreenHost(includeIme = includeIme, maxFontScale = maxFontScale, bottomClearance = bottomClearance, content = content) }
 }
 
 /** Pure width rule used by [RvScreenHost]: the content width for a window of [availableWidthDp]. */

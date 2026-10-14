@@ -34,9 +34,11 @@ import kotlin.math.roundToInt
 @Composable
 fun PiecePackScreen(args: SpatialArgs) {
     val saved = rememberSaveable(args.seed) { mutableStateOf<String?>(null) }
-    val game = remember(args.seed, args.difficulty) {
-        PiecePackState(args.seed, args.difficulty).also { g -> saved.value?.let { g.restore(it) } }
-    }
+    val game = produceState<PiecePackState?>(null, args.seed, args.difficulty) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) {
+            PiecePackState(args.seed, args.difficulty).also { g -> saved.value?.let { g.restore(it) } }
+        }
+    }.value ?: run { SpatialLoading(); return }
     var tick by remember { mutableIntStateOf(0) }
     var done by rememberSaveable(args.seed) { mutableStateOf(false) }
     var selectedSlot by remember { mutableIntStateOf(-1) }

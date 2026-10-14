@@ -92,9 +92,13 @@ fun WordHiveScreen(
     }
 
     WordPuzzleScaffold("Word Hive", levelLabel, onBack) {
-        Text("Make words of 4+ letters that use the gold centre letter", fontSize = 13.sp, textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(Modifier.height(6.dp))
+        // On short screens (< 520dp under the header) drop the instruction line so the honeycomb and the button rows fit.
+        val hiveCompact = LocalWordViewport.current < 520.dp
+        if (!hiveCompact) {
+            Text("Make words of 4+ letters that use the gold centre letter", fontSize = 13.sp, textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Spacer(Modifier.height(6.dp))
+        }
         Text("${WordHiveRules.ranks[rankIdx].first}  -  $score pts", fontSize = 18.sp, fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface)
         LinearProgressIndicator(
@@ -114,7 +118,7 @@ fun WordHiveScreen(
                 }
             }
             WordPuzzleMessage(message)
-            HexBoard(puzzle.center, outer, WordFit.boardScale(LocalWordViewport.current.value - HIVE_FIXED_DP, 222f + 70f)) { entry += it }
+            HexBoard(puzzle.center, outer, WordFit.boardScale(LocalWordViewport.current.value - (if (hiveCompact) HIVE_FIXED_DP - 36f else HIVE_FIXED_DP), 222f)) { entry += it }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 WordActionButton("Delete", "Delete last letter", enabled = entry.isNotEmpty()) { entry = entry.dropLast(1) }
