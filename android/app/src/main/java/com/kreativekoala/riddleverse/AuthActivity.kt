@@ -92,9 +92,12 @@ class AuthActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
+        // Same guest rule as the Profile card; EXTRA_FORCE_SHOW_AUTH (Profile card, Account section) always opens the form.
+        val forceShow = intent?.getBooleanExtra(EXTRA_FORCE_SHOW_AUTH, false) == true
+        val bounceHome = shouldBounceFromAuth(auth.currentUser, forceShow)
         // Only auto-redirect if NOT coming from a specific activity
         val isComingFromLogin = intent?.getBooleanExtra("from_login", false) == true
-        if (auth.currentUser != null && auth.currentUser?.isAnonymous != true) { // anonymous guests must be able to reach sign-in
+        if (bounceHome) { // real signed-in users only; guests and explicit requests always see the form
             val user = auth.currentUser
 
             safeTrackAnalytics {
@@ -122,13 +125,13 @@ class AuthActivity : AppCompatActivity() {
 
 
         // Check for cached sign-in
-        if (auth.currentUser != null && auth.currentUser?.isAnonymous != true) { // anonymous guests must be able to reach sign-in
+        if (bounceHome) { // real signed-in users only; guests and explicit requests always see the form
             navigateToMainWithOnboardingCheck()
             return
         }
 
         setupEmailAuthUi()
-        if (SupabaseAuth.repository(this).hasStoredSession()) {
+        if (!forceShow && SupabaseAuth.repository(this).hasStoredSession()) {
             trySilentSupabaseRestore()
         }
 

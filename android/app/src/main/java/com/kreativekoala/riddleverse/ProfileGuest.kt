@@ -12,3 +12,17 @@ fun isGuestProfile(hasUser: Boolean, isAnonymous: Boolean, displayName: String?,
 
 fun isGuestProfile(user: FirebaseUser?): Boolean =
     isGuestProfile(user != null, user?.isAnonymous == true, user?.displayName, user?.email)
+
+/**
+ * AuthActivity opens, or sends the user straight back to Home because they are "already signed in".
+ * Bounce only for a real (non-guest) user and never when the screen was explicitly requested ([forceShow]),
+ * using the SAME guest rule as the Profile card so the two can never disagree.
+ */
+fun shouldBounceFromAuth(hasUser: Boolean, isAnonymous: Boolean, displayName: String?, email: String?, forceShow: Boolean): Boolean =
+    !forceShow && hasUser && !isGuestProfile(hasUser, isAnonymous, displayName, email)
+
+fun shouldBounceFromAuth(user: FirebaseUser?, forceShow: Boolean): Boolean =
+    shouldBounceFromAuth(user != null, user?.isAnonymous == true, user?.displayName, user?.email, forceShow)
+
+/** Intent extra: open the sign-in / sign-up screen no matter who is currently signed in. */
+const val EXTRA_FORCE_SHOW_AUTH = "force_show_auth"

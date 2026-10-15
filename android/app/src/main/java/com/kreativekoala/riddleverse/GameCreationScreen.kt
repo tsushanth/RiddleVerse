@@ -670,6 +670,43 @@ fun GameCreationScreen(
                 }
             }
 
+            // Success state: the game was built (and saved server-side when it has an id).
+            if (!generationVM.isGenerating && generationVM.errorMessage == null && generationVM.bundleDirPath != null) {
+                val readyGameId = generationVM.resultGameId
+                Card(
+                    modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                    colors = CardDefaults.cardColors(containerColor = RvSuccess.copy(alpha = 0.15f)),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(Modifier.padding(16.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text("\uD83C\uDF89", fontSize = 24.sp)
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column {
+                                Text("Your game is ready", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
+                                Text(
+                                    if (readyGameId != null) "It is saved under Games > Community and can be played now." else "It was built on this phone.",
+                                    fontSize = 13.sp, color = RvInk
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
+                            if (readyGameId != null) {
+                                Button(
+                                    onClick = { ChromeGameLauncher.launchGame(context, readyGameId, FirebaseAuth.getInstance().currentUser?.uid) },
+                                    modifier = Modifier.weight(1f).heightIn(min = 48.dp)
+                                ) { Text("Play", maxLines = 1) }
+                            }
+                            OutlinedButton(
+                                onClick = { generationVM.clearResult(); promptText = "" },
+                                modifier = Modifier.weight(1f).heightIn(min = 48.dp)
+                            ) { Text("Create another", maxLines = 1, softWrap = false) }
+                        }
+                    }
+                }
+            }
+
             // Error message
             val currentError = generationVM.errorMessage
             if (currentError != null) {

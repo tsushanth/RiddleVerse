@@ -241,6 +241,18 @@ class GameGenerationViewModel : ViewModel() {
         progressPercent = 0f
     }
 
+    /** Clears a finished result so the Create form is ready for another game. */
+    fun clearResult() {
+        showPreview = false
+        showCompletionBanner = false
+        bundleDirPath = null
+        bundleBase64 = null
+        resultGameId = null
+        buildPhase = ""
+        buildDetail = ""
+        progressPercent = 0f
+    }
+
     fun dismissBanner() {
         showCompletionBanner = false
     }

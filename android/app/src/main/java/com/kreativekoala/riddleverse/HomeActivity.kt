@@ -521,10 +521,10 @@ fun HomeScreen(navController: NavHostController,
                         context.startActivity(intent)
                     },
                     onSignIn = {
-                        context.startActivity(Intent(context, AuthActivity::class.java))
+                        context.startActivity(Intent(context, AuthActivity::class.java).putExtra(EXTRA_FORCE_SHOW_AUTH, true))
                     },
                     onSignUp = {
-                        context.startActivity(Intent(context, AuthActivity::class.java))
+                        context.startActivity(Intent(context, AuthActivity::class.java).putExtra(EXTRA_FORCE_SHOW_AUTH, true))
                     },
                     onShowRatingDialog = { showRatingDialog = true }
                 )
