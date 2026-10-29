@@ -12,7 +12,7 @@
     "health-check:detailed": "curl -s http://localhost:8080/api/health/detailed | jq",
     "startup-check": "npm run health-check",
     "docker-health": "curl -f http://localhost:8080/api/health || exit 1",
-    "test": "node --test test/usageTracker.credentials.test.js test/llmUsage.accounting.test.js test/openaiImage.test.js test/puzzleMonitoring.test.js",
+    "test": "node --test test/usageTracker.credentials.test.js test/llmUsage.accounting.test.js test/openaiImage.test.js test/puzzleMonitoring.test.js test/streakNotifications.test.js",
     "test:auth": "node --test test/auth/"
   },
   "keywords": [],
