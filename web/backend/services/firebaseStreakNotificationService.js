@@ -1,19 +1,76 @@
 // services/firebaseStreakNotificationService.js
 import { admin, db } from '../config/firebaseAdmin.js';
 import { supabase } from '../config/database.js';
+import { createHash } from 'node:crypto';
 
-class FirebaseStreakNotificationService {
-    constructor() {
+/**
+ * Operating limits. All come from env vars so they can be changed with
+ * `flyctl secrets set` / `fly.toml [env]` without a code change.
+ *
+ *   STREAK_NOTIFICATIONS_ENABLED   "true" or "1" turns the job on. Anything else (or unset) = OFF.
+ *   STREAK_MAX_USERS_PER_RUN       default 25. Max users that get a Firestore query per run.
+ *   STREAK_TOKEN_MAX_AGE_DAYS      default 90. Tokens not updated within this window are skipped.
+ *   STREAK_MIN_RUN_GAP_MINUTES     default 60. A new run is skipped if one started more recently
+ *                                  (checked in Supabase, so machine restarts do not multiply runs).
+ *
+ * Worst-case Firestore reads: 25 users x 30 docs = 750 per run, <= 24 runs/day = 18,000/day.
+ */
+export function isStreakNotificationsEnabled(env = process.env) {
+    const v = String(env.STREAK_NOTIFICATIONS_ENABLED || '').trim().toLowerCase();
+    return v === 'true' || v === '1';
+}
+
+function intEnv(name, fallback, env = process.env) {
+    const n = parseInt(env[name], 10);
+    return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+export function getStreakLimits(env = process.env) {
+    return {
+        maxUsersPerRun: intEnv('STREAK_MAX_USERS_PER_RUN', 25, env),
+        tokenMaxAgeDays: intEnv('STREAK_TOKEN_MAX_AGE_DAYS', 90, env),
+        minRunGapMinutes: intEnv('STREAK_MIN_RUN_GAP_MINUTES', 60, env)
+    };
+}
+
+/** Short stable id for logs and stored error details. Never log the email itself. */
+export function hashUser(userEmail) {
+    return createHash('sha256').update(String(userEmail || '')).digest('hex').slice(0, 8);
+}
+
+function isQuotaError(error) {
+    return !!error && (error.code === 8 || /RESOURCE_EXHAUSTED/.test(String(error.message || '')));
+}
+
+export class FirebaseStreakNotificationService {
+    constructor(deps = {}) {
+        // Injectable for tests; production uses the real Supabase client, Firestore and admin SDK.
+        this.supabase = deps.supabase ?? supabase;
+        this.db = deps.db ?? db;
+        this.admin = deps.admin ?? admin;
         this.processedUsers = new Set(); // Prevent duplicate processing in same run
         this.isRunning = false;
         this.intervalId = null;
         this.jobHistory = [];
+        this.disabledLogged = false;
+    }
+
+    /** Log once per process that the job is off, so the log shows it is deliberate. */
+    logDisabledOnce() {
+        if (!this.disabledLogged) {
+            this.disabledLogged = true;
+            console.log('ℹ️ Streak notification job is OFF (set STREAK_NOTIFICATIONS_ENABLED=true to enable)');
+        }
     }
 
     /**
      * Start the periodic streak notification service
      */
     startPeriodicService(intervalMinutes = 60) {
+        if (!isStreakNotificationsEnabled()) {
+            this.logDisabledOnce();
+            return;
+        }
         if (this.intervalId) {
             console.log('🔥 Streak notification service already running');
             return;
@@ -48,8 +105,19 @@ class FirebaseStreakNotificationService {
      * Run a single periodic check with comprehensive error handling
      */
     async runPeriodicCheck() {
+        if (!isStreakNotificationsEnabled()) {
+            this.logDisabledOnce();
+            return;
+        }
         if (this.isRunning) {
             console.log('⏭️ Skipping streak check - already running');
+            return;
+        }
+
+        // The Fly machine stops when idle and every wake used to start a run, so the
+        // in-process interval does not bound the run rate. Bound it in Supabase instead.
+        if (await this.ranRecently()) {
+            console.log('⏭️ Skipping streak check - a run started within the minimum gap');
             return;
         }
 
@@ -79,6 +147,11 @@ class FirebaseStreakNotificationService {
             
             // Clear processed users
             this.clearProcessedUsers();
+
+            if (results.quotaExhausted) {
+                // Close the job row as failed instead of reporting a fake "completed" run.
+                throw new Error(`Firestore quota exhausted (${results.quotaErrorCount} quota errors)`);
+            }
 
             const endTime = new Date();
             const duration = Math.round((endTime - startTime) / 1000);
@@ -119,14 +192,41 @@ class FirebaseStreakNotificationService {
             await this.logJobFailure(jobResult, error);
 
         } finally {
+            this.clearProcessedUsers();
             this.isRunning = false;
             this.addToHistory(jobResult);
         }
     }
 
     /**
+     * True if a job row started within the minimum gap. Fails closed: if Supabase
+     * cannot answer, skip the run rather than risk an unbounded Firestore burst.
+     */
+    async ranRecently() {
+        try {
+            const { minRunGapMinutes } = getStreakLimits();
+            const since = new Date(Date.now() - minRunGapMinutes * 60 * 1000).toISOString();
+            const { data, error } = await this.supabase
+                .from('streak_notification_jobs')
+                .select('job_id')
+                .gte('started_at', since)
+                .limit(1);
+            if (error) {
+                console.error('❌ Could not check recent streak runs, skipping this run:', error.message);
+                return true;
+            }
+            return Array.isArray(data) && data.length > 0;
+        } catch (error) {
+            console.error('❌ Could not check recent streak runs, skipping this run:', error.message);
+            return true;
+        }
+    }
+
+    /**
      * Main function: Check all users for streak-based notifications
-     * FIXED: Now uses Supabase for tokens, Firebase for analytics
+     * Uses Supabase for tokens, Firebase for analytics.
+     * Work per run is capped (see getStreakLimits) and users with no usable,
+     * recently refreshed FCM token are never queried in Firestore.
      */
     async checkAllUsersForStreakNotifications() {
         try {
@@ -137,15 +237,27 @@ class FirebaseStreakNotificationService {
                 comebackUsers: 0,
                 celebrationUsers: 0,
                 notificationsSent: 0,
+                quotaExhausted: false,
+                quotaErrorCount: 0,
                 errors: []
             };
-    
-            // FIXED: Get users from Supabase notification tokens (where the data actually is)
-            const { data: tokenUsers, error } = await supabase
+
+            const { maxUsersPerRun, tokenMaxAgeDays } = getStreakLimits();
+            const freshSince = new Date(Date.now() - tokenMaxAgeDays * 24 * 60 * 60 * 1000).toISOString();
+
+            // Only active tokens that are non-empty and recently refreshed; freshest first.
+            // The explicit limit also replaces the silent 1000-row PostgREST default.
+            // Fetch a few extra rows because several tokens can belong to one user.
+            const { data: tokenUsers, error } = await this.supabase
                 .from('user_notification_tokens')
-                .select('user_email, firebase_uid')
-                .eq('is_active', true);
-    
+                .select('user_email, firebase_uid, fcm_token')
+                .eq('is_active', true)
+                .not('fcm_token', 'is', null)
+                .neq('fcm_token', '')
+                .gte('updated_at', freshSince)
+                .order('updated_at', { ascending: false })
+                .limit(maxUsersPerRun * 3);
+
             if (error) {
                 console.error('❌ Error fetching tokens from Supabase:', error);
                 throw error;
@@ -167,37 +279,42 @@ class FirebaseStreakNotificationService {
                 }
             });
     
-            const userList = Array.from(uniqueUsers.values());
+            const userList = Array.from(uniqueUsers.values()).slice(0, maxUsersPerRun);
             results.totalUsers = userList.length;
             results.validUsers = userList.length;
-    
-            console.log(`📊 Processing ${results.totalUsers} unique users for streak notifications`);
-    
-            // Process users in batches to avoid overwhelming Firebase
-            const batchSize = 10;
+
+            console.log(`📊 Processing ${results.totalUsers} unique users for streak notifications (cap ${maxUsersPerRun})`);
+
+            // Process users in small batches to avoid overwhelming Firebase
+            const batchSize = 5;
             for (let i = 0; i < userList.length; i += batchSize) {
+                // Quota circuit breaker: once Firestore says RESOURCE_EXHAUSTED, stop the run.
+                if (results.quotaExhausted) {
+                    console.error(`❌ Firestore quota exhausted - aborting run after ${results.quotaErrorCount} quota errors`);
+                    break;
+                }
                 const batch = userList.slice(i, i + batchSize);
-                
+
                 await Promise.all(
                     batch.map(async (user) => {
                         try {
                             await this.checkUserStreakStatusWithUid(user.email, user.firebase_uid, results);
                         } catch (error) {
                             results.errors.push({
-                                userEmail: user.email,
+                                user: hashUser(user.email),
                                 error: error.message,
                                 type: 'user_processing_failed'
                             });
                         }
                     })
                 );
-                
+
                 // Small delay between batches
                 if (i + batchSize < userList.length) {
                     await new Promise(resolve => setTimeout(resolve, 200));
                 }
             }
-    
+
             console.log(`📊 Streak check complete: ${results.notificationsSent} notifications sent`);
             return results;
     
@@ -221,15 +338,15 @@ class FirebaseStreakNotificationService {
             let uid = firebaseUid;
             if (!uid) {
                 try {
-                    const userRecord = await admin.auth().getUserByEmail(userEmail);
+                    const userRecord = await this.admin.auth().getUserByEmail(userEmail);
                     uid = userRecord.uid;
                 } catch (authError) {
-                    console.log(`⚠️ User ${userEmail} not found in Firebase Auth - skipping`);
+                    console.log(`⚠️ User ${hashUser(userEmail)} not found in Firebase Auth - skipping`);
                     return;
                 }
             }
     
-            const streakData = await this.calculateUserStreakFromFirebaseWithUid(userEmail, uid);
+            const streakData = await this.calculateUserStreakFromFirebaseWithUid(userEmail, uid, results);
             if (!streakData) return;
     
             const hoursFromLastOpen = streakData.hoursFromLastOpen;
@@ -256,7 +373,7 @@ class FirebaseStreakNotificationService {
     
         } catch (error) {
             results.errors.push({
-                userEmail,
+                user: hashUser(userEmail),
                 error: error.message,
                 type: 'user_processing_failed'
             });
@@ -266,12 +383,12 @@ class FirebaseStreakNotificationService {
     /**
      * Enhanced Firebase data calculation with better error handling
      */
-    async calculateUserStreakFromFirebaseWithUid(userEmail, firebaseUid) {
+    async calculateUserStreakFromFirebaseWithUid(userEmail, firebaseUid, results = null) {
         try {
             const now = new Date();
             const thirtyDaysAgo = new Date(now.getTime() - (30 * 24 * 60 * 60 * 1000));
     
-            const analyticsSnapshot = await db.collection('puzzle_analytics')
+            const analyticsSnapshot = await this.db.collection('puzzle_analytics')
                 .where('user_id', '==', firebaseUid)
                 .where('event_name', '==', 'app_open')
                 .where('timestamp', '>=', thirtyDaysAgo.getTime())
@@ -314,7 +431,16 @@ class FirebaseStreakNotificationService {
             };
     
         } catch (error) {
-            console.error(`❌ Error calculating streak for ${userEmail}:`, error.message);
+            if (isQuotaError(error) && results) {
+                // Log once per run, not once per user; the batch loop aborts on this flag.
+                results.quotaErrorCount = (results.quotaErrorCount || 0) + 1;
+                if (!results.quotaExhausted) {
+                    results.quotaExhausted = true;
+                    console.error('❌ Firestore RESOURCE_EXHAUSTED while calculating streaks (first occurrence this run)');
+                }
+                return null;
+            }
+            console.error(`❌ Error calculating streak for user ${hashUser(userEmail)}:`, error.message);
             return null;
         }
     }
@@ -442,21 +568,21 @@ class FirebaseStreakNotificationService {
     async sendNotificationToUser(userEmail, title, message, notificationType, streakValue) {
         try {
             // Get user's FCM tokens from Supabase
-            const { data: tokens, error } = await supabase
+            const { data: tokens, error } = await this.supabase
                 .from('user_notification_tokens')
                 .select('fcm_token')
                 .eq('user_email', userEmail)
                 .eq('is_active', true);
 
             if (error || !tokens || tokens.length === 0) {
-                console.log(`⚠️ No active FCM tokens for ${userEmail}`);
+                console.log(`⚠️ No active FCM tokens for user ${hashUser(userEmail)}`);
                 return false;
             }
 
             const fcmTokens = tokens.map(t => t.fcm_token).filter(t => t);
             
             if (fcmTokens.length === 0) {
-                console.log(`⚠️ No valid FCM tokens for ${userEmail}`);
+                console.log(`⚠️ No valid FCM tokens for user ${hashUser(userEmail)}`);
                 return false;
             }
 
@@ -466,19 +592,19 @@ class FirebaseStreakNotificationService {
                 tokens: fcmTokens
             };
 
-            const response = await admin.messaging().sendMulticast(fcmMessage);
+            const response = await this.admin.messaging().sendMulticast(fcmMessage);
             
             if (response.successCount > 0) {
                 await this.logNotificationSent(userEmail, notificationType, streakValue);
-                console.log(`✅ Sent ${notificationType} notification to ${userEmail} (${response.successCount}/${fcmTokens.length} tokens)`);
+                console.log(`✅ Sent ${notificationType} notification to user ${hashUser(userEmail)} (${response.successCount}/${fcmTokens.length} tokens)`);
                 return true;
             } else {
-                console.error(`❌ Failed to send notification to ${userEmail}: all tokens failed`);
+                console.error(`❌ Failed to send notification to user ${hashUser(userEmail)}: all tokens failed`);
                 return false;
             }
 
         } catch (error) {
-            console.error(`❌ Error sending notification to ${userEmail}:`, error.message);
+            console.error(`❌ Error sending notification to user ${hashUser(userEmail)}:`, error.message);
             return false;
         }
     }
@@ -548,7 +674,7 @@ class FirebaseStreakNotificationService {
      */
     async logNotificationSent(userEmail, type, streakValue) {
         try {
-            await supabase
+            const { error } = await this.supabase
                 .from('streak_notification_logs')
                 .insert({
                     user_email: userEmail,
@@ -556,8 +682,11 @@ class FirebaseStreakNotificationService {
                     streak_value: streakValue,
                     sent_at: new Date().toISOString()
                 });
+            if (error) {
+                console.error(`❌ Error logging notification for user ${hashUser(userEmail)}:`, error.message);
+            }
         } catch (error) {
-            console.error(`❌ Error logging notification:`, error);
+            console.error(`❌ Error logging notification for user ${hashUser(userEmail)}:`, error.message);
         }
     }
 
@@ -565,38 +694,34 @@ class FirebaseStreakNotificationService {
      * Get last notification time for type
      */
     async getLastNotificationTime(userEmail, type) {
-        try {
-            const { data } = await supabase
-                .from('streak_notification_logs')
-                .select('sent_at')
-                .eq('user_email', userEmail)
-                .eq('notification_type', type)
-                .order('sent_at', { ascending: false })
-                .limit(1);
+        // Throws when the dedup table cannot be read: the caller records an error and sends
+        // nothing. Returning null here used to mean "never sent", i.e. an hourly re-send.
+        const { data, error } = await this.supabase
+            .from('streak_notification_logs')
+            .select('sent_at')
+            .eq('user_email', userEmail)
+            .eq('notification_type', type)
+            .order('sent_at', { ascending: false })
+            .limit(1);
+        if (error) throw new Error(`dedup lookup failed: ${error.message}`);
 
-            return data?.[0] ? new Date(data[0].sent_at).getTime() : null;
-        } catch (error) {
-            return null;
-        }
+        return data?.[0] ? new Date(data[0].sent_at).getTime() : null;
     }
 
     /**
      * Get last celebrated streak level
      */
     async getLastCelebrationStreak(userEmail) {
-        try {
-            const { data } = await supabase
-                .from('streak_notification_logs')
-                .select('streak_value')
-                .eq('user_email', userEmail)
-                .eq('notification_type', 'celebration')
-                .order('streak_value', { ascending: false })
-                .limit(1);
+        const { data, error } = await this.supabase
+            .from('streak_notification_logs')
+            .select('streak_value')
+            .eq('user_email', userEmail)
+            .eq('notification_type', 'celebration')
+            .order('streak_value', { ascending: false })
+            .limit(1);
+        if (error) throw new Error(`dedup lookup failed: ${error.message}`);
 
-            return data?.[0]?.streak_value || 0;
-        } catch (error) {
-            return 0;
-        }
+        return data?.[0]?.streak_value || 0;
     }
 
     /**
@@ -645,7 +770,7 @@ class FirebaseStreakNotificationService {
      */
     async logJobStart(jobId, startTime) {
         try {
-            await supabase
+            const { error } = await this.supabase
                 .from('streak_notification_jobs')
                 .insert({
                     job_id: jobId,
@@ -655,8 +780,9 @@ class FirebaseStreakNotificationService {
                     notifications_sent: 0,
                     errors_count: 0
                 });
+            if (error) console.error('❌ Failed to log job start:', error.message);
         } catch (error) {
-            console.error('❌ Failed to log job start:', error);
+            console.error('❌ Failed to log job start:', error.message);
         }
     }
 
@@ -665,7 +791,8 @@ class FirebaseStreakNotificationService {
      */
     async logJobCompletion(jobResult) {
         try {
-            await supabase
+            // supabase-js does not throw on failure; it returns { error }. Ignoring it left rows 'running'.
+            const { error } = await this.supabase
                 .from('streak_notification_jobs')
                 .update({
                     status: 'completed',
@@ -680,8 +807,9 @@ class FirebaseStreakNotificationService {
                     error_details: jobResult.errors.length > 0 ? JSON.stringify(jobResult.errors) : null
                 })
                 .eq('job_id', jobResult.jobId);
+            if (error) console.error('❌ Failed to close job row (completion):', error.message);
         } catch (error) {
-            console.error('❌ Failed to log job completion:', error);
+            console.error('❌ Failed to log job completion:', error.message);
         }
     }
 
@@ -690,7 +818,7 @@ class FirebaseStreakNotificationService {
      */
     async logJobFailure(jobResult, error) {
         try {
-            await supabase
+            const { error: updateError } = await this.supabase
                 .from('streak_notification_jobs')
                 .update({
                     status: 'failed',
@@ -706,8 +834,9 @@ class FirebaseStreakNotificationService {
                     })
                 })
                 .eq('job_id', jobResult.jobId);
+            if (updateError) console.error('❌ Failed to close job row (failure):', updateError.message);
         } catch (logError) {
-            console.error('❌ Failed to log job failure:', logError);
+            console.error('❌ Failed to log job failure:', logError.message);
         }
     }
 
@@ -716,7 +845,7 @@ class FirebaseStreakNotificationService {
      */
     async logUserError(userEmail, errorType, errorMessage, jobId) {
         try {
-            await supabase
+            await this.supabase
                 .from('streak_notification_errors')
                 .insert({
                     job_id: jobId,

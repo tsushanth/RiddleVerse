@@ -237,3 +237,24 @@ Recommended Bid = LTV × CPA Target %
 - High Value: 40% of LTV
 - Medium Value: 50% of LTV
 - Low Value: 60% of LTV
+## Streak notification job (OFF by default)
+
+`backend/services/firebaseStreakNotificationService.js` runs only when the env var
+`STREAK_NOTIFICATIONS_ENABLED` is `true` (or `1`). Unset or anything else means off: no timer, no
+Supabase or Firestore calls, and `POST /api/streak-notifications/run-now` and `/start` answer 503.
+
+Why it is off: it never sent a notification in about 19,900 runs, all stored FCM tokens are older
+than 90 days, and its per-user Firestore queries exhausted the free daily read quota.
+
+Turn it on (only after reading "Before enabling"):
+
+    flyctl secrets set STREAK_NOTIFICATIONS_ENABLED=true -a quiz-web-frontend     # on
+    flyctl secrets unset STREAK_NOTIFICATIONS_ENABLED -a quiz-web-frontend        # off again
+
+Optional limits (defaults in brackets): `STREAK_MAX_USERS_PER_RUN` [25],
+`STREAK_TOKEN_MAX_AGE_DAYS` [90], `STREAK_MIN_RUN_GAP_MINUTES` [60]. Worst case with defaults is
+25 users x 30 docs = 750 Firestore reads per run and 18,000 per day.
+
+Before enabling: the Supabase table `streak_notification_logs` (notification de-duplication) must
+exist. It does not today; while it is missing the job sends nothing (the lookup fails closed).
+Fresh tokens are also needed (the app must register FCM tokens again), otherwise the job selects nobody.

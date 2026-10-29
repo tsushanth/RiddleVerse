@@ -112,15 +112,10 @@ app.use((req, res, next) => {
 // Initialize streak notification service
 async function initializeStreakNotificationService() {
     try {
+        // OFF unless STREAK_NOTIFICATIONS_ENABLED=true (see services/firebaseStreakNotificationService.js).
+        // startPeriodicService already schedules the first run ~5s after boot; the extra
+        // 30s run that used to live here only doubled the Firestore reads on every wake.
         firebaseStreakNotificationService.startPeriodicService(60);
-
-        setTimeout(async () => {
-            try {
-                await firebaseStreakNotificationService.runPeriodicCheck();
-            } catch (error) {
-                console.error('Initial streak service check failed:', error.message);
-            }
-        }, 30000);
     } catch (error) {
         console.error('Failed to initialize streak notification service:', error.message);
     }

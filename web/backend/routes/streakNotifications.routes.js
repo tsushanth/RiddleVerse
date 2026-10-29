@@ -1,6 +1,6 @@
 // routes/streakNotifications.routes.js - Streak notification management endpoints
 import express from 'express';
-import { firebaseStreakNotificationService } from '../services/firebaseStreakNotificationService.js';
+import { firebaseStreakNotificationService, isStreakNotificationsEnabled } from '../services/firebaseStreakNotificationService.js';
 import { supabase } from '../config/database.js';
 
 const router = express.Router();
@@ -43,6 +43,13 @@ router.get('/status', async (req, res) => {
  */
 router.post('/run-now', async (req, res) => {
     try {
+        if (!isStreakNotificationsEnabled()) {
+            return res.status(503).json({
+                success: false,
+                error: 'Streak notification job is disabled (STREAK_NOTIFICATIONS_ENABLED is not true)'
+            });
+        }
+
         if (firebaseStreakNotificationService.isRunning) {
             return res.status(409).json({
                 success: false,
@@ -95,6 +102,13 @@ router.post('/stop', async (req, res) => {
  */
 router.post('/start', async (req, res) => {
     try {
+        if (!isStreakNotificationsEnabled()) {
+            return res.status(503).json({
+                success: false,
+                error: 'Streak notification job is disabled (STREAK_NOTIFICATIONS_ENABLED is not true)'
+            });
+        }
+
         const { intervalMinutes = 60 } = req.body;
 
         firebaseStreakNotificationService.startPeriodicService(intervalMinutes);
