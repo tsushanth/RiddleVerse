@@ -37,6 +37,12 @@ export default function CreateGamePage() {
 
     const token = localStorage.getItem('token')
 
+    // A build takes about 3-4 minutes (up to 10). Give up after 11 so the page never spins for ever.
+    const controller = new AbortController()
+    abortRef.current = controller
+    const timeoutId = setTimeout(() => controller.abort(), 11 * 60 * 1000)
+    let gotResult = false
+
     try {
       const response = await fetch(`${API_BASE_URL}/api/game-creation/generate`, {
         method: 'POST',
@@ -50,6 +56,7 @@ export default function CreateGamePage() {
           userName: user?.displayName || user?.email?.split('@')[0] || 'Anonymous',
           title: prompt.trim().substring(0, 100),
         }),
+        signal: controller.signal,
       })
 
       if (!response.ok) {
@@ -82,6 +89,7 @@ export default function CreateGamePage() {
                 setProgressPercent(event.progressPercent)
               }
             } else if (event.type === 'result') {
+              gotResult = true
               // Save the game
               const saveRes = await fetch(`${API_BASE_URL}/api/game-creation/save`, {
                 method: 'POST',
@@ -108,7 +116,7 @@ export default function CreateGamePage() {
                 window.open(`https://puzzleverseai.com/play/${gameId}`, '_blank')
               }
             } else if (event.type === 'error') {
-              throw new Error(event.message || 'Generation failed')
+              throw new Error(event.error || event.message || 'Generation failed')
             }
           } catch (parseErr) {
             // Ignore parse errors for incomplete chunks
@@ -118,9 +126,19 @@ export default function CreateGamePage() {
           }
         }
       }
+
+      // The stream closed without a game and without an error event: do not just reset silently.
+      if (!gotResult) {
+        throw new Error('The build server stopped before your game was ready. Please try again.')
+      }
     } catch (err) {
-      setError(err.message || 'Something went wrong')
+      setError(
+        err.name === 'AbortError'
+          ? 'Building took too long and was stopped. Please try again, or try a simpler idea.'
+          : (err.message || 'Something went wrong')
+      )
     } finally {
+      clearTimeout(timeoutId)
       setGenerating(false)
     }
   }
@@ -232,7 +250,14 @@ export default function CreateGamePage() {
           >
             <div className="flex items-center gap-3">
               <AlertCircle size={20} className="text-red-400 shrink-0" />
-              <p className="text-red-300 text-sm">{error}</p>
+              <p className="text-red-300 text-sm flex-1">{error}</p>
+              <button
+                onClick={handleGenerate}
+                disabled={!prompt.trim() || generating}
+                className="shrink-0 text-sm font-medium text-white bg-white/10 hover:bg-white/20 rounded-full px-4 py-1.5 disabled:opacity-50"
+              >
+                Try again
+              </button>
             </div>
           </motion.div>
         )}

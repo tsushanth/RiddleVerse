@@ -5,6 +5,7 @@ import { supabase } from '../config/database.js';
 import { callAI } from '../utils/aiClient.js';
 import { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import { DIFFICULTY_COSTS, MAX_DIFFICULTY_LEVEL, getDifficultyCost } from '../services/difficultyService.js';
+import { createForgeSessionCloser } from '../services/forgeSessionService.js';
 
 const router = express.Router();
 
@@ -493,6 +494,10 @@ router.post('/generate', async (req, res) => {
     // Declared at function scope so the outer catch can reference it on
     // failure paths (a `const` inside the try block isn't visible in catch).
     let forgeSessionId = null;
+    // Closes the forge session exactly once (completed or failed). Replaced with the real
+    // closer once the session row exists. Every exit path below must reach it, otherwise the
+    // row stays 'generating' for ever (that is what 83 prod rows were).
+    let closeForge = () => false;
     try {
         const { prompt, userId, userName, title, referenceImage } = req.body;
 
@@ -557,6 +562,11 @@ router.post('/generate', async (req, res) => {
         // success the streaming branch below flips it to 'completed' and
         // links to the resulting custom_games.id.
         forgeSessionId = await startForgeSession(userId, prompt);
+        closeForge = createForgeSessionCloser({
+            sessionId: forgeSessionId,
+            finish: finishForgeSession,
+            recordEvent: (name, params) => recordAnalyticsEvent(name, userId, params),
+        });
         recordAnalyticsEvent('forge_session_started', userId, {
             session_id: forgeSessionId,
             has_reference_image: !!referenceImage,
@@ -601,18 +611,21 @@ router.post('/generate', async (req, res) => {
                     errorMsg = err.error || errorMsg;
                     // Forward quota info if present
                     if (err.quotaExhausted) {
+                        closeForge('failed', 'worker_quota');
                         res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, quotaExhausted: true, resetTime: err.resetTime })}\n\n`);
                         res.end();
                         return;
                     }
                 }
             } catch {}
+            closeForge('failed', 'worker_http_error');
             res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg })}\n\n`);
             res.end();
             return;
         }
 
         if (!workerResponse.body) {
+            closeForge('failed', 'worker_unreachable');
             res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed' })}\n\n`);
             res.end();
             return;
@@ -623,6 +636,8 @@ router.post('/generate', async (req, res) => {
         const decoder = new TextDecoder();
         let buffer = '';
         let resultReceived = false;
+        let workerErrorSeen = false;
+        let errorForwarded = false;
 
         try {
             while (true) {
@@ -718,11 +733,7 @@ router.post('/generate', async (req, res) => {
 
                                 if (dbError) {
                                     console.error(`[generate] DB save error:`, dbError.message);
-                                    finishForgeSession(forgeSessionId, 'failed');
-                                    recordAnalyticsEvent('forge_session_failed', userId, {
-                                        session_id: forgeSessionId,
-                                        reason: 'db_save_error',
-                                    });
+                                    closeForge('failed', 'db_save_error');
                                 } else {
                                     console.log(`[generate] Saved: ${gameId} ("${gameTitle}")${newSeriesId ? ` series=${newSeriesId.slice(0,8)}` : ''}`);
                                     refreshBrowseCache();
@@ -730,7 +741,7 @@ router.post('/generate', async (req, res) => {
                                     captureGameThumbnail(gameId)
                                         .then(() => refreshBrowseCache())
                                         .catch(err => console.error('[thumbnail] Background error:', err.message));
-                                    finishForgeSession(forgeSessionId, 'completed', gameId);
+                                    closeForge('completed', null, gameId);
                                     recordAnalyticsEvent('forge_session_completed', userId, {
                                         session_id: forgeSessionId,
                                         game_id: gameId,
@@ -750,6 +761,10 @@ router.post('/generate', async (req, res) => {
                                     quality: parsed.quality
                                 })}\n\n`);
                             } else if (parsed.type === 'error') {
+                                // Do not close here: the worker could still send a result. The
+                                // session is closed after the stream ends if none arrived.
+                                workerErrorSeen = true;
+                                errorForwarded = true;
                                 res.write(`data: ${JSON.stringify({
                                     type: 'error',
                                     error: parsed.error
@@ -763,7 +778,18 @@ router.post('/generate', async (req, res) => {
             }
         } catch (streamError) {
             if (!resultReceived) {
+                closeForge('failed', streamError?.name === 'TimeoutError' ? 'timeout' : 'stream_lost');
+                errorForwarded = true;
                 res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost' })}\n\n`);
+            }
+        }
+
+        // Stream ended without a result: the worker finished (or died) without delivering a game.
+        // Previously this left the row 'generating' and the client with no message at all.
+        if (!resultReceived) {
+            closeForge('failed', workerErrorSeen ? 'worker_error' : 'stream_ended_without_result');
+            if (!errorForwarded) {
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'The build server stopped before your game was ready. Please try again.' })}\n\n`);
             }
         }
 
@@ -771,14 +797,11 @@ router.post('/generate', async (req, res) => {
 
     } catch (error) {
         console.error('[generate] Error:', error.message);
-        if (forgeSessionId) {
-            finishForgeSession(forgeSessionId, 'failed');
-            recordAnalyticsEvent('forge_session_failed', null, {
-                session_id: forgeSessionId,
-                reason: error.name === 'TimeoutError' ? 'timeout' : 'server_error',
-                error_message: error.message?.substring(0, 200),
-            });
-        }
+        // No-op if a path above already closed the session.
+        const reason = error.name === 'TimeoutError'
+            ? 'timeout'
+            : (error.message === 'fetch failed' ? 'worker_unreachable' : 'server_error');
+        closeForge('failed', reason);
 
         // If headers already sent (SSE mode), send error event
         if (res.headersSent) {
