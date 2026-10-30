@@ -55,6 +55,8 @@ import { handleStripeWebhook } from './services/payoutService.js';
 import { initializeDailyPuzzleSystem } from './services/dailyPuzzleCacheSetup.js';
 import { firebaseStreakNotificationService } from './services/firebaseStreakNotificationService.js';
 import { remixDigestService } from './services/remixDigestService.js';
+import { startForgeSessionSweeper } from './services/forgeSessionService.js';
+import { supabase } from './config/database.js';
 import { wordFrequencyManager } from './services/wordFrequencyManager.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { reportCrash } from './utils/failureReporter.js';
@@ -127,6 +129,8 @@ async function initializeServer() {
         await wordFrequencyManager.load();
         await initializeStreakNotificationService();
         remixDigestService.start();
+        // OFF unless FORGE_SESSION_SWEEPER_ENABLED=true (marks forge sessions stuck 'generating' > 15 min as failed).
+        startForgeSessionSweeper({ supabase });
         const cacheInitResult = await initializeDailyPuzzleSystem();
 
         if (!cacheInitResult.success) {
