@@ -1,4 +1,5 @@
 import admin from "firebase-admin";
+import { installFirestoreQuotaGuard } from "../utils/firestoreQuotaGuard.js";
 
 // Allow smoke tests to run during Docker build (env vars not yet available)
 const IS_SMOKE_TEST = process.env.DOCKER_BUILD === 'true' ||
@@ -33,6 +34,18 @@ if (serviceAccountKey && !admin.apps.length) {
         databaseURL: process.env.FIREBASE_DATABASE_URL || `https://${serviceAccountKey.project_id}.firebaseio.com`
     });
     db = admin.firestore();
+    // One alert if Firestore quota is exhausted anywhere (also when a caller swallows the error).
+    try {
+        // Classes are taken from live instances (no network call) so the SDK export shape does not matter.
+        const coll = db.collection('_quota_guard');
+        installFirestoreQuotaGuard({
+            Firestore: db.constructor,
+            CollectionReference: coll.constructor,
+            Query: { prototype: Object.getPrototypeOf(coll.constructor.prototype) },
+            DocumentReference: db.doc('_quota_guard/x').constructor,
+            WriteBatch: db.batch().constructor,
+        });
+    } catch (e) { console.warn('[firestore-quota-guard] not installed:', e?.message || e); }
 }
 
 export { admin, db };

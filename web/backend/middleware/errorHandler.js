@@ -1,4 +1,4 @@
-import { reportBackendError } from '../utils/failureReporter.js';
+import { reportBackendError, isFirestoreQuotaError, reportFirestoreQuota } from '../utils/failureReporter.js';
 /**
  * Centralized error handling middleware
  */
@@ -99,7 +99,8 @@ export const errorHandler = (err, req, res, next) => {
         message = 'Request timeout';
     }
 
-    if (statusCode >= 500) reportBackendError(req, err, statusCode);
+    if (isFirestoreQuotaError(err)) reportFirestoreQuota('express');
+    if (statusCode >= 500) { res.locals.failureReported = true; reportBackendError(req, err, statusCode); }
 
     // Log error for debugging (only log 5xx errors or unexpected errors)
     if (statusCode >= 500 || !err.isOperational) {
@@ -155,3 +156,22 @@ export default {
     errorHandler,
     requestLogger
 };
+
+
+/**
+ * Safety net for the ~190 handlers that catch an error, log it and answer res.status(500) themselves:
+ * those never reach errorHandler, so nothing was reported. Reports any 5xx that was not already
+ * reported, once per route pattern per hour at the reporter. Flow = route pattern (no ids, no query).
+ */
+export const createUnhandled5xxReporter = (report = reportBackendError) => (req, res, next) => {
+    res.on('finish', () => {
+        try {
+            if (res.statusCode < 500 || res.locals?.failureReported) return;
+            if (req.originalUrl?.startsWith('/api/health') || res.statusCode === 503 && req.path === '/health') return;
+            const pattern = req.route?.path ? `${req.baseUrl || ''}${typeof req.route.path === 'string' ? req.route.path : ''}` : (req.baseUrl || 'unrouted');
+            report({ method: req.method, path: pattern }, new Error(`Handler answered HTTP ${res.statusCode} after catching an error`), res.statusCode);
+        } catch { /* reporting must never break a response */ }
+    });
+    next();
+};
+export const reportUnhandled5xx = createUnhandled5xxReporter();

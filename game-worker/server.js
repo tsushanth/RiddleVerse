@@ -21,6 +21,7 @@ import * as path from 'path';
 import * as os from 'os';
 import crypto from 'crypto';
 import zlib from 'zlib';
+import { reportWorkerFailure, reportWorkerCrash, classifyCliFailure, reportCliFailure, createSlotTracker, freeDiskBytes, evaluateHealth } from './monitoring.js';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -112,8 +113,13 @@ function getQuotaErrorMessage() {
     return 'AI usage limit reached. The service typically resets at 8am Pacific Time. Please try again later.';
 }
 
-let activeGenerations = 0;
 const MAX_CONCURRENT = 2;
+const slots = createSlotTracker(MAX_CONCURRENT, (kind) => {
+    console.warn(`[slots] anomaly: ${kind}`);
+    reportWorkerFailure('forge.worker.slots', 'Forge worker: concurrency counter went wrong (double release); in-flight accounting is unreliable', { kind });
+});
+// Read-only view kept under the old name so the handlers' `slots.full()` checks and /health still read it.
+Object.defineProperty(globalThis, '__unused', { value: 0, writable: true });
 
 // ============================================
 // CLAUDE.md Guardrails
@@ -820,11 +826,17 @@ app.get('/health', (req, res) => {
     let gitAvail = false;
     try { execSync('git --version', { stdio: 'pipe' }); gitAvail = true; } catch {}
 
-    res.json({
-        healthy: true,
+    const freeBytes = freeDiskBytes(PROJECTS_DIR);
+    const verdict = evaluateHealth({ cliAvailable, quotaExhausted, activeGenerations: slots.active, freeBytes });
+    // 503 when the worker cannot build (CLI missing / quota exhausted / counter corrupt / disk nearly full)
+    // so the central reporter's /health probe alerts. Body keeps the same fields as before.
+    res.status(verdict.ok ? 200 : 503).json({
+        healthy: verdict.ok,
+        unhealthyReasons: verdict.reasons,
+        diskFreeGb: freeBytes === null ? null : Math.round(freeBytes / 1024 ** 3 * 10) / 10,
         cliAvailable,
         cliPath,
-        activeGenerations,
+        activeGenerations: slots.active,
         maxConcurrent: MAX_CONCURRENT,
         quotaExhausted,
         quotaResetTime,
@@ -846,7 +858,7 @@ app.post('/generate', authMiddleware, async (req, res) => {
         return res.status(400).json({ error: 'Game description is required' });
     }
 
-    if (activeGenerations >= MAX_CONCURRENT) {
+    if (slots.full()) {
         return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
     }
 
@@ -859,7 +871,7 @@ app.post('/generate', authMiddleware, async (req, res) => {
         });
     }
 
-    activeGenerations++;
+    const releaseSlot = slots.acquire();
     const startTime = Date.now();
     const requestId = `game-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     let projectDir = null;
@@ -967,7 +979,7 @@ Start building now. Create the files.`;
         const genResult = await runClaudeCommand(claudePath, generatePrompt, projectDir, requestId, 15);
 
         if (!genResult.success) {
-            activeGenerations--;
+            releaseSlot();
             if (genResult.quotaError) {
                 // Track quota state for fast-fail on future requests
                 quotaExhausted = true;
@@ -988,7 +1000,7 @@ Start building now. Create the files.`;
             if (htmlFiles.length > 0) {
                 fs.renameSync(path.join(projectDir, htmlFiles[0]), path.join(projectDir, 'index.html'));
             } else {
-                activeGenerations--;
+                releaseSlot();
                 return sendError('No game files were created. Please try again with a different description.');
             }
         }
@@ -1187,9 +1199,10 @@ Fix the root cause of each error. The game must load without JavaScript errors a
 
     } catch (error) {
         console.error(`[${requestId}] Error:`, error.message);
+        noteHandlerError(error);
         sendError('Internal worker error. Please try again.');
     } finally {
-        activeGenerations--;
+        releaseSlot();
         if (projectDir) {
             setTimeout(() => cleanupProjectFolder(projectDir), 120000);
         }
@@ -1263,6 +1276,11 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
             const isQuotaError = containsQuotaError(stderr) || containsQuotaError(output);
             const resetTime = isQuotaError ? (extractResetTime(stderr) || extractResetTime(output)) : null;
 
+            if (code !== 0 || isQuotaError) {
+                // Provider-wide failure classes get ONE clear alert (quota / CLI login / disk), not a per-build one.
+                const cls = classifyCliFailure(`${stderr}\n${output}`.slice(-4000));
+                if (cls) reportCliFailure(cls);
+            }
             if (code === 0 && !isQuotaError) {
                 // Success — clear any stale quota flag
                 if (quotaExhausted) {
@@ -1280,6 +1298,9 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
 
         proc.on('error', (error) => {
             clearTimeout(timeout);
+            const cls = classifyCliFailure(`${error.code || ''} ${error.message}`);
+            if (cls) reportCliFailure(cls);
+            else reportWorkerFailure('forge.worker.cli_spawn', 'Forge worker: Claude CLI could not be started', { code: String(error.code || 'unknown').slice(0, 24) });
             resolve({ success: false, output: '', error: error.message, quotaError: false });
         });
     });
@@ -1312,7 +1333,7 @@ app.post('/generate-harder', authMiddleware, async (req, res) => {
         return res.status(400).json({ error: 'difficultyLevel must be 2-5' });
     }
 
-    if (activeGenerations >= MAX_CONCURRENT) {
+    if (slots.full()) {
         return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
     }
 
@@ -1324,7 +1345,7 @@ app.post('/generate-harder', authMiddleware, async (req, res) => {
         });
     }
 
-    activeGenerations++;
+    const releaseSlot = slots.acquire();
     const startTime = Date.now();
     const requestId = `harder-${difficultyLevel}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     let projectDir = null;
@@ -1425,7 +1446,7 @@ Modify the existing files now to increase the difficulty.`;
         const genResult = await runClaudeCommand(claudePath, generatePrompt, projectDir, requestId, 15);
 
         if (!genResult.success) {
-            activeGenerations--;
+            releaseSlot();
             if (genResult.quotaError) {
                 quotaExhausted = true;
                 if (genResult.resetTime) quotaResetTime = genResult.resetTime;
@@ -1544,9 +1565,10 @@ Make any small fixes needed. Don't rewrite — just polish.`;
 
     } catch (error) {
         console.error(`[${requestId}] Error:`, error.message);
+        noteHandlerError(error);
         sendError('Internal worker error during difficulty generation.');
     } finally {
-        activeGenerations--;
+        releaseSlot();
         if (projectDir) {
             setTimeout(() => cleanupProjectFolder(projectDir), 120000);
         }
@@ -1587,7 +1609,7 @@ app.post('/generate-next-level', authMiddleware, async (req, res) => {
     if (!nextLevelIndex || nextLevelIndex < 2) {
         return res.status(400).json({ error: 'nextLevelIndex must be >= 2' });
     }
-    if (activeGenerations >= MAX_CONCURRENT) {
+    if (slots.full()) {
         return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
     }
     if (quotaExhausted) {
@@ -1598,7 +1620,7 @@ app.post('/generate-next-level', authMiddleware, async (req, res) => {
         });
     }
 
-    activeGenerations++;
+    const releaseSlot = slots.acquire();
     const startTime = Date.now();
     const requestId = `nextlvl-${nextLevelIndex}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     let projectDir = null;
@@ -1691,7 +1713,7 @@ Build the game now.`;
         const genResult = await runClaudeCommand(claudePath, generatePrompt, projectDir, requestId, 20);
 
         if (!genResult.success) {
-            activeGenerations--;
+            releaseSlot();
             if (genResult.quotaError) {
                 quotaExhausted = true;
                 if (genResult.resetTime) quotaResetTime = genResult.resetTime;
@@ -1778,9 +1800,10 @@ Make any small fixes needed. Don't rewrite — just polish. DO NOT modify ./prev
 
     } catch (error) {
         console.error(`[${requestId}] Error:`, error.message);
+        noteHandlerError(error);
         sendError('Internal worker error during next-level generation.');
     } finally {
-        activeGenerations--;
+        releaseSlot();
         if (projectDir) {
             setTimeout(() => cleanupProjectFolder(projectDir), 120000);
         }
@@ -1815,7 +1838,7 @@ app.post('/customize', authMiddleware, async (req, res) => {
         return res.status(400).json({ error: 'customizeDescription is required' });
     }
 
-    if (activeGenerations >= MAX_CONCURRENT) {
+    if (slots.full()) {
         return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
     }
 
@@ -1827,7 +1850,7 @@ app.post('/customize', authMiddleware, async (req, res) => {
         });
     }
 
-    activeGenerations++;
+    const releaseSlot = slots.acquire();
     const startTime = Date.now();
     const requestId = `customize-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
     let projectDir = null;
@@ -1919,7 +1942,7 @@ Modify the existing files now to apply the customization.`;
         const genResult = await runClaudeCommand(claudePath, customizePrompt, projectDir, requestId, 15);
 
         if (!genResult.success) {
-            activeGenerations--;
+            releaseSlot();
             if (genResult.quotaError) {
                 quotaExhausted = true;
                 if (genResult.resetTime) quotaResetTime = genResult.resetTime;
@@ -1998,9 +2021,10 @@ Make any small fixes needed. Don't rewrite — just polish.`;
 
     } catch (error) {
         console.error(`[${requestId}] Error:`, error.message);
+        noteHandlerError(error);
         sendError('Internal worker error during customization.');
     } finally {
-        activeGenerations--;
+        releaseSlot();
         if (projectDir) {
             setTimeout(() => cleanupProjectFolder(projectDir), 120000);
         }
@@ -2361,7 +2385,7 @@ app.post('/tweak', authMiddleware, async (req, res) => {
         return res.status(503).json({ error: 'Git integration not configured (missing GITHUB_PAT)' });
     }
 
-    if (activeGenerations >= MAX_CONCURRENT) {
+    if (slots.full()) {
         return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
     }
 
@@ -2373,7 +2397,7 @@ app.post('/tweak', authMiddleware, async (req, res) => {
         });
     }
 
-    activeGenerations++;
+    const releaseSlot = slots.acquire();
     const startTime = Date.now();
     const requestId = `tweak-${gameId.substring(0, 8)}-${Date.now()}`;
     let projectDir = null;
@@ -2457,7 +2481,7 @@ app.post('/tweak', authMiddleware, async (req, res) => {
             fs.renameSync(path.join(repoDir, '.git'), path.join(projectDir, '.git'));
             fs.rmSync(repoDir, { recursive: true, force: true });
         } catch (cloneErr) {
-            activeGenerations--;
+            releaseSlot();
             return sendError(`Failed to clone game repo: ${cloneErr.message}`);
         }
 
@@ -2488,7 +2512,7 @@ Apply the changes now.`;
         const tweakResult = await runClaudeCommand(claudePath, tweakPrompt, projectDir, requestId, 12);
 
         if (!tweakResult.success) {
-            activeGenerations--;
+            releaseSlot();
             if (tweakResult.quotaError) {
                 quotaExhausted = true;
                 if (tweakResult.resetTime) quotaResetTime = tweakResult.resetTime;
@@ -2564,9 +2588,10 @@ Fix them now. Do NOT add TODO comments — implement actual fixes.`;
 
     } catch (error) {
         console.error(`[${requestId}] Tweak error:`, error.message);
+        noteHandlerError(error);
         sendError('Internal worker error during tweak.');
     } finally {
-        activeGenerations--;
+        releaseSlot();
         if (projectDir) {
             setTimeout(() => cleanupProjectFolder(projectDir), 120000);
         }
@@ -2602,7 +2627,20 @@ app.get('/versions/:repoName', authMiddleware, async (req, res) => {
 
 const gitAvailable = checkGitAvailable();
 
-app.listen(PORT, () => {
+// Crash loops (e.g. EADDRINUSE on the port, a thrown error at boot): report before exiting so pm2's restart
+// loop produces an email (deduped to one per hour) instead of silence.
+for (const evt of ['uncaughtException', 'unhandledRejection']) {
+    process.on(evt, (err) => {
+        console.error(evt, err);
+        const cls = classifyCliFailure(`${err?.code || ''} ${err?.message || ''}`);
+        const msg = err?.code === 'EADDRINUSE' ? 'Forge worker: port already in use (EADDRINUSE); pm2 is crash-looping'
+            : cls === 'enospc' ? 'Forge worker crashed: disk is full (ENOSPC)'
+            : `Forge worker process crashed (${evt})`;
+        reportWorkerCrash(evt, msg).finally(() => process.exit(1));
+    });
+}
+
+const server = app.listen(PORT, () => {
     let cliPath = 'NOT FOUND';
     try { cliPath = findClaudeCLI(); } catch {}
     console.log(`Game Worker running on http://localhost:${PORT}`);
@@ -2614,3 +2652,4 @@ app.listen(PORT, () => {
     console.log(`Git available: ${gitAvailable}`);
     console.log(`Build phases: ${BUILD_PHASES.map(p => p.id).join(' -> ')}`);
 });
+server.on('error', (err) => { throw err; }); // surfaces EADDRINUSE to the crash handler above

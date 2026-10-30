@@ -85,6 +85,7 @@ export async function sweepStuckForgeSessions({
       .limit(limit);
     if (error) {
       log.warn?.('[forge-sweeper] select failed:', error.message);
+      report('forge.sweeper', new Error('Forge sweeper could not read forge_sessions (database error)'), { reason: 'sweeper_db_error' });
       return { swept: 0, found: 0 };
     }
     if (!rows || rows.length === 0) return { swept: 0, found: 0 };
@@ -118,8 +119,51 @@ export async function sweepStuckForgeSessions({
     return { swept, found: rows.length };
   } catch (e) {
     log.warn?.('[forge-sweeper] pass threw:', e?.message || e);
+    report('forge.sweeper', new Error('Forge sweeper pass threw an exception'), { reason: 'sweeper_exception' });
     return { swept: 0, found: 0 };
   }
+}
+
+export const FORGE_DEADMAN_WINDOW_MS = 3 * 60 * 60 * 1000;
+export const FORGE_DEADMAN_MIN_ATTEMPTS = 3;
+export const FORGE_RATE_WINDOW_MS = 24 * 60 * 60 * 1000;
+export const FORGE_RATE_MIN_ATTEMPTS = 10;
+export const FORGE_RATE_MIN_COMPLETION = 0.2;
+
+/**
+ * End-to-end invariant: forge sessions created vs completed.
+ *  - dead-man: >= 3 sessions created in the last 3 h and none completed in that window
+ *  - rate: >= 10 sessions created in the last 24 h and fewer than 20% completed
+ * One report per rule per pass (the reporter dedupes to one email per hour). Never throws.
+ * Returns { created3h, completed3h, created24h, completed24h, alerts: string[] }.
+ */
+export async function checkForgeInvariant({ supabase, now = Date.now(), report = defaultReportFailure, log = console } = {}) {
+  const out = { created3h: 0, completed3h: 0, created24h: 0, completed24h: 0, alerts: [] };
+  try {
+    const count = async (windowMs, completedOnly) => {
+      let q = supabase.from('forge_sessions').select('id', { count: 'exact', head: true }).gte('created_at', new Date(now - windowMs).toISOString());
+      if (completedOnly) q = q.eq('status', 'completed');
+      const { count: n, error } = await q;
+      if (error) throw new Error(error.message || 'count failed');
+      return n || 0;
+    };
+    out.created3h = await count(FORGE_DEADMAN_WINDOW_MS, false);
+    out.completed3h = await count(FORGE_DEADMAN_WINDOW_MS, true);
+    out.created24h = await count(FORGE_RATE_WINDOW_MS, false);
+    out.completed24h = await count(FORGE_RATE_WINDOW_MS, true);
+    if (out.created3h >= FORGE_DEADMAN_MIN_ATTEMPTS && out.completed3h === 0) {
+      out.alerts.push('deadman');
+      report('forge.invariant', new Error('Forge dead-man: sessions were started in the last 3 hours but none completed'), { rule: 'no_completion_3h' });
+    }
+    if (out.created24h >= FORGE_RATE_MIN_ATTEMPTS && out.completed24h / out.created24h < FORGE_RATE_MIN_COMPLETION) {
+      out.alerts.push('rate');
+      report('forge.invariant', new Error('Forge completion rate is below 20 percent over the last 24 hours'), { rule: 'low_completion_24h' });
+    }
+  } catch (e) {
+    log.warn?.('[forge-invariant] check failed:', e?.message || e);
+    report('forge.invariant', new Error('Forge invariant check could not query forge_sessions'), { rule: 'check_failed' });
+  }
+  return out;
 }
 
 let timer = null;
@@ -142,4 +186,21 @@ export function startForgeSessionSweeper({ supabase, env = process.env, interval
 
 export function stopForgeSessionSweeper() {
   if (timer) { clearInterval(timer); timer = null; }
+}
+
+let invariantTimer = null;
+export const FORGE_INVARIANT_INTERVAL_MS = 30 * 60 * 1000;
+/** Read-only dead-man / completion-rate monitor. ON by default; FORGE_INVARIANT_MONITOR=false turns it off. */
+export function startForgeInvariantMonitor({ supabase, env = process.env, intervalMs = FORGE_INVARIANT_INTERVAL_MS, firstRunDelayMs = 5 * 60 * 1000 } = {}) {
+  if (env.FORGE_INVARIANT_MONITOR === 'false') return false;
+  if (invariantTimer) return true;
+  const run = () => { void checkForgeInvariant({ supabase }); };
+  const first = setTimeout(run, firstRunDelayMs);
+  first.unref?.();
+  invariantTimer = setInterval(run, intervalMs);
+  invariantTimer.unref?.();
+  return true;
+}
+export function stopForgeInvariantMonitor() {
+  if (invariantTimer) { clearInterval(invariantTimer); invariantTimer = null; }
 }

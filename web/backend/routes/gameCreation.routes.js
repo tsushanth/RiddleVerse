@@ -6,6 +6,7 @@ import { callAI } from '../utils/aiClient.js';
 import { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import { DIFFICULTY_COSTS, MAX_DIFFICULTY_LEVEL, getDifficultyCost } from '../services/difficultyService.js';
 import { createForgeSessionCloser } from '../services/forgeSessionService.js';
+import { reportFailure } from '../utils/failureReporter.js';
 
 const router = express.Router();
 
@@ -62,11 +63,13 @@ async function startForgeSession(userId, prompt) {
             .single();
         if (error) {
             console.warn('[forge_sessions] start non-fatal:', error.message);
+            reportFailure('forge.session_db', new Error('Forge session row could not be created (database error)'), { op: 'start' });
             return null;
         }
         return data?.id || null;
     } catch (e) {
         console.warn('[forge_sessions] start threw non-fatal:', e?.message || e);
+        reportFailure('forge.session_db', new Error('Forge session row could not be created (database error)'), { op: 'start' });
         return null;
     }
 }
@@ -80,9 +83,13 @@ async function finishForgeSession(sessionId, status, savedGameId = null) {
             .from('forge_sessions')
             .update(payload)
             .eq('id', sessionId);
-        if (error) console.warn(`[forge_sessions] finish(${status}) non-fatal:`, error.message);
+        if (error) {
+            console.warn(`[forge_sessions] finish(${status}) non-fatal:`, error.message);
+            reportFailure('forge.session_db', new Error('Forge session row could not be closed (database error)'), { op: 'finish' });
+        }
     } catch (e) {
         console.warn(`[forge_sessions] finish(${status}) threw non-fatal:`, e?.message || e);
+        reportFailure('forge.session_db', new Error('Forge session row could not be closed (database error)'), { op: 'finish' });
     }
 }
 
@@ -99,6 +106,18 @@ async function recordGamePlay(gameId, playerId) {
     } catch (e) {
         console.warn('[game_plays] insert non-fatal:', e?.message || e);
     }
+}
+
+// Non-generate worker calls (harder / tweak / customize / next-level) had no failure signal. One stable
+// message per class; 429 (busy) is expected back-pressure and is not reported.
+function reportWorkerHttp(op, status) {
+    if (status === 429) return;
+    const msg = status === 503
+        ? 'Build server refused the request (503: out of AI capacity or unavailable)'
+        : status === 401
+            ? 'Build server rejected the backend secret (401): GAME_WORKER_SECRET mismatch'
+            : 'Build server returned an HTTP error';
+    reportFailure('forge.worker_http', new Error(msg), { op, status: String(status) });
 }
 
 const API_BASE_URL = process.env.API_BASE_URL || '';
@@ -1236,6 +1255,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
         });
 
         if (!workerResponse.ok) {
+            reportWorkerHttp('harder', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
             try {
                 if (workerResponse.headers.get('content-type')?.includes('application/json')) {
@@ -1534,6 +1554,7 @@ router.post('/:gameId/tweak', async (req, res) => {
         });
 
         if (!workerResponse.ok) {
+            reportWorkerHttp('tweak', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
             try {
                 const err = await workerResponse.json();
@@ -1745,6 +1766,7 @@ router.post('/:gameId/customize', async (req, res) => {
         });
 
         if (!workerResponse.ok) {
+            reportWorkerHttp('customize', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
             try {
                 const err = await workerResponse.json();
@@ -1942,6 +1964,7 @@ router.get('/:gameId/versions', async (req, res) => {
         );
 
         if (!workerResponse.ok) {
+            reportWorkerHttp('versions', workerResponse.status);
             throw new Error(`Worker error ${workerResponse.status}`);
         }
 
@@ -2284,6 +2307,7 @@ Requirements:
         });
 
         if (!workerResponse.ok) {
+            reportWorkerHttp('generate_variant', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
             try {
                 if (workerResponse.headers.get('content-type')?.includes('application/json')) {
@@ -3115,6 +3139,7 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
     }
 
     if (!workerResponse.ok || !workerResponse.body) {
+        if (!workerResponse.ok) reportWorkerHttp('next_level', workerResponse.status);
         res.write(`data: ${JSON.stringify({ type: 'error', error: `Build server error (${workerResponse.status})` })}\n\n`);
         return res.end();
     }

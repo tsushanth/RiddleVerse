@@ -1,3 +1,4 @@
+import { reportProviderError } from './failureReporter.js';
 // Shared OpenAI image generation helper (gpt-image-* models).
 //
 // Replaces the old dall-e-3 + response_format:"b64_json" calls. The gpt-image
@@ -164,6 +165,7 @@ export async function generateImageB64({ prompt, size, quality, apiKey, timeoutM
         } else {
             message = `OpenAI image generation failed (HTTP ${status}${err.code ? `, ${err.code}` : ''}): ${openaiMessage}`;
         }
+        if (!policy) reportProviderError('openai-image', { status, data, message: openaiMessage });
         throw new OpenAIImageError(message, { status, code: err.code || null, type: err.type || null, openaiMessage, contentPolicy: policy });
     }
 

@@ -55,10 +55,10 @@ import { handleStripeWebhook } from './services/payoutService.js';
 import { initializeDailyPuzzleSystem } from './services/dailyPuzzleCacheSetup.js';
 import { firebaseStreakNotificationService } from './services/firebaseStreakNotificationService.js';
 import { remixDigestService } from './services/remixDigestService.js';
-import { startForgeSessionSweeper } from './services/forgeSessionService.js';
+import { startForgeSessionSweeper, startForgeInvariantMonitor } from './services/forgeSessionService.js';
 import { supabase } from './config/database.js';
 import { wordFrequencyManager } from './services/wordFrequencyManager.js';
-import { errorHandler } from './middleware/errorHandler.js';
+import { errorHandler, reportUnhandled5xx } from './middleware/errorHandler.js';
 import { reportCrash } from './utils/failureReporter.js';
 
 // New simple daily puzzle system (in-memory, no Redis)
@@ -75,6 +75,7 @@ let healthCheckInProgress = false;
 const HEALTH_CHECK_CACHE_DURATION = 5 * 60 * 1000;
 
 const app = express();
+app.use(reportUnhandled5xx); // every 5xx that no one reported (handlers that catch and answer 500 themselves)
 app.set('trust proxy', 1);
 app.use(cors());
 
@@ -131,6 +132,8 @@ async function initializeServer() {
         remixDigestService.start();
         // OFF unless FORGE_SESSION_SWEEPER_ENABLED=true (marks forge sessions stuck 'generating' > 15 min as failed).
         startForgeSessionSweeper({ supabase });
+        // Read-only dead-man + completion-rate check on forge_sessions (ON; FORGE_INVARIANT_MONITOR=false to stop).
+        startForgeInvariantMonitor({ supabase });
         const cacheInitResult = await initializeDailyPuzzleSystem();
 
         if (!cacheInitResult.success) {
