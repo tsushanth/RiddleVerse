@@ -10,6 +10,7 @@ import {
 import { triggerAutoGenerationSafe } from '../services/puzzleService.js';
 import { cacheScheduler } from '../services/cacheScheduler.js';
 import { PUZZLE_TYPES } from '../config/puzzleConfig.js';
+import { isAdminKey } from '../middleware/adminKey.js';
 
 const router = express.Router();
 
@@ -39,7 +40,7 @@ const adminLimiter = rateLimit({
 const validateAdmin = (req, res, next) => {
     const adminKey = req.body?.adminKey || req.query?.adminKey;
     
-    if (adminKey !== process.env.ADMIN_KEY) {
+    if (!isAdminKey(adminKey)) {
         return res.status(401).json({
             success: false,
             message: 'Unauthorized',
