@@ -57,6 +57,7 @@ import { firebaseStreakNotificationService } from './services/firebaseStreakNoti
 import { remixDigestService } from './services/remixDigestService.js';
 import { startForgeSessionSweeper, startForgeInvariantMonitor } from './services/forgeSessionService.js';
 import { supabase } from './config/database.js';
+import { createDeepHealthHandler, buildChecks as buildDeepChecks } from './services/deepHealth.js';
 import { wordFrequencyManager } from './services/wordFrequencyManager.js';
 import { errorHandler, reportUnhandled5xx } from './middleware/errorHandler.js';
 import { reportCrash } from './utils/failureReporter.js';
@@ -187,6 +188,11 @@ app.get('/api/health', (req, res) => {
         timestamp: new Date().toISOString()
     });
 });
+
+// Deep health for external probes: Supabase + Firestore + the Hetzner forge worker, no LLM call, no writes (see services/deepHealth.js).
+app.get('/api/health/deep', createDeepHealthHandler({
+    checks: () => buildDeepChecks({ supabase, getDb: async () => (await import('./config/firebaseAdmin.js')).db, workerUrl: process.env.GAME_WORKER_URL }),
+}));
 
 app.get('/api/health/detailed', async (req, res) => {
     try {
