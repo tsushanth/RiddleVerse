@@ -67,6 +67,7 @@ import { refreshDailyPuzzles } from './services/dailyPuzzles.js';
 import dailyPuzzlesBulkRoutes from './routes/dailyPuzzlesBulk.routes.js';
 import cron from 'node-cron';
 import { llm } from './utils/llmUsageInstance.js';
+import { isAdminKey } from './middleware/adminKey.js';
 
 const __dirname = path.resolve();
 
@@ -315,7 +316,7 @@ app.use(errorHandler);
 // Admin endpoints for error silencing
 app.post('/api/admin/silence-error', (req, res) => {
     const adminKey = req.headers['x-admin-key'];
-    if (adminKey !== process.env.ADMIN_KEY) {
+    if (!isAdminKey(adminKey)) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
@@ -332,7 +333,7 @@ app.post('/api/admin/silence-error', (req, res) => {
 
 app.post('/api/admin/unsilence-error', (req, res) => {
     const adminKey = req.headers['x-admin-key'];
-    if (adminKey !== process.env.ADMIN_KEY) {
+    if (!isAdminKey(adminKey)) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
@@ -349,7 +350,7 @@ app.post('/api/admin/unsilence-error', (req, res) => {
 
 app.get('/api/admin/silenced-errors', (req, res) => {
     const adminKey = req.headers['x-admin-key'];
-    if (adminKey !== process.env.ADMIN_KEY) {
+    if (!isAdminKey(adminKey)) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
@@ -358,7 +359,7 @@ app.get('/api/admin/silenced-errors', (req, res) => {
 
 app.post('/api/admin/clear-silences', (req, res) => {
     const adminKey = req.headers['x-admin-key'];
-    if (adminKey !== process.env.ADMIN_KEY) {
+    if (!isAdminKey(adminKey)) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
