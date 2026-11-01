@@ -1,6 +1,7 @@
 // utils/aiClient.js
 
 import axios from 'axios';
+import { reportProviderError } from './failureReporter.js';
 import usageTracker, { USAGE_CATEGORIES } from './usageTracker.js';
 import { recordAnthropicResponse, recordAnthropicAxiosError } from './llmUsageInstance.js';
 
@@ -257,6 +258,7 @@ export async function callAI(prompt, requestedModel = null, maxRetries = 2, opti
                 lastError = error;
                 console.error(`❌ ${modelName} API Error (attempt ${attempt}/${maxRetries}):`, error.message);
                 if (apiConfig.isAnthropic) recordAnthropicAxiosError(error, apiConfig.model, llmFeature);
+                reportProviderError(modelName, error); // 401 / credit exhausted / quota: one stable alert per provider
                 
                 // Track failed attempt
                 await usageTracker.trackRequest({
