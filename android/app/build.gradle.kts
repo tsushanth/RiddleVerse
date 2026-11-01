@@ -188,7 +188,9 @@ dependencies {
     implementation(project(":ratingkit"))
     implementation("com.github.tiktok:tiktok-business-android-sdk:1.6.0")
     implementation(libs.play.services.fido)
-    implementation(libs.mediation.test.suite)
+    // AdMob Mediation Test Suite is a developer tool: debug builds only. In release it shipped 4 extra
+    // activities that the Play pre-launch crawler launched without extras (NPE in NetworkDetailActivity).
+    debugImplementation(libs.mediation.test.suite)
     implementation(libs.androidx.glance)
     implementation(libs.identity.jvm)
     implementation("androidx.collection:collection-ktx:1.4.0")
