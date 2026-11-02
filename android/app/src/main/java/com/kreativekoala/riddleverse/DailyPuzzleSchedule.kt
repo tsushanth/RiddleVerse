@@ -39,6 +39,9 @@ object DailyPuzzleSchedule {
      */
     val ROTATION: List<String> = listOf(
         "sudoku", "binarygrid", "signgrid", "pixellogic", "tubetint", "conduit", "crateshift", "wordladder", "wordhive",
+        // Added at integration, before the first daily ships: seeded, unique-solution, no luck, a miss reveals nothing.
+        "crowns", "trail",
+        // Left out on purpose: Linkup (running out of mistakes reveals the groups) and Riddles (a miss reveals the answer).
     )
 
     /** Difficulty label handed to every generator. One fixed level keeps the puzzle identical for all players. */
