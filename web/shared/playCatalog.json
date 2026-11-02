@@ -280,6 +280,20 @@
         "Use the feedback to deduce the code within the limited number of tries."
       ],
       "tip": "Use early guesses to find which colours are in the code, then work out their positions."
+    },
+    {
+      "slug": "crowns",
+      "name": "Crowns",
+      "category": "spatial",
+      "summary": "Put one crown in every row, column and colour region, with no two crowns touching.",
+      "description": "Crowns is a region-placement logic puzzle on a grid from 5 by 5 up to 9 by 9. The board is split into coloured regions, and you place exactly one crown in every row, every column and every region while keeping all crowns apart, even diagonally. Every region has its own pattern as well as a colour, and every puzzle has exactly one solution.",
+      "howToPlay": [
+        "Tap a square once to mark it with an X, twice to place a crown, and a third time to clear it.",
+        "Place exactly one crown in each row, each column and each coloured region.",
+        "No two crowns may touch, including diagonally. Crowns that break a rule are outlined in red.",
+        "Use the arrow keys and Space to play with a keyboard, and Undo or Hint if you get stuck."
+      ],
+      "tip": "Look for a colour that fits in only one row or column: its crown is there, which rules out the rest of that line."
     }
   ]
 }

@@ -30,12 +30,14 @@ before(async () => {
 after(async () => { await server?.close() })
 
 test('typeMap is identical to the pre-refactor snapshot (every alias, same canonical key)', () => {
-  const now = Object.fromEntries(Object.entries(R.typeMap).sort(([a], [b]) => (a < b ? -1 : 1)))
+  // web/game-crowns: games added after the refactor extend the maps; the snapshot pins only the pre-refactor entries.
+  const now = Object.fromEntries(Object.entries(R.typeMap).filter(([k]) => k in snapshot.typeMap).sort(([a], [b]) => (a < b ? -1 : 1)))
   assert.deepEqual(now, snapshot.typeMap)
 })
 
 test('renderers: same canonical keys, same component names as the pre-refactor snapshot', () => {
-  const now = Object.fromEntries(Object.entries(R.renderers).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
+  // web/game-crowns: only the pre-refactor keys are pinned (see above).
+  const now = Object.fromEntries(Object.entries(R.renderers).filter(([k]) => k in snapshot.renderers).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
   assert.deepEqual(now, snapshot.renderers)
 })
 
