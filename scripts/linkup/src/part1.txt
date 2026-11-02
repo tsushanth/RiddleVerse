@@ -1,0 +1,187 @@
+# Linkup bank part 1. Line format: tier | title | WORDS ; "x WORD > tier" declares a deliberate red herring.
+1 | Citrus fruits | LEMON ORANGE GRAPEFRUIT TANGERINE
+2 | Shades of green | LIME OLIVE MINT JADE
+3 | Hide an animal | BOWL GRAPE STEEL SCOWL
+4 | Sound like a letter | TEA SEA EYE QUEUE
+x LIME > 1
+
+1 | Farm animals | COW PIG SHEEP HORSE
+2 | Chess pieces | KING QUEEN ROOK BISHOP
+3 | Start with a silent letter | KNIGHT WRIST GNAT PSALM
+4 | Palindromes | LEVEL RADAR CIVIC KAYAK
+x KNIGHT > 2
+
+1 | Hats | BERET FEZ FEDORA BOWLER
+2 | Cricket terms | WICKET INNINGS UMPIRE STUMPS
+3 | Words before FLY | BUTTER DRAGON FIRE HOUSE
+4 | Silent B | THUMB LAMB CLIMB DOUBT
+x BOWLER > 2
+
+1 | Snakes | COBRA VIPER MAMBA ADDER
+2 | Coffee drinks | LATTE MOCHA ESPRESSO CAPPUCCINO
+3 | Programming languages | JAVA PYTHON RUBY SWIFT
+4 | Hide a colour | STEALTH SHRED STAND MARIGOLD
+x JAVA > 2
+x PYTHON > 1
+
+1 | Planets | EARTH SATURN VENUS MARS
+2 | Greek gods | ZEUS HERA ATHENA POSEIDON
+3 | Words before SHIP | FRIEND LEADER HARD CHAMPION
+4 | Hide a body part | PEARL CHARM SHINE SLIPPER
+x EARTH > 4
+
+1 | Fruits | APPLE BANANA PEACH CHERRY
+2 | Shades of red | RUBY CRIMSON SCARLET MAROON
+3 | Words after WATER | MELON FALL COLOUR PROOF
+4 | Palindromes | NOON LEVEL REFER ROTOR
+x CHERRY > 2
+x MELON > 1
+
+1 | Writing tools | PEN PENCIL MARKER CRAYON
+2 | Animal enclosures | COOP STY HUTCH KENNEL
+3 | Words before BOX | LETTER MATCH TOOL JUKE
+4 | Start with a metal | TINSEL IRONY LEADER GOLDFISH
+x PEN > 2
+
+1 | Mammals | WHALE BAT HORSE OTTER
+2 | Cricket equipment | PADS STUMPS BAILS GLOVES
+3 | Words after SNOW | BALL MAN FLAKE STORM
+4 | Only Roman numeral letters | CIVIL LIVID VIVID MIMIC
+x BAT > 2
+
+1 | Fruits | FIG DATE PEAR PLUM
+2 | Shades of purple | VIOLET LILAC MAUVE INDIGO
+3 | Words before STONE | LIME MOON GRAVE KEY
+4 | Hide a number | WEIGHT NETWORK HONEY LISTEN
+x PLUM > 2
+x LIME > 1
+
+1 | Seasons | SPRING SUMMER WINTER AUTUMN
+2 | Ways to jump | HOP LEAP VAULT BOUND
+3 | Words after SUN | FLOWER BURN GLASSES DIAL
+4 | Anagrams of each other | LEAST SLATE STALE TALES
+x SPRING > 2
+
+1 | Orchestra instruments | VIOLIN FLUTE TRUMPET CELLO
+2 | Things with keys | PIANO TYPEWRITER KEYBOARD CALCULATOR
+3 | Words before BELL | BLUE DOOR COW DUMB
+4 | Palindromes | MADAM TENET SOLOS STATS
+x PIANO > 1
+
+1 | African countries | KENYA GHANA CHAD EGYPT
+2 | Boys' names | OWEN ETHAN LIAM NOAH
+3 | Words before WORK | HOME HOUSE TEAM FIRE
+4 | Hide an animal | PLANTS DRAMA COMBAT WHEN
+x CHAD > 2
+
+1 | Garden tools | RAKE SICKLE TROWEL SHOVEL
+2 | Card suits | HEART CLUB DIAMOND SPADE
+3 | Things you can crack | JOKE EGG CODE WHIP
+4 | Two pairs of double letters | BALLOON COFFEE ADDRESS SUCCESS
+x SPADE > 1
+
+1 | Parts of a house | ROOF WALL CHIMNEY PORCH
+2 | Parts of a ship | HULL MAST ANCHOR DECK
+3 | Words after BOOK | CASE MARK WORM SHELF
+4 | Hide a colour | SUBLIME JADED PLUMBER AQUARIUM
+x DECK > 1
+
+1 | Planets | MARS VENUS SATURN JUPITER
+2 | Metals | IRON COPPER ZINC MERCURY
+3 | Things you can break | RECORD NEWS SILENCE HEART
+4 | Anagrams of each other | STAR RATS ARTS TSAR
+x MERCURY > 1
+
+1 | Sea animals | WHALE DOLPHIN SQUID OCTOPUS
+2 | Ways to close or fasten | LATCH BOLT ZIP SEAL
+3 | Words after TOOTH | BRUSH PASTE PICK FAIRY
+4 | Only Roman numeral letters | MILD VIVID MIMIC DIM
+x SEAL > 1
+
+1 | Birds | EAGLE SWAN OWL CRANE
+2 | Construction machines | DIGGER BULLDOZER EXCAVATOR LOADER
+3 | Words before BERRY | BLUE STRAW RASP CRAN
+4 | Silent W | WRIST WRITE WRONG WRECK
+x CRANE > 2
+
+1 | Fish | SALMON TROUT COD BASS
+2 | Singing voices | SOPRANO ALTO TENOR BARITONE
+3 | Words after RAIN | BOW DROP COAT FALL
+4 | Sound like a number | WON TOO ATE FORE
+x BASS > 2
+
+1 | Money | COIN CASH CHEQUE NOTE
+2 | Music terms | TEMPO PITCH CHORD SCALE
+3 | Words before BOOK | TEXT COOK SCRAP HAND
+4 | Hide a colour | HATRED PROSE GOLDEN TANGO
+x NOTE > 2
+x NOTE > 3
+
+1 | Places to play sport | COURT RINK TRACK PITCH
+2 | Ways to throw | HURL TOSS FLING LOB
+3 | Words before LIGHT | SUN MOON STAR FLASH
+4 | Silent B | COMB TOMB NUMB PLUMBER
+x PITCH > 2
+
+1 | Sports | GOLF RUGBY HOCKEY CRICKET
+2 | Insects | ANT MOTH BEETLE WASP
+3 | Words after FIRE | PLACE WORKS FLY TRUCK
+4 | Two pairs of double letters | BALLOON COFFEE ASSESS SUCCESS
+x CRICKET > 2
+x FLY > 2
+
+1 | Vegetables | CARROT ONION LEEK TURNIP
+2 | Racket sports | TENNIS BADMINTON PICKLEBALL SQUASH
+3 | Words before ROOM | MUSH CLASS BATH STOCK
+4 | Hide a body part | ALARM SNAIL CHIPS AHEAD
+x SQUASH > 1
+
+1 | Metals | IRON GOLD SILVER TIN
+2 | Containers | JAR BOX CAN BOTTLE
+3 | Words before BALL | FOOT BASE SNOW EYE
+4 | Anagrams of each other | TEAM MATE TAME MEAT
+x TIN > 2
+
+1 | Vehicles | BUS TRAIN TRAM FERRY
+2 | Team roles | COACH REFEREE CAPTAIN GOALIE
+3 | Words after HOUSE | HOLD KEEPER BOAT WORK
+4 | Palindromic names | ANNA OTTO HANNAH BOB
+x COACH > 1
+x BOAT > 1
+
+1 | Metals | IRON ZINC LEAD NICKEL
+2 | Ways to guide | STEER DIRECT PILOT USHER
+3 | Things that run | NOSE RIVER ENGINE TAP
+4 | Hide an animal | CHAPEL COWARD DOGMA BATHE
+x LEAD > 2
+
+1 | Dog sounds | WOOF GROWL HOWL YELP
+2 | Parts of a tree | ROOT TRUNK BRANCH BARK
+3 | Words after GOLD | FISH MINE SMITH RUSH
+4 | Hide a colour | GREYHOUND BLUEPRINT PINKIE REDUCE
+x BARK > 1
+
+1 | Birds | ROBIN FALCON SWALLOW WREN
+2 | Ways to eat | CHEW GULP NIBBLE MUNCH
+3 | Words before BOARD | SKATE SURF SNOW DASH
+4 | Anagrams of each other | EAST EATS SATE TEAS
+x SWALLOW > 2
+
+1 | Computer hardware | KEYBOARD MONITOR PRINTER SCANNER
+2 | Rodents | BEAVER SQUIRREL HAMSTER MOUSE
+3 | Words before WALK | MOON SIDE CAT JAY
+4 | Sound like a number | TOO ATE WON FOR
+x MOUSE > 1
+
+1 | Shapes | CIRCLE OVAL SQUARE STAR
+2 | Things in space | PLANET COMET MOON ASTEROID
+3 | Words after SUN | SET RISE SHINE BURN
+4 | Only Roman numeral letters | CIVIC LIVID MILD DIM
+x STAR > 2
+
+1 | Organs | LIVER KIDNEY LUNG STOMACH
+2 | Valentine's Day things | HEART ROSE CUPID CHOCOLATES
+3 | Things you can break | RECORD NEWS SILENCE BREAD
+4 | Hide a number | CANINE FREIGHT STONE OFTEN
+x HEART > 1
+x HEART > 3

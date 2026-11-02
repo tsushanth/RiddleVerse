@@ -96,11 +96,11 @@ object HardcodedPuzzleGroups {
                 id = "word_games_plus",
                 name = "Word Games Plus",
                 description = "Guess, climb, build and crack with words and codes",
-                puzzleTypes = listOf("wordguess", "wordladder", "letterballoons", "wordhive", "codecracker"),
+                puzzleTypes = listOf("wordguess", "wordladder", "letterballoons", "wordhive", "codecracker", "linkup"),
                 completedTypes = emptySet(),
                 category = "English",
                 difficulty = "Mixed",
-                totalTypes = 5
+                totalTypes = 6
             ),
 
             PuzzleGroup(

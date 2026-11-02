@@ -31,6 +31,7 @@ object NewGameInfo {
         "wordladder" to Info("Word Ladder", word, listOf("Expand vocabulary and spelling.", "Improve flexible thinking.")),
         "letterballoons" to Info("Letter Balloons", word, listOf("Improve spelling recall.", "Practice smart letter guessing.")),
         "wordhive" to Info("Word Hive", word, listOf("Grow your vocabulary.", "Spot word patterns faster.")),
+        "linkup" to Info("Linkup", word, listOf("Spot hidden categories.", "Resist tempting red herrings.")), // linkup
         "codecracker" to Info("Code Cracker", focus, listOf("Practice deductive reasoning.", "Improve systematic thinking."))
     )
 
