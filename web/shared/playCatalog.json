@@ -1,0 +1,277 @@
+{
+  "_note": "Single source of truth for the public /play pages. Read by the backend (meta injection, sitemap) and bundled into the frontend. Copy is written from the game rules in web/frontend/src/components/puzzles; do not add numbers or claims the code does not back up. Keep ASCII only. summary must stay under 120 characters.",
+  "categories": [
+    { "id": "grid", "name": "Grid logic" },
+    { "id": "classic", "name": "Classic casual" },
+    { "id": "spatial", "name": "Spatial" },
+    { "id": "word", "name": "Word games" }
+  ],
+  "games": [
+    {
+      "slug": "sudoku",
+      "name": "Sudoku",
+      "category": "grid",
+      "summary": "Fill the grid so every row, column and box holds each digit once. 4x4, 6x6 and 9x9 grids.",
+      "description": "Sudoku is the classic number-placement puzzle: fill every empty cell so each row, column and box contains every digit exactly once. This version has 4x4, 6x6 and 9x9 grids, so newcomers and regulars can both find a size that fits, plus a pencil tool for jotting down candidates. Each puzzle is generated fresh in your browser.",
+      "howToPlay": [
+        "Tap an empty cell, then choose a digit to place in it.",
+        "Each row, each column and each box must contain every digit exactly once.",
+        "Switch on the pencil tool to note candidate digits before you commit.",
+        "Every puzzle has exactly one solution, so you can always reason your way to it."
+      ],
+      "tip": "Scan for a row, column or box that is missing only one or two digits and start there."
+    },
+    {
+      "slug": "binarygrid",
+      "name": "Binary Grid",
+      "category": "grid",
+      "summary": "Fill the grid with 0s and 1s: no three in a row, balanced rows and columns, no duplicate lines.",
+      "description": "Binary Grid is a logic puzzle played with just two digits. You fill every cell with a 0 or a 1 while keeping each row and column balanced and avoiding repeated patterns. There is no guessing required, only deduction, and a new grid is generated every time you play.",
+      "howToPlay": [
+        "Fill every cell with either a 0 or a 1.",
+        "No more than two equal digits may touch in a row or column.",
+        "Each row and each column must contain as many 0s as 1s.",
+        "No two rows may be identical, and no two columns may be identical."
+      ],
+      "tip": "Two equal digits side by side force the cells on both ends to be the opposite digit."
+    },
+    {
+      "slug": "cagemath",
+      "name": "Cage Math",
+      "category": "grid",
+      "summary": "Fill the grid so no digit repeats in a row or column and every cage hits its arithmetic target.",
+      "description": "Cage Math blends a Latin-square grid with arithmetic. Outlined cages carry a target number and a sign, and the digits inside must add, subtract, multiply or divide to reach it. It rewards patient deduction, and each grid is generated fresh in your browser.",
+      "howToPlay": [
+        "Fill the grid with digits so none repeats in any row or column.",
+        "The number and sign in a cage corner give that cage's target.",
+        "The digits in a cage must add, subtract, multiply or divide to reach the target.",
+        "A cage showing only a number is a single cell. Digits may repeat inside a cage if they sit in different rows and columns."
+      ],
+      "tip": "Start with single-cell cages and cages that have very few possible digit combinations."
+    },
+    {
+      "slug": "signgrid",
+      "name": "Sign Grid",
+      "category": "grid",
+      "summary": "Fill the grid so no digit repeats in a row or column and every < and > sign is respected.",
+      "description": "Sign Grid is a number-placement puzzle where small inequality signs sit between neighbouring cells. Each sign tells you which of the two cells holds the smaller digit, which gives you a steady supply of clues. A new grid is generated each time you play.",
+      "howToPlay": [
+        "Fill the grid so no digit repeats in any row or column.",
+        "A sign between two cells points to the smaller one.",
+        "The cell at the narrow end of the sign holds the smaller digit.",
+        "Use the signs together with the no-repeat rule to narrow down each cell."
+      ],
+      "tip": "A cell that is smaller than all of its neighbours in a line is a strong candidate for the lowest digit."
+    },
+    {
+      "slug": "tilemerge",
+      "name": "Tile Merge",
+      "category": "classic",
+      "summary": "Slide and merge matching tiles to reach the goal tile before you run out of moves or space.",
+      "description": "Tile Merge is a slide-and-combine puzzle. Every move slides all the tiles in one direction, and equal tiles that touch merge into a bigger one. You get three undos, so a mistake does not have to end the run.",
+      "howToPlay": [
+        "Swipe, or use the arrow keys or WASD, to slide every tile in that direction.",
+        "Equal tiles that touch merge into one bigger tile.",
+        "Reach the goal tile before you run out of moves or space.",
+        "You get 3 undos if a move goes wrong."
+      ],
+      "tip": "Keep your biggest tile in a corner and build next to it."
+    },
+    {
+      "slug": "slidetiles",
+      "name": "Slide Tiles",
+      "category": "classic",
+      "summary": "Slide numbered tiles into order, finishing with the empty space in the bottom right corner.",
+      "description": "Slide Tiles is the familiar sliding-number puzzle. Tiles can only move into the empty space, so every slide changes what you can do next. Plan a few moves ahead and put the numbers back in order.",
+      "howToPlay": [
+        "Tap a tile in the same row or column as the empty space to slide it.",
+        "Arrow keys and WASD also work on a keyboard.",
+        "Put the numbers in order.",
+        "Finish with the empty space in the bottom right corner."
+      ],
+      "tip": "Solve the top row first, then the next one, and leave the last two rows for the end."
+    },
+    {
+      "slug": "lightflip",
+      "name": "Light Flip",
+      "category": "classic",
+      "summary": "Tapping a light flips it and its four neighbours. Turn every light off in as few taps as you can.",
+      "description": "Light Flip is a lights-out puzzle on a small grid. Each tap toggles one light together with the lights next to it, so the board changes in ways that are easy to start and tricky to finish. Aim to switch everything off in as few taps as possible.",
+      "howToPlay": [
+        "Tap a light to flip it and its four neighbours.",
+        "Turn every light off to win.",
+        "Fewer taps give a better score.",
+        "Hint is available if you get stuck, and each hint costs score."
+      ],
+      "tip": "Tapping the same cell twice does nothing, so look for a cell that has not been tapped yet."
+    },
+    {
+      "slug": "safesweep",
+      "name": "Safe Sweep",
+      "category": "classic",
+      "summary": "A minesweeper-style puzzle: open every safe square without touching a mine. Your first tap is always safe.",
+      "description": "Safe Sweep is a minefield puzzle driven by the numbers you uncover. Each number tells how many mines touch that square, and careful reasoning lets you flag the mines and clear the rest. Your first tap is always safe.",
+      "howToPlay": [
+        "Tap a square to open it.",
+        "A number tells how many mines touch that square.",
+        "Flag the mines you are sure about, then open every safe square.",
+        "Long press, right click or use Flag mode to place a flag."
+      ],
+      "tip": "Tap a number whose flags are all placed to open its other neighbours in one go."
+    },
+    {
+      "slug": "disctower",
+      "name": "Disc Tower",
+      "category": "classic",
+      "summary": "Move the whole stack of discs to the right-hand peg, never placing a bigger disc on a smaller one.",
+      "description": "Disc Tower is the Tower of Hanoi puzzle. You move one disc at a time between three pegs and must never rest a bigger disc on a smaller one. It looks simple with a few discs and gets deeper with each extra disc.",
+      "howToPlay": [
+        "Move the whole stack to the right-hand peg.",
+        "Move one disc at a time.",
+        "Never put a bigger disc on a smaller one.",
+        "Tap a peg to pick up its top disc, then tap where to drop it."
+      ],
+      "tip": "The fewest possible moves is 2 to the power of the number of discs, minus 1. Hint shows the next best move."
+    },
+    {
+      "slug": "pixellogic",
+      "name": "Pixel Logic",
+      "category": "spatial",
+      "summary": "Use the number clues beside each row and column to reveal a hidden pixel picture.",
+      "description": "Pixel Logic is a nonogram puzzle. The numbers beside each row and column describe the runs of filled squares, and your job is to work out exactly which squares to fill. Drag to paint a line, and use the magnifier on big grids.",
+      "howToPlay": [
+        "Numbers beside each row and column give the lengths of runs of filled squares, in order.",
+        "Fill the squares that must be filled and cross out the ones that cannot be.",
+        "Drag to paint a line of squares.",
+        "Use the magnifier on big grids."
+      ],
+      "tip": "A clue that nearly fills its line tells you exactly where the squares go. Finished lines turn grey."
+    },
+    {
+      "slug": "tubetint",
+      "name": "Tube Tint",
+      "category": "spatial",
+      "summary": "Pour coloured liquid between tubes until every tube holds a single colour.",
+      "description": "Tube Tint is a colour-sorting puzzle. You pour the top colour from one tube into another, but only onto the same colour or into an empty tube, and only if there is room. Sort until every tube is a single colour.",
+      "howToPlay": [
+        "Select a tube, then another to pour the top colour across.",
+        "You can only pour onto the same colour or into an empty tube.",
+        "There must be room in the tube you pour into.",
+        "Sort until every tube is a single colour."
+      ],
+      "tip": "Free up an empty tube early. If you get stuck, undo, or add one extra tube."
+    },
+    {
+      "slug": "piecepack",
+      "name": "Piece Pack",
+      "category": "spatial",
+      "summary": "Place pieces on the board and clear full rows and columns before you run out of pieces or space.",
+      "description": "Piece Pack is a block-placement puzzle. You drag pieces from a tray onto the board and clear a line by completing a full row or column. The challenge is clearing the target number of lines before no piece fits.",
+      "howToPlay": [
+        "Drag a piece from the tray onto the board.",
+        "Complete a full row or column to clear it.",
+        "Clear the target number of lines to win.",
+        "You lose if you run out of pieces, or if no piece fits."
+      ],
+      "tip": "You can select a piece and then tap the board. Keep the board tidy, because holes are hard to fill."
+    },
+    {
+      "slug": "crateshift",
+      "name": "Crate Shift",
+      "category": "spatial",
+      "summary": "A crate-pushing puzzle: push every crate onto a target ring in as few moves as you can.",
+      "description": "Crate Shift is a push-the-crate puzzle in the Sokoban tradition. You walk into a crate to push it, and you can never pull one back, so each move needs thought. Fewer moves earn more stars.",
+      "howToPlay": [
+        "Walk into a crate to push it.",
+        "Push every crate onto a target ring.",
+        "You cannot pull crates or push two at once.",
+        "Use the arrow keys, swipe, or the arrow buttons. Fewer moves earn more stars."
+      ],
+      "tip": "A crate in a corner is stuck for good, so use Undo freely."
+    },
+    {
+      "slug": "conduit",
+      "name": "Conduit",
+      "category": "spatial",
+      "summary": "Rotate pipe tiles to carry power from the glowing source to every lamp with no open ends.",
+      "description": "Conduit is a pipe-rotation puzzle. Tapping a tile turns it a quarter turn, and your goal is a connected network that powers every lamp. Edges and corners have few options, which makes them a good place to begin.",
+      "howToPlay": [
+        "Tap a tile to rotate it a quarter turn.",
+        "Connect pipes so power flows from the glowing source to every lamp.",
+        "Leave no open ends.",
+        "Work outward from the source until the whole network is connected."
+      ],
+      "tip": "Edges and corners have few options. Fix those first."
+    },
+    {
+      "slug": "wordguess",
+      "name": "Word Guess",
+      "category": "word",
+      "summary": "Guess the hidden five-letter word in six tries, using colour feedback after every guess.",
+      "description": "Word Guess is a five-letter word puzzle with six tries. After each guess the tiles change colour to show which letters are in the right place, which are in the word but elsewhere, and which are absent. You can type on a keyboard or use the on-screen keys.",
+      "howToPlay": [
+        "Type a five-letter word and press Enter to submit it.",
+        "Tiles show which letters are correct, which are in the word but in the wrong place, and which are not in the word.",
+        "Use that feedback to refine your next guess.",
+        "You have six tries to find the word."
+      ],
+      "tip": "Open with a word that uses common letters, and use every clue from the previous guess."
+    },
+    {
+      "slug": "wordladder",
+      "name": "Word Ladder",
+      "category": "word",
+      "summary": "Turn the start word into the target word by changing one letter at a time, using real words each step.",
+      "description": "Word Ladder gives you a start word and a target word. You change exactly one letter at a time, and every step along the way must be a real word, until you reach the target. A hint can show the next word on a shortest path.",
+      "howToPlay": [
+        "Start from the given word and aim for the target word.",
+        "Change exactly one letter in each step.",
+        "Every step must be a word in the word list, and you cannot reuse a word.",
+        "Finishing at or close to the par number of steps scores best."
+      ],
+      "tip": "Work from both ends: think about which words are one letter away from the target."
+    },
+    {
+      "slug": "letterballoons",
+      "name": "Letter Balloons",
+      "category": "word",
+      "summary": "A hangman-style word game: guess the hidden word from its category before you run out of lives.",
+      "description": "Letter Balloons is a word-guessing game in the spirit of hangman. You are told the category, such as animals, space or music, and guess letters to uncover the word. Wrong guesses cost lives, and a hint can reveal a letter for a score penalty.",
+      "howToPlay": [
+        "Read the category to get a clue to the hidden word.",
+        "Pick letters to see whether they appear in the word.",
+        "Wrong letters cost you a life.",
+        "Use a hint to reveal one letter, at a score penalty."
+      ],
+      "tip": "Start with common vowels, then use the category to narrow down the consonants."
+    },
+    {
+      "slug": "wordhive",
+      "name": "Word Hive",
+      "category": "word",
+      "summary": "Make words from seven letters. Every word needs the centre letter and at least four letters.",
+      "description": "Word Hive gives you seven letters arranged around a hive, with one required centre letter. You build as many words as you can, each with at least four letters and always including the centre letter. A word that uses all seven letters is a pangram and earns a bonus.",
+      "howToPlay": [
+        "Form words using the seven letters shown.",
+        "Every word must include the centre letter.",
+        "Words must be at least four letters long.",
+        "Longer words score more, and a pangram that uses all seven letters earns a bonus."
+      ],
+      "tip": "Look for common endings such as -ING, -ED and -ER to build longer words quickly."
+    },
+    {
+      "slug": "codecracker",
+      "name": "Code Cracker",
+      "category": "word",
+      "summary": "A Mastermind-style code puzzle: deduce the hidden colour code from exact and misplaced feedback.",
+      "description": "Code Cracker is a code-breaking puzzle in the Mastermind style. You guess a sequence of coloured symbols and get feedback on how many are the right colour in the right slot and how many are the right colour in the wrong slot. Every colour also has its own symbol, so colour is never the only cue.",
+      "howToPlay": [
+        "Pick a colour for each position to make a guess.",
+        "Exact means the right colour in the right slot.",
+        "Misplaced means the right colour in the wrong slot.",
+        "Use the feedback to deduce the code within the limited number of tries."
+      ],
+      "tip": "Use early guesses to find which colours are in the code, then work out their positions."
+    }
+  ]
+}
