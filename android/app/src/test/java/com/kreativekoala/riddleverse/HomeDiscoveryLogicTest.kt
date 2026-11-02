@@ -60,8 +60,8 @@ class HomeDiscoveryLogicTest {
     @Test fun sameFamilySiblingsFollowRecommendedSimilar() {
         val r = rank(listOf(PlayRecord("anagram", 1, 0, 10)))
         val sim = r.filter { it.reason == ForYouReason.SIMILAR }.map { it.game.type }
-        // recommended three first, then other English games from the registry
-        assertEquals(listOf("wordprefix", "synonyms", "letterset", "antonyms", "wordsearch"), sim.take(5))
+        // recommended three first, then at most two other English games from the registry
+        assertEquals(listOf("wordprefix", "synonyms", "letterset", "antonyms", "wordsearch"), sim)
     }
 
     @Test fun picksAreUniqueAndLimited() {

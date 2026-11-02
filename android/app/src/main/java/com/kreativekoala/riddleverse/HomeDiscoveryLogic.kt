@@ -100,6 +100,7 @@ object ForYouRanking {
     /** Wins/plays needed (with at least [MIN_PLAYS_FOR_EASY]) to count as an easy winner. */
     const val EASY_WIN_RATE = 0.6f
     const val MIN_PLAYS_FOR_EASY = 2
+    const val MAX_SIBLINGS = 2
 
     /**
      * Quick-win starter list for players with no history. Chosen from finish rates in telemetry:
@@ -141,8 +142,10 @@ object ForYouRanking {
             val recentGame = byType.getValue(recent.type)
             add(recent.type, ForYouReason.CONTINUE)
             similarTo(recent.type).forEach { add(it, ForYouReason.SIMILAR, recentGame.title) }
-            // same-family siblings the recommendation map does not know about
-            all.filter { it.filterCategory == recentGame.filterCategory }
+            // a couple of same-family siblings the recommendation map does not know about; capped so a
+            // large family (English has ~15 games) cannot crowd out the easy winners below
+            all.filter { it.filterCategory == recentGame.filterCategory && it.type !in out && byType.containsKey(it.type) }
+                .take(MAX_SIBLINGS)
                 .forEach { add(it.type, ForYouReason.SIMILAR, recentGame.title) }
         }
 
