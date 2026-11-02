@@ -191,6 +191,11 @@
             android:exported="true" />
 
         <activity
+            android:name="com.kreativekoala.riddleverse.DailyPuzzleActivity"
+            android:theme="@style/Theme.RiddleVerse"
+            android:exported="false" />
+
+        <activity
             android:name="com.kreativekoala.riddleverse.PuzzleActivity"
             android:theme="@style/Theme.RiddleVerse"
             android:exported="true" />
