@@ -7,7 +7,11 @@ export const NEW_WAVE_TYPES = [
 ];
 const NEW_WAVE = new Set(NEW_WAVE_TYPES);
 
-export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open']);
+// Public /play page measurement (web only, anonymous): puzzle_type = game slug. No new columns:
+// difficulty (enum, start/complete only), duration_ms only on complete, session_id is a random per-page-load id.
+export const WEB_PLAY_EVENT_TYPES = new Set(['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta']);
+export const WEB_PLAY_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
+export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open', ...WEB_PLAY_EVENT_TYPES]);
 // Install-funnel events (no puzzle): puzzle_type is the fixed placeholder 'app'; they carry funnelStep / daysSinceInstall only.
 export const FUNNEL_EVENT_TYPES = new Set(['funnel', 'app_open']);
 export const APP_PUZZLE_TYPE = 'app';
@@ -41,6 +45,8 @@ export function validatePayload(body, now = Date.now()) {
         if (!EVENT_TYPES.has(e.type)) return null;
         if (typeof e.puzzleType !== 'string' || !PUZZLE_RE.test(e.puzzleType)) return null;
         const isFunnel = FUNNEL_EVENT_TYPES.has(e.type);
+        const isWebPlay = WEB_PLAY_EVENT_TYPES.has(e.type);
+        if (isWebPlay && body.platform !== 'web') return null;
         let funnelStep = null;
         let daysSinceInstall = null;
         if (isFunnel) {
@@ -58,6 +64,19 @@ export function validatePayload(body, now = Date.now()) {
         let eventTs = null;
         if (typeof e.ts === 'number' && Number.isFinite(e.ts)) {
             eventTs = new Date(Math.min(Math.max(e.ts, now - DAY), now + DAY)).toISOString();
+        }
+        if (isWebPlay) {
+            // Whitelist only: nothing else the client sends is copied into the row.
+            events.push({
+                event_ts: eventTs,
+                event_type: e.type,
+                puzzle_type: e.puzzleType,
+                difficulty: (e.type === 'web_play_start' || e.type === 'web_play_complete') && WEB_PLAY_DIFFICULTIES.has(e.difficulty) ? e.difficulty : null,
+                session_id: str(e.sessionId, 64),
+                duration_ms: e.type === 'web_play_complete' ? int(e.durationMs) : null,
+                score: null, moves: null, hints_used: null, mistakes: null, error_message: null,
+            });
+            continue;
         }
         events.push(isFunnel ? {
             event_ts: eventTs,
@@ -111,7 +130,8 @@ export const INSTALL_LIMIT = { limit: 300, windowMs: 3600e3 };
 
 export function toRows(v, userId) {
     return v.events.map((e) => ({
-        user_id: userId || null,
+        // web_play_* rows are anonymous by design: never attach the signed-in uid.
+        user_id: e.event_type && WEB_PLAY_EVENT_TYPES.has(e.event_type) ? null : (userId || null),
         install_id: v.installId,
         platform: v.platform,
         app_version: v.appVersion,

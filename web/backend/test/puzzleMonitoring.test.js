@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import express from 'express';
 import cors from 'cors';
 import { createPuzzleMonitoringRouters } from '../routes/puzzleMonitoring.routes.js';
-import { validatePayload, createLimiter, buildAdminPuzzles, computeAlerts, NEW_WAVE_TYPES, FUNNEL_STEPS } from '../services/puzzleMonitoring.js';
+import { validatePayload, createLimiter, buildAdminPuzzles, computeAlerts, NEW_WAVE_TYPES, FUNNEL_STEPS, WEB_PLAY_EVENT_TYPES } from '../services/puzzleMonitoring.js';
 
 const NOW = 1_800_000_000_000;
 const good = () => ({ installId: 'abc', platform: 'web', events: [{ type: 'start', puzzleType: 'sudoku' }] });
@@ -249,5 +249,68 @@ test('funnel: ingest route stores rows with funnel columns, shares install rate 
 test('funnel: admin puzzle summary hides the placeholder "app" puzzle', () => {
     const out = buildAdminPuzzles({ puzzles: [{ puzzleType: 'app', starts: 0 }, { puzzleType: 'sudoku', starts: 3, completes: 1 }] }, { days: 7, platform: 'all' }, NOW);
     assert.equal(out.byPuzzle.some((p) => p.puzzleType === 'app'), false);
+    assert.equal(out.byPuzzle.find((p) => p.puzzleType === 'sudoku').starts, 3);
+});
+
+// ---- public /play page measurement (web_play_*) ----
+const WP = ['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta'];
+const wev = (type, over = {}) => ({ type, puzzleType: 'sudoku', sessionId: 's1', ts: NOW, ...over });
+const wpay = (...events) => ({ installId: 'abc', platform: 'web', appVersion: 'web-play', events });
+
+test('web_play: the four event names validate and map to puzzle_type = slug', () => {
+    assert.deepEqual([...WEB_PLAY_EVENT_TYPES].sort(), [...WP].sort());
+    for (const t of WP) {
+        const v = validatePayload(wpay(wev(t)), NOW);
+        assert.ok(v, t);
+        assert.equal(v.events[0].event_type, t);
+        assert.equal(v.events[0].puzzle_type, 'sudoku');
+        assert.equal(v.events[0].session_id, 's1');
+        assert.equal('funnel_step' in v.events[0], false);
+    }
+});
+test('web_play: web platform only, real slug only', () => {
+    assert.equal(validatePayload({ ...wpay(wev('web_play_view')), platform: 'android' }, NOW), null);
+    for (const e of [wev('web_play_view', { puzzleType: 'app' }), wev('web_play_view', { puzzleType: 'Sudoku' }),
+        wev('web_play_view', { puzzleType: 'a-b' }), wev('web_play_view', { puzzleType: undefined })]) {
+        assert.equal(validatePayload(wpay(e), NOW), null, JSON.stringify(e));
+    }
+});
+test('web_play: difficulty is an enum, duration only on complete, no score/moves/hints/mistakes/error text', () => {
+    const v = validatePayload(wpay(
+        wev('web_play_start', { difficulty: 'medium', durationMs: 99 }),
+        wev('web_play_complete', { difficulty: 'hard', durationMs: 4321 }),
+        wev('web_play_complete', { difficulty: 'me@x.com', durationMs: -1 }),
+        wev('web_play_view', { difficulty: 'easy', score: 5, moves: 6, hintsUsed: 7, mistakes: 8, errorMessage: 'secret' }),
+    ), NOW);
+    const [s, c, bad, view] = v.events;
+    assert.equal(s.difficulty, 'medium'); assert.equal(s.duration_ms, null);
+    assert.equal(c.difficulty, 'hard'); assert.equal(c.duration_ms, 4321);
+    assert.equal(bad.difficulty, null); assert.equal(bad.duration_ms, null);
+    assert.equal(view.difficulty, null);
+    for (const r of v.events) for (const k of ['score', 'moves', 'hints_used', 'mistakes', 'error_message']) assert.equal(r[k], null, k);
+});
+test('web_play: no PII fields survive into the row', () => {
+    const v = validatePayload(wpay(wev('web_play_cta', { email: 'a@b.c', url: 'https://x', referrer: 'r', userAgent: 'ua', userId: 'u' })), NOW);
+    const text = JSON.stringify(v);
+    for (const bad of ['a@b.c', 'https://x', '"r"', '"ua"', '"u"']) assert.equal(text.includes(bad), false, bad);
+});
+test('web_play: ingest stores rows anonymously even when a bearer token is sent', async () => {
+    const t = await boot();
+    try {
+        const r = await post(t.base, wpay(wev('web_play_view'), wev('web_play_cta')), { authorization: 'Bearer good' });
+        assert.equal(r.status, 202);
+        assert.equal(t.client.inserted.length, 2);
+        assert.equal(t.client.inserted[0].user_id, null);
+        assert.equal(t.client.inserted[0].platform, 'web');
+        assert.equal(t.client.inserted[1].event_type, 'web_play_cta');
+        assert.equal((await post(t.base, wpay(wev('web_play_nope')))).status, 400);
+        // plain puzzle events from signed-in users still carry user_id
+        const r2 = await post(t.base, wpay({ type: 'start', puzzleType: 'sudoku', ts: NOW }), { authorization: 'Bearer good' });
+        assert.equal(r2.status, 202);
+        assert.equal(t.client.inserted[2].user_id, 'u1');
+    } finally { t.close(); }
+});
+test('web_play: does not change the puzzle summary starts/completes (counted by their own event types)', () => {
+    const out = buildAdminPuzzles({ puzzles: [{ puzzleType: 'sudoku', starts: 3, completes: 1 }] }, { days: 7, platform: 'all' }, NOW);
     assert.equal(out.byPuzzle.find((p) => p.puzzleType === 'sudoku').starts, 3);
 });
