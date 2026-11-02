@@ -18,6 +18,7 @@ import LoadingSpinner from './components/LoadingSpinner'
 import AdminPage from './pages/AdminPage'
 import PlayIndexPage from './pages/PlayIndexPage'
 import PlayGamePage from './pages/PlayGamePage'
+import DailyPage from './pages/DailyPage' // web/daily-page
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -131,6 +132,7 @@ export default function App() {
 
       {/* Public, indexable, no-login play pages (meta for crawlers is injected by the backend, see services/playPages.js) */}
       <Route path="/play" element={<PlayEntry />} />
+      <Route path="/play/daily" element={<DailyPage />} /> {/* web/daily-page */}
       <Route path="/play/:type" element={<PlayGamePage />} />
 
       {/* Catch all - redirect to home or welcome */}

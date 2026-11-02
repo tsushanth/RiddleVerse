@@ -48,7 +48,7 @@ function ControlButton({ label, icon: Icon, onClick, disabled, active, badge }) 
 }
 
 /** One running game for a built spec. Owns the mutable play state. */
-function GridPlay({ spec, onAnswer, onNewPuzzle }) {
+function GridPlay({ spec, onAnswer, onNewPuzzle, daily = false }) { // web/daily-page: daily = fixed board, no reveal, no re-roll
   const stateRef = useRef(null)
   if (stateRef.current === null) stateRef.current = new GridPlayState(spec)
   const st = stateRef.current
@@ -110,12 +110,14 @@ function GridPlay({ spec, onAnswer, onNewPuzzle }) {
       if (st.status === STATUS.WON) ev('complete', { score: st.score() })
       else {
         ev('fail')
-        st.revealAll()
-        setRevealed(true)
+        if (!daily) { // web/daily-page: a failed daily keeps the answer hidden so the retry is a real solve
+          st.revealAll()
+          setRevealed(true)
+        }
       }
     }
     bump()
-  }, [st, ev])
+  }, [st, ev, daily])
 
   const act = useCallback(
     (fn) => {
@@ -136,8 +138,10 @@ function GridPlay({ spec, onAnswer, onNewPuzzle }) {
     if (finished.current) return
     finished.current = true
     ev('fail')
-    st.revealAll()
-    setRevealed(true)
+    if (!daily) { // web/daily-page
+      st.revealAll()
+      setRevealed(true)
+    }
     bump()
     setTimeout(() => {
       if (!answered.current) {
@@ -279,7 +283,7 @@ function GridPlay({ spec, onAnswer, onNewPuzzle }) {
           <p className="text-sm text-white/80">
             {st.status === STATUS.WON
               ? `Time ${clock(st.elapsedSeconds)} | Mistakes ${st.mistakes} | Hints ${st.hintsUsed} | +${st.score()} points`
-              : 'Three mistakes ends the puzzle. The solution is shown above.'}
+              : daily ? 'Three mistakes ends this try. Try again: it is the same puzzle.' : 'Three mistakes ends the puzzle. The solution is shown above.'}
           </p>
           <button type="button" onClick={cont} className="mt-2 min-h-[44px] px-6 rounded-xl bg-purple-500 hover:bg-purple-600 text-white font-semibold focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
             Continue
@@ -319,12 +323,14 @@ function GridPlay({ spec, onAnswer, onNewPuzzle }) {
       </div>
 
       <div className="flex gap-2 justify-between">
+        {daily ? <span /> : ( // web/daily-page: the daily board is the same for everyone, no re-roll
         <button type="button" onClick={onNewPuzzle} className="min-h-[44px] px-3 flex items-center gap-1.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 text-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
           <RefreshCw size={16} aria-hidden="true" /> New puzzle
         </button>
+        )}
         {playing && (
           <button type="button" onClick={giveUp} className="min-h-[44px] px-3 flex items-center gap-1.5 rounded-xl text-white/70 hover:text-white hover:bg-white/10 text-sm focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
-            <Flag size={16} aria-hidden="true" /> Show solution
+            <Flag size={16} aria-hidden="true" /> {daily ? 'Give up this try' : 'Show solution'}
           </button>
         )}
       </div>
@@ -370,11 +376,13 @@ export default function GridPuzzle({ game, puzzle, onAnswer }) {
   }, [key, game, tier, seed])
 
   const skip = () => onAnswer(false, '', true)
+  const daily = puzzle?.daily === true // web/daily-page: set only by pages/DailyPage.jsx
   const ready = built.key === key
 
   return (
     <GridErrorBoundary key={key} puzzleType={game} difficulty={tier} onSkip={skip}>
       <div className="max-w-[480px] mx-auto space-y-3">
+        {!daily && ( // web/daily-page: the daily is fixed at Medium
         <div className="flex items-center justify-center gap-1.5" role="group" aria-label="Difficulty">
           {TIERS.map((t) => (
             <button
@@ -390,6 +398,7 @@ export default function GridPuzzle({ game, puzzle, onAnswer }) {
             </button>
           ))}
         </div>
+        )}
         {!ready && (
           <p role="status" aria-live="polite" className="text-white/70 text-center py-10">
             Building your puzzle...
@@ -403,7 +412,7 @@ export default function GridPuzzle({ game, puzzle, onAnswer }) {
             </button>
           </div>
         )}
-        {ready && built.spec && <GridPlay key={key} spec={built.spec} onAnswer={onAnswer} onNewPuzzle={() => setRound({ id: pid, n: roundN + 1 })} />}
+        {ready && built.spec && <GridPlay key={key} spec={built.spec} onAnswer={onAnswer} daily={daily} onNewPuzzle={() => setRound({ id: pid, n: roundN + 1 })} />}
       </div>
     </GridErrorBoundary>
   )

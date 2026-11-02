@@ -97,6 +97,33 @@ function metaForIndex(catalog) {
     };
 }
 
+// web/daily-page: /play/daily is not a catalog game (the slug "daily" is reserved), so it has its own meta.
+export const DAILY_PATH = '/play/daily';
+function metaForDaily() {
+    const title = `Daily Puzzle: One Free Puzzle a Day, No Sign-Up | ${SITE_NAME}`;
+    const description = 'A new free puzzle every day, the same for everyone. Solve it in your browser with no account, keep a streak and share your time without spoilers.';
+    const jsonLd = [
+        {
+            '@context': 'https://schema.org',
+            '@type': 'WebPage',
+            name: `Daily puzzle | ${SITE_NAME}`,
+            description,
+            url: canonicalFor(DAILY_PATH),
+            inLanguage: 'en',
+            isAccessibleForFree: true,
+            publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_ORIGIN },
+        },
+        breadcrumb([['Play', '/play'], ['Daily', DAILY_PATH]]),
+    ];
+    const bodyHtml = `<main style="${BODY_STYLE}">`
+        + `<h1>Daily puzzle</h1>`
+        + `<p>One free puzzle a day, the same game for everyone, switching at midnight UTC. Solve it to extend your streak and share your time without spoilers. No account needed.</p>`
+        + `<p><a style="${LINK_STYLE}" href="/play">Browse all free puzzle games</a></p>`
+        + `<p><a style="${LINK_STYLE}" href="${escapeHtml(playStoreUrl('daily'))}">Get the app on Google Play</a></p>`
+        + `</main>`;
+    return { kind: 'daily', slug: null, path: DAILY_PATH, title, description, canonical: canonicalFor(DAILY_PATH), jsonLd, bodyHtml };
+}
+
 function breadcrumb(items) {
     return {
         '@context': 'https://schema.org',
@@ -149,6 +176,7 @@ export function resolvePlayPage(reqPath, catalog) {
     if (p === '/play') return metaForIndex(catalog);
     const m = /^\/play\/([^/]+)$/.exec(p);
     if (!m) return null;
+    if (m[1] === 'daily') return metaForDaily(); // web/daily-page
     const game = catalog.games.find((g) => g.slug === m[1]);
     return game ? metaForGame(game, catalog) : null;
 }
@@ -185,7 +213,7 @@ export function injectMeta(template, meta) {
 }
 
 export function buildSitemap(catalog, origin = SITE_ORIGIN) {
-    const urls = ['/play', ...catalog.games.map((g) => `/play/${g.slug}`)];
+    const urls = ['/play', DAILY_PATH /* web/daily-page */, ...catalog.games.map((g) => `/play/${g.slug}`)];
     const body = urls.map((u) => `  <url><loc>${escapeHtml(origin + u)}</loc></url>`).join('\n');
     return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
 }
@@ -231,7 +259,7 @@ export function createPlayPagesRouter(deps = {}) {
             if (req.path.replace(/\/+$/, '') === '/play' && req.query.session_id !== undefined) return next();
 
             const slug = req.params.slug;
-            if (slug && slug !== slug.toLowerCase() && catalog.games.some((g) => g.slug === slug.toLowerCase())) {
+            if (slug && slug !== slug.toLowerCase() && (slug.toLowerCase() === 'daily' || catalog.games.some((g) => g.slug === slug.toLowerCase()))) { // web/daily-page: 'daily'
                 return res.redirect(301, `/play/${slug.toLowerCase()}`);
             }
             const meta = resolvePlayPage(req.path, catalog);
