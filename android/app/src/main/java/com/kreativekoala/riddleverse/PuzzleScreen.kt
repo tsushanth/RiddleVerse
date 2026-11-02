@@ -343,7 +343,8 @@ fun PuzzleScreen(
         PuzzleScreenType.PIECE_PACK_SCREEN,
         PuzzleScreenType.CRATE_SHIFT_SCREEN,
         PuzzleScreenType.TRAIL_SCREEN, // trail (feat/game-trail)
-        PuzzleScreenType.CONDUIT_SCREEN -> {
+        PuzzleScreenType.CONDUIT_SCREEN,
+        PuzzleScreenType.CROWNS_SCREEN /* crowns: feat/game-crowns */ -> {
             SpatialPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,

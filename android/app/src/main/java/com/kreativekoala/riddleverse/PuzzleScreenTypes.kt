@@ -66,6 +66,7 @@ enum class PuzzleScreenType(val typeName: String) {
     CRATE_SHIFT_SCREEN("Crate Shift Screen"),
     CONDUIT_SCREEN("Conduit Screen"),
     TRAIL_SCREEN("Trail Screen"), // trail (feat/game-trail)
+    CROWNS_SCREEN("Crowns Screen"), // crowns: feat/game-crowns
     PROGRESSIVE_REVEAL("Progressive Reveal Screen"),
     REAL_OR_AI("Real or AI"),
     // --- classic puzzles (feat/puzzles-classic) ---
