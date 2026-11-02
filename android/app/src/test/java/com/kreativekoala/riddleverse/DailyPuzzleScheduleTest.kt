@@ -25,10 +25,10 @@ class DailyPuzzleScheduleTest {
     @Test fun pinnedValues_neverChange() {
         // If this fails you changed the rotation, shuffle or seed mixing: every player's puzzle would change. Don't.
         val expected = listOf(
-            "crateshift" to 4726940851620634300L, "tubetint" to 3169490807060299793L, "pixellogic" to 3931529243979955455L,
-            "wordhive" to 6292848748641144246L, "signgrid" to 2836158810257466357L, "binarygrid" to 2599900883310011191L,
-            "sudoku" to 3211176445299877934L, "conduit" to 4650300333674332901L, "wordladder" to 5280230434093151369L,
-            "pixellogic" to 7175925850101726451L, "wordhive" to 3978227786564930015L, "crateshift" to 5146235931912561850L,
+            "sudoku" to 4527261813821353884L, "pixellogic" to 8835145113840076600L, "trail" to 2901484473631558593L,
+            "binarygrid" to 4842427100611025672L, "crateshift" to 2291775358946610719L, "wordladder" to 3603402527236592872L,
+            "tubetint" to 4776291343674502624L, "conduit" to 4650300333674332901L, "wordhive" to 406316262646320558L,
+            "crowns" to 1626138777792331493L, "signgrid" to 6615591259456261696L, "crowns" to 5710741035983703786L,
         )
         expected.forEachIndexed { i, (type, seed) ->
             val spec = DailyPuzzleSchedule.specFor(first + i)
@@ -98,7 +98,7 @@ class DailyPuzzleScheduleTest {
     }
 
     @Test fun rotationIsDistributedEvenly() {
-        val counts = (first until first + 9 * 100).groupingBy { DailyPuzzleSchedule.specFor(it).type }.eachCount()
+        val counts = (first until first + DailyPuzzleSchedule.ROTATION.size * 100).groupingBy { DailyPuzzleSchedule.specFor(it).type }.eachCount()
         assertTrue(counts.values.all { it == 100 })
     }
 
