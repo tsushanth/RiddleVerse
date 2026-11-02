@@ -173,7 +173,10 @@ class DailyCompletionActivity : AppCompatActivity() {
         }
 
         setContent {
-            RvActivityTheme {
+            // Users report oversized text here. The screen is built from fixed-size cards and tiles sized in dp and
+            // had no font cap (the puzzle screens cap at 1.3x, PuzzleActivity), so at large system font sizes the
+            // text outgrew them. Same cap, judgment call: not verified on a device.
+            RvActivityTheme(maxFontScale = 1.3f) {
                 DailyCompletionScreen(
                     completionType = completionType,
                     isCustomPuzzle = isCustomPuzzle,

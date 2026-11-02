@@ -200,7 +200,7 @@ fun MultipleChoicePuzzleScreen(
                         if (!isAnswered) {
                             onOptionSelected(option)
                             isAnswered = true
-                            val isCorrect = option == correctAnswer
+                            val isCorrect = MultipleChoiceJudge.sameAnswer(option, correctAnswer)
 
                             // UPDATED: Removed automatic sharing after correct answers
                             feedbackManager.showFeedback(
@@ -214,7 +214,7 @@ fun MultipleChoicePuzzleScreen(
                                 totalTime = timerSeconds,
                                 onComplete = {
                                     // Simply continue without showing share dialog
-                                    onContinue(true)
+                                    onContinue(option) // the tapped option; wrappers judge it with MultipleChoiceJudge
                                 }
                             )
                         }
@@ -595,7 +595,7 @@ fun EnhancedOptionsSection(
 ) {
     Column {
         options.forEach { option ->
-            val isCorrect = option == correctAnswer
+            val isCorrect = MultipleChoiceJudge.sameAnswer(option, correctAnswer)
             val isSelected = option == selectedOption
 
             val backgroundColor = when {
