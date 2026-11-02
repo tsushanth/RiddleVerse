@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import express from 'express';
 import cors from 'cors';
 import { createPuzzleMonitoringRouters } from '../routes/puzzleMonitoring.routes.js';
-import { validatePayload, createLimiter, buildAdminPuzzles, computeAlerts, NEW_WAVE_TYPES } from '../services/puzzleMonitoring.js';
+import { validatePayload, createLimiter, buildAdminPuzzles, computeAlerts, NEW_WAVE_TYPES, FUNNEL_STEPS } from '../services/puzzleMonitoring.js';
 
 const NOW = 1_800_000_000_000;
 const good = () => ({ installId: 'abc', platform: 'web', events: [{ type: 'start', puzzleType: 'sudoku' }] });
@@ -186,4 +186,68 @@ test('alerts: thresholds, min-starts gate, new-wave silence, severity order', ()
 test('alerts end-to-end: all 19 silent -> 19 info', () => {
     const r = buildAdminPuzzles({}, { days: 7, platform: 'all' }, NOW);
     assert.equal(r.alerts.length, 19); assert.ok(r.alerts.every((x) => x.severity === 'info'));
+});
+
+// ---- install funnel / day-N return events ----
+const fev = (over = {}) => ({ type: 'funnel', puzzleType: 'app', funnelStep: 'first_open', ts: NOW, ...over });
+const fpay = (...events) => ({ installId: 'abc', platform: 'android', appVersion: '1.0', events });
+
+test('funnel: every allow-listed step validates and maps to funnel_step', () => {
+    for (const step of FUNNEL_STEPS) {
+        const v = validatePayload(fpay(fev({ funnelStep: step })), NOW);
+        assert.ok(v, step);
+        assert.equal(v.events[0].funnel_step, step);
+        assert.equal(v.events[0].event_type, 'funnel');
+        assert.equal(v.events[0].puzzle_type, 'app');
+        assert.equal(v.events[0].days_since_install, undefined);
+    }
+    assert.equal(FUNNEL_STEPS.size, 9);
+});
+test('funnel: rejects unknown/missing step, wrong puzzleType, and free text', () => {
+    const bad = [
+        fev({ funnelStep: 'bob@example.com' }), fev({ funnelStep: undefined }), fev({ funnelStep: 5 }),
+        fev({ funnelStep: 'FIRST_OPEN' }), fev({ puzzleType: 'sudoku' }),
+    ];
+    for (const e of bad) assert.equal(validatePayload(fpay(e), NOW), null, JSON.stringify(e));
+});
+test('app_open: needs 0..3650 integer daysSinceInstall', () => {
+    const ok = (d) => validatePayload(fpay({ type: 'app_open', puzzleType: 'app', daysSinceInstall: d, ts: NOW }), NOW);
+    assert.equal(ok(0).events[0].days_since_install, 0);
+    assert.equal(ok(7.9).events[0].days_since_install, 7);
+    assert.equal(ok(3650).events[0].event_type, 'app_open');
+    assert.equal(ok(3650).events[0].funnel_step, undefined);
+    for (const d of [-1, 3651, '7', null, undefined, NaN]) assert.equal(ok(d), null, String(d));
+});
+test('funnel: puzzleType "app" is reserved, plain puzzle events cannot use it', () => {
+    assert.equal(validatePayload(fpay({ type: 'start', puzzleType: 'app' }), NOW), null);
+});
+test('funnel: extra fields on funnel events are ignored; puzzle rows never carry funnel columns', () => {
+    const v = validatePayload(fpay(fev({ score: 9, difficulty: 'hard', sessionId: 's', errorMessage: 'x', email: 'a@b.c' }),
+        { type: 'start', puzzleType: 'sudoku', funnelStep: 'first_open', daysSinceInstall: 3 }), NOW);
+    const f = v.events[0];
+    assert.equal(f.score, null); assert.equal(f.difficulty, null); assert.equal(f.session_id, null); assert.equal(f.error_message, null);
+    assert.equal(JSON.stringify(f).includes('a@b.c'), false);
+    const p = v.events[1];
+    assert.equal('funnel_step' in p, false);
+    assert.equal('days_since_install' in p, false);
+});
+test('funnel: ingest route stores rows with funnel columns, shares install rate limit', async () => {
+    const t = await boot();
+    try {
+        const r = await post(t.base, fpay(fev(), { type: 'app_open', puzzleType: 'app', daysSinceInstall: 1, ts: NOW }));
+        assert.equal(r.status, 202);
+        assert.equal(t.client.inserted.length, 2);
+        assert.equal(t.client.inserted[0].funnel_step, 'first_open');
+        assert.equal(t.client.inserted[1].days_since_install, 1);
+        assert.equal(t.client.inserted[0].install_id, 'abc');
+        assert.equal((await post(t.base, fpay(fev({ funnelStep: 'nope' })))).status, 400);
+        // INSTALL_LIMIT (300/h) counts funnel events too
+        for (let i = 0; i < 5; i++) await post(t.base, fpay(...Array(50).fill(fev())), {});
+        assert.equal((await post(t.base, fpay(...Array(50).fill(fev())))).status, 429);
+    } finally { t.close(); }
+});
+test('funnel: admin puzzle summary hides the placeholder "app" puzzle', () => {
+    const out = buildAdminPuzzles({ puzzles: [{ puzzleType: 'app', starts: 0 }, { puzzleType: 'sudoku', starts: 3, completes: 1 }] }, { days: 7, platform: 'all' }, NOW);
+    assert.equal(out.byPuzzle.some((p) => p.puzzleType === 'app'), false);
+    assert.equal(out.byPuzzle.find((p) => p.puzzleType === 'sudoku').starts, 3);
 });

@@ -53,6 +53,7 @@ class WelcomeOnboardingActivity : AppCompatActivity() {
                         AnalyticsManager.getInstance()?.track(
                             AnalyticsEvent.tutorialComplete(duration)
                         )
+                        Funnel.log("onboarding_done")
                         // Mark onboarding as completed
                         getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                             .edit()
@@ -65,6 +66,7 @@ class WelcomeOnboardingActivity : AppCompatActivity() {
                     },
                     onSkip = {
 
+                        Funnel.log("onboarding_done")
                         // Same as complete but mark as skipped
                         getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
                             .edit()

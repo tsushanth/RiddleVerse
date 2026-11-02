@@ -2693,6 +2693,7 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Funnel.log("home_shown")
         val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         var dailyStreakReward: StreakReward? = null
         activityScope.launch {
