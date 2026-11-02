@@ -307,6 +307,7 @@ object TrailEngine {
                 if (cands.isNotEmpty()) { wpIdx.add(cands[rnd.nextInt(cands.size)]); done = true }
             }
             if (!done) {
+                if (band == 0) return null // easy puzzles never use walls: try another path
                 // add a wall on an edge Q uses but the generator path does not
                 val cands = ArrayList<Int>()
                 for (i in 0 until m - 1) {
@@ -321,7 +322,7 @@ object TrailEngine {
 
         // reduction: drop dots / walls that are not needed for uniqueness (harder puzzles), within a node budget
         if (band >= 1) {
-            val tries = if (band == 1) 4 else 10
+            val tries = if (band == 1) 6 else 30
             val removable = ArrayList<Int>()
             for (x in wpIdx) if (x != 0 && x != m - 1) removable.add(x)
             removable.shuffle(rnd)

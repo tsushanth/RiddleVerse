@@ -33,6 +33,15 @@ class SpatialTrailTest {
                 assertEquals(p.solution[p.cells - 1], p.waypoints.last())
                 dots += p.waypoints.size; walls += p.wallCount; nodes += p.nodes
             }
+            for (b in 0..2) {
+                var nd = 0L; var dd = 0; var ww = 0; var tt = 0.0; var mx = 0.0
+                for (seed in 1L..100L) {
+                    val t0 = System.nanoTime(); val q = TrailEngine.generate(n, b, seed + 1000)
+                    val ms = (System.nanoTime() - t0) / 1e6; tt += ms; if (ms > mx) mx = ms
+                    nd += q.nodes; dd += q.waypoints.size; ww += q.wallCount
+                }
+                sb.append(String.format("  N=%d %s: dots %.1f walls %.1f proofNodes %.0f avg %.2f ms max %.1f ms%n", n, bandName[b], dd / 100.0, ww / 100.0, nd / 100.0, tt / 100, mx))
+            }
             sb.append(String.format("N=%d: avg %.2f ms, max %.1f ms, dots %.1f, walls %.1f, nodes %.0f%n",
                 n, totalMs / 500, maxMs, dots / 500.0, walls / 500.0, nodes / 500.0))
         }
@@ -112,7 +121,9 @@ class SpatialTrailTest {
         assertEquals(3, s.length)
         assertTrue(s.step(p.solution[1]))          // stepping onto the previous cell removes the last one
         assertEquals(2, s.length)
-        assertFalse(s.step(p.solution[0]))         // cannot revisit the start
+        assertTrue(s.step(p.solution[0]))          // dragging back to the start leaves only the start
+        assertEquals(1, s.length)
+        assertFalse(s.step(p.solution[0]))         // the start itself cannot be re-entered
         // entering the last dot early is refused
         val last = p.waypoints.last()
         for (nb in listOf(last - 1, last + 1, last - p.n, last + p.n)) {
