@@ -1,0 +1,166 @@
+1 | Pizza toppings | PEPPERONI MUSHROOM OLIVE ONION
+2 | Shades of green | EMERALD FOREST MOSS LIME
+3 | Things you can pop | BALLOON BUBBLE CORK QUESTION
+4 | Add S to the front for a new word | TALE MALL PIT TRAIN
+x OLIVE > 2
+
+1 | Sandwich fillings | HAM CHEESE TUNA EGG
+2 | Meats | BACON STEAK LAMB PORK
+3 | Things you can lose | KEYS TEMPER WEIGHT FACE
+4 | Typed on the top row only | POTTERY REPORT TROUPE PETITE
+x HAM > 2
+
+1 | Baby animals | KITTEN PUPPY FOAL LAMB
+2 | Meats | BEEF PORK VEAL MUTTON
+3 | Words before SKIN | SHEEP DEER SNAKE PIG
+4 | Letters in alphabetical order | GHOST BIOPSY FILMY DEMO
+x LAMB > 2
+
+1 | Drinks | LEMONADE SQUASH COLA PUNCH
+2 | Ways to hit | SMACK WHACK BASH THUMP
+3 | Things you can pull | TOOTH FACE STRING CRACKER
+4 | Hide a colour | SUBLIME JADED PLUMBER REDUCE
+x PUNCH > 2
+x PUNCH > 3
+
+1 | Cutting actions | SLICE DICE MINCE CHOP
+2 | Cuts of pork | RIB LOIN BELLY SHOULDER
+3 | Things you can strike | MATCH POSE DEAL GOLD
+4 | Silent K | KNACK KNAVE KNELL KNOLL
+x CHOP > 2
+
+1 | Beach things | SAND TOWEL UMBRELLA BUCKET
+2 | Parts of an egg | YOLK WHITE SHELL MEMBRANE
+3 | Words before FISH | JELLY CRAY SILVER ANGEL
+4 | Hide a body part | ALLEGE HAIRY SHINGLE LEARN
+x SHELL > 1
+x SHELL > 3
+
+1 | Footwear | SANDAL SLIPPER LOAFER BOOT
+2 | Parts of a car | BONNET BUMPER WHEEL ENGINE
+3 | Words before CAMP | SUMMER BASE TRAINING PRISON
+4 | Spell a word backwards | DOOM GULP TIPS DRAWER
+x BOOT > 2
+x BOOT > 3
+
+1 | Cleaning tools | MOP SPONGE VACUUM DUSTER
+2 | Witch things | BROOM CAULDRON WAND HAT
+3 | Words before PAN | FRYING SAUCE DUST BED
+4 | Hide an animal | PIGMENT BATTLE RATTLE COWBOY
+x BROOM > 1
+
+1 | Keyboard keys | TAB ENTER SHIFT ESCAPE
+2 | Ways to leave | DEPART EXIT BOLT FLEE
+3 | Words before BAR | SNACK TOOL CROW HANDLE
+4 | Add S to the front for a new word | LIGHT NAIL LOW PIN
+x ESCAPE > 2
+
+1 | Loud noises | BANG BOOM CRASH THUD
+2 | Parts of a sailboat | KEEL RUDDER SAIL JIB
+3 | Words before TOWN | GHOST DOWN HOME CHINA
+4 | Spell a word backwards | STRAP SMART DENIM SPOOL
+x BOOM > 2
+
+1 | Gym exercises | SQUAT LUNGE CRUNCH PLANK
+2 | Pieces of wood | BEAM LOG BOARD TIMBER
+3 | Words before JACK | FLAP LUMBER UNION BLACK
+4 | Anagrams of each other | CRATE TRACE CATER REACT
+x PLANK > 2
+
+1 | Fruits | MANGO PAPAYA GUAVA LYCHEE
+2 | Flightless birds | EMU OSTRICH PENGUIN KIWI
+3 | Words before STAR | POP ROCK FILM LONE
+4 | Hide a colour | PROSE BLUEPRINT STAND SUBLIME
+x KIWI > 1
+
+1 | European capitals | ROME MADRID LISBON BERLIN
+2 | Trojan War figures | ACHILLES HECTOR HELEN PARIS
+3 | Words before TOWER | CLOCK WATER IVORY CONTROL
+4 | Palindromes | MADAM NOON KAYAK DEED
+x PARIS > 1
+
+1 | Tableware | BOWL SAUCER MUG PLATE
+2 | Geology words | CRUST MANTLE CORE MAGMA
+3 | Words before NUMBER | PHONE PIN LUCKY SERIAL
+4 | Palindromes | TENET SOLOS STATS DEED
+x PLATE > 2
+
+1 | Jewellery | RING NECKLACE BRACELET EARRING
+2 | Sounds a phone makes | BUZZ BEEP CHIME TRILL
+3 | Words after WEDDING | CAKE DRESS DAY VOWS
+4 | Palindromic names | EVE ANNA HANNAH OTTO
+x RING > 2
+x RING > 3
+
+1 | Small pests | FLEA LOUSE GNAT MIDGE
+2 | Clock sounds | TICK TOCK CHIME ALARM
+3 | Words before TAPE | DUCT RED MASKING MEASURING
+4 | Silent W | WRENCH WRAPPER WRITHE WRECKAGE
+x TICK > 1
+
+1 | Public transport | BUS TRAM TRAIN TAXI
+2 | Ways to teach | TUTOR DRILL EDUCATE INSTRUCT
+3 | Words before STATION | POLICE FIRE SPACE RADIO
+4 | Only Roman numeral letters | VIVID CIVIL MILD DIM
+x TRAIN > 2
+
+1 | Hair words | CURL STRAND TRESS WAVE
+2 | Door parts | KEY HANDLE HINGE KNOCKER
+3 | Words before SMITH | BLACK GOLD SILVER LOCK
+4 | Letters in alphabetical order | ALMOST FIRST FILMY DEMO
+x LOCK > 1
+x LOCK > 2
+
+1 | Hats | BERET BEANIE FEDORA CAP
+2 | Bottle parts | CORK LABEL NECK STOPPER
+3 | Words before BAND | RUBBER HEAD WRIST ARM
+4 | Sound like a letter | ARE YOU TEA PEA
+x CAP > 2
+
+1 | Toys | DOLL TEDDY PUZZLE BLOCK
+2 | Ways to stop | HALT BAR STOP CEASE
+3 | Words before HEAD | HOT AIR BONE FIGURE
+4 | Hide a number | ALONE TENNIS EIGHTY CANINE
+x BLOCK > 2
+
+1 | Fishing gear | NET HOOK ROD REEL
+2 | Tennis terms | RACKET COURT SERVE DEUCE
+3 | Words before SCAPE | LAND SEA CITY MOON
+4 | Silent B | DUMB COMB DOUBT LAMB
+x NET > 2
+
+1 | Post office items | STAMP ENVELOPE PARCEL LETTER
+2 | Ways to walk heavily | STOMP TRAMP PLOD TRUDGE
+3 | Words before BOX | POST SHOE SAND SOAP
+4 | Spell a word backwards | DOOM GULP LAGER DIAPER
+x STAMP > 2
+
+1 | Royal items | THRONE SCEPTER ROBE CROWN
+2 | Parts of a tooth | ENAMEL ROOT PULP NERVE
+3 | Words before TANK | FISH THINK FUEL SEPTIC
+4 | Hide an animal | STEEL PLANTS COMBAT WHEN
+x CROWN > 2
+
+1 | Ways to greet | NOD SALUTE BOW HUG
+2 | Ocean features | TIDE SWELL REEF WAVE
+3 | Words before FRONT | SEA WATER SHOP STORE
+4 | Palindromes | RADAR LEVEL SEES NUN
+x WAVE > 1
+
+1 | Magic words | WAND SPELL POTION CURSE
+2 | Periods of time | WHILE STRETCH PERIOD SEASON
+3 | Words before POWDER | BAKING CURRY TALCUM CHILLI
+4 | Hide a colour | GOLDEN BLUEBERRY STAND SHRED
+x SPELL > 2
+
+1 | Fish parts | FIN GILL TAIL SCALE
+2 | Measuring tools | RULER TAPE GAUGE PROTRACTOR
+3 | Words before MAIL | AIR JUNK CHAIN BLACK
+4 | Hide a number | HONEY STONE TENNIS EIGHTY
+x SCALE > 2
+
+1 | Newspaper words | EDITOR HEADLINE COLUMN REPORTER
+2 | Gym lifts | PRESS SQUAT CURL DEADLIFT
+3 | Words before CODE | ZIP MORSE BAR DRESS
+4 | Palindromes | RADAR DEED SEES NUN
+x PRESS > 1

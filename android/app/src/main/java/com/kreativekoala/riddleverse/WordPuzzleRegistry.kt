@@ -19,9 +19,10 @@ object WordPuzzleRegistry {
     const val LETTER_BALLOONS = "letterballoons"
     const val WORD_HIVE = "wordhive"
     const val CODE_CRACKER = "codecracker"
+    const val LINKUP = "linkup" // linkup (feat/game-linkup)
 
     /** Puzzle type keys (Puzzle.puzzleType / QuizCategory.category). */
-    val TYPES: Set<String> = setOf(WORD_GUESS, WORD_LADDER, LETTER_BALLOONS, WORD_HIVE, CODE_CRACKER,
+    val TYPES: Set<String> = setOf(WORD_GUESS, WORD_LADDER, LETTER_BALLOONS, WORD_HIVE, CODE_CRACKER, LINKUP,
         RiddlePack.TYPE /* riddle pack (feat/riddle-pack) */)
 
     fun isWordPuzzleType(type: String?): Boolean = type != null && type.lowercase() in TYPES
@@ -33,6 +34,7 @@ object WordPuzzleRegistry {
         WORD_HIVE -> "Word Hive Screen"
         CODE_CRACKER -> "Code Cracker Screen"
         RiddlePack.TYPE -> RiddlePack.SCREEN_NAME // riddle pack (feat/riddle-pack)
+        LINKUP -> "Linkup Screen" // linkup
         else -> "Default"
     }
 
@@ -44,7 +46,8 @@ object WordPuzzleRegistry {
         QuizCategory("Letter Balloons", "Guess the word before the balloons pop", Icons.Default.TextFields, LETTER_BALLOONS, "English"),
         QuizCategory("Word Hive", "Build words from seven letters", Icons.Default.Search, WORD_HIVE, "English"),
         QuizCategory("Code Cracker", "Deduce the hidden colour code", Icons.Default.Lock, CODE_CRACKER, "Focus"),
-        RiddlePack.category // riddle pack (feat/riddle-pack)
+        RiddlePack.category, // riddle pack (feat/riddle-pack)
+        QuizCategory("Linkup", "Sort 16 words into 4 hidden groups", Icons.Default.Apps, LINKUP, "English") // linkup
     )
 
     private fun hint(type: String) = when (type) {
@@ -52,6 +55,7 @@ object WordPuzzleRegistry {
         WORD_LADDER -> "Change one letter at a time to reach the target word"
         LETTER_BALLOONS -> "Guess letters before all the balloons pop"
         WORD_HIVE -> "Make words of 4+ letters using the centre letter"
+        LINKUP -> "Find four tiles that share a link. Four mistakes allowed" // linkup
         else -> "Use the feedback pegs to crack the colour code"
     }
 
@@ -71,6 +75,7 @@ object WordPuzzleRegistry {
             LETTER_BALLOONS -> LetterBalloonsGenerator.generate(d, seed).toString()
             WORD_HIVE -> (WordHiveGenerator.generate(WordPuzzleLists.get(context), d, seed)
                 ?: error("word list unavailable")).toJson(seed, d).toString()
+            LINKUP -> LinkupGenerator.generateJson(context, d) // linkup
             else -> CodeCrackerGenerator.generate(d, seed).toJson(seed, d).toString()
         }
     }
@@ -112,6 +117,10 @@ object WordPuzzleRegistry {
             "Make words of four or more letters from the seven letters. Every word must use the gold centre letter. Letters can be reused. A word that uses all seven letters is a pangram worth a bonus.",
             "Reach the goal rank to solve the puzzle.", listOf(Color(0xFFFFB020), Color(0xFFD98A00)))
         RiddlePack.TYPE -> RiddlePack.tutorialContent() // riddle pack (feat/riddle-pack)
+        LINKUP -> SimpleTutorialContent( // linkup
+            "Linkup", "🧩",
+            "Sixteen tiles hide four groups of four. Tap four tiles that share a link, then press Submit. You can make four mistakes. Groups are ranked from easy to very tricky, and some tiles fit more than one group on purpose.",
+            "Shuffle to see the tiles fresh. A hint marks one tile of the easiest group left.", listOf(Color(0xFF5C6BC0), Color(0xFF3F4FA0)))
         else -> SimpleTutorialContent(
             "Code Cracker", "🔐",
             "Crack the hidden colour code. Fill the pegs and press Check. A dark feedback peg means a right colour in the right place, a light peg means a right colour in the wrong place.",
@@ -143,6 +152,7 @@ fun WordPuzzleScreenWrapper(
             WordPuzzleRegistry.LETTER_BALLOONS -> LetterBalloonsScreen(json, level, onBack, done)
             WordPuzzleRegistry.WORD_HIVE -> WordHiveScreen(json, level, onBack, done)
             RiddlePack.TYPE -> RiddleScreen(json, level, onBack, done) // riddle pack (feat/riddle-pack)
+            WordPuzzleRegistry.LINKUP -> LinkupScreen(json, level, onBack, done) // linkup
             else -> CodeCrackerScreen(json, level, onBack, done)
         }
     }

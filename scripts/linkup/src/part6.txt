@@ -1,0 +1,99 @@
+1 | Parts of a fruit | PIT CORE PEEL SEED
+2 | Things you plant | BULB SAPLING CUTTING SPROUT
+3 | Words after SEA | SIDE SHELL FOOD SICK
+4 | Letters in alphabetical order | BEGIN GHOST ALMOST DEMO
+x SEED > 2
+
+1 | Rail things | SIGNAL PLATFORM CARRIAGE SLEEPER
+2 | Parts of an album | ALBUM VERSE CHORUS SINGLE
+3 | Words before SUIT | TRACK SPACE WET LAW
+4 | Hide an animal | BEARING SHAPE PANTRY SCOWL
+x TRACK > 1
+x TRACK > 2
+
+1 | Workers | STAFF CREW TEAM PERSONNEL
+2 | Sticks | CANE ROD WAND POLE
+3 | Words before ROOM | BALL SHOW WAR SPARE
+4 | Add S to the front for a new word | TALK TICK WEAR WORD
+x STAFF > 2
+
+1 | Cooling devices | AIRCON COOLER FRIDGE FREEZER
+2 | Supporters | BACKER FOLLOWER ADMIRER SUPPORTER
+3 | Words before CLUB | NIGHT GOLF BOOK FAN
+4 | Two pairs of double letters | BALLOON SUCCESS ADDRESS ASSESS
+x FAN > 1
+x FAN > 2
+
+1 | Fire starters | LIGHTER FLINT TINDER MATCH
+2 | Sporting contests | GAME RACE FIXTURE TOURNAMENT
+3 | Words before STICK | CANDLE LIP YARD HOCKEY
+4 | Spell a word backwards | DEVIL STRAP DRAWER SMART
+x MATCH > 2
+x MATCH > 3
+
+1 | Shapes | SQUARE TRIANGLE CIRCLE RECTANGLE
+2 | Public spaces | PLAZA PARK MARKET COMMON
+3 | Words before DANCE | TAP LINE BELLY RAIN
+4 | Palindromes | LEVEL ROTOR RADAR MOM
+x SQUARE > 2
+x SQUARE > 3
+
+1 | Medieval people | KNIGHT SQUIRE JESTER PAGE
+2 | Parts of a book | SPINE COVER INDEX CHAPTER
+3 | Words before SIDE | SEA FIRE BED COUNTRY
+4 | Silent T | THISTLE BUSTLE RUSTLE NESTLE
+x PAGE > 2
+
+1 | Bedding | PILLOW DUVET BLANKET SHEET
+2 | Pieces of paper | MEMO FLYER LEAFLET RECEIPT
+3 | Words before SHOP | WORK BOOK PET GIFT
+4 | Hide an animal | ANTLER SHAPE BATHE COWARD
+x SHEET > 2
+
+1 | In the sky | MOON STAR RAINBOW CLOUD
+2 | Internet words | EMAIL BROWSER SERVER WEBSITE
+3 | Words after DAY | LIGHT BREAK DREAM TIME
+4 | Typed on the top row only | PROPERTY POTTERY TREETOP TROUPE
+x CLOUD > 2
+
+1 | Forest animals | BEAR WOLF FOX DEER
+2 | Ways to endure | STAND TOLERATE SUFFER ENDURE
+3 | Words before MARKET | SUPER FLEA BLACK STOCK
+4 | Hide a body part | FARMER SHINY LEARN WHIP
+x BEAR > 2
+
+1 | Cutlery | FORK SPOON KNIFE LADLE
+2 | Ways to split | BRANCH DIVIDE SPLIT PART
+3 | Words before LIFT | FACE SKI SHOP AIR
+4 | Palindromes | CIVIC KAYAK ROTOR REFER
+x FORK > 2
+
+1 | Sheep words | EWE LAMB FLEECE RAM
+2 | Computer parts | CPU DISK CACHE MONITOR
+3 | Words before PAGE | HOME WEB FRONT TITLE
+4 | Hide a number | OFTEN PHONE NETWORK EIGHTY
+x RAM > 2
+
+1 | Roof materials | SLATE TILE THATCH SHINGLE
+2 | Shades of grey | CHARCOAL ASH PEWTER SMOKE
+3 | Words before HOLD | HOUSE FOOT HAND STRONG
+4 | Anagrams of each other | SILENT ENLIST TINSEL INLETS
+x SLATE > 2
+
+1 | Marks | STAIN BLOT SMUDGE SPOT
+2 | Ways to notice | SEE NOTICE SPY GLIMPSE
+3 | Words before TALK | SMALL PEP BABY SWEET
+4 | Silent N | AUTUMN COLUMN HYMN CONDEMN
+x SPOT > 2
+
+1 | Toys | YOYO KITE MARBLE TOP
+2 | High points | PEAK SUMMIT CREST APEX
+3 | Words before WHEEL | STEERING FERRIS CART SPINNING
+4 | Palindromes | DAD MOM NOON TOOT
+x TOP > 2
+
+1 | Art supplies | BRUSH EASEL CANVAS PALETTE
+2 | Wall coverings | PAINT WALLPAPER TILES PLASTER
+3 | Words before FIELD | BATTLE CORN MINE AIR
+4 | Silent U | BISCUIT BUILD GUILT LEAGUE
+x PAINT > 1

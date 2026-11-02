@@ -135,7 +135,7 @@ fun PuzzleScreen(
 
         // --- word puzzles (feat/puzzles-word) ---
         PuzzleScreenType.WORD_GUESS_SCREEN, PuzzleScreenType.WORD_LADDER_SCREEN, PuzzleScreenType.LETTER_BALLOONS_SCREEN,
-        PuzzleScreenType.WORD_HIVE_SCREEN, PuzzleScreenType.CODE_CRACKER_SCREEN -> {
+        PuzzleScreenType.WORD_HIVE_SCREEN, PuzzleScreenType.CODE_CRACKER_SCREEN, PuzzleScreenType.LINKUP_SCREEN /* linkup */ -> {
             WordPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,

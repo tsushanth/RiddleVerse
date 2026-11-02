@@ -1,0 +1,174 @@
+1 | Flowers | TULIP DAISY POPPY IRIS
+2 | Parts of the eye | PUPIL LENS RETINA CORNEA
+3 | Words before DROP | RAIN SNOW DEW TEAR
+4 | Silent K | KNEAD KNUCKLE KNIT KNEEL
+x IRIS > 2
+
+1 | School people | TEACHER PRINCIPAL JANITOR PUPIL
+2 | Parts of the eye | IRIS LENS RETINA CORNEA
+3 | Words before PLAY | ROLE FAIR FOUL SCREEN
+4 | Hide a body part | SHEAR CHINA LEGAL ARMOUR
+x PUPIL > 2
+
+1 | Fish | COD CARP PERCH HERRING
+2 | Places for birds to sit | BRANCH LEDGE WIRE FENCE
+3 | Words before TIME | BED TEA NIGHT LUNCH
+4 | Silent W | WREATH WRAP WRESTLE WRINKLE
+x PERCH > 2
+
+1 | Fish | CARP TUNA EEL PIKE
+2 | Medieval weapons | SPEAR LANCE MACE DAGGER
+3 | Words before HOLE | KEY LOOP POT BLOW
+4 | Anagrams of each other | STOP SPOT POTS TOPS
+x PIKE > 2
+
+1 | Male animals | BULL STAG ROOSTER BUCK
+2 | Slang for money | DOUGH BREAD LOLLY MOOLAH
+3 | Words before SHOT | SNAP MUG SLING BIG
+4 | Hide a number | LISTEN OFTEN PHONE FREIGHT
+x BUCK > 2
+x BUCK > 3
+
+1 | Parts of a car | BONNET BUMPER WHEEL EXHAUST
+2 | Parts of a tree | ROOT BRANCH TWIG TRUNK
+3 | Words before FALL | WATER RAIN SNOW NIGHT
+4 | Hide a colour | GREYHOUND HATRED TANGO SUBLIME
+x TRUNK > 1
+
+1 | Parts of a book | COVER PAGE INDEX CHAPTER
+2 | Bones | SKULL FEMUR RIB SPINE
+3 | Words before FIGHT | FIRE BULL FOOD DOG
+4 | Palindromes | RADAR LEVEL NOON KAYAK
+x SPINE > 1
+
+1 | Birds | SWAN HERON OWL DUCK
+2 | Ways to avoid | DODGE EVADE SIDESTEP AVOID
+3 | Animals that are also verbs | BADGER WOLF HOUND FERRET
+4 | Anagrams of each other | EVIL VEIL LIVE VILE
+x DUCK > 2
+x DUCK > 3
+
+1 | Parts of a plant | STEM PETAL BUD LEAF
+2 | Parts of a book | PAGE COVER INDEX PREFACE
+3 | Words after TEA | CUP POT BAG TIME
+4 | Silent K | KNIFE KNEE KNOT KNOW
+x LEAF > 2
+
+1 | Trees | OAK ELM MAPLE BEECH
+2 | Woodworking tools | SAW DRILL CHISEL PLANE
+3 | Words before WOOD | DRIFT SAND HOLLY PLY
+4 | Silent B | CRUMB LIMB DEBT SUBTLE
+x PLANE > 1
+
+1 | Trees | OAK BEECH WILLOW CHESTNUT
+2 | Fire leftovers | SOOT EMBER CINDER CHARCOAL
+3 | Words before TRAY | TEA BAKING SERVING ASH
+4 | Palindromes | MADAM ROTOR LEVEL SEES
+x ASH > 1
+x ASH > 2
+
+1 | Hand tools | SAW HAMMER PLIERS WRENCH
+2 | Past tense verbs | ATE RAN SANG SWAM
+3 | Things with teeth | COMB ZIPPER GEAR SHARK
+4 | Start with a silent letter | GNOME KNEEL WREATH PSYCHIC
+x SAW > 2
+x SAW > 3
+
+1 | Things in a toolbox | NAIL SCREW BOLT RIVET
+2 | Body parts | ELBOW KNEE WRIST ANKLE
+3 | Words before POLISH | SHOE FRENCH FLOOR SILVER
+4 | Sound like a letter | SEA PEA EYE ARE
+x NAIL > 2
+x NAIL > 3
+
+1 | Places to keep money | WALLET PURSE VAULT BANK
+2 | Parts of a river | DELTA MOUTH SOURCE CURRENT
+3 | Words before FORCE | AIR TASK WORK POLICE
+4 | Silent L | FOLK YOLK WALK TALK
+x BANK > 2
+
+1 | Toys | KITE DOLL YOYO TEDDY
+2 | Birds of prey | EAGLE FALCON HAWK OSPREY
+3 | Words after SKY | LINE LIGHT SCRAPER DIVE
+4 | Palindromes | MOM DAD NUN EYE
+x KITE > 2
+
+1 | Percussion | DRUM CYMBAL TRIANGLE XYLOPHONE
+2 | Shapes | CIRCLE OVAL SQUARE HEXAGON
+3 | Words before STRING | SHOE HEART DRAW BOW
+4 | Sound like an animal | DEAR BARE BORE FLEE
+x TRIANGLE > 2
+
+1 | Keyboard instruments | PIANO ORGAN SYNTH ACCORDION
+2 | Body organs | HEART LIVER LUNG BRAIN
+3 | Words after ARM | CHAIR PIT BAND REST
+4 | Hide a body part | SPEAR SHINY CLIPS HEADER
+x ORGAN > 2
+
+1 | Homes | HOUSE FLAT COTTAGE BUNGALOW
+2 | Music symbols | SHARP CLEF REST NATURAL
+3 | Words before PLACE | FIRE MARKET BIRTH WORK
+4 | Palindromes | MOM NOON TENET STATS
+x FLAT > 2
+
+1 | Colours | BLUE PINK BROWN YELLOW
+2 | Golf course features | BUNKER FAIRWAY GREEN ROUGH
+3 | Words after HOT | DOG SPOT HEAD HOUSE
+4 | Sound like a body part | HEAL WASTE MUSSEL KNOWS
+x GREEN > 1
+
+1 | Household appliances | TOASTER KETTLE BLENDER IRON
+2 | Metals | ZINC LEAD NICKEL COPPER
+3 | Golf equipment | TEE PUTTER WEDGE DRIVER
+4 | Hide an animal | DANDELION GRASP GIANT PIRATE
+x IRON > 2
+x IRON > 3
+
+1 | Brass instruments | TRUMPET TROMBONE TUBA CORNET
+2 | Animal body parts | HORN HOOF TAIL FUR
+3 | Words before HORN | SHOE FOG BULL LONG
+4 | Sound like a fruit | PAIR PARE PLUMB BURY
+x HORN > 1
+
+1 | Containers | BARREL CRATE DRUM TUB
+2 | Parts of the ear | LOBE CANAL ANVIL STIRRUP
+3 | Words before ROLL | EGG SPRING SWISS SAUSAGE
+4 | Only Roman numeral letters | MIX MILD LIVID CIVIL
+x DRUM > 2
+
+1 | Spreads | JAM BUTTER HONEY MARMALADE
+2 | Traffic problems | QUEUE CRASH DELAY ROADWORKS
+3 | Things you can catch | COLD BUS FISH THIEF
+4 | Start with a body part | ARMY FOOTAGE HEARTH HIPPO
+x JAM > 2
+
+1 | Parts of the face | CHEEK CHIN BROW JAW
+2 | Places of worship | CHURCH MOSQUE TEMPLE SYNAGOGUE
+3 | Words after WIND | MILL SCREEN FALL BREAK
+4 | Silent H | GHOST RHYME THYME EXHAUST
+x TEMPLE > 1
+
+1 | Playground | SLIDE SEESAW ROUNDABOUT SWING
+2 | Music styles | JAZZ BLUES DISCO FUNK
+3 | Words before STORM | SNOW RAIN SAND THUNDER
+4 | Hide a colour | BLUEBERRY HATRED STAND GOLDEN
+x SWING > 2
+
+1 | Words for big | HUGE GIANT VAST ENORMOUS
+2 | Words for small | TINY MINI WEE PETITE
+3 | Words before SIZE | KING QUEEN PINT BITE
+4 | Hide an animal | PIRATE LOCATE GRASP FEEL
+x GIANT > 4
+
+1 | Words for tired | WEARY SLEEPY DROWSY EXHAUSTED
+2 | Words for happy | GLAD JOLLY CHEERFUL MERRY
+3 | Things you can catch | COLD BUS FISH WAVE
+4 | Sound like food | MEET BRED BEAT FLOWER
+x BEAT > 1
+
+1 | Ways to walk | STROLL AMBLE MARCH STRIDE
+2 | Ways to talk | CHAT GOSSIP NATTER BABBLE
+3 | Horse gaits | WALK TROT CANTER GALLOP
+4 | Silent G | SIGN DESIGN FOREIGN REIGN
+x WALK > 1
+x TROT > 1
