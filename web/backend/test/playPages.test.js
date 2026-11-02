@@ -159,7 +159,7 @@ test('injectMeta: copy with HTML, quotes, "$&" and </script> cannot break out of
 test('sitemap: index + one URL per game, absolute, unique, valid shell', () => {
     const xml = buildSitemap(catalog);
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    assert.equal(locs.length, catalog.games.length + 1);
+    assert.equal(locs.length, catalog.games.length + 2 /* web/daily-page: + /play/daily */);
     assert.equal(new Set(locs).size, locs.length);
     assert.equal(locs[0], 'https://puzzleverseai.com/play');
     for (const g of catalog.games) assert.ok(locs.includes(`https://puzzleverseai.com/play/${g.slug}`));
@@ -228,7 +228,7 @@ test('router: robots.txt and sitemap.xml', async () => {
         assert.match(await robots.text(), /Sitemap:/);
         const sm = await fetch(`${base}/sitemap.xml`);
         assert.match(sm.headers.get('content-type'), /xml/);
-        assert.equal((await sm.text()).match(/<loc>/g).length, catalog.games.length + 1);
+        assert.equal((await sm.text()).match(/<loc>/g).length, catalog.games.length + 2 /* web/daily-page: + /play/daily */);
     });
 });
 
@@ -237,4 +237,35 @@ test('router: template read failure goes to the error handler (500), not a hang'
         const r = await fetch(`${base}/play/sudoku`);
         assert.equal(r.status, 500);
     }, async () => { throw new Error('no index.html'); });
+});
+
+// ---- web/daily-page ----
+test('daily: /play/daily has its own meta, is in the sitemap, and the slug is not a catalog game', () => {
+    assert.ok(!catalog.games.some((g) => g.slug === 'daily'), '"daily" is reserved for /play/daily');
+    const m = resolvePlayPage('/play/daily', catalog);
+    assert.equal(m.kind, 'daily');
+    assert.equal(m.canonical, `${SITE_ORIGIN}/play/daily`);
+    assert.equal(resolvePlayPage('/play/daily/', catalog).canonical, m.canonical);
+    assert.ok(m.title.length <= 65 && m.description.length <= 165, `${m.title.length}/${m.description.length}`);
+    const others = ['/play', ...catalog.games.map((g) => `/play/${g.slug}`)].map((p) => resolvePlayPage(p, catalog));
+    assert.ok(others.every((o) => o.title !== m.title && o.description !== m.description && o.canonical !== m.canonical));
+    assert.ok(buildSitemap(catalog).includes('<loc>https://puzzleverseai.com/play/daily</loc>'));
+    assert.ok(!/[^\x20-\x7E]/.test(m.title + m.description + m.bodyHtml), 'ASCII only');
+    const html = injectMeta(TEMPLATE, m);
+    assert.match(html, /<link rel="canonical" href="https:\/\/puzzleverseai\.com\/play\/daily" \/>/);
+    assert.match(html, /<div id="root"><main[^>]*><h1>Daily puzzle<\/h1>/);
+    for (const block of [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]) JSON.parse(block[1]);
+    assert.ok(!/earn|coin|reward|prize/i.test(m.description + m.bodyHtml), 'no earnings claims');
+});
+
+test('daily: router serves /play/daily (200, injected), 301s mixed case, does not touch the custom-game route', async () => {
+    await withServer(async (base) => {
+        const r = await fetch(`${base}/play/daily`);
+        assert.equal(r.status, 200);
+        assert.match(await r.text(), /<h1>Daily puzzle<\/h1>/);
+        const up = await fetch(`${base}/play/Daily`, { redirect: 'manual' });
+        assert.equal(up.status, 301);
+        assert.equal(up.headers.get('location'), '/play/daily');
+        assert.equal(await (await fetch(`${base}/play/daily-x`)).text(), 'custom-game:daily-x');
+    });
 });

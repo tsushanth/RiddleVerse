@@ -16,6 +16,12 @@ export default function PlayIndexPage() {
         <p className="text-white/80">Pick a game and start playing right away. No account, no download, no sign-up.</p>
       </section>
 
+      {/* web/daily-page */}
+      <Link to="/play/daily" className="glass block rounded-2xl p-4 hover:bg-white/25 transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-white">
+        <span className="block font-semibold text-lg">Daily puzzle</span>
+        <span className="block text-sm text-white/80 mt-1">A new free puzzle every day, the same for everyone. Keep a streak and share your time.</span>
+      </Link>
+
       {PLAY_CATEGORIES.map((cat) => (
         <section key={cat.id} aria-labelledby={`cat-${cat.id}`} className="space-y-3">
           <h2 id={`cat-${cat.id}`} className="text-xl font-bold">{cat.name}</h2>
