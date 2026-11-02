@@ -2,6 +2,8 @@
 // Contract: {installId, platform:'web', appVersion, events:[{type, puzzleType, difficulty, sessionId,
 // durationMs, score, moves, hintsUsed, mistakes, errorMessage, ts}]}. Never throws, ignores 404/5xx, no PII.
 
+import { suppressedOnPlayPage } from './webPlayAnalytics.js'
+
 const API_BASE_URL = import.meta.env.DEV ? '' : 'https://puzzleverseai.com'
 const ENDPOINT = `${API_BASE_URL}/api/puzzle-events`
 const INSTALL_KEY = 'rv_install_id'
@@ -45,8 +47,14 @@ export function newSessionId() {
   return uuid()
 }
 
+// GPC / Do Not Track on a public /play page: send nothing (checked on every call, same rule as webPlayAnalytics).
+function privacyBlocked() {
+  return suppressedOnPlayPage(typeof navigator !== 'undefined' ? navigator : undefined, typeof window !== 'undefined' ? window : undefined)
+}
+
 function send(events, useBeacon) {
   try {
+    if (privacyBlocked()) return
     const body = JSON.stringify({ installId: getInstallId(), platform: 'web', appVersion: APP_VERSION, events })
     if (useBeacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
       const blob = new Blob([body], { type: 'application/json' })
@@ -90,7 +98,7 @@ function ensureHooks() {
  */
 export function trackPuzzleEvent(type, puzzleType, fields = {}) {
   try {
-    if (!TYPES.includes(type)) return
+    if (!TYPES.includes(type) || privacyBlocked()) return
     ensureHooks()
     const f = fields || {}
     const ev = { type, puzzleType: String(puzzleType || ''), ts: Date.now() }

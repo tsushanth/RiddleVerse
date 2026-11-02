@@ -35,6 +35,20 @@ export function trackingSuppressed(nav, win) {
   }
 }
 
+/**
+ * Same decision for the legacy game-shell telemetry (utils/puzzleEvents.js): on the public /play pages (no login) it must
+ * stay silent when GPC/DNT is on. Elsewhere (the signed-in app) it is unchanged.
+ */
+export function suppressedOnPlayPage(nav, win) {
+  try {
+    const p = win && win.location && win.location.pathname
+    if (typeof p !== 'string' || !(p === '/play' || p.startsWith('/play/'))) return false
+    return trackingSuppressed(nav, win)
+  } catch {
+    return false
+  }
+}
+
 function randomId() {
   try {
     if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID()
