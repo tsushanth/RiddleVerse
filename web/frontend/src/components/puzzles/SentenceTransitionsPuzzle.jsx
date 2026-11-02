@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import PuzzleTimer from './PuzzleTimer'
+import { isCorrectChoice } from './choiceJudge'
 
 /**
  * Multiple choice for best transition word in a sentence.
@@ -9,7 +10,7 @@ import PuzzleTimer from './PuzzleTimer'
 export default function SentenceTransitionsPuzzle({ puzzle, onAnswer }) {
   const question = typeof puzzle.question === 'string' ? puzzle.question : JSON.stringify(puzzle.question)
   const options = puzzle.options || []
-  const correctAnswer = (puzzle.answer || '').trim().toLowerCase()
+  const correctAnswer = puzzle.answer
 
   const [selected, setSelected] = useState(null)
   const [revealed, setRevealed] = useState(false)
@@ -19,7 +20,7 @@ export default function SentenceTransitionsPuzzle({ puzzle, onAnswer }) {
     setSelected(option)
     setRevealed(true)
 
-    const isCorrect = option.toLowerCase().trim() === correctAnswer
+    const isCorrect = isCorrectChoice(option, correctAnswer)
     setTimeout(() => onAnswer(isCorrect, option), 1200)
   }
 
@@ -32,7 +33,7 @@ export default function SentenceTransitionsPuzzle({ puzzle, onAnswer }) {
 
   const getStyle = (option) => {
     if (!revealed) return 'bg-white/10 border-white/20 hover:bg-white/20'
-    const isCorrect = option.toLowerCase().trim() === correctAnswer
+    const isCorrect = isCorrectChoice(option, correctAnswer)
     const isSel = option === selected
     if (isCorrect) return 'bg-green-500/30 border-green-400'
     if (isSel) return 'bg-red-500/30 border-red-400'

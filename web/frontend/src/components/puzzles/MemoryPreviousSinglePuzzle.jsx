@@ -1,245 +1,156 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Eye, ChevronRight, Check } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import PuzzleTimer from './PuzzleTimer'
-import { parseJsonField } from './puzzleUtils'
+import { formatTime } from './puzzleUtils'
+import {
+  parseMemorySingle, newSession, reduce, scoreRun, timeBudgetSeconds,
+  FIRST_SYMBOL_MS, FEEDBACK_MS,
+} from './memorySingleLogic'
 
 /**
- * MemoryPreviousSinglePuzzle — DB type "memoryprevioussingle"
- * Shows a sequence of single values one at a time. After viewing, user answers
- * questions about which value was N steps back (n-back task).
+ * MemoryPreviousSinglePuzzle — DB type "memoryprevioussingle" (shown as Memory Match / N-Back).
+ * Symbols appear one at a time. The first is only to remember; for every later symbol the player says whether it is
+ * the SAME as the one just before it or DIFFERENT. The sequence is fixed for the whole game; scoring and the clock
+ * live in memorySingleLogic.js (unit-tested).
  */
-export default function MemoryPreviousSinglePuzzle({ puzzle, onAnswer }) {
-  const parsed = parseJsonField(puzzle.question)
-  const answerParsed = parseJsonField(puzzle.answer)
+const SYMBOLS = {
+  0: { glyph: '●', color: 'text-sky-300' },    // circle
+  1: { glyph: '▲', color: 'text-amber-300' },  // triangle
+}
 
-  const binarySequence = parsed?.binarySequence || []
-  const questionSequence = parsed?.questionSequence || []
-  const instructions = parsed?.instructions || {}
-  const totalSteps = parsed?.totalSteps || binarySequence.length
-  const correctAnswers = answerParsed?.correctAnswers || answerParsed?.answerSequence || []
+function Session({ symbols, onAnswer }) {
+  const [state, dispatch] = useReducer(reduce, symbols, newSession)
+  const reported = useRef(false)
 
-  const [phase, setPhase] = useState('viewing') // 'viewing' | 'answering'
-  const [currentStep, setCurrentStep] = useState(0)
-  const [currentAnswer, setCurrentAnswer] = useState(0)
-  const [userAnswers, setUserAnswers] = useState([])
-  const [input, setInput] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-  const [showingValue, setShowingValue] = useState(true)
-
-  useEffect(() => {
-    setPhase('viewing')
-    setCurrentStep(0)
-    setCurrentAnswer(0)
-    setUserAnswers([])
-    setInput('')
-    setSubmitted(false)
-    setShowingValue(true)
-  }, [puzzle.puzzleId])
-
-  // Auto-advance through sequence
-  useEffect(() => {
-    if (phase !== 'viewing' || currentStep >= totalSteps) return
-
-    setShowingValue(true)
-    const timer = setTimeout(() => {
-      setShowingValue(false)
-      const nextTimer = setTimeout(() => {
-        if (currentStep + 1 < totalSteps) {
-          setCurrentStep(prev => prev + 1)
-        } else {
-          setPhase('answering')
-        }
-      }, 300)
-      return () => clearTimeout(nextTimer)
-    }, 1500)
-
-    return () => clearTimeout(timer)
-  }, [phase, currentStep, totalSteps])
-
-  const handleSkipViewing = () => {
-    setPhase('answering')
+  const report = (result) => {
+    if (reported.current) return
+    reported.current = true
+    onAnswer(result.passed, `${result.correct}/${result.total}`)
   }
 
-  const handleAnswerSubmit = (e) => {
-    e.preventDefault()
-    if (!input.trim()) return
+  // First symbol: show it alone, then move on.
+  useEffect(() => {
+    if (state.done || state.index !== 0) return
+    const t = setTimeout(() => dispatch({ type: 'firstShown' }), FIRST_SYMBOL_MS)
+    return () => clearTimeout(t)
+  }, [state.done, state.index])
 
-    const newAnswers = [...userAnswers, input.trim()]
-    setUserAnswers(newAnswers)
-    setInput('')
+  // Tick/cross pause after each answer.
+  useEffect(() => {
+    if (state.feedback === null) return
+    const t = setTimeout(() => dispatch({ type: 'feedbackDone' }), FEEDBACK_MS)
+    return () => clearTimeout(t)
+  }, [state.feedback, state.index])
 
-    if (currentAnswer + 1 < correctAnswers.length) {
-      setCurrentAnswer(prev => prev + 1)
-    } else {
-      setSubmitted(true)
-      let correct = 0
-      newAnswers.forEach((ans, i) => {
-        if (String(ans) === String(correctAnswers[i])) correct++
-      })
-      const passed = correct >= Math.ceil(correctAnswers.length * 0.5)
-      setTimeout(() => onAnswer(passed, `${correct}/${correctAnswers.length}`), 1000)
-    }
-  }
+  // Finished: report once, after a short beat so the last tick/cross is visible.
+  useEffect(() => {
+    if (!state.done) return
+    const t = setTimeout(() => report(scoreRun(state.expected, state.answers)), 800)
+    return () => clearTimeout(t)
+  }, [state.done])
 
   const handleTimeUp = () => {
-    if (!submitted) {
-      setSubmitted(true)
-      onAnswer(false, 'timeout')
-    }
+    if (!state.done) dispatch({ type: 'timeout' })
   }
 
-  const currentValue = binarySequence[currentStep]
-  const currentQ = questionSequence[currentAnswer]
+  const sym = SYMBOLS[state.symbols[state.index]] || { glyph: String(state.symbols[state.index]), color: 'text-white' }
+  const canAnswer = state.index >= 1 && state.feedback === null && !state.done
+  const answered = state.answers.length
+  const total = state.expected.length
 
   return (
     <div className="space-y-5">
       <PuzzleTimer
-        timerStr={phase === 'viewing' ? '0:30' : (puzzle.timer || '1:00')}
+        timerStr={formatTime(timeBudgetSeconds(state.symbols.length))}
         onTimeUp={handleTimeUp}
-        paused={submitted}
-        key={phase}
+        paused={state.done}
       />
 
-      <AnimatePresence mode="wait">
-        {phase === 'viewing' ? (
+      <p className="text-purple-300 text-sm font-semibold uppercase tracking-widest text-center">
+        {state.index === 0 ? 'Remember this one' : 'Same as the one before?'}
+      </p>
+
+      <div className="flex items-center gap-2">
+        <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
           <motion.div
-            key="viewing"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="space-y-4"
-          >
-            <div className="flex items-center gap-2 justify-center">
-              <Eye size={18} className="text-purple-400" />
-              <p className="text-purple-300 text-sm font-semibold uppercase tracking-widest">
-                Watch the Sequence
-              </p>
-            </div>
+            className="h-full bg-purple-500 rounded-full"
+            animate={{ width: `${total ? (answered / total) * 100 : 0}%` }}
+          />
+        </div>
+        <span className="text-white/50 text-xs">{answered}/{total}</span>
+      </div>
 
-            {instructions?.description && (
-              <p className="text-white/60 text-sm text-center">{instructions.description}</p>
-            )}
-
-            {/* Progress bar */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-purple-500 rounded-full"
-                  animate={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-                />
-              </div>
-              <span className="text-white/50 text-xs">{currentStep + 1}/{totalSteps}</span>
-            </div>
-
-            {/* Current value display */}
-            <div className="flex justify-center py-8">
-              <AnimatePresence mode="wait">
-                {showingValue && (
-                  <motion.div
-                    key={currentStep}
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.5 }}
-                    className="w-24 h-24 rounded-2xl bg-purple-500/30 border-2 border-purple-400/50 flex items-center justify-center"
-                  >
-                    <span className="text-white font-bold text-4xl">{currentValue}</span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <button
-              onClick={handleSkipViewing}
-              className="w-full bg-white/10 hover:bg-white/15 text-white/60 font-medium py-2 rounded-xl transition-colors text-sm"
+      <div className="flex justify-center py-6">
+        <AnimatePresence mode="wait">
+          {!state.done && (
+            <motion.div
+              key={state.index}
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.5 }}
+              className="relative w-28 h-28 rounded-2xl bg-purple-500/30 border-2 border-purple-400/50 flex items-center justify-center"
             >
-              Skip to Questions
-            </button>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="answering"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
+              <span className={`font-bold text-6xl ${sym.color}`}>{sym.glyph}</span>
+              {state.feedback && (
+                <span className={`absolute -top-3 -right-3 rounded-full p-1 ${state.feedback === 'correct' ? 'bg-green-500' : 'bg-red-500'}`}>
+                  {state.feedback === 'correct' ? <Check size={18} className="text-white" /> : <X size={18} className="text-white" />}
+                </span>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {state.index === 0 && !state.done && (
+        <p className="text-white/50 text-xs text-center">Nothing to tap yet. Next one: is it the same as this?</p>
+      )}
+
+      {state.index >= 1 && !state.done && (
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => dispatch({ type: 'answer', value: 1 })}
+            disabled={!canAnswer}
+            className="bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-colors"
           >
-            <p className="text-amber-300 text-sm font-semibold uppercase tracking-widest text-center">
-              Recall the Values
-            </p>
+            SAME
+          </button>
+          <button
+            onClick={() => dispatch({ type: 'answer', value: 0 })}
+            disabled={!canAnswer}
+            className="bg-rose-500 hover:bg-rose-600 disabled:opacity-50 text-white font-semibold py-4 rounded-xl transition-colors"
+          >
+            DIFFERENT
+          </button>
+        </div>
+      )}
 
-            {!submitted && currentQ && (
-              <>
-                <div className="bg-amber-500/10 rounded-xl p-4 border border-amber-500/20 text-center">
-                  <p className="text-white text-sm">
-                    {currentQ.isFirstStep
-                      ? `What was the value at step ${currentQ.step}?`
-                      : `What value was shown at step ${currentQ.step}?`
-                    }
-                  </p>
-                  {currentQ.value !== undefined && (
-                    <p className="text-white/40 text-xs mt-1">
-                      Current value shown: {currentQ.value}
-                    </p>
-                  )}
-                </div>
-
-                {/* Previous answers */}
-                {userAnswers.length > 0 && (
-                  <div className="space-y-1">
-                    {userAnswers.map((ans, i) => (
-                      <div key={i} className="bg-white/5 rounded-lg px-3 py-2 text-sm text-white/60">
-                        Question {i + 1}: <span className="text-white font-bold">{ans}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <form onSubmit={handleAnswerSubmit} className="space-y-3">
-                  <input
-                    type="text"
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Enter the value..."
-                    className="w-full bg-white/10 border border-white/20 text-white placeholder-white/50 rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-400/50 text-center text-xl font-bold"
-                    inputMode="numeric"
-                    autoFocus
-                  />
-                  <button
-                    type="submit"
-                    disabled={!input.trim()}
-                    className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 disabled:bg-green-500/50 text-white font-semibold py-3 rounded-xl transition-colors"
-                  >
-                    <Check size={20} />
-                    {currentAnswer + 1 < correctAnswers.length ? 'Next' : 'Submit'}
-                  </button>
-                </form>
-              </>
-            )}
-
-            {submitted && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="space-y-2"
-              >
-                {userAnswers.map((ans, i) => {
-                  const correct = String(ans) === String(correctAnswers[i])
-                  return (
-                    <div key={i} className={`rounded-lg p-3 border text-sm ${
-                      correct ? 'bg-green-500/15 border-green-500/30' : 'bg-red-500/15 border-red-500/30'
-                    }`}>
-                      <p className={correct ? 'text-green-300' : 'text-red-300'}>
-                        Q{i + 1}: You said <strong>{ans}</strong>
-                        {!correct && <> | Correct: <strong>{correctAnswers[i]}</strong></>}
-                      </p>
-                    </div>
-                  )
-                })}
-              </motion.div>
-            )}
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {state.done && (
+        <p className="text-white/70 text-sm text-center">
+          {scoreRun(state.expected, state.answers).correct}/{total} correct
+        </p>
+      )}
     </div>
   )
+}
+
+export default function MemoryPreviousSinglePuzzle({ puzzle, onAnswer }) {
+  const { symbols } = parseMemorySingle(puzzle)
+
+  if (symbols.length < 2) {
+    return (
+      <div className="space-y-3 text-center">
+        <p className="text-white/70 text-sm">This puzzle could not be loaded.</p>
+        <button
+          onClick={() => onAnswer(false, 'invalid', true)}
+          className="bg-white/10 hover:bg-white/15 text-white/70 font-medium py-2 px-4 rounded-xl text-sm"
+        >
+          Skip
+        </button>
+      </div>
+    )
+  }
+
+  // key: a new puzzle starts a fresh session; nothing else ever replaces the sequence mid-game.
+  return <Session key={puzzle.puzzleId} symbols={symbols} onAnswer={onAnswer} />
 }
