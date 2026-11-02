@@ -7,22 +7,22 @@ import org.json.JSONObject
 // game screens already render. The seed travels in Puzzle.question, exactly as it does for ordinary play, so no
 // game screen needed to change.
 
-class DailyPuzzle(val spec: DailyPuzzleSpec, val puzzle: Puzzle, val screenType: String)
+class DailyBuiltPuzzle(val spec: DailyPuzzleSpec, val puzzle: Puzzle, val screenType: String)
 
 object DailyPuzzleFactory {
 
     /** May load word lists from assets for the word games, so call off the main thread. */
-    fun build(context: Context, spec: DailyPuzzleSpec): DailyPuzzle {
+    fun build(context: Context, spec: DailyPuzzleSpec): DailyBuiltPuzzle {
         val d = DailyPuzzleSchedule.DIFFICULTY
         val type = spec.type
         val grid = GridGame.fromKey(type)
         return when {
-            grid != null -> DailyPuzzle(
+            grid != null -> DailyBuiltPuzzle(
                 spec,
                 GridPuzzleFactory.createPuzzle(grid, d, spec.seed).copy(puzzleId = id(spec)),
                 "Grid Puzzle Screen",
             )
-            type in SpatialPuzzles.TYPES -> DailyPuzzle(
+            type in SpatialPuzzles.TYPES -> DailyBuiltPuzzle(
                 spec,
                 Puzzle(
                     puzzleId = id(spec),
@@ -35,7 +35,7 @@ object DailyPuzzleFactory {
                 ),
                 SpatialPuzzles.screenOption(type),
             )
-            type in WordPuzzleRegistry.TYPES -> DailyPuzzle(
+            type in WordPuzzleRegistry.TYPES -> DailyBuiltPuzzle(
                 spec,
                 WordPuzzleRegistry.createPuzzle(type, d, context, spec.seed).copy(puzzleId = id(spec)),
                 WordPuzzleRegistry.screenTypeName(type),

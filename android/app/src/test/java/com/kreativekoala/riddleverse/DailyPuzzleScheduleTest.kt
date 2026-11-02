@@ -24,11 +24,18 @@ class DailyPuzzleScheduleTest {
 
     @Test fun pinnedValues_neverChange() {
         // If this fails you changed the rotation, shuffle or seed mixing: every player's puzzle would change. Don't.
-        val s = DailyPuzzleSchedule.specFor(first)
-        assertEquals(1, s.number)
-        assertTrue(s.type in DailyPuzzleSchedule.ROTATION)
-        assertEquals(DailyPuzzleSchedule.specFor(first).seed, s.seed)
-        assertTrue(s.seed >= 0)
+        val expected = listOf(
+            "crateshift" to 4726940851620634300L, "tubetint" to 3169490807060299793L, "pixellogic" to 3931529243979955455L,
+            "wordhive" to 6292848748641144246L, "signgrid" to 2836158810257466357L, "binarygrid" to 2599900883310011191L,
+            "sudoku" to 3211176445299877934L, "conduit" to 4650300333674332901L, "wordladder" to 5280230434093151369L,
+            "pixellogic" to 7175925850101726451L, "wordhive" to 3978227786564930015L, "crateshift" to 5146235931912561850L,
+        )
+        expected.forEachIndexed { i, (type, seed) ->
+            val spec = DailyPuzzleSchedule.specFor(first + i)
+            assertEquals("number $i", i + 1, spec.number)
+            assertEquals("type #${i + 1}", type, spec.type)
+            assertEquals("seed #${i + 1}", seed, spec.seed)
+        }
     }
 
     @Test fun everyInstantOfAUtcDay_mapsToThatDay() {
@@ -43,7 +50,7 @@ class DailyPuzzleScheduleTest {
     @Test fun phoneTimeZone_doesNotMatter() {
         // 2026-11-02 00:30 in Tokyo (UTC+9) is still 2026-11-01 15:30 UTC: same puzzle as someone in London at that instant.
         val tokyo = java.time.ZonedDateTime.of(2026, 11, 2, 0, 30, 0, 0, java.time.ZoneId.of("Asia/Tokyo")).toInstant().toEpochMilli()
-        val la = java.time.ZonedDateTime.of(2026, 11, 1, 8, 30, 0, 0, java.time.ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli()
+        val la = java.time.ZonedDateTime.of(2026, 11, 1, 7, 30, 0, 0, java.time.ZoneId.of("America/Los_Angeles")).toInstant().toEpochMilli()
         assertEquals(tokyo, la)
         assertEquals(DailyPuzzleSchedule.dayOf(tokyo), DailyPuzzleSchedule.dayOf(la))
         assertEquals(first, DailyPuzzleSchedule.dayOf(tokyo))

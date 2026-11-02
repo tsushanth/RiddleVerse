@@ -70,7 +70,7 @@ private fun DailyPuzzleRoot(day: Long, onClose: () -> Unit) {
     var startedAt by rememberSaveable { mutableLongStateOf(-1L) }
     var failed by remember { mutableStateOf(false) }
 
-    val built by produceState<DailyPuzzle?>(null, spec) {
+    val built by produceState<DailyBuiltPuzzle?>(null, spec) {
         value = withContext(Dispatchers.Default) {
             try { DailyPuzzleFactory.build(context, spec) } catch (e: Exception) { null }
         }
