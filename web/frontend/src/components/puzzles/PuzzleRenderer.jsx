@@ -202,19 +202,23 @@ const renderers = {
   dualcard: DualCardPuzzle,
 }
 
-// --- web grid puzzles (feat/web-puzzles-grid) ---
-import { gridRenderers, gridTypeMap } from './grid/gridRegistry'
-Object.assign(typeMap, gridTypeMap)
-Object.assign(renderers, gridRenderers)
-// --- end web grid puzzles ---
-// --- web classic puzzles (feat/web-puzzles-classic) ---
-import { classicTypeMap, classicRenderers } from './classic/classicRegistry'
-Object.assign(typeMap, classicTypeMap)
-Object.assign(renderers, classicRenderers)
-// --- web spatial puzzles (feat/web-puzzles-spatial) ---
-import { spatialTypeMap, spatialRenderers } from './spatial/registry'
-Object.assign(typeMap, spatialTypeMap)
-Object.assign(renderers, spatialRenderers)
+// Family registries are discovered by glob, so adding a game family never edits this file.
+// Contract: a module at puzzles/<family>/registry.jsx or puzzles/<family>/<name>Registry.{js,jsx}
+// exports `...TypeMap` (alias -> canonical key) and `...Renderers` (canonical key -> component).
+// Keys must be unique across families (asserted by test/registry). Family modules load eagerly, as
+// the old static imports did; each family keeps its own React.lazy for the heavy game code.
+const registryModules = import.meta.glob('./*/*[Rr]egistry.{js,jsx}', { eager: true })
+
+/** Pure merge step (exported for tests): `modules` is a path -> module-namespace map. */
+export function mergeRegistries(modules, typeMapTarget, renderersTarget) {
+  for (const path of Object.keys(modules).sort()) {
+    for (const [name, value] of Object.entries(modules[path])) {
+      if (/TypeMap$/.test(name)) Object.assign(typeMapTarget, value)
+      else if (/Renderers$/.test(name)) Object.assign(renderersTarget, value)
+    }
+  }
+}
+mergeRegistries(registryModules, typeMap, renderers)
 
 /**
  * Determines which renderer to use based on puzzle type and data shape.
@@ -250,9 +254,3 @@ export default function PuzzleRenderer({ puzzleType, puzzle, onAnswer, onSubmitT
 
 // Export for testing / direct use
 export { resolveRenderer, typeMap, renderers }
-
-// --- web word puzzles (feat/web-puzzles-word) ---
-import { wordPuzzleTypeMap, wordPuzzleRenderers } from './word/wordPuzzleRegistry.js'
-Object.assign(typeMap, wordPuzzleTypeMap)
-Object.assign(renderers, wordPuzzleRenderers)
-// --- end web word puzzles ---

@@ -1,4 +1,12 @@
 {
+  "_addAGame": [
+    "HOW TO ADD A GAME: exactly one JSON entry here plus one frontend registry module. Nothing else is shared.",
+    "1. Append ONE object to games[] (keep the order stable; append at the end): slug (lowercase letters only, unique, = the puzzle type key), name, category (an id from categories[]), summary (ASCII, under 120 chars), description (2-3 sentences), howToPlay (3+ short steps), tip.",
+    "2. If the game needs a new category, append ONE object to categories[]; otherwise reuse one.",
+    "3. Add ONE frontend module web/frontend/src/components/puzzles/<family>/registry.jsx (or <name>Registry.jsx) exporting <x>TypeMap (alias -> canonical key, must include the slug) and <x>Renderers (canonical key -> component). It is picked up by import.meta.glob in PuzzleRenderer.jsx, so do not edit PuzzleRenderer.jsx.",
+    "4. Run: cd web/backend && npm test; cd web/frontend && npm test. Tests derive every expectation from this file, so no test needs a new count.",
+    "Copy rules: written from the game rules in code, no invented numbers or claims, ASCII only."
+  ],
   "_note": "Single source of truth for the public /play pages. Read by the backend (meta injection, sitemap) and bundled into the frontend. Copy is written from the game rules in web/frontend/src/components/puzzles; do not add numbers or claims the code does not back up. Keep ASCII only. summary must stay under 120 characters.",
   "categories": [
     { "id": "grid", "name": "Grid logic" },
