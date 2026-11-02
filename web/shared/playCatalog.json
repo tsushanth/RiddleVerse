@@ -294,6 +294,21 @@
         "Use Share riddle to send a friend the riddle without the answer."
       ],
       "tip": "Try a first guess before opening a hint. The third hint gives the first letter, so save it for last."
+    },
+    {
+      "slug": "linkup",
+      "name": "Linkup",
+      "category": "word",
+      "summary": "Sort 16 words into four hidden groups of four. You can make four mistakes before the game ends.",
+      "description": "Linkup shows 16 words that fall into four hidden groups of four, each with its own link, such as a category or a bit of wordplay. Select four words you think belong together and submit; solved groups are revealed with a name, a shape and a colour for their difficulty. You can make four mistakes, and a hint marks one word from the easiest group still hidden.",
+      "howToPlay": [
+        "Tap four words that share a link, then press Submit.",
+        "A correct set is revealed with its group name and difficulty.",
+        "A wrong set costs one of your four mistakes. On Easy and Medium you are told when you were one word away.",
+        "Use Shuffle to reorder the remaining words, or Hint to mark one word from the easiest group left.",
+        "Find all four groups before you run out of mistakes."
+      ],
+      "tip": "Some words fit more than one group, so start with the set you are surest of and let the leftovers settle the rest."
     }
   ]
 }
