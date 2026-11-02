@@ -102,14 +102,14 @@ class FunnelTest {
         val c = client()
         c.enqueue(PuzzleEvent("funnel", "whatever", "hard", "s", score = 9, ts = 5, funnelStep = "first_open"))
         c.flush()
-        assertEquals("""{"installId":"inst-1","platform":"android","appVersion":"1.0","events":[{"type":"funnel","puzzleType":"app","sessionId":"s","ts":5,"funnelStep":"first_open"}]}""", sent[0])
+        assertEquals("""{"installId":"inst-1","platform":"android","appVersion":"1.0","events":[{"type":"funnel","puzzleType":"app","sessionId":"s","funnelStep":"first_open","ts":5}]}""", sent[0])
     }
 
     @Test fun appOpenSerialised() {
         val c = client()
         c.enqueue(PuzzleEvent("app_open", "app", null, "s", ts = 5, daysSinceInstall = 7))
         c.flush()
-        assertTrue(sent[0].contains(""""type":"app_open","puzzleType":"app","sessionId":"s","ts":5,"daysSinceInstall":7"""))
+        assertTrue(sent[0].contains(""""type":"app_open","puzzleType":"app","sessionId":"s","daysSinceInstall":7,"ts":5"""))
     }
 
     @Test fun clientDropsUnknownStepsMissingStepAndBadDays() {
