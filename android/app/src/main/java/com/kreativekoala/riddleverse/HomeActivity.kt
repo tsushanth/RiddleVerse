@@ -340,14 +340,19 @@ fun HomeScreen(navController: NavHostController,
         // Header with greeting and user info
         HeaderSection()
 
-        // Web/iOS promo banner (dismissable)
-        WebPromoBanner()
+        // On a short viewport (phone in landscape, ~420 dp tall) the header, banners and bottom bar used to take the
+        // whole screen and leave a ~70 dp sliver for the games. The promos are optional, so skip them there; they
+        // come back in portrait.
+        if (androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp >= 480) {
+            // Web/iOS promo banner (dismissable)
+            WebPromoBanner()
 
-        // Skippable intro, offered once as a dismissible card (never a gate)
-        OnboardingOffer()
+            // Skippable intro, offered once as a dismissible card (never a gate)
+            OnboardingOffer()
 
-        // First-run, one-time "Switch to <language>?" suggestion (home-discovery)
-        LanguageSuggestionChip()
+            // First-run, one-time "Switch to <language>?" suggestion (home-discovery)
+            LanguageSuggestionChip()
+        }
 
         // Main Content Area
         Box(

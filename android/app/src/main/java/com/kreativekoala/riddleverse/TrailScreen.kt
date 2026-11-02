@@ -129,7 +129,7 @@ private fun TrailBoard(args: SpatialArgs, p: TrailPuzzle) {
         }
     ) {
         Text(
-            "Dot ${minOf(game.dotsVisited + 1, game.totalDots)} of ${game.totalDots} next  |  $message",
+            "Dot ${minOf(game.dotsVisited + 1, game.totalDots)} of ${game.totalDots} next" + (if (message.isBlank()) "" else "  |  $message"),
             fontSize = 12.sp, color = scheme.onSurfaceVariant, maxLines = 2,
             modifier = Modifier.padding(horizontal = 12.dp, vertical = 2.dp)
         )

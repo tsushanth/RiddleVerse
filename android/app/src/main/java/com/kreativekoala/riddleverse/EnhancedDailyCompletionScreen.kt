@@ -1875,7 +1875,7 @@ fun EnhancedPerformanceCard(
                 ) {
                     Text("🔥", fontSize = 20.sp)
                     Text(
-                        "Streak: $animatedStreak Days",
+                        "Streak: $animatedStreak ${if (animatedStreak == 1) "Day" else "Days"}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvCoral
