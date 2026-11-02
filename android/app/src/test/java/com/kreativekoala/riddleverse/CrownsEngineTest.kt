@@ -24,13 +24,15 @@ class CrownsEngineTest {
         // warm the JIT so the time budget measures steady state, like a running app
         for (s in 0L until 30L) CrownsEngine.generate(9, 90_000 + s)
         val report = StringBuilder()
+        val cpu = java.lang.management.ManagementFactory.getThreadMXBean()
         for (n in CrownsEngine.MIN_N..CrownsEngine.MAX_N) {
             var maxMs = 0.0; var totalMs = 0.0
             val bands = IntArray(5)
             for (seed in 1L..1000L) {
-                val t0 = System.nanoTime()
+                // thread CPU time, not wall clock: other builds on a busy dev machine must not fail the budget
+                val t0 = cpu.currentThreadCpuTime
                 val p = CrownsEngine.generate(n, seed)
-                val ms = (System.nanoTime() - t0) / 1e6
+                val ms = (cpu.currentThreadCpuTime - t0) / 1e6
                 totalMs += ms; if (ms > maxMs) maxMs = ms
                 assertValid(p, "n=$n seed=$seed")
                 bands[p.band]++
@@ -70,6 +72,20 @@ class CrownsEngineTest {
             hard += CrownsEngine.generate("Hard", seed).band
         }
         assertTrue("avg hard band $hard should exceed easy $easy", hard > easy)
+    }
+
+    @Test fun difficultyLevelsLandInTheirBands() {
+        var easyOk = 0; var medOk = 0; var hardOk = 0
+        val total = 200
+        for (seed in 1L..total.toLong()) {
+            if (CrownsEngine.generate("Easy", seed).band <= 2) easyOk++
+            if (CrownsEngine.generate("Medium", seed).band in 2..3) medOk++
+            if (CrownsEngine.generate("Hard", seed).band >= 3) hardOk++
+        }
+        println("band match: easy=$easyOk/$total medium=$medOk/$total hard=$hardOk/$total")
+        assertTrue("easy $easyOk", easyOk >= total * 0.95)
+        assertTrue("medium $medOk", medOk >= total * 0.85)
+        assertTrue("hard $hardOk", hardOk >= total * 0.85)
     }
 
     @Test fun solverDetectsNonUniqueAndInvalid() {
@@ -113,12 +129,16 @@ class CrownsEngineTest {
         assertTrue(g.conflicts()[0] && g.conflicts()[2 * n])
         g.cells.fill(0); g.cells[0] = 2; g.cells[n + 1] = 2   // diagonal touch
         assertTrue(g.conflicts()[0] && g.conflicts()[n + 1])
-        // same region, far apart
+        // same region, in different rows and columns and not touching
         g.cells.fill(0)
-        val region = p.regions[0]
-        val far = (0 until n * n).first { it / n >= 3 && it % n != 0 && p.regions[it] == region }.let { it }
-        g.cells[0] = 2; g.cells[far] = 2
-        assertTrue(g.conflicts()[0] && g.conflicts()[far])
+        var pair: Pair<Int, Int>? = null
+        for (i in 0 until n * n) for (j in i + 1 until n * n) {
+            if (p.regions[i] == p.regions[j] && i / n != j / n && i % n != j % n &&
+                abs(i / n - j / n) > 1 && abs(i % n - j % n) > 1 && pair == null) pair = i to j
+        }
+        val (a, b) = pair!!
+        g.cells[a] = 2; g.cells[b] = 2
+        assertTrue(g.conflicts()[a] && g.conflicts()[b])
         // marks never conflict
         g.cells.fill(1)
         assertFalse(g.hasConflicts())
