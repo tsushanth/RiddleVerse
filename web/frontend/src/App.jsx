@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { GameProvider } from './context/GameContext'
@@ -16,9 +17,11 @@ import CoinShopPage from './pages/CoinShopPage'
 import GameSessionPage from './pages/GameSessionPage'
 import LoadingSpinner from './components/LoadingSpinner'
 import AdminPage from './pages/AdminPage'
-import PlayIndexPage from './pages/PlayIndexPage'
-import PlayGamePage from './pages/PlayGamePage'
-import DailyPage from './pages/DailyPage' // web/daily-page
+// The public /play pages (shell, catalog, analytics, daily) load on demand: they are only needed on /play*, and keeping them
+// out of the shared bundle holds the main chunk within its size budget.
+const PlayIndexPage = lazy(() => import('./pages/PlayIndexPage'))
+const PlayGamePage = lazy(() => import('./pages/PlayGamePage'))
+const DailyPage = lazy(() => import('./pages/DailyPage'))
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -53,7 +56,7 @@ function PublicRoute({ children }) {
 // /play?session_id=<uuid> is the host-controlled AI game session wrapper; plain /play is the public game list.
 function PlayEntry() {
   const [params] = useSearchParams()
-  return params.get('session_id') !== null ? <GameSessionPage /> : <PlayIndexPage />
+  return params.get('session_id') !== null ? <GameSessionPage /> : <Suspense fallback={<LoadingSpinner />}><PlayIndexPage /></Suspense>
 }
 
 export default function App() {
@@ -132,8 +135,8 @@ export default function App() {
 
       {/* Public, indexable, no-login play pages (meta for crawlers is injected by the backend, see services/playPages.js) */}
       <Route path="/play" element={<PlayEntry />} />
-      <Route path="/play/daily" element={<DailyPage />} /> {/* web/daily-page */}
-      <Route path="/play/:type" element={<PlayGamePage />} />
+      <Route path="/play/daily" element={<Suspense fallback={<LoadingSpinner />}><DailyPage /></Suspense>} /> {/* web/daily-page */}
+      <Route path="/play/:type" element={<Suspense fallback={<LoadingSpinner />}><PlayGamePage /></Suspense>} />
 
       {/* Catch all - redirect to home or welcome */}
       <Route path="*" element={<Navigate to="/" replace />} />
