@@ -1,10 +1,13 @@
-import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
 import PlayShell, { PlayStoreButton } from '../components/play/PlayShell'
 import PuzzleRenderer from '../components/puzzles/PuzzleRenderer'
 import { PLAY_GAMES, getPlayGame, playGameDescription, playGameTitle } from '../utils/playCatalog'
 import { applyPageMeta } from '../utils/pageMeta'
+import { webPlay, createRoundTracker } from '../utils/webPlayAnalytics'
+
+const DIFFICULTY_LABEL = { 1: 'easy', 2: 'medium', 3: 'hard' }
 
 const LEVELS = [
   { level: 1, label: 'Easy' },
@@ -45,9 +48,22 @@ function PlayGame({ game }) {
     [game.slug, round, difficulty]
   )
 
-  const onAnswer = useCallback(() => setFinishedOnce(true), [])
+  // Anonymous page measurement (view / start / complete / Play CTA); sends nothing when GPC or DNT is on.
+  const tracker = useMemo(() => createRoundTracker(webPlay, game.slug), [game.slug])
   // The four grid games ship their own difficulty chips and New puzzle control; do not double them up.
   const selfManaged = game.category === 'grid'
+  // Grid games own their difficulty chips, so no difficulty label for them.
+  const diffLabel = selfManaged ? undefined : DIFFICULTY_LABEL[difficulty]
+  const diffRef = useRef(diffLabel)
+  diffRef.current = diffLabel
+  useEffect(() => { webPlay.view(game.slug) }, [game.slug])
+  useEffect(() => { tracker.reset() }, [tracker, puzzle.puzzleId])
+  const onInteract = useCallback(() => tracker.interact(diffRef.current), [tracker])
+
+  const onAnswer = useCallback((isCorrect) => {
+    setFinishedOnce(true)
+    tracker.answered(isCorrect, diffRef.current)
+  }, [tracker])
   const others = PLAY_GAMES.filter((g) => g.slug !== game.slug && g.category === game.category)
   const more = others.length ? others : PLAY_GAMES.filter((g) => g.slug !== game.slug).slice(0, 4)
 
@@ -78,7 +94,7 @@ function PlayGame({ game }) {
       </div>
       )}
 
-      <div className="glass rounded-2xl p-4 sm:p-6">
+      <div className="glass rounded-2xl p-4 sm:p-6" onPointerDownCapture={onInteract} onKeyDownCapture={onInteract}>
         <PuzzleRenderer key={puzzle.puzzleId} puzzleType={game.slug} puzzle={puzzle} onAnswer={onAnswer} />
       </div>
 
@@ -92,7 +108,9 @@ function PlayGame({ game }) {
             <RefreshCw size={18} aria-hidden="true" /> New puzzle
           </button>
         )}
-        <PlayStoreButton campaign={game.slug} />
+        <span className="contents" onClickCapture={() => webPlay.cta(game.slug)}>
+          <PlayStoreButton campaign={game.slug} />
+        </span>
       </div>
 
       {finishedOnce && (
