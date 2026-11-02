@@ -429,20 +429,30 @@ fun UnifiedSessionCompletionHandler(
     val currentUser = FirebaseAuth.getInstance().currentUser
 
     LaunchedEffect(sessionScore) {
+        // Always report back. The callback is what shows the result and moves on to the next puzzle, so skipping it
+        // (no account, a zero score, or a failed submit) left the player on a blank screen with no way forward but Back.
+        // Guests have no account to submit adaptive stats to; they get a neutral result (difficulty unchanged).
+        val neutral = AdaptiveSessionResult(
+            adaptiveConfig = null, rankingImprovement = null,
+            oldDifficulty = currentDifficulty, newDifficulty = currentDifficulty,
+            shouldShowAdaptation = false, shouldShowRanking = false
+        )
         if (currentUser != null && sessionScore > 0) {
-            try {
-                val adaptiveManager = UnifiedAdaptiveManager.getInstance()
-                val results = adaptiveManager.submitSessionPerformance(
+            val results = try {
+                UnifiedAdaptiveManager.getInstance().submitSessionPerformance(
                     userId = currentUser.uid,
                     puzzleType = puzzleType,
                     sessionScore = sessionScore,
                     sessionStats = sessionStats,
                     currentDifficulty = currentDifficulty
                 )
-                onResultsReady(results)
             } catch (e: Exception) {
                 Log.e("UnifiedSession", "Failed to process session completion", e)
+                neutral
             }
+            onResultsReady(results)
+        } else {
+            onResultsReady(neutral)
         }
     }
 }

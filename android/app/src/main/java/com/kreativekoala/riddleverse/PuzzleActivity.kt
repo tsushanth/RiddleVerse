@@ -186,7 +186,9 @@ class PuzzleActivity : AppCompatActivity() {
                         val intent = Intent(context, DailyCompletionActivity::class.java).apply {
                             putExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, (context as? Activity)?.intent?.getBooleanExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, false) == true)
                             // Always include these for regular completion
-                            putExtra("streakDays", (1..10).random())
+                            // Was a random 1..10, so a brand-new player was told "Streak: 5 Days" and the share text claimed it.
+                            // Real value: days-in-a-row the app was used (never below 1: they are playing today).
+                            putExtra("streakDays", DailyStreakManager.getDailyData(context).currentStreak.coerceAtLeast(1))
                             putExtra("earnedPoints", listOf(100, 200, 250, 300, 500).random())
 
                             // 🚀 FIXED: Add session statistics and puzzle type
