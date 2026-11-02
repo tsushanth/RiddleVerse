@@ -211,6 +211,10 @@ fun ForYouTab(
                 }
             }
         } else {
+            // Home discovery rows (home-discovery): registry-driven, not gated on the puzzle queue
+            item { NewGamesRow(onPuzzleTypeSelected) }
+            item { PickedForYouRow(onPuzzleTypeSelected) }
+
             // Telegram bot banner
             item {
                 TelegramBotBanner()

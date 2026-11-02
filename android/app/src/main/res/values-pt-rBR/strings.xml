@@ -387,4 +387,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">Desafio de Geografia dos Países</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Jogos novos</string>
+    <string name="home_new_subtitle">Quebra-cabeças fresquinhos</string>
+    <string name="home_new_badge">NOVO</string>
+    <string name="home_foryou_title">Escolhidos para você</string>
+    <string name="foryou_reason_continue">Continue jogando</string>
+    <string name="foryou_reason_similar">Como %1$s</string>
+    <string name="foryou_reason_winner">Você manda bem</string>
+    <string name="foryou_reason_quick">Vitória rápida</string>
+    <string name="lang_switch_prompt">Mudar para %1$s?</string>
+    <string name="lang_switch_action">Mudar</string>
+    <string name="lang_not_now">Agora não</string>
 </resources>

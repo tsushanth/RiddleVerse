@@ -295,4 +295,17 @@
     <string name="no_hint_available">İpucu mevcut değil</string>
     <string name="tap_ascending_order">Sayılara artan sırada dokunun (küçükten büyüğe)</string>
     <string name="country_geography_challenge">Ülke Coğrafya Mücadelesi</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Yeni oyunlar</string>
+    <string name="home_new_subtitle">Denemek için taze bulmacalar</string>
+    <string name="home_new_badge">YENİ</string>
+    <string name="home_foryou_title">Senin için seçildi</string>
+    <string name="foryou_reason_continue">Kaldığın yerden devam et</string>
+    <string name="foryou_reason_similar">%1$s gibi</string>
+    <string name="foryou_reason_winner">Başarılı olduklarınız</string>
+    <string name="foryou_reason_quick">Hızlı galibiyet</string>
+    <string name="lang_switch_prompt">%1$s diline geçilsin mi?</string>
+    <string name="lang_switch_action">Geç</string>
+    <string name="lang_not_now">Şimdi değil</string>
 </resources>

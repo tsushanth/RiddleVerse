@@ -381,4 +381,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">Cabaran Geografi Negara</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Permainan baharu</string>
+    <string name="home_new_subtitle">Teka-teki segar untuk dicuba</string>
+    <string name="home_new_badge">BAHARU</string>
+    <string name="home_foryou_title">Dipilih untuk anda</string>
+    <string name="foryou_reason_continue">Sambung bermain</string>
+    <string name="foryou_reason_similar">Seperti %1$s</string>
+    <string name="foryou_reason_winner">Anda sering menang</string>
+    <string name="foryou_reason_quick">Kemenangan pantas</string>
+    <string name="lang_switch_prompt">Tukar kepada %1$s?</string>
+    <string name="lang_switch_action">Tukar</string>
+    <string name="lang_not_now">Bukan sekarang</string>
 </resources>

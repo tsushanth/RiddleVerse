@@ -343,6 +343,9 @@ fun HomeScreen(navController: NavHostController,
         // Web/iOS promo banner (dismissable)
         WebPromoBanner()
 
+        // First-run, one-time "Switch to <language>?" suggestion (home-discovery)
+        LanguageSuggestionChip()
+
         // Main Content Area
         Box(
             modifier = Modifier
@@ -679,6 +682,18 @@ fun HeaderSection() {
             )
             UserScoreView()
         }
+
+        // Language switch (home-discovery): was only reachable through Android system settings
+        var showLanguagePicker by remember { mutableStateOf(false) }
+        IconButton(onClick = { showLanguagePicker = true }) {
+            Icon(
+                imageVector = Icons.Default.Language,
+                contentDescription = stringResource(R.string.language),
+                tint = RvInkSoft,
+                modifier = androidx.compose.ui.Modifier.size(26.dp)
+            )
+        }
+        if (showLanguagePicker) LanguagePickerDialog { showLanguagePicker = false }
 
         IconButton(onClick = {
             context.startActivity(android.content.Intent(context, LeaderboardActivity::class.java))
@@ -1634,6 +1649,10 @@ fun SettingsTab(
                     onNavigateToTopics = onNavigateToTopics,
                     onNavigateToAchievements = onNavigateToAchievements
                 )
+            }
+
+            item {
+                LanguageSettingsSection()
             }
 
             item {

@@ -388,4 +388,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">Country Geography Challenge</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">New games</string>
+    <string name="home_new_subtitle">Fresh puzzles to try</string>
+    <string name="home_new_badge">NEW</string>
+    <string name="home_foryou_title">Picked for you</string>
+    <string name="foryou_reason_continue">Jump back in</string>
+    <string name="foryou_reason_similar">Like %1$s</string>
+    <string name="foryou_reason_winner">You win these</string>
+    <string name="foryou_reason_quick">Quick win</string>
+    <string name="lang_switch_prompt">Switch to %1$s?</string>
+    <string name="lang_switch_action">Switch</string>
+    <string name="lang_not_now">Not now</string>
 </resources>

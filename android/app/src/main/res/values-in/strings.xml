@@ -295,4 +295,17 @@
     <string name="no_hint_available">Tidak ada petunjuk tersedia</string>
     <string name="tap_ascending_order">Ketuk angka secara berurutan (terkecil ke terbesar)</string>
     <string name="country_geography_challenge">Tantangan Geografi Negara</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Game baru</string>
+    <string name="home_new_subtitle">Teka-teki segar untuk dicoba</string>
+    <string name="home_new_badge">BARU</string>
+    <string name="home_foryou_title">Dipilih untukmu</string>
+    <string name="foryou_reason_continue">Lanjutkan bermain</string>
+    <string name="foryou_reason_similar">Mirip %1$s</string>
+    <string name="foryou_reason_winner">Yang sering kamu menangkan</string>
+    <string name="foryou_reason_quick">Menang cepat</string>
+    <string name="lang_switch_prompt">Ganti ke %1$s?</string>
+    <string name="lang_switch_action">Ganti</string>
+    <string name="lang_not_now">Nanti saja</string>
 </resources>

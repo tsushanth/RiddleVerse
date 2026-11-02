@@ -9,7 +9,9 @@ data class QuizCategory(
     val subtitle: String,
     val icon: ImageVector,
     val category: String,
-    val filterCategory: String
+    val filterCategory: String,
+    // home-discovery: set true on a new registry entry to put it in the Home "New" row (additive, defaulted)
+    val isNew: Boolean = false
 )
 
 object QuizCategories {
