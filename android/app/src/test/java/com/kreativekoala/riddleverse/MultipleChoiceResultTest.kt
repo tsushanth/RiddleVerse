@@ -2,7 +2,10 @@ package com.kreativekoala.riddleverse
 
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import android.os.Looper
+import java.time.Duration
 import org.junit.Assert.assertEquals
+import org.robolectric.Shadows.shadowOf
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -25,7 +28,10 @@ class MultipleChoiceResultTest : LayoutMatrixBase() {
             )
         }
         compose.onNodeWithText(option).performClick()
-        compose.mainClock.advanceTimeBy(6000); compose.waitForIdle()
+        compose.mainClock.advanceTimeBy(1000); compose.waitForIdle()
+        // The feedback overlay hides itself on a Handler delay, then calls onContinue.
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(10))
+        compose.waitForIdle()
         return received
     }
 

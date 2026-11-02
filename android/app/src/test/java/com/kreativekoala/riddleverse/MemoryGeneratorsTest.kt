@@ -10,7 +10,7 @@ import org.robolectric.annotation.Config
 
 /** Memory Match generators are pure: the answer key must follow from the symbol sequence, over many random games. */
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [35])
+@Config(sdk = [35], application = android.app.Application::class)
 class MemoryGeneratorsTest {
 
     private fun ints(a: org.json.JSONArray) = List(a.length()) { a.getInt(it) }
