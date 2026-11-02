@@ -132,7 +132,10 @@ object PuzzleEvents {
     private fun post(body: String, token: String?): Int {
         val rb = Request.Builder().url(ENDPOINT).post(body.toRequestBody("application/json".toMediaType()))
         if (!token.isNullOrEmpty()) rb.header("Authorization", "Bearer $token")
-        http.newCall(rb.build()).execute().use { return it.code }
+        http.newCall(rb.build()).execute().use {
+            if (BuildConfig.DEBUG) android.util.Log.d("PuzzleEvents", "POST ${it.code} body=${body.take(600)}")
+            return it.code
+        }
     }
 
     private inline fun guarded(block: () -> Unit) { try { block() } catch (_: Throwable) { } }

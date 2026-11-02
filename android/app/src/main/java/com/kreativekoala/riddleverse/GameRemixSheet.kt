@@ -499,6 +499,10 @@ fun GameRemixSheet(
                         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(Icons.Default.Warning, null, tint = RvError, modifier = Modifier.size(16.dp))
                             Text(error, fontSize = 12.sp, color = RvInk)
+                            if (vm.needsSignIn) {
+                                val ctx = androidx.compose.ui.platform.LocalContext.current
+                                TextButton(onClick = { ctx.startActivity(GuestGate.signInIntent(ctx)) }) { Text("Sign in") }
+                            }
                         }
                     }
                 }

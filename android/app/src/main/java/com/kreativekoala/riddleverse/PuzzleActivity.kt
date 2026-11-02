@@ -184,6 +184,7 @@ class PuzzleActivity : AppCompatActivity() {
                     LaunchedEffect(Unit) {
                         val activity = context as? AppCompatActivity
                         val intent = Intent(context, DailyCompletionActivity::class.java).apply {
+                            putExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, (context as? Activity)?.intent?.getBooleanExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, false) == true)
                             // Always include these for regular completion
                             putExtra("streakDays", (1..10).random())
                             putExtra("earnedPoints", listOf(100, 200, 250, 300, 500).random())

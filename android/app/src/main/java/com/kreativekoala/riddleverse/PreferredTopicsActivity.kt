@@ -73,6 +73,9 @@ fun PreferredTopicsScreen(onSaveComplete: () -> Unit) {
     val context = LocalContext.current
     val db = FirebaseFirestore.getInstance()
     val userEmail = FirebaseAuth.getInstance().currentUser?.email ?: "guest@example.com"
+    // Guests (no e-mail) keep topics on the phone: the server doc and AI puzzle generation are per account, and one
+    // shared "guest@example.com" document would mix every guest together. They move to the account on sign-in.
+    val isGuestTopics = FirebaseAuth.getInstance().currentUser?.email.isNullOrBlank()
 
     var selectedTopics by remember { mutableStateOf(listOf<String>()) }
     var newTopic by remember { mutableStateOf(TextFieldValue()) }
@@ -87,6 +90,12 @@ fun PreferredTopicsScreen(onSaveComplete: () -> Unit) {
     // Load topics on start
     LaunchedEffect(Unit) {
         isLoading = true
+        if (isGuestTopics) {
+            selectedTopics = context.getSharedPreferences(GuestDataMigration.TOPICS_PREFS, android.content.Context.MODE_PRIVATE)
+                .getString(GuestDataMigration.TOPICS_KEY, "").orEmpty().split("\n").filter { it.isNotBlank() }
+            isLoading = false
+            return@LaunchedEffect
+        }
         db.collection("user_topics").document(userEmail).get().addOnSuccessListener { doc ->
             val topics = doc.get("topics") as? List<String> ?: emptyList()
             selectedTopics = topics.toMutableList()
@@ -639,6 +648,13 @@ private fun saveTopicsAndGeneratePuzzles(
     onGeneratingStateChange: (Boolean) -> Unit,
     onComplete: () -> Unit
 ) {
+    if (FirebaseAuth.getInstance().currentUser?.email.isNullOrBlank()) {
+        context.getSharedPreferences(GuestDataMigration.TOPICS_PREFS, android.content.Context.MODE_PRIVATE)
+            .edit().putString(GuestDataMigration.TOPICS_KEY, selectedTopics.joinToString("\n")).apply()
+        Toast.makeText(context, "Topics saved on this phone. Sign in to get daily puzzles on them.", Toast.LENGTH_LONG).show()
+        onComplete()
+        return
+    }
     onSavingStateChange(true)
 
     // Step 1: Save topics to Firestore
