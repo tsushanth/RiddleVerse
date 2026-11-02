@@ -86,8 +86,10 @@ class MainActivity : AppCompatActivity() {
             setupFCM()
         }
 
-        // Request notification permissions
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Request notification permissions. Signed-in users are asked here as before; a brand new or guest user is
+        // asked later from Home, once they have played, so the first screen is the game and not a system dialog.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && FirebaseAuth.getInstance().currentUser != null) {
+            GuestPrefs.markNotificationPermissionAsked(this)
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
@@ -209,13 +211,25 @@ class MainActivity : AppCompatActivity() {
             })
             finish()
         } else {
-            Log.d("MainActivity", "No user logged in, showing welcome screen")
+            if (GuestRules.launchRoute(hasUser = false, guestStarted = GuestPrefs.isStarted(this)) == GuestRules.LaunchRoute.HOME) {
+                // Returning guest: straight to Home, same as a signed-in user.
+                Log.d("MainActivity", "Returning guest, navigating to Home")
+                startActivity(Intent(this, HomeActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                })
+                finish()
+                return
+            }
+            Log.d("MainActivity", "New device, showing first-run screen")
             setContent {
                 RvActivityTheme {
-                    WelcomeScreen(onGetStartedClick = {
-                        startActivity(Intent(this@MainActivity, WelcomeActivity::class.java))
-                        finish()
-                    })
+                    FirstRunScreen(
+                        // MainActivity stays on the back stack under the sign-in screen so Back returns to Play.
+                        onSignInClick = {
+                            startActivity(Intent(this@MainActivity, AuthActivity::class.java).putExtra("from_login", true))
+                        },
+                        onFinished = { finish() }
+                    )
                 }
             }
         }

@@ -197,6 +197,8 @@ class SubscriptionManager private constructor(
 
     fun purchasePackage(activity: Activity, pkg: Package) {
         if (purchaseState == PurchaseState.Purchasing) return
+        // The backend grants monthly coins / bonuses to the account; a guest purchase would never be credited there.
+        if (!GuestGate.requireAccount(activity, "subscribe")) return
         purchaseState = PurchaseState.Purchasing
 
         Purchases.sharedInstance.purchase(

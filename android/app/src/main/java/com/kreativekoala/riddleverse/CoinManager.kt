@@ -702,6 +702,8 @@ class CoinManager private constructor() {
     }
 
     fun launchPurchase(activity: Activity, pack: CoinPack) {
+        // Coins live on the server under the account id: a guest purchase would have nowhere to be credited.
+        if (!GuestGate.requireAccount(activity, "buy coins")) return
         val product = storeProducts.firstOrNull { it.id == pack.productId }
         if (product == null) {
             purchaseMessage = "Product not available"

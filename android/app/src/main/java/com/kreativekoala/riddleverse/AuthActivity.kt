@@ -240,6 +240,10 @@ class AuthActivity : AppCompatActivity() {
     private fun completeSignIn(method: String, isNewUser: Boolean) {
                     val user = auth.currentUser
 
+                    // Guest-first: whatever this person did as a guest on this phone moves onto the account, then the guest era ends.
+                    GuestDataMigration.migrateOnSignIn(this, user)
+                    GuestPrefs.clear(this)
+
                     // SET USER ID FOR ANALYTICS
                     safeTrackAnalytics {
                         // SET USER ID FOR ANALYTICS
@@ -363,19 +367,12 @@ class AuthActivity : AppCompatActivity() {
         finish()
     }
 
+    /**
+     * Name kept for the call sites. Onboarding no longer blocks sign-in: everyone goes straight to Home, which offers
+     * the (skippable) intro as a dismissible card until it has been seen or dismissed.
+     */
     private fun navigateToMainWithOnboardingCheck() {
-        val prefs = getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
-        val onboardingCompleted = prefs.getBoolean("onboarding_completed", false)
-
-        if (!onboardingCompleted) {
-            // First time user - show onboarding
-            val intent = Intent(this, WelcomeOnboardingActivity::class.java)
-            startActivity(intent)
-        } else {
-            // Returning user - go straight to home
-            navigateToMain() // Use your existing method
-        }
-        finish()
+        navigateToMain()
     }
 
 
