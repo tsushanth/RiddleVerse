@@ -26,9 +26,9 @@ const TEMPLATE = `<!DOCTYPE html>
   </body>
 </html>`;
 
-test('catalog: 19 games, unique slugs, every field present, ASCII, summary short', () => {
-    assert.equal(catalog.games.length, 19);
-    assert.equal(new Set(catalog.games.map((g) => g.slug)).size, 19);
+test('catalog: unique slugs, every field present, ASCII, summary short (count-agnostic)', () => {
+    assert.ok(catalog.games.length > 0);
+    assert.equal(new Set(catalog.games.map((g) => g.slug)).size, catalog.games.length);
     const cats = new Set(catalog.categories.map((c) => c.id));
     for (const g of catalog.games) {
         assert.match(g.slug, /^[a-z]+$/);
@@ -41,7 +41,21 @@ test('catalog: 19 games, unique slugs, every field present, ASCII, summary short
     }
 });
 
-test('catalog slugs match the web ports registered in the frontend', () => {
+test('every catalog game has a route, sitemap URL, unique meta and its how-to text in the crawlable body', () => {
+    const sitemapLocs = new Set([...buildSitemap(catalog).matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]));
+    for (const g of catalog.games) {
+        const meta = resolvePlayPage(`/play/${g.slug}`, catalog);
+        assert.equal(meta?.kind, 'game', `${g.slug} has no route`);
+        assert.ok(meta.title && meta.description && meta.canonical, `${g.slug} meta`);
+        assert.ok(sitemapLocs.has(`${SITE_ORIGIN}/play/${g.slug}`), `${g.slug} missing from sitemap`);
+        for (const step of g.howToPlay) assert.ok(meta.bodyHtml.includes(escapeHtml(step)), `${g.slug} how-to step missing from body`);
+        assert.ok(meta.bodyHtml.includes(escapeHtml(g.tip)), `${g.slug} tip`);
+        const index = resolvePlayPage('/play', catalog);
+        assert.ok(index.bodyHtml.includes(`href="/play/${g.slug}"`), `${g.slug} not linked from the index`);
+    }
+});
+
+test('catalog games registered by the frontend family registries are all in the catalog (frontend test checks the reverse)', () => {
     const root = path.join(here, '..', '..', 'frontend', 'src', 'components', 'puzzles');
     const arr = (file, re) => [...fs.readFileSync(path.join(root, file), 'utf8').match(re)[1].matchAll(/'([a-z]+)'/g)].map((m) => m[1]);
     const expected = [
@@ -50,8 +64,11 @@ test('catalog slugs match the web ports registered in the frontend', () => {
         ...arr('word/wordPuzzleRegistry.js', /WORD_PUZZLE_TYPES = \[([^\]]*)\]/),
         ...[...fs.readFileSync(path.join(root, 'grid/gridRegistry.jsx'), 'utf8').match(/gridRenderers = \{([^}]*)\}/)[1].matchAll(/^\s*([a-z]+):/gm)].map((m) => m[1]),
     ];
-    assert.equal(expected.length, 19);
-    assert.deepEqual([...catalog.games.map((g) => g.slug)].sort(), [...expected].sort());
+    assert.ok(expected.length > 0);
+    // One direction only: newer games register through other registry modules (see _addAGame in the
+    // catalog). web/frontend/test/registry checks that EVERY catalog slug resolves in the merged registry.
+    const slugs = new Set(catalog.games.map((g) => g.slug));
+    for (const t of expected) assert.ok(slugs.has(t), `${t} is registered in the frontend but missing from the catalog`);
 });
 
 test('playStoreUrl: UTM-tagged, encoded, same as the frontend helper', () => {
@@ -121,7 +138,8 @@ test('injectMeta: index page lists every game as a crawlable link and ItemList e
     for (const g of catalog.games) assert.ok(html.includes(`href="/play/${g.slug}"`), g.slug);
     const ld = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]));
     assert.equal(ld[0]['@type'], 'CollectionPage');
-    assert.equal(ld[0].mainEntity.itemListElement.length, 19);
+    assert.equal(ld[0].mainEntity.itemListElement.length, catalog.games.length);
+    assert.equal(ld[0].mainEntity.numberOfItems, catalog.games.length);
 });
 
 test('injectMeta: copy with HTML, quotes, "$&" and </script> cannot break out of the page', () => {
@@ -138,11 +156,11 @@ test('injectMeta: copy with HTML, quotes, "$&" and </script> cannot break out of
     assert.equal(JSON.parse(safeJsonLd({ a: '</script>' })).a, '</script>');
 });
 
-test('sitemap: index + one URL per game (20), absolute, unique, valid shell', () => {
+test('sitemap: index + one URL per game, absolute, unique, valid shell', () => {
     const xml = buildSitemap(catalog);
     const locs = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
-    assert.equal(locs.length, 20);
-    assert.equal(new Set(locs).size, 20);
+    assert.equal(locs.length, catalog.games.length + 1);
+    assert.equal(new Set(locs).size, locs.length);
     assert.equal(locs[0], 'https://puzzleverseai.com/play');
     for (const g of catalog.games) assert.ok(locs.includes(`https://puzzleverseai.com/play/${g.slug}`));
     assert.ok(locs.every((l) => l.startsWith('https://puzzleverseai.com/') && !l.includes('?')));
@@ -210,7 +228,7 @@ test('router: robots.txt and sitemap.xml', async () => {
         assert.match(await robots.text(), /Sitemap:/);
         const sm = await fetch(`${base}/sitemap.xml`);
         assert.match(sm.headers.get('content-type'), /xml/);
-        assert.equal((await sm.text()).match(/<loc>/g).length, 20);
+        assert.equal((await sm.text()).match(/<loc>/g).length, catalog.games.length + 1);
     });
 });
 
