@@ -13,6 +13,10 @@ const root = path.resolve(here, '..', '..')
 const snapshot = JSON.parse(fs.readFileSync(path.join(here, 'registry-snapshot.json'), 'utf8'))
 const catalog = JSON.parse(fs.readFileSync(path.resolve(root, '..', 'shared', 'playCatalog.json'), 'utf8'))
 const nameOf = (c) => c.displayName || c.name || String(c.$$typeof)
+// Games added after the refactor (catalog slugs that are not in the snapshot) are allowed to appear; the
+// snapshot itself must still match exactly. web/game-linkup
+const slugs = new Set(catalog.games.map((g) => g.slug))
+const isNewGame = (key) => slugs.has(key) && !(key in snapshot.typeMap)
 
 let server, R, families
 before(async () => {
@@ -30,12 +34,12 @@ before(async () => {
 after(async () => { await server?.close() })
 
 test('typeMap is identical to the pre-refactor snapshot (every alias, same canonical key)', () => {
-  const now = Object.fromEntries(Object.entries(R.typeMap).sort(([a], [b]) => (a < b ? -1 : 1)))
+  const now = Object.fromEntries(Object.entries(R.typeMap).filter(([k]) => !isNewGame(k)).sort(([a], [b]) => (a < b ? -1 : 1)))
   assert.deepEqual(now, snapshot.typeMap)
 })
 
 test('renderers: same canonical keys, same component names as the pre-refactor snapshot', () => {
-  const now = Object.fromEntries(Object.entries(R.renderers).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
+  const now = Object.fromEntries(Object.entries(R.renderers).filter(([k]) => !isNewGame(k)).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
   assert.deepEqual(now, snapshot.renderers)
 })
 

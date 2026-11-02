@@ -73,6 +73,9 @@ Object.assign(puzzleTypeNames, wordPuzzleNames)
 import { classicTypeNames, isClassicType } from '../components/puzzles/classic/classicRegistry'
 Object.assign(puzzleTypeNames, classicTypeNames)
 
+// web/game-linkup
+Object.assign(puzzleTypeNames, { linkup: 'Linkup' })
+
 // --- web spatial puzzles (feat/web-puzzles-spatial) ---
 Object.assign(puzzleTypeNames, { pixellogic: 'Pixel Logic', tubetint: 'Tube Tint', piecepack: 'Piece Pack', crateshift: 'Crate Shift', conduit: 'Conduit' })
 
@@ -470,7 +473,7 @@ export default function PuzzlePage() {
                       // Don't show raw JSON answers for complex puzzle types that handle their own feedback
                       const selfHandledTypes = ['sudoku','binarygrid','cagemath','signgrid' /* web grid puzzles */,'realorai','which_is_real','synonyms','antonyms','synonymgrouping','antonymballoon','memorystory','memoryretention','memorysquares','memorypreviouspair','memoryprevioussingle','memorysequencing','uniqueobject','colorshapematching','triangledotmemory','symmetry','imagepuzzle','wordsearch','crossword','wordsnake','letterset','wordprefix', ...WORD_PUZZLE_TYPES /* web word puzzles */]
                       const answerStr = typeof puzzle.answer === 'string' ? puzzle.answer : JSON.stringify(puzzle.answer)
-                      const isSelfHandled = selfHandledTypes.includes(type) || selfHandledTypes.includes(puzzle.puzzleType) || isClassicType(type) // web classic puzzles
+                      const isSelfHandled = selfHandledTypes.includes(type) || selfHandledTypes.includes(puzzle.puzzleType) || isClassicType(type) || type === 'linkup' // web classic puzzles, web/game-linkup
                       const isJsonAnswer = answerStr.startsWith('{') || answerStr.startsWith('[')
                       if (isSelfHandled || isJsonAnswer) return null
                       return (
@@ -486,7 +489,7 @@ export default function PuzzlePage() {
                     {(() => {
                       const selfHandledTypes = ['sudoku','binarygrid','cagemath','signgrid' /* web grid puzzles */,'realorai','which_is_real','synonyms','antonyms','synonymgrouping','antonymballoon','memorystory','memoryretention','memorysquares','memorypreviouspair','memoryprevioussingle','memorysequencing','uniqueobject','colorshapematching','triangledotmemory','symmetry','imagepuzzle','wordsearch','crossword','wordsnake','letterset','wordprefix', ...WORD_PUZZLE_TYPES /* web word puzzles */]
                       const answerStr = typeof puzzle.answer === 'string' ? puzzle.answer : JSON.stringify(puzzle.answer)
-                      const isSelfHandled = selfHandledTypes.includes(type) || selfHandledTypes.includes(puzzle.puzzleType) || isClassicType(type) // web classic puzzles
+                      const isSelfHandled = selfHandledTypes.includes(type) || selfHandledTypes.includes(puzzle.puzzleType) || isClassicType(type) || type === 'linkup' // web classic puzzles, web/game-linkup
                       const isJsonAnswer = answerStr.startsWith('{') || answerStr.startsWith('[')
                       if (isSelfHandled || isJsonAnswer) return null
                       return (
