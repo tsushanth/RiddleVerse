@@ -210,6 +210,7 @@ class MainActivity : AppCompatActivity() {
             finish()
         } else {
             Log.d("MainActivity", "No user logged in, showing welcome screen")
+            Funnel.log("welcome_shown")
             setContent {
                 RvActivityTheme {
                     WelcomeScreen(onGetStartedClick = {

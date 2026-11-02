@@ -130,6 +130,7 @@ class AuthActivity : AppCompatActivity() {
             return
         }
 
+        Funnel.log("auth_started")
         setupEmailAuthUi()
         if (!forceShow && SupabaseAuth.repository(this).hasStoredSession()) {
             trySilentSupabaseRestore()
@@ -238,6 +239,7 @@ class AuthActivity : AppCompatActivity() {
      * analytics, RevenueCat login + attributes, navigation.
      */
     private fun completeSignIn(method: String, isNewUser: Boolean) {
+                    Funnel.log("auth_done")
                     val user = auth.currentUser
 
                     // SET USER ID FOR ANALYTICS
