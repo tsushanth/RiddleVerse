@@ -185,6 +185,9 @@ fun ForYouTab(
             }
         }
 
+        // Daily puzzle: same puzzle for everyone, solve-based streak (local only, works for guests)
+        item { DailyPuzzleHomeCard() }
+
         // Loading state
         if (isLoading) {
             item {
