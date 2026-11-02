@@ -1,5 +1,5 @@
 # tier: medium. Line format: riddle | answer | alternates (;) | hint 1 (vague) | hint 2 (pointed) | explanation
-What goes up every year but never comes back down? | age | your age | Everybody has one. | A new candle gets added to the cake each time it rises. | Your age goes up on every birthday and never goes down.
+What goes up every year but never comes back down? | age | | Everybody has one. | A new candle gets added to the cake each time it rises. | Your age goes up on every birthday and never goes down.
 What building has the most stories? | library | the library;public library | You must be quiet inside. | You can borrow things here for free. | A library has the most stories, because it is full of story books.
 What is always in front of you but cannot be seen? | future | the future | It has not happened yet. | Next week belongs to it. | The future is always ahead of you, but you cannot see it yet.
 What has a bottom at the top? | legs | leg;your legs | Your body has two of them. | They help you walk and run. | Your bottom sits at the top of your legs.

@@ -51,6 +51,7 @@ object RiddleMatcher {
     internal fun typoBudget(accepted: String): Int {
         val c = compact(accepted)
         return when {
+            normalize(accepted).any { it.length == 1 } -> 0 // "the letter M" must not accept "the letter R"
             c.length < 7 || c.all { it.isDigit() } -> 0
             c.length >= 12 -> 2
             else -> 1

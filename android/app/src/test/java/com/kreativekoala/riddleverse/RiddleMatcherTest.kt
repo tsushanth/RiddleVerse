@@ -73,6 +73,11 @@ class RiddleMatcherTest {
         assertTrue(ok("thermometr", "thermometer"))
     }
 
+    @Test fun singleLetterAnswersGetNoTypoTolerance() {
+        assertFalse(ok("the letter R", "the letter M", "m"))
+        assertTrue(ok("letter m", "the letter M", "m"))
+    }
+
     @Test fun extraSpacesInsideCompoundWordsAreForgiven() {
         assertTrue(ok("tea pot", "teapot"))
         assertTrue(ok("teapot", "tea pot"))

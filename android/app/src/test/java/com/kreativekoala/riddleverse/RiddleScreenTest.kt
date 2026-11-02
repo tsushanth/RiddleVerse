@@ -171,6 +171,7 @@ class RiddleScreenTest : LayoutMatrixBase() {
         show()
         compose.onNodeWithText("Reveal").performClick()
         compose.onNodeWithText("Yes").performClick()
+        compose.waitForIdle()
         assertEquals(0, storedStreak())
     }
 
