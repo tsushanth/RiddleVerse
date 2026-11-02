@@ -280,6 +280,21 @@
         "Use the feedback to deduce the code within the limited number of tries."
       ],
       "tip": "Use early guesses to find which colours are in the code, then work out their positions."
+    },
+    {
+      "slug": "trail",
+      "name": "Trail",
+      "category": "spatial",
+      "summary": "Draw one line from dot 1 through the numbered dots in order, covering every square. Walls block the way.",
+      "description": "Trail is a path-drawing puzzle on a grid from 5x5 up to 8x8. You draw a single continuous line that starts at dot 1, passes through the numbered dots in order and covers every square exactly once, and it can never cross a wall. Every puzzle has exactly one solution and is generated in your browser, so you can always work it out by logic. Easy boards have no walls.",
+      "howToPlay": [
+        "Start at dot 1 and drag to extend the line one square at a time.",
+        "Visit the numbered dots in order, and cover every square exactly once. The line cannot cross a wall.",
+        "Drag back along the line to undo, or use Undo or Reset.",
+        "Prefer not to drag? Tap a square next to the end of the line to extend it, or use the arrow keys.",
+        "Stuck? Hint marks the next few squares of the solution."
+      ],
+      "tip": "Squares in a corner or beside walls have only one or two ways through, so start your reasoning there."
     }
   ]
 }

@@ -29,13 +29,15 @@ before(async () => {
 })
 after(async () => { await server?.close() })
 
-test('typeMap is identical to the pre-refactor snapshot (every alias, same canonical key)', () => {
-  const now = Object.fromEntries(Object.entries(R.typeMap).sort(([a], [b]) => (a < b ? -1 : 1)))
+// Games added after the refactor (one catalog entry + one registry module each) are allowed on top of the snapshot;
+// every snapshot entry must still be there, unchanged. // web/game-trail
+test('typeMap keeps every pre-refactor snapshot alias with the same canonical key', () => {
+  const now = Object.fromEntries(Object.entries(R.typeMap).filter(([k]) => k in snapshot.typeMap).sort(([a], [b]) => (a < b ? -1 : 1)))
   assert.deepEqual(now, snapshot.typeMap)
 })
 
-test('renderers: same canonical keys, same component names as the pre-refactor snapshot', () => {
-  const now = Object.fromEntries(Object.entries(R.renderers).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
+test('renderers keep every pre-refactor snapshot key with the same component name', () => {
+  const now = Object.fromEntries(Object.entries(R.renderers).filter(([k]) => k in snapshot.renderers).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
   assert.deepEqual(now, snapshot.renderers)
 })
 

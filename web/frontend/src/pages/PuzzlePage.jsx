@@ -75,6 +75,7 @@ Object.assign(puzzleTypeNames, classicTypeNames)
 
 // --- web spatial puzzles (feat/web-puzzles-spatial) ---
 Object.assign(puzzleTypeNames, { pixellogic: 'Pixel Logic', tubetint: 'Tube Tint', piecepack: 'Piece Pack', crateshift: 'Crate Shift', conduit: 'Conduit' })
+Object.assign(puzzleTypeNames, { trail: 'Trail' }) // web/game-trail
 
 // ---------------------------------------------------------------------------
 // Daily puzzle helpers — localStorage-based progress tracking

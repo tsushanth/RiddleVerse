@@ -114,6 +114,8 @@ const puzzleCategories = [
   },
 ]
 
+puzzleCategories.find((c) => c.id === 'spatial').puzzles.push({ type: 'trail', name: 'Trail', icon: Map, color: '#7c3aed', description: 'Draw one line through every square' }) // web/game-trail
+
 // --- web classic puzzles (feat/web-puzzles-classic) ---
 import { classicCategory } from '../components/puzzles/classic/classicRegistry'
 puzzleCategories.push(classicCategory)
