@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import PuzzleTimer from './PuzzleTimer'
 import { parseJsonField, shuffle } from './puzzleUtils'
+import { isCorrectChoice } from './choiceJudge'
 
 export default function TriviaPuzzle({ puzzle, onAnswer }) {
   const [selected, setSelected] = useState(null)
@@ -14,15 +15,15 @@ export default function TriviaPuzzle({ puzzle, onAnswer }) {
     try { options = JSON.parse(options) } catch { options = [] }
   }
   if (!Array.isArray(options)) options = []
-  const correctAnswer = (typeof puzzle.answer === 'string' ? puzzle.answer : '') || ''
+  // The key can arrive as a string or a number (math rows); judging goes through choiceJudge either way.
+  const correctAnswer = puzzle.answer
 
   const handleSelect = (option) => {
     if (revealed) return
     setSelected(option)
     setRevealed(true)
 
-    const isCorrect =
-      option.toLowerCase().trim() === correctAnswer.toLowerCase().trim()
+    const isCorrect = isCorrectChoice(option, correctAnswer)
 
     setTimeout(() => {
       onAnswer(isCorrect, option)
@@ -40,7 +41,7 @@ export default function TriviaPuzzle({ puzzle, onAnswer }) {
     if (!revealed) {
       return 'bg-white/10 border-white/20 hover:bg-white/20 hover:border-purple-400/50 active:scale-[0.97]'
     }
-    const isCorrect = option.toLowerCase().trim() === correctAnswer.toLowerCase().trim()
+    const isCorrect = isCorrectChoice(option, correctAnswer)
     const isSelected = option === selected
     if (isCorrect) return 'bg-green-500/30 border-green-400 text-green-300'
     if (isSelected && !isCorrect) return 'bg-red-500/30 border-red-400 text-red-300'
