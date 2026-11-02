@@ -29,14 +29,23 @@ before(async () => {
 })
 after(async () => { await server?.close() })
 
-test('typeMap is identical to the pre-refactor snapshot (every alias, same canonical key)', () => {
-  const now = Object.fromEntries(Object.entries(R.typeMap).sort(([a], [b]) => (a < b ? -1 : 1)))
-  assert.deepEqual(now, snapshot.typeMap)
+// web/game-riddles: games added after the refactor (catalog slugs) are allowed on top of the snapshot; every snapshot
+// entry must still be identical, and anything extra must be a catalog game (so a stray alias still fails).
+const catalogSlugs = new Set(catalog.games.map((g) => g.slug))
+const sortObj = (o) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)))
+
+test('typeMap equals the pre-refactor snapshot (every alias, same canonical key); extras are only catalog games', () => {
+  const now = sortObj(R.typeMap)
+  const base = Object.fromEntries(Object.entries(now).filter(([k]) => k in snapshot.typeMap))
+  assert.deepEqual(base, snapshot.typeMap)
+  for (const [k, v] of Object.entries(now)) if (!(k in snapshot.typeMap)) assert.ok(catalogSlugs.has(k) && catalogSlugs.has(v), `unexpected typeMap entry ${k} -> ${v}`)
 })
 
-test('renderers: same canonical keys, same component names as the pre-refactor snapshot', () => {
-  const now = Object.fromEntries(Object.entries(R.renderers).map(([k, v]) => [k, nameOf(v)]).sort(([a], [b]) => (a < b ? -1 : 1)))
-  assert.deepEqual(now, snapshot.renderers)
+test('renderers: same canonical keys, same component names as the pre-refactor snapshot; extras are only catalog games', () => {
+  const now = sortObj(Object.fromEntries(Object.entries(R.renderers).map(([k, v]) => [k, nameOf(v)])))
+  const base = Object.fromEntries(Object.entries(now).filter(([k]) => k in snapshot.renderers))
+  assert.deepEqual(base, snapshot.renderers)
+  for (const k of Object.keys(now)) if (!(k in snapshot.renderers)) assert.ok(catalogSlugs.has(k), `unexpected renderer ${k}`)
 })
 
 test('every family renderer is the very same component object the family registry exports', () => {

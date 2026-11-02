@@ -280,6 +280,20 @@
         "Use the feedback to deduce the code within the limited number of tries."
       ],
       "tip": "Use early guesses to find which colours are in the code, then work out their positions."
+    },
+    {
+      "slug": "riddles",
+      "name": "Riddles",
+      "category": "word",
+      "summary": "Classic riddles with three free hints, a star score and a streak. Type your answer and see if you got it.",
+      "description": "Riddles gives you a classic riddle to solve in your own words, at easy, medium or hard difficulty. Spelling is forgiving: capital letters, a leading \"a\" or \"the\", simple plurals and a small typo on longer answers all count. Every riddle in a tier shows up once before any repeats.",
+      "howToPlay": [
+        "Read the riddle and type your answer, then press Check.",
+        "Stuck? Take up to three free hints. Each hint takes one star off your score, from three stars down to one.",
+        "Solve riddles in a row to build a streak on this device. Skipping or revealing an answer resets it.",
+        "Use Share riddle to send a friend the riddle without the answer."
+      ],
+      "tip": "Try a first guess before opening a hint. The third hint gives the first letter, so save it for last."
     }
   ]
 }
