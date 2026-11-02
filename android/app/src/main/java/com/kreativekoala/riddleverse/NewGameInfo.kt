@@ -27,6 +27,7 @@ object NewGameInfo {
         "piecepack" to Info("Piece Pack", spatial, listOf("Improve spatial reasoning.", "Practice fitting shapes efficiently.")),
         "crateshift" to Info("Crate Shift", spatial, listOf("Build forward planning skills.", "Improve problem-solving.")),
         "conduit" to Info("Conduit", spatial, listOf("Train spatial visualisation.", "Practice connecting systems.")),
+        "crowns" to Info("Crowns", spatial, listOf("Practice constraint reasoning.", "Strengthen deduction and focus.")), // crowns: feat/game-crowns
         "wordguess" to Info("Word Guess", word, listOf("Grow your vocabulary.", "Practice elimination logic.")),
         "wordladder" to Info("Word Ladder", word, listOf("Expand vocabulary and spelling.", "Improve flexible thinking.")),
         "letterballoons" to Info("Letter Balloons", word, listOf("Improve spelling recall.", "Practice smart letter guessing.")),
