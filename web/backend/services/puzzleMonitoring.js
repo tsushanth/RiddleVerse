@@ -7,7 +7,15 @@ export const NEW_WAVE_TYPES = [
 ];
 const NEW_WAVE = new Set(NEW_WAVE_TYPES);
 
-export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error']);
+export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open']);
+// Install-funnel events (no puzzle): puzzle_type is the fixed placeholder 'app'; they carry funnelStep / daysSinceInstall only.
+export const FUNNEL_EVENT_TYPES = new Set(['funnel', 'app_open']);
+export const APP_PUZZLE_TYPE = 'app';
+export const FUNNEL_STEPS = new Set([
+    'first_open', 'welcome_shown', 'auth_started', 'auth_done', 'guest_started',
+    'onboarding_done', 'home_shown', 'first_puzzle_started', 'first_puzzle_completed',
+]);
+export const MAX_DAYS_SINCE_INSTALL = 3650;
 export const PLATFORMS = new Set(['android', 'web']);
 const PUZZLE_RE = /^[a-z0-9_]{1,40}$/;
 const DAY = 24 * 3600 * 1000;
@@ -32,11 +40,35 @@ export function validatePayload(body, now = Date.now()) {
         if (!e || typeof e !== 'object' || Array.isArray(e)) return null;
         if (!EVENT_TYPES.has(e.type)) return null;
         if (typeof e.puzzleType !== 'string' || !PUZZLE_RE.test(e.puzzleType)) return null;
+        const isFunnel = FUNNEL_EVENT_TYPES.has(e.type);
+        let funnelStep = null;
+        let daysSinceInstall = null;
+        if (isFunnel) {
+            if (e.puzzleType !== APP_PUZZLE_TYPE) return null;
+            if (e.type === 'funnel') {
+                if (typeof e.funnelStep !== 'string' || !FUNNEL_STEPS.has(e.funnelStep)) return null;
+                funnelStep = e.funnelStep;
+            } else {
+                daysSinceInstall = int(e.daysSinceInstall);
+                if (daysSinceInstall == null || daysSinceInstall > MAX_DAYS_SINCE_INSTALL) return null;
+            }
+        } else if (e.puzzleType === APP_PUZZLE_TYPE) {
+            return null; // 'app' is reserved for funnel events; keep it out of puzzle stats
+        }
         let eventTs = null;
         if (typeof e.ts === 'number' && Number.isFinite(e.ts)) {
             eventTs = new Date(Math.min(Math.max(e.ts, now - DAY), now + DAY)).toISOString();
         }
-        events.push({
+        events.push(isFunnel ? {
+            event_ts: eventTs,
+            event_type: e.type,
+            puzzle_type: APP_PUZZLE_TYPE,
+            difficulty: null, session_id: null, duration_ms: null, score: null, moves: null,
+            hints_used: null, mistakes: null, error_message: null,
+            // Only set the keys that apply, so rows for other event types never reference columns that may not exist yet.
+            ...(funnelStep ? { funnel_step: funnelStep } : {}),
+            ...(daysSinceInstall != null ? { days_since_install: daysSinceInstall } : {}),
+        } : {
             event_ts: eventTs,
             event_type: e.type,
             puzzle_type: e.puzzleType,
@@ -91,7 +123,8 @@ const rate = (num, den) => (den > 0 ? num / den : null);
 
 /** Turn the puzzle_monitoring_summary RPC payload into the admin response. */
 export function buildAdminPuzzles(raw, { days, platform }, now = Date.now()) {
-    const rows = new Map((raw?.puzzles || []).map((p) => [p.puzzleType, p]));
+    // 'app' rows are install-funnel events, not a puzzle.
+    const rows = new Map((raw?.puzzles || []).filter((p) => p.puzzleType !== APP_PUZZLE_TYPE).map((p) => [p.puzzleType, p]));
     for (const t of NEW_WAVE_TYPES) if (!rows.has(t)) rows.set(t, { puzzleType: t });
     const byPuzzle = [...rows.values()].map((p) => {
         const starts = Number(p.starts) || 0, completes = Number(p.completes) || 0;
