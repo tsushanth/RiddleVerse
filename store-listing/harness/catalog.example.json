@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "app_package": "com.kreativekoala.riddleverse",
+  "variants": [
+    {
+      "id": "baseline-en-us-2026-11-02",
+      "locale": "en-US",
+      "title": "RiddleVerse - Brain Training",
+      "short": "Brain training puzzles powered by AI",
+      "full": "Replace with the live text captured by the snapshot command.",
+      "assets": {},
+      "hypothesis": "control: the listing as it is live today",
+      "created_at": "2026-11-02",
+      "status": "baseline"
+    },
+    {
+      "id": "title-riddle-first",
+      "locale": "en-US",
+      "title": "Riddles & Brain Puzzles",
+      "short": null,
+      "full": null,
+      "assets": {},
+      "hypothesis": "A title that names the thing people search for (riddles, puzzles) beats the brand-plus-category title on search-driven visitors",
+      "created_at": "2026-11-02",
+      "status": "draft"
+    }
+  ]
+}
