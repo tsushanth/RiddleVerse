@@ -1,0 +1,142 @@
+{
+ "locale": "en-US",
+ "limits": {
+  "title": 30,
+  "short_description": 80,
+  "full_description": 4000
+ },
+ "variants": {
+  "A": {
+   "name": "Clearer benefit-led",
+   "title": "RiddleVerse: Puzzle & AI Games",
+   "short_description": "Train your brain with 70+ puzzle types, or describe a game and let AI build it.",
+   "full_description": "Train your brain with 70+ puzzle types - or describe any game and let AI build it for you.\nStart with a quick daily puzzle, then try something new: math, logic, memory, word and visual challenges, all in one app.\n\nCREATE A GAME FROM A SENTENCE\nType what you want (\"a space shooter where you dodge asteroids and collect power-ups\") and RiddleVerse's AI builds a playable game in a couple of minutes. Play it right away, share it, and see how it scores on its leaderboard.\n\n70+ PUZZLE TYPES\n- Math: equations, estimation, averages, tip calculation and more\n- English and words: anagrams, crosswords, word search and synonyms\n- Memory: pattern recall, memory squares, image vortex\n- Visual: spot the pattern, copy the grid, find hidden objects\n- Logic: Sudoku, number sequences, deduction\n- Quick general knowledge questions\nEvery puzzle shows your score, speed bonus and progress, with difficulty levels from easy upward.\n\nEASY TO START, HARD TO PUT DOWN\n- Play as a guest - no sign-up needed to try it\n- Daily reward and streak bonuses for coming back\n- Leaderboards to compare your scores\n- Browse and play games made by the community\n- 40+ puzzle types work offline\n\nOPTIONAL PREMIUM\nRiddleVerse is free to play with ads. The free plan includes 10 AI game creations per day (100 per month). Premium removes ads and lifts those limits: $5.99 per month or $24.99 per year (prices may vary by country). Cancel anytime in Google Play.\n\nDownload RiddleVerse and give your brain a daily workout.",
+   "feature_tagline": "Brain puzzles + AI-made games",
+   "screenshots": [
+    [
+     "01_create_prompt",
+     "Describe a game. AI builds it."
+    ],
+    [
+     "02_ai_game_play",
+     "Play what you just imagined"
+    ],
+    [
+     "03_home",
+     "Quick, daily brain workouts"
+    ],
+    [
+     "04_categories",
+     "70+ puzzle types to try"
+    ],
+    [
+     "05_symmetry_play",
+     "Sharpen memory and focus"
+    ],
+    [
+     "06_symmetry_win",
+     "Beat the clock, earn points"
+    ],
+    [
+     "07_daily_reward",
+     "Daily rewards and streaks"
+    ],
+    [
+     "08_building_game",
+     "Your game, ready in minutes"
+    ]
+   ],
+   "title_chars": 30,
+   "short_description_chars": 79,
+   "full_description_chars": 1490
+  },
+  "B": {
+   "name": "Curiosity / hook-led",
+   "title": "RiddleVerse: Build AI Games",
+   "short_description": "Type an idea. AI builds a playable game in minutes. Plus 70+ brain puzzles.",
+   "full_description": "Type an idea. AI builds the game. You play it in minutes.\nRiddleVerse turns a sentence into a playable game - then keeps you busy with 70+ brain puzzles when you want a challenge.\n\nHOW IT WORKS\n1. Describe a game: \"a memory game with animals\", \"a space shooter\", \"a word-warp puzzle\"\n2. Watch it get built (about two minutes)\n3. Play it, tweak it, and see how you rank on its leaderboard\n\nNot sure what to make? Tap one of the idea chips (Space Escape, Maze Runner, Word Warp, Tilt Tunnel...) and go.\n\nWHEN YOU WANT A CLASSIC PUZZLE\n- Sudoku, number sequences and logic deduction\n- Math puzzles, estimation and quick mental arithmetic\n- Memory games and pattern copying\n- Anagrams, word search and crosswords\n- Visual challenges and hidden objects\nEach one tracks your score, time and speed bonus, so you can beat your own record.\n\nKEEP IT FUN EVERY DAY\n- Open a daily gift for coins, and build a streak for bonus rewards\n- Play as a guest first, sign in later if you like\n- Browse games other players made and climb their leaderboards\n- Works offline for 40+ puzzle types\n- Also available as a Telegram bot (@Riddleverse_bot) for group-chat quizzes\n\nOPTIONAL PREMIUM\nRiddleVerse is free to play with ads. The free plan includes 10 AI game creations per day (100 per month). Premium removes ads and lifts those limits: $5.99 per month or $24.99 per year (prices may vary by country). Cancel anytime in Google Play.\n\nWhat game will you make first?",
+   "feature_tagline": "Type an idea. Play your game.",
+   "screenshots": [
+    [
+     "02_ai_game_play",
+     "Made by AI in minutes. Playable now."
+    ],
+    [
+     "01_create_prompt",
+     "What game would you make?"
+    ],
+    [
+     "08_building_game",
+     "Watch your idea become a game"
+    ],
+    [
+     "06_symmetry_win",
+     "Perfect! Plus speed bonus points"
+    ],
+    [
+     "05_symmetry_play",
+     "Can you copy it in 30 seconds?"
+    ],
+    [
+     "03_home",
+     "Pick a puzzle, any puzzle"
+    ],
+    [
+     "04_categories",
+     "70+ puzzle types. Which is yours?"
+    ],
+    [
+     "07_daily_reward",
+     "Open your daily gift"
+    ]
+   ],
+   "title_chars": 27,
+   "short_description_chars": 75,
+   "full_description_chars": 1446
+  },
+  "C": {
+   "name": "Feature-led (no verified social proof yet)",
+   "title": "RiddleVerse: Puzzles & Games",
+   "short_description": "70+ puzzle types, community-made games, leaderboards and daily rewards.",
+   "full_description": "70+ puzzle types, community-made games, leaderboards and daily rewards - in one free app.\nRiddleVerse is a puzzle and game hub: classic brain training plus games built by AI and by other players.\n\nWHAT YOU GET\n- 70+ puzzle types across 6 categories: Math, English, Memory, Visual, Logic and General\n- AI game creator: describe a game in plain text and get a playable game in a couple of minutes\n- Community games: browse new releases and trending games, play them and post scores\n- Leaderboards for puzzles and games\n- Daily reward with streak bonuses (bigger bonuses at 7, 14, 30, 50 and 100 days)\n- Score, speed bonus and difficulty levels on every puzzle\n- Guest mode: start playing without an account\n- Offline play for 40+ puzzle types\n- Telegram bot (@Riddleverse_bot) to quiz your group chat\n\nPUZZLE CATEGORIES\nMath (13 types), English (14), Memory (11), Visual (6), Logic (16) and General knowledge. Highlights include Sudoku, Symmetry, anagrams, crosswords, number sequences, estimation, memory squares and hidden-object searches.\n\nBUILD YOUR OWN\nPick an idea chip or write your own prompt, and RiddleVerse's AI generates the game files for you. Edit it later with a text request, or remix a game you like. Creating uses free daily credits; some edits cost in-app coins.\n\nOPTIONAL PREMIUM\nRiddleVerse is free to play with ads. The free plan includes 10 AI game creations per day (100 per month). Premium removes ads and lifts those limits: $5.99 per month or $24.99 per year (prices may vary by country). Cancel anytime in Google Play.\n\nInstall RiddleVerse and find the puzzle that clicks for you.",
+   "feature_tagline": "70+ puzzles. Community games.",
+   "screenshots": [
+    [
+     "03_home",
+     "Puzzles, games and daily picks"
+    ],
+    [
+     "04_categories",
+     "70+ puzzle types, 6 categories"
+    ],
+    [
+     "02_ai_game_play",
+     "Community and AI-made games"
+    ],
+    [
+     "01_create_prompt",
+     "Create a game from plain text"
+    ],
+    [
+     "06_symmetry_win",
+     "Points, speed bonuses, levels"
+    ],
+    [
+     "05_symmetry_play",
+     "Difficulty levels for every skill"
+    ],
+    [
+     "07_daily_reward",
+     "Daily rewards and streak bonuses"
+    ],
+    [
+     "08_building_game",
+     "AI builds your game in minutes"
+    ]
+   ],
+   "title_chars": 28,
+   "short_description_chars": 71,
+   "full_description_chars": 1606
+  }
+ }
+}
