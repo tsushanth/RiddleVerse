@@ -381,4 +381,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">تحدي جغرافيا الدول</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">ألعاب جديدة</string>
+    <string name="home_new_subtitle">ألغاز جديدة لتجربتها</string>
+    <string name="home_new_badge">جديد</string>
+    <string name="home_foryou_title">مختارة لك</string>
+    <string name="foryou_reason_continue">تابع اللعب</string>
+    <string name="foryou_reason_similar">مثل %1$s</string>
+    <string name="foryou_reason_winner">ألعاب تفوز بها</string>
+    <string name="foryou_reason_quick">فوز سريع</string>
+    <string name="lang_switch_prompt">التبديل إلى %1$s؟</string>
+    <string name="lang_switch_action">تبديل</string>
+    <string name="lang_not_now">ليس الآن</string>
 </resources>

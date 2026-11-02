@@ -381,4 +381,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">Hamon sa Heograpiya ng Bansa</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Mga bagong laro</string>
+    <string name="home_new_subtitle">Mga bagong puzzle na subukan</string>
+    <string name="home_new_badge">BAGO</string>
+    <string name="home_foryou_title">Pinili para sa iyo</string>
+    <string name="foryou_reason_continue">Ituloy ang laro</string>
+    <string name="foryou_reason_similar">Tulad ng %1$s</string>
+    <string name="foryou_reason_winner">Madalas kang manalo</string>
+    <string name="foryou_reason_quick">Mabilis na panalo</string>
+    <string name="lang_switch_prompt">Lumipat sa %1$s?</string>
+    <string name="lang_switch_action">Lumipat</string>
+    <string name="lang_not_now">Mamaya na</string>
 </resources>

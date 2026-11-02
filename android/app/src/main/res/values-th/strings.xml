@@ -295,4 +295,17 @@
     <string name="no_hint_available">ไม่มีคำใบ้</string>
     <string name="tap_ascending_order">แตะตัวเลขตามลำดับจากน้อยไปมาก</string>
     <string name="country_geography_challenge">ความท้าทายภูมิศาสตร์ประเทศ</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">เกมใหม่</string>
+    <string name="home_new_subtitle">ปริศนาใหม่ให้ลองเล่น</string>
+    <string name="home_new_badge">ใหม่</string>
+    <string name="home_foryou_title">เลือกมาเพื่อคุณ</string>
+    <string name="foryou_reason_continue">เล่นต่อ</string>
+    <string name="foryou_reason_similar">คล้าย %1$s</string>
+    <string name="foryou_reason_winner">เกมที่คุณชนะบ่อย</string>
+    <string name="foryou_reason_quick">ชนะง่าย ๆ</string>
+    <string name="lang_switch_prompt">เปลี่ยนเป็น%1$sไหม?</string>
+    <string name="lang_switch_action">เปลี่ยน</string>
+    <string name="lang_not_now">ไว้ก่อน</string>
 </resources>

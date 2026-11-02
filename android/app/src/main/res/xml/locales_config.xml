@@ -4,10 +4,20 @@
     <locale android:name="es" />
     <locale android:name="fr" />
     <locale android:name="de" />
-    <locale android:name="ja" />
-    <locale android:name="zh-CN" />
-    <locale android:name="ko" />
-    <locale android:name="pt-BR" />
     <locale android:name="it" />
+    <locale android:name="pt-BR" />
+    <locale android:name="nl" />
+    <locale android:name="pl" />
+    <locale android:name="ru" />
+    <locale android:name="tr" />
+    <locale android:name="ar" />
     <locale android:name="hi" />
+    <locale android:name="ja" />
+    <locale android:name="ko" />
+    <locale android:name="zh-CN" />
+    <locale android:name="th" />
+    <locale android:name="vi" />
+    <locale android:name="id" />
+    <locale android:name="ms" />
+    <locale android:name="tl" />
 </locale-config>
