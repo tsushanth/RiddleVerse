@@ -18,7 +18,7 @@ object SpatialPuzzles {
     const val CRATE_SHIFT = "crateshift"
     const val CONDUIT = "conduit"
 
-    val TYPES: Set<String> = linkedSetOf(PIXEL_LOGIC, TUBE_TINT, PIECE_PACK, CRATE_SHIFT, CONDUIT)
+    val TYPES: Set<String> = linkedSetOf(PIXEL_LOGIC, TUBE_TINT, PIECE_PACK, CRATE_SHIFT, CONDUIT, TrailGame.TYPE) // trail (feat/game-trail)
 
     fun isSpatial(type: String?): Boolean = type != null && type.lowercase() in TYPES
 
@@ -29,6 +29,7 @@ object SpatialPuzzles {
         PIECE_PACK -> "Piece Pack Screen"
         CRATE_SHIFT -> "Crate Shift Screen"
         CONDUIT -> "Conduit Screen"
+        TrailGame.TYPE -> TrailGame.SCREEN_OPTION // trail (feat/game-trail)
         else -> "Default"
     }
 
@@ -37,7 +38,8 @@ object SpatialPuzzles {
         QuizCategory("Tube Tint", "Pour colours until each tube is one colour", Icons.Default.Opacity, TUBE_TINT, "Logic"),
         QuizCategory("Piece Pack", "Fit pieces and clear lines", Icons.Default.ViewModule, PIECE_PACK, "Logic"),
         QuizCategory("Crate Shift", "Push every crate onto a target", Icons.Default.Inventory2, CRATE_SHIFT, "Logic"),
-        QuizCategory("Conduit", "Rotate pipes to power every lamp", Icons.Default.Timeline, CONDUIT, "Logic")
+        QuizCategory("Conduit", "Rotate pipes to power every lamp", Icons.Default.Timeline, CONDUIT, "Logic"),
+        TrailGame.category // trail (feat/game-trail)
     )
 
     private fun hintFor(type: String) = when (type) {
@@ -45,6 +47,7 @@ object SpatialPuzzles {
         TUBE_TINT -> "Pour the top colour onto the same colour or into an empty tube. Empty tubes are your workspace."
         PIECE_PACK -> "Fill whole rows or columns to clear them. Keep space for the next pieces."
         CRATE_SHIFT -> "You can only push one crate at a time, never pull. Avoid pushing crates into corners."
+        TrailGame.TYPE -> TrailGame.HINT // trail (feat/game-trail)
         else -> "Start from the source and work outwards. Corners and ends have only a few ways to turn."
     }
 
@@ -101,6 +104,7 @@ object SpatialPuzzles {
             tip = "Edges and corners have few options. Fix those first.",
             backgroundColor = listOf(Color(0xFF2193B0), Color(0xFF6DD5ED))
         )
+        TrailGame.TYPE -> TrailGame.tutorial // trail (feat/game-trail)
         else -> null
     }
 }
@@ -145,11 +149,13 @@ fun SpatialPuzzleScreenWrapper(
             PuzzleScreenType.PIECE_PACK_SCREEN -> PiecePackScreen(args)
             PuzzleScreenType.CRATE_SHIFT_SCREEN -> CrateShiftScreen(args)
             PuzzleScreenType.CONDUIT_SCREEN -> ConduitScreen(args)
+            PuzzleScreenType.TRAIL_SCREEN -> TrailScreen(args) // trail (feat/game-trail)
             else -> when (currentPuzzle.puzzleType?.lowercase()) {
                 SpatialPuzzles.PIXEL_LOGIC -> PixelLogicScreen(args)
                 SpatialPuzzles.TUBE_TINT -> TubeTintScreen(args)
                 SpatialPuzzles.PIECE_PACK -> PiecePackScreen(args)
                 SpatialPuzzles.CRATE_SHIFT -> CrateShiftScreen(args)
+                TrailGame.TYPE -> TrailScreen(args) // trail (feat/game-trail)
                 else -> ConduitScreen(args)
             }
         }

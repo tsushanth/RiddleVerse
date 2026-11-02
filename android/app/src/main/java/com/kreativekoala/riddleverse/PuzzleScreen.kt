@@ -342,6 +342,7 @@ fun PuzzleScreen(
         PuzzleScreenType.TUBE_TINT_SCREEN,
         PuzzleScreenType.PIECE_PACK_SCREEN,
         PuzzleScreenType.CRATE_SHIFT_SCREEN,
+        PuzzleScreenType.TRAIL_SCREEN, // trail (feat/game-trail)
         PuzzleScreenType.CONDUIT_SCREEN -> {
             SpatialPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
