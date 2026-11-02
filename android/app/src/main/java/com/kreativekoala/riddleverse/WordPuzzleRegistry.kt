@@ -21,7 +21,8 @@ object WordPuzzleRegistry {
     const val CODE_CRACKER = "codecracker"
 
     /** Puzzle type keys (Puzzle.puzzleType / QuizCategory.category). */
-    val TYPES: Set<String> = setOf(WORD_GUESS, WORD_LADDER, LETTER_BALLOONS, WORD_HIVE, CODE_CRACKER)
+    val TYPES: Set<String> = setOf(WORD_GUESS, WORD_LADDER, LETTER_BALLOONS, WORD_HIVE, CODE_CRACKER,
+        RiddlePack.TYPE /* riddle pack (feat/riddle-pack) */)
 
     fun isWordPuzzleType(type: String?): Boolean = type != null && type.lowercase() in TYPES
 
@@ -31,6 +32,7 @@ object WordPuzzleRegistry {
         LETTER_BALLOONS -> "Letter Balloons Screen"
         WORD_HIVE -> "Word Hive Screen"
         CODE_CRACKER -> "Code Cracker Screen"
+        RiddlePack.TYPE -> RiddlePack.SCREEN_NAME // riddle pack (feat/riddle-pack)
         else -> "Default"
     }
 
@@ -41,7 +43,8 @@ object WordPuzzleRegistry {
         QuizCategory("Word Ladder", "Change one letter at a time", Icons.Default.Link, WORD_LADDER, "English"),
         QuizCategory("Letter Balloons", "Guess the word before the balloons pop", Icons.Default.TextFields, LETTER_BALLOONS, "English"),
         QuizCategory("Word Hive", "Build words from seven letters", Icons.Default.Search, WORD_HIVE, "English"),
-        QuizCategory("Code Cracker", "Deduce the hidden colour code", Icons.Default.Lock, CODE_CRACKER, "Focus")
+        QuizCategory("Code Cracker", "Deduce the hidden colour code", Icons.Default.Lock, CODE_CRACKER, "Focus"),
+        RiddlePack.category // riddle pack (feat/riddle-pack)
     )
 
     private fun hint(type: String) = when (type) {
@@ -74,6 +77,7 @@ object WordPuzzleRegistry {
 
     fun createPuzzle(type: String, difficulty: String, context: Context, seed: Long = Random.nextLong()): Puzzle {
         val t = type.lowercase()
+        if (t == RiddlePack.TYPE) return RiddlePack.createPuzzle(difficulty, context, seed) // riddle pack (feat/riddle-pack)
         return Puzzle(
             puzzleId = "${t}_${System.currentTimeMillis()}",
             puzzleType = t,
@@ -107,6 +111,7 @@ object WordPuzzleRegistry {
             "Word Hive", "🐝",
             "Make words of four or more letters from the seven letters. Every word must use the gold centre letter. Letters can be reused. A word that uses all seven letters is a pangram worth a bonus.",
             "Reach the goal rank to solve the puzzle.", listOf(Color(0xFFFFB020), Color(0xFFD98A00)))
+        RiddlePack.TYPE -> RiddlePack.tutorialContent() // riddle pack (feat/riddle-pack)
         else -> SimpleTutorialContent(
             "Code Cracker", "🔐",
             "Crack the hidden colour code. Fill the pegs and press Check. A dark feedback peg means a right colour in the right place, a light peg means a right colour in the wrong place.",
@@ -137,6 +142,7 @@ fun WordPuzzleScreenWrapper(
             WordPuzzleRegistry.WORD_LADDER -> WordLadderScreen(json, level, onBack, done)
             WordPuzzleRegistry.LETTER_BALLOONS -> LetterBalloonsScreen(json, level, onBack, done)
             WordPuzzleRegistry.WORD_HIVE -> WordHiveScreen(json, level, onBack, done)
+            RiddlePack.TYPE -> RiddleScreen(json, level, onBack, done) // riddle pack (feat/riddle-pack)
             else -> CodeCrackerScreen(json, level, onBack, done)
         }
     }

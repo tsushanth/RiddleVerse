@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Riddle pack (feat/riddle-pack). English only for now: the riddle content itself is English. -->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
+    <string name="riddle_title">Riddle</string>
+    <string name="riddle_stars_desc">%1$d of %2$d stars</string>
+    <string name="riddle_streak">Streak: %1$d</string>
+    <string name="riddle_streak_desc">Correct answers in a row: %1$d</string>
+    <string name="riddle_hint_button">Hint %1$d of %2$d</string>
+    <string name="riddle_hint_button_none">No more hints</string>
+    <string name="riddle_hint_desc">Show hint %1$d of %2$d. Each hint takes one star off your score.</string>
+    <string name="riddle_hint_none_desc">All hints are shown</string>
+    <string name="riddle_hint_line">Hint %1$d: %2$s</string>
+    <string name="riddle_skip">Skip</string>
+    <string name="riddle_skip_desc">Skip this riddle</string>
+    <string name="riddle_reveal">Reveal</string>
+    <string name="riddle_reveal_desc">Reveal the answer</string>
+    <string name="riddle_your_answer">Your answer</string>
+    <string name="riddle_check">Check</string>
+    <string name="riddle_check_desc">Check your answer</string>
+    <string name="riddle_wrong">Not quite. Try again or take a hint.</string>
+    <string name="riddle_empty">Type an answer first.</string>
+    <string name="riddle_correct">Correct! The answer is %1$s.</string>
+    <string name="riddle_revealed">The answer is %1$s.</string>
+    <string name="riddle_stars_result">Stars earned: %1$d of %2$d (hints used: %3$d)</string>
+    <string name="riddle_next">Next riddle</string>
+    <string name="riddle_share">Share riddle</string>
+    <string name="riddle_share_desc">Share this riddle with a friend</string>
+    <string name="riddle_share_text">Can you solve this riddle?\n\n%1$s\n\nPlay more riddles in RiddleVerse: %2$s</string>
+    <string name="riddle_confirm_reveal_title">Reveal the answer?</string>
+    <string name="riddle_confirm_reveal_body">This riddle will count as unsolved and your streak will reset.</string>
+    <string name="riddle_confirm_skip_title">Skip this riddle?</string>
+    <string name="riddle_confirm_skip_body">Your streak will reset.</string>
+    <string name="riddle_confirm_yes">Yes</string>
+    <string name="riddle_confirm_no">Cancel</string>
+    <string name="riddle_tier_easy">Easy</string>
+    <string name="riddle_tier_medium">Medium</string>
+    <string name="riddle_tier_hard">Hard</string>
+    <string name="riddle_tier_desc">Difficulty: %1$s</string>
+</resources>
