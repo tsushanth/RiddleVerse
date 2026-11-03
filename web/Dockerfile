@@ -8,6 +8,8 @@ RUN npm install
 
 # Copy all frontend files
 COPY frontend ./
+# Shared public-play-page catalog (imported by the frontend as ../../../shared/playCatalog.json)
+COPY shared /shared
 
 # Build the frontend
 RUN npm run build
@@ -31,6 +33,8 @@ RUN npm ci
 
 # Copy backend source code
 COPY backend ./
+# Shared public-play-page catalog (read by services/playPages.js at ../../shared/playCatalog.json)
+COPY shared /shared
 
 # Create public folder and copy the frontend build
 RUN mkdir -p public

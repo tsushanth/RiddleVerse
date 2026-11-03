@@ -76,12 +76,14 @@ object PuzzleEvents {
     fun puzzleShown(puzzle: Puzzle?, fallbackType: String?) = guarded {
         val (key, type, diff) = describe(puzzle, fallbackType) ?: return@guarded
         tracker.start(key, type, diff)?.let { emit(it) }
+        Funnel.log("first_puzzle_started")
     }
 
     /** Result reported through PuzzleCompletionHandler: `complete` or `fail`. */
     fun puzzleFinished(puzzle: Puzzle?, fallbackType: String?, success: Boolean, score: Int) = guarded {
         val (key, type, diff) = describe(puzzle, fallbackType) ?: return@guarded
         emit(tracker.finish(key, type, diff, success, score))
+        if (success) Funnel.log("first_puzzle_completed")
     }
 
     /** Puzzle screen left; emits `abandon` if it was not completed. Skipped on rotation. */
@@ -101,6 +103,9 @@ object PuzzleEvents {
         val type = PuzzleEventsClient.sanitizePuzzleType(p?.puzzleType ?: fallback) ?: return null
         return Triple(p?.puzzleId ?: type, type, PuzzleEventsClient.sanitizeDifficulty(p?.difficulty))
     }
+
+    /** Used by [Funnel]: same queue, endpoint and install id as puzzle events. */
+    internal fun emitFunnel(e: PuzzleEvent) = guarded { emit(e) }
 
     private fun emit(e: PuzzleEvent) {
         val c = client ?: return

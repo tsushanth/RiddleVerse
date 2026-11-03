@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
 import { GameProvider } from './context/GameContext'
 import Layout from './components/Layout'
@@ -16,6 +17,11 @@ import CoinShopPage from './pages/CoinShopPage'
 import GameSessionPage from './pages/GameSessionPage'
 import LoadingSpinner from './components/LoadingSpinner'
 import AdminPage from './pages/AdminPage'
+// The public /play pages (shell, catalog, analytics, daily) load on demand: they are only needed on /play*, and keeping them
+// out of the shared bundle holds the main chunk within its size budget.
+const PlayIndexPage = lazy(() => import('./pages/PlayIndexPage'))
+const PlayGamePage = lazy(() => import('./pages/PlayGamePage'))
+const DailyPage = lazy(() => import('./pages/DailyPage'))
 
 // Protected route wrapper
 function ProtectedRoute({ children }) {
@@ -45,6 +51,12 @@ function PublicRoute({ children }) {
   }
 
   return children
+}
+
+// /play?session_id=<uuid> is the host-controlled AI game session wrapper; plain /play is the public game list.
+function PlayEntry() {
+  const [params] = useSearchParams()
+  return params.get('session_id') !== null ? <GameSessionPage /> : <Suspense fallback={<LoadingSpinner />}><PlayIndexPage /></Suspense>
 }
 
 export default function App() {
@@ -121,8 +133,10 @@ export default function App() {
         } />
       </Route>
 
-      {/* Game session wrapper — no layout chrome, no auth required */}
-      <Route path="/play" element={<GameSessionPage />} />
+      {/* Public, indexable, no-login play pages (meta for crawlers is injected by the backend, see services/playPages.js) */}
+      <Route path="/play" element={<PlayEntry />} />
+      <Route path="/play/daily" element={<Suspense fallback={<LoadingSpinner />}><DailyPage /></Suspense>} /> {/* web/daily-page */}
+      <Route path="/play/:type" element={<Suspense fallback={<LoadingSpinner />}><PlayGamePage /></Suspense>} />
 
       {/* Catch all - redirect to home or welcome */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -14,7 +14,11 @@ data class PuzzleEvent(
     val hintsUsed: Int? = null,
     val mistakes: Int? = null,
     val errorMessage: String? = null,
-    val ts: Long
+    val ts: Long,
+    /** Only for type "funnel": one of [PuzzleEventsClient.FUNNEL_STEPS]. */
+    val funnelStep: String? = null,
+    /** Only for type "app_open": whole local days since install. */
+    val daysSinceInstall: Int? = null
 )
 
 /**
@@ -38,7 +42,15 @@ class PuzzleEventsClient(
         const val BASE_BACKOFF_MS = 15_000L
         const val MAX_BACKOFF_MS = 15 * 60_000L
         const val MAX_ERROR_CHARS = 300
-        private val TYPES = setOf("start", "complete", "fail", "abandon", "hint", "undo", "error")
+        private val TYPES = setOf("start", "complete", "fail", "abandon", "hint", "undo", "error", "funnel", "app_open")
+        /** Install-funnel event types. They carry the fixed puzzle type [APP_PUZZLE_TYPE] (puzzle_type is NOT NULL server side). */
+        const val APP_PUZZLE_TYPE = "app"
+        const val MAX_DAYS_SINCE_INSTALL = 3650
+        val FUNNEL_STEPS = setOf(
+            "first_open", "welcome_shown", "auth_started", "auth_done", "guest_started",
+            "onboarding_done", "home_shown", "first_puzzle_started", "first_puzzle_completed"
+        )
+        private fun isFunnelType(t: String) = t == "funnel" || t == "app_open"
         private val PUZZLE_TYPE = Regex("^[a-z0-9_]{1,40}$")
         private val DIFFICULTIES = setOf("easy", "medium", "hard")
         private val EMAIL = Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
@@ -94,9 +106,13 @@ class PuzzleEventsClient(
     fun enqueue(event: PuzzleEvent): Boolean = try {
         if (!enabled()) false else {
             val type = event.type
-            val pt = sanitizePuzzleType(event.puzzleType)
-            if (type !in TYPES || pt == null) false else {
+            val funnel = isFunnelType(type)
+            val pt = if (funnel) APP_PUZZLE_TYPE else sanitizePuzzleType(event.puzzleType)
+            val step = if (type == "funnel") event.funnelStep?.takeIf { it in FUNNEL_STEPS } else null
+            val days = if (type == "app_open") event.daysSinceInstall?.takeIf { it in 0..MAX_DAYS_SINCE_INSTALL } else null
+            if (type !in TYPES || pt == null || (type == "funnel" && step == null) || (type == "app_open" && days == null)) false else {
                 val clean = event.copy(
+                    funnelStep = step, daysSinceInstall = days,
                     puzzleType = pt,
                     difficulty = sanitizeDifficulty(event.difficulty),
                     durationMs = event.durationMs?.coerceAtLeast(0),
@@ -105,7 +121,7 @@ class PuzzleEventsClient(
                     hintsUsed = event.hintsUsed?.coerceAtLeast(0),
                     mistakes = event.mistakes?.coerceAtLeast(0),
                     errorMessage = if (type == "error") sanitizeError(event.errorMessage) else null
-                )
+                ).let { if (funnel) it.copy(difficulty = null, score = null, moves = null, hintsUsed = null, mistakes = null, durationMs = null) else it }
                 synchronized(lock) {
                     queue.addLast(clean)
                     while (queue.size > MAX_QUEUE) queue.removeFirst()
@@ -130,6 +146,8 @@ class PuzzleEventsClient(
             e.hintsUsed?.let { sb.append(",\"hintsUsed\":").append(it) }
             e.mistakes?.let { sb.append(",\"mistakes\":").append(it) }
             e.errorMessage?.let { sb.append(",\"errorMessage\":\"").append(esc(it)).append('"') }
+            e.funnelStep?.let { sb.append(",\"funnelStep\":\"").append(esc(it)).append('"') }
+            e.daysSinceInstall?.let { sb.append(",\"daysSinceInstall\":").append(it) }
             sb.append(",\"ts\":").append(e.ts).append('}')
         }
         return sb.append("]}").toString()

@@ -68,6 +68,7 @@ import dailyPuzzlesBulkRoutes from './routes/dailyPuzzlesBulk.routes.js';
 import cron from 'node-cron';
 import { llm } from './utils/llmUsageInstance.js';
 import { isAdminKey } from './middleware/adminKey.js';
+import { createPlayPagesRouter } from './services/playPages.js';
 
 const __dirname = path.resolve();
 
@@ -294,6 +295,10 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     res.sendFile(path.join(__dirname, 'public', '.well-known', 'assetlinks.json'));
 });
+
+// Public no-login play pages: /play, /play/<puzzle-type>, robots.txt, sitemap.xml (per-route meta injected into index.html).
+// Anything it does not own falls through to the custom-game /play/:gameId routes and the SPA.
+app.use(createPlayPagesRouter());
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));

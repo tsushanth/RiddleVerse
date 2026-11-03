@@ -39,6 +39,7 @@ const puzzleCategories = [
       { type: 'letterballoons', name: 'Letter Balloons', icon: Shuffle, color: '#ef4444', description: 'Save the balloons' },
       { type: 'wordhive', name: 'Word Hive', icon: Layers, color: '#f59e0b', description: 'Build words from 7 letters' },
       { type: 'codecracker', name: 'Code Cracker', icon: Key, color: '#9b5de5', description: 'Deduce the hidden code' },
+      { type: 'linkup', name: 'Linkup', icon: Layers, color: '#06b6d4', description: 'Group 16 words into four sets' }, // web/game-linkup
       // --- end web word puzzles ---
     ]
   },
@@ -113,6 +114,8 @@ const puzzleCategories = [
     ]
   },
 ]
+
+puzzleCategories.find((c) => c.id === 'spatial').puzzles.push({ type: 'trail', name: 'Trail', icon: Map, color: '#7c3aed', description: 'Draw one line through every square' }) // web/game-trail
 
 // --- web classic puzzles (feat/web-puzzles-classic) ---
 import { classicCategory } from '../components/puzzles/classic/classicRegistry'

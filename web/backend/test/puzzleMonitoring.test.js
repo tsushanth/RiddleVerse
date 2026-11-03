@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import express from 'express';
 import cors from 'cors';
 import { createPuzzleMonitoringRouters } from '../routes/puzzleMonitoring.routes.js';
-import { validatePayload, createLimiter, buildAdminPuzzles, computeAlerts, NEW_WAVE_TYPES } from '../services/puzzleMonitoring.js';
+import { validatePayload, createLimiter, buildAdminPuzzles, computeAlerts, NEW_WAVE_TYPES, FUNNEL_STEPS, WEB_PLAY_EVENT_TYPES } from '../services/puzzleMonitoring.js';
 
 const NOW = 1_800_000_000_000;
 const good = () => ({ installId: 'abc', platform: 'web', events: [{ type: 'start', puzzleType: 'sudoku' }] });
@@ -186,4 +186,131 @@ test('alerts: thresholds, min-starts gate, new-wave silence, severity order', ()
 test('alerts end-to-end: all 19 silent -> 19 info', () => {
     const r = buildAdminPuzzles({}, { days: 7, platform: 'all' }, NOW);
     assert.equal(r.alerts.length, 19); assert.ok(r.alerts.every((x) => x.severity === 'info'));
+});
+
+// ---- install funnel / day-N return events ----
+const fev = (over = {}) => ({ type: 'funnel', puzzleType: 'app', funnelStep: 'first_open', ts: NOW, ...over });
+const fpay = (...events) => ({ installId: 'abc', platform: 'android', appVersion: '1.0', events });
+
+test('funnel: every allow-listed step validates and maps to funnel_step', () => {
+    for (const step of FUNNEL_STEPS) {
+        const v = validatePayload(fpay(fev({ funnelStep: step })), NOW);
+        assert.ok(v, step);
+        assert.equal(v.events[0].funnel_step, step);
+        assert.equal(v.events[0].event_type, 'funnel');
+        assert.equal(v.events[0].puzzle_type, 'app');
+        assert.equal(v.events[0].days_since_install, undefined);
+    }
+    assert.equal(FUNNEL_STEPS.size, 9);
+});
+test('funnel: rejects unknown/missing step, wrong puzzleType, and free text', () => {
+    const bad = [
+        fev({ funnelStep: 'bob@example.com' }), fev({ funnelStep: undefined }), fev({ funnelStep: 5 }),
+        fev({ funnelStep: 'FIRST_OPEN' }), fev({ puzzleType: 'sudoku' }),
+    ];
+    for (const e of bad) assert.equal(validatePayload(fpay(e), NOW), null, JSON.stringify(e));
+});
+test('app_open: needs 0..3650 integer daysSinceInstall', () => {
+    const ok = (d) => validatePayload(fpay({ type: 'app_open', puzzleType: 'app', daysSinceInstall: d, ts: NOW }), NOW);
+    assert.equal(ok(0).events[0].days_since_install, 0);
+    assert.equal(ok(7.9).events[0].days_since_install, 7);
+    assert.equal(ok(3650).events[0].event_type, 'app_open');
+    assert.equal(ok(3650).events[0].funnel_step, undefined);
+    for (const d of [-1, 3651, '7', null, undefined, NaN]) assert.equal(ok(d), null, String(d));
+});
+test('funnel: puzzleType "app" is reserved, plain puzzle events cannot use it', () => {
+    assert.equal(validatePayload(fpay({ type: 'start', puzzleType: 'app' }), NOW), null);
+});
+test('funnel: extra fields on funnel events are ignored; puzzle rows never carry funnel columns', () => {
+    const v = validatePayload(fpay(fev({ score: 9, difficulty: 'hard', sessionId: 's', errorMessage: 'x', email: 'a@b.c' }),
+        { type: 'start', puzzleType: 'sudoku', funnelStep: 'first_open', daysSinceInstall: 3 }), NOW);
+    const f = v.events[0];
+    assert.equal(f.score, null); assert.equal(f.difficulty, null); assert.equal(f.session_id, null); assert.equal(f.error_message, null);
+    assert.equal(JSON.stringify(f).includes('a@b.c'), false);
+    const p = v.events[1];
+    assert.equal('funnel_step' in p, false);
+    assert.equal('days_since_install' in p, false);
+});
+test('funnel: ingest route stores rows with funnel columns, shares install rate limit', async () => {
+    const t = await boot();
+    try {
+        const r = await post(t.base, fpay(fev(), { type: 'app_open', puzzleType: 'app', daysSinceInstall: 1, ts: NOW }));
+        assert.equal(r.status, 202);
+        assert.equal(t.client.inserted.length, 2);
+        assert.equal(t.client.inserted[0].funnel_step, 'first_open');
+        assert.equal(t.client.inserted[1].days_since_install, 1);
+        assert.equal(t.client.inserted[0].install_id, 'abc');
+        assert.equal((await post(t.base, fpay(fev({ funnelStep: 'nope' })))).status, 400);
+        // INSTALL_LIMIT (300/h) counts funnel events too
+        for (let i = 0; i < 5; i++) await post(t.base, fpay(...Array(50).fill(fev())), {});
+        assert.equal((await post(t.base, fpay(...Array(50).fill(fev())))).status, 429);
+    } finally { t.close(); }
+});
+test('funnel: admin puzzle summary hides the placeholder "app" puzzle', () => {
+    const out = buildAdminPuzzles({ puzzles: [{ puzzleType: 'app', starts: 0 }, { puzzleType: 'sudoku', starts: 3, completes: 1 }] }, { days: 7, platform: 'all' }, NOW);
+    assert.equal(out.byPuzzle.some((p) => p.puzzleType === 'app'), false);
+    assert.equal(out.byPuzzle.find((p) => p.puzzleType === 'sudoku').starts, 3);
+});
+
+// ---- public /play page measurement (web_play_*) ----
+const WP = ['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta'];
+const wev = (type, over = {}) => ({ type, puzzleType: 'sudoku', sessionId: 's1', ts: NOW, ...over });
+const wpay = (...events) => ({ installId: 'abc', platform: 'web', appVersion: 'web-play', events });
+
+test('web_play: the four event names validate and map to puzzle_type = slug', () => {
+    assert.deepEqual([...WEB_PLAY_EVENT_TYPES].sort(), [...WP].sort());
+    for (const t of WP) {
+        const v = validatePayload(wpay(wev(t)), NOW);
+        assert.ok(v, t);
+        assert.equal(v.events[0].event_type, t);
+        assert.equal(v.events[0].puzzle_type, 'sudoku');
+        assert.equal(v.events[0].session_id, 's1');
+        assert.equal('funnel_step' in v.events[0], false);
+    }
+});
+test('web_play: web platform only, real slug only', () => {
+    assert.equal(validatePayload({ ...wpay(wev('web_play_view')), platform: 'android' }, NOW), null);
+    for (const e of [wev('web_play_view', { puzzleType: 'app' }), wev('web_play_view', { puzzleType: 'Sudoku' }),
+        wev('web_play_view', { puzzleType: 'a-b' }), wev('web_play_view', { puzzleType: undefined })]) {
+        assert.equal(validatePayload(wpay(e), NOW), null, JSON.stringify(e));
+    }
+});
+test('web_play: difficulty is an enum, duration only on complete, no score/moves/hints/mistakes/error text', () => {
+    const v = validatePayload(wpay(
+        wev('web_play_start', { difficulty: 'medium', durationMs: 99 }),
+        wev('web_play_complete', { difficulty: 'hard', durationMs: 4321 }),
+        wev('web_play_complete', { difficulty: 'me@x.com', durationMs: -1 }),
+        wev('web_play_view', { difficulty: 'easy', score: 5, moves: 6, hintsUsed: 7, mistakes: 8, errorMessage: 'secret' }),
+    ), NOW);
+    const [s, c, bad, view] = v.events;
+    assert.equal(s.difficulty, 'medium'); assert.equal(s.duration_ms, null);
+    assert.equal(c.difficulty, 'hard'); assert.equal(c.duration_ms, 4321);
+    assert.equal(bad.difficulty, null); assert.equal(bad.duration_ms, null);
+    assert.equal(view.difficulty, null);
+    for (const r of v.events) for (const k of ['score', 'moves', 'hints_used', 'mistakes', 'error_message']) assert.equal(r[k], null, k);
+});
+test('web_play: no PII fields survive into the row', () => {
+    const v = validatePayload(wpay(wev('web_play_cta', { email: 'a@b.c', url: 'https://x', referrer: 'r', userAgent: 'ua', userId: 'u' })), NOW);
+    const text = JSON.stringify(v);
+    for (const bad of ['a@b.c', 'https://x', '"r"', '"ua"', '"u"']) assert.equal(text.includes(bad), false, bad);
+});
+test('web_play: ingest stores rows anonymously even when a bearer token is sent', async () => {
+    const t = await boot();
+    try {
+        const r = await post(t.base, wpay(wev('web_play_view'), wev('web_play_cta')), { authorization: 'Bearer good' });
+        assert.equal(r.status, 202);
+        assert.equal(t.client.inserted.length, 2);
+        assert.equal(t.client.inserted[0].user_id, null);
+        assert.equal(t.client.inserted[0].platform, 'web');
+        assert.equal(t.client.inserted[1].event_type, 'web_play_cta');
+        assert.equal((await post(t.base, wpay(wev('web_play_nope')))).status, 400);
+        // plain puzzle events from signed-in users still carry user_id
+        const r2 = await post(t.base, wpay({ type: 'start', puzzleType: 'sudoku', ts: NOW }), { authorization: 'Bearer good' });
+        assert.equal(r2.status, 202);
+        assert.equal(t.client.inserted[2].user_id, 'u1');
+    } finally { t.close(); }
+});
+test('web_play: does not change the puzzle summary starts/completes (counted by their own event types)', () => {
+    const out = buildAdminPuzzles({ puzzles: [{ puzzleType: 'sudoku', starts: 3, completes: 1 }] }, { days: 7, platform: 'all' }, NOW);
+    assert.equal(out.byPuzzle.find((p) => p.puzzleType === 'sudoku').starts, 3);
 });
