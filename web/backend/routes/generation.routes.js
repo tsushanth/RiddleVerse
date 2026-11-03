@@ -2,8 +2,10 @@
 import express from 'express';
 import { generateCustomPuzzles } from '../services/puzzleService.js';
 import { regenerationService } from '../services/regenerationService.js';
+import { createGenerateRiddleGuard } from '../middleware/generateRiddleGuard.js';
 
 const router = express.Router();
+const generateRiddleGuard = createGenerateRiddleGuard();
 
 /**
  * Helper function to generate puzzles with notification
@@ -26,7 +28,7 @@ async function generateCustomPuzzlesWithNotification(topic, format, numPuzzles, 
 /**
  * Generate riddle endpoint
  */
-router.post('/generate-riddle', async (req, res) => {
+router.post('/generate-riddle', generateRiddleGuard, async (req, res) => {
     try {
         const { topic, format, numPuzzles, userId } = req.body;
 
@@ -61,7 +63,8 @@ router.post('/generate-riddle', async (req, res) => {
         const puzzleId = `riddle-${Date.now()}`;
 
         // Fire off puzzle generation with notification (async)
-        generateCustomPuzzlesWithNotification(topic, format, numPuzzles, userId, puzzleId);
+        generateCustomPuzzlesWithNotification(topic, format, numPuzzles, userId, puzzleId)
+            .catch(() => { /* already logged inside; a rejection here must not become an unhandledRejection */ });
 
         return res.json({
             message: "success",
