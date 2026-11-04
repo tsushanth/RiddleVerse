@@ -78,7 +78,6 @@ class DailyCompletionActivity : AppCompatActivity() {
             Log.e("DailyCompletionActivity", "Failed to initialize AdManager", e)
         }
         val streakDays = intent.getIntExtra("streakDays", 1)
-        val earnedPoints = intent.getIntExtra("earnedPoints", 100)
         val isCustomPuzzle = intent.getBooleanExtra("isCustomPuzzle", false)
         val customPuzzleId = intent.getStringExtra("customPuzzleId")
 
@@ -94,6 +93,10 @@ class DailyCompletionActivity : AppCompatActivity() {
             Log.e("DailyCompletionActivity", "Failed to parse session stats", e)
             null
         }
+        // PuzzleActivity passes the points it derived from the session. If an old/other caller sends none, derive
+        // them from the same stats here instead of a hard-coded 100.
+        val earnedPoints = if (intent.hasExtra("earnedPoints")) intent.getIntExtra("earnedPoints", 0)
+        else CompletionScoring.pointsFor(sessionStats, isCustomPuzzle)
 
         // Extract group information
         sourceGroupId = intent.getStringExtra("sourceGroupId")

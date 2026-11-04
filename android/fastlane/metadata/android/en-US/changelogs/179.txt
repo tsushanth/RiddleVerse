@@ -1,0 +1,6 @@
+Play in one tap, no sign-up needed.
+- Leaderboard points now come from how you actually played, and the points you see are the points you get
+- New daily puzzle with a share card to challenge friends
+- 4 new games: Crowns, Trail, Linkup and a fresh pack of riddles
+- Fixed answers being marked wrong in math and memory games
+- Smoother Home with game discovery and general polish

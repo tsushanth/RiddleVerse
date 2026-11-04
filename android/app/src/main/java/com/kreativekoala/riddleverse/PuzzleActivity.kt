@@ -189,7 +189,6 @@ class PuzzleActivity : AppCompatActivity() {
                             // Was a random 1..10, so a brand-new player was told "Streak: 5 Days" and the share text claimed it.
                             // Real value: days-in-a-row the app was used (never below 1: they are playing today).
                             putExtra("streakDays", DailyStreakManager.getDailyData(context).currentStreak.coerceAtLeast(1))
-                            putExtra("earnedPoints", listOf(100, 200, 250, 300, 500).random())
 
                             // 🚀 FIXED: Add session statistics and puzzle type
                             try {
@@ -206,6 +205,15 @@ class PuzzleActivity : AppCompatActivity() {
 
                                 putExtra("sessionStats", Gson().toJson(sessionStats))
                                 putExtra("puzzleType", puzzleType)
+                                // Was a random 100..500 (doubled later for non-custom). Now the real session performance;
+                                // this single value is what the screen shows, the share text says and the leaderboard gets.
+                                putExtra(
+                                    "earnedPoints",
+                                    CompletionScoring.pointsFor(
+                                        sessionStats,
+                                        (context as? Activity)?.intent?.getBooleanExtra("isCustomPuzzle", false) == true
+                                    )
+                                )
 
                             } catch (e: Exception) {
                                 Log.e("PuzzleActivity", "❌ Failed to add session stats", e)

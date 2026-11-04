@@ -35,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -768,26 +769,25 @@ fun EnhancedSuccessContentWithRanking(
     var celebrationStage by remember { mutableStateOf(0) }
 
     // Score update logic with celebration trigger
+    // Credit the points once per completion. The activity is recreated on rotation and the intent survives that,
+    // so without this flag the same completion was added (and posted) again.
+    var pointsCredited by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(earnedPoints) {
-        val scoreManager = ScoreDisplayManager(context)
-        val bonusPoints = if (isCustomPuzzle) earnedPoints else earnedPoints * 2
-        scoreManager.updateLocalScore(bonusPoints)
-
-        try {
-            ScoreManager.updateBackendScore(bonusPoints)
-
-            // Trigger celebration sequence
-            showCelebration = true
-            delay(500)
-            celebrationStage = 1
-            delay(1000)
-            celebrationStage = 2
-            delay(1000)
-            celebrationStage = 3
-
-        } catch (e: Exception) {
-            Log.e("DailyCompletion", "Failed to update backend score", e)
+        if (!pointsCredited) {
+            pointsCredited = true
+            // Exactly what the card and the share text show: no extra multiplier here.
+            ScoreDisplayManager(context).updateLocalScore(earnedPoints)
+            ScoreManager.updateBackendScore(earnedPoints)
         }
+
+        // Trigger celebration sequence
+        showCelebration = true
+        delay(500)
+        celebrationStage = 1
+        delay(1000)
+        celebrationStage = 2
+        delay(1000)
+        celebrationStage = 3
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
