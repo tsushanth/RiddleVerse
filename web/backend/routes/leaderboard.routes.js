@@ -5,6 +5,7 @@ import {
     getFeaturedPuzzles
 } from '../services/puzzleService.js';
 import { supabase } from '../config/database.js';
+import { isValidScoreDelta } from '../utils/scoreBounds.js';
 
 const router = express.Router();
 
@@ -73,7 +74,7 @@ router.get('/score', async (req, res) => {
 router.post('/update-score', async (req, res) => {
     const { userId, name, score } = req.body;
 
-    if (!userId || !name || typeof score !== 'number') {
+    if (!userId || !name || !isValidScoreDelta(score)) {
         return res.status(400).json({ error: 'Invalid request' });
     }
 
