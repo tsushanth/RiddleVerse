@@ -135,7 +135,7 @@ fun PuzzleScreen(
 
         // --- word puzzles (feat/puzzles-word) ---
         PuzzleScreenType.WORD_GUESS_SCREEN, PuzzleScreenType.WORD_LADDER_SCREEN, PuzzleScreenType.LETTER_BALLOONS_SCREEN,
-        PuzzleScreenType.WORD_HIVE_SCREEN, PuzzleScreenType.CODE_CRACKER_SCREEN -> {
+        PuzzleScreenType.WORD_HIVE_SCREEN, PuzzleScreenType.CODE_CRACKER_SCREEN, PuzzleScreenType.LINKUP_SCREEN /* linkup */ -> {
             WordPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,
@@ -342,7 +342,9 @@ fun PuzzleScreen(
         PuzzleScreenType.TUBE_TINT_SCREEN,
         PuzzleScreenType.PIECE_PACK_SCREEN,
         PuzzleScreenType.CRATE_SHIFT_SCREEN,
-        PuzzleScreenType.CONDUIT_SCREEN -> {
+        PuzzleScreenType.TRAIL_SCREEN, // trail (feat/game-trail)
+        PuzzleScreenType.CONDUIT_SCREEN,
+        PuzzleScreenType.CROWNS_SCREEN /* crowns: feat/game-crowns */ -> {
             SpatialPuzzleScreenWrapper(
                 currentPuzzle = currentPuzzle,
                 viewModel = viewModel,

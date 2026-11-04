@@ -74,7 +74,7 @@ fun SentenceTransitionsScreenWrapper(
                 Log.d("PuzzleScreen", "🔄 Sentence Transitions onContinue called")
                 Log.d("PuzzleScreen", "📝 Selected: $selectedAnswer, Correct: $correctAnswer")
 
-                val isCorrect = selectedAnswer == correctAnswer
+                val isCorrect = MultipleChoiceJudge.isCorrect(selectedAnswer, correctAnswer)
                 handlePuzzleCompletion(isCorrect, true, 0)
             },
             onCorrectAnswer = { inTime ->
@@ -316,7 +316,7 @@ fun MultipleChoiceScreenWrapper(
             Log.d("PuzzleScreen", "🔄 MultipleChoice onContinue called")
             Log.d("PuzzleScreen", "📝 Selected: $selectedAnswer, Correct: ${currentPuzzle.answer}")
 
-            val isCorrect = selectedAnswer == currentPuzzle.answer
+            val isCorrect = MultipleChoiceJudge.isCorrect(selectedAnswer, currentPuzzle.answer)
             handlePuzzleCompletion(isCorrect, true, 0)
         },
         onCorrectAnswer = { inTime ->

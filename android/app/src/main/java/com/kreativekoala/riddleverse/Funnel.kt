@@ -76,18 +76,22 @@ class FunnelState(
  * install id, backoff, bounded 200-event in-memory queue). No emails, no device ids, no free text: only the
  * allow-listed step name or days_since_install is sent. Never throws, never blocks the UI.
  *
- * Disabled in debug builds (test installs would pollute retention). Also off when [PuzzleEvents.setEnabled] is false.
+ * Debug builds only log (and queue when the "debug_emit" pref in [PREFS] is true) so test installs do not pollute retention. Also off when [PuzzleEvents.setEnabled] is false.
  * Note: the repo has no "qa" build type ("qa" is a puzzle type), so DEBUG is the exclusion.
  */
 object Funnel {
     private const val PREFS = "funnel_state"
     @Volatile private var state: FunnelState? = null
     private var startedActivities = 0
+    @Volatile private var debugEmit = false
 
     fun init(app: Application) {
         try {
-            if (state != null || BuildConfig.DEBUG) return
+            if (state != null) return
             val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            // Debug builds track steps (logcat tag "Funnel") but only queue them when this pref is set, so test
+            // installs do not pollute the production funnel.
+            debugEmit = BuildConfig.DEBUG && prefs.getBoolean("debug_emit", false)
             val installTime = try {
                 app.packageManager.getPackageInfo(app.packageName, 0).firstInstallTime
             } catch (_: Throwable) { System.currentTimeMillis() }
@@ -113,11 +117,21 @@ object Funnel {
         } catch (_: Throwable) { }
     }
 
+    /** Guest-flow steps ([FunnelStep]) mapped onto the allow-list; steps with no allow-listed equivalent stay local. */
+    @Suppress("UNUSED_PARAMETER")
+    fun log(step: FunnelStep, props: Map<String, Any?> = emptyMap()) {
+        val mapped = step.funnelStep
+        if (mapped != null) log(mapped)
+        else if (BuildConfig.DEBUG) android.util.Log.d("Funnel", "local-only step ${step.key} $props")
+    }
+
     /** Report an install-funnel step (see [PuzzleEventsClient.FUNNEL_STEPS]). Only the first call per install sends. */
     fun log(step: String) {
         try {
             val st = state ?: return
             if (!st.shouldLog(step)) return
+            if (BuildConfig.DEBUG) android.util.Log.d("Funnel", "step=$step emit=$debugEmit")
+            if (BuildConfig.DEBUG && !debugEmit) return
             PuzzleEvents.emitFunnel(
                 PuzzleEvent("funnel", PuzzleEventsClient.APP_PUZZLE_TYPE, null, PuzzleEventsClient.newId(),
                     ts = System.currentTimeMillis(), funnelStep = step)
@@ -128,6 +142,8 @@ object Funnel {
     private fun appOpen() {
         try {
             val days = state?.appOpenDays() ?: return
+            if (BuildConfig.DEBUG) android.util.Log.d("Funnel", "app_open days=$days emit=$debugEmit")
+            if (BuildConfig.DEBUG && !debugEmit) return
             PuzzleEvents.emitFunnel(
                 PuzzleEvent("app_open", PuzzleEventsClient.APP_PUZZLE_TYPE, null, PuzzleEventsClient.newId(),
                     ts = System.currentTimeMillis(), daysSinceInstall = days)

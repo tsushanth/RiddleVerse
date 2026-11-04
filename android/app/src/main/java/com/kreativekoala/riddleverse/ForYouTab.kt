@@ -185,6 +185,9 @@ fun ForYouTab(
             }
         }
 
+        // Daily puzzle: same puzzle for everyone, solve-based streak (local only, works for guests)
+        item { DailyPuzzleHomeCard() }
+
         // Loading state
         if (isLoading) {
             item {
@@ -211,6 +214,10 @@ fun ForYouTab(
                 }
             }
         } else {
+            // Home discovery rows (home-discovery): registry-driven, not gated on the puzzle queue
+            item { NewGamesRow(onPuzzleTypeSelected) }
+            item { PickedForYouRow(onPuzzleTypeSelected) }
+
             // Telegram bot banner
             item {
                 TelegramBotBanner()

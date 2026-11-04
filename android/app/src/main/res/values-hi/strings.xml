@@ -387,4 +387,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">देश भूगोल चुनौती</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">नए गेम</string>
+    <string name="home_new_subtitle">आज़माने के लिए ताज़ा पहेलियाँ</string>
+    <string name="home_new_badge">नया</string>
+    <string name="home_foryou_title">आपके लिए चुने गए</string>
+    <string name="foryou_reason_continue">फिर से खेलें</string>
+    <string name="foryou_reason_similar">%1$s जैसे</string>
+    <string name="foryou_reason_winner">जिनमें आप जीतते हैं</string>
+    <string name="foryou_reason_quick">आसान जीत</string>
+    <string name="lang_switch_prompt">%1$s में बदलें?</string>
+    <string name="lang_switch_action">बदलें</string>
+    <string name="lang_not_now">अभी नहीं</string>
 </resources>

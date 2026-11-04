@@ -338,4 +338,17 @@
     <string name="tap_ascending_order">Нажимайте числа в порядке возрастания (от наименьшего к наибольшему)</string>
 
     <string name="country_geography_challenge">Географический вызов стран</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Новые игры</string>
+    <string name="home_new_subtitle">Свежие головоломки</string>
+    <string name="home_new_badge">НОВОЕ</string>
+    <string name="home_foryou_title">Подобрано для вас</string>
+    <string name="foryou_reason_continue">Продолжить</string>
+    <string name="foryou_reason_similar">Похоже на «%1$s»</string>
+    <string name="foryou_reason_winner">У вас получается</string>
+    <string name="foryou_reason_quick">Быстрая победа</string>
+    <string name="lang_switch_prompt">Переключить на %1$s?</string>
+    <string name="lang_switch_action">Переключить</string>
+    <string name="lang_not_now">Не сейчас</string>
 </resources>

@@ -64,13 +64,6 @@ object DailyStreakManager {
         return sdf.format(Date())
     }
 
-    private fun getYesterdayString(): String {
-        val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_YEAR, -1)
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-        return sdf.format(calendar.time)
-    }
-
     fun getDailyData(context: Context): DailyData {
         val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         return DailyData(
@@ -131,83 +124,25 @@ object DailyStreakManager {
     }
 
     /**
-     * Main function called on app open
-     * Returns: Pair<Boolean, StreakReward?> (shouldResetGroups, streakReward)
+     * Called on app open. Since the daily puzzle (feat/daily-puzzle-share) this NO LONGER extends the streak or
+     * pays coins: opening the app proves nothing, solving does (see [DailyPuzzleStore.recordSolve]). It still
+     * tracks the day last opened and tells the caller when a new day started (so puzzle groups reset).
+     *
+     * The old open-streak values in this file are left untouched and are carried into the solve-streak exactly
+     * once, by [DailyPuzzleStore.ensureMigrated], which runs first so it sees the pre-update "last opened" day.
+     *
+     * Returns: Pair<Boolean, StreakReward?> (shouldResetGroups, always null reward).
      */
     fun processAppOpen(context: Context): Pair<Boolean, StreakReward?> {
+        DailyPuzzleStore.ensureMigrated(context)
         val currentData = getDailyData(context)
         val today = getTodayString()
-        val yesterday = getYesterdayString()
-
-        Log.d(TAG, "📅 Processing app open:")
-        Log.d(TAG, "  Today: $today")
-        Log.d(TAG, "  Yesterday: $yesterday")
-        Log.d(TAG, "  Last opened: ${currentData.lastOpenedDay}")
-        Log.d(TAG, "  Current streak: ${currentData.currentStreak}")
-
-        return when {
-            // First time opening or same day - no reset needed
-            currentData.lastOpenedDay == today -> {
-                Log.d(TAG, "📱 Same day open - no changes needed")
-                Pair(false, null)
-            }
-
-            // Opened yesterday - continue streak
-            currentData.lastOpenedDay == yesterday -> {
-                val newStreak = currentData.currentStreak + 1
-                val newBestStreak = maxOf(currentData.bestStreak, newStreak)
-                val streakReward = calculateStreakReward(newStreak)
-
-                val updatedData = currentData.copy(
-                    lastOpenedDay = today,
-                    currentStreak = newStreak,
-                    coins = currentData.coins + streakReward.coins,
-                    totalDaysPlayed = currentData.totalDaysPlayed + 1,
-                    bestStreak = newBestStreak
-                )
-
-                saveDailyData(context, updatedData)
-
-                Log.d(TAG, "🔥 Streak continued!")
-                Log.d(TAG, "  New streak: $newStreak")
-                Log.d(TAG, "  Reward: ${streakReward.coins} coins")
-                Log.d(TAG, "  Special: ${streakReward.specialReward}")
-
-                // Reset groups for new day and give streak reward
-                Pair(true, streakReward)
-            }
-
-            // Missed day(s) - reset streak but count as new day
-            else -> {
-                val streakReward = if (currentData.lastOpenedDay.isEmpty()) {
-                    // First time user
-                    calculateStreakReward(1)
-                } else {
-                    // Returning user who missed days - reset streak to 1
-                    calculateStreakReward(1)
-                }
-
-                val updatedData = currentData.copy(
-                    lastOpenedDay = today,
-                    currentStreak = 1, // Reset to 1 (today counts)
-                    coins = currentData.coins + streakReward.coins,
-                    totalDaysPlayed = currentData.totalDaysPlayed + 1
-                )
-
-                saveDailyData(context, updatedData)
-
-                if (currentData.lastOpenedDay.isEmpty()) {
-                    Log.d(TAG, "🎉 Welcome new user!")
-                } else {
-                    Log.d(TAG, "💔 Streak broken - resetting to day 1")
-                    Log.d(TAG, "  Previous streak was: ${currentData.currentStreak}")
-                }
-                Log.d(TAG, "  New day reward: ${streakReward.coins} coins")
-
-                // Reset groups for new day and give day 1 reward
-                Pair(true, streakReward)
-            }
-        }
+        if (currentData.lastOpenedDay == today) return Pair(false, null)
+        saveDailyData(
+            context,
+            currentData.copy(lastOpenedDay = today, totalDaysPlayed = currentData.totalDaysPlayed + 1)
+        )
+        return Pair(true, null)
     }
 
     fun addCoins(context: Context, amount: Int) {

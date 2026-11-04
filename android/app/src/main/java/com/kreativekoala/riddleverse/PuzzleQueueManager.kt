@@ -413,6 +413,8 @@ class PuzzleQueueManager private constructor(internal val context: Context) {
         return withContext(Dispatchers.IO) {
             try {
                 val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                // /batch-fetch-puzzles rejects a blank userId with 400 (guests); callers fall back to single fetches.
+                if (userId.isBlank()) return@withContext emptyList()
 
                 val requestData = JSONObject().apply {
                     put("userId", userId)

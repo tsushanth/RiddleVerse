@@ -1,0 +1,5 @@
+Play in one tap, no sign-up needed.
+- New daily puzzle with a share card to challenge friends
+- 4 new games: Crowns, Trail, Linkup and a fresh pack of riddles
+- Fixed answers being marked wrong in math and memory games
+- Smoother Home with game discovery and general polish

@@ -383,4 +383,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">Landengeografie-uitdaging</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Nieuwe spellen</string>
+    <string name="home_new_subtitle">Verse puzzels om te proberen</string>
+    <string name="home_new_badge">NIEUW</string>
+    <string name="home_foryou_title">Voor jou gekozen</string>
+    <string name="foryou_reason_continue">Ga verder</string>
+    <string name="foryou_reason_similar">Zoals %1$s</string>
+    <string name="foryou_reason_winner">Dit gaat je goed af</string>
+    <string name="foryou_reason_quick">Snelle winst</string>
+    <string name="lang_switch_prompt">Overschakelen naar %1$s?</string>
+    <string name="lang_switch_action">Wisselen</string>
+    <string name="lang_not_now">Niet nu</string>
 </resources>

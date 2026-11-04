@@ -295,4 +295,17 @@
     <string name="no_hint_available">Không có gợi ý</string>
     <string name="tap_ascending_order">Nhấn số theo thứ tự tăng dần (nhỏ đến lớn)</string>
     <string name="country_geography_challenge">Thử thách Địa lý Quốc gia</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">Trò chơi mới</string>
+    <string name="home_new_subtitle">Câu đố mới để thử</string>
+    <string name="home_new_badge">MỚI</string>
+    <string name="home_foryou_title">Chọn riêng cho bạn</string>
+    <string name="foryou_reason_continue">Chơi tiếp</string>
+    <string name="foryou_reason_similar">Giống %1$s</string>
+    <string name="foryou_reason_winner">Bạn chơi giỏi</string>
+    <string name="foryou_reason_quick">Thắng nhanh</string>
+    <string name="lang_switch_prompt">Chuyển sang %1$s?</string>
+    <string name="lang_switch_action">Chuyển</string>
+    <string name="lang_not_now">Để sau</string>
 </resources>

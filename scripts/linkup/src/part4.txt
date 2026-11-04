@@ -1,0 +1,130 @@
+1 | Zodiac signs | ARIES VIRGO LIBRA LEO
+2 | Boys' names | LUKE JACK NOAH OWEN
+3 | Words before TRAP | MOUSE BEAR SAND DEATH
+4 | Silent T | BALLET BUFFET GOURMET DEBUT
+x LEO > 2
+
+1 | Greek letters | ALPHA BETA GAMMA SIGMA
+2 | Dances | WALTZ SALSA POLKA SAMBA
+3 | NATO alphabet words | ECHO TANGO HOTEL VICTOR
+4 | Palindromes | DEED NOON SOLOS RADAR
+x TANGO > 2
+x ALPHA > 3
+
+1 | Chinese zodiac animals | RAT TIGER MONKEY DRAGON
+2 | Mythical creatures | UNICORN PHOENIX GRIFFIN MERMAID
+3 | Words before FRUIT | GRAPE PASSION STAR JACK
+4 | Hide an animal | CATALOG ANTHEM PIGPEN BEARER
+x DRAGON > 2
+
+1 | Shakespeare plays | HAMLET MACBETH OTHELLO TEMPEST
+2 | Storms | GALE SQUALL TYPHOON BLIZZARD
+3 | Words before WORD | PASS KEY CROSS BUZZ
+4 | Hide a colour | STEALTH HATRED BLUEPRINT MARIGOLD
+x TEMPEST > 2
+
+1 | Famous scientists | NEWTON DARWIN CURIE EINSTEIN
+2 | Units of measurement | WATT VOLT OHM JOULE
+3 | Words before STROKE | BACK BREAST HEAT MASTER
+4 | Anagrams of each other | NOTES ONSET STONE TONES
+x NEWTON > 2
+
+1 | Dog breeds | BEAGLE POODLE COLLIE LABRADOR
+2 | Athletes | BOXER SWIMMER RUNNER ARCHER
+3 | Words before NAIL | THUMB TOE FINGER HANG
+4 | Palindromes | RACECAR REFER ROTOR RADAR
+x BOXER > 1
+
+1 | Furniture | CHAIR SOFA DESK STOOL
+2 | Charts and data | TABLE GRAPH CHART DIAGRAM
+3 | Words before CLOTH | DISH LOIN OIL FLOOR
+4 | Only Roman numeral letters | DIM CIVIC MILD VIVID
+x TABLE > 1
+x TABLE > 3
+
+1 | Card games | POKER RUMMY SNAP BRIDGE
+2 | Structures | TOWER DAM TUNNEL PIER
+3 | Words before MAKER | SHOE DRESS MATCH WATCH
+4 | Sound like a letter | BEE JAY WHY QUEUE
+x BRIDGE > 2
+
+1 | Parts of a story | SETTING THEME CHARACTER ENDING
+2 | Garden areas | LAWN PATIO BORDER PLOT
+3 | Words before PHONE | SMART HEAD MICRO EAR
+4 | Hide a number | ATTEND HONEY LISTEN FREIGHT
+x PLOT > 1
+
+1 | Experts | ACE PRO MASTER WIZARD
+2 | Tennis terms | DEUCE LOVE SERVE VOLLEY
+3 | Words before FACE | BABY POKER BOLD TYPE
+4 | Silent S | ISLAND AISLE DEBRIS ISLE
+x ACE > 2
+
+1 | Jobs | PILOT BAKER FARMER DENTIST
+2 | TV terms | EPISODE SEASON SERIES TRAILER
+3 | Words after FLIGHT | PATH DECK PLAN CASE
+4 | Anagrams of each other | LEAP PALE PEAL PLEA
+x PILOT > 2
+
+1 | Baseball roles | PITCHER CATCHER SHORTSTOP BATTER
+2 | Baking ingredients | FLOUR SUGAR BUTTER EGGS
+3 | Words after BREAD | CRUMB BIN BOARD BASKET
+4 | Hide an animal | BEARING RATIO PANTRY HOWL
+x BATTER > 2
+
+1 | Breads | BAGEL BAGUETTE PITA NAAN
+2 | Hairstyles | BUN BRAID PLAIT PONYTAIL
+3 | Words after DOOR | BELL MAT FRAME STEP
+4 | Palindromic names | ADA ANNA OTTO BOB
+x BUN > 1
+x BOB > 2
+
+1 | Desert animals | CAMEL SCORPION LIZARD COYOTE
+2 | Shades of beige | TAN BEIGE KHAKI SAND
+3 | Words after SAND | CASTLE PAPER STORM BOX
+4 | Hide an animal | SHAPE ANTHEM BOWL CATALOG
+x CAMEL > 2
+
+1 | Guitar parts | FRET NECK BRIDGE STRING
+2 | Thin cords | ROPE CABLE THREAD TWINE
+3 | Words before BEAN | JELLY COFFEE GREEN BAKED
+4 | Palindromes | RACECAR KAYAK CIVIC LEVEL
+x STRING > 2
+
+1 | Irregular plurals | MOUSE GOOSE TOOTH CHILD
+2 | Rodents | RAT BEAVER SQUIRREL HAMSTER
+3 | Words before DOG | HOT SHEEP WATCH BULL
+4 | Letters in alphabetical order | ALMOST CHIMPS BEGIN FIRST
+x MOUSE > 2
+
+1 | Same plural as singular | SHEEP DEER MOOSE SALMON
+2 | Shades of pink | ROSE BLUSH CORAL PEACH
+3 | Things you can cast | SPELL NET VOTE SHADOW
+4 | Typed on the top row only | TYPEWRITER PROPERTY POTTERY TREETOP
+x SALMON > 2
+
+1 | Fingers and toes | THUMB PINKY INDEX TOE
+2 | Body parts | ELBOW KNEE ANKLE SHOULDER
+3 | Things you can fly | KITE PLANE FLAG DRONE
+4 | Spell a word backwards | DEVIL LAGER DIAPER STRESSED
+x TOE > 2
+x THUMB > 2
+x PINKY > 2
+
+1 | Breakfast foods | PANCAKE CEREAL OMELETTE PORRIDGE
+2 | Ways to talk nonsense | RAMBLE BABBLE BLATHER WAFFLE
+3 | Things you can set | TABLE ALARM RECORD SAIL
+4 | Add S to the front for a new word | MILE WORD HIP PEAR
+x WAFFLE > 1
+
+1 | Dairy foods | MILK CHEESE BUTTER YOGURT
+2 | Words after ICE | CREAM CUBE BERG SKATE
+3 | Things you can raise | FLAG CHILD HAND ALARM
+4 | Silent T | CHRISTMAS CASTLE FASTEN SOFTEN
+x CREAM > 1
+
+1 | Cooking methods | BOIL FRY ROAST GRILL
+2 | Illegal taking | POACH LOOT PILFER SWIPE
+3 | Words before WATCH | WRIST STOP BIRD NIGHT
+4 | Typed on the top row only | PROPERTY TYPEWRITER TROUPE REPORT
+x POACH > 1

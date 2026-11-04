@@ -65,6 +65,8 @@ enum class PuzzleScreenType(val typeName: String) {
     PIECE_PACK_SCREEN("Piece Pack Screen"),
     CRATE_SHIFT_SCREEN("Crate Shift Screen"),
     CONDUIT_SCREEN("Conduit Screen"),
+    TRAIL_SCREEN("Trail Screen"), // trail (feat/game-trail)
+    CROWNS_SCREEN("Crowns Screen"), // crowns: feat/game-crowns
     PROGRESSIVE_REVEAL("Progressive Reveal Screen"),
     REAL_OR_AI("Real or AI"),
     // --- classic puzzles (feat/puzzles-classic) ---
@@ -79,6 +81,7 @@ enum class PuzzleScreenType(val typeName: String) {
     LETTER_BALLOONS_SCREEN("Letter Balloons Screen"),
     WORD_HIVE_SCREEN("Word Hive Screen"),
     CODE_CRACKER_SCREEN("Code Cracker Screen"),
+    LINKUP_SCREEN("Linkup Screen"), // linkup (feat/game-linkup)
     // --- end word puzzles ---
     WORD_SEARCH_SCREEN("Word Search Screen");
 

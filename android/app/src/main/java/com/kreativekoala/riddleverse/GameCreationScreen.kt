@@ -747,6 +747,15 @@ fun GameCreationScreen(
                                 fontSize = 13.sp,
                                 color = RvInk
                             )
+                            if (generationVM.needsSignIn) {
+                                TextButton(
+                                    onClick = {
+                                        Funnel.log(FunnelStep.GUEST_GATE_SIGN_IN, mapOf("feature" to "create_game"))
+                                        context.startActivity(GuestGate.signInIntent(context))
+                                    },
+                                    modifier = Modifier.heightIn(min = 48.dp)
+                                ) { Text("Sign in or create account") }
+                            }
                         }
                     }
                 }

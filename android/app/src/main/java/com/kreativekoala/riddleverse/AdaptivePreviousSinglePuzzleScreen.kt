@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -39,6 +38,9 @@ import kotlin.random.Random
  * Focuses on core memory challenge without complex distractors
  */
 object SimplifiedAdaptiveMemoryGenerator {
+
+    /** Number of puzzles generated in this process; lets tests prove a game keeps ONE sequence from start to end. */
+    @Volatile internal var generatedCount = 0
 
     data class SimpleConfig(
         val delayMs: Long, // Simple delay for reveal
@@ -119,12 +121,31 @@ object SimplifiedAdaptiveMemoryGenerator {
         )
     )
 
+    /** The pause after each answer (✓/✗ is shown) before the next symbol; see the answer handler in the screen. */
+    const val FEEDBACK_PAUSE_MS = 1500L
+    /** The first symbol is shown alone for this long before the first question. */
+    const val FIRST_SYMBOL_MS = 2000L
+
+    /**
+     * Seconds on the clock for a game of [symbols] symbols. It used to be a flat 4 s per symbol, but every answer
+     * is followed by a 1.5 s feedback pause and each symbol has its own reveal delay, so on the harder levels most
+     * of the budget went on waiting and the clock ended the game while the player was still answering.
+     * Budget = unavoidable waiting + 4 s of thinking per symbol.
+     */
+    fun timeBudgetSeconds(symbols: Int, delayMs: Long): Int {
+        if (symbols <= 0) return 0
+        val answers = symbols - 1
+        val waitMs = FIRST_SYMBOL_MS + answers * (FEEDBACK_PAUSE_MS + delayMs)
+        return symbols * 4 + ((waitMs + 999) / 1000).toInt()
+    }
+
     /**
      * Generate simplified adaptive puzzle
      */
     fun generateSimplePuzzle(
         difficultyLevel: DifficultyManager.DifficultyLevel
     ): Pair<String, String> {
+        generatedCount++
         val config = getDifficultyConfigs()[difficultyLevel.index]
             ?: getDifficultyConfigs()[2]!!
 
@@ -411,8 +432,10 @@ fun SimplifiedAdaptiveMemoryScreen(
         }
     }
 
-    // Generate simplified puzzle data
-    val (puzzleData, answerData) = remember(currentDifficultyLevel) {
+    // Generate the puzzle ONCE per game. It used to be keyed on currentDifficultyLevel, so when the adaptive level
+    // moved (after ~2 answers) a different sequence replaced the one the player was holding in their head while the
+    // question index, hearts and score carried over. The adaptive level now only shapes the next puzzle.
+    val (puzzleData, answerData) = remember {
         try {
             SimplifiedAdaptiveMemoryGenerator.generateSimplePuzzle(currentDifficultyLevel)
         } catch (e: Exception) {
@@ -495,6 +518,7 @@ fun SimplifiedAdaptiveMemoryScreen(
     // Visual states
     var isRevealed by remember { mutableStateOf(false) }
 
+    val scope = rememberCoroutineScope()
     val feedbackManager = rememberUnifiedFeedbackManager()
     val currentLevel = feedbackManager.getCurrentLevel()
     val streakInfo = feedbackManager.getStreakInfo()
@@ -502,7 +526,7 @@ fun SimplifiedAdaptiveMemoryScreen(
     var showHint by remember { mutableStateOf(false) }
 
     // Timer management
-    var timeRemaining by remember { mutableStateOf(questionSequence.size * 4) }
+    var timeRemaining by remember { mutableStateOf(SimplifiedAdaptiveMemoryGenerator.timeBudgetSeconds(questionSequence.size, simpleConfig.delayMs)) }
 
     LaunchedEffect(gameState) {
         if (gameState == "playing") {
@@ -539,7 +563,7 @@ fun SimplifiedAdaptiveMemoryScreen(
             // Auto-advance only on first symbol
             if (currentQuestionIndex == 0) {
                 Log.d(TAG, "First symbol shown, auto-advancing after 2 seconds")
-                delay(2000)
+                delay(SimplifiedAdaptiveMemoryGenerator.FIRST_SYMBOL_MS)
 
                 if (gameState == "playing" && currentQuestionIndex == 0 && questionSequence.size > 1) {
                     Log.d(TAG, "Auto-advancing from first symbol to second symbol")
@@ -564,7 +588,7 @@ fun SimplifiedAdaptiveMemoryScreen(
         ) { config ->
             adaptationInfo = config
             if (config.confidenceScore > 0.5f) {
-                currentDifficultyLevel = config.level
+                // Do not swap currentDifficultyLevel mid-game: the sequence in play must not change.
                 showAdaptationNotification = SHOW_ADAPTATION_NOTICES
             }
         }
@@ -722,8 +746,8 @@ fun SimplifiedAdaptiveMemoryScreen(
                         recordPerformance(isCorrect, System.currentTimeMillis() - startTime)
                         showFeedback = true
 
-                        GlobalScope.launch {
-                            delay(1500)
+                        scope.launch {
+                            delay(SimplifiedAdaptiveMemoryGenerator.FEEDBACK_PAUSE_MS)
                             showFeedback = false
 
                             if (currentQuestionIndex < questionSequence.size - 1) {
@@ -767,7 +791,7 @@ fun SimplifiedAdaptiveMemoryScreen(
                         timeSpent = System.currentTimeMillis() - startTime,
                         difficulty = simpleConfig.name,
                         timeRemaining = timeRemaining,
-                        totalTime = questionSequence.size * 4,
+                        totalTime = SimplifiedAdaptiveMemoryGenerator.timeBudgetSeconds(questionSequence.size, simpleConfig.delayMs),
                         onComplete = {
                             onSubmitAnswer(isSuccess)
                             fetchNextPuzzle(currentScore)
@@ -801,7 +825,7 @@ private fun SimpleInstructionsScreen(
             verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 12.dp, Alignment.CenterVertically)
         ) {
             Text(
-                text = "Memory Previous Single",
+                text = "Memory Match: same or different?",
                 fontSize = if (compact) 20.sp else 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvOnTone,
@@ -810,7 +834,7 @@ private fun SimpleInstructionsScreen(
             )
 
             Text(
-                text = simpleConfig.description,
+                text = "Symbols appear one at a time. Is each one the same as the one just before it?",
                 fontSize = 14.sp,
                 color = RvOnTone.copy(alpha = 0.9f),
                 textAlign = TextAlign.Center,
@@ -835,10 +859,10 @@ private fun SimpleInstructionsScreen(
                     Spacer(modifier = Modifier.height(if (compact) 4.dp else 8.dp))
 
                     val instructions = listOf(
-                        "1. Look at the first symbol and remember it",
-                        "2. For each new symbol, decide if it's SAME or DIFFERENT",
-                        "3. Compare only with the previous symbol",
-                        "4. Tap SAME if it matches, DIFFERENT if not"
+                        "1. The first symbol is only to remember: nothing to tap yet",
+                        "2. Each new symbol: compare it with the one just before",
+                        "3. Tap SAME if they match, DIFFERENT if they don't",
+                        "4. Only the previous symbol counts, not the whole sequence"
                     )
 
                     instructions.forEach { instruction ->
@@ -853,7 +877,7 @@ private fun SimpleInstructionsScreen(
                     if (simpleConfig.delayMs > 0) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Note: Symbols will have a ${simpleConfig.delayMs}ms delay",
+                            text = "Each symbol appears after a short pause",
                             fontSize = 12.sp,
                             color = Color(0xFF6D28D9),
                             fontWeight = FontWeight.Medium

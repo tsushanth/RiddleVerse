@@ -383,4 +383,17 @@
 
     <!-- Geography -->
     <string name="country_geography_challenge">국가 지리 챌린지</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">새 게임</string>
+    <string name="home_new_subtitle">새로 나온 퍼즐을 만나 보세요</string>
+    <string name="home_new_badge">신규</string>
+    <string name="home_foryou_title">추천 게임</string>
+    <string name="foryou_reason_continue">이어서 하기</string>
+    <string name="foryou_reason_similar">%1$s와(과) 비슷</string>
+    <string name="foryou_reason_winner">잘 푸는 게임</string>
+    <string name="foryou_reason_quick">빠른 승리</string>
+    <string name="lang_switch_prompt">%1$s(으)로 바꿀까요?</string>
+    <string name="lang_switch_action">변경</string>
+    <string name="lang_not_now">나중에</string>
 </resources>

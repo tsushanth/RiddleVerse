@@ -71,6 +71,9 @@ class GameGenerationViewModel : ViewModel() {
     var estimatedSecondsRemaining by mutableIntStateOf(0)
     var errorMessage by mutableStateOf<String?>(null)
 
+    /** True while the visible error is the guest "sign in to create" prompt (UI adds a Sign in button). */
+    val needsSignIn: Boolean get() = errorMessage == GuestGate.SIGN_IN_TO_CREATE
+
     // Rate limit upsell state
     var showRateLimitUpsell by mutableStateOf(false)
     var rateLimitCoinCost by mutableIntStateOf(10)
@@ -112,6 +115,13 @@ class GameGenerationViewModel : ViewModel() {
 
     fun startGeneration(mode: GenerationMode, context: Context) {
         if (isGenerating) return
+        // Generating a game costs real model time and is attributed to a creator account: guests are asked to sign in
+        // first (they can still browse and play games).
+        if (GuestGate.isGuest()) {
+            errorMessage = GuestGate.SIGN_IN_TO_CREATE
+            Funnel.log(FunnelStep.GUEST_GATE_SHOWN, mapOf("feature" to "create_game"))
+            return
+        }
 
         isGenerating = true
         errorMessage = null

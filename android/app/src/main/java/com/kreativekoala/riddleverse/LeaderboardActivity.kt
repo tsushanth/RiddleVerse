@@ -148,6 +148,23 @@ fun LeaderboardScreen() {
             }
         )
 
+        // Guests can read the board but are not on it until they have an account.
+        if (GuestGate.isGuest()) {
+            androidx.compose.material3.Card(modifier = Modifier.fillMaxWidth().padding(top = 8.dp)) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Sign in to join the leaderboard", modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
+                    androidx.compose.material3.TextButton(
+                        onClick = { context.startActivity(GuestGate.signInIntent(context)) },
+                        modifier = Modifier.heightIn(min = 48.dp)
+                    ) { Text("Sign in") }
+                }
+            }
+        }
+
         // Show loading state if topUsers is empty
         if (topUsers.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

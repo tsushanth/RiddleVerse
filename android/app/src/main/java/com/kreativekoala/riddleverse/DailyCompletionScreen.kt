@@ -8,6 +8,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import okhttp3.*
@@ -63,6 +66,9 @@ class DailyCompletionActivity : AppCompatActivity() {
     private var sourceGroupName: String? = null
     private var groupPuzzleType: String? = null
 
+    // Guest-first: set once per real launch (not on rotation) when this completion should nudge for an account.
+    private var guestPromptDue = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
@@ -72,7 +78,6 @@ class DailyCompletionActivity : AppCompatActivity() {
             Log.e("DailyCompletionActivity", "Failed to initialize AdManager", e)
         }
         val streakDays = intent.getIntExtra("streakDays", 1)
-        val earnedPoints = intent.getIntExtra("earnedPoints", 100)
         val isCustomPuzzle = intent.getBooleanExtra("isCustomPuzzle", false)
         val customPuzzleId = intent.getStringExtra("customPuzzleId")
 
@@ -88,6 +93,10 @@ class DailyCompletionActivity : AppCompatActivity() {
             Log.e("DailyCompletionActivity", "Failed to parse session stats", e)
             null
         }
+        // PuzzleActivity passes the points it derived from the session. If an old/other caller sends none, derive
+        // them from the same stats here instead of a hard-coded 100.
+        val earnedPoints = if (intent.hasExtra("earnedPoints")) intent.getIntExtra("earnedPoints", 0)
+        else CompletionScoring.pointsFor(sessionStats, isCustomPuzzle)
 
         // Extract group information
         sourceGroupId = intent.getStringExtra("sourceGroupId")
@@ -144,6 +153,19 @@ class DailyCompletionActivity : AppCompatActivity() {
             }
         }
 
+        if (savedInstanceState == null && completionType is CompletionType.Success) {
+            if (intent.getBooleanExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, false)) Funnel.log(FunnelStep.FIRST_PUZZLE_COMPLETED)
+            if (GuestGate.isGuest()) {
+                val state = GuestPrefs.recordSessionCompleted(this)
+                Funnel.log(FunnelStep.SESSION_COMPLETED_AS_GUEST, mapOf("completed_sessions" to state.completedSessions))
+                if (SignupPromptPolicy.shouldShow(isGuest = true, s = state)) {
+                    val shown = GuestPrefs.recordPromptShown(this)
+                    guestPromptDue = true
+                    Funnel.log(FunnelStep.SIGNUP_PROMPT_SHOWN, mapOf("nth" to shown.promptsShown))
+                }
+            }
+        }
+
         // Show the regular completion screen with modified navigation
         showEnhancedCompletionScreen(
             completionType = completionType,
@@ -167,13 +189,17 @@ class DailyCompletionActivity : AppCompatActivity() {
             val timeTaken = intent.getLongExtra("timeTaken", 0L)
             val finalScore = intent.getIntExtra("finalScore", 0)
 
-            if (userId != null && finalScore > 0) {
+            if (!userId.isNullOrBlank() && finalScore > 0) {
                 updateCustomPuzzleLeaderboard(customPuzzleId, userId, timeTaken, finalScore)
             }
         }
 
         setContent {
-            RvActivityTheme {
+            // Users report oversized text here. The screen is built from fixed-size cards and tiles sized in dp and
+            // had no font cap (the puzzle screens cap at 1.3x, PuzzleActivity), so at large system font sizes the
+            // text outgrew them. Same cap, judgment call: not verified on a device.
+            RvActivityTheme(maxFontScale = 1.3f) {
+              androidx.compose.foundation.layout.Box(modifier = androidx.compose.ui.Modifier.fillMaxSize()) {
                 DailyCompletionScreen(
                     completionType = completionType,
                     isCustomPuzzle = isCustomPuzzle,
@@ -200,6 +226,32 @@ class DailyCompletionActivity : AppCompatActivity() {
                     },
                     showAdBeforeNavigation = ::showAdBeforeNavigation
                 )
+                // Gentle account nudge, a moment after the result is on screen. Always dismissible.
+                var promptVisible by rememberSaveable { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    if (guestPromptDue) { kotlinx.coroutines.delay(1200); promptVisible = true }
+                }
+                if (promptVisible) {
+                    GuestSignupPrompt(
+                        modifier = androidx.compose.ui.Modifier.align(androidx.compose.ui.Alignment.BottomCenter)
+                            .navigationBarsPadding(),
+                        onCreateAccount = {
+                            Funnel.log(FunnelStep.SIGNUP_PROMPT_ACCEPTED)
+                            promptVisible = false
+                            startActivity(GuestGate.signInIntent(this@DailyCompletionActivity))
+                        },
+                        onNotNow = {
+                            Funnel.log(FunnelStep.SIGNUP_PROMPT_DISMISSED, mapOf("opted_out" to false))
+                            promptVisible = false
+                        },
+                        onNeverAgain = {
+                            Funnel.log(FunnelStep.SIGNUP_PROMPT_DISMISSED, mapOf("opted_out" to true))
+                            GuestPrefs.recordPromptOptOut(this@DailyCompletionActivity)
+                            promptVisible = false
+                        }
+                    )
+                }
+              }
             }
         }
     }

@@ -340,8 +340,19 @@ fun HomeScreen(navController: NavHostController,
         // Header with greeting and user info
         HeaderSection()
 
-        // Web/iOS promo banner (dismissable)
-        WebPromoBanner()
+        // On a short viewport (phone in landscape, ~420 dp tall) the header, banners and bottom bar used to take the
+        // whole screen and leave a ~70 dp sliver for the games. The promos are optional, so skip them there; they
+        // come back in portrait.
+        if (androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp >= 480) {
+            // Web/iOS promo banner (dismissable)
+            WebPromoBanner()
+
+            // Skippable intro, offered once as a dismissible card (never a gate)
+            OnboardingOffer()
+
+            // First-run, one-time "Switch to <language>?" suggestion (home-discovery)
+            LanguageSuggestionChip()
+        }
 
         // Main Content Area
         Box(
@@ -386,7 +397,11 @@ fun HomeScreen(navController: NavHostController,
                     isLoading = isLoading,
                     isLoadingMore = isLoadingMore,
                     onCreatePuzzle = {
-                        context.startActivity(Intent(context, CreatePuzzleActivity::class.java))
+                        // Server-side AI generation is per account: guests get a "sign in to create" prompt.
+                        val act = context as? android.app.Activity
+                        if (act == null || GuestGate.requireAccount(act, "create puzzles")) {
+                            context.startActivity(Intent(context, CreatePuzzleActivity::class.java))
+                        }
                     },
                     onPuzzleSelected = { puzzle ->
                         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
@@ -516,6 +531,7 @@ fun HomeScreen(navController: NavHostController,
                     onSignOut = {
                         FirebaseAuth.getInstance().signOut()
                         com.kreativekoala.riddleverse.auth.SupabaseAuth.clearSession(context)
+                        GuestPrefs.clear(context) // signing out returns to the first-run screen, not a half-guest state
                         val intent = Intent(context, WelcomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         context.startActivity(intent)
@@ -679,6 +695,18 @@ fun HeaderSection() {
             )
             UserScoreView()
         }
+
+        // Language switch (home-discovery): was only reachable through Android system settings
+        var showLanguagePicker by remember { mutableStateOf(false) }
+        IconButton(onClick = { showLanguagePicker = true }) {
+            Icon(
+                imageVector = Icons.Default.Language,
+                contentDescription = stringResource(R.string.language),
+                tint = RvInkSoft,
+                modifier = androidx.compose.ui.Modifier.size(26.dp)
+            )
+        }
+        if (showLanguagePicker) LanguagePickerDialog { showLanguagePicker = false }
 
         IconButton(onClick = {
             context.startActivity(android.content.Intent(context, LeaderboardActivity::class.java))
@@ -1634,6 +1662,10 @@ fun SettingsTab(
                     onNavigateToTopics = onNavigateToTopics,
                     onNavigateToAchievements = onNavigateToAchievements
                 )
+            }
+
+            item {
+                LanguageSettingsSection()
             }
 
             item {
@@ -2711,26 +2743,15 @@ class HomeActivity : AppCompatActivity() {
         val ratingManager = AppRatingManager(this)
         ratingManager.incrementLaunchCount()
 
-        val tutorialPrefs = TutorialPreferences(this)
-        val shouldShowOnboarding = !tutorialPrefs.hasCompletedOnboarding()
-
         setContent {
             // includeIme = false: the bottom tab bar must not ride up on the keyboard; HomeScreen pads for it itself.
             RvActivityTheme(includeIme = false, bottomClearance = 0.dp) {
-                var showOnboarding by remember { mutableStateOf(shouldShowOnboarding) }
                 val navController = rememberNavController()
                 var showStreakDialog by remember { mutableStateOf(dailyStreakReward != null) }
                 val streakReward by remember { mutableStateOf(dailyStreakReward) }
 
-                if (showOnboarding) {
-                    // Show onboarding tutorial for first-time users
-                    OnboardingScreen(
-                        onComplete = {
-                            tutorialPrefs.markOnboardingCompleted()
-                            showOnboarding = false
-                        }
-                    )
-                } else {
+                // The intro is no longer a gate: HomeScreen offers it as a dismissible card (OnboardingOffer).
+                run {
                     // Show normal home screen
                     LaunchedEffect(Unit) {
                         GroupCompletionManager.registerObserver { groupId, userId ->
@@ -2781,8 +2802,26 @@ class HomeActivity : AppCompatActivity() {
             }
             startActivity(intent)
         } else {
-            Toast.makeText(this, "Please log in to access daily quizzes", Toast.LENGTH_SHORT).show()
+            GuestGate.requireAccount(this, "play daily quizzes")
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        askNotificationPermissionOnce()
+    }
+
+    /** Asked once, here (after the person has actually played), instead of as the first thing on a fresh install. */
+    private fun askNotificationPermissionOnce() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) return
+        if (GuestPrefs.notificationPermissionAsked(this)) return
+        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+            == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            GuestPrefs.markNotificationPermissionAsked(this); return
+        }
+        // A brand new guest has Home underneath the first puzzle: wait until Home is really the visible screen.
+        GuestPrefs.markNotificationPermissionAsked(this)
+        androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
     }
 }
 
