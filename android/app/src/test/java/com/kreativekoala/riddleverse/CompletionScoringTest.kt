@@ -13,24 +13,28 @@ class CompletionScoringTest {
     )
 
     @Test fun equalPerformanceGivesEqualPoints() {
-        val a = CompletionScoring.pointsFor(stats(640, 5), false)
-        repeat(50) { assertEquals(a, CompletionScoring.pointsFor(stats(640, 5), false)) }
+        val a = CompletionScoring.pointsFor(stats(320, 5), false)
+        repeat(50) { assertEquals(a, CompletionScoring.pointsFor(stats(320, 5), false)) }
     }
 
-    @Test fun pointsComeFromTheRealSessionScore() {
-        assertEquals(640, CompletionScoring.pointsFor(stats(640, 5), false))
-        assertEquals(320, CompletionScoring.pointsFor(stats(320, 3), false))
+    @Test fun pointsComeFromTheRealSessionScoreOnTheLeaderboardScale() {
+        assertEquals(640, CompletionScoring.pointsFor(stats(320, 5), false))
+        assertEquals(100, CompletionScoring.pointsFor(stats(50, 1, 1), false)) // one slow easy puzzle (seen on device)
+        assertEquals(320, CompletionScoring.pointsFor(stats(160, 1, 1), false)) // one fast medium puzzle
     }
 
     @Test fun betterPerformanceGivesMorePoints() {
-        val worse = CompletionScoring.pointsFor(stats(300, 3), false)
-        val better = CompletionScoring.pointsFor(stats(650, 5), false)
+        val worse = CompletionScoring.pointsFor(stats(150, 3), false)
+        val better = CompletionScoring.pointsFor(stats(325, 5), false)
         assertTrue(better > worse)
+        assertTrue(CompletionScoring.pointsFor(stats(160, 1, 1), false) > CompletionScoring.pointsFor(stats(100, 1, 1), false))
     }
 
-    @Test fun typicalGoodSessionIsOnTheOldScale() {
-        val p = CompletionScoring.pointsFor(stats(700, 5), false)
-        assertTrue(p in 100..1000)
+    @Test fun typicalSessionsLandOnTheOldRange() {
+        for (raw in listOf(50, 100, 160, 300, 380)) {
+            val p = CompletionScoring.pointsFor(stats(raw, 1, 1), false)
+            assertTrue("$raw -> $p", p in 100..1000)
+        }
     }
 
     @Test fun nothingCorrectStillGetsTheMinimumNotZero() {
@@ -41,15 +45,15 @@ class CompletionScoringTest {
     @Test fun absurdScoresAreBounded() {
         assertEquals(CompletionScoring.MAX_POINTS, CompletionScoring.pointsFor(stats(Int.MAX_VALUE, 5), false))
         assertEquals(CompletionScoring.MAX_POINTS, CompletionScoring.pointsFor(stats(50_000, 5), false))
-        // a score the game cannot produce from one correct answer is capped by that answer
-        assertEquals(CompletionScoring.MAX_PER_CORRECT_ANSWER, CompletionScoring.pointsFor(stats(900, 1), false))
+        // a score the game cannot produce from one correct answer is capped by that answer (400 raw, x2)
+        assertEquals(CompletionScoring.MAX_PER_CORRECT_ANSWER * 2, CompletionScoring.pointsFor(stats(900, 1), false))
         // negative and nonsense counts never go below the minimum or throw
         assertEquals(CompletionScoring.MIN_POINTS, CompletionScoring.pointsFor(stats(-50, -3, -1), false))
     }
 
     @Test fun customPuzzlesEarnHalfAndAreNeverDoubled() {
-        assertEquals(320, CompletionScoring.pointsFor(stats(640, 5), true))
+        assertEquals(320, CompletionScoring.pointsFor(stats(320, 5), true))
         assertEquals(CompletionScoring.MAX_POINTS / 2, CompletionScoring.pointsFor(stats(5000, 5), true))
-        assertTrue(CompletionScoring.pointsFor(stats(640, 5), true) < CompletionScoring.pointsFor(stats(640, 5), false))
+        assertTrue(CompletionScoring.pointsFor(stats(320, 5), true) < CompletionScoring.pointsFor(stats(320, 5), false))
     }
 }
