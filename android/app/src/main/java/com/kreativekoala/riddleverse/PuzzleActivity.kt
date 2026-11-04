@@ -186,7 +186,6 @@ class PuzzleActivity : AppCompatActivity() {
                         val intent = Intent(context, DailyCompletionActivity::class.java).apply {
                             // Always include these for regular completion
                             putExtra("streakDays", (1..10).random())
-                            putExtra("earnedPoints", listOf(100, 200, 250, 300, 500).random())
 
                             // 🚀 FIXED: Add session statistics and puzzle type
                             try {
@@ -203,6 +202,15 @@ class PuzzleActivity : AppCompatActivity() {
 
                                 putExtra("sessionStats", Gson().toJson(sessionStats))
                                 putExtra("puzzleType", puzzleType)
+                                // Was a random 100..500 (doubled later for non-custom). Now the real session performance;
+                                // this single value is what the screen shows, the share text says and the leaderboard gets.
+                                putExtra(
+                                    "earnedPoints",
+                                    CompletionScoring.pointsFor(
+                                        sessionStats,
+                                        (context as? Activity)?.intent?.getBooleanExtra("isCustomPuzzle", false) == true
+                                    )
+                                )
 
                             } catch (e: Exception) {
                                 Log.e("PuzzleActivity", "❌ Failed to add session stats", e)
