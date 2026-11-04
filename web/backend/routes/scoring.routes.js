@@ -1,7 +1,7 @@
 // routes/scoring.routes.js - Score and leaderboard endpoints
 import express from 'express';
 import { supabase } from '../config/database.js';
-import { isValidScoreDelta } from '../utils/scoreBounds.js';
+import { clampScoreDelta } from '../utils/scoreBounds.js';
 
 const router = express.Router();
 
@@ -12,9 +12,10 @@ const router = express.Router();
  * different path prefix for backward compat with older clients.
  */
 router.post('/update-score', async (req, res) => {
-    const { userId, name, score } = req.body;
+    const { userId, name, score: rawScore } = req.body;
+    const score = clampScoreDelta(rawScore);
 
-    if (!userId || !name || !isValidScoreDelta(score)) {
+    if (!userId || !name || score === null) {
         return res.status(400).json({ error: 'Invalid request' });
     }
 
