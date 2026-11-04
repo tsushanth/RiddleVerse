@@ -5,6 +5,7 @@ import {
     getFeaturedPuzzles
 } from '../services/puzzleService.js';
 import { supabase } from '../config/database.js';
+import { clampScoreDelta } from '../utils/scoreBounds.js';
 
 const router = express.Router();
 
@@ -71,9 +72,10 @@ router.get('/score', async (req, res) => {
 
 // Update user score
 router.post('/update-score', async (req, res) => {
-    const { userId, name, score } = req.body;
+    const { userId, name, score: rawScore } = req.body;
+    const score = clampScoreDelta(rawScore);
 
-    if (!userId || !name || typeof score !== 'number') {
+    if (!userId || !name || score === null) {
         return res.status(400).json({ error: 'Invalid request' });
     }
 
