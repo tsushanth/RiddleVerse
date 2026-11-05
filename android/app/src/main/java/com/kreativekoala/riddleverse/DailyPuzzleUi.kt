@@ -116,6 +116,15 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
         if (share.streak > 0) {
             Text("🔥 ${share.streak} day streak", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RvFlame)
         }
+        if (record.freezesUsed > 0) {
+            Text(
+                "A streak freeze covered ${if (record.freezesUsed == 1) "your missed day" else "${record.freezesUsed} missed days"}, so your streak survived.",
+                fontSize = 14.sp, color = RvInkSoft, textAlign = TextAlign.Center,
+            )
+        }
+        if (record.freezeEarned) {
+            Text("You earned a streak freeze for a rainy day.", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvGrape, textAlign = TextAlign.Center)
+        }
         record.reward?.let { r ->
             Text("+${r.coins} coins", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
             r.specialReward?.let { Text(it, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvGrape) }
@@ -142,6 +151,9 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
             },
             modifier = Modifier.fillMaxWidth(), tone = RvToneSun,
         ) { Text("Share as text", color = RvOnTone, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+
+        ReminderOfferCard()
+        SupporterOfferCard()
 
         Text("Next puzzle in ${countdown(DailyPuzzleSchedule.millisUntilNext(now))}", fontSize = 14.sp, color = RvInkSoft)
         Box(Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onDone).padding(horizontal = 24.dp, vertical = 12.dp)) {

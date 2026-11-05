@@ -11,13 +11,18 @@ const NEW_WAVE = new Set(NEW_WAVE_TYPES);
 // difficulty (enum, start/complete only), duration_ms only on complete, session_id is a random per-page-load id.
 export const WEB_PLAY_EVENT_TYPES = new Set(['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta']);
 export const WEB_PLAY_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
-export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open', ...WEB_PLAY_EVENT_TYPES]);
+export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open', 'daily_solved', ...WEB_PLAY_EVENT_TYPES]);
 // Install-funnel events (no puzzle): puzzle_type is the fixed placeholder 'app'; they carry funnelStep / daysSinceInstall only.
-export const FUNNEL_EVENT_TYPES = new Set(['funnel', 'app_open']);
+// 'daily_solved' = one row per solved daily puzzle: days_since_install + score (= streak length after the solve).
+export const FUNNEL_EVENT_TYPES = new Set(['funnel', 'app_open', 'daily_solved']);
 export const APP_PUZZLE_TYPE = 'app';
 export const FUNNEL_STEPS = new Set([
     'first_open', 'welcome_shown', 'auth_started', 'auth_done', 'guest_started',
     'onboarding_done', 'home_shown', 'first_puzzle_started', 'first_puzzle_completed',
+    // Retention steps (once per install, reported by Android >= the retention release).
+    'daily_completed', 'streak_3', 'streak_7', 'reminder_enabled',
+    'notif_permission_granted', 'notif_permission_denied', 'welcome_back_shown',
+    'supporter_offer_shown', 'supporter_purchased',
 ]);
 export const MAX_DAYS_SINCE_INSTALL = 3650;
 export const PLATFORMS = new Set(['android', 'web']);
@@ -49,6 +54,7 @@ export function validatePayload(body, now = Date.now()) {
         if (isWebPlay && body.platform !== 'web') return null;
         let funnelStep = null;
         let daysSinceInstall = null;
+        let streakScore = null;
         if (isFunnel) {
             if (e.puzzleType !== APP_PUZZLE_TYPE) return null;
             if (e.type === 'funnel') {
@@ -57,6 +63,7 @@ export function validatePayload(body, now = Date.now()) {
             } else {
                 daysSinceInstall = int(e.daysSinceInstall);
                 if (daysSinceInstall == null || daysSinceInstall > MAX_DAYS_SINCE_INSTALL) return null;
+                if (e.type === 'daily_solved') streakScore = Math.min(int(e.score) ?? 0, 100000);
             }
         } else if (e.puzzleType === APP_PUZZLE_TYPE) {
             return null; // 'app' is reserved for funnel events; keep it out of puzzle stats
@@ -82,7 +89,7 @@ export function validatePayload(body, now = Date.now()) {
             event_ts: eventTs,
             event_type: e.type,
             puzzle_type: APP_PUZZLE_TYPE,
-            difficulty: null, session_id: null, duration_ms: null, score: null, moves: null,
+            difficulty: null, session_id: null, duration_ms: null, score: streakScore, moves: null,
             hints_used: null, mistakes: null, error_message: null,
             // Only set the keys that apply, so rows for other event types never reference columns that may not exist yet.
             ...(funnelStep ? { funnel_step: funnelStep } : {}),

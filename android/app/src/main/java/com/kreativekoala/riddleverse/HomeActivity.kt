@@ -1657,6 +1657,10 @@ fun SettingsTab(
             }
 
             item {
+                DailyPuzzleSettingsSection()
+            }
+
+            item {
                 AppFeaturesSection(
                     onNavigateToLeaderboard = onNavigateToLeaderboard,
                     onNavigateToTopics = onNavigateToTopics,
@@ -2806,23 +2810,8 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        askNotificationPermissionOnce()
-    }
-
-    /** Asked once, here (after the person has actually played), instead of as the first thing on a fresh install. */
-    private fun askNotificationPermissionOnce() {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) return
-        if (GuestPrefs.notificationPermissionAsked(this)) return
-        if (androidx.core.content.ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-            == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-            GuestPrefs.markNotificationPermissionAsked(this); return
-        }
-        // A brand new guest has Home underneath the first puzzle: wait until Home is really the visible screen.
-        GuestPrefs.markNotificationPermissionAsked(this)
-        androidx.core.app.ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1001)
-    }
+    // The notification permission is no longer requested here on Home. It is asked just in time, with the reason,
+    // from the daily puzzle result screen (ReminderOfferCard) or the Settings > Daily puzzle switch.
 }
 
 @Composable

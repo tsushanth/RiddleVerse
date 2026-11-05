@@ -19,7 +19,7 @@ interface FunnelStore {
  * - [appOpenDays]: returns whole local days since install the first time it is called on a given
  *   local day, else null (so at most one `app_open` per local day).
  * - Installs whose APK was first installed more than [LEGACY_AFTER_MS] before this state was created
- *   (i.e. users who updated into this version) never report the one-time steps, so they do not
+ *   (i.e. users who updated into this version) never report the one-time INSTALL steps (retention steps still report), so they do not
  *   pollute the new-install funnel; they still report `app_open` with the true days since install.
  */
 class FunnelState(
@@ -43,7 +43,7 @@ class FunnelState(
         if (raw == null) {
             // First run of the funnel on this install: decide new vs legacy once.
             val legacy = clock() - installTimeMs > LEGACY_AFTER_MS
-            val init = if (legacy) PuzzleEventsClient.FUNNEL_STEPS.toMutableSet() else mutableSetOf()
+            val init = if (legacy) PuzzleEventsClient.INSTALL_STEPS.toMutableSet() else mutableSetOf()
             store.put(K_SEEN, init.joinToString(","))
             return init
         }
@@ -59,6 +59,10 @@ class FunnelState(
         store.put(K_SEEN, s.joinToString(","))
         return true
     }
+
+    /** Whole local days since install, regardless of whether `app_open` was already reported today. */
+    fun daysSinceInstall(): Int =
+        (localDay(clock()) - localDay(installTimeMs)).coerceIn(0, PuzzleEventsClient.MAX_DAYS_SINCE_INSTALL.toLong()).toInt()
 
     /** Days since install if no `app_open` was reported yet for today's local date, else null. */
     @Synchronized
@@ -135,6 +139,25 @@ object Funnel {
             PuzzleEvents.emitFunnel(
                 PuzzleEvent("funnel", PuzzleEventsClient.APP_PUZZLE_TYPE, null, PuzzleEventsClient.newId(),
                     ts = System.currentTimeMillis(), funnelStep = step)
+            )
+        } catch (_: Throwable) { }
+    }
+
+    /**
+     * One event per solved daily puzzle (repeatable, unlike [log]): `score` carries the streak length after the solve.
+     * Also reports the once-per-install retention steps `daily_completed`, `streak_3` and `streak_7`.
+     */
+    fun dailySolved(streak: Int) {
+        try {
+            log("daily_completed")
+            if (streak >= 3) log("streak_3")
+            if (streak >= 7) log("streak_7")
+            val days = state?.daysSinceInstall() ?: return
+            if (BuildConfig.DEBUG) android.util.Log.d("Funnel", "daily_solved streak=$streak days=$days emit=$debugEmit")
+            if (BuildConfig.DEBUG && !debugEmit) return
+            PuzzleEvents.emitFunnel(
+                PuzzleEvent("daily_solved", PuzzleEventsClient.APP_PUZZLE_TYPE, null, PuzzleEventsClient.newId(),
+                    score = streak.coerceIn(0, 100000), ts = System.currentTimeMillis(), daysSinceInstall = days)
             )
         } catch (_: Throwable) { }
     }

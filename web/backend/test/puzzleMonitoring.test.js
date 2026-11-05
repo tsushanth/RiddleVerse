@@ -201,7 +201,10 @@ test('funnel: every allow-listed step validates and maps to funnel_step', () => 
         assert.equal(v.events[0].puzzle_type, 'app');
         assert.equal(v.events[0].days_since_install, undefined);
     }
-    assert.equal(FUNNEL_STEPS.size, 9);
+    assert.equal(FUNNEL_STEPS.size, 18);
+    for (const step of ['daily_completed', 'streak_3', 'streak_7', 'reminder_enabled', 'notif_permission_granted', 'notif_permission_denied', 'welcome_back_shown', 'supporter_offer_shown', 'supporter_purchased']) {
+        assert.ok(FUNNEL_STEPS.has(step), step);
+    }
 });
 test('funnel: rejects unknown/missing step, wrong puzzleType, and free text', () => {
     const bad = [
@@ -217,6 +220,17 @@ test('app_open: needs 0..3650 integer daysSinceInstall', () => {
     assert.equal(ok(3650).events[0].event_type, 'app_open');
     assert.equal(ok(3650).events[0].funnel_step, undefined);
     for (const d of [-1, 3651, '7', null, undefined, NaN]) assert.equal(ok(d), null, String(d));
+});
+test('daily_solved: days_since_install + streak length in score, nothing else is copied', () => {
+    const ok = (extra) => validatePayload(fpay({ type: 'daily_solved', puzzleType: 'app', daysSinceInstall: 4, score: 5, ts: NOW, ...extra }), NOW);
+    const r = ok({ errorMessage: 'a@b.c', difficulty: 'hard', sessionId: 's' }).events[0];
+    assert.equal(r.event_type, 'daily_solved'); assert.equal(r.puzzle_type, 'app');
+    assert.equal(r.days_since_install, 4); assert.equal(r.score, 5);
+    assert.equal(r.error_message, null); assert.equal(r.difficulty, null); assert.equal(r.session_id, null);
+    assert.equal(ok({ score: undefined }).events[0].score, 0);
+    assert.equal(ok({ score: 10 ** 9 }).events[0].score, 100000);
+    for (const d of [-1, 3651, '4', null, undefined]) assert.equal(ok({ daysSinceInstall: d }), null, String(d));
+    assert.equal(ok({ puzzleType: 'sudoku' }), null);
 });
 test('funnel: puzzleType "app" is reserved, plain puzzle events cannot use it', () => {
     assert.equal(validatePayload(fpay({ type: 'start', puzzleType: 'app' }), NOW), null);

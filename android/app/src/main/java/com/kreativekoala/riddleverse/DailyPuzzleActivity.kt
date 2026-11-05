@@ -128,6 +128,7 @@ private fun DailyPuzzleRoot(day: Long, onClose: () -> Unit) {
                     AnalyticsManager.getInstance()?.track(
                         AnalyticsEvent("daily_puzzle_solved", mapOf("number" to spec.number, "type" to spec.type, "seconds" to secs, "attempts" to record.result.attempts))
                     )
+                    if (record.firstSolve) Funnel.dailySolved(record.result.streak)
                     solved = record
                 } else {
                     DailyPuzzleStore.recordFailure(context, day)
