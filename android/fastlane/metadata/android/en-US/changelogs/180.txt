@@ -1,0 +1,4 @@
+- Optional daily reminder for the daily puzzle: turn it on or off in Settings
+- Streak freezes quietly cover a missed day so your streak survives
+- A welcome-back card when you return after a break
+- Bug fixes and polish
