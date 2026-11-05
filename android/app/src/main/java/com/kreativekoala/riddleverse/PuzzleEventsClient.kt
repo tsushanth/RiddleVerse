@@ -42,15 +42,26 @@ class PuzzleEventsClient(
         const val BASE_BACKOFF_MS = 15_000L
         const val MAX_BACKOFF_MS = 15 * 60_000L
         const val MAX_ERROR_CHARS = 300
-        private val TYPES = setOf("start", "complete", "fail", "abandon", "hint", "undo", "error", "funnel", "app_open")
+        private val TYPES = setOf("start", "complete", "fail", "abandon", "hint", "undo", "error", "funnel", "app_open", "daily_solved")
         /** Install-funnel event types. They carry the fixed puzzle type [APP_PUZZLE_TYPE] (puzzle_type is NOT NULL server side). */
         const val APP_PUZZLE_TYPE = "app"
         const val MAX_DAYS_SINCE_INSTALL = 3650
-        val FUNNEL_STEPS = setOf(
+        /** New-install funnel. Players who updated into the build (legacy installs) never report these. */
+        val INSTALL_STEPS = setOf(
             "first_open", "welcome_shown", "auth_started", "auth_done", "guest_started",
             "onboarding_done", "home_shown", "first_puzzle_started", "first_puzzle_completed"
         )
-        private fun isFunnelType(t: String) = t == "funnel" || t == "app_open"
+        /** Retention steps, once per install each. Legacy installs DO report these (that is the dormant base we want to win back). */
+        val RETENTION_STEPS = setOf(
+            "daily_completed", "streak_3", "streak_7", "reminder_enabled",
+            "notif_permission_granted", "notif_permission_denied", "welcome_back_shown",
+            // Optional supporter offer (flag OFF until the owner creates the product).
+            "supporter_offer_shown", "supporter_purchased"
+        )
+        val FUNNEL_STEPS = INSTALL_STEPS + RETENTION_STEPS
+        /** Anonymous event types that carry days_since_install: one `app_open` per local day, one `daily_solved` per solved daily (score = streak length). */
+        private fun isFunnelType(t: String) = t == "funnel" || t == "app_open" || t == "daily_solved"
+        private fun carriesDays(t: String) = t == "app_open" || t == "daily_solved"
         private val PUZZLE_TYPE = Regex("^[a-z0-9_]{1,40}$")
         private val DIFFICULTIES = setOf("easy", "medium", "hard")
         private val EMAIL = Regex("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}")
@@ -109,8 +120,8 @@ class PuzzleEventsClient(
             val funnel = isFunnelType(type)
             val pt = if (funnel) APP_PUZZLE_TYPE else sanitizePuzzleType(event.puzzleType)
             val step = if (type == "funnel") event.funnelStep?.takeIf { it in FUNNEL_STEPS } else null
-            val days = if (type == "app_open") event.daysSinceInstall?.takeIf { it in 0..MAX_DAYS_SINCE_INSTALL } else null
-            if (type !in TYPES || pt == null || (type == "funnel" && step == null) || (type == "app_open" && days == null)) false else {
+            val days = if (carriesDays(type)) event.daysSinceInstall?.takeIf { it in 0..MAX_DAYS_SINCE_INSTALL } else null
+            if (type !in TYPES || pt == null || (type == "funnel" && step == null) || (carriesDays(type) && days == null)) false else {
                 val clean = event.copy(
                     funnelStep = step, daysSinceInstall = days,
                     puzzleType = pt,
@@ -121,7 +132,13 @@ class PuzzleEventsClient(
                     hintsUsed = event.hintsUsed?.coerceAtLeast(0),
                     mistakes = event.mistakes?.coerceAtLeast(0),
                     errorMessage = if (type == "error") sanitizeError(event.errorMessage) else null
-                ).let { if (funnel) it.copy(difficulty = null, score = null, moves = null, hintsUsed = null, mistakes = null, durationMs = null) else it }
+                ).let {
+                    if (funnel) it.copy(
+                        difficulty = null, moves = null, hintsUsed = null, mistakes = null, durationMs = null,
+                        // daily_solved keeps its streak length in `score`; every other funnel event carries no score.
+                        score = if (type == "daily_solved") it.score else null
+                    ) else it
+                }
                 synchronized(lock) {
                     queue.addLast(clean)
                     while (queue.size > MAX_QUEUE) queue.removeFirst()

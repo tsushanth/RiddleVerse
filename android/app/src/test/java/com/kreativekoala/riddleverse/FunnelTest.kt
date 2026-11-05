@@ -36,12 +36,48 @@ class FunnelTest {
         assertFalse(s.shouldLog(""))
     }
 
-    @Test fun allNineStepsAreAllowListed() {
+    @Test fun allEighteenStepsAreAllowListed() {
         val s = state()
-        val steps = listOf("first_open", "welcome_shown", "auth_started", "auth_done", "guest_started",
+        val install = listOf("first_open", "welcome_shown", "auth_started", "auth_done", "guest_started",
             "onboarding_done", "home_shown", "first_puzzle_started", "first_puzzle_completed")
-        assertEquals(steps.toSet(), PuzzleEventsClient.FUNNEL_STEPS)
-        steps.forEach { assertTrue(it, s.shouldLog(it)) }
+        val retention = listOf("daily_completed", "streak_3", "streak_7", "reminder_enabled",
+            "notif_permission_granted", "notif_permission_denied", "welcome_back_shown",
+            "supporter_offer_shown", "supporter_purchased")
+        assertEquals(install.toSet(), PuzzleEventsClient.INSTALL_STEPS)
+        assertEquals(retention.toSet(), PuzzleEventsClient.RETENTION_STEPS)
+        assertEquals((install + retention).toSet(), PuzzleEventsClient.FUNNEL_STEPS)
+        (install + retention).forEach { assertTrue(it, s.shouldLog(it)) }
+    }
+
+    @Test fun legacyInstallStillReportsRetentionSteps() {
+        // The 21k dormant installs are all "legacy": they must report the comeback steps even though they skip install steps.
+        val s = state(install = t0 - 90 * day)
+        assertFalse(s.shouldLog("first_open"))
+        assertTrue(s.shouldLog("daily_completed"))
+        assertFalse(s.shouldLog("daily_completed"))
+        assertTrue(s.shouldLog("welcome_back_shown"))
+    }
+
+    @Test fun dailySolvedIsRepeatableWithDaysAndStreakInScore() {
+        val c = client()
+        assertFalse(c.enqueue(PuzzleEvent("daily_solved", "app", null, "s", score = 4, ts = now))) // missing days -> rejected
+        assertEquals(0, c.size)
+        c.enqueue(PuzzleEvent("daily_solved", "app", "hard", "s", score = 4, ts = now, daysSinceInstall = 12, hintsUsed = 3))
+        c.enqueue(PuzzleEvent("daily_solved", "app", null, "s2", score = 5, ts = now, daysSinceInstall = 13))
+        assertEquals(2, c.size)
+        c.flush(force = true)
+        val body = sent.last()
+        assertTrue(body, body.contains("\"type\":\"daily_solved\"") && body.contains("\"score\":4") && body.contains("\"daysSinceInstall\":12"))
+        assertFalse(body, body.contains("hintsUsed") || body.contains("difficulty"))
+    }
+
+    @Test fun daysSinceInstallDoesNotConsumeTheDailyAppOpen() {
+        val s = state()
+        assertEquals(0, s.daysSinceInstall())
+        assertEquals(0, s.appOpenDays())
+        now = t0 + 3 * day
+        assertEquals(3, s.daysSinceInstall())
+        assertEquals(3, s.appOpenDays())
     }
 
     @Test fun appOpenOncePerLocalDayWithDaysSinceInstall() {

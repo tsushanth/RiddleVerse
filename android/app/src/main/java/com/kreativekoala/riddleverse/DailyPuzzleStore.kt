@@ -24,6 +24,12 @@ data class DailySolveRecord(
     /** False when this day had already been solved (nothing was awarded this time). */
     val firstSolve: Boolean,
     val reward: StreakReward?,
+    /** Missed days this solve bridged with streak freezes (0 normally). */
+    val freezesUsed: Int = 0,
+    /** True when this solve earned a new streak freeze. */
+    val freezeEarned: Boolean = false,
+    /** Freezes left after this solve. */
+    val freezesLeft: Int = 0,
 )
 
 object DailyPuzzleStore {
@@ -35,6 +41,7 @@ object DailyPuzzleStore {
     private const val K_BEST = "streak_best"
     private const val K_LAST = "last_solve_day"
     private const val K_TOTAL = "total_solved"
+    private const val K_FREEZES = "streak_freezes"
     private const val K_RES_DAY = "result_day"
     private const val K_RES_TYPE = "result_type"
     private const val K_RES_SECS = "result_seconds"
@@ -71,6 +78,7 @@ object DailyPuzzleStore {
             putInt(K_BEST, migrated.best)
             putLong(K_LAST, migrated.lastSolveDay ?: -1L)
             putInt(K_TOTAL, 0)
+            putInt(K_FREEZES, migrated.freezes)
             putBoolean(K_MIGRATED, true)
         }.commit()
     }
@@ -84,8 +92,14 @@ object DailyPuzzleStore {
             best = p.getInt(K_BEST, 0),
             lastSolveDay = if (last < 0) null else last,
             totalSolved = p.getInt(K_TOTAL, 0),
+            // Absent key = a player who migrated before freezes existed: they get the starting freeze once.
+            freezes = p.getInt(K_FREEZES, DailyStreakRules.STARTING_FREEZES)
+                .coerceIn(0, DailyStreakRules.SUPPORTER_MAX_FREEZES),
         )
     }
+
+    /** Streak freezes in the bag right now. */
+    fun freezesLeft(c: Context): Int = streakState(c).freezes
 
     /** The streak to display right now (0 once a full day has been missed). */
     fun displayStreak(c: Context, day: Long = today()): Int = DailyStreakRules.display(streakState(c), day)
@@ -122,7 +136,12 @@ object DailyPuzzleStore {
     @Synchronized
     fun recordSolve(c: Context, day: Long, type: String, seconds: Int): DailySolveRecord {
         resultFor(c, day)?.let { return DailySolveRecord(it, firstSolve = false, reward = null) }
-        val outcome = DailyStreakRules.applySolve(streakState(c), day)
+        val supporter = Supporter.isSupporter(c)
+        val outcome = DailyStreakRules.applySolve(
+            streakState(c), day,
+            maxFreezes = if (supporter) DailyStreakRules.SUPPORTER_MAX_FREEZES else DailyStreakRules.MAX_FREEZES,
+            freezeEvery = if (supporter) DailyStreakRules.SUPPORTER_FREEZE_EVERY else DailyStreakRules.FREEZE_EVERY,
+        )
         if (!outcome.counted) {
             // Solved a day at or before the last recorded solve (e.g. clock moved back): keep state, report plainly.
             val r = DailySolveResult(day, type, seconds, failedAttempts(c, day) + 1, outcome.streak)
@@ -136,6 +155,7 @@ object DailyPuzzleStore {
             putInt(K_BEST, s.best)
             putLong(K_LAST, s.lastSolveDay ?: -1L)
             putInt(K_TOTAL, s.totalSolved)
+            putInt(K_FREEZES, s.freezes)
             putLong(K_RES_DAY, day)
             putString(K_RES_TYPE, type)
             putInt(K_RES_SECS, result.seconds)
@@ -145,7 +165,10 @@ object DailyPuzzleStore {
         // Same reward table and same local coin ledger the open-streak used, now paid only for solving.
         val reward = DailyStreakManager.calculateStreakReward(outcome.streak)
         DailyStreakManager.addCoins(c, reward.coins)
-        return DailySolveRecord(result, firstSolve = true, reward = reward)
+        return DailySolveRecord(
+            result, firstSolve = true, reward = reward,
+            freezesUsed = outcome.freezesUsed, freezeEarned = outcome.freezeEarned, freezesLeft = s.freezes,
+        )
     }
 
     fun shareResultOf(c: Context, r: DailySolveResult): DailyShareResult = DailyShareResult(

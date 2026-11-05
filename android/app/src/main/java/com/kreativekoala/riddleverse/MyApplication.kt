@@ -37,6 +37,7 @@ class MyApplication : Application() {
 
         PuzzleEvents.init(this)
         Funnel.init(this)
+        Retention.init(this)
 
         // Initialize Firebase first (required early)
         FirebaseApp.initializeApp(this)

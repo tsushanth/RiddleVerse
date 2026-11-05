@@ -104,7 +104,9 @@ class DailyStreakRulesTest {
         val m = DailyStreakRules.migrateOpenStreak(7, 7, yesterday, today, yesterday, utc)
         assertEquals(7, DailyStreakRules.display(m, utc))
         assertEquals(8, DailyStreakRules.applySolve(m, utc).streak)
-        assertEquals(0, DailyStreakRules.display(m, utc + 1)) // not solved today -> gone tomorrow
+        // Not solved today: the starting streak freeze covers that one missed day, a second missed day ends it.
+        assertEquals(7, DailyStreakRules.display(m, utc + 1))
+        assertEquals(0, DailyStreakRules.display(m, utc + 2))
     }
 
     @Test fun migration_alreadyBrokenStreak_isZero_butBestKept() {
@@ -115,7 +117,7 @@ class DailyStreakRulesTest {
 
     @Test fun migration_neverOpenedBefore_isEmpty() {
         val m = DailyStreakRules.migrateOpenStreak(0, 0, "", today, yesterday, utc)
-        assertEquals(DailySolveStreak(), m)
+        assertEquals(DailySolveStreak(freezes = DailyStreakRules.STARTING_FREEZES), m)
     }
 
     @Test fun migration_bestNeverBelowCurrent() {
