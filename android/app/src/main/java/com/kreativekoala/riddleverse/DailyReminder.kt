@@ -117,6 +117,7 @@ object DailyReminder {
         try {
             val today = DailyPuzzleStore.today()
             val allowed = shouldPost(c, today)
+            if (BuildConfig.DEBUG) android.util.Log.d("DailyReminder", "fire allowed=$allowed enabled=${isEnabled(c)} unopened=${unopenedCount(c)}")
             if (!allowed) return
             ensureChannel(c)
             val streak = DailyPuzzleStore.displayStreak(c, today)
@@ -137,7 +138,9 @@ object DailyReminder {
             @Suppress("MissingPermission") // checked in shouldPost via areNotificationsEnabled
             NotificationManagerCompat.from(c).notify(NOTIF_ID, n)
             prefs(c).edit().putInt(K_UNOPENED, unopenedCount(c) + 1).apply()
-        } catch (_: Throwable) { }
+        } catch (t: Throwable) {
+            android.util.Log.w("DailyReminder", "fire failed: ${t.javaClass.simpleName}")
+        }
     }
 
     private fun shouldPost(c: Context, today: Long): Boolean = ReminderPolicy.shouldSend(
