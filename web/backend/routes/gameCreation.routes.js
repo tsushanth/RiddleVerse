@@ -3266,6 +3266,10 @@ router.get('/:gameId', async (req, res) => {
             .eq('id', gameId)
             .single();
 
+        // PGRST116 = no rows, 22P02 = malformed uuid: both mean "no such game", not a server fault.
+        if (error && (error.code === 'PGRST116' || error.code === '22P02')) {
+            return res.status(404).json({ error: 'Game not found' });
+        }
         if (error) throw error;
         if (!data) return res.status(404).json({ error: 'Game not found' });
 
