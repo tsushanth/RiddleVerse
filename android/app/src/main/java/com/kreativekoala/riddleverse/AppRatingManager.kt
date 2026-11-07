@@ -366,11 +366,15 @@ fun DismissalOptionsDialog(
                 ) {
                     Text(stringResource(R.string.dont_ask_again))
                 }
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+
+                // Cancel lives in the same column: as a separate dismissButton, AlertDialog's button row placed it
+                // under the tall column above, so it overlapped "Remind me in a month" and was never visible.
+                TextButton(
+                    onClick = onDismiss,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
         }
     )
