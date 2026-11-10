@@ -5,6 +5,7 @@ import http from 'node:http';
 // config/database.js builds the Supabase client at import time from env.
 process.env.SUPABASE_URL = 'http://supabase.test';
 process.env.SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.SUPABASE_SERVICE_KEY = 'test-service-key';
 
 // Stand in for PostgREST: supabase-js uses the global fetch.
 const realFetch = globalThis.fetch;

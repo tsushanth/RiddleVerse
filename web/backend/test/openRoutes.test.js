@@ -8,6 +8,7 @@ import http from 'node:http';
 process.env.DOCKER_BUILD = 'true';
 process.env.SUPABASE_URL = 'http://supabase.test';
 process.env.SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.SUPABASE_SERVICE_KEY = 'test-service-key';
 const KEY = 'unit-test-notification-key-0123456789';
 
 const supabaseCalls = [];
