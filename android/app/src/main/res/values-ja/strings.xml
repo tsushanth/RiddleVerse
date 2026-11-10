@@ -213,8 +213,7 @@
     <string name="custom_puzzles">カスタムパズル</string>
 
     <!-- Creator Monetization -->
-    <string name="earn_coins_from_games">プレイヤーがゲームを楽しむとコインを獲得できます！</string>
-    <string name="creator_revenue_share" formatted="false">ゲームで使われたコインの55%を獲得</string>
+    <string name="create_share_games">オリジナルのゲームを作って共有しよう</string>
     <string name="coins_earned">獲得コイン</string>
     <string name="plays_monetized">収益化プレイ数</string>
     <string name="per_game">ゲームごと</string>

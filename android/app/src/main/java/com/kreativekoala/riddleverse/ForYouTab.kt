@@ -52,7 +52,6 @@ fun ForYouTab(
 ) {
     val context = LocalContext.current
     val prefs = remember { context.getSharedPreferences("riddleverse_prefs", Context.MODE_PRIVATE) }
-    var showEarnBanner by remember { mutableStateOf(!prefs.getBoolean("earn_banner_dismissed", false)) }
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     val coroutineScope = rememberCoroutineScope()
 
@@ -222,19 +221,6 @@ fun ForYouTab(
             // Telegram bot banner
             item {
                 TelegramBotBanner()
-            }
-
-            // Earn money banner
-            if (showEarnBanner) {
-                item {
-                    EarnMoneyBanner(
-                        onTap = { onNavigateToCreate?.invoke() },
-                        onDismiss = {
-                            showEarnBanner = false
-                            prefs.edit().putBoolean("earn_banner_dismissed", true).apply()
-                        }
-                    )
-                }
             }
 
             // Quick Actions
@@ -1465,62 +1451,6 @@ fun RecentQuickCard(
                         .padding(horizontal = 2.dp, vertical = 3.dp)
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun EarnMoneyBanner(
-    onTap: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(RvSuccess, RvSuccessEdge)
-                )
-            ),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .clickable { onTap() }
-                .padding(horizontal = 16.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Text(text = "💰", fontSize = 32.sp)
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Earn real cash on RiddleVerse",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = RvOnTone
-                )
-                Text(
-                    text = "Create a game → players find it → you get paid.",
-                    fontSize = 12.sp,
-                    color = RvOnTone.copy(alpha = 0.85f)
-                )
-            }
-            Icon(
-                imageVector = Icons.Default.ArrowForward,
-                contentDescription = null,
-                tint = RvOnTone.copy(alpha = 0.9f),
-                modifier = Modifier.size(22.dp)
-            )
-        }
-        IconButton(onClick = onDismiss) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = "Dismiss",
-                tint = RvOnTone.copy(alpha = 0.7f),
-                modifier = Modifier.size(16.dp)
-            )
         }
     }
 }

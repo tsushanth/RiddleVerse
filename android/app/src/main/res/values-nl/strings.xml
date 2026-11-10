@@ -213,8 +213,7 @@
     <string name="custom_puzzles">Aangepaste puzzels</string>
 
     <!-- Creator Monetization -->
-    <string name="earn_coins_from_games">Verdien munten wanneer spelers van je spellen genieten!</string>
-    <string name="creator_revenue_share" formatted="false">Je krijgt 55% van de munten die aan je spellen worden besteed</string>
+    <string name="create_share_games">Maak en deel je eigen spellen</string>
     <string name="coins_earned">Munten verdiend</string>
     <string name="plays_monetized">Betaalde speelsessies</string>
     <string name="per_game">Per spel</string>

@@ -217,8 +217,7 @@
     <string name="custom_puzzles">Custom Puzzles</string>
 
     <!-- Creator Monetization -->
-    <string name="earn_coins_from_games">Earn coins when players enjoy your games!</string>
-    <string name="creator_revenue_share" formatted="false">You get 55% of coins spent on your games</string>
+    <string name="create_share_games">Create and share your own games</string>
     <string name="coins_earned">Coins Earned</string>
     <string name="plays_monetized">Plays Monetized</string>
     <string name="per_game">Per Game</string>
@@ -277,7 +276,7 @@
     <string name="instant">Instant</string>
     <string name="premium_member">Premium Member</string>
     <string name="upgrade_now">Upgrade Now</string>
-    <string name="upgrade_for_unlimited">Earn money creating games. Play unlimited. No ads.</string>
+    <string name="upgrade_for_unlimited">Create and play unlimited. No ads.</string>
 
     <!-- Puzzle Settings -->
     <string name="game_settings">Game Settings</string>

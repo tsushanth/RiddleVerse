@@ -305,9 +305,8 @@ fun GameRemixSheet(
                     ) {
                         Icon(Icons.Default.Star, null, tint = RvSuccessEdge, modifier = Modifier.size(36.dp))
                         Column {
-                            Text("Create & Earn Real Money", fontWeight = FontWeight.Bold, color = RvInk)
-                            Text("Earn coins when others play — cash out via Stripe!", fontSize = 12.sp, color = RvInkSoft)
-                            Text("You earn 55% of every coin spent on your game", fontSize = 10.sp, color = RvSuccessEdge.copy(alpha = 0.8f))
+                            Text("Create and share your own games", fontWeight = FontWeight.Bold, color = RvInk)
+                            Text("Remix this game and publish it for others to play", fontSize = 12.sp, color = RvInkSoft)
                         }
                     }
                 }

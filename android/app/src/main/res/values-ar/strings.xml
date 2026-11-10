@@ -211,8 +211,7 @@
     <string name="custom_puzzles">ألغاز مخصصة</string>
 
     <!-- Creator Monetization -->
-    <string name="earn_coins_from_games">اكسب عملات عندما يستمتع اللاعبون بألعابك!</string>
-    <string name="creator_revenue_share" formatted="false">تحصل على 55% من العملات المنفقة على ألعابك</string>
+    <string name="create_share_games">أنشئ ألعابك الخاصة وشاركها</string>
     <string name="coins_earned">العملات المكتسبة</string>
     <string name="plays_monetized">اللعبات المحققة للدخل</string>
     <string name="per_game">لكل لعبة</string>

@@ -2051,14 +2051,9 @@ fun CreatorEarningsSection() {
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Text(
-                            text = stringResource(R.string.earn_coins_from_games),
+                            text = stringResource(R.string.create_share_games),
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
-                        )
-                        Text(
-                            text = stringResource(R.string.creator_revenue_share),
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -2683,16 +2678,6 @@ fun BottomTabBar(
                             )
                         }
 
-                        // 💰 earn badge on Games tab
-                        if (tab == TabSelection.CREATE_GAME) {
-                            Text(
-                                text = "💰",
-                                fontSize = 9.sp,
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    .offset(x = 4.dp, y = 4.dp)
-                            )
-                        }
                     }
 
                     Spacer(modifier = Modifier.height(4.dp))
