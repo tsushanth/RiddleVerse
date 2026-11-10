@@ -533,7 +533,7 @@
 "Submit (+20% bonus)" = "Enviar (+20% de bônus)";
 "Learn from others who identified the AI image correctly:" = "Aprenda com outros que identificaram corretamente a imagem de IA:";
 
-// MARK: - Find Object / Waldo
+// MARK: - Find Object / Hidden objects
 "Hidden Objects" = "Objetos ocultos";
 "Failed to load image" = "Falha ao carregar imagem";
 "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "Pinça para zoom \u{2022} Arraste para mover \u{2022} Toque para encontrar objetos";
@@ -543,7 +543,7 @@
 "Objects to Find" = "Objetos para encontrar";
 "These objects were naturally discovered by AI vision in the scene" = "Estes objetos foram naturalmente descobertos pela visão de IA na cena";
 "Show Hint" = "Mostrar dica";
-"ENHANCED WALDO" = "WALDO APRIMORADO";
+"ENHANCED SEARCH" = "BUSCA APRIMORADA";
 
 // MARK: - Geography
 "Geography Cities Challenge" = "Desafio de cidades geográficas";

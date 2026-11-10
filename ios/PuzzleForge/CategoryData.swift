@@ -83,7 +83,7 @@ struct CategoryData {
         ),
 
         CategoryData(
-            title: "Waldo Puzzle",
+            title: "Find It",
             subtitle: "Find hidden objects in images",
             icon: "eye.fill",
             backgroundColor: Color(red: 0.9, green: 0.4, blue: 0.6),
@@ -293,7 +293,7 @@ struct CategoryData {
         ),
 
         CategoryData(
-            title: "Waldo Puzzle",
+            title: "Find It",
             subtitle: "Find hidden objects in images",
             icon: "eye.fill",
             backgroundColor: Color(red: 0.9, green: 0.4, blue: 0.6),

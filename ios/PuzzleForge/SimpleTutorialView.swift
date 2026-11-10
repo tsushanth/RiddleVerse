@@ -468,7 +468,7 @@ struct TutorialContentLibrary {
     )
 
     static let waldoPuzzle = SimpleTutorialContent(
-        title: "Waldo Puzzle",
+        title: "Find It",
         emoji: "🔴",
         instruction: "Find the target character or object in a crowded scene. Scan carefully!",
         tip: "Look for distinctive features like colors or patterns.",

@@ -649,7 +649,7 @@ export class WaldoPuzzleGenerator {
                     if (attempt === maxRetries) {
                         return { 
                             success: false, 
-                            message: puzzleResult.error || 'Failed to generate Waldo puzzle',
+                            message: puzzleResult.error || 'Failed to generate hidden-object puzzle',
                             attempts: attempt
                         };
                     }
@@ -663,7 +663,7 @@ export class WaldoPuzzleGenerator {
                 if (attempt === maxRetries) {
                     return {
                         success: false,
-                        message: `Waldo puzzle generation error after ${maxRetries} attempts: ${error.message}`,
+                        message: `Hidden-object puzzle generation error after ${maxRetries} attempts: ${error.message}`,
                         attempts: attempt
                     };
                 }
@@ -795,7 +795,7 @@ export class WaldoPuzzleGenerator {
             nature: "Include natural elements, wildlife, and organic environmental features"
         };
 
-        return `Create a detailed, vibrant "Where's Waldo" style illustration: ${sceneTemplate.description}
+        return `Create a detailed, vibrant hidden-object search illustration: ${sceneTemplate.description}
 
 SCENE COMPLEXITY: ${complexityInstructions[difficulty] || complexityInstructions.medium}
 CATEGORY FOCUS: ${categoryEnhancements[sceneTemplate.category] || ''}
@@ -822,7 +822,7 @@ SPATIAL ORGANIZATION:
 QUALITY STANDARDS:
 - High detail and clarity throughout the image
 - Excellent color saturation and contrast
-- Professional "Where's Waldo" illustration quality
+- Professional hidden-object illustration quality
 - Engaging and fun visual experience
 - All objects clearly distinguishable when found
 
@@ -833,7 +833,7 @@ CRITICAL SUCCESS FACTORS:
 4. Scene must match the ${sceneTemplate.theme} theme perfectly
 5. Overall complexity should match ${difficulty} difficulty level
 
-Style: Professional "Where's Waldo" style illustration with excellent clarity, bright colors, and engaging visual complexity perfect for hidden object searching.`;
+Style: Professional hidden-object style illustration with excellent clarity, bright colors, and engaging visual complexity perfect for hidden object searching.`;
     }
 
     // ✅ Improved object detection using percentage positions
@@ -841,7 +841,7 @@ Style: Professional "Where's Waldo" style illustration with excellent clarity, b
         try {
             const objectNames = hiddenObjects.map(obj => `${obj.name} (${obj.color})`).join(', ');
             
-            const detectionPrompt = `ANALYZE this "Where's Waldo" style image to find these EXACT objects: ${objectNames}
+            const detectionPrompt = `ANALYZE this hidden-object search image to find these EXACT objects: ${objectNames}
 
 🎯 DETECTION TASK:
 Look carefully at this detailed illustration and locate each of these specific objects:

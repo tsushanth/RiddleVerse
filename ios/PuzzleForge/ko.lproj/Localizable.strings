@@ -533,7 +533,7 @@
 "Submit (+20% bonus)" = "제출 (+20% 보너스)";
 "Learn from others who identified the AI image correctly:" = "AI 이미지를 올바르게 식별한 사람들에게서 배우세요:";
 
-// MARK: - Find Object / Waldo
+// MARK: - Find Object / Hidden objects
 "Hidden Objects" = "숨겨진 물체";
 "Failed to load image" = "이미지 로딩 실패";
 "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "핀치로 확대 \u{2022} 드래그로 이동 \u{2022} 탭하여 물체 찾기";
@@ -543,7 +543,7 @@
 "Objects to Find" = "찾을 물체";
 "These objects were naturally discovered by AI vision in the scene" = "이 물체들은 AI 비전에 의해 장면에서 자연스럽게 발견되었습니다";
 "Show Hint" = "힌트 보기";
-"ENHANCED WALDO" = "강화된 월도";
+"ENHANCED SEARCH" = "강화된 검색";
 
 // MARK: - Geography
 "Geography Cities Challenge" = "지리 도시 도전";
