@@ -150,6 +150,22 @@ test('interim: shape check, account daily limit, global ceiling, and a normal pu
     res = mkRes(); await h3(mkReq({ userId: 'b', productId: P100, transactionId: 'GPA.2222-2222-2222-22222', platform: 'android' }), res); assert.equal(res.code, 503);
 });
 
+test('enforce: account daily limit still applies after verification (second layer); nothing credited', async () => {
+    const db = mkDb({ ledger: [{ amount: 1200 }, { amount: 1200 }, { amount: 1200 }] });
+    const h = createPurchaseHandler({ env: {}, supabase: db, verifier: okVerifier() });
+    const res = mkRes(); await h(mkReq({ userId: 'u9', productId: P500, transactionId: ORDER, platform: 'android' }), res);
+    assert.equal(res.code, 429);
+    assert.equal(db.calls.length, 0);
+});
+
+test('unique-violation from the database is reported as already processed, not an error', async () => {
+    const db = mkDb({ rpcImpl: async () => ({ data: null, error: { code: '23505', message: 'duplicate key' } }) });
+    const h = createPurchaseHandler({ env: {}, supabase: db, verifier: okVerifier() });
+    const res = mkRes(); await h(mkReq({ userId: 'u1', productId: P100, transactionId: ORDER, platform: 'android' }), res);
+    assert.equal(res.code, 200);
+    assert.equal(res.body.coinsAdded, undefined);
+});
+
 test('concurrent claims of one transaction id: the second is refused while the first is in flight', async () => {
     let release;
     const gate = new Promise((r) => { release = r; });

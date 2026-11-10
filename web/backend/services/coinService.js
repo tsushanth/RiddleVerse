@@ -166,23 +166,26 @@ export function createPurchaseHandler(deps = {}) {
                     return res.status(400).json({ error: 'purchase_not_verified' });
                 }
             } else {
-                // interim: no receipt check; shape check, per-account and global limits, logging.
+                // interim: no receipt check; the shape check is the only validation of the id.
                 if (!PLAY_ORDER_ID_RE.test(transactionId)) {
                     logAnomaly('bad_order_id_shape', { productId, userId, authed: hasAuth, ip });
                     return res.status(400).json({ error: 'purchase_not_verified' });
                 }
-                const recent = await recentPurchases(d.supabase, userId, d.now);
-                if (recent === null) {
-                    logAnomaly('ledger_unreadable', { userId });
-                } else if (recent.count >= policy.accountPurchasesPerDay || recent.coins + pack.coins > policy.accountCoinsPerDay) {
-                    logAnomaly('account_daily_limit', { userId, count: recent.count, coins: recent.coins, productId });
-                    return res.status(429).json({ error: 'Daily purchase limit reached for this account. Please contact support if this is a mistake.' });
-                }
-                if (counters.globalWouldExceed(pack.coins, policy.globalCoinsPerDay)) {
-                    logAnomaly('global_daily_ceiling', { userId, productId });
-                    return res.status(503).json({ error: 'purchase_verification_unavailable', retryable: true });
-                }
                 logAnomaly('unverified_credit', { productId, userId, authed: hasAuth, ip, orderIdPrefix: transactionId.slice(0, 8) });
+            }
+
+            // Second layer, both modes: per-account and global ceilings. In enforce mode the order is verified but not recorded
+            // yet when one trips, so the buyer can retry later (orders stay valid for COIN_PURCHASE_MAX_ORDER_AGE_HOURS).
+            const recent = await recentPurchases(d.supabase, userId, d.now);
+            if (recent === null) {
+                logAnomaly('ledger_unreadable', { userId });
+            } else if (recent.count >= policy.accountPurchasesPerDay || recent.coins + pack.coins > policy.accountCoinsPerDay) {
+                logAnomaly('account_daily_limit', { userId, count: recent.count, coins: recent.coins, productId, mode: policy.mode });
+                return res.status(429).json({ error: 'Daily purchase limit reached for this account. Please try again tomorrow or contact support.' });
+            }
+            if (counters.globalWouldExceed(pack.coins, policy.globalCoinsPerDay)) {
+                logAnomaly('global_daily_ceiling', { userId, productId, mode: policy.mode });
+                return res.status(503).json({ error: 'purchase_verification_unavailable', retryable: true });
             }
 
             console.log(`[Coins] Purchase: ${userId.slice(0, 6)}… buying ${pack.coins} coins (${productId}) via ${platform} [${policy.mode}]`);
@@ -195,6 +198,10 @@ export function createPurchaseHandler(deps = {}) {
                 p_iap_transaction_id: transactionId
             });
 
+            if (error && error.code === '23505') {
+                // unique index on coin_transactions.iap_transaction_id: a concurrent claim won the race; nothing was credited here
+                return res.json({ success: true, message: 'Transaction already processed' });
+            }
             if (error) {
                 console.error('Error recording coin purchase:', error);
                 return res.status(500).json({ error: 'Failed to record purchase' });
@@ -205,7 +212,7 @@ export function createPurchaseHandler(deps = {}) {
                 return res.json({ success: true, message: 'Transaction already processed', balance: data.new_balance });
             }
 
-            if (policy.mode !== 'enforce') counters.recordGlobal(pack.coins);
+            counters.recordGlobal(pack.coins);
             console.log(`[Coins] Purchase complete: now ${data.new_balance} coins`);
 
             res.json({

@@ -16,10 +16,11 @@ and no purchase token. The iOS client sends an empty `transactionId` and has alw
    whose product id matches, quantity is 1, and (optionally) the order is not older than `COIN_PURCHASE_MAX_ORDER_AGE_HOURS`.
    Anything the verifier cannot decide (no credential, Google API error) returns `503 {retryable: true}` and credits nothing.
 3. Idempotent on the order id (`add_purchased_coins` duplicate check) plus an in-process guard against concurrent claims.
-4. `COIN_PURCHASE_VERIFY=interim`: explicit opt-in used only while the credential below does not exist. No receipt check.
-   Applies: Android only, order id must look like `GPA.xxxx-xxxx-xxxx-xxxxx`, per-account limits (default 4 purchases and 3000
-   coins per rolling 24 h, read from `coin_transactions`), per-IP limit (20 claims/h), global ceiling (30000 coins/UTC day per
-   machine), and every credit is logged as `[Coins][ANOMALY] unverified_credit ...`.
+4. `COIN_PURCHASE_VERIFY=interim`: explicit opt-in used only while the verifier credential is not working. No receipt check:
+   Android only, order id must look like `GPA.xxxx-xxxx-xxxx-xxxxx`, and every credit is logged as `[Coins][ANOMALY] unverified_credit ...`.
+   Second layer in BOTH modes: per-account limits (default 4 purchases and 3000 coins per rolling 24 h, read from `coin_transactions`),
+   per-IP limit (20 claims/h) and a global ceiling (30000 coins/UTC day per machine). In enforce mode a limit that trips after
+   verification credits nothing and the buyer can retry later (the order stays valid for `COIN_PURCHASE_MAX_ORDER_AGE_HOURS`).
 5. Optional `Authorization: Bearer` (Firebase/Supabase token): when present it must verify and match `userId`.
    `COIN_PURCHASE_REQUIRE_AUTH=true` makes it mandatory once clients send it.
 6. A creator's own spend never earns a creator share.
@@ -48,4 +49,23 @@ the order stays retryable on the server side. The next app release should read `
 - `orders.get` proves a paid order exists, not who bought it. The idempotency key plus the optional bearer check bind it to an
   account; strict binding needs the client to send its ID token (see game-creation auth design).
 - Refunds after crediting are not clawed back (no refund notification handler yet).
-- The duplicate check in `add_purchased_coins` has no unique index behind it; a unique index on `coin_transactions.iap_transaction_id` should be added in a migration.
+- `coin_transactions` now has a partial unique index on `iap_transaction_id` (where not null), see
+  `web/backend/migrations/coin_transactions_iap_unique.sql`. The function's check-then-insert race now fails the second insert
+  (the function rolls back, the handler reports "already processed").
+- The database function `spend_coins` credits the creator 70 % of a spend (`virtual_currency.sql`), while the app and `COIN_PACKS`
+  settings say 55 % (`CREATOR_SHARE_PCT`). Not changed here: payouts are held and the earnings wording was removed, so the intended
+  split is a product decision to be made before payouts are turned on.
+
+## Manual positive test (needed once: no real order was available when this was built)
+
+Use a Play license tester account (Play Console > Settings > License testing) on a device with the release or internal-test build,
+signed in to the app with a normal account, and buy the smallest pack (100 coins).
+1. Before: note the balance (`GET /api/coins/balance?userId=<uid>`).
+2. Buy the pack. Expected in the app: balance +100.
+3. Fly logs (`fly logs -a quiz-web-frontend`) should show `[Coins] Purchase: xxxxxx… buying 100 coins ... [enforce]` and then
+   `Purchase complete`, with no `[Coins][ANOMALY]` line. A `verifier_unavailable` or `purchase_not_verified` line means the order
+   lookup failed: check the `detail`/`code` (`play api 401/403` = service account permissions not active yet; `not_found` = the
+   order id format Play returns for test purchases differs; `product_mismatch` = product ids differ).
+4. Repeat the same request with the same order id (replay): it must answer "already processed" and the balance must not change.
+5. If step 3 fails only for test purchases, set `COIN_PURCHASE_VERIFY=interim` to roll back, and record what `orders.get`
+   returned for that order (status and state only).
