@@ -1,6 +1,9 @@
 // coinService.js - Virtual currency service
 import { supabase } from '../config/database.js';
 import { getDifficultyCost, MAX_DIFFICULTY_LEVEL } from './difficultyService.js';
+import { getPlayPurchaseVerifier, PLAY_ORDER_ID_RE } from './playPurchaseVerifier.js';
+import { readPolicy, createCounters, recentPurchases, logAnomaly } from './coinPurchasePolicy.js';
+import { verifiedCaller } from '../middleware/callerIdentity.js';
 
 const COIN_PACKS = {
     'com.kreativekoala.riddleverse.coins.100': { coins: 100, price: '$0.99' },
@@ -59,58 +62,167 @@ export async function getCoinBalance(req, res) {
 }
 
 /**
- * Record a coin purchase after IAP verification
+ * Record a coin purchase.
+ *
+ * Fails closed: in the default `enforce` mode coins are credited only when the Google Play order is verified server side
+ * (see services/playPurchaseVerifier.js and services/coinPurchasePolicy.js). The coin amount always comes from COIN_PACKS,
+ * never from the request. Crediting is idempotent on the transaction id (add_purchased_coins).
+ *
+ * Shipped Android clients send no credential, so an Authorization header is optional: when present it must verify and match
+ * userId; COIN_PURCHASE_REQUIRE_AUTH=true makes it mandatory once clients send it.
  */
-export async function purchaseCoins(req, res) {
-    try {
-        const { userId, productId, transactionId, platform } = req.body;
+export function createPurchaseHandler(deps = {}) {
+    const d = {
+        env: process.env,
+        supabase,
+        now: Date.now,
+        verifier: null,
+        counters: null,
+        verifyCaller: null,
+        ...deps,
+    };
+    const counters = d.counters || (d.counters = createCounters(d.now));
+    const inflight = new Set();
 
-        if (!userId || !productId || !transactionId || !platform) {
-            return res.status(400).json({
-                error: 'userId, productId, transactionId, and platform are required'
+    return async function purchaseCoinsHandler(req, res) {
+        let lockKey = null;
+        try {
+            const policy = readPolicy(d.env);
+            const body = req.body && typeof req.body === 'object' ? req.body : {};
+            const { userId, productId, transactionId, platform } = body;
+            const ip = String(req.ip || req.socket?.remoteAddress || 'unknown');
+
+            if (!userId || !productId || !transactionId || !platform) {
+                return res.status(400).json({
+                    error: 'userId, productId, transactionId, and platform are required'
+                });
+            }
+            if (typeof userId !== 'string' || userId.length > 128 ||
+                typeof productId !== 'string' || typeof transactionId !== 'string' || transactionId.length > 128 ||
+                typeof platform !== 'string') {
+                return res.status(400).json({ error: 'Invalid purchase fields' });
+            }
+
+            const pack = COIN_PACKS[productId];
+            if (!pack) {
+                return res.status(400).json({
+                    error: 'Invalid product ID',
+                    validProducts: Object.keys(COIN_PACKS)
+                });
+            }
+
+            if (platform !== 'android') {
+                logAnomaly('unsupported_platform', { platform: String(platform).slice(0, 16), userId });
+                return res.status(400).json({ error: 'purchase_not_verified', message: 'This platform cannot be verified yet.' });
+            }
+
+            // Optional identity: if a token is sent it must be valid and belong to userId.
+            const hasAuth = typeof req.headers?.authorization === 'string' && req.headers.authorization.startsWith('Bearer ');
+            if (hasAuth) {
+                const caller = await (d.verifyCaller || verifiedCaller)(req);
+                if (!caller) return res.status(401).json({ error: 'Invalid or expired credentials' });
+                if (caller.uid !== userId) {
+                    logAnomaly('uid_mismatch', { userId });
+                    return res.status(403).json({ error: 'Credentials do not match userId' });
+                }
+            } else if (String(d.env.COIN_PURCHASE_REQUIRE_AUTH || '').toLowerCase() === 'true') {
+                return res.status(401).json({ error: 'Authentication required' });
+            }
+
+            if (counters.ipOverLimit(ip, policy.ipClaimsPerHour)) {
+                logAnomaly('ip_rate_limit', { ip, userId });
+                res.setHeader('Retry-After', '3600');
+                return res.status(429).json({ error: 'Too many purchase requests. Please try again later.' });
+            }
+            counters.recordIp(ip);
+
+            if (inflight.has(transactionId)) {
+                return res.status(409).json({ error: 'This purchase is already being processed' });
+            }
+            inflight.add(transactionId);
+            lockKey = transactionId;
+
+            if (policy.mode === 'enforce') {
+                const verifier = d.verifier || getPlayPurchaseVerifier();
+                if (!verifier.isConfigured()) {
+                    logAnomaly('verifier_not_configured', { productId, userId, authed: hasAuth });
+                    return res.status(503).json({
+                        error: 'purchase_verification_unavailable',
+                        retryable: true,
+                        message: 'We could not confirm your purchase yet. Your coins will not be lost: please try again later.'
+                    });
+                }
+                const v = await verifier.verifyOrder({ orderId: transactionId, productId }, { maxAgeMs: policy.maxOrderAgeMs });
+                if (!v.ok && v.code === 'unavailable') {
+                    logAnomaly('verifier_unavailable', { detail: v.detail, productId, userId, authed: hasAuth });
+                    return res.status(503).json({
+                        error: 'purchase_verification_unavailable',
+                        retryable: true,
+                        message: 'We could not confirm your purchase yet. Your coins will not be lost: please try again later.'
+                    });
+                }
+                if (!v.ok) {
+                    logAnomaly('purchase_not_verified', { code: v.code, productId, userId, authed: hasAuth, ip });
+                    return res.status(400).json({ error: 'purchase_not_verified' });
+                }
+            } else {
+                // interim: no receipt check; shape check, per-account and global limits, logging.
+                if (!PLAY_ORDER_ID_RE.test(transactionId)) {
+                    logAnomaly('bad_order_id_shape', { productId, userId, authed: hasAuth, ip });
+                    return res.status(400).json({ error: 'purchase_not_verified' });
+                }
+                const recent = await recentPurchases(d.supabase, userId, d.now);
+                if (recent === null) {
+                    logAnomaly('ledger_unreadable', { userId });
+                } else if (recent.count >= policy.accountPurchasesPerDay || recent.coins + pack.coins > policy.accountCoinsPerDay) {
+                    logAnomaly('account_daily_limit', { userId, count: recent.count, coins: recent.coins, productId });
+                    return res.status(429).json({ error: 'Daily purchase limit reached for this account. Please contact support if this is a mistake.' });
+                }
+                if (counters.globalWouldExceed(pack.coins, policy.globalCoinsPerDay)) {
+                    logAnomaly('global_daily_ceiling', { userId, productId });
+                    return res.status(503).json({ error: 'purchase_verification_unavailable', retryable: true });
+                }
+                logAnomaly('unverified_credit', { productId, userId, authed: hasAuth, ip, orderIdPrefix: transactionId.slice(0, 8) });
+            }
+
+            console.log(`[Coins] Purchase: ${userId.slice(0, 6)}… buying ${pack.coins} coins (${productId}) via ${platform} [${policy.mode}]`);
+
+            const { data, error } = await d.supabase.rpc('add_purchased_coins', {
+                p_user_id: userId,
+                p_amount: pack.coins,
+                p_reason: productId,
+                p_platform: platform,
+                p_iap_transaction_id: transactionId
             });
-        }
 
-        const pack = COIN_PACKS[productId];
-        if (!pack) {
-            return res.status(400).json({
-                error: 'Invalid product ID',
-                validProducts: Object.keys(COIN_PACKS)
+            if (error) {
+                console.error('Error recording coin purchase:', error);
+                return res.status(500).json({ error: 'Failed to record purchase' });
+            }
+
+            if (data.duplicate) {
+                console.log(`[Coins] Duplicate transaction ${transactionId}, returning success`);
+                return res.json({ success: true, message: 'Transaction already processed', balance: data.new_balance });
+            }
+
+            if (policy.mode !== 'enforce') counters.recordGlobal(pack.coins);
+            console.log(`[Coins] Purchase complete: now ${data.new_balance} coins`);
+
+            res.json({
+                success: true,
+                coinsAdded: pack.coins,
+                newBalance: data.new_balance
             });
+        } catch (error) {
+            console.error('Unexpected error in purchaseCoins:', error);
+            res.status(500).json({ error: 'Internal server error' });
+        } finally {
+            if (lockKey) inflight.delete(lockKey);
         }
-
-        console.log(`[Coins] Purchase: ${userId} buying ${pack.coins} coins (${productId}) via ${platform}`);
-
-        const { data, error } = await supabase.rpc('add_purchased_coins', {
-            p_user_id: userId,
-            p_amount: pack.coins,
-            p_reason: productId,
-            p_platform: platform,
-            p_iap_transaction_id: transactionId
-        });
-
-        if (error) {
-            console.error('Error recording coin purchase:', error);
-            return res.status(500).json({ error: 'Failed to record purchase' });
-        }
-
-        if (data.duplicate) {
-            console.log(`[Coins] Duplicate transaction ${transactionId}, returning success`);
-            return res.json({ success: true, message: 'Transaction already processed', balance: data.new_balance });
-        }
-
-        console.log(`[Coins] Purchase complete: ${userId} now has ${data.new_balance} coins`);
-
-        res.json({
-            success: true,
-            coinsAdded: pack.coins,
-            newBalance: data.new_balance
-        });
-    } catch (error) {
-        console.error('Unexpected error in purchaseCoins:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+    };
 }
+
+export const purchaseCoins = createPurchaseHandler();
 
 /**
  * Spend coins (e.g. continue playing)
@@ -128,6 +240,8 @@ export async function spendCoins(req, res) {
         // Creator gets their share on replay, customize, and harder_challenge
         // Owner customizing their own game should not send creatorId from the client
         let effectiveCreatorId = creatorId || null;
+        // A creator's own spend never earns them a share (stops mint-and-recycle through their own game).
+        if (effectiveCreatorId && effectiveCreatorId === userId) effectiveCreatorId = null;
 
         if (reason === 'harder_challenge') {
             if (!difficultyLevel || difficultyLevel < 2 || difficultyLevel > MAX_DIFFICULTY_LEVEL) {
