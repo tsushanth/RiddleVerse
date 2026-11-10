@@ -6,6 +6,15 @@ const MIN_PAYOUT_COINS = 1000;
 const COIN_TO_USD = 0.007;
 const PLATFORM_URL = 'https://puzzleverseai.com';
 
+/**
+ * Payouts are held for manual review unless PAYOUTS_ENABLED=true. Coin balances can include coins from purchases that were
+ * credited without receipt verification, so no automatic cash-out until the owner has reviewed the ledger and turned this on.
+ * Held requests are logged ([Payouts][HELD]) so they can be followed up by hand.
+ */
+export function payoutsEnabled(env = process.env) {
+    return String(env.PAYOUTS_ENABLED || '').toLowerCase() === 'true';
+}
+
 let stripe = null;
 function getStripe() {
     if (!stripe) {
@@ -46,12 +55,14 @@ export async function getPayoutEligibility(req, res) {
         const stripeConnected = !!stripeData?.stripe_account_id;
         const stripePayoutsEnabled = stripeData?.payouts_enabled || false;
 
-        const eligible = earnedBalance >= MIN_PAYOUT_COINS && stripePayoutsEnabled;
+        const paused = !payoutsEnabled();
+        const eligible = !paused && earnedBalance >= MIN_PAYOUT_COINS && stripePayoutsEnabled;
         const usdAmount = parseFloat((earnedBalance * COIN_TO_USD).toFixed(2));
 
         res.json({
             success: true,
             eligible,
+            payoutsPaused: paused,
             earnedBalance,
             minThreshold: MIN_PAYOUT_COINS,
             conversionRate: COIN_TO_USD,
@@ -196,6 +207,15 @@ export async function requestPayout(req, res) {
 
         if (!creatorId || !coinsAmount) {
             return res.status(400).json({ error: 'creatorId and coinsAmount are required' });
+        }
+
+        if (!payoutsEnabled()) {
+            console.warn(`[Payouts][HELD] request held for manual review: creator=${String(creatorId).slice(0, 6)}… coins=${coinsAmount}`);
+            return res.status(423).json({
+                success: false,
+                error: 'payouts_under_review',
+                message: 'Payouts are temporarily paused while we review the system. Your balance is safe.'
+            });
         }
 
         if (coinsAmount < MIN_PAYOUT_COINS) {
