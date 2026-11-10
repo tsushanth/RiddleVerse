@@ -2,6 +2,7 @@
 import express from 'express';
 import { firebaseStreakNotificationService, isStreakNotificationsEnabled } from '../services/firebaseStreakNotificationService.js';
 import { supabase } from '../config/database.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
 
@@ -41,7 +42,7 @@ router.get('/status', async (req, res) => {
 /**
  * Manually trigger a streak check (for testing)
  */
-router.post('/run-now', async (req, res) => {
+router.post('/run-now', requireNotificationAdmin, async (req, res) => {
     try {
         if (!isStreakNotificationsEnabled()) {
             return res.status(503).json({
@@ -78,7 +79,7 @@ router.post('/run-now', async (req, res) => {
 /**
  * Stop the periodic streak service
  */
-router.post('/stop', async (req, res) => {
+router.post('/stop', requireNotificationAdmin, async (req, res) => {
     try {
         firebaseStreakNotificationService.stopPeriodicService();
 
@@ -100,7 +101,7 @@ router.post('/stop', async (req, res) => {
 /**
  * Start the periodic streak service
  */
-router.post('/start', async (req, res) => {
+router.post('/start', requireNotificationAdmin, async (req, res) => {
     try {
         if (!isStreakNotificationsEnabled()) {
             return res.status(503).json({
@@ -131,7 +132,7 @@ router.post('/start', async (req, res) => {
 /**
  * Test specific user's streak status
  */
-router.post('/test-user', async (req, res) => {
+router.post('/test-user', requireNotificationAdmin, async (req, res) => {
     try {
         const { userEmail } = req.body;
 

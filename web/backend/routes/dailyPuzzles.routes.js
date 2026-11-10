@@ -11,6 +11,8 @@ import {
 } from '../services/dailyPuzzleService.js';
 import { db } from '../config/firebaseAdmin.js';
 import { supabase } from '../config/database.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
+import { fcmTokenRegisterLimiter } from '../config/middleware.js';
 
 const router = express.Router();
 
@@ -435,15 +437,24 @@ router.post('/cleanup', async (req, res) => {
     }
 });
 
-// Register FCM token
-router.post('/register-fcm-token', async (req, res) => {
+// Register FCM token. Also mounted at POST /register-fcm-token (server.js): the shipped Android and iOS apps post there.
+export async function registerFcmTokenHandler(req, res) {
     try {
-        const { userEmail, userId, fcmToken, platform } = req.body;
+        const { userEmail, userId, fcmToken, platform } = req.body || {};
         
         if (!userEmail || !fcmToken || !platform) {
             return res.status(400).json({
                 error: 'Missing required fields: userEmail, fcmToken, platform'
             });
+        }
+
+        if (typeof userEmail !== 'string' || typeof fcmToken !== 'string' || typeof platform !== 'string'
+            || (userId !== undefined && userId !== null && typeof userId !== 'string')) {
+            return res.status(400).json({ error: 'userEmail, fcmToken, platform and userId must be strings' });
+        }
+
+        if (userEmail.length > 320 || !userEmail.includes('@') || fcmToken.length > 4096 || (userId && userId.length > 128)) {
+            return res.status(400).json({ error: 'Invalid userEmail, fcmToken or userId' });
         }
         
         if (!['ios', 'android'].includes(platform)) {
@@ -478,10 +489,11 @@ router.post('/register-fcm-token', async (req, res) => {
             error: error.message
         });
     }
-});
+}
+router.post('/register-fcm-token', fcmTokenRegisterLimiter, registerFcmTokenHandler);
 
 // Trigger daily puzzle job
-router.post('/trigger-job', async (req, res) => {
+router.post('/trigger-job', requireNotificationAdmin, async (req, res) => {
     try {
         const result = await dailyPuzzleGenerationJobWithManualTrigger();
         

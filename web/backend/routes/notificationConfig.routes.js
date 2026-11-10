@@ -5,13 +5,38 @@ import { admin } from '../config/firebaseAdmin.js';
 import { notificationLimiter } from '../config/middleware.js';
 import { notificationService } from '../services/notificationService.js';
 import { sendMulticastNotification, listUserDailyTopics } from '../services/dailyPuzzleService.js';
+import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware/notificationAuth.js';
+
+// POST /test-notification is called by the shipped mobile apps (their "Test Notification" button) without credentials, so it
+// cannot require the admin key. Without the key it is limited: fixed text (no caller-chosen title/body) and a small per-account cap.
+const TEST_NOTIFICATION_DEFAULT_TITLE = '🧪 Test Notification';
+const TEST_NOTIFICATION_DEFAULT_BODY = 'This is a test notification from your puzzle app!';
+const TEST_NOTIFICATION_MAX_PER_HOUR = 5;
+const testNotificationCounts = new Map();
+
+export function allowAnonymousTestNotification(userEmail, now = Date.now()) {
+    const key = String(userEmail).toLowerCase();
+    const hits = (testNotificationCounts.get(key) || []).filter(t => now - t < 60 * 60 * 1000);
+    if (hits.length >= TEST_NOTIFICATION_MAX_PER_HOUR) {
+        testNotificationCounts.set(key, hits);
+        return false;
+    }
+    hits.push(now);
+    testNotificationCounts.set(key, hits);
+    if (testNotificationCounts.size > 5000) {
+        for (const [k, v] of testNotificationCounts) {
+            if (!v.some(t => now - t < 60 * 60 * 1000)) testNotificationCounts.delete(k);
+        }
+    }
+    return true;
+}
 
 const router = express.Router();
 
 /**
  * Create notification config
  */
-router.post('/configs', notificationLimiter, async (req, res) => {
+router.post('/configs', requireNotificationAdmin, notificationLimiter, async (req, res) => {
     try {
         const {
             name,
@@ -120,10 +145,19 @@ router.get('/stats', notificationLimiter, async (req, res) => {
  */
 router.post('/test-notification', async (req, res) => {
     try {
-        const { userEmail, title, body } = req.body;
+        const { userEmail } = req.body;
+        let { title, body } = req.body;
 
-        if (!userEmail) {
+        if (!userEmail || typeof userEmail !== 'string') {
             return res.status(400).json({ error: 'userEmail required' });
+        }
+
+        if (!hasNotificationAdminKey(req)) {
+            title = undefined;
+            body = undefined;
+            if (!allowAnonymousTestNotification(userEmail)) {
+                return res.status(429).json({ success: false, error: 'Too many test notifications for this account, try again later' });
+            }
         }
 
         const { data: tokens } = await supabase
@@ -140,8 +174,8 @@ router.post('/test-notification', async (req, res) => {
         }
 
         const notificationData = {
-            title: title || '🧪 Test Notification',
-            body: body || 'This is a test notification from your puzzle app!',
+            title: title || TEST_NOTIFICATION_DEFAULT_TITLE,
+            body: body || TEST_NOTIFICATION_DEFAULT_BODY,
             data: {
                 type: 'test',
                 userEmail: userEmail,
@@ -172,7 +206,7 @@ router.post('/test-notification', async (req, res) => {
 /**
  * Send notifications to all users
  */
-router.post('/send-notifications', async (req, res) => {
+router.post('/send-notifications', requireNotificationAdmin, async (req, res) => {
     const { title, body } = req.body;
 
     if (!title || !body) {

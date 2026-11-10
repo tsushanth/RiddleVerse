@@ -52,6 +52,20 @@ export const sendNotificationLimiter = rateLimit({
     }
 });
 
+// FCM token registration: the apps call it once per launch/token refresh. Keyed by the real client IP when Cloudflare supplies it
+// (req.ip behind Cloudflare + Fly is an edge address shared by many users). Generous because mobile carriers share addresses.
+export const fcmTokenRegisterLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 120,
+    keyGenerator: (req) => {
+        const cf = req.headers['cf-connecting-ip'];
+        return typeof cf === 'string' && cf.length > 0 && cf.length < 64 ? cf : req.ip;
+    },
+    message: { error: 'Too many token registrations from this address, please try again later.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
 // Rate limiting for RiddleVerse app endpoints
 export const riddleVerseRateLimit = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
