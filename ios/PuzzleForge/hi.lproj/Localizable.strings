@@ -533,7 +533,7 @@
 "Submit (+20% bonus)" = "जमा करें (+20% बोनस)";
 "Learn from others who identified the AI image correctly:" = "उन लोगों से सीखें जिन्होंने AI छवि को सही तरीके से पहचाना:";
 
-// MARK: - Find Object / Waldo
+// MARK: - Find Object / Hidden objects
 "Hidden Objects" = "छिपी वस्तुएँ";
 "Failed to load image" = "छवि लोड करने में विफल";
 "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "ज़ूम के लिए पिंच \u{2022} पैन के लिए खींचें \u{2022} वस्तुएँ खोजने के लिए टैप करें";
@@ -543,7 +543,7 @@
 "Objects to Find" = "खोजने वाली वस्तुएँ";
 "These objects were naturally discovered by AI vision in the scene" = "ये वस्तुएँ दृश्य में AI दृष्टि द्वारा स्वाभाविक रूप से खोजी गई थीं";
 "Show Hint" = "संकेत दिखाएँ";
-"ENHANCED WALDO" = "उन्नत वॉल्डो";
+"ENHANCED SEARCH" = "उन्नत खोज";
 
 // MARK: - Geography
 "Geography Cities Challenge" = "भूगोल शहर चुनौती";

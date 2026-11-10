@@ -68,7 +68,7 @@ export function resolveQuality(quality) {
     return pick(quality) || pick(process.env.OPENAI_IMAGE_QUALITY) || DEFAULT_IMAGE_QUALITY;
 }
 
-/** Quality for services that need fine detail (Find Differences, Waldo). */
+/** Quality for services that need fine detail (Find Differences, hidden-object scenes). */
 export function detailQuality() {
     return resolveQuality(process.env.OPENAI_IMAGE_QUALITY_DETAIL || DEFAULT_DETAIL_QUALITY);
 }

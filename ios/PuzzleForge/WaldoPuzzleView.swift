@@ -93,7 +93,7 @@ struct WaldoPuzzleView: View {
             Color.black.ignoresSafeArea()
             
             if isLoading {
-                LoadingView(message: "Loading Waldo puzzle...")
+                LoadingView(message: "Loading puzzle...")
             } else if let error = errorMessage {
                 ErrorView(message: error, retryAction: onBack)
             } else if let data = puzzleData {
@@ -149,7 +149,7 @@ struct WaldoPuzzleView: View {
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.white)
                     
-                    Text("ENHANCED WALDO")
+                    Text("ENHANCED SEARCH")
                         .font(.system(size: 8, weight: .bold))
                         .foregroundColor(.red)
                 }

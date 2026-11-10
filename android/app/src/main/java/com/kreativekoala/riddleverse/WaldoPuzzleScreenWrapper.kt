@@ -1,4 +1,4 @@
-// WaldoPuzzleScreenWrapper.kt - Enhanced Where's Waldo Style Puzzle with Dual Detection
+// WaldoPuzzleScreenWrapper.kt - Enhanced hidden-object search puzzle with Dual Detection
 package com.kreativekoala.riddleverse
 
 import androidx.compose.ui.res.stringResource

@@ -533,7 +533,7 @@
 "Submit (+20% bonus)" = "送信 (+20%ボーナス)";
 "Learn from others who identified the AI image correctly:" = "AI画像を正しく識別した人から学ぶ:";
 
-// MARK: - Find Object / Waldo
+// MARK: - Find Object / Hidden objects
 "Hidden Objects" = "隠しオブジェクト";
 "Failed to load image" = "画像の読み込みに失敗";
 "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "ピンチでズーム \u{2022} ドラッグで移動 \u{2022} タップでオブジェクトを探す";
@@ -543,7 +543,7 @@
 "Objects to Find" = "見つけるオブジェクト";
 "These objects were naturally discovered by AI vision in the scene" = "これらのオブジェクトはAIビジョンによってシーン内で自然に発見されました";
 "Show Hint" = "ヒントを表示";
-"ENHANCED WALDO" = "強化版ウォーリー";
+"ENHANCED SEARCH" = "強化版さがし";
 
 // MARK: - Geography
 "Geography Cities Challenge" = "地理・都市チャレンジ";

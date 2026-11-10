@@ -533,7 +533,7 @@
 "Submit (+20% bonus)" = "提交 (+20%奖励)";
 "Learn from others who identified the AI image correctly:" = "向正确识别AI图片的人学习:";
 
-// MARK: - Find Object / Waldo
+// MARK: - Find Object / Hidden objects
 "Hidden Objects" = "隐藏物品";
 "Failed to load image" = "图片加载失败";
 "Pinch to zoom \u{2022} Drag to pan \u{2022} Tap to find objects" = "捏合缩放 \u{2022} 拖动平移 \u{2022} 点击寻找物品";
@@ -543,7 +543,7 @@
 "Objects to Find" = "需要找到的物品";
 "These objects were naturally discovered by AI vision in the scene" = "这些物品是由AI视觉在场景中自然发现的";
 "Show Hint" = "显示提示";
-"ENHANCED WALDO" = "增强版沃尔多";
+"ENHANCED SEARCH" = "增强搜索";
 
 // MARK: - Geography
 "Geography Cities Challenge" = "地理城市挑战";

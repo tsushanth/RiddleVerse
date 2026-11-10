@@ -69,7 +69,7 @@ object QuizCategories {
         QuizCategory("Image Questions", "Image Questions", Icons.Default.Photo, "imagequestion", "Visual"),
 
 
-        QuizCategory("Waldo Puzzle", "Waldo Puzzle", Icons.Default.CheckCircle, "waldopuzzle", "Visual"),
+        QuizCategory("Find It", "Spot the hidden items in a busy scene", Icons.Default.CheckCircle, "waldopuzzle", "Visual"),
 
         QuizCategory("Music Match", "Multi-Match Music Quiz", Icons.Default.MusicNote, "musicidentification", "Audio"),
 
