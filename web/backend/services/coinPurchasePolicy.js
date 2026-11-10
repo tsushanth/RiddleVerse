@@ -8,6 +8,7 @@
 //            android, the transaction id must look like a Play order id, per-account daily limits, a per-IP hourly limit and a
 //            global daily ceiling apply, and every claim is logged. This is a stop-gap, not a defence against a determined
 //            attacker (an order id of the right shape can be invented); it exists so legitimate purchases keep working.
+// The per-account, per-IP and global limits below apply in BOTH modes as a second layer.
 //
 // Counters kept in memory are per Fly machine and reset on restart; the per-account limits read the coin_transactions ledger.
 
