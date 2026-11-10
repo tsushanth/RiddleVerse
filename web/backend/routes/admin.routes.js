@@ -8,6 +8,7 @@ import {
 import { regenerationService } from '../services/regenerationService.js';
 import { PuzzleGenerator } from '../services/puzzleGeneration.js';
 import { supabase } from '../config/database.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const router = express.Router();
 router.use(adminLimiter);
 
 // Regenerate stuck puzzle sets
-router.post('/api/regenerate-stuck-puzzle-sets', async (req, res) => {
+router.post('/api/regenerate-stuck-puzzle-sets', requireNotificationAdmin, async (req, res) => {
     try {
         const { dryRun = true } = req.body;
         const defaultPuzzleCount = 10;
@@ -245,7 +246,7 @@ router.post('/api/regenerate-stuck-puzzle-sets', async (req, res) => {
 });
 
 // Cleanup duplicates
-router.post('/api/cleanup-duplicates', async (req, res) => {
+router.post('/api/cleanup-duplicates', requireNotificationAdmin, async (req, res) => {
     try {
         const { 
             dryRun = true,
@@ -414,7 +415,7 @@ router.post('/api/cleanup-duplicates', async (req, res) => {
 });
 
 // Analyze puzzle duplicates by type - comprehensive analysis
-router.get('/api/analyze-duplicates', async (req, res) => {
+router.get('/api/analyze-duplicates', requireNotificationAdmin, async (req, res) => {
     try {
         const { limit = 500 } = req.query;
         const table = 'puzzles'; // Fixed to puzzles table

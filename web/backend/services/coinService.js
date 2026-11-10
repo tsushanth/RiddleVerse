@@ -11,6 +11,7 @@ const COIN_PACKS = {
 const CONTINUE_COST = 10; // coins to continue playing after game over
 const CUSTOMIZE_COST = 10; // coins per game customization
 const CREATOR_SHARE_PCT = 55; // creator gets 55% of spent coins
+const AWARD_REASONS = { app_rating_reward: 100 }; // reason -> the only amount POST /api/coins/award will grant
 
 /**
  * Get user's coin balance
@@ -272,17 +273,28 @@ export async function awardCoins(req, res) {
             return res.status(400).json({ error: 'userId, amount, and reason are required' });
         }
 
+        // This route is called without credentials (the iOS rating reward). Keep it to that one reward, at its fixed size,
+        // once per account: the transaction id below is per user and reason, so the RPC's duplicate check enforces "once".
+        const allowed = AWARD_REASONS[reason];
+        if (typeof userId !== 'string' || userId.length > 128 || !allowed || amount !== allowed) {
+            return res.status(400).json({ error: 'Unsupported award' });
+        }
+
         const { data, error } = await supabase.rpc('add_purchased_coins', {
             p_user_id: userId,
             p_amount: amount,
             p_reason: reason,
             p_platform: platform || null,
-            p_iap_transaction_id: `award_${reason}_${Date.now()}`
+            p_iap_transaction_id: `award_${reason}_${userId}`
         });
 
         if (error) {
             console.error('Error awarding coins:', error);
             return res.status(500).json({ error: 'Failed to award coins' });
+        }
+
+        if (data && data.duplicate) {
+            return res.json({ success: true, coinsAdded: 0, message: 'Already awarded' });
         }
 
         console.log(`[Coins] Award: ${userId} +${amount} coins for ${reason}`);

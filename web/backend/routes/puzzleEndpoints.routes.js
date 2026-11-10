@@ -21,6 +21,7 @@ import {
     updatePuzzleLeaderboard
 } from '../services/puzzleService.js';
 import { getNextDailyPuzzle, hasDailyPuzzles } from '../services/dailyPuzzles.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
 
@@ -401,7 +402,7 @@ router.get('/reset-puzzle-progress', (req, res) => {
     resetPuzzleProgress(req, res);
 });
 
-router.get('/reset-all-users-puzzle-progress', (req, res) => {
+router.get('/reset-all-users-puzzle-progress', requireNotificationAdmin, (req, res) => {
     req.body = {
         puzzleType: req.query.puzzleType,
         difficulty: req.query.difficulty
@@ -443,7 +444,7 @@ router.post('/request-puzzle-regeneration', async (req, res) => {
 /**
  * Generate puzzle endpoint
  */
-router.get("/generate-puzzle", async (req, res) => {
+router.get("/generate-puzzle", requireNotificationAdmin, async (req, res) => {
     try {
         const { puzzleType, modelName, difficulty } = req.query;
 

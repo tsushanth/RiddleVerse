@@ -834,6 +834,46 @@ export async function storeFCMToken(userEmail, userId, fcmToken, platform) {
 }
 
 /**
+ * Emails (as stored) that currently have this push token bound as active, de-duplicated.
+ * Used to refuse an unauthenticated registration that would attach a token to a second account.
+ */
+export async function getActiveTokenOwners(fcmToken) {
+    const { data, error } = await supabase
+        .from('user_notification_tokens')
+        .select('user_email')
+        .eq('fcm_token', fcmToken)
+        .eq('is_active', true);
+    if (error) throw new Error(`Failed to look up FCM token owner: ${error.message}`);
+    return [...new Set((data || []).map(r => String(r.user_email || '')).filter(Boolean))];
+}
+
+/**
+ * The signed-in user has proven control of this device: stop delivering the token to any other account
+ * (for example the previous user of a shared device).
+ */
+export async function deactivateTokenForOtherAccounts(fcmToken, otherEmails) {
+    if (!otherEmails || otherEmails.length === 0) return;
+    const { error } = await supabase
+        .from('user_notification_tokens')
+        .update({ is_active: false })
+        .eq('fcm_token', fcmToken)
+        .in('user_email', otherEmails);
+    if (error) throw new Error(`Failed to release FCM token from other accounts: ${error.message}`);
+}
+
+/** Whether this email has at least one active push token. Deliberately a boolean: no token material leaves the server. */
+export async function hasActiveFcmToken(userEmail) {
+    const { data, error } = await supabase
+        .from('user_notification_tokens')
+        .select('platform')
+        .eq('user_email', userEmail)
+        .eq('is_active', true)
+        .limit(1);
+    if (error) throw new Error(error.message);
+    return Boolean(data && data.length > 0);
+}
+
+/**
  * Send daily puzzle notifications to users
  */
 export async function sendDailyPuzzleNotifications(generationResults) {

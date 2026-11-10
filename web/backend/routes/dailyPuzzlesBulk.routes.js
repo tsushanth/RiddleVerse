@@ -8,6 +8,7 @@ import {
   getDailyCacheStats,
   refreshDailyPuzzles,
 } from '../services/dailyPuzzles.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
 
@@ -101,7 +102,7 @@ router.get('/daily/stats', (req, res) => {
  * POST /api/puzzles/daily/refresh
  * Manually trigger a cache refresh (admin use).
  */
-router.post('/daily/refresh', async (req, res) => {
+router.post('/daily/refresh', requireNotificationAdmin, async (req, res) => {
   try {
     const result = await refreshDailyPuzzles();
     return res.json({ success: true, ...result });
