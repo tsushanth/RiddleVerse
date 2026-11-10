@@ -68,6 +68,7 @@ import dailyPuzzlesBulkRoutes from './routes/dailyPuzzlesBulk.routes.js';
 import cron from 'node-cron';
 import { llm } from './utils/llmUsageInstance.js';
 import { isAdminKey } from './middleware/adminKey.js';
+import { createGameCreationGuard, createWriteRateLimit } from './middleware/gameCreationGuard.js';
 import { registerFcmTokenHandler } from './routes/dailyPuzzles.routes.js';
 import { fcmTokenRegisterLimiter } from './config/middleware.js';
 import { createPlayPagesRouter } from './services/playPages.js';
@@ -245,16 +246,18 @@ app.use('/', notificationConfigRoutes);
 app.use('/', generationRoutes);
 
 // Existing route modules
+const gameCreationGuard = createGameCreationGuard();
+const writeRateLimit = createWriteRateLimit();
 app.use('/api/ltv', ltvRoutes);
 app.use('/api/daily-puzzle-cache', dailyPuzzleCacheRoutes);
 app.use('/api/dash', dashProxyRoutes);
 app.use('/api/dash', puzzleAdminRouter);
-app.use('/api/games', gamesRoutes);
-app.use('/api/game-creation', gameCreationRoutes);
-app.use('/api/chat-scores', chatScoresRoutes);
+app.use('/api/games', writeRateLimit, gamesRoutes);
+app.use('/api/game-creation', gameCreationGuard, gameCreationRoutes);
+app.use('/api/chat-scores', writeRateLimit, chatScoresRoutes);
 app.use('/api/coins', coinsRoutes);
 app.use('/api/payouts', payoutRoutes);
-app.use('/api/leaderboard', leaderboardRoutes);
+app.use('/api/leaderboard', writeRateLimit, leaderboardRoutes);
 app.use('/api/sessions', sessionRoutes);
 app.use('/api', userConfigRoutes);
 app.use('/', adminRoutes);
@@ -601,7 +604,7 @@ setTimeout(function(){
 });
 
 // POST /api/game-score/:gameId — Submit score from web game player
-app.post('/api/game-score/:gameId', async (req, res) => {
+app.post('/api/game-score/:gameId', writeRateLimit, async (req, res) => {
     try {
         const { gameId } = req.params;
         const { userId, score } = req.body;
