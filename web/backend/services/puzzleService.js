@@ -1457,10 +1457,15 @@ async function notifyPuzzleGenerationComplete(puzzleType, difficulty, triggering
         
         console.log(`📢 Sending puzzle ready notification for ${puzzleType} (${difficulty})`);
         
-        // Send notification to all users
+        // Send notification to all users. The route requires the notification admin key; without it (unset) nothing is sent.
+        const notificationKey = process.env.NOTIFICATION_ADMIN_KEY;
+        if (!notificationKey) {
+            console.warn('NOTIFICATION_ADMIN_KEY is not set: skipping puzzle ready notification');
+            return;
+        }
         const response = await fetch('https://puzzleverseai.com/send-notifications', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 'Content-Type': 'application/json', 'x-notification-admin-key': notificationKey },
             body: JSON.stringify({ 
                 title, 
                 body,

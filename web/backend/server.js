@@ -68,6 +68,8 @@ import dailyPuzzlesBulkRoutes from './routes/dailyPuzzlesBulk.routes.js';
 import cron from 'node-cron';
 import { llm } from './utils/llmUsageInstance.js';
 import { isAdminKey } from './middleware/adminKey.js';
+import { registerFcmTokenHandler } from './routes/dailyPuzzles.routes.js';
+import { fcmTokenRegisterLimiter } from './config/middleware.js';
 import { createPlayPagesRouter } from './services/playPages.js';
 
 const __dirname = path.resolve();
@@ -260,6 +262,8 @@ app.use('/api/analytics', analyticsRoutes);
 app.use('/auth', authRoutes);
 app.use('/api/auth', authLinkRoutes);
 app.use('/api/daily-puzzles', dailyPuzzlesRoutes);
+// Alias: the shipped Android and iOS apps post FCM tokens to /register-fcm-token. Same handler, validation and limiter as the /api/daily-puzzles route.
+app.post('/register-fcm-token', fcmTokenRegisterLimiter, registerFcmTokenHandler);
 app.use("/api/puzzles", puzzleRoutes);
 app.use("/api/puzzles", dailyPuzzlesBulkRoutes); // GET /api/puzzles/daily
 
