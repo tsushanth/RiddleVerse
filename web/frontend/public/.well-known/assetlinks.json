@@ -1,6 +1,18 @@
 [
   {
     "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kreativekoala.riddleverse",
+      "sha256_cert_fingerprints": [
+        "57:AE:00:BD:E0:72:3C:C5:68:3B:22:2D:FB:B1:7E:9F:14:EF:A1:43:03:65:B7:14:68:D0:4A:36:2E:6F:E4:CF"
+      ]
+    }
+  },
+  {
+    "relation": [
       "delegate_permission/common.handle_all_urls",
       "delegate_permission/common.get_login_creds"
     ],
