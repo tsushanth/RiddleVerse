@@ -274,21 +274,6 @@ fun GameCreationScreen(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Earn money banner (reuses ForYouTab composable)
-            val context2 = context
-            val prefs2 = remember { context2.getSharedPreferences("riddleverse_prefs", android.content.Context.MODE_PRIVATE) }
-            var showCreateBanner by remember { mutableStateOf(!prefs2.getBoolean("earn_banner_dismissed", false)) }
-            if (showCreateBanner) {
-                EarnMoneyBanner(
-                    onTap = { /* already on create tab */ },
-                    onDismiss = {
-                        prefs2.edit().putBoolean("earn_banner_dismissed", true).apply()
-                        showCreateBanner = false
-                    }
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
             // Header
             Text(
                 text = stringResource(R.string.create_a_game),

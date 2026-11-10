@@ -184,7 +184,7 @@ fun GamePreviewScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("Game ready! 🎮", color = RvInk, fontWeight = FontWeight.Bold)
-                    Text("Tap 💰 in the top bar to publish and earn real cash!", color = RvSun, fontSize = 12.sp)
+                    Text("Publish your game so other players can find and play it!", color = RvSun, fontSize = 12.sp)
                 }
             }
         }
@@ -217,14 +217,14 @@ fun GamePreviewScreen(
             onDismissRequest = { showCloseDialog = false },
             title = {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                    Text("💰", fontSize = 32.sp)
+                    Text("🎮", fontSize = 32.sp)
                     Spacer(modifier = Modifier.height(4.dp))
                     Text("Publish before you go!", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
                 }
             },
             text = {
                 Text(
-                    "Players can find your game and you earn real cash — 55% of every coin spent on it. Publish now to go live!",
+                    "Publish your game so other players can find and play it. Publish now to go live!",
                     fontSize = 14.sp,
                     color = RvInkSoft.copy(alpha = 0.8f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -255,7 +255,7 @@ fun GamePreviewScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = RvSuccess),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Publish & Earn 💰", fontWeight = FontWeight.Bold, color = RvOnTone)
+                    Text("Publish", fontWeight = FontWeight.Bold, color = RvOnTone)
                 }
             },
             dismissButton = {

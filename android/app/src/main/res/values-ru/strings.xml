@@ -189,8 +189,7 @@
     <string name="unable_to_load_progress">Не удалось загрузить данные прогресса</string>
     <string name="custom_puzzles">Пользовательские головоломки</string>
 
-    <string name="earn_coins_from_games">Зарабатывайте монеты, когда игрокам нравятся ваши игры!</string>
-    <string name="creator_revenue_share" formatted="false">Вы получаете 55% монет, потраченных на ваши игры</string>
+    <string name="create_share_games">Создавайте и делитесь своими играми</string>
     <string name="coins_earned">Заработано монет</string>
     <string name="plays_monetized">Монетизированные игры</string>
     <string name="per_game">За игру</string>

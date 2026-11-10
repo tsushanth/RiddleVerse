@@ -123,7 +123,7 @@ fun SubscriptionUpgradeDialog(
             PaywallFeature("\u2728", "Unlimited Games", "Create without limits"),
             PaywallFeature("\uD83C\uDFAF", "Play All Games", "Access every community game"),
             PaywallFeature("\u26A1", "Priority Speed", "Faster game generation"),
-            PaywallFeature("\uD83D\uDCB0", "Earn Rewards", "Get paid for your creations"),
+            PaywallFeature("\uD83D\uDCB0", "Share Your Games", "Publish games for others to play"),
             PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
         ),
         products = paywallProducts,
@@ -478,7 +478,7 @@ fun HardPaywallGate(
             PaywallFeature("\u2728", "Unlimited Games", "Create without limits"),
             PaywallFeature("\uD83C\uDFAF", "Play All Games", "Access every community game"),
             PaywallFeature("\u26A1", "Priority Speed", "Faster game generation"),
-            PaywallFeature("\uD83D\uDCB0", "Earn Rewards", "Get paid for your creations"),
+            PaywallFeature("\uD83D\uDCB0", "Share Your Games", "Publish games for others to play"),
             PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
         ),
         products = paywallProducts,

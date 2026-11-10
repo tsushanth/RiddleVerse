@@ -217,8 +217,7 @@
     <string name="custom_puzzles">Puzzles Personalizados</string>
 
     <!-- Creator Monetization -->
-    <string name="earn_coins_from_games">Ganhe moedas quando jogadores curtirem seus jogos!</string>
-    <string name="creator_revenue_share" formatted="false">Você recebe 55% das moedas gastas nos seus jogos</string>
+    <string name="create_share_games">Crie e compartilhe seus próprios jogos</string>
     <string name="coins_earned">Moedas Ganhas</string>
     <string name="plays_monetized">Jogadas Monetizadas</string>
     <string name="per_game">Por Jogo</string>
