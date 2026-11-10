@@ -4,6 +4,7 @@ import express from 'express';
 import { PuzzleGenerator } from '../services/puzzleGeneration.js';
 import { PuzzleValidator } from '../services/puzzleValidation.js';
 import { PUZZLE_TYPES, DIFFICULTY_LEVELS } from '../config/puzzleConfig.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
 const puzzleGenerator = new PuzzleGenerator();
@@ -11,7 +12,7 @@ const puzzleGenerator = new PuzzleGenerator();
 /**
  * Generate puzzle with new standardized system
  */
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireNotificationAdmin, async (req, res) => {
   try {
     const { 
       puzzleType, 
@@ -89,7 +90,7 @@ router.post('/generate', async (req, res) => {
 /**
  * Migrate puzzles to current standards
  */
-router.post('/migrate', async (req, res) => {
+router.post('/migrate', requireNotificationAdmin, async (req, res) => {
   try {
     const { 
       puzzleTypes = null, // null means all types
@@ -224,7 +225,7 @@ router.get('/standards/:puzzleType', async (req, res) => {
 /**
  * Bulk validate puzzles
  */
-router.post('/bulk-validate', async (req, res) => {
+router.post('/bulk-validate', requireNotificationAdmin, async (req, res) => {
   try {
     const { 
       puzzleType, 

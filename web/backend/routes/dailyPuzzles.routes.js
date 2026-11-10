@@ -7,11 +7,15 @@ import {
     cleanupOldDailyPuzzles,
     generateUserDailyPuzzlesWithNotifications,
     storeFCMToken,
+    getActiveTokenOwners,
+    deactivateTokenForOtherAccounts,
+    hasActiveFcmToken,
     dailyPuzzleGenerationJobWithManualTrigger
 } from '../services/dailyPuzzleService.js';
 import { db } from '../config/firebaseAdmin.js';
 import { supabase } from '../config/database.js';
-import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
+import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware/notificationAuth.js';
+import { verifiedCaller } from '../middleware/callerIdentity.js';
 import { fcmTokenRegisterLimiter } from '../config/middleware.js';
 
 const router = express.Router();
@@ -109,7 +113,7 @@ router.get('/topics', async (req, res) => {
 });
 
 // Generate puzzles for specific user
-router.post('/generate', async (req, res) => {
+router.post('/generate', requireNotificationAdmin, async (req, res) => {
     const { email: targetEmail } = req.body;
 
     try {
@@ -208,7 +212,7 @@ router.post('/generate', async (req, res) => {
 });
 
 // Generate with notifications
-router.post('/generate-with-notifications', async (req, res) => {
+router.post('/generate-with-notifications', requireNotificationAdmin, async (req, res) => {
     const { email: targetEmail } = req.query;
 
     if (!targetEmail) {
@@ -285,7 +289,7 @@ router.post('/generate-with-notifications', async (req, res) => {
 });
 
 // Test generation for specific email
-router.post('/test-generation', async (req, res) => {
+router.post('/test-generation', requireNotificationAdmin, async (req, res) => {
     const { email, topics } = req.body;
     
     if (!email || !topics || !Array.isArray(topics)) {
@@ -402,7 +406,7 @@ router.get('/statistics', async (req, res) => {
 });
 
 // Cleanup old puzzles
-router.post('/cleanup', async (req, res) => {
+router.post('/cleanup', requireNotificationAdmin, async (req, res) => {
     const { days = 730, dryRun = true } = req.body;
     
     try {
@@ -468,6 +472,28 @@ export async function registerFcmTokenHandler(req, res) {
             console.warn(`Potentially invalid Firebase UID format: ${userId}`);
         }
         
+        // Who is asking? A verified sign-in for exactly this email may bind the token (and takes it over from
+        // another account on the same device). Everything else is the legacy unauthenticated call that installed
+        // app versions make: accepted only for a token no other account holds, and it never moves a binding.
+        const caller = await verifiedCaller(req);
+        const owns = Boolean(caller && caller.email && caller.email === userEmail.trim().toLowerCase());
+        if (caller && caller.email && !owns) {
+            return res.status(403).json({ success: false, error: 'Token can only be registered for the signed-in account' });
+        }
+        const wantEmail = userEmail.trim().toLowerCase();
+        const owners = await getActiveTokenOwners(fcmToken);
+        const others = owners.filter(e => e.trim().toLowerCase() !== wantEmail);
+        if (owns) {
+            await deactivateTokenForOtherAccounts(fcmToken, others);
+        } else {
+            if (String(process.env.FCM_REGISTER_REQUIRE_AUTH || '').toLowerCase() === 'true') {
+                return res.status(401).json({ success: false, error: 'Authentication required' });
+            }
+            if (others.length > 0) {
+                return res.status(409).json({ success: false, error: 'Token is already registered to another account' });
+            }
+        }
+
         const result = await storeFCMToken(userEmail, userId, fcmToken, platform);
         
         if (result.success) {
@@ -512,42 +538,30 @@ router.post('/trigger-job', requireNotificationAdmin, async (req, res) => {
     }
 });
 
-// Check user FCM token
+// Is a push token registered for this email? Boolean only: no token material, platform or timestamps are returned.
+// Callable by the account's own verified sign-in or with the notification admin key. No shipped app calls it.
 router.get('/check-fcm-token', async (req, res) => {
     const { email } = req.query;
-    
-    if (!email) {
+
+    if (!email || typeof email !== 'string') {
         return res.status(400).json({ error: "Email parameter required" });
     }
 
     try {
-        const { data: tokens, error } = await supabase
-            .from('user_notification_tokens')
-            .select('fcm_token, platform, last_used')
-            .eq('user_email', email)
-            .eq('is_active', true);
-
-        if (error) {
-            throw new Error(error.message);
+        let allowed = hasNotificationAdminKey(req);
+        if (!allowed) {
+            const caller = await verifiedCaller(req);
+            allowed = Boolean(caller && caller.email && caller.email === email.trim().toLowerCase());
+        }
+        if (!allowed) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
         }
 
-        return res.json({
-            success: true,
-            userEmail: email,
-            activeTokens: tokens ? tokens.length : 0,
-            tokens: tokens ? tokens.map(t => ({
-                platform: t.platform,
-                tokenPreview: t.fcm_token.substring(0, 20) + '...',
-                lastUsed: t.last_used
-            })) : []
-        });
+        return res.json({ success: true, registered: await hasActiveFcmToken(email) });
 
     } catch (error) {
         console.error("Error checking FCM tokens:", error);
-        return res.status(500).json({
-            success: false,
-            error: error.message
-        });
+        return res.status(500).json({ success: false, error: 'Failed to check token status' });
     }
 });
 

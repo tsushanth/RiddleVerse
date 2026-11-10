@@ -2,6 +2,8 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
 import { admin, db } from '../config/firebaseAdmin.js';
+import { hasNotificationAdminKey } from '../middleware/notificationAuth.js';
+import { callerIsUid } from '../middleware/callerIdentity.js';
 
 const router = express.Router();
 
@@ -20,6 +22,12 @@ router.delete('/delete-user-account', async (req, res) => {
         }
 
         const userEmail = email || userId;
+
+        // Irreversible and destructive: only the account's own verified sign-in (uid must equal userId) or the admin key.
+        // The shipped apps send neither a token nor the confirmation text, so this does not change what they can do today.
+        if (!hasNotificationAdminKey(req) && !(await callerIsUid(req, String(userId)))) {
+            return res.status(401).json({ success: false, error: 'Unauthorized' });
+        }
 
         if (confirmationText !== 'DELETE') {
             return res.status(400).json({

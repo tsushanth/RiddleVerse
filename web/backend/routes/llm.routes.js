@@ -4,6 +4,7 @@ import axios from 'axios';
 import usageTracker, { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import { recordAnthropicResponse, recordAnthropicAxiosError, createStreamUsageRecorder } from '../utils/llmUsageInstance.js';
 import { extractTopicFromPrompt, determineCategory } from '../utils/puzzleUtils.js';
+import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
 
@@ -134,7 +135,7 @@ async function generateImageForGame(prompt, difficulty = 'medium') {
 /**
  * Streaming LLM endpoint
  */
-router.post('/call-llm-stream', async (req, res) => {
+router.post('/call-llm-stream', requireNotificationAdmin, async (req, res) => {
     const startTime = Date.now();
 
     try {
@@ -348,7 +349,7 @@ DO NOT use local file references. DO NOT make up image URLs.`
 /**
  * Non-streaming LLM endpoint
  */
-router.post('/call-llm', async (req, res) => {
+router.post('/call-llm', requireNotificationAdmin, async (req, res) => {
     const startTime = Date.now();
 
     try {

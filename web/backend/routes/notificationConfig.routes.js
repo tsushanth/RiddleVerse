@@ -6,6 +6,7 @@ import { notificationLimiter } from '../config/middleware.js';
 import { notificationService } from '../services/notificationService.js';
 import { sendMulticastNotification, listUserDailyTopics } from '../services/dailyPuzzleService.js';
 import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware/notificationAuth.js';
+import { verifiedCaller } from '../middleware/callerIdentity.js';
 
 // POST /test-notification is called by the shipped mobile apps (their "Test Notification" button) without credentials, so it
 // cannot require the admin key. Without the key it is limited: fixed text (no caller-chosen title/body) and a small per-account cap.
@@ -26,6 +27,33 @@ export function allowAnonymousTestNotification(userEmail, now = Date.now()) {
     if (testNotificationCounts.size > 5000) {
         for (const [k, v] of testNotificationCounts) {
             if (!v.some(t => now - t < 60 * 60 * 1000)) testNotificationCounts.delete(k);
+        }
+    }
+    return true;
+}
+
+// Anonymous callers can name any email, so besides the per-account cap they share a per-client-address cap and one global cap:
+// a stranger cannot fan the fixed test text out across many accounts. A caller signed in as that exact account is not subject to them.
+const TEST_NOTIFICATION_MAX_PER_HOUR_PER_ADDRESS = 20;
+const TEST_NOTIFICATION_MAX_PER_HOUR_GLOBAL = 300;
+const testNotificationByAddress = new Map();
+let testNotificationGlobalHits = [];
+
+export function allowAnonymousTestNotificationSource(address, now = Date.now()) {
+    const hourAgo = now - 60 * 60 * 1000;
+    testNotificationGlobalHits = testNotificationGlobalHits.filter(t => t > hourAgo);
+    const key = String(address || 'unknown');
+    const hits = (testNotificationByAddress.get(key) || []).filter(t => t > hourAgo);
+    if (testNotificationGlobalHits.length >= TEST_NOTIFICATION_MAX_PER_HOUR_GLOBAL || hits.length >= TEST_NOTIFICATION_MAX_PER_HOUR_PER_ADDRESS) {
+        testNotificationByAddress.set(key, hits);
+        return false;
+    }
+    hits.push(now);
+    testNotificationByAddress.set(key, hits);
+    testNotificationGlobalHits.push(now);
+    if (testNotificationByAddress.size > 5000) {
+        for (const [k, v] of testNotificationByAddress) {
+            if (!v.some(t => t > hourAgo)) testNotificationByAddress.delete(k);
         }
     }
     return true;
@@ -155,6 +183,14 @@ router.post('/test-notification', async (req, res) => {
         if (!hasNotificationAdminKey(req)) {
             title = undefined;
             body = undefined;
+            const caller = await verifiedCaller(req);
+            const isOwner = Boolean(caller && caller.email && caller.email === userEmail.trim().toLowerCase());
+            if (caller && caller.email && !isOwner) {
+                return res.status(403).json({ success: false, error: 'Test notifications can only be sent to your own account' });
+            }
+            if (!isOwner && !allowAnonymousTestNotificationSource(req.ip)) {
+                return res.status(429).json({ success: false, error: 'Too many test notifications, try again later' });
+            }
             if (!allowAnonymousTestNotification(userEmail)) {
                 return res.status(429).json({ success: false, error: 'Too many test notifications for this account, try again later' });
             }
