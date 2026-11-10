@@ -661,7 +661,7 @@ Return as JSON array:
                 throw new Error(`Failed to import Supabase config: ${importError.message}`);
             }
 
-            if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) {
+            if (!process.env.SUPABASE_URL || !(process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)) {
                 throw new Error('Missing Supabase environment variables');
             }
 
