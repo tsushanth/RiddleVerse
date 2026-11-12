@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">あなたのパズル</string>
     <string name="subtab_featured">注目</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">RiddleVerseを楽しんでいますか？</string>
-    <string name="rate_in_play_store">Play Storeで評価してください！</string>
     <string name="help_us_improve">改善にご協力ください！</string>
-    <string name="rate_experience">RiddleVerseの体験を評価してください</string>
-    <string name="rate_incentive">評価で100コイン＋早期アクセスをゲット！</string>
-    <string name="thanks_great_rating">高評価ありがとうございます！Play Storeでも共有していただけますか？</string>
-    <string name="share_detailed_feedback">先に詳しいフィードバックを送ることもできます！</string>
-    <string name="sorry_bad_experience">ご不便をおかけして申し訳ありません。改善点を教えていただけますか？</string>
     <string name="continue_label">続ける</string>
-    <string name="rate">評価する</string>
-    <string name="rate_in_store">ストアで評価</string>
-    <string name="give_feedback">フィードバック</string>
-    <string name="not_now">今はしない</string>
     <string name="maybe_later">あとで</string>
-    <string name="feedback_first">先にフィードバック</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">評価リマインダー</string>
-    <string name="when_remind_again">次のリマインドはいつにしますか？</string>
-    <string name="remind_in_week">1週間後にリマインド</string>
-    <string name="remind_in_month">1ヶ月後にリマインド</string>
-    <string name="dont_ask_again">もう聞かない</string>
+    <!-- Dialog buttons -->
     <string name="cancel">キャンセル</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">所持コイン</string>
     <string name="coins_used_description">コインはゲームの続行やクリエイターの応援に使えます。</string>
     <string name="best_value">お得</string>
-    <string name="rate_for_early_access">評価して早期アクセスをゲット！</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>

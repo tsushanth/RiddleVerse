@@ -40,29 +40,13 @@
     <string name="subtab_your_puzzles">Iyong mga Palaisipan</string>
     <string name="subtab_featured">Tampok</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">Nag-eenjoy ka ba sa RiddleVerse?</string>
-    <string name="rate_in_play_store">I-rate kami sa Play Store!</string>
     <string name="help_us_improve">Tulungan kaming mapabuti!</string>
-    <string name="rate_experience">Paano mo ire-rate ang iyong karanasan sa RiddleVerse?</string>
-    <string name="rate_incentive">Makakuha ng 100 barya + maagang access sa pag-rate sa amin!</string>
-    <string name="thanks_great_rating">Salamat sa magandang rating! Maaari mo ba itong ibahagi sa Play Store?</string>
-    <string name="share_detailed_feedback">Maaari ka ring magbahagi ng detalyadong feedback sa amin muna!</string>
-    <string name="sorry_bad_experience">Paumanhin na hindi maganda ang karanasan mo. Maaari mo ba kaming sabihan kung ano ang mapapabuti namin?</string>
     <string name="continue_label">Magpatuloy</string>
-    <string name="rate">I-rate</string>
-    <string name="rate_in_store">I-rate sa Store</string>
-    <string name="give_feedback">Magbigay ng Feedback</string>
-    <string name="not_now">Hindi Ngayon</string>
     <string name="maybe_later">Mamaya Na Lang</string>
-    <string name="feedback_first">Feedback Muna</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">Paalala sa Rating</string>
-    <string name="when_remind_again">Kailan mo gustong paalalahanan muli?</string>
-    <string name="remind_in_week">Paalalahanan ako sa isang linggo</string>
-    <string name="remind_in_month">Paalalahanan ako sa isang buwan</string>
-    <string name="dont_ask_again">Huwag nang itanong muli</string>
+    <!-- Dialog buttons -->
     <string name="cancel">Kanselahin</string>
 
     <!-- Feedback Dialog -->
@@ -81,7 +65,6 @@
     <string name="your_coins">Iyong mga Barya</string>
     <string name="coins_used_description">Ang mga barya ay ginagamit upang magpatuloy sa mga laro at suportahan ang mga tagalikha.</string>
     <string name="best_value">Pinakamahusay na Halaga</string>
-    <string name="rate_for_early_access">Mag-rate para sa maagang access!</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>

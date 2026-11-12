@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">Vos puzzles</string>
     <string name="subtab_featured">En vedette</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">Vous aimez RiddleVerse ?</string>
-    <string name="rate_in_play_store">Notez-nous sur le Play Store !</string>
     <string name="help_us_improve">Aidez-nous à nous améliorer !</string>
-    <string name="rate_experience">Comment évalueriez-vous votre expérience avec RiddleVerse ?</string>
-    <string name="rate_incentive">Obtenez 100 pièces + accès anticipé en nous notant !</string>
-    <string name="thanks_great_rating">Merci pour cette super note ! Pourriez-vous la partager sur le Play Store ?</string>
-    <string name="share_detailed_feedback">Vous pouvez aussi nous envoyer vos commentaires détaillés d\'abord !</string>
-    <string name="sorry_bad_experience">Nous sommes désolés que votre expérience ne soit pas satisfaisante. Pourriez-vous nous dire ce que nous pouvons améliorer ?</string>
     <string name="continue_label">Continuer</string>
-    <string name="rate">Noter</string>
-    <string name="rate_in_store">Noter en boutique</string>
-    <string name="give_feedback">Donner un avis</string>
-    <string name="not_now">Pas maintenant</string>
     <string name="maybe_later">Peut-être plus tard</string>
-    <string name="feedback_first">Avis d\'abord</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">Rappel de notation</string>
-    <string name="when_remind_again">Quand souhaitez-vous être rappelé ?</string>
-    <string name="remind_in_week">Rappeler dans une semaine</string>
-    <string name="remind_in_month">Rappeler dans un mois</string>
-    <string name="dont_ask_again">Ne plus demander</string>
+    <!-- Dialog buttons -->
     <string name="cancel">Annuler</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">Vos pièces</string>
     <string name="coins_used_description">Les pièces servent à continuer les jeux et soutenir les créateurs.</string>
     <string name="best_value">Meilleur rapport</string>
-    <string name="rate_for_early_access">Notez pour un accès anticipé !</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>

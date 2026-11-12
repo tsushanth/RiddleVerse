@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">Your Puzzles</string>
     <string name="subtab_featured">Featured</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">Enjoying RiddleVerse?</string>
-    <string name="rate_in_play_store">Rate us in the Play Store!</string>
     <string name="help_us_improve">Help us improve!</string>
-    <string name="rate_experience">How would you rate your experience with RiddleVerse?</string>
-    <string name="rate_incentive">Get 100 coins + early access by rating us!</string>
-    <string name="thanks_great_rating">Thanks for the great rating! Would you mind sharing it in the Play Store?</string>
-    <string name="share_detailed_feedback">You can also share detailed feedback with us first!</string>
-    <string name="sorry_bad_experience">We\'re sorry you\'re not having a great experience. Could you tell us what we can improve?</string>
     <string name="continue_label">Continue</string>
-    <string name="rate">Rate</string>
-    <string name="rate_in_store">Rate in Store</string>
-    <string name="give_feedback">Give Feedback</string>
-    <string name="not_now">Not Now</string>
     <string name="maybe_later">Maybe Later</string>
-    <string name="feedback_first">Feedback First</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">Rating Reminder</string>
-    <string name="when_remind_again">When would you like to be reminded again?</string>
-    <string name="remind_in_week">Remind me in a week</string>
-    <string name="remind_in_month">Remind me in a month</string>
-    <string name="dont_ask_again">Don\'t ask again</string>
+    <!-- Dialog buttons -->
     <string name="cancel">Cancel</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">Your Coins</string>
     <string name="coins_used_description">Coins are used to continue games and support creators.</string>
     <string name="best_value">Best Value</string>
-    <string name="rate_for_early_access">Rate for early access!</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>

@@ -36,26 +36,10 @@
     <string name="subtab_featured">Рекомендуемые</string>
 
     <string name="enjoying_app">Вам нравится RiddleVerse?</string>
-    <string name="rate_in_play_store">Оцените нас в Play Store!</string>
     <string name="help_us_improve">Помогите нам улучшиться!</string>
-    <string name="rate_experience">Как бы вы оценили опыт использования RiddleVerse?</string>
-    <string name="rate_incentive">Получите 100 монет + ранний доступ, оценив нас!</string>
-    <string name="thanks_great_rating">Спасибо за высокую оценку! Не могли бы вы поделиться ей в Play Store?</string>
-    <string name="share_detailed_feedback">Вы также можете сначала отправить подробный отзыв!</string>
-    <string name="sorry_bad_experience">Нам жаль, что у вас не лучший опыт. Подскажите, что мы можем улучшить?</string>
     <string name="continue_label">Продолжить</string>
-    <string name="rate">Оценить</string>
-    <string name="rate_in_store">Оценить в магазине</string>
-    <string name="give_feedback">Оставить отзыв</string>
-    <string name="not_now">Не сейчас</string>
     <string name="maybe_later">Может быть позже</string>
-    <string name="feedback_first">Сначала отзыв</string>
 
-    <string name="rating_reminder">Напоминание об оценке</string>
-    <string name="when_remind_again">Когда напомнить снова?</string>
-    <string name="remind_in_week">Напомнить через неделю</string>
-    <string name="remind_in_month">Напомнить через месяц</string>
-    <string name="dont_ask_again">Больше не спрашивать</string>
     <string name="cancel">Отмена</string>
 
     <string name="tell_us_what_you_love">Расскажите, что вам нравится!</string>
@@ -72,7 +56,6 @@
     <string name="your_coins">Ваши монеты</string>
     <string name="coins_used_description">Монеты используются для продолжения игр и поддержки создателей.</string>
     <string name="best_value">Лучшее предложение</string>
-    <string name="rate_for_early_access">Оцените для раннего доступа!</string>
 
     <string name="ok">ОК</string>
     <string name="back">Назад</string>

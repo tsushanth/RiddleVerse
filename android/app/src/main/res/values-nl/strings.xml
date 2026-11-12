@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">Jouw puzzels</string>
     <string name="subtab_featured">Uitgelicht</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">Geniet je van RiddleVerse?</string>
-    <string name="rate_in_play_store">Beoordeel ons in de Play Store!</string>
     <string name="help_us_improve">Help ons verbeteren!</string>
-    <string name="rate_experience">Hoe beoordeel je jouw ervaring met RiddleVerse?</string>
-    <string name="rate_incentive">Krijg 100 munten + vroege toegang door ons te beoordelen!</string>
-    <string name="thanks_great_rating">Bedankt voor de geweldige beoordeling! Wil je deze delen in de Play Store?</string>
-    <string name="share_detailed_feedback">Je kunt ook eerst gedetailleerde feedback met ons delen!</string>
-    <string name="sorry_bad_experience">Het spijt ons dat je geen goede ervaring hebt. Kun je ons vertellen wat we kunnen verbeteren?</string>
     <string name="continue_label">Doorgaan</string>
-    <string name="rate">Beoordelen</string>
-    <string name="rate_in_store">Beoordeel in Store</string>
-    <string name="give_feedback">Feedback geven</string>
-    <string name="not_now">Niet nu</string>
     <string name="maybe_later">Misschien later</string>
-    <string name="feedback_first">Eerst feedback</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">Beoordelingsherinnering</string>
-    <string name="when_remind_again">Wanneer wil je opnieuw herinnerd worden?</string>
-    <string name="remind_in_week">Herinner me over een week</string>
-    <string name="remind_in_month">Herinner me over een maand</string>
-    <string name="dont_ask_again">Niet meer vragen</string>
+    <!-- Dialog buttons -->
     <string name="cancel">Annuleren</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">Jouw munten</string>
     <string name="coins_used_description">Munten worden gebruikt om spellen voort te zetten en makers te ondersteunen.</string>
     <string name="best_value">Beste waarde</string>
-    <string name="rate_for_early_access">Beoordeel voor vroege toegang!</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>

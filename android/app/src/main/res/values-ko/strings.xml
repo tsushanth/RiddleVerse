@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">내 퍼즐</string>
     <string name="subtab_featured">추천</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">RiddleVerse를 즐기고 계신가요?</string>
-    <string name="rate_in_play_store">Play 스토어에서 평가해 주세요!</string>
     <string name="help_us_improve">개선에 도움을 주세요!</string>
-    <string name="rate_experience">RiddleVerse 경험을 평가해 주세요</string>
-    <string name="rate_incentive">평가하면 100코인 + 얼리 액세스를 받으세요!</string>
-    <string name="thanks_great_rating">좋은 평가 감사합니다! Play 스토어에서도 공유해 주시겠어요?</string>
-    <string name="share_detailed_feedback">먼저 자세한 피드백을 공유할 수도 있습니다!</string>
-    <string name="sorry_bad_experience">좋지 않은 경험을 드려 죄송합니다. 어떤 점을 개선하면 좋을까요?</string>
     <string name="continue_label">계속</string>
-    <string name="rate">평가</string>
-    <string name="rate_in_store">스토어에서 평가</string>
-    <string name="give_feedback">피드백</string>
-    <string name="not_now">나중에</string>
     <string name="maybe_later">다음에</string>
-    <string name="feedback_first">먼저 피드백</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">평가 알림</string>
-    <string name="when_remind_again">언제 다시 알려드릴까요?</string>
-    <string name="remind_in_week">일주일 후 알림</string>
-    <string name="remind_in_month">한 달 후 알림</string>
-    <string name="dont_ask_again">다시 묻지 않기</string>
+    <!-- Dialog buttons -->
     <string name="cancel">취소</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">보유 코인</string>
     <string name="coins_used_description">코인은 게임 계속하기와 크리에이터 지원에 사용됩니다.</string>
     <string name="best_value">최고 가치</string>
-    <string name="rate_for_early_access">평가하고 얼리 액세스를 받으세요!</string>
 
     <!-- Common Buttons -->
     <string name="ok">확인</string>

@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">आपकी पहेलियाँ</string>
     <string name="subtab_featured">विशेष</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">RiddleVerse पसंद आ रहा है?</string>
-    <string name="rate_in_play_store">Play Store पर रेट करें!</string>
     <string name="help_us_improve">हमें बेहतर बनाने में मदद करें!</string>
-    <string name="rate_experience">RiddleVerse के साथ आपका अनुभव कैसा रहा?</string>
-    <string name="rate_incentive">रेट करके 100 सिक्के + अर्ली एक्सेस पाएँ!</string>
-    <string name="thanks_great_rating">बढ़िया रेटिंग के लिए धन्यवाद! क्या आप इसे Play Store पर साझा करेंगे?</string>
-    <string name="share_detailed_feedback">आप पहले हमें विस्तृत फ़ीडबैक भी दे सकते हैं!</string>
-    <string name="sorry_bad_experience">हमें खेद है कि आपका अनुभव अच्छा नहीं रहा। कृपया बताएँ कि हम क्या सुधार कर सकते हैं?</string>
     <string name="continue_label">जारी रखें</string>
-    <string name="rate">रेट करें</string>
-    <string name="rate_in_store">स्टोर पर रेट करें</string>
-    <string name="give_feedback">फ़ीडबैक दें</string>
-    <string name="not_now">अभी नहीं</string>
     <string name="maybe_later">शायद बाद में</string>
-    <string name="feedback_first">पहले फ़ीडबैक</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">रेटिंग रिमाइंडर</string>
-    <string name="when_remind_again">आप कब फिर से याद दिलाना चाहेंगे?</string>
-    <string name="remind_in_week">एक हफ़्ते में याद दिलाएँ</string>
-    <string name="remind_in_month">एक महीने में याद दिलाएँ</string>
-    <string name="dont_ask_again">दोबारा न पूछें</string>
+    <!-- Dialog buttons -->
     <string name="cancel">रद्द करें</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">आपके सिक्के</string>
     <string name="coins_used_description">सिक्कों का उपयोग खेल जारी रखने और रचनाकारों का समर्थन करने के लिए किया जाता है।</string>
     <string name="best_value">सर्वोत्तम मूल्य</string>
-    <string name="rate_for_early_access">अर्ली एक्सेस के लिए रेट करें!</string>
 
     <!-- Common Buttons -->
     <string name="ok">ठीक है</string>

@@ -225,8 +225,6 @@ fun HomeScreen(navController: NavHostController,
     var puzzleGroups by remember { mutableStateOf<List<PuzzleGroup>>(emptyList()) }
 
     val context = LocalContext.current
-    val ratingManager = remember { AppRatingManager(context) }
-    var showRatingDialog by remember { mutableStateOf(false) }
 
     val handlePuzzleTypeSelected: (String) -> Unit = { puzzleType ->
         // Track as recent puzzle
@@ -271,12 +269,6 @@ fun HomeScreen(navController: NavHostController,
     }
 
     LaunchedEffect(Unit) {
-        if (ratingManager.shouldShowRatingPrompt()) {
-            showRatingDialog = true
-            ratingManager.markRatingPromptShown()
-            Log.d("HomeScreen", "Rating dialog triggered based on preferences")
-        }
-
         // Simplified group loading
         try {
             val userId = FirebaseAuth.getInstance().currentUser?.email ?: ""
@@ -541,8 +533,7 @@ fun HomeScreen(navController: NavHostController,
                     },
                     onSignUp = {
                         context.startActivity(Intent(context, AuthActivity::class.java).putExtra(EXTRA_FORCE_SHOW_AUTH, true))
-                    },
-                    onShowRatingDialog = { showRatingDialog = true }
+                    }
                 )
             }
         }
@@ -573,19 +564,6 @@ fun HomeScreen(navController: NavHostController,
                 onDismiss = { gameGenerationVM.dismissBanner() }
             )
         }
-    }
-
-    if (showRatingDialog) {
-        RatingFlowDialog(
-            onDismiss = {
-                showRatingDialog = false
-                Log.d("HomeScreen", "Rating dialog dismissed")
-            },
-            onCompleted = {
-                showRatingDialog = false
-                Log.d("HomeScreen", "Rating dialog completed")
-            }
-        )
     }
 
     // Show loading state
@@ -1612,8 +1590,7 @@ fun SettingsTab(
     onNavigateToAchievements: () -> Unit,
     onSignOut: () -> Unit,
     onSignIn: () -> Unit,
-    onSignUp: () -> Unit,
-    onShowRatingDialog: () -> Unit
+    onSignUp: () -> Unit
 ) {
     // Anonymous / identity-less users count as guests (Guest label + sign-in button), not as signed in.
     val isSignedIn = remember { mutableStateOf(!isGuestProfile(FirebaseAuth.getInstance().currentUser)) }
@@ -1673,7 +1650,7 @@ fun SettingsTab(
             }
 
             item {
-                RatingSection(onShowRatingDialog = onShowRatingDialog)
+                RatingSection()
             }
 
             item {
@@ -1689,45 +1666,19 @@ fun SettingsTab(
 }
 
 @Composable
-fun RatingSection(onShowRatingDialog: () -> Unit) {
+fun RatingSection() {
     val context = LocalContext.current
-    val ratingManager = remember { AppRatingManager(context) }
     var showFeedbackDialog by remember { mutableStateOf(false) }
-
-    val hasRated = remember { ratingManager.hasUserRated() }
-    val isDismissedPermanently = remember { ratingManager.hasUserDismissedPermanently() }
-    val hasGivenNegativeFeedback = remember { ratingManager.hasGivenNegativeFeedback() }
 
     SettingsSection(title = "Support & Feedback") {
         Column {
             SettingsRow(
                 icon = Icons.Default.Star,
-                title = when {
-                    hasRated -> "App Feedback"
-                    hasGivenNegativeFeedback -> "Additional Feedback"
-                    isDismissedPermanently -> "Rate RiddleVerse"
-                    else -> "Rate RiddleVerse"
-                },
-                subtitle = when {
-                    hasRated -> "Share additional feedback or suggestions"
-                    hasGivenNegativeFeedback -> "Share more thoughts or suggestions"
-                    isDismissedPermanently -> "Changed your mind? Rate us and get rewards!"
-                    else -> "Rate us and get exclusive rewards!"
-                },
+                title = "Rate RiddleVerse",
+                subtitle = "Open RiddleVerse on Google Play",
                 onClick = {
-                    if (isDismissedPermanently) {
-                        // Reset permanent dismissal if user manually opens rating
-                        val prefs = context.getSharedPreferences("app_rating_prefs", Context.MODE_PRIVATE)
-                        prefs.edit().putBoolean("user_dismissed_permanently", false).apply()
-                        Log.d("RatingSection", "Reset permanent dismissal - user manually opened rating")
-                    }
-
-                    if (hasRated || hasGivenNegativeFeedback) {
-                        // Show feedback dialog directly for users who already rated/gave feedback
-                        showFeedbackDialog = true
-                    } else {
-                        // Show normal rating flow
-                        onShowRatingDialog()
+                    if (!PlayListing.open(context)) {
+                        Toast.makeText(context, "Couldn't open Google Play", Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -1736,8 +1687,8 @@ fun RatingSection(onShowRatingDialog: () -> Unit) {
 
             SettingsRow(
                 icon = Icons.Default.BugReport,
-                title = "Report a Bug",
-                subtitle = "Found something not working? Let us know!",
+                title = "Send Feedback",
+                subtitle = "Tell us what to improve or what isn't working",
                 onClick = {
                     showFeedbackDialog = true
                 }
@@ -1760,7 +1711,7 @@ fun RatingSection(onShowRatingDialog: () -> Unit) {
     // Show feedback dialog when triggered from settings
     if (showFeedbackDialog) {
         FeedbackDialog(
-            isPositive = hasRated, // Assume positive if they've already rated
+            isPositive = false,
             onDismiss = {
                 showFeedbackDialog = false
             },
@@ -2729,9 +2680,6 @@ class HomeActivity : AppCompatActivity() {
                 Log.e("HomeActivity", "Analytics tracking failed", e)
             }
         }
-        val ratingManager = AppRatingManager(this)
-        ratingManager.incrementLaunchCount()
-
         setContent {
             // includeIme = false: the bottom tab bar must not ride up on the keyboard; HomeScreen pads for it itself.
             RvActivityTheme(includeIme = false, bottomClearance = 0.dp) {
