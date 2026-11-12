@@ -1,48 +1,36 @@
-RiddleVerse — the ultimate brain training app with 45+ puzzle types, AI-powered game creation, and daily rewards that keep you sharp.
+Riddles with free hints, a new puzzle every day, 70+ kinds of brain games, and games that AI builds from one sentence. Play free, no account needed.
 
-🧩 45+ PUZZLE TYPES
-Challenge yourself across 10 categories:
-• Math — equations, estimation, percentages, tip calculations & more
-• Language — anagrams, crosswords, word search, word snake & synonyms
-• Memory — visual patterns, story recall, image vortex & memory pairs
-• Geography — place cities and countries on interactive world maps
-• Visual — find hidden objects, spot differences & symmetry puzzles
-• Logic — number sequences, dual card logic & deduction
-• Focus — color matching, unique object detection & context switching
-• Audio — music identification challenges
-• Reaction — symbol swipe & rapid response tests
-• Trivia — general knowledge & Real vs AI detection
+DAILY PUZZLE
+• A new puzzle every day, the same one for everybody, changing at midnight UTC
+• Keep a daily streak going, and earn streak freezes that save it if you miss a day
+• Share a result card with friends that never shows the answer
+• Optional daily reminder, one notification a day, only if you have not solved it yet, and you can turn it off in Settings
 
-💰 EARN COINS DAILY
-• Log in daily to earn 10-30 coins automatically
-• Build streaks for bonus rewards: 50 coins at Day 7, 200 at Day 30, 500 at Day 100!
-• Use coins to continue games, unlock harder challenges & customize puzzles
-• Coin packs available if you want more
+RIDDLES
+• 300 classic riddles in easy, medium and hard
+• Free hints, each one costs a star, so you choose how much help you want
+• Type your answer, skip a riddle or reveal the answer
+• Share a riddle with a friend without spoiling the answer
+• Works offline
 
-🎮 CREATE & CUSTOMIZE GAMES
-• Generate your own AI-powered puzzles with custom topics
-• Browse and play community-created games
-• Customize any game to make it your own
-• Choose from multiple puzzle formats: crossword, word search, Q&A & more
+70+ PUZZLE TYPES
+• Logic: Sudoku, Binary Grid, Crowns, Trail and more
+• Words: Word Ladder, Word Hive, Linkup, anagrams and more
+• Math, memory and visual puzzles
+• Many puzzle types work without an internet connection
 
-🏆 COMPETE & CLIMB
-• Global leaderboards for every puzzle type
-• See your rank, percentile & performance stats
-• Track accuracy, speed & consistency over time
+CREATE A GAME FROM A SENTENCE
+• Describe a game in your own words, by typing or by voice, and AI builds a playable version for you
+• Generating a game needs an internet connection and takes a couple of minutes
+• Browse and play community-made games in Explore
 
-📈 SMART DIFFICULTY
-• 15 difficulty levels per puzzle — from Tutorial to Grandmaster
-• Adaptive system adjusts to your skill level automatically
-• Never too easy, never too hard — always the right challenge
+COMPETE
+• Leaderboards, plus points and levels for every puzzle you solve
 
-📴 WORKS OFFLINE
-• 35+ puzzle types available without internet
-• Play anywhere, anytime — progress syncs when you reconnect
+PLAY WITHOUT AN ACCOUNT
+• Jump straight in as a guest. Sign in later to keep your progress
 
-⭐ PREMIUM (Optional)
-• Unlimited puzzle generation
-• No ads — distraction-free experience
-• Early access to new features
-• Monthly ($5.99) or yearly ($24.99) plans
-
-Download RiddleVerse and start training your brain today!
+PREMIUM (OPTIONAL)
+• Removes ads and unlocks unlimited game creation
+• $5.99 per month or $24.99 per year, cancel any time in Google Play
+• The free version is supported by ads

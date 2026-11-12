@@ -1,1 +1,1 @@
-RiddleVerse
+RiddleVerse: Game Teka-teki AI
