@@ -40,29 +40,13 @@
     <string name="subtab_your_puzzles">ألغازك</string>
     <string name="subtab_featured">مميز</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">هل تستمتع بـ RiddleVerse؟</string>
-    <string name="rate_in_play_store">قيّمنا في Play Store!</string>
     <string name="help_us_improve">ساعدنا في التحسين!</string>
-    <string name="rate_experience">كيف تقيّم تجربتك مع RiddleVerse؟</string>
-    <string name="rate_incentive">احصل على 100 عملة + وصول مبكر بتقييمنا!</string>
-    <string name="thanks_great_rating">شكرًا على التقييم الرائع! هل تمانع في مشاركته في Play Store؟</string>
-    <string name="share_detailed_feedback">يمكنك أيضًا مشاركة ملاحظات مفصلة معنا أولًا!</string>
-    <string name="sorry_bad_experience">نأسف لعدم حصولك على تجربة رائعة. هل يمكنك إخبارنا بما يمكننا تحسينه؟</string>
     <string name="continue_label">متابعة</string>
-    <string name="rate">تقييم</string>
-    <string name="rate_in_store">قيّم في المتجر</string>
-    <string name="give_feedback">إعطاء ملاحظات</string>
-    <string name="not_now">ليس الآن</string>
     <string name="maybe_later">ربما لاحقًا</string>
-    <string name="feedback_first">الملاحظات أولًا</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">تذكير بالتقييم</string>
-    <string name="when_remind_again">متى تريد أن نذكرك مرة أخرى؟</string>
-    <string name="remind_in_week">ذكّرني بعد أسبوع</string>
-    <string name="remind_in_month">ذكّرني بعد شهر</string>
-    <string name="dont_ask_again">لا تسأل مرة أخرى</string>
+    <!-- Dialog buttons -->
     <string name="cancel">إلغاء</string>
 
     <!-- Feedback Dialog -->
@@ -81,7 +65,6 @@
     <string name="your_coins">عملاتك</string>
     <string name="coins_used_description">تُستخدم العملات لمتابعة الألعاب ودعم المبدعين.</string>
     <string name="best_value">أفضل قيمة</string>
-    <string name="rate_for_early_access">قيّم للحصول على وصول مبكر!</string>
 
     <!-- Common Buttons -->
     <string name="ok">حسنًا</string>

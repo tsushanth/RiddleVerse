@@ -40,29 +40,13 @@
     <string name="subtab_your_puzzles">Teka-teki Anda</string>
     <string name="subtab_featured">Pilihan</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">Menikmati RiddleVerse?</string>
-    <string name="rate_in_play_store">Nilai kami di Play Store!</string>
     <string name="help_us_improve">Bantu kami memperbaiki!</string>
-    <string name="rate_experience">Bagaimana anda menilai pengalaman anda dengan RiddleVerse?</string>
-    <string name="rate_incentive">Dapatkan 100 syiling + akses awal dengan menilai kami!</string>
-    <string name="thanks_great_rating">Terima kasih atas penilaian yang hebat! Adakah anda sudi berkongsi di Play Store?</string>
-    <string name="share_detailed_feedback">Anda juga boleh berkongsi maklum balas terperinci dengan kami terlebih dahulu!</string>
-    <string name="sorry_bad_experience">Kami kesal anda tidak mempunyai pengalaman yang baik. Bolehkah anda beritahu kami apa yang boleh diperbaiki?</string>
     <string name="continue_label">Teruskan</string>
-    <string name="rate">Nilai</string>
-    <string name="rate_in_store">Nilai di Store</string>
-    <string name="give_feedback">Beri Maklum Balas</string>
-    <string name="not_now">Bukan Sekarang</string>
     <string name="maybe_later">Mungkin Nanti</string>
-    <string name="feedback_first">Maklum Balas Dahulu</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">Peringatan Penilaian</string>
-    <string name="when_remind_again">Bilakah anda mahu diingatkan semula?</string>
-    <string name="remind_in_week">Ingatkan saya dalam seminggu</string>
-    <string name="remind_in_month">Ingatkan saya dalam sebulan</string>
-    <string name="dont_ask_again">Jangan tanya lagi</string>
+    <!-- Dialog buttons -->
     <string name="cancel">Batal</string>
 
     <!-- Feedback Dialog -->
@@ -81,7 +65,6 @@
     <string name="your_coins">Syiling Anda</string>
     <string name="coins_used_description">Syiling digunakan untuk meneruskan permainan dan menyokong pencipta.</string>
     <string name="best_value">Nilai Terbaik</string>
-    <string name="rate_for_early_access">Nilai untuk akses awal!</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>

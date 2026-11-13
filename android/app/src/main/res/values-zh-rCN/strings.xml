@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">我的谜题</string>
     <string name="subtab_featured">精选</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">喜欢RiddleVerse吗？</string>
-    <string name="rate_in_play_store">在Play商店给我们评分！</string>
     <string name="help_us_improve">帮助我们改进！</string>
-    <string name="rate_experience">您对RiddleVerse的体验评分如何？</string>
-    <string name="rate_incentive">评分即可获得100金币+抢先体验！</string>
-    <string name="thanks_great_rating">感谢您的好评！能否在Play商店分享您的评价？</string>
-    <string name="share_detailed_feedback">您也可以先向我们提供详细反馈！</string>
-    <string name="sorry_bad_experience">很抱歉您的体验不佳。能告诉我们如何改进吗？</string>
     <string name="continue_label">继续</string>
-    <string name="rate">评分</string>
-    <string name="rate_in_store">去商店评分</string>
-    <string name="give_feedback">反馈</string>
-    <string name="not_now">暂时不要</string>
     <string name="maybe_later">以后再说</string>
-    <string name="feedback_first">先反馈</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">评分提醒</string>
-    <string name="when_remind_again">您希望何时再次提醒？</string>
-    <string name="remind_in_week">一周后提醒</string>
-    <string name="remind_in_month">一个月后提醒</string>
-    <string name="dont_ask_again">不再询问</string>
+    <!-- Dialog buttons -->
     <string name="cancel">取消</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">您的金币</string>
     <string name="coins_used_description">金币用于继续游戏和支持创作者。</string>
     <string name="best_value">超值</string>
-    <string name="rate_for_early_access">评分获取抢先体验！</string>
 
     <!-- Common Buttons -->
     <string name="ok">确定</string>

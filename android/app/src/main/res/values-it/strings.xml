@@ -42,29 +42,13 @@
     <string name="subtab_your_puzzles">I Tuoi Puzzle</string>
     <string name="subtab_featured">In Evidenza</string>
 
-    <!-- Rating Dialog -->
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
     <string name="enjoying_app">Ti piace RiddleVerse?</string>
-    <string name="rate_in_play_store">Valutaci sul Play Store!</string>
     <string name="help_us_improve">Aiutaci a migliorare!</string>
-    <string name="rate_experience">Come valuteresti la tua esperienza con RiddleVerse?</string>
-    <string name="rate_incentive">Ottieni 100 monete + accesso anticipato valutandoci!</string>
-    <string name="thanks_great_rating">Grazie per l\'ottima valutazione! Ti andrebbe di condividerla sul Play Store?</string>
-    <string name="share_detailed_feedback">Puoi anche condividere un feedback dettagliato con noi prima!</string>
-    <string name="sorry_bad_experience">Ci dispiace che la tua esperienza non sia ottimale. Potresti dirci cosa possiamo migliorare?</string>
     <string name="continue_label">Continua</string>
-    <string name="rate">Valuta</string>
-    <string name="rate_in_store">Valuta nello Store</string>
-    <string name="give_feedback">Dai Feedback</string>
-    <string name="not_now">Non Ora</string>
     <string name="maybe_later">Forse Dopo</string>
-    <string name="feedback_first">Prima il Feedback</string>
 
-    <!-- Rating Reminder Dialog -->
-    <string name="rating_reminder">Promemoria Valutazione</string>
-    <string name="when_remind_again">Quando vorresti essere ricordato?</string>
-    <string name="remind_in_week">Ricordamelo tra una settimana</string>
-    <string name="remind_in_month">Ricordamelo tra un mese</string>
-    <string name="dont_ask_again">Non chiedere più</string>
+    <!-- Dialog buttons -->
     <string name="cancel">Annulla</string>
 
     <!-- Feedback Dialog -->
@@ -83,7 +67,6 @@
     <string name="your_coins">Le Tue Monete</string>
     <string name="coins_used_description">Le monete vengono usate per continuare i giochi e supportare i creatori.</string>
     <string name="best_value">Miglior Valore</string>
-    <string name="rate_for_early_access">Valuta per accesso anticipato!</string>
 
     <!-- Common Buttons -->
     <string name="ok">OK</string>
