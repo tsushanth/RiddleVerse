@@ -1,1 +1,1 @@
-RiddleVerse: rozwiązuj zagadki, quizy i łamigłówki!
+Zagadki z podpowiedziami, łamigłówka dnia, gry logiczne i gry tworzone przez AI.

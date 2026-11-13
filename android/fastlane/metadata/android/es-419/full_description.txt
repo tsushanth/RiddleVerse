@@ -1,54 +1,38 @@
-RiddleVerse: ¡Tu destino para acertijos geniales!  Sumérgete en desafíos inteligentes y divertidos, desde acertijos matemáticos y de lógica hasta historias enigmáticas, preguntas de cultura general y anagramas.  Con IA de última generación, cada juego es único y pondrá a prueba tu ingenio, memoria y creatividad.
+Acertijos con pistas gratis, un rompecabezas nuevo cada día, más de 70 tipos de juegos mentales y juegos que la IA crea a partir de una sola frase. Juega gratis, sin necesidad de cuenta.
 
-Características Principales
+Los acertijos y los rompecabezas de palabras están en inglés.
 
-1. ¡Variedad de Acertijos!
-Elige entre:
+ROMPECABEZAS DIARIO
+• Un rompecabezas nuevo cada día, el mismo para todos, que cambia a medianoche UTC
+• Mantén una racha diaria y gana congelamientos de racha que la salvan si te saltas un día
+• Comparte con tus amigos una tarjeta de resultado que nunca muestra la respuesta
+• Recordatorio diario opcional: una notificación al día, solo si todavía no lo has resuelto, y puedes desactivarlo en Configuración
 
-* Acertijos matemáticos: ¡Pon a prueba tu lógica y cálculo!
-* Acertijos de historia: ¡Resuelve misterios con ingenio!
-* Trivial: ¡Aumenta tus conocimientos!
-* Anagramas y juegos de palabras: ¡Expande tu vocabulario!
+ACERTIJOS
+• 300 acertijos clásicos en fácil, medio y difícil
+• Pistas gratis, cada una cuesta una estrella, así que tú eliges cuánta ayuda quieres
+• Escribe tu respuesta, salta un acertijo o muestra la respuesta
+• Comparte un acertijo con un amigo sin revelar la respuesta
+• Funciona sin conexión
 
-2. ¡Acertijos Generados por IA!
-Nuestra IA crea acertijos únicos y desafiantes, ¡siempre tendrás algo nuevo que resolver!  Cada uno está cuidadosamente revisado para asegurar su calidad y dificultad.
+MÁS DE 70 TIPOS DE ROMPECABEZAS
+• Lógica: Sudoku, Binary Grid, Crowns, Trail y más
+• Palabras: Word Ladder, Word Hive, Linkup, anagramas y más
+• Rompecabezas de matemáticas, memoria y visuales
+• Muchos tipos de rompecabezas funcionan sin conexión a internet
 
-3. ¡Crea Tus Propios Acertijos!
-¿Quieres retar a tus amigos? ¡Crea tus propios cuestionarios personalizados eligiendo el tema y el tipo de acertijo!
+CREA UN JUEGO A PARTIR DE UNA FRASE
+• Describe un juego con tus propias palabras, escribiendo o por voz, y la IA crea una versión jugable para ti
+• Generar un juego requiere conexión a internet y tarda un par de minutos
+• Explora y juega los juegos creados por la comunidad en Explore
 
-4. ¡Tabla de Líderes y Puntuaciones!
-Compite con otros jugadores, sube en la tabla de posiciones y demuestra tu destreza. ¡Cada respuesta correcta suma puntos, y la velocidad te da ventaja!
+COMPITE
+• Tablas de clasificación, además de puntos y niveles por cada rompecabezas que resuelvas
 
-5. ¡Pistas e Información Inmediata!
-¿Necesitas ayuda?  Usa las pistas inteligentes de nuestra IA.  Recibirás retroalimentación instantánea para aprender de tus errores.
+JUEGA SIN CUENTA
+• Entra directamente como invitado. Inicia sesión más tarde para conservar tu progreso
 
-6. ¡Acertijos Diarios!
-¡Un nuevo desafío cada día! Mantén tu mente activa con un acertijo temático.
-
-7. ¡Juega Sin Registrarte!
-¡Comienza a jugar al instante! Regístrate más tarde para guardar tu progreso, ver tu puntuación y acceder a funciones extra.
-
-8. ¡Diseño Limpio y Moderno!
-Una interfaz sencilla e intuitiva para que te concentres en lo importante: ¡resolver acertijos! Funciona perfecto en cualquier dispositivo Android.
-
-¿Cómo Jugar?
-
-Selecciona una categoría o tu cuestionario personalizado. Lee la pregunta, responde y obtén retroalimentación inmediata.  La app usa procesamiento de lenguaje natural para evaluar tus respuestas.  En los acertijos de opción múltiple, solo tienes que tocar la respuesta correcta. ¡Todo es rápido y fluido!
-
-¡Entretenimiento y Aprendizaje!
-
-RiddleVerse no es solo un juego, ¡es una herramienta educativa! Perfecto para estudiantes, amantes de los acertijos, familias y cualquiera que quiera ejercitar su mente.
-
-¿Para Quién Es RiddleVerse?
-
-* Amantes de los acertijos de todas las edades
-* Estudiantes y quienes buscan aprender continuamente
-* Profesores que buscan actividades creativas para sus alumnos
-* Familias que buscan juegos divertidos y estimulantes
-* ¡Para cualquiera que quiera un entrenamiento mental diario!
-
-Mejoras y Retroalimentación
-
-RiddleVerse está en constante evolución.  Añadimos nuevos tipos de acertijos, mejoramos la calidad y la experiencia de juego. ¡Tu opinión es importante! Envíanos tus comentarios a través de la app.
-
-¡Descarga RiddleVerse ahora y comienza a desafiar tu mente! ¡Comparte con tus amigos y conviértete en un maestro de los acertijos!
+PREMIUM (OPCIONAL)
+• Elimina los anuncios y desbloquea la creación ilimitada de juegos
+• $5.99 al mes o $24.99 al año, cancela cuando quieras en Google Play
+• La versión gratuita se financia con anuncios

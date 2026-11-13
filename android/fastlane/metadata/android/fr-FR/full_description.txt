@@ -1,61 +1,38 @@
-RiddleVerse est la destination idéale pour des défis de réflexion captivants et intelligents. Que vous soyez amateur de quiz mathématiques, d'énigmes narratives, de jeux-questionnaires ou de jeux de mots comme les anagrammes, RiddleVerse a de quoi mettre votre intelligence à l'épreuve et aiguiser votre esprit. Grâce à une IA avancée, chaque puzzle est généré de manière unique et conçu pour stimuler votre raisonnement, votre mémoire et votre créativité.
+Des énigmes avec indices gratuits, un nouveau puzzle chaque jour, plus de 70 types de jeux de réflexion, et des jeux que l'IA crée à partir d'une seule phrase. Jouez gratuitement, sans compte.
 
-Caractéristiques principales
+Les énigmes et les puzzles de mots sont en anglais.
 
-1. Différents types de puzzles
-Choisissez parmi différentes catégories, notamment :
+PUZZLE DU JOUR
+• Un nouveau puzzle chaque jour, le même pour tout le monde, qui change à minuit UTC
+• Gardez une série quotidienne et gagnez des gels de série qui la sauvent si vous manquez un jour
+• Partagez avec vos amis une carte de résultat qui ne montre jamais la réponse
+• Rappel quotidien facultatif : une seule notification par jour, uniquement si vous n'avez pas encore résolu le puzzle, et vous pouvez la désactiver dans les Réglages
 
-Des puzzles mathématiques qui testent vos calculs et votre logique
+ÉNIGMES
+• 300 énigmes classiques en facile, moyen et difficile
+• Indices gratuits, chacun coûte une étoile : vous choisissez l'aide dont vous avez besoin
+• Saisissez votre réponse, passez une énigme ou affichez la réponse
+• Partagez une énigme avec un ami sans dévoiler la réponse
+• Fonctionne hors ligne
 
-Des puzzles narratifs qui stimulent la réflexion et la compréhension
+PLUS DE 70 TYPES DE PUZZLES
+• Logique : Sudoku, Binary Grid, Crowns, Trail et plus encore
+• Mots : Word Ladder, Word Hive, Linkup, anagrammes et plus encore
+• Puzzles de calcul, de mémoire et visuels
+• De nombreux types de puzzles fonctionnent sans connexion internet
 
-Des jeux-questionnaires qui développent vos connaissances générales
+CRÉER UN JEU À PARTIR D'UNE PHRASE
+• Décrivez un jeu avec vos propres mots, en tapant ou à la voix, et l'IA en crée une version jouable
+• La création d'un jeu nécessite une connexion internet et prend quelques minutes
+• Parcourez et jouez aux jeux créés par la communauté dans Explore
 
-Des anagrammes et des défis de vocabulaire pour enrichir votre vocabulaire
+COMPÉTITION
+• Classements, plus des points et des niveaux pour chaque puzzle résolu
 
-2. Contenu généré par l'IA
-Tous les puzzles sont générés par des modèles d'IA avancés et validés pour leur qualité et leur difficulté. À chaque partie, vous obtenez des puzzles originaux et uniques.
+JOUER SANS COMPTE
+• Lancez-vous directement en invité. Connectez-vous plus tard pour conserver votre progression
 
-3. Création de puzzles personnalisés
-Envie de défier vos amis ou de tester votre créativité ? Utilisez la fonctionnalité « Créer un quiz personnalisé » pour créer des énigmes personnalisées en saisissant un sujet et en sélectionnant un format.
-
-4. Classement et score
-Suivez vos performances, comparez vos scores à ceux des autres joueurs et grimpez au classement. Chaque bonne réponse vous rapporte des points et votre rapidité améliore votre classement.
-
-5. Système d'indices et de commentaires
-En panne d'inspiration ? Utilisez des indices conçus intelligemment par l'IA pour vous guider. Recevez un retour instantané après avoir soumis votre réponse pour apprendre et vous améliorer.
-
-6. Défis quotidiens
-Revenez chaque jour pour de nouveaux défis et des séries d'énigmes thématiques. Restez concentré et constant en résolvant une seule énigme par jour.
-
-7. Jouez sans connexion
-Lancez-vous directement dans les énigmes sans connexion. Connectez-vous ultérieurement pour suivre vos scores, sauvegarder votre progression et accéder aux énigmes et classements personnalisés.
-
-8. Design élégant et minimaliste
-Profitez d'une interface épurée et moderne conçue pour vous concentrer sur le défi. Compatible avec de nombreux appareils Android.
-
-Fonctionnement
-
-Sélectionnez une catégorie de puzzle ou chargez un quiz personnalisé. Lisez la question, saisissez votre réponse et recevez un retour immédiat. L'application utilise le traitement automatique du langage naturel pour évaluer vos réponses de manière objective. Pour les puzzles à choix multiples, appuyez simplement sur votre réponse et continuez. Toutes vos interactions sont fluides et rapides, optimisées pour les appareils mobiles.
-
-Éducatif et amusant
-
-RiddleVerse n'est pas qu'un jeu : c'est un outil éducatif. Que vous soyez un étudiant souhaitant développer ses capacités de réflexion, un amateur de quiz en quête de son prochain défi ou simplement en quête d'un passe-temps productif, RiddleVerse est fait pour vous.
-
-À qui s'adresse-t-il ?
-
-Amateurs de puzzles de tous âges
-
-Étudiants et apprenants permanents
-
-Enseignants souhaitant susciter l'intérêt de leurs élèves avec des questions créatives
-
-Familles en quête de jeux cérébraux amusants
-
-Toute personne aimant s'entraîner mentalement au quotidien
-
-Commentaires et améliorations
-
-RiddleVerse est en constante évolution. Nous ajoutons constamment de nouveaux formats, améliorons la qualité des puzzles et optimisons l'expérience de jeu. Vos commentaires nous aident à améliorer RiddleVerse. N'hésitez pas à nous contacter à tout moment via la section commentaires de l'application.
-
-Téléchargez RiddleVerse dès maintenant et découvrez le monde des énigmes intelligentes alimentées par l'IA. Mettez vos méninges à l'épreuve, partagez vos jeux avec vos amis et devenez un expert en énigmes.
+PREMIUM (FACULTATIF)
+• Supprime les publicités et débloque la création de jeux illimitée
+• $5.99 par mois ou $24.99 par an, résiliable à tout moment dans Google Play
+• La version gratuite est financée par la publicité

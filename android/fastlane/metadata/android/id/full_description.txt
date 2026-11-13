@@ -1,15 +1,38 @@
-Selamat datang di RiddleVerse, tempat terbaik untuk menantang otak Anda dengan berbagai puzzle seru! Apakah Anda siap menghadapi tantangan dengan teka-teki AI yang menantang? Suka game matematika, teka-teki cerita, atau puzzle kata seperti anagram? Kami punya segalanya!
+Teka-teki dengan petunjuk gratis, puzzle baru setiap hari, lebih dari 70 jenis game otak, dan game yang dibuat AI dari satu kalimat. Main gratis, tanpa perlu akun.
 
-**Tantangan Otak Terbaik**
-Nikmati berbagai jenis puzzle dan kuis yang dirancang untuk mengasah kecerdasan Anda. Temukan tantangan ultimate yang akan membuat Anda berpikir keras dan menemukan solusi kreatif.
+Teka-teki dan puzzle kata dalam bahasa Inggris.
 
-**Puzzle dan Game AI**
-Dengan dukungan AI, setiap teka-teki dirancang untuk memberikan pengalaman bermain yang unik dan menantang. Temukan puzzle baru setiap hari dan lihat seberapa cepat Anda bisa menyelesaikannya.
+PUZZLE HARIAN
+• Puzzle baru setiap hari, sama untuk semua orang, berganti pada tengah malam UTC
+• Jaga rangkaian harian dan dapatkan pembeku rangkaian yang menyelamatkannya jika kamu melewatkan satu hari
+• Bagikan kartu hasil ke teman tanpa pernah menampilkan jawabannya
+• Pengingat harian opsional, satu notifikasi per hari, hanya jika kamu belum menyelesaikannya, dan bisa dimatikan di Pengaturan
 
-**Game Matematika dan Kata**
-Apakah Anda menyukai tantangan angka atau lebih suka bermain dengan kata-kata? Kami memiliki puzzle untuk setiap selera, dari game matematika hingga teka-teki kata. Coba semua dan lihat mana yang menjadi favorit Anda!
+TEKA-TEKI
+• 300 teka-teki klasik dengan tingkat mudah, sedang, dan sulit
+• Petunjuk gratis, masing-masing memakai satu bintang, jadi kamu yang menentukan seberapa banyak bantuan
+• Ketik jawabanmu, lewati teka-teki, atau tampilkan jawabannya
+• Bagikan teka-teki ke teman tanpa membocorkan jawabannya
+• Bisa dimainkan offline
 
-**Rasakan Sensasi Menemukan Solusi**
-Menemukan jawaban dari teka-teki yang sulit memberikan kepuasan tersendiri. Tantang diri Anda dan teman-teman untuk menyelesaikan puzzle paling sulit dan lihat siapa yang paling cerdas.
+70+ JENIS PUZZLE
+• Logika: Sudoku, Binary Grid, Crowns, Trail, dan lainnya
+• Kata: Word Ladder, Word Hive, Linkup, anagram, dan lainnya
+• Puzzle matematika, memori, dan visual
+• Banyak jenis puzzle bisa dimainkan tanpa koneksi internet
 
-Bergabunglah dengan RiddleVerse sekarang, dan mulai perjalanan Anda dalam dunia puzzle yang penuh tantangan dan kesenangan. Unduh sekarang dan temukan tantangan yang tepat untuk Anda!
+BUAT GAME DARI SATU KALIMAT
+• Jelaskan game dengan kata-katamu sendiri, dengan mengetik atau suara, dan AI membuatkan versi yang bisa dimainkan
+• Membuat game memerlukan koneksi internet dan memakan waktu beberapa menit
+• Jelajahi dan mainkan game buatan komunitas di Explore
+
+BERKOMPETISI
+• Papan peringkat, ditambah poin dan level untuk setiap puzzle yang kamu selesaikan
+
+MAIN TANPA AKUN
+• Langsung main sebagai tamu. Masuk nanti untuk menyimpan kemajuanmu
+
+PREMIUM (OPSIONAL)
+• Menghapus iklan dan membuka pembuatan game tanpa batas
+• $5.99 per bulan atau $24.99 per tahun, batalkan kapan saja di Google Play
+• Versi gratis didukung oleh iklan

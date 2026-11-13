@@ -1,18 +1,38 @@
-RiddleVerse ile yapay zeka destekli bulmacalar dünyasına adım atın! Beyninizi çalıştıracak ve size meydan okuyacak en iyi bulmacaları burada bulacaksınız. Matematiksel zorluklardan, hikaye tabanlı bilmecelere kadar her şey burada. 
+Ücretsiz ipuçlu bilmeceler, her gün yeni bir bulmaca, 70'ten fazla zeka oyunu türü ve yapay zekânın tek bir cümleden oluşturduğu oyunlar. Ücretsiz oyna, hesap gerekmez.
 
-**Zeki Bulmacalar** 
-AI ile güçlendirilmiş bu beyin bulmacaları, zekanızı test etmek ve geliştirmek için tasarlandı. Bulmacalar, oyunlar ve daha fazlasıyla zihninizi keskinleştirin. 
+Bilmeceler ve kelime bulmacaları İngilizcedir.
 
-**Matematik ve Mantık**  
-Matematik testleri ve mantık bulmacalarıyla kendinizi sınayın. Bu zorluklar, problem çözme yeteneklerinizi artıracak ve matematik becerilerinizi geliştirecek. 
+GÜNLÜK BULMACA
+• Her gün yeni bir bulmaca, herkes için aynı, UTC gece yarısı değişir
+• Günlük serini sürdür ve bir günü kaçırırsan onu kurtaran seri dondurmaları kazan
+• Arkadaşlarınla cevabı asla göstermeyen bir sonuç kartı paylaş
+• İsteğe bağlı günlük hatırlatma: günde bir bildirim, yalnızca henüz çözmediysen gelir ve Ayarlar'dan kapatabilirsin
 
-**Kelime Oyunları ve Anagramlar** 
-Kelime dağarcığınızı genişletmek ve eğlenmek için kelime bulmacaları mükemmel bir seçenek. Anagramlar ve kelime oyunları ile eğlenceli vakit geçirin. 
+BİLMECELER
+• Kolay, orta ve zor seviyede 300 klasik bilmece
+• Ücretsiz ipuçları, her biri bir yıldıza mal olur, böylece ne kadar yardım isteyeceğine sen karar verirsin
+• Cevabını yaz, bir bilmeceyi atla veya cevabı göster
+• Cevabı açık etmeden bir bilmeceyi arkadaşınla paylaş
+• Çevrimdışı çalışır
 
-**Nihai Zorluklar** 
-Kapsamlı bulmaca koleksiyonumuzda her seviyeye uygun bir şeyler bulacaksınız. RiddleVerse, bulmaca tutkunları için nihai meydan okuma alanıdır. 
+70+ BULMACA TÜRÜ
+• Mantık: Sudoku, Binary Grid, Crowns, Trail ve daha fazlası
+• Kelime: Word Ladder, Word Hive, Linkup, anagramlar ve daha fazlası
+• Matematik, hafıza ve görsel bulmacalar
+• Birçok bulmaca türü internet bağlantısı olmadan çalışır
 
-**Hemen Başlayın** 
-RiddleVerse dünyasına katılın ve zihninizi yeni zorluklarla test edin! 
+TEK CÜMLEDEN OYUN OLUŞTUR
+• Bir oyunu kendi sözcüklerinle, yazarak veya sesle anlat, yapay zekâ senin için oynanabilir bir sürüm oluştursun
+• Oyun oluşturmak için internet bağlantısı gerekir ve birkaç dakika sürer
+• Explore'da topluluğun yaptığı oyunlara göz at ve oyna
 
-İndirin ve zekanızı keşfedin!
+YARIŞ
+• Liderlik tabloları, ayrıca çözdüğün her bulmaca için puan ve seviye
+
+HESAPSIZ OYNA
+• Misafir olarak hemen başla. İlerlemeni saklamak için sonra giriş yap
+
+PREMIUM (İSTEĞE BAĞLI)
+• Reklamları kaldırır ve sınırsız oyun oluşturmanın kilidini açar
+• Ayda $5.99 veya yılda $24.99, Google Play'de istediğin zaman iptal et
+• Ücretsiz sürüm reklamlarla desteklenir
