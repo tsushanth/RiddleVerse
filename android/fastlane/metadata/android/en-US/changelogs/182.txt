@@ -1,0 +1,4 @@
+- One simpler rating prompt: removed the extra pop-up
+- New Rate RiddleVerse and Send Feedback rows in Settings
+- The Waldo Puzzle category is now called Find It
+- Corrected the web promo banner wording

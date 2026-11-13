@@ -24,8 +24,8 @@ android {
         applicationId = "com.kreativekoala.riddleverse"
         minSdk = 26
         targetSdk = 36
-        versionCode = 181
-        versionName = "181.0"
+        versionCode = 182
+        versionName = "182.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         // API base URL for sharing games
