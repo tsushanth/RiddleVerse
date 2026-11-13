@@ -52,7 +52,7 @@ fun WebPromoBanner() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Also available on iOS & Web \u2192 puzzleverseai.com",
+                text = "Also available on the web \u2192 puzzleverseai.com",
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = RvGrape,
