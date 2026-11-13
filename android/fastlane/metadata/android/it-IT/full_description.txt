@@ -1,54 +1,38 @@
-RiddleVerse: la tua destinazione ideale per sfide di puzzle intelligenti e coinvolgenti.  Che tu sia appassionato di quiz matematici, enigmi narrativi, quiz a risposta multipla o giochi di parole come gli anagrammi, RiddleVerse offre qualcosa per mettere alla prova il tuo ingegno e affinare le tue capacità cognitive.  Grazie all'intelligenza artificiale avanzata, ogni puzzle è generato in modo unico e progettato per stimolare ragionamento, memoria e creatività.
+Indovinelli con indizi gratuiti, un nuovo puzzle ogni giorno, oltre 70 tipi di giochi di logica e giochi che l'IA crea da una sola frase. Gioca gratis, senza bisogno di un account.
 
-Caratteristiche principali
+Gli indovinelli e i puzzle di parole sono in inglese.
 
-1. Varietà di Puzzle
-Scegli tra diverse categorie:
+PUZZLE DEL GIORNO
+• Un nuovo puzzle ogni giorno, lo stesso per tutti, che cambia a mezzanotte UTC
+• Mantieni attiva la tua serie giornaliera e guadagna blocchi serie che la salvano se salti un giorno
+• Condividi con gli amici una scheda del risultato che non mostra mai la risposta
+• Promemoria giornaliero facoltativo: una sola notifica al giorno, solo se non hai ancora risolto il puzzle, e puoi disattivarlo nelle Impostazioni
 
-* Puzzle matematici per testare calcolo e logica
-* Enigmi narrativi che richiedono pensiero critico e comprensione
-* Quiz per ampliare le tue conoscenze
-* Anagrammi e giochi di parole per arricchire il tuo vocabolario
+INDOVINELLI
+• 300 indovinelli classici in facile, medio e difficile
+• Indizi gratuiti, ognuno costa una stella, così scegli tu quanto aiuto vuoi
+• Scrivi la tua risposta, salta un indovinello o mostra la risposta
+• Condividi un indovinello con un amico senza svelare la risposta
+• Funziona offline
 
-2. Contenuto Generato dall'IA
-Tutti i puzzle sono creati da modelli di IA avanzati e accuratamente testati per qualità e difficoltà. Ogni partita offre sfide nuove e originali.
+OLTRE 70 TIPI DI PUZZLE
+• Logica: Sudoku, Binary Grid, Crowns, Trail e altro
+• Parole: Word Ladder, Word Hive, Linkup, anagrammi e altro
+• Puzzle di matematica, memoria e visivi
+• Molti tipi di puzzle funzionano senza connessione a internet
 
-3. Crea i Tuoi Puzzle
-Vuoi sfidare gli amici o mettere alla prova la tua creatività? Crea quiz personalizzati scegliendo un argomento e un formato.
+CREA UN GIOCO DA UNA FRASE
+• Descrivi un gioco con parole tue, scrivendo o a voce, e l'IA crea una versione giocabile per te
+• Per generare un gioco serve una connessione a internet e ci vogliono un paio di minuti
+• Sfoglia e gioca ai giochi creati dalla community in Explore
 
-4. Classifica e Punteggi
-Tieni traccia dei tuoi progressi, confronta i tuoi punteggi con altri giocatori e scala la classifica.  Ogni risposta corretta ti fa guadagnare punti, e la velocità premia!
+COMPETIZIONE
+• Classifiche, più punti e livelli per ogni puzzle che risolvi
 
-5. Suggerimenti e Feedback
-In difficoltà? Usa i suggerimenti intelligenti dell'IA per trovare la soluzione. Ricevi feedback immediati per imparare dagli errori.
+GIOCA SENZA ACCOUNT
+• Entra subito come ospite. Accedi più tardi per mantenere i tuoi progressi
 
-6. Sfide Giornaliere
-Torna ogni giorno per nuove sfide e set a tema.  Mantieni la mente allenata risolvendo un puzzle al giorno.
-
-7. Gioca Senza Accedere
-Inizia subito a giocare senza registrazione.  Accedi in seguito per salvare i progressi, visualizzare la classifica e creare puzzle personalizzati.
-
-8. Design Moderno ed Elegante
-Un'interfaccia pulita e intuitiva per concentrarti sulla sfida.  Perfetto per tutti i dispositivi Android.
-
-Come Funziona
-
-Seleziona una categoria o carica un quiz personalizzato. Leggi la domanda, inserisci la risposta e ricevi un feedback immediato. L'app utilizza l'elaborazione del linguaggio naturale per valutare le risposte. Per i quiz a scelta multipla, basta selezionare la risposta corretta.  L'esperienza è fluida e veloce, ottimizzata per dispositivi mobili.
-
-Educativo e Divertente
-
-RiddleVerse non è solo un gioco, ma uno strumento educativo.  Perfetto per studenti, appassionati di quiz, o chiunque cerchi un passatempo stimolante.
-
-Chi Dovrebbe Giocare?
-
-* Amanti dei puzzle di tutte le età
-* Studenti e appassionati di apprendimento continuo
-* Insegnanti che cercano attività coinvolgenti per gli studenti
-* Famiglie in cerca di giochi divertenti e stimolanti
-* Chiunque desideri allenare la mente ogni giorno
-
-Feedback e Miglioramenti
-
-RiddleVerse è in costante evoluzione. Aggiungiamo nuovi formati, miglioriamo la qualità dei puzzle e ottimizziamo l'esperienza di gioco. Il tuo feedback è prezioso!  Contattaci tramite la sezione feedback nell'app.
-
-Scarica RiddleVerse ora e inizia la tua avventura nel mondo dei puzzle intelligenti basati sull'IA.  Sfida il tuo cervello, condividi con gli amici e diventa un vero maestro dei puzzle!
+PREMIUM (FACOLTATIVO)
+• Rimuove le pubblicità e sblocca la creazione illimitata di giochi
+• $5.99 al mese o $24.99 all'anno, annulla quando vuoi in Google Play
+• La versione gratuita è sostenuta dalla pubblicità

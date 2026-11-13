@@ -1,37 +1,38 @@
-RiddleVerse: seu destino para desafios de quebra-cabeças inteligentes e envolventes. Se você curte quizzes de matemática, enigmas com histórias, perguntas e respostas ou palavras cruzadas e anagramas, o RiddleVerse tem algo para testar sua inteligência e aguçar sua mente. Com tecnologia de IA avançada, cada quebra-cabeça é único e criado para desafiar seu raciocínio, memória e criatividade.
+Charadas com dicas grátis, um quebra-cabeça novo todo dia, mais de 70 tipos de jogos mentais e jogos que a IA cria a partir de uma única frase. Jogue de graça, sem precisar de conta.
 
-Recursos Principais
+As charadas e os quebra-cabeças de palavras estão em inglês.
 
-1. Diversidade de Quebra-Cabeças
-Escolha entre diversas categorias:
+QUEBRA-CABEÇA DIÁRIO
+• Um quebra-cabeça novo todo dia, o mesmo para todos, que muda à meia-noite UTC
+• Mantenha uma sequência diária e ganhe congelamentos de sequência que a salvam se você perder um dia
+• Compartilhe com amigos um cartão de resultado que nunca mostra a resposta
+• Lembrete diário opcional: uma notificação por dia, só se você ainda não resolveu, e você pode desativá-lo em Configurações
 
-Quebra-cabeças de matemática que testam sua lógica e cálculo;
+CHARADAS
+• 300 charadas clássicas em fácil, médio e difícil
+• Dicas grátis, cada uma custa uma estrela, então você escolhe quanta ajuda quer
+• Digite sua resposta, pule uma charada ou revele a resposta
+• Compartilhe uma charada com um amigo sem estragar a resposta
+• Funciona offline
 
-Enigmas que exigem raciocínio e interpretação;
+MAIS DE 70 TIPOS DE QUEBRA-CABEÇAS
+• Lógica: Sudoku, Binary Grid, Crowns, Trail e mais
+• Palavras: Word Ladder, Word Hive, Linkup, anagramas e mais
+• Quebra-cabeças de matemática, memória e visuais
+• Muitos tipos de quebra-cabeça funcionam sem conexão com a internet
 
-Perguntas e respostas para expandir seu conhecimento;
+CRIE UM JOGO A PARTIR DE UMA FRASE
+• Descreva um jogo com suas próprias palavras, digitando ou por voz, e a IA cria uma versão jogável para você
+• Gerar um jogo exige conexão com a internet e leva alguns minutos
+• Navegue e jogue jogos feitos pela comunidade em Explore
 
-Anagramas e desafios de palavras para enriquecer seu vocabulário. 2. Conteúdo Gerado por IA
-Todos os quebra-cabeças são gerados por IA de ponta e revisados para garantir qualidade e dificuldade.  A cada partida, desafios novos e exclusivos. 3. Crie Seus Próprios Quebra-Cabeças
-Desafie seus amigos ou teste sua criatividade!  Crie quizzes personalizados escolhendo um tema e o formato desejado. 4. Ranking e Pontuação
-Acompanhe seu progresso, compare sua pontuação com outros jogadores e suba no ranking.  Cada resposta correta vale pontos, e a velocidade te ajuda a subir mais rápido. 5. Sistema de Dicas e Feedback
-Encontrou uma pergunta difícil? Use as dicas inteligentes da IA para te ajudar.  Receba feedback instantâneo após responder para aprender e melhorar. 6. Desafios Diários
-Volte todos os dias para novos desafios e temas. Mantenha a mente afiada resolvendo um quebra-cabeça por dia. 7. Jogue Sem Cadastro
-Comece a jogar sem precisar criar uma conta.  Faça login depois para salvar seu progresso, acessar o ranking e criar seus próprios quizzes. 8. Design Moderno e Intuitivo
-Interface limpa e moderna para você se concentrar nos desafios. Funciona perfeitamente em diversos aparelhos Android. Como Jogar
+COMPETIÇÃO
+• Rankings, além de pontos e níveis para cada quebra-cabeça que você resolve
 
-Escolha uma categoria ou carregue um quiz personalizado. Leia a pergunta, responda e receba feedback imediato. O app usa processamento de linguagem natural para avaliar sua resposta. Em perguntas de múltipla escolha, basta tocar na sua resposta. Tudo é rápido e fluido, otimizado para dispositivos móveis. Educacional e Divertido
+JOGUE SEM CONTA
+• Entre direto como convidado. Faça login depois para manter seu progresso
 
-RiddleVerse não é só um jogo, é uma ferramenta educacional. Se você é estudante, amante de quizzes, ou busca um passatempo estimulante, o RiddleVerse é para você. Para Quem é Indicado
-
-Amadores de quebra-cabeças de todas as idades;
-
-Estudantes e quem busca aprendizado contínuo;
-
-Professores que querem atividades criativas para seus alunos;
-
-Famílias que procuram jogos para exercitar o cérebro;
-
-Quem busca um desafio mental diário. Feedback e Melhorias
-
-O RiddleVerse está em constante evolução. Adicionamos novos formatos, melhoramos a qualidade dos quebra-cabeças e aprimoramos a experiência de jogo. Seu feedback é valioso! Envie suas sugestões pelo app. Baixe o RiddleVerse agora e embarque em uma jornada de quebra-cabeças inteligentes e criados por IA. Desafie sua mente, compartilhe com os amigos e torne-se um mestre dos enigmas!
+PREMIUM (OPCIONAL)
+• Remove os anúncios e libera a criação ilimitada de jogos
+• $5.99 por mês ou $24.99 por ano, cancele quando quiser no Google Play
+• A versão gratuita é sustentada por anúncios

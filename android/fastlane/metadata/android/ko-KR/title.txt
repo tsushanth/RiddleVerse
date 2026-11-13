@@ -1,1 +1,1 @@
-AI 수수께끼 게임
+RiddleVerse: AI 수수께끼 게임

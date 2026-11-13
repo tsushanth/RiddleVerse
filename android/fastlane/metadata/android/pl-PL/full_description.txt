@@ -1,61 +1,38 @@
-RiddleVerse to najlepsze miejsce na wciągające i inteligentne wyzwania logiczne. Niezależnie od tego, czy lubisz quizy matematyczne, zagadki oparte na fabule, gry z ciekawostkami, czy łamigłówki słowne, takie jak anagramy, RiddleVerse ma coś, co przetestuje Twój spryt i wyostrzy umysł. Każda łamigłówka, oparta na zaawansowanej sztucznej inteligencji, jest unikalnie generowana i zaprojektowana tak, aby rzucić wyzwanie Twojemu rozumowaniu, pamięci i kreatywnemu myśleniu.
+Zagadki z darmowymi podpowiedziami, nowa łamigłówka każdego dnia, ponad 70 rodzajów gier logicznych i gry, które AI tworzy z jednego zdania. Graj za darmo, bez konta.
 
-Kluczowe cechy
+Zagadki i łamigłówki słowne są po angielsku.
 
-1. Różnorodne rodzaje łamigłówek
-Wybieraj spośród różnych kategorii, w tym:
+CODZIENNA ŁAMIGŁÓWKA
+• Nowa łamigłówka każdego dnia, taka sama dla wszystkich, zmienia się o północy UTC
+• Utrzymuj dzienną serię i zdobywaj zamrożenia serii, które ratują ją, gdy ominiesz dzień
+• Udostępniaj znajomym kartę wyniku, która nigdy nie pokazuje odpowiedzi
+• Opcjonalne codzienne przypomnienie: jedno powiadomienie dziennie, tylko jeśli jeszcze nie rozwiązałeś łamigłówki. Możesz je wyłączyć w Ustawieniach
 
-Zagadki matematyczne, które sprawdzają Twoje obliczenia i logikę
+ZAGADKI
+• 300 klasycznych zagadek na poziomach łatwym, średnim i trudnym
+• Darmowe podpowiedzi, każda kosztuje jedną gwiazdkę, więc sam wybierasz, ile pomocy chcesz
+• Wpisz odpowiedź, pomiń zagadkę lub odkryj odpowiedź
+• Udostępnij zagadkę znajomemu bez zdradzania odpowiedzi
+• Działa offline
 
-Łamigłówki fabularne wymagające sprytnego myślenia i rozumienia
+PONAD 70 RODZAJÓW ŁAMIGŁÓWEK
+• Logika: Sudoku, Binary Grid, Crowns, Trail i więcej
+• Słowa: Word Ladder, Word Hive, Linkup, anagramy i więcej
+• Łamigłówki matematyczne, pamięciowe i wizualne
+• Wiele rodzajów łamigłówek działa bez połączenia z internetem
 
-Ciekawostki, które poszerzają Twoją wiedzę ogólną
+STWÓRZ GRĘ Z JEDNEGO ZDANIA
+• Opisz grę własnymi słowami, wpisując lub głosowo, a AI zbuduje dla Ciebie grywalną wersję
+• Tworzenie gry wymaga połączenia z internetem i trwa kilka minut
+• Przeglądaj i graj w gry stworzone przez społeczność w Explore
 
-Anagramy i wyzwania słowne, aby poszerzyć swoje słownictwo
+RYWALIZACJA
+• Rankingi oraz punkty i poziomy za każdą rozwiązaną łamigłówkę
 
-2. Treści generowane przez sztuczną inteligencję
-Wszystkie łamigłówki są generowane przez zaawansowane modele AI i sprawdzane pod kątem jakości i trudności. Za każdym razem, gdy grasz, otrzymujesz świeże i unikalne łamigłówki.
+GRAJ BEZ KONTA
+• Zacznij od razu jako gość. Zaloguj się później, aby zachować postępy
 
-3. Tworzenie niestandardowych puzzli
-Chcesz rzucić wyzwanie znajomym lub sprawdzić swoją kreatywność? Użyj funkcji Utwórz niestandardowy quiz, aby wygenerować spersonalizowane łamigłówki, wprowadzając temat i wybierając format.
-
-4. Tablica wyników i punktacja
-Śledź swoje wyniki, porównuj swoje wyniki z innymi graczami i pnij się w tabeli liderów. Każda poprawna odpowiedź daje punkty, a prędkość zwiększa twoją rangę.
-
-5. System podpowiedzi i informacji zwrotnych
-Utknąłeś z trudnym pytaniem? Korzystaj ze wskazówek inteligentnie opracowanych przez sztuczną inteligencję, aby kierować swoim myśleniem. Uzyskaj natychmiastową informację zwrotną po przesłaniu odpowiedzi, aby uczyć się i ulepszać.
-
-6. Codzienne wyzwania logiczne
-Wracaj codziennie po nowe wyzwania i tematyczne zestawy puzzli. Zachowaj bystrość i konsekwentność, rozwiązując tylko jedną łamigłówkę dziennie.
-
-7. Graj bez logowania
-Wskocz do łamigłówek bez konieczności logowania się. Zaloguj się później, aby śledzić wyniki, zapisywać postępy i uzyskać dostęp do niestandardowych łamigłówek i tabel wyników.
-
-8. Piękny, minimalistyczny design
-Ciesz się przejrzystym i nowoczesnym interfejsem zaprojektowanym tak, aby skupić się na wyzwaniu. Działa płynnie na wielu urządzeniach z Androidem.
-
-Jak to działa
-
-Wybierz kategorię puzzli lub załaduj niestandardowy quiz. Przeczytaj pytanie, wpisz odpowiedź i otrzymuj natychmiastową informację zwrotną. Aplikacja wykorzystuje przetwarzanie języka naturalnego, aby rzetelnie oceniać wprowadzane informacje. W przypadku łamigłówek wielokrotnego wyboru po prostu dotknij swojej odpowiedzi i kontynuuj. Wszystkie interakcje są płynne i szybkie, zoptymalizowane pod kątem urządzeń mobilnych.
-
-Edukacyjne i zabawne
-
-RiddleVerse to nie tylko gra — to narzędzie edukacyjne. Niezależnie od tego, czy jesteś uczniem, który chce poprawić swoje umiejętności myślenia, miłośnikiem ciekawostek szukającym kolejnego wyzwania, czy po prostu kimś, kto szuka produktywnej rozrywki, RiddleVerse jest przeznaczony dla Ciebie.
-
-Kto powinien zagrać
-
-Miłośnicy łamigłówek w każdym wieku
-
-Studenci i osoby uczące się przez całe życie
-
-Nauczyciele, którzy chcą angażować uczniów w kreatywne pytania
-
-Rodziny szukające zabawnych gier umysłowych
-
-Dla każdego, kto uwielbia codzienny trening mentalny
-
-Informacje zwrotne i ulepszenia
-
-RiddleVerse stale ewoluuje. Stale dodajemy nowe formaty, poprawiamy jakość łamigłówek i poprawiamy wrażenia z rozgrywki. Twoja opinia pomoże nam ulepszyć RiddleVerse. Skontaktuj się z nami w dowolnym momencie za pośrednictwem sekcji opinii w aplikacji.
-
-Pobierz RiddleVerse już teraz i rozpocznij podróż do świata inteligentnych łamigłówek opartych na sztucznej inteligencji. Rzuć wyzwanie swojemu mózgowi, podziel się z przyjaciółmi i zostań mistrzem łamigłówek.
+PREMIUM (OPCJONALNIE)
+• Usuwa reklamy i odblokowuje nieograniczone tworzenie gier
+• $5.99 miesięcznie lub $24.99 rocznie, anuluj w dowolnej chwili w Google Play
+• Wersja darmowa jest finansowana z reklam
