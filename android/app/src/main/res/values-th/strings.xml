@@ -290,4 +290,65 @@
     <string name="lang_switch_prompt">เปลี่ยนเป็น%1$sไหม?</string>
     <string name="lang_switch_action">เปลี่ยน</string>
     <string name="lang_not_now">ไว้ก่อน</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">รีเฟรช</string>
+    <string name="daily_reminder_title">ปริศนาวันนี้พร้อมแล้ว</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">รักษาสตรีค %d วันของคุณต่อไป</item>
+    </plurals>
+    <string name="daily_reminder_body">หนึ่งปริศนา เหมือนกันสำหรับทุกคน ใช้เวลาไม่กี่นาที</string>
+    <string name="daily_reminder_body_streak">ปริศนาวันนี้พร้อมแล้ว ใช้เวลาไม่กี่นาที</string>
+    <string name="daily_reminder_channel_name">การเตือนปริศนารายวัน</string>
+    <string name="daily_reminder_channel_desc">เตือนวันละครั้งสำหรับปริศนารายวัน คุณปิดได้ในการตั้งค่า</string>
+    <string name="daily_card_title">ปริศนาวันนี้</string>
+    <string name="daily_card_cd">ปริศนาวันนี้หมายเลข %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  ไขได้ใน %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  ปริศนาเดียวกันสำหรับทุกคน</string>
+    <string name="daily_card_next_in">ปริศนาถัดไปในอีก %1$s</string>
+    <string name="daily_card_view_result">ดูผลลัพธ์</string>
+    <string name="daily_card_play">เล่น</string>
+    <string name="daily_result_title">ไขปริศนารายวัน #%1$d แล้ว ✅</string>
+    <string name="daily_result_first_try">ไขได้ในครั้งแรก</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d ครั้ง</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 สตรีค %d วัน</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">ตัวหยุดสตรีคช่วยครอบคลุมวันที่พลาดไป %d วัน สตรีคของคุณจึงยังอยู่</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">คุณได้รับตัวหยุดสตรีคไว้ใช้ในวันที่พลาด</string>
+    <string name="daily_result_coins">+%d เหรียญ</string>
+    <string name="daily_result_card_cd">การ์ดผลลัพธ์ที่แชร์ได้ของคุณ ไม่แสดงคำตอบ</string>
+    <string name="daily_result_share_image">แชร์การ์ดภาพ</string>
+    <string name="daily_result_share_text">แชร์เป็นข้อความ</string>
+    <string name="welcome_back_title">ยินดีต้อนรับกลับมา</string>
+    <string name="welcome_back_msg_streak">คุณหายไป %1$d วัน และสตรีค %2$d วันของคุณยังอยู่ ปริศนาวันนี้ #%3$d พร้อมแล้ว</string>
+    <string name="welcome_back_msg_best">ผ่านมา %1$d วันแล้ว สตรีคที่ดีที่สุดของคุณคือ %2$d วัน และปริศนาวันนี้ #%3$d เป็นวันที่ดีในการเริ่มสตรีคใหม่</string>
+    <string name="welcome_back_msg_plain">ผ่านมา %1$d วันแล้ว ปริศนาวันนี้ #%2$d พร้อมแล้ว เหมือนกันสำหรับทุกคน</string>
+    <string name="welcome_back_play">เล่นปริศนาวันนี้</string>
+    <string name="welcome_back_dismiss">ปิด</string>
+    <string name="reminder_on_note">เปิดการเตือนแล้ว คุณเปลี่ยนเวลาหรือปิดได้ในการตั้งค่า</string>
+    <string name="reminder_later_note">ไม่เป็นไร คุณเปิดการเตือนภายหลังได้ในการตั้งค่า</string>
+    <string name="reminder_offer_title">รับการเตือนสำหรับปริศนาพรุ่งนี้ไหม?</string>
+    <string name="reminder_offer_body">แจ้งเตือนวันละครั้ง เฉพาะเมื่อคุณยังไม่ได้ไข เพื่อให้รักษาสตรีคได้ง่าย ไม่มีโฆษณาในการแจ้งเตือน คุณปิดได้ทุกเมื่อในการตั้งค่า</string>
+    <string name="reminder_offer_yes">เตือนฉัน</string>
+    <string name="reminder_offer_no">ไว้ทีหลัง</string>
+    <string name="daily_settings_title">ปริศนารายวัน</string>
+    <string name="daily_settings_reminder">การเตือนรายวัน</string>
+    <string name="daily_settings_reminder_desc">แจ้งเตือนวันละครั้ง เฉพาะเมื่อคุณยังไม่ได้ไขปริศนาวันนี้</string>
+    <string name="daily_settings_blocked">การแจ้งเตือนของ RiddleVerse ถูกบล็อกบนโทรศัพท์เครื่องนี้</string>
+    <string name="daily_settings_open_settings">เปิดการตั้งค่าการแจ้งเตือน</string>
+    <string name="daily_settings_time">เวลาเตือน</string>
+    <string name="daily_settings_time_cd">เตือนฉันเวลา %1$s</string>
+    <string name="guest_tour_title">มาใหม่ใช่ไหม? ดูวิธีเล่นใน 20 วินาที</string>
+    <string name="guest_tour_subtitle">แตะเพื่อดูว่า RiddleVerse ทำงานอย่างไร</string>
+    <string name="guest_tour_dismiss">ปิดการแนะนำ</string>
+    <string name="guest_save_title">บันทึกความคืบหน้าของคุณไหม?</string>
+    <string name="guest_save_body">สร้างบัญชีฟรีเพื่อเก็บคะแนนและสตรีคไว้เมื่อเปลี่ยนโทรศัพท์ และเข้าร่วมกระดานผู้นำ ทุกอย่างที่คุณทำมาจะถูกย้ายไปด้วย</string>
+    <string name="guest_save_yes">บันทึกความคืบหน้าของฉัน</string>
+    <string name="guest_save_not_now">ไว้ทีหลัง</string>
+    <string name="guest_save_never">ไม่ต้องถามอีก</string>
 </resources>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>Wybór wielokrotny</item>
+        <item>Anagram</item>
+        <item>Krzyżówka</item>
+        <item>Wykreślanka</item>
+    </string-array>
+</resources>

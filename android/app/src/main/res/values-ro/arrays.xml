@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>Alegere multiplă</item>
+        <item>Anagramă</item>
+        <item>Cuvinte încrucișate</item>
+        <item>Căutare de cuvinte</item>
+    </string-array>
+</resources>

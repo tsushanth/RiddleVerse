@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Förhandsversion</string>
+    <string name="auth_title_sign_in">Logga in</string>
+    <string name="auth_title_create">Skapa konto</string>
+    <string name="auth_email_hint">E-post</string>
+    <string name="auth_password_hint">Lösenord</string>
+    <string name="auth_show_password">Visa lösenord</string>
+    <string name="auth_sign_in">Logga in</string>
+    <string name="auth_create">Skapa konto</string>
+    <string name="auth_toggle_to_create">Ny här? Skapa ett konto</string>
+    <string name="auth_toggle_to_sign_in">Har du redan ett konto? Logga in</string>
+    <string name="auth_or">eller</string>
+    <string name="auth_loading">Laddar</string>
+    <string name="auth_google_config_error">Inloggning med Google är inte tillgänglig i den här versionen. Logga in med din e-postadress och ditt lösenord i stället.</string>
+    <string name="auth_confirm_email">Kontot har skapats. Kontrollera din e-post för att bekräfta det och logga sedan in.</string>
+</resources>

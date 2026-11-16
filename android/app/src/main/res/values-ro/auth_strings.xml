@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Versiune de previzualizare</string>
+    <string name="auth_title_sign_in">Autentificare</string>
+    <string name="auth_title_create">Creează cont</string>
+    <string name="auth_email_hint">E-mail</string>
+    <string name="auth_password_hint">Parolă</string>
+    <string name="auth_show_password">Arată parola</string>
+    <string name="auth_sign_in">Autentificare</string>
+    <string name="auth_create">Creează cont</string>
+    <string name="auth_toggle_to_create">Ești nou aici? Creează un cont</string>
+    <string name="auth_toggle_to_sign_in">Ai deja un cont? Autentificare</string>
+    <string name="auth_or">sau</string>
+    <string name="auth_loading">Se încarcă</string>
+    <string name="auth_google_config_error">Autentificarea cu Google nu este disponibilă în această versiune. Te rugăm să te autentifici cu e-mailul și parola.</string>
+    <string name="auth_confirm_email">Cont creat. Verifică-ți e-mailul pentru a-l confirma, apoi autentifică-te.</string>
+</resources>

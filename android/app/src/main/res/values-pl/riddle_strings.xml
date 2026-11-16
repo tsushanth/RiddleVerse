@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">Zagadka</string>
+    <string name="riddle_stars_desc">%1$d z %2$d gwiazdek</string>
+    <string name="riddle_streak">Seria: %1$d</string>
+    <string name="riddle_streak_desc">Poprawne odpowiedzi z rzędu: %1$d</string>
+    <string name="riddle_hint_button">Podpowiedź %1$d z %2$d</string>
+    <string name="riddle_hint_button_none">Brak kolejnych podpowiedzi</string>
+    <string name="riddle_hint_desc">Pokaż podpowiedź %1$d z %2$d. Każda podpowiedź odejmuje jedną gwiazdkę od wyniku.</string>
+    <string name="riddle_hint_none_desc">Wszystkie podpowiedzi są pokazane</string>
+    <string name="riddle_hint_line">Podpowiedź %1$d: %2$s</string>
+    <string name="riddle_skip">Pomiń</string>
+    <string name="riddle_skip_desc">Pomiń tę zagadkę</string>
+    <string name="riddle_reveal">Odkryj</string>
+    <string name="riddle_reveal_desc">Odkryj odpowiedź</string>
+    <string name="riddle_your_answer">Twoja odpowiedź</string>
+    <string name="riddle_check">Sprawdź</string>
+    <string name="riddle_check_desc">Sprawdź swoją odpowiedź</string>
+    <string name="riddle_wrong">Jeszcze nie to. Spróbuj ponownie lub skorzystaj z podpowiedzi.</string>
+    <string name="riddle_empty">Najpierw wpisz odpowiedź.</string>
+    <string name="riddle_correct">Dobrze! Odpowiedź to %1$s.</string>
+    <string name="riddle_revealed">Odpowiedź to %1$s.</string>
+    <string name="riddle_stars_result">Zdobyte gwiazdki: %1$d z %2$d (użyte podpowiedzi: %3$d)</string>
+    <string name="riddle_next">Następna zagadka</string>
+    <string name="riddle_share">Udostępnij zagadkę</string>
+    <string name="riddle_share_desc">Udostępnij tę zagadkę znajomemu</string>
+    <string name="riddle_share_text">Rozwiążesz tę zagadkę?\n\n%1$s\n\nZagraj w więcej zagadek w RiddleVerse: %2$s</string>
+    <string name="riddle_confirm_reveal_title">Odkryć odpowiedź?</string>
+    <string name="riddle_confirm_reveal_body">Ta zagadka zostanie policzona jako nierozwiązana, a Twoja seria zostanie zresetowana.</string>
+    <string name="riddle_confirm_skip_title">Pominąć tę zagadkę?</string>
+    <string name="riddle_confirm_skip_body">Twoja seria zostanie zresetowana.</string>
+    <string name="riddle_confirm_yes">Tak</string>
+    <string name="riddle_confirm_no">Anuluj</string>
+    <string name="riddle_tier_easy">Łatwa</string>
+    <string name="riddle_tier_medium">Średnia</string>
+    <string name="riddle_tier_hard">Trudna</string>
+    <string name="riddle_tier_desc">Poziom trudności: %1$s</string>
+</resources>

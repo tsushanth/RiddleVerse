@@ -376,4 +376,65 @@
     <string name="lang_switch_prompt">Tukar kepada %1$s?</string>
     <string name="lang_switch_action">Tukar</string>
     <string name="lang_not_now">Bukan sekarang</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Muat semula</string>
+    <string name="daily_reminder_title">Teka-teki hari ini sudah sedia</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">Teruskan siri %d hari anda</item>
+    </plurals>
+    <string name="daily_reminder_body">Satu teka-teki, sama untuk semua orang. Ambil masa beberapa minit sahaja.</string>
+    <string name="daily_reminder_body_streak">Teka-teki hari ini sudah sedia. Ambil masa beberapa minit sahaja.</string>
+    <string name="daily_reminder_channel_name">Peringatan teka-teki harian</string>
+    <string name="daily_reminder_channel_desc">Satu peringatan sehari untuk teka-teki harian. Anda boleh mematikannya dalam Tetapan.</string>
+    <string name="daily_card_title">Teka-teki hari ini</string>
+    <string name="daily_card_cd">Teka-teki hari ini nombor %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  diselesaikan dalam %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  teka-teki sama untuk semua orang</string>
+    <string name="daily_card_next_in">Teka-teki seterusnya dalam %1$s</string>
+    <string name="daily_card_view_result">Lihat keputusan</string>
+    <string name="daily_card_play">Main</string>
+    <string name="daily_result_title">Harian #%1$d diselesaikan ✅</string>
+    <string name="daily_result_first_try">percubaan pertama</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d percubaan</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 Siri %d hari</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">Pembekuan siri melindungi %d hari yang anda terlepas, jadi siri anda kekal.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Anda memperoleh satu pembekuan siri untuk hari yang sukar.</string>
+    <string name="daily_result_coins">+%d syiling</string>
+    <string name="daily_result_card_cd">Kad keputusan anda yang boleh dikongsi. Kad ini tidak menunjukkan jawapan.</string>
+    <string name="daily_result_share_image">Kongsi kad imej</string>
+    <string name="daily_result_share_text">Kongsi sebagai teks</string>
+    <string name="welcome_back_title">Selamat kembali</string>
+    <string name="welcome_back_msg_streak">Anda tiada selama %1$d hari dan siri %2$d hari anda masih hidup. Teka-teki hari ini #%3$d sudah sedia.</string>
+    <string name="welcome_back_msg_best">Sudah %1$d hari berlalu. Siri terbaik anda ialah %2$d hari, dan teka-teki hari ini #%3$d ialah hari yang sesuai untuk memulakan siri baharu.</string>
+    <string name="welcome_back_msg_plain">Sudah %1$d hari berlalu. Teka-teki hari ini #%2$d sudah sedia, sama untuk semua orang.</string>
+    <string name="welcome_back_play">Main teka-teki hari ini</string>
+    <string name="welcome_back_dismiss">Tutup</string>
+    <string name="reminder_on_note">Peringatan dihidupkan. Anda boleh menukar masa atau mematikannya dalam Tetapan.</string>
+    <string name="reminder_later_note">Tiada masalah. Anda boleh menghidupkan peringatan kemudian dalam Tetapan.</string>
+    <string name="reminder_offer_title">Dapatkan peringatan untuk teka-teki esok?</string>
+    <string name="reminder_offer_body">Satu pemberitahuan sehari, hanya jika anda belum menyelesaikannya, supaya siri anda mudah dikekalkan. Tiada iklan di dalamnya. Anda boleh mematikannya pada bila-bila masa dalam Tetapan.</string>
+    <string name="reminder_offer_yes">Ingatkan saya</string>
+    <string name="reminder_offer_no">Bukan sekarang</string>
+    <string name="daily_settings_title">Teka-teki harian</string>
+    <string name="daily_settings_reminder">Peringatan harian</string>
+    <string name="daily_settings_reminder_desc">Satu pemberitahuan sehari, hanya jika anda belum menyelesaikan teka-teki hari ini.</string>
+    <string name="daily_settings_blocked">Pemberitahuan disekat untuk RiddleVerse pada telefon ini.</string>
+    <string name="daily_settings_open_settings">Buka tetapan pemberitahuan</string>
+    <string name="daily_settings_time">Masa peringatan</string>
+    <string name="daily_settings_time_cd">Ingatkan saya pada %1$s</string>
+    <string name="guest_tour_title">Baharu di sini? Ikuti lawatan 20 saat</string>
+    <string name="guest_tour_subtitle">Ketik untuk melihat cara RiddleVerse berfungsi</string>
+    <string name="guest_tour_dismiss">Tutup lawatan</string>
+    <string name="guest_save_title">Simpan kemajuan anda?</string>
+    <string name="guest_save_body">Cipta akaun percuma untuk mengekalkan skor dan siri anda jika anda menukar telefon, dan untuk menyertai papan pendahulu. Semua yang telah anda lakukan setakat ini akan dipindahkan.</string>
+    <string name="guest_save_yes">Simpan kemajuan saya</string>
+    <string name="guest_save_not_now">Bukan sekarang</string>
+    <string name="guest_save_never">Jangan tanya lagi</string>
 </resources>

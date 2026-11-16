@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Versi pratonton</string>
+    <string name="auth_title_sign_in">Log masuk</string>
+    <string name="auth_title_create">Cipta akaun</string>
+    <string name="auth_email_hint">E-mel</string>
+    <string name="auth_password_hint">Kata laluan</string>
+    <string name="auth_show_password">Tunjukkan kata laluan</string>
+    <string name="auth_sign_in">Log masuk</string>
+    <string name="auth_create">Cipta akaun</string>
+    <string name="auth_toggle_to_create">Baharu di sini? Cipta akaun</string>
+    <string name="auth_toggle_to_sign_in">Sudah ada akaun? Log masuk</string>
+    <string name="auth_or">atau</string>
+    <string name="auth_loading">Memuatkan</string>
+    <string name="auth_google_config_error">Log masuk Google tidak tersedia dalam versi ini. Sila log masuk menggunakan e-mel dan kata laluan anda.</string>
+    <string name="auth_confirm_email">Akaun telah dicipta. Semak e-mel anda untuk mengesahkannya, kemudian log masuk.</string>
+</resources>

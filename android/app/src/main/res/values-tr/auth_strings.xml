@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Önizleme sürümü</string>
+    <string name="auth_title_sign_in">Giriş yap</string>
+    <string name="auth_title_create">Hesap oluştur</string>
+    <string name="auth_email_hint">E-posta</string>
+    <string name="auth_password_hint">Şifre</string>
+    <string name="auth_show_password">Şifreyi göster</string>
+    <string name="auth_sign_in">Giriş yap</string>
+    <string name="auth_create">Hesap oluştur</string>
+    <string name="auth_toggle_to_create">Yeni misiniz? Hesap oluşturun</string>
+    <string name="auth_toggle_to_sign_in">Zaten hesabınız var mı? Giriş yapın</string>
+    <string name="auth_or">veya</string>
+    <string name="auth_loading">Yükleniyor</string>
+    <string name="auth_google_config_error">Google ile giriş bu sürümde kullanılamıyor. Lütfen bunun yerine e-posta ve şifrenizle giriş yapın.</string>
+    <string name="auth_confirm_email">Hesap oluşturuldu. Onaylamak için e-postanızı kontrol edin, ardından giriş yapın.</string>
+</resources>

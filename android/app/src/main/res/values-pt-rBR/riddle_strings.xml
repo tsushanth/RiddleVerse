@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">Charada</string>
+    <string name="riddle_stars_desc">%1$d de %2$d estrelas</string>
+    <string name="riddle_streak">Sequência: %1$d</string>
+    <string name="riddle_streak_desc">Respostas certas seguidas: %1$d</string>
+    <string name="riddle_hint_button">Dica %1$d de %2$d</string>
+    <string name="riddle_hint_button_none">Sem mais dicas</string>
+    <string name="riddle_hint_desc">Mostrar a dica %1$d de %2$d. Cada dica tira uma estrela da sua pontuação.</string>
+    <string name="riddle_hint_none_desc">Todas as dicas estão visíveis</string>
+    <string name="riddle_hint_line">Dica %1$d: %2$s</string>
+    <string name="riddle_skip">Pular</string>
+    <string name="riddle_skip_desc">Pular esta charada</string>
+    <string name="riddle_reveal">Revelar</string>
+    <string name="riddle_reveal_desc">Revelar a resposta</string>
+    <string name="riddle_your_answer">Sua resposta</string>
+    <string name="riddle_check">Verificar</string>
+    <string name="riddle_check_desc">Verificar sua resposta</string>
+    <string name="riddle_wrong">Quase! Tente de novo ou peça uma dica.</string>
+    <string name="riddle_empty">Digite uma resposta primeiro.</string>
+    <string name="riddle_correct">Correto! A resposta é %1$s.</string>
+    <string name="riddle_revealed">A resposta é %1$s.</string>
+    <string name="riddle_stars_result">Estrelas ganhas: %1$d de %2$d (dicas usadas: %3$d)</string>
+    <string name="riddle_next">Próxima charada</string>
+    <string name="riddle_share">Compartilhar charada</string>
+    <string name="riddle_share_desc">Compartilhar esta charada com um amigo</string>
+    <string name="riddle_share_text">Você consegue resolver esta charada?\n\n%1$s\n\nJogue mais charadas no RiddleVerse: %2$s</string>
+    <string name="riddle_confirm_reveal_title">Revelar a resposta?</string>
+    <string name="riddle_confirm_reveal_body">Esta charada contará como não resolvida e sua sequência será zerada.</string>
+    <string name="riddle_confirm_skip_title">Pular esta charada?</string>
+    <string name="riddle_confirm_skip_body">Sua sequência será zerada.</string>
+    <string name="riddle_confirm_yes">Sim</string>
+    <string name="riddle_confirm_no">Cancelar</string>
+    <string name="riddle_tier_easy">Fácil</string>
+    <string name="riddle_tier_medium">Médio</string>
+    <string name="riddle_tier_hard">Difícil</string>
+    <string name="riddle_tier_desc">Dificuldade: %1$s</string>
+</resources>

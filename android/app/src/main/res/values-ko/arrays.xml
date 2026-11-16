@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>객관식</item>
+        <item>애너그램</item>
+        <item>십자말풀이</item>
+        <item>단어 찾기</item>
+    </string-array>
+</resources>

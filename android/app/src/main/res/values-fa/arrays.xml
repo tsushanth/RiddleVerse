@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>چندگزینه‌ای</item>
+        <item>آناگرام</item>
+        <item>جدول کلمات متقاطع</item>
+        <item>جستجوی کلمه</item>
+    </string-array>
+</resources>

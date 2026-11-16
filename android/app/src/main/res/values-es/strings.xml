@@ -385,4 +385,72 @@
 
     <!-- needs native review (machine translation) -->
     <string name="refresh">Actualizar</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="daily_reminder_title">El acertijo de hoy está listo</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Mantén tu racha de %d día</item>
+        <item quantity="many">Mantén tu racha de %d de días</item>
+        <item quantity="other">Mantén tu racha de %d días</item>
+    </plurals>
+    <string name="daily_reminder_body">Un acertijo, el mismo para todos. Solo toma un par de minutos.</string>
+    <string name="daily_reminder_body_streak">El acertijo de hoy está listo. Solo toma un par de minutos.</string>
+    <string name="daily_reminder_channel_name">Recordatorio del acertijo diario</string>
+    <string name="daily_reminder_channel_desc">Un recordatorio al día para el acertijo diario. Puedes desactivarlo en Ajustes.</string>
+    <string name="daily_card_title">El acertijo de hoy</string>
+    <string name="daily_card_cd">Acertijo de hoy número %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  resuelto en %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  el mismo acertijo para todos</string>
+    <string name="daily_card_next_in">Próximo acertijo en %1$s</string>
+    <string name="daily_card_view_result">Ver resultado</string>
+    <string name="daily_card_play">Jugar</string>
+    <string name="daily_result_title">Diario #%1$d resuelto ✅</string>
+    <string name="daily_result_first_try">al primer intento</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d intento</item>
+        <item quantity="many">%d de intentos</item>
+        <item quantity="other">%d intentos</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 Racha de %d día</item>
+        <item quantity="many">🔥 Racha de %d de días</item>
+        <item quantity="other">🔥 Racha de %d días</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Un congelador de racha cubrió tu día perdido, así que tu racha se salvó.</item>
+        <item quantity="many">Un congelador de racha cubrió %d de días perdidos, así que tu racha se salvó.</item>
+        <item quantity="other">Un congelador de racha cubrió %d días perdidos, así que tu racha se salvó.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Ganaste un congelador de racha para un día difícil.</string>
+    <string name="daily_result_coins">+%d monedas</string>
+    <string name="daily_result_card_cd">Tu tarjeta de resultado para compartir. No muestra la respuesta.</string>
+    <string name="daily_result_share_image">Compartir tarjeta como imagen</string>
+    <string name="daily_result_share_text">Compartir como texto</string>
+    <string name="welcome_back_title">Te damos la bienvenida de nuevo</string>
+    <string name="welcome_back_msg_streak">Estuviste fuera %1$d días y tu racha de %2$d días sigue viva. El acertijo de hoy, el #%3$d, está listo.</string>
+    <string name="welcome_back_msg_best">Han pasado %1$d días. Tu mejor racha fue de %2$d días, y el acertijo de hoy, el #%3$d, es un buen momento para empezar una nueva.</string>
+    <string name="welcome_back_msg_plain">Han pasado %1$d días. El acertijo de hoy, el #%2$d, está listo, el mismo para todos.</string>
+    <string name="welcome_back_play">Jugar el acertijo de hoy</string>
+    <string name="welcome_back_dismiss">Descartar</string>
+    <string name="reminder_on_note">Recordatorio activado. Puedes cambiar la hora o desactivarlo en Ajustes.</string>
+    <string name="reminder_later_note">No hay problema. Puedes activar el recordatorio más tarde en Ajustes.</string>
+    <string name="reminder_offer_title">¿Quieres un recordatorio para el acertijo de mañana?</string>
+    <string name="reminder_offer_body">Una notificación al día, solo si aún no lo has resuelto, para que sea fácil mantener tu racha. Sin anuncios. Puedes desactivarla cuando quieras en Ajustes.</string>
+    <string name="reminder_offer_yes">Recordármelo</string>
+    <string name="reminder_offer_no">Ahora no</string>
+    <string name="daily_settings_title">Acertijo diario</string>
+    <string name="daily_settings_reminder">Recordatorio diario</string>
+    <string name="daily_settings_reminder_desc">Una notificación al día, solo si aún no has resuelto el acertijo de hoy.</string>
+    <string name="daily_settings_blocked">Las notificaciones de RiddleVerse están bloqueadas en este teléfono.</string>
+    <string name="daily_settings_open_settings">Abrir ajustes de notificaciones</string>
+    <string name="daily_settings_time">Hora del recordatorio</string>
+    <string name="daily_settings_time_cd">Recordarme a las %1$s</string>
+    <string name="guest_tour_title">¿Eres nuevo? Haz el recorrido de 20 segundos</string>
+    <string name="guest_tour_subtitle">Toca para ver cómo funciona RiddleVerse</string>
+    <string name="guest_tour_dismiss">Descartar el recorrido</string>
+    <string name="guest_save_title">¿Guardar tu progreso?</string>
+    <string name="guest_save_body">Crea una cuenta gratis para conservar tu puntaje y tu racha si cambias de teléfono, y para unirte a la tabla de clasificación. Todo lo que has hecho hasta ahora se transfiere.</string>
+    <string name="guest_save_yes">Guardar mi progreso</string>
+    <string name="guest_save_not_now">Ahora no</string>
+    <string name="guest_save_never">No volver a preguntar</string>
 </resources>

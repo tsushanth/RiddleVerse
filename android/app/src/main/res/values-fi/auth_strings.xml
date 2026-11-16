@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Esikatseluversio</string>
+    <string name="auth_title_sign_in">Kirjaudu sisään</string>
+    <string name="auth_title_create">Luo tili</string>
+    <string name="auth_email_hint">Sähköposti</string>
+    <string name="auth_password_hint">Salasana</string>
+    <string name="auth_show_password">Näytä salasana</string>
+    <string name="auth_sign_in">Kirjaudu sisään</string>
+    <string name="auth_create">Luo tili</string>
+    <string name="auth_toggle_to_create">Uusi täällä? Luo tili</string>
+    <string name="auth_toggle_to_sign_in">Onko sinulla jo tili? Kirjaudu sisään</string>
+    <string name="auth_or">tai</string>
+    <string name="auth_loading">Ladataan</string>
+    <string name="auth_google_config_error">Googlella kirjautuminen ei ole käytettävissä tässä versiossa. Kirjaudu sisään sähköpostilla ja salasanalla.</string>
+    <string name="auth_confirm_email">Tili luotu. Vahvista se sähköpostistasi ja kirjaudu sitten sisään.</string>
+</resources>

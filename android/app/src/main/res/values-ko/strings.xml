@@ -378,4 +378,65 @@
     <string name="lang_switch_prompt">%1$s(으)로 바꿀까요?</string>
     <string name="lang_switch_action">변경</string>
     <string name="lang_not_now">나중에</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">새로고침</string>
+    <string name="daily_reminder_title">오늘의 퍼즐이 준비됐어요</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">%d일 연속 기록을 이어 가세요</item>
+    </plurals>
+    <string name="daily_reminder_body">모두에게 같은 퍼즐 하나. 몇 분이면 끝나요.</string>
+    <string name="daily_reminder_body_streak">오늘의 퍼즐이 준비됐어요. 몇 분이면 끝나요.</string>
+    <string name="daily_reminder_channel_name">일일 퍼즐 알림</string>
+    <string name="daily_reminder_channel_desc">일일 퍼즐을 위해 하루에 한 번 알려 드려요. 설정에서 끌 수 있어요.</string>
+    <string name="daily_card_title">오늘의 퍼즐</string>
+    <string name="daily_card_cd">오늘의 퍼즐 %1$d번, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  %3$s 만에 해결</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  모두에게 같은 퍼즐</string>
+    <string name="daily_card_next_in">다음 퍼즐까지 %1$s</string>
+    <string name="daily_card_view_result">결과 보기</string>
+    <string name="daily_card_play">플레이</string>
+    <string name="daily_result_title">일일 #%1$d 해결 ✅</string>
+    <string name="daily_result_first_try">첫 시도</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d번 시도</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 %d일 연속</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">연속 기록 보호권이 놓친 %d일을 막아 줘서 연속 기록이 유지됐어요.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">만일을 위한 연속 기록 보호권을 얻었어요.</string>
+    <string name="daily_result_coins">+%d 코인</string>
+    <string name="daily_result_card_cd">공유할 수 있는 결과 카드예요. 정답은 표시되지 않아요.</string>
+    <string name="daily_result_share_image">이미지 카드로 공유</string>
+    <string name="daily_result_share_text">텍스트로 공유</string>
+    <string name="welcome_back_title">다시 오신 걸 환영해요</string>
+    <string name="welcome_back_msg_streak">%1$d일 동안 자리를 비우셨지만 %2$d일 연속 기록은 아직 살아 있어요. 오늘의 퍼즐 #%3$d이(가) 준비됐어요.</string>
+    <string name="welcome_back_msg_best">%1$d일 만이에요. 최고 연속 기록은 %2$d일이었어요. 오늘의 퍼즐 #%3$d(으)로 새로 시작해 보세요.</string>
+    <string name="welcome_back_msg_plain">%1$d일 만이에요. 모두에게 같은 오늘의 퍼즐 #%2$d이(가) 준비됐어요.</string>
+    <string name="welcome_back_play">오늘의 퍼즐 플레이</string>
+    <string name="welcome_back_dismiss">닫기</string>
+    <string name="reminder_on_note">알림이 켜졌어요. 시간 변경이나 끄기는 설정에서 할 수 있어요.</string>
+    <string name="reminder_later_note">괜찮아요. 나중에 설정에서 알림을 켤 수 있어요.</string>
+    <string name="reminder_offer_title">내일 퍼즐 알림을 받을까요?</string>
+    <string name="reminder_offer_body">아직 풀지 않았을 때만 하루에 한 번 알려 드려서 연속 기록을 쉽게 이어 갈 수 있어요. 광고는 없어요. 언제든 설정에서 끌 수 있어요.</string>
+    <string name="reminder_offer_yes">알림 받기</string>
+    <string name="reminder_offer_no">나중에</string>
+    <string name="daily_settings_title">일일 퍼즐</string>
+    <string name="daily_settings_reminder">일일 알림</string>
+    <string name="daily_settings_reminder_desc">오늘의 퍼즐을 아직 풀지 않았을 때만 하루에 한 번 알려 드려요.</string>
+    <string name="daily_settings_blocked">이 휴대폰에서 RiddleVerse의 알림이 차단되어 있어요.</string>
+    <string name="daily_settings_open_settings">알림 설정 열기</string>
+    <string name="daily_settings_time">알림 시간</string>
+    <string name="daily_settings_time_cd">%1$s에 알려 주세요</string>
+    <string name="guest_tour_title">처음이세요? 20초 둘러보기</string>
+    <string name="guest_tour_subtitle">탭해서 RiddleVerse 사용법 보기</string>
+    <string name="guest_tour_dismiss">둘러보기 닫기</string>
+    <string name="guest_save_title">진행 상황을 저장할까요?</string>
+    <string name="guest_save_body">무료 계정을 만들면 휴대폰을 바꿔도 점수와 연속 기록을 유지하고 리더보드에 참여할 수 있어요. 지금까지의 기록은 모두 그대로 옮겨져요.</string>
+    <string name="guest_save_yes">진행 상황 저장</string>
+    <string name="guest_save_not_now">나중에</string>
+    <string name="guest_save_never">다시 묻지 않기</string>
 </resources>

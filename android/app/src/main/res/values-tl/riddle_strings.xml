@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">Bugtong</string>
+    <string name="riddle_stars_desc">%1$d sa %2$d na bituin</string>
+    <string name="riddle_streak">Sunod-sunod: %1$d</string>
+    <string name="riddle_streak_desc">Magkakasunod na tamang sagot: %1$d</string>
+    <string name="riddle_hint_button">Pahiwatig %1$d sa %2$d</string>
+    <string name="riddle_hint_button_none">Wala nang pahiwatig</string>
+    <string name="riddle_hint_desc">Ipakita ang pahiwatig %1$d sa %2$d. Bawat pahiwatig ay bumabawas ng isang bituin sa iyong score.</string>
+    <string name="riddle_hint_none_desc">Naipakita na ang lahat ng pahiwatig</string>
+    <string name="riddle_hint_line">Pahiwatig %1$d: %2$s</string>
+    <string name="riddle_skip">Laktawan</string>
+    <string name="riddle_skip_desc">Laktawan ang bugtong na ito</string>
+    <string name="riddle_reveal">Ipakita</string>
+    <string name="riddle_reveal_desc">Ipakita ang sagot</string>
+    <string name="riddle_your_answer">Iyong sagot</string>
+    <string name="riddle_check">Suriin</string>
+    <string name="riddle_check_desc">Suriin ang iyong sagot</string>
+    <string name="riddle_wrong">Malapit na. Subukan ulit o kumuha ng pahiwatig.</string>
+    <string name="riddle_empty">Mag-type muna ng sagot.</string>
+    <string name="riddle_correct">Tama! Ang sagot ay %1$s.</string>
+    <string name="riddle_revealed">Ang sagot ay %1$s.</string>
+    <string name="riddle_stars_result">Mga bituing nakuha: %1$d sa %2$d (mga pahiwatig na ginamit: %3$d)</string>
+    <string name="riddle_next">Susunod na bugtong</string>
+    <string name="riddle_share">Ibahagi ang bugtong</string>
+    <string name="riddle_share_desc">Ibahagi ang bugtong na ito sa kaibigan</string>
+    <string name="riddle_share_text">Kaya mo bang sagutin ang bugtong na ito?\n\n%1$s\n\nMaglaro ng mas maraming bugtong sa RiddleVerse: %2$s</string>
+    <string name="riddle_confirm_reveal_title">Ipakita ang sagot?</string>
+    <string name="riddle_confirm_reveal_body">Mabibilang na hindi nasagot ang bugtong na ito at mare-reset ang iyong streak.</string>
+    <string name="riddle_confirm_skip_title">Laktawan ang bugtong na ito?</string>
+    <string name="riddle_confirm_skip_body">Mare-reset ang iyong streak.</string>
+    <string name="riddle_confirm_yes">Oo</string>
+    <string name="riddle_confirm_no">Kanselahin</string>
+    <string name="riddle_tier_easy">Madali</string>
+    <string name="riddle_tier_medium">Katamtaman</string>
+    <string name="riddle_tier_hard">Mahirap</string>
+    <string name="riddle_tier_desc">Hirap: %1$s</string>
+</resources>

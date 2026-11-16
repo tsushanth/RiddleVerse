@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">Αίνιγμα</string>
+    <string name="riddle_stars_desc">%1$d από %2$d αστέρια</string>
+    <string name="riddle_streak">Σερί: %1$d</string>
+    <string name="riddle_streak_desc">Σωστές απαντήσεις στη σειρά: %1$d</string>
+    <string name="riddle_hint_button">Υπόδειξη %1$d από %2$d</string>
+    <string name="riddle_hint_button_none">Δεν υπάρχουν άλλες υποδείξεις</string>
+    <string name="riddle_hint_desc">Εμφάνιση υπόδειξης %1$d από %2$d. Κάθε υπόδειξη αφαιρεί ένα αστέρι από το σκορ σας.</string>
+    <string name="riddle_hint_none_desc">Εμφανίζονται όλες οι υποδείξεις</string>
+    <string name="riddle_hint_line">Υπόδειξη %1$d: %2$s</string>
+    <string name="riddle_skip">Παράλειψη</string>
+    <string name="riddle_skip_desc">Παράλειψη αυτού του αινίγματος</string>
+    <string name="riddle_reveal">Αποκάλυψη</string>
+    <string name="riddle_reveal_desc">Αποκάλυψη της απάντησης</string>
+    <string name="riddle_your_answer">Η απάντησή σας</string>
+    <string name="riddle_check">Έλεγχος</string>
+    <string name="riddle_check_desc">Έλεγχος της απάντησής σας</string>
+    <string name="riddle_wrong">Όχι ακριβώς. Δοκιμάστε ξανά ή πάρτε μια υπόδειξη.</string>
+    <string name="riddle_empty">Πληκτρολογήστε πρώτα μια απάντηση.</string>
+    <string name="riddle_correct">Σωστά! Η απάντηση είναι %1$s.</string>
+    <string name="riddle_revealed">Η απάντηση είναι %1$s.</string>
+    <string name="riddle_stars_result">Αστέρια που κερδίσατε: %1$d από %2$d (υποδείξεις που χρησιμοποιήθηκαν: %3$d)</string>
+    <string name="riddle_next">Επόμενο αίνιγμα</string>
+    <string name="riddle_share">Κοινοποίηση αινίγματος</string>
+    <string name="riddle_share_desc">Κοινοποιήστε αυτό το αίνιγμα σε έναν φίλο</string>
+    <string name="riddle_share_text">Μπορείτε να λύσετε αυτό το αίνιγμα;\n\n%1$s\n\nΠαίξτε κι άλλα αινίγματα στο RiddleVerse: %2$s</string>
+    <string name="riddle_confirm_reveal_title">Αποκάλυψη της απάντησης;</string>
+    <string name="riddle_confirm_reveal_body">Αυτό το αίνιγμα θα μετρήσει ως άλυτο και το σερί σας θα μηδενιστεί.</string>
+    <string name="riddle_confirm_skip_title">Παράλειψη αυτού του αινίγματος;</string>
+    <string name="riddle_confirm_skip_body">Το σερί σας θα μηδενιστεί.</string>
+    <string name="riddle_confirm_yes">Ναι</string>
+    <string name="riddle_confirm_no">Ακύρωση</string>
+    <string name="riddle_tier_easy">Εύκολο</string>
+    <string name="riddle_tier_medium">Μέτριο</string>
+    <string name="riddle_tier_hard">Δύσκολο</string>
+    <string name="riddle_tier_desc">Δυσκολία: %1$s</string>
+</resources>

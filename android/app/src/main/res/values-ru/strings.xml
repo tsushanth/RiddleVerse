@@ -333,4 +333,77 @@
     <string name="lang_switch_prompt">Переключить на %1$s?</string>
     <string name="lang_switch_action">Переключить</string>
     <string name="lang_not_now">Не сейчас</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Обновить</string>
+    <string name="daily_reminder_title">Сегодняшняя головоломка готова</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Продолжайте серию: %d день подряд</item>
+        <item quantity="few">Продолжайте серию: %d дня подряд</item>
+        <item quantity="many">Продолжайте серию: %d дней подряд</item>
+        <item quantity="other">Продолжайте серию: %d дня подряд</item>
+    </plurals>
+    <string name="daily_reminder_body">Одна головоломка, одна для всех. Она займёт пару минут.</string>
+    <string name="daily_reminder_body_streak">Сегодняшняя головоломка готова. Она займёт пару минут.</string>
+    <string name="daily_reminder_channel_name">Напоминание о ежедневной головоломке</string>
+    <string name="daily_reminder_channel_desc">Одно напоминание в день о ежедневной головоломке. Его можно отключить в Настройках.</string>
+    <string name="daily_card_title">Сегодняшняя головоломка</string>
+    <string name="daily_card_cd">Сегодняшняя головоломка №%1$d, %2$s</string>
+    <string name="daily_card_solved">№%1$d  %2$s  решена за %3$s</string>
+    <string name="daily_card_unsolved">№%1$d  %2$s  •  одна головоломка для всех</string>
+    <string name="daily_card_next_in">Следующая головоломка через %1$s</string>
+    <string name="daily_card_view_result">Посмотреть результат</string>
+    <string name="daily_card_play">Играть</string>
+    <string name="daily_result_title">Ежедневная головоломка №%1$d решена ✅</string>
+    <string name="daily_result_first_try">с первой попытки</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d попытка</item>
+        <item quantity="few">%d попытки</item>
+        <item quantity="many">%d попыток</item>
+        <item quantity="other">%d попытки</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 Серия: %d день</item>
+        <item quantity="few">🔥 Серия: %d дня</item>
+        <item quantity="many">🔥 Серия: %d дней</item>
+        <item quantity="other">🔥 Серия: %d дня</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Заморозка серии покрыла %d пропущенный день, поэтому ваша серия сохранилась.</item>
+        <item quantity="few">Заморозка серии покрыла %d пропущенных дня, поэтому ваша серия сохранилась.</item>
+        <item quantity="many">Заморозка серии покрыла %d пропущенных дней, поэтому ваша серия сохранилась.</item>
+        <item quantity="other">Заморозка серии покрыла %d пропущенного дня, поэтому ваша серия сохранилась.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Вы получили заморозку серии на чёрный день.</string>
+    <string name="daily_result_coins">+%d монет</string>
+    <string name="daily_result_card_cd">Ваша карточка результата, которой можно поделиться. Ответ на ней не виден.</string>
+    <string name="daily_result_share_image">Поделиться карточкой-изображением</string>
+    <string name="daily_result_share_text">Поделиться текстом</string>
+    <string name="welcome_back_title">С возвращением</string>
+    <string name="welcome_back_msg_streak">Вас не было дней: %1$d, а ваша серия из %2$d дн. всё ещё жива. Сегодняшняя головоломка №%3$d готова.</string>
+    <string name="welcome_back_msg_best">Прошло дней: %1$d. Ваша лучшая серия была %2$d дн., а сегодняшняя головоломка №%3$d — хороший повод начать новую.</string>
+    <string name="welcome_back_msg_plain">Прошло дней: %1$d. Сегодняшняя головоломка №%2$d готова, одна для всех.</string>
+    <string name="welcome_back_play">Играть в сегодняшнюю головоломку</string>
+    <string name="welcome_back_dismiss">Закрыть</string>
+    <string name="reminder_on_note">Напоминание включено. Время можно изменить или отключить напоминание в Настройках.</string>
+    <string name="reminder_later_note">Без проблем. Напоминание можно включить позже в Настройках.</string>
+    <string name="reminder_offer_title">Получать напоминание о завтрашней головоломке?</string>
+    <string name="reminder_offer_body">Одно уведомление в день, только если вы ещё не решили головоломку, чтобы вам было легко сохранить серию. Без рекламы. Его можно отключить в любое время в Настройках.</string>
+    <string name="reminder_offer_yes">Напомнить</string>
+    <string name="reminder_offer_no">Не сейчас</string>
+    <string name="daily_settings_title">Ежедневная головоломка</string>
+    <string name="daily_settings_reminder">Ежедневное напоминание</string>
+    <string name="daily_settings_reminder_desc">Одно уведомление в день, только если вы ещё не решили сегодняшнюю головоломку.</string>
+    <string name="daily_settings_blocked">Уведомления RiddleVerse на этом телефоне заблокированы.</string>
+    <string name="daily_settings_open_settings">Открыть настройки уведомлений</string>
+    <string name="daily_settings_time">Время напоминания</string>
+    <string name="daily_settings_time_cd">Напомнить в %1$s</string>
+    <string name="guest_tour_title">Впервые здесь? Пройдите 20-секундный тур</string>
+    <string name="guest_tour_subtitle">Нажмите, чтобы узнать, как работает RiddleVerse</string>
+    <string name="guest_tour_dismiss">Закрыть тур</string>
+    <string name="guest_save_title">Сохранить ваш прогресс?</string>
+    <string name="guest_save_body">Создайте бесплатный аккаунт, чтобы сохранить результат и серию при смене телефона, а также участвовать в таблице лидеров. Всё, что вы сделали до сих пор, будет перенесено.</string>
+    <string name="guest_save_yes">Сохранить мой прогресс</string>
+    <string name="guest_save_not_now">Не сейчас</string>
+    <string name="guest_save_never">Больше не спрашивать</string>
 </resources>

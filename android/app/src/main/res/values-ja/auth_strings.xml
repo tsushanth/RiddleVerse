@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">プレビュー版</string>
+    <string name="auth_title_sign_in">サインイン</string>
+    <string name="auth_title_create">アカウントを作成</string>
+    <string name="auth_email_hint">メールアドレス</string>
+    <string name="auth_password_hint">パスワード</string>
+    <string name="auth_show_password">パスワードを表示</string>
+    <string name="auth_sign_in">サインイン</string>
+    <string name="auth_create">アカウントを作成</string>
+    <string name="auth_toggle_to_create">初めての方はこちら。アカウントを作成</string>
+    <string name="auth_toggle_to_sign_in">すでにアカウントをお持ちですか？サインイン</string>
+    <string name="auth_or">または</string>
+    <string name="auth_loading">読み込み中</string>
+    <string name="auth_google_config_error">このビルドではGoogleサインインを利用できません。代わりにメールアドレスとパスワードでサインインしてください。</string>
+    <string name="auth_confirm_email">アカウントを作成しました。メールを確認してアカウントを認証してから、サインインしてください。</string>
+</resources>

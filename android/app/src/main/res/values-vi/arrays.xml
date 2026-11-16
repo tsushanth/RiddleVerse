@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>Trắc nghiệm</item>
+        <item>Đảo chữ</item>
+        <item>Ô chữ</item>
+        <item>Tìm từ</item>
+    </string-array>
+</resources>

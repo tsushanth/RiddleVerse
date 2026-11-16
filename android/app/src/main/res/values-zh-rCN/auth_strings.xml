@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">预览版本</string>
+    <string name="auth_title_sign_in">登录</string>
+    <string name="auth_title_create">创建账户</string>
+    <string name="auth_email_hint">邮箱</string>
+    <string name="auth_password_hint">密码</string>
+    <string name="auth_show_password">显示密码</string>
+    <string name="auth_sign_in">登录</string>
+    <string name="auth_create">创建账户</string>
+    <string name="auth_toggle_to_create">新用户？创建账户</string>
+    <string name="auth_toggle_to_sign_in">已有账户？登录</string>
+    <string name="auth_or">或</string>
+    <string name="auth_loading">加载中</string>
+    <string name="auth_google_config_error">此版本不支持 Google 登录。请改用邮箱和密码登录。</string>
+    <string name="auth_confirm_email">账户已创建。请查收邮件完成确认，然后登录。</string>
+</resources>
