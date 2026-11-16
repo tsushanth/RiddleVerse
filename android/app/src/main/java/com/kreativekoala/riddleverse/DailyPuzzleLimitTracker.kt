@@ -32,7 +32,7 @@ class DailyPuzzleLimitTracker private constructor(context: Context) {
      * Get current date as string in YYYY-MM-DD format
      */
     private fun getCurrentDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
     }
 
     /**

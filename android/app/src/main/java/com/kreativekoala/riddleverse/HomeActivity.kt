@@ -166,7 +166,7 @@ object RecentPuzzlesManager {
     }
 
     private fun getCurrentDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
     }
 
     private fun generateDailyActions(context: Context): List<RecentPuzzleType> {
