@@ -1,4 +1,4 @@
-Riddles with free hints, a new puzzle every day, 70+ kinds of brain games, and games that AI builds from one sentence. Play free, no account needed.
+Riddles and brain teasers with free hints, a new puzzle every day, 70+ kinds of logic, word and math games, and games that AI builds from one sentence. Play free, no account needed.
 
 DAILY PUZZLE
 • A new puzzle every day, the same one for everybody, changing at midnight UTC
@@ -15,8 +15,8 @@ RIDDLES
 
 70+ PUZZLE TYPES
 • Logic: Sudoku, Binary Grid, Crowns, Trail and more
-• Words: Word Ladder, Word Hive, Linkup, anagrams and more
-• Math, memory and visual puzzles
+• Words: Word Guess, Word Ladder, Word Hive, Linkup, anagrams and more
+• Math, memory and visual puzzles, including hidden-object scenes
 • Many puzzle types work without an internet connection
 
 CREATE A GAME FROM A SENTENCE
