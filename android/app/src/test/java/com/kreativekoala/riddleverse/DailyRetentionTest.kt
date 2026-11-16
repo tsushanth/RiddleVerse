@@ -75,10 +75,14 @@ class DailyRetentionTest {
     }
 
     @Test fun reminder_messageMentionsStreakOnlyWhenThereIsOne() {
-        assertTrue(ReminderPolicy.message(5).first.contains("5-day streak"))
-        assertFalse(ReminderPolicy.message(1).first.contains("streak"))
-        assertFalse(ReminderPolicy.message(0).first.contains("streak"))
-        listOf(0, 1, 5).forEach { s -> ReminderPolicy.message(s).let { assertTrue((it.first + it.second).all { c -> c.code < 128 }) } }
+        // The text itself lives in string resources (localized); the policy only chooses which one and the plural count.
+        val streaking = ReminderPolicy.message(5)
+        assertEquals(R.plurals.daily_reminder_title_streak, streaking.title); assertEquals(5, streaking.streak)
+        assertEquals(R.string.daily_reminder_body_streak, streaking.body)
+        listOf(0, 1).forEach { s ->
+            val m = ReminderPolicy.message(s)
+            assertEquals(R.string.daily_reminder_title, m.title); assertNull(m.streak); assertEquals(R.string.daily_reminder_body, m.body)
+        }
     }
 
     @Test fun reminder_nextTriggerIsTheNextLocalHour() {
@@ -105,10 +109,12 @@ class DailyRetentionTest {
     }
 
     @Test fun welcomeBack_messageStatesFactsOnly() {
-        assertTrue(WelcomeBackRules.message(4, 6, 6, 12).contains("6-day streak is still alive"))
-        assertTrue(WelcomeBackRules.message(9, 0, 8, 12).contains("best streak was 8 days"))
+        val alive = WelcomeBackRules.message(4, 6, 6, 12)
+        assertEquals(R.string.welcome_back_msg_streak, alive.res); assertEquals(listOf(4, 6, 12), alive.args)
+        val best = WelcomeBackRules.message(9, 0, 8, 12)
+        assertEquals(R.string.welcome_back_msg_best, best.res); assertEquals(listOf(9, 8, 12), best.args)
         val plain = WelcomeBackRules.message(30, 0, 0, 12)
-        assertTrue(plain.contains("#12")); assertFalse(plain.contains("streak"))
+        assertEquals(R.string.welcome_back_msg_plain, plain.res); assertEquals(listOf(30, 12), plain.args)
     }
 }
 
