@@ -1,7 +1,5 @@
 package com.kreativekoala.riddleverse
 
-import java.text.Normalizer
-
 // --- riddle pack (feat/riddle-pack) --- answer matching for typed riddle answers.
 // Deliberately stricter than AnswerMatcher (no synonym table, no partial match): a riddle has ONE answer, so
 // "tree" must not be accepted for "oak". scripts/riddles/riddle_norm.py mirrors normalize()/variants()/same().
@@ -10,16 +8,22 @@ object RiddleMatcher {
     /** Leading filler words that are dropped ("it is a clock", "the clock"). */
     private val FILLERS = setOf("a", "an", "the", "it", "its", "is", "are", "they", "theyre", "i", "think", "maybe", "this", "that", "answer")
 
-    /** Lower-case, accent-free, apostrophes removed, punctuation -> space, leading fillers dropped. */
+    /**
+     * Lower-case, accent-free, apostrophes removed, punctuation -> space, leading fillers dropped. Letters and digits of every
+     * script are kept (see [TextFolding]); before the multilingual fix every non-ASCII letter was turned into a space, so an
+     * answer typed in Arabic, Hindi, Cyrillic or CJK normalised to nothing and could never match.
+     */
     fun normalize(s: String): List<String> {
-        val nfd = Normalizer.normalize(s.lowercase(java.util.Locale.ROOT), Normalizer.Form.NFD)
-        val sb = StringBuilder(nfd.length)
-        for (c in nfd) {
+        val folded = TextFolding.fold(s)
+        val sb = StringBuilder(folded.length)
+        var i = 0
+        while (i < folded.length) {
+            val cp = folded.codePointAt(i)
+            i += Character.charCount(cp)
             when {
-                Character.getType(c) == Character.NON_SPACING_MARK.toInt() -> {}
-                c == '\'' || c == '’' -> {}
-                c == '&' -> sb.append(" and ")
-                c in 'a'..'z' || c in '0'..'9' -> sb.append(c)
+                cp == '\''.code || cp == '\u2019'.code -> {}
+                cp == '&'.code -> sb.append(" and ")
+                TextFolding.isWordCodePoint(cp) -> sb.appendCodePoint(cp)
                 else -> sb.append(' ')
             }
         }
@@ -30,6 +34,8 @@ object RiddleMatcher {
 
     /** A token plus its simple singular forms, so "cities" ~ "city", "boxes" ~ "box", "leaves" ~ "leaf". */
     fun variants(t: String): Set<String> {
+        // The singular rules are English: only apply them to plain ASCII tokens, never to Spanish, Arabic, Hindi... words.
+        if (!t.all { it in 'a'..'z' || it in '0'..'9' }) return setOf(t)
         val v = mutableSetOf(t)
         if (t.length > 4 && t.endsWith("ies")) v += t.dropLast(3) + "y"
         if (t.length > 4 && t.endsWith("ves")) { v += t.dropLast(3) + "f"; v += t.dropLast(3) + "fe" }
