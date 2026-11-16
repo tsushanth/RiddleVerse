@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>Pilihan Berganda</item>
+        <item>Anagram</item>
+        <item>Teka Silang Kata</item>
+        <item>Cari Perkataan</item>
+    </string-array>
+</resources>

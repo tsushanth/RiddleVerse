@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>多肢選択</item>
+        <item>アナグラム</item>
+        <item>クロスワード</item>
+        <item>ワードサーチ</item>
+    </string-array>
+</resources>

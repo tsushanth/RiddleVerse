@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -82,8 +83,8 @@ fun OnboardingOffer() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f).padding(vertical = 6.dp)) {
-                Text("New here? Take the 20-second tour", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RvGrape)
-                Text("Tap to see how RiddleVerse works", fontSize = 12.sp, color = RvInkSoft)
+                Text(stringResource(R.string.guest_tour_title), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RvGrape)
+                Text(stringResource(R.string.guest_tour_subtitle), fontSize = 12.sp, color = RvInkSoft)
             }
             IconButton(
                 onClick = {
@@ -93,7 +94,7 @@ fun OnboardingOffer() {
                 },
                 modifier = Modifier.size(48.dp)
             ) {
-                Icon(Icons.Default.Close, contentDescription = "Dismiss the tour", tint = RvInkSoft, modifier = Modifier.size(18.dp))
+                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.guest_tour_dismiss), tint = RvInkSoft, modifier = Modifier.size(18.dp))
             }
         }
     }
@@ -133,10 +134,9 @@ fun GuestSignupPrompt(onCreateAccount: () -> Unit, onNotNow: () -> Unit, onNever
         elevation = androidx.compose.material3.CardDefaults.cardElevation(8.dp)
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
-            Text("Save your progress?", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.guest_save_title), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Text(
-                "Create a free account to keep your score and streak if you change phones, and to join the leaderboard. " +
-                    "Everything you have done so far moves over.",
+                stringResource(R.string.guest_save_body),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
             )
@@ -144,10 +144,10 @@ fun GuestSignupPrompt(onCreateAccount: () -> Unit, onNotNow: () -> Unit, onNever
                 onClick = onCreateAccount,
                 modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = RvViolet)
-            ) { Text("Save my progress") }
+            ) { Text(stringResource(R.string.guest_save_yes)) }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                TextButton(onClick = onNotNow, modifier = Modifier.heightIn(min = 48.dp)) { Text("Not now") }
-                TextButton(onClick = onNeverAgain, modifier = Modifier.heightIn(min = 48.dp)) { Text("Don't ask again") }
+                TextButton(onClick = onNotNow, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.guest_save_not_now)) }
+                TextButton(onClick = onNeverAgain, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.guest_save_never)) }
             }
         }
     }

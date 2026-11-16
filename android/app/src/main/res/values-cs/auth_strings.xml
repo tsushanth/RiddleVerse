@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Náhledová verze</string>
+    <string name="auth_title_sign_in">Přihlásit se</string>
+    <string name="auth_title_create">Vytvořit účet</string>
+    <string name="auth_email_hint">E-mail</string>
+    <string name="auth_password_hint">Heslo</string>
+    <string name="auth_show_password">Zobrazit heslo</string>
+    <string name="auth_sign_in">Přihlásit se</string>
+    <string name="auth_create">Vytvořit účet</string>
+    <string name="auth_toggle_to_create">Jste tu noví? Vytvořte si účet</string>
+    <string name="auth_toggle_to_sign_in">Už máte účet? Přihlaste se</string>
+    <string name="auth_or">nebo</string>
+    <string name="auth_loading">Načítání</string>
+    <string name="auth_google_config_error">Přihlášení přes Google není v této verzi dostupné. Přihlaste se prosím pomocí e-mailu a hesla.</string>
+    <string name="auth_confirm_email">Účet byl vytvořen. Potvrďte ho v e-mailu a poté se přihlaste.</string>
+</resources>

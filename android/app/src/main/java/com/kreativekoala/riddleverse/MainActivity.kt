@@ -27,7 +27,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -500,7 +500,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8A65)),
                 modifier = Modifier.size(64.dp)
             ) {
-                Icon(Icons.Default.ArrowForward, contentDescription = null, tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = Color.White)
             }
         }
     }
@@ -536,7 +536,7 @@ fun WelcomeScreen() {
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF8A65)),
                 modifier = Modifier.size(64.dp)
             ) {
-                Icon(Icons.Default.ArrowForward, contentDescription = null, tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = null, tint = Color.White)
             }
         }
     }

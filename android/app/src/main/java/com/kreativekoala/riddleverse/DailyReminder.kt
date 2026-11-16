@@ -33,10 +33,15 @@ object ReminderPolicy {
         unopenedCount: Int,
     ): Boolean = enabled && notificationsAllowed && !solvedToday && unopenedCount < MAX_UNOPENED
 
-    /** Text for the reminder; mentions the streak only when there is one worth keeping. Plain, no pressure. */
-    fun message(streak: Int): Pair<String, String> =
-        if (streak >= 2) "Keep your $streak-day streak going" to "Today's puzzle is ready. It takes a couple of minutes."
-        else "Today's puzzle is ready" to "One puzzle, the same for everyone. It takes a couple of minutes."
+    /**
+     * Which text the reminder shows (resource ids, resolved against the current app language when it fires); mentions the
+     * streak only when there is one worth keeping. Plain, no pressure. [streak] is the plural count for the title, or null.
+     */
+    class ReminderText(@androidx.annotation.PluralsRes @androidx.annotation.StringRes val title: Int, val streak: Int?, @androidx.annotation.StringRes val body: Int)
+
+    fun message(streak: Int): ReminderText =
+        if (streak >= 2) ReminderText(R.plurals.daily_reminder_title_streak, streak, R.string.daily_reminder_body_streak)
+        else ReminderText(R.string.daily_reminder_title, null, R.string.daily_reminder_body)
 
     /** Next occurrence of [hour]:00 local time strictly after [nowMs]. */
     fun nextTriggerAt(nowMs: Long, hour: Int, zone: java.util.TimeZone = java.util.TimeZone.getDefault()): Long {
@@ -121,7 +126,10 @@ object DailyReminder {
             if (!allowed) return
             ensureChannel(c)
             val streak = DailyPuzzleStore.displayStreak(c, today)
-            val (title, text) = ReminderPolicy.message(streak)
+            val msg = ReminderPolicy.message(streak)
+            val lc = localized(c)
+            val title = if (msg.streak != null) lc.resources.getQuantityString(msg.title, msg.streak, msg.streak) else lc.getString(msg.title)
+            val text = lc.getString(msg.body)
             val open = TaskStackBuilder.create(c)
                 .addNextIntent(Intent(c, MainActivity::class.java))
                 .addNextIntent(Intent(c, DailyPuzzleActivity::class.java))
@@ -150,13 +158,26 @@ object DailyReminder {
         unopenedCount = unopenedCount(c),
     )
 
+    /**
+     * A context whose resources follow the language the player picked in the app (AppCompat per-app locale). A receiver or alarm
+     * context only follows the device language on Android 12 and below, which would send an English notification to a player
+     * who chose Hindi in the app.
+     */
+    internal fun localized(c: Context): Context {
+        val chosen = androidx.appcompat.app.AppCompatDelegate.getApplicationLocales()
+        if (chosen.isEmpty) return c
+        val conf = android.content.res.Configuration(c.resources.configuration)
+        conf.setLocales(android.os.LocaleList.forLanguageTags(chosen.toLanguageTags()))
+        return c.createConfigurationContext(conf)
+    }
+
     private fun ensureChannel(c: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val nm = c.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        if (nm.getNotificationChannel(CHANNEL_ID) != null) return
+        // Re-creating an existing channel only refreshes its name and description, so they follow the app language.
         nm.createNotificationChannel(
-            NotificationChannel(CHANNEL_ID, "Daily puzzle reminder", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                description = "One reminder a day for the daily puzzle. You can turn it off in Settings."
+            NotificationChannel(CHANNEL_ID, localized(c).getString(R.string.daily_reminder_channel_name), NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = localized(c).getString(R.string.daily_reminder_channel_desc)
             }
         )
     }

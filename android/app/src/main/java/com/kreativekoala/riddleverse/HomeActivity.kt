@@ -23,6 +23,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -160,7 +166,7 @@ object RecentPuzzlesManager {
     }
 
     private fun getCurrentDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
     }
 
     private fun generateDailyActions(context: Context): List<RecentPuzzleType> {
@@ -631,7 +637,7 @@ fun ErrorGameScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedButton(onClick = onBack) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back))
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(stringResource(R.string.go_back))
             }
@@ -1388,7 +1394,7 @@ fun ReactionGamePlaceholder() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowLeft,
+            imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
             contentDescription = null,
             tint = RvOnTone,
             modifier = Modifier.size(24.dp)
@@ -1400,7 +1406,7 @@ fun ReactionGamePlaceholder() {
             modifier = Modifier.size(20.dp)
         )
         Icon(
-            imageVector = Icons.Default.ArrowRight,
+            imageVector = Icons.AutoMirrored.Filled.ArrowRight,
             contentDescription = null,
             tint = RvOnTone,
             modifier = Modifier.size(24.dp)
@@ -2408,7 +2414,7 @@ fun AccountSection(
     SettingsSection(title = "Account") {
         if (isSignedIn) {
             SettingsRow(
-                icon = Icons.Default.Logout,
+                icon = Icons.AutoMirrored.Filled.Logout,
                 title = "Sign Out",
                 iconTint = RvError,
                 titleColor = RvError,
@@ -2417,7 +2423,7 @@ fun AccountSection(
         } else {
             Column {
                 SettingsRow(
-                    icon = Icons.Default.Login,
+                    icon = Icons.AutoMirrored.Filled.Login,
                     title = "Sign In",
                     onClick = onSignIn
                 )
@@ -2927,7 +2933,7 @@ fun CustomPuzzlesHeader(
                     )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Sort, // Changed to Sort icon
+                    imageVector = Icons.AutoMirrored.Filled.Sort, // Changed to Sort icon
                     contentDescription = stringResource(R.string.sort_by),
                     tint = RvOnTone
                 )

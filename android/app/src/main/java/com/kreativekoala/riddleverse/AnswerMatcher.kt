@@ -79,6 +79,11 @@ class AnswerMatcher {
         val normalizedUser = normalizeText(userAnswer)
         val normalizedCorrect = normalizeText(correctAnswer)
 
+        // Nothing but punctuation on either side: never a match (an empty string must not equal an empty string).
+        if (normalizedUser.isEmpty() || normalizedCorrect.isEmpty()) {
+            return MatchResult(false, 0.0, MatchType.NO_MATCH, "No match found")
+        }
+
         // 1. Exact match (highest confidence)
         if (normalizedUser == normalizedCorrect) {
             return MatchResult(true, 1.0, MatchType.EXACT, "Exact match")
@@ -113,14 +118,12 @@ class AnswerMatcher {
      * Normalize text for comparison
      */
     private fun normalizeText(text: String): String {
-        return text
-            .lowercase()
-            .trim()
-            // Remove accents and diacritics
-            .let { Normalizer.normalize(it, Normalizer.Form.NFD) }
-            .replace(Regex("[\\p{InCombiningDiacriticalMarks}]"), "")
-            // Remove punctuation
-            .replace(Regex("[^a-z0-9\\s]"), "")
+        // Script-aware: accents, tashkeel and digit systems are folded, but letters of every script survive (the old
+        // "[^a-z0-9\\s]" deleted all non-Latin text, so any Arabic/Hindi/Cyrillic/CJK answer normalised to "" and
+        // two different non-Latin strings compared as equal).
+        return TextFolding.fold(text.trim())
+            // Remove punctuation (keep letters, attached marks, digits, whitespace in any script)
+            .replace(Regex("[^\\p{L}\\p{M}\\p{N}\\s]"), "")
             // Normalize whitespace
             .replace(Regex("\\s+"), " ")
             .trim()

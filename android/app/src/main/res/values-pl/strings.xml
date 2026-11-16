@@ -376,4 +376,77 @@
     <string name="lang_switch_prompt">Przełączyć na %1$s?</string>
     <string name="lang_switch_action">Przełącz</string>
     <string name="lang_not_now">Nie teraz</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Odśwież</string>
+    <string name="daily_reminder_title">Dzisiejsza łamigłówka jest gotowa</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Utrzymaj swoją %d-dniową serię</item>
+        <item quantity="few">Utrzymaj swoją %d-dniową serię</item>
+        <item quantity="many">Utrzymaj swoją %d-dniową serię</item>
+        <item quantity="other">Utrzymaj swoją %d-dniową serię</item>
+    </plurals>
+    <string name="daily_reminder_body">Jedna łamigłówka, taka sama dla wszystkich. Zajmuje kilka minut.</string>
+    <string name="daily_reminder_body_streak">Dzisiejsza łamigłówka jest gotowa. Zajmuje kilka minut.</string>
+    <string name="daily_reminder_channel_name">Przypomnienie o codziennej łamigłówce</string>
+    <string name="daily_reminder_channel_desc">Jedno przypomnienie dziennie o codziennej łamigłówce. Możesz je wyłączyć w Ustawieniach.</string>
+    <string name="daily_card_title">Dzisiejsza łamigłówka</string>
+    <string name="daily_card_cd">Dzisiejsza łamigłówka numer %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  rozwiązano w %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  ta sama łamigłówka dla wszystkich</string>
+    <string name="daily_card_next_in">Następna łamigłówka za %1$s</string>
+    <string name="daily_card_view_result">Zobacz wynik</string>
+    <string name="daily_card_play">Graj</string>
+    <string name="daily_result_title">Codzienna #%1$d rozwiązana ✅</string>
+    <string name="daily_result_first_try">za pierwszym razem</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d próba</item>
+        <item quantity="few">%d próby</item>
+        <item quantity="many">%d prób</item>
+        <item quantity="other">%d próby</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 Seria: %d dzień</item>
+        <item quantity="few">🔥 Seria: %d dni</item>
+        <item quantity="many">🔥 Seria: %d dni</item>
+        <item quantity="other">🔥 Seria: %d dnia</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Zamrożenie serii pokryło pominięty dzień, więc Twoja seria przetrwała.</item>
+        <item quantity="few">Zamrożenie serii pokryło %d pominięte dni, więc Twoja seria przetrwała.</item>
+        <item quantity="many">Zamrożenie serii pokryło %d pominiętych dni, więc Twoja seria przetrwała.</item>
+        <item quantity="other">Zamrożenie serii pokryło %d pominiętego dnia, więc Twoja seria przetrwała.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Zdobywasz zamrożenie serii na czarną godzinę.</string>
+    <string name="daily_result_coins">+%d monet</string>
+    <string name="daily_result_card_cd">Twoja karta wyniku do udostępnienia. Nie pokazuje odpowiedzi.</string>
+    <string name="daily_result_share_image">Udostępnij kartę jako obraz</string>
+    <string name="daily_result_share_text">Udostępnij jako tekst</string>
+    <string name="welcome_back_title">Witaj ponownie</string>
+    <string name="welcome_back_msg_streak">Nie było Cię %1$d dni, a Twoja %2$d-dniowa seria nadal trwa. Dzisiejsza łamigłówka #%3$d jest gotowa.</string>
+    <string name="welcome_back_msg_best">Minęło %1$d dni. Twoja najlepsza seria trwała %2$d dni, a dzisiejsza łamigłówka #%3$d to dobry moment, by zacząć nową.</string>
+    <string name="welcome_back_msg_plain">Minęło %1$d dni. Dzisiejsza łamigłówka #%2$d jest gotowa, taka sama dla wszystkich.</string>
+    <string name="welcome_back_play">Zagraj w dzisiejszą łamigłówkę</string>
+    <string name="welcome_back_dismiss">Zamknij</string>
+    <string name="reminder_on_note">Przypomnienie włączone. Możesz zmienić godzinę lub je wyłączyć w Ustawieniach.</string>
+    <string name="reminder_later_note">Nie ma problemu. Przypomnienie możesz włączyć później w Ustawieniach.</string>
+    <string name="reminder_offer_title">Chcesz dostać przypomnienie o jutrzejszej łamigłówce?</string>
+    <string name="reminder_offer_body">Jedno powiadomienie dziennie, tylko jeśli jeszcze jej nie rozwiązano, dzięki czemu łatwo utrzymasz serię. Bez reklam. W każdej chwili możesz je wyłączyć w Ustawieniach.</string>
+    <string name="reminder_offer_yes">Przypomnij mi</string>
+    <string name="reminder_offer_no">Nie teraz</string>
+    <string name="daily_settings_title">Codzienna łamigłówka</string>
+    <string name="daily_settings_reminder">Codzienne przypomnienie</string>
+    <string name="daily_settings_reminder_desc">Jedno powiadomienie dziennie, tylko jeśli dzisiejsza łamigłówka nie została jeszcze rozwiązana.</string>
+    <string name="daily_settings_blocked">Powiadomienia z RiddleVerse są zablokowane na tym telefonie.</string>
+    <string name="daily_settings_open_settings">Otwórz ustawienia powiadomień</string>
+    <string name="daily_settings_time">Godzina przypomnienia</string>
+    <string name="daily_settings_time_cd">Przypomnij mi o %1$s</string>
+    <string name="guest_tour_title">Nowy tutaj? Zobacz 20-sekundowy przewodnik</string>
+    <string name="guest_tour_subtitle">Dotknij, aby zobaczyć, jak działa RiddleVerse</string>
+    <string name="guest_tour_dismiss">Zamknij przewodnik</string>
+    <string name="guest_save_title">Zapisać Twoje postępy?</string>
+    <string name="guest_save_body">Utwórz darmowe konto, aby zachować wynik i serię po zmianie telefonu oraz dołączyć do rankingu. Wszystko, co dotąd zrobiono, zostanie przeniesione.</string>
+    <string name="guest_save_yes">Zapisz moje postępy</string>
+    <string name="guest_save_not_now">Nie teraz</string>
+    <string name="guest_save_never">Nie pytaj ponownie</string>
 </resources>

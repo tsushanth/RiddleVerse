@@ -290,4 +290,67 @@
     <string name="lang_switch_prompt">Ganti ke %1$s?</string>
     <string name="lang_switch_action">Ganti</string>
     <string name="lang_not_now">Nanti saja</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Segarkan</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="daily_reminder_title">Puzzle hari ini sudah siap</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">Pertahankan seri %d hari Anda</item>
+    </plurals>
+    <string name="daily_reminder_body">Satu puzzle, sama untuk semua orang. Hanya butuh beberapa menit.</string>
+    <string name="daily_reminder_body_streak">Puzzle hari ini sudah siap. Hanya butuh beberapa menit.</string>
+    <string name="daily_reminder_channel_name">Pengingat puzzle harian</string>
+    <string name="daily_reminder_channel_desc">Satu pengingat per hari untuk puzzle harian. Anda bisa mematikannya di Pengaturan.</string>
+    <string name="daily_card_title">Puzzle hari ini</string>
+    <string name="daily_card_cd">Puzzle hari ini nomor %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  selesai dalam %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  puzzle yang sama untuk semua orang</string>
+    <string name="daily_card_next_in">Puzzle berikutnya dalam %1$s</string>
+    <string name="daily_card_view_result">Lihat hasil</string>
+    <string name="daily_card_play">Main</string>
+    <string name="daily_result_title">Harian #%1$d selesai ✅</string>
+    <string name="daily_result_first_try">percobaan pertama</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d percobaan</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 Seri %d hari</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">Pembeku seri menutupi %d hari yang terlewat, jadi seri Anda tetap bertahan.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Anda mendapatkan pembeku seri untuk hari yang kurang beruntung.</string>
+    <string name="daily_result_coins">+%d koin</string>
+    <string name="daily_result_card_cd">Kartu hasil Anda yang bisa dibagikan. Kartu ini tidak menampilkan jawaban.</string>
+    <string name="daily_result_share_image">Bagikan kartu gambar</string>
+    <string name="daily_result_share_text">Bagikan sebagai teks</string>
+    <string name="welcome_back_title">Selamat datang kembali</string>
+    <string name="welcome_back_msg_streak">Anda pergi selama %1$d hari dan seri %2$d hari Anda masih bertahan. Puzzle hari ini #%3$d sudah siap.</string>
+    <string name="welcome_back_msg_best">Sudah %1$d hari berlalu. Seri terbaik Anda adalah %2$d hari, dan puzzle hari ini #%3$d adalah waktu yang pas untuk memulai seri baru.</string>
+    <string name="welcome_back_msg_plain">Sudah %1$d hari berlalu. Puzzle hari ini #%2$d sudah siap, sama untuk semua orang.</string>
+    <string name="welcome_back_play">Mainkan puzzle hari ini</string>
+    <string name="welcome_back_dismiss">Tutup</string>
+    <string name="reminder_on_note">Pengingat aktif. Anda bisa mengubah waktunya atau mematikannya di Pengaturan.</string>
+    <string name="reminder_later_note">Tidak masalah. Anda bisa mengaktifkan pengingat nanti di Pengaturan.</string>
+    <string name="reminder_offer_title">Ingin diingatkan soal puzzle besok?</string>
+    <string name="reminder_offer_body">Satu notifikasi per hari, hanya jika Anda belum menyelesaikannya, sehingga seri Anda mudah dijaga. Tanpa iklan. Anda bisa mematikannya kapan saja di Pengaturan.</string>
+    <string name="reminder_offer_yes">Ingatkan saya</string>
+    <string name="reminder_offer_no">Nanti saja</string>
+    <string name="daily_settings_title">Puzzle harian</string>
+    <string name="daily_settings_reminder">Pengingat harian</string>
+    <string name="daily_settings_reminder_desc">Satu notifikasi per hari, hanya jika Anda belum menyelesaikan puzzle hari ini.</string>
+    <string name="daily_settings_blocked">Notifikasi untuk RiddleVerse diblokir di ponsel ini.</string>
+    <string name="daily_settings_open_settings">Buka pengaturan notifikasi</string>
+    <string name="daily_settings_time">Waktu pengingat</string>
+    <string name="daily_settings_time_cd">Ingatkan saya pukul %1$s</string>
+    <string name="guest_tour_title">Baru di sini? Ikuti tur 20 detik</string>
+    <string name="guest_tour_subtitle">Ketuk untuk melihat cara kerja RiddleVerse</string>
+    <string name="guest_tour_dismiss">Tutup tur</string>
+    <string name="guest_save_title">Simpan progres Anda?</string>
+    <string name="guest_save_body">Buat akun gratis untuk menyimpan skor dan seri Anda jika berganti ponsel, dan untuk ikut papan peringkat. Semua yang sudah Anda lakukan akan ikut dipindahkan.</string>
+    <string name="guest_save_yes">Simpan progres saya</string>
+    <string name="guest_save_not_now">Nanti saja</string>
+    <string name="guest_save_never">Jangan tanya lagi</string>
 </resources>

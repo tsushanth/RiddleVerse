@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">RiddleVerse</string>
-    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
-    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+    <string name="default_web_client_id" translatable="false">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id" translatable="false">1:719851629523:android:9075a087f0cbcc6a129d26</string>
 
     <!-- Puzzle descriptions -->
     <string name="word_search_description">Find hidden words in a grid</string>
@@ -383,4 +383,68 @@
     <string name="lang_switch_prompt">Switch to %1$s?</string>
     <string name="lang_switch_action">Switch</string>
     <string name="lang_not_now">Not now</string>
+
+    <!-- Daily puzzle, welcome-back, reminder and guest cards (extracted from hard-coded English for localization) -->
+    <string name="daily_reminder_title">Today\'s puzzle is ready</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Keep your %d-day streak going</item>
+        <item quantity="other">Keep your %d-day streak going</item>
+    </plurals>
+    <string name="daily_reminder_body">One puzzle, the same for everyone. It takes a couple of minutes.</string>
+    <string name="daily_reminder_body_streak">Today\'s puzzle is ready. It takes a couple of minutes.</string>
+    <string name="daily_reminder_channel_name">Daily puzzle reminder</string>
+    <string name="daily_reminder_channel_desc">One reminder a day for the daily puzzle. You can turn it off in Settings.</string>
+    <string name="daily_card_title">Today\'s puzzle</string>
+    <string name="daily_card_cd">Today\'s puzzle number %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  solved in %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  same puzzle for everyone</string>
+    <string name="daily_card_next_in">Next puzzle in %1$s</string>
+    <string name="daily_card_view_result">View result</string>
+    <string name="daily_card_play">Play</string>
+    <string name="daily_result_title">Daily #%1$d solved ✅</string>
+    <string name="daily_result_first_try">first try</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d try</item>
+        <item quantity="other">%d tries</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 %d day streak</item>
+        <item quantity="other">🔥 %d day streak</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">A streak freeze covered your missed day, so your streak survived.</item>
+        <item quantity="other">A streak freeze covered %d missed days, so your streak survived.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">You earned a streak freeze for a rainy day.</string>
+    <string name="daily_result_coins">+%d coins</string>
+    <string name="daily_result_card_cd">Your shareable result card. It does not show the answer.</string>
+    <string name="daily_result_share_image">Share image card</string>
+    <string name="daily_result_share_text">Share as text</string>
+    <string name="welcome_back_title">Welcome back</string>
+    <string name="welcome_back_msg_streak">You were away %1$d days and your %2$d-day streak is still alive. Today\'s puzzle #%3$d is ready.</string>
+    <string name="welcome_back_msg_best">It has been %1$d days. Your best streak was %2$d days, and today\'s puzzle #%3$d is a good day to start a new one.</string>
+    <string name="welcome_back_msg_plain">It has been %1$d days. Today\'s puzzle #%2$d is ready, the same for everyone.</string>
+    <string name="welcome_back_play">Play today\'s puzzle</string>
+    <string name="welcome_back_dismiss">Dismiss</string>
+    <string name="reminder_on_note">Reminder on. You can change the time or turn it off in Settings.</string>
+    <string name="reminder_later_note">No problem. You can turn the reminder on later in Settings.</string>
+    <string name="reminder_offer_title">Get a reminder for tomorrow\'s puzzle?</string>
+    <string name="reminder_offer_body">One notification a day, only if you have not solved it yet, so your streak is easy to keep. No ads in it. You can turn it off any time in Settings.</string>
+    <string name="reminder_offer_yes">Remind me</string>
+    <string name="reminder_offer_no">Not now</string>
+    <string name="daily_settings_title">Daily puzzle</string>
+    <string name="daily_settings_reminder">Daily reminder</string>
+    <string name="daily_settings_reminder_desc">One notification a day, only if you have not solved today\'s puzzle.</string>
+    <string name="daily_settings_blocked">Notifications are blocked for RiddleVerse on this phone.</string>
+    <string name="daily_settings_open_settings">Open notification settings</string>
+    <string name="daily_settings_time">Reminder time</string>
+    <string name="daily_settings_time_cd">Remind me at %1$s</string>
+    <string name="guest_tour_title">New here? Take the 20-second tour</string>
+    <string name="guest_tour_subtitle">Tap to see how RiddleVerse works</string>
+    <string name="guest_tour_dismiss">Dismiss the tour</string>
+    <string name="guest_save_title">Save your progress?</string>
+    <string name="guest_save_body">Create a free account to keep your score and streak if you change phones, and to join the leaderboard. Everything you have done so far moves over.</string>
+    <string name="guest_save_yes">Save my progress</string>
+    <string name="guest_save_not_now">Not now</string>
+    <string name="guest_save_never">Don\'t ask again</string>
 </resources>

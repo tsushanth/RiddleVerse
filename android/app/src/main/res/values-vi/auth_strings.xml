@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Bản xem trước</string>
+    <string name="auth_title_sign_in">Đăng nhập</string>
+    <string name="auth_title_create">Tạo tài khoản</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Mật khẩu</string>
+    <string name="auth_show_password">Hiện mật khẩu</string>
+    <string name="auth_sign_in">Đăng nhập</string>
+    <string name="auth_create">Tạo tài khoản</string>
+    <string name="auth_toggle_to_create">Mới dùng lần đầu? Tạo tài khoản</string>
+    <string name="auth_toggle_to_sign_in">Đã có tài khoản? Đăng nhập</string>
+    <string name="auth_or">hoặc</string>
+    <string name="auth_loading">Đang tải</string>
+    <string name="auth_google_config_error">Đăng nhập bằng Google không khả dụng trong bản này. Vui lòng đăng nhập bằng email và mật khẩu.</string>
+    <string name="auth_confirm_email">Đã tạo tài khoản. Hãy kiểm tra email để xác nhận, rồi đăng nhập.</string>
+</resources>

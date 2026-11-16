@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -124,7 +126,7 @@ fun SwipeWordScreen(
             ) {
                 IconButton(onClick = onBackToHome) {
                     Icon(
-                        Icons.Default.ArrowBack,
+                        Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back_to_home),
                         tint = RvInk
                     )
@@ -304,13 +306,13 @@ fun SwipeWordScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("SWIPE LEFT", color = RvInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         Text("(Negative)", color = RvInk, fontSize = 14.sp)
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Swipe left", tint = RvInk, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Swipe left", tint = RvInk, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
                     }
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("SWIPE RIGHT", color = RvInk, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                         Text("(Positive)", color = RvInk, fontSize = 14.sp)
-                        Icon(Icons.Default.ArrowForward, contentDescription = "Swipe right", tint = RvInk, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
+                        Icon(Icons.AutoMirrored.Filled.ArrowForward, contentDescription = "Swipe right", tint = RvInk, modifier = Modifier.size(if (compact) 20.dp else 24.dp))
                     }
                 }
             }

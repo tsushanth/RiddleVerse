@@ -31,6 +31,8 @@ import kotlinx.coroutines.delay
 import kotlin.math.sqrt
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Lightbulb
@@ -732,7 +734,7 @@ fun EnhancedFindDifferencesHeader(
                     onClick = { onViewModeChange(ViewMode.PORTRAIT_ZOOMABLE) }
                 )
                 ViewModeButton(
-                    icon = Icons.Default.List,
+                    icon = Icons.AutoMirrored.Filled.List,
                     label = "Zones",
                     isSelected = viewMode == ViewMode.ZONES_LIST,
                     onClick = { onViewModeChange(ViewMode.ZONES_LIST) }
@@ -762,7 +764,7 @@ fun EnhancedFindDifferencesHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = Color.White)
                 }
 
                 Column(

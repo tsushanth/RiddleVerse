@@ -378,4 +378,65 @@
     <string name="lang_switch_prompt">%1$sに切り替えますか？</string>
     <string name="lang_switch_action">切り替える</string>
     <string name="lang_not_now">今はしない</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">更新</string>
+    <string name="daily_reminder_title">今日のパズルの準備ができました</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">%d日連続の記録を続けましょう</item>
+    </plurals>
+    <string name="daily_reminder_body">パズルは1日1問で、みんな同じ問題です。数分で終わります。</string>
+    <string name="daily_reminder_body_streak">今日のパズルの準備ができました。数分で終わります。</string>
+    <string name="daily_reminder_channel_name">デイリーパズルのリマインダー</string>
+    <string name="daily_reminder_channel_desc">デイリーパズルのリマインダーを1日1回お知らせします。設定でオフにできます。</string>
+    <string name="daily_card_title">今日のパズル</string>
+    <string name="daily_card_cd">今日のパズル %1$d番、%2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  %3$sで解決</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  みんな同じパズル</string>
+    <string name="daily_card_next_in">次のパズルまで%1$s</string>
+    <string name="daily_card_view_result">結果を見る</string>
+    <string name="daily_card_play">プレイ</string>
+    <string name="daily_result_title">デイリー #%1$d 解決 ✅</string>
+    <string name="daily_result_first_try">1回で正解</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d回</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 %d日連続</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">ストリークフリーズが%d日分の未プレイ日をカバーしたので、連続記録は途切れませんでした。</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">もしもの日のために、ストリークフリーズを獲得しました。</string>
+    <string name="daily_result_coins">+%dコイン</string>
+    <string name="daily_result_card_cd">共有できる結果カードです。答えは表示されません。</string>
+    <string name="daily_result_share_image">画像カードを共有</string>
+    <string name="daily_result_share_text">テキストで共有</string>
+    <string name="welcome_back_title">おかえりなさい</string>
+    <string name="welcome_back_msg_streak">%1$d日ぶりですが、%2$d日連続の記録はまだ続いています。今日のパズル #%3$d の準備ができています。</string>
+    <string name="welcome_back_msg_best">%1$d日ぶりです。最高の連続記録は%2$d日でした。今日のパズル #%3$d から、新しい記録を始めてみませんか。</string>
+    <string name="welcome_back_msg_plain">%1$d日ぶりです。今日のパズル #%2$d の準備ができています。みんな同じ問題です。</string>
+    <string name="welcome_back_play">今日のパズルをプレイ</string>
+    <string name="welcome_back_dismiss">閉じる</string>
+    <string name="reminder_on_note">リマインダーをオンにしました。時間の変更やオフにする操作は設定で行えます。</string>
+    <string name="reminder_later_note">大丈夫です。リマインダーは後から設定でオンにできます。</string>
+    <string name="reminder_offer_title">明日のパズルのリマインダーを受け取りますか？</string>
+    <string name="reminder_offer_body">通知は1日1回で、まだ解いていない場合のみ届くので、連続記録を続けやすくなります。広告は含まれません。設定でいつでもオフにできます。</string>
+    <string name="reminder_offer_yes">通知する</string>
+    <string name="reminder_offer_no">今はしない</string>
+    <string name="daily_settings_title">デイリーパズル</string>
+    <string name="daily_settings_reminder">デイリーリマインダー</string>
+    <string name="daily_settings_reminder_desc">今日のパズルをまだ解いていない場合のみ、1日1回通知します。</string>
+    <string name="daily_settings_blocked">このスマートフォンでは、RiddleVerseの通知がブロックされています。</string>
+    <string name="daily_settings_open_settings">通知設定を開く</string>
+    <string name="daily_settings_time">リマインダーの時間</string>
+    <string name="daily_settings_time_cd">%1$sに通知</string>
+    <string name="guest_tour_title">初めての方へ。20秒のツアー</string>
+    <string name="guest_tour_subtitle">タップしてRiddleVerseの使い方を見る</string>
+    <string name="guest_tour_dismiss">ツアーを閉じる</string>
+    <string name="guest_save_title">進行状況を保存しますか？</string>
+    <string name="guest_save_body">無料アカウントを作成すると、機種変更してもスコアと連続記録を引き継げて、ランキングにも参加できます。これまでの記録はすべて移行されます。</string>
+    <string name="guest_save_yes">進行状況を保存</string>
+    <string name="guest_save_not_now">今はしない</string>
+    <string name="guest_save_never">今後は表示しない</string>
 </resources>

@@ -378,4 +378,65 @@
     <string name="lang_switch_prompt">切换到%1$s？</string>
     <string name="lang_switch_action">切换</string>
     <string name="lang_not_now">暂不</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">刷新</string>
+    <string name="daily_reminder_title">今日谜题已就绪</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">保持你的 %d 天连续记录</item>
+    </plurals>
+    <string name="daily_reminder_body">每天一道题，所有人都一样。只需几分钟。</string>
+    <string name="daily_reminder_body_streak">今日谜题已就绪。只需几分钟。</string>
+    <string name="daily_reminder_channel_name">每日谜题提醒</string>
+    <string name="daily_reminder_channel_desc">每天为每日谜题提醒一次。你可以在“设置”中关闭。</string>
+    <string name="daily_card_title">今日谜题</string>
+    <string name="daily_card_cd">今日谜题第 %1$d 期，%2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  用时 %3$s 解开</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  所有人的谜题相同</string>
+    <string name="daily_card_next_in">下一道谜题将在 %1$s 后开始</string>
+    <string name="daily_card_view_result">查看结果</string>
+    <string name="daily_card_play">开始</string>
+    <string name="daily_result_title">每日 #%1$d 已解开 ✅</string>
+    <string name="daily_result_first_try">一次答对</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d 次尝试</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 连续 %d 天</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">连续记录冻结卡抵消了你错过的 %d 天，所以你的连续记录得以保留。</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">你获得了一张连续记录冻结卡，以备不时之需。</string>
+    <string name="daily_result_coins">+%d 金币</string>
+    <string name="daily_result_card_cd">你的可分享结果卡片。卡片不会显示答案。</string>
+    <string name="daily_result_share_image">分享图片卡片</string>
+    <string name="daily_result_share_text">以文字分享</string>
+    <string name="welcome_back_title">欢迎回来</string>
+    <string name="welcome_back_msg_streak">你离开了 %1$d 天，你的 %2$d 天连续记录依然保留。今日谜题 #%3$d 已就绪。</string>
+    <string name="welcome_back_msg_best">已经过去 %1$d 天了。你的最佳连续记录是 %2$d 天，今天的谜题 #%3$d 正适合重新开始一段新的记录。</string>
+    <string name="welcome_back_msg_plain">已经过去 %1$d 天了。今日谜题 #%2$d 已就绪，所有人的题目都一样。</string>
+    <string name="welcome_back_play">玩今日谜题</string>
+    <string name="welcome_back_dismiss">关闭</string>
+    <string name="reminder_on_note">提醒已开启。你可以在“设置”中更改时间或关闭提醒。</string>
+    <string name="reminder_later_note">没关系。你可以稍后在“设置”中开启提醒。</string>
+    <string name="reminder_offer_title">要接收明天谜题的提醒吗？</string>
+    <string name="reminder_offer_body">每天一条通知，仅在你尚未解开时发送，帮你轻松保持连续记录。通知中没有广告。你可以随时在“设置”中关闭。</string>
+    <string name="reminder_offer_yes">提醒我</string>
+    <string name="reminder_offer_no">暂不</string>
+    <string name="daily_settings_title">每日谜题</string>
+    <string name="daily_settings_reminder">每日提醒</string>
+    <string name="daily_settings_reminder_desc">每天一条通知，仅在你尚未解开今日谜题时发送。</string>
+    <string name="daily_settings_blocked">此手机已屏蔽 RiddleVerse 的通知。</string>
+    <string name="daily_settings_open_settings">打开通知设置</string>
+    <string name="daily_settings_time">提醒时间</string>
+    <string name="daily_settings_time_cd">在 %1$s 提醒我</string>
+    <string name="guest_tour_title">新来的？花 20 秒看看导览</string>
+    <string name="guest_tour_subtitle">点按了解 RiddleVerse 的玩法</string>
+    <string name="guest_tour_dismiss">关闭导览</string>
+    <string name="guest_save_title">保存你的进度？</string>
+    <string name="guest_save_body">创建免费账户，即使换手机也能保留你的得分和连续记录，还可以加入排行榜。你目前的所有进度都会一并转移。</string>
+    <string name="guest_save_yes">保存我的进度</string>
+    <string name="guest_save_not_now">暂不</string>
+    <string name="guest_save_never">不再询问</string>
 </resources>

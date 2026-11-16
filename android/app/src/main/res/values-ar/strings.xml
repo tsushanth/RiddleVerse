@@ -376,4 +376,87 @@
     <string name="lang_switch_prompt">التبديل إلى %1$s؟</string>
     <string name="lang_switch_action">تبديل</string>
     <string name="lang_not_now">ليس الآن</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">تحديث</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="daily_reminder_title">لغز اليوم جاهز</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="zero">حافظ على سلسلتك البالغة %d يوم</item>
+        <item quantity="one">حافظ على سلسلتك البالغة يوم واحد</item>
+        <item quantity="two">حافظ على سلسلتك البالغة %d يومين</item>
+        <item quantity="few">حافظ على سلسلتك البالغة %d أيام</item>
+        <item quantity="many">حافظ على سلسلتك البالغة %d يومًا</item>
+        <item quantity="other">حافظ على سلسلتك البالغة %d يوم</item>
+    </plurals>
+    <string name="daily_reminder_body">لغز واحد، هو نفسه للجميع. يستغرق دقائق قليلة.</string>
+    <string name="daily_reminder_body_streak">لغز اليوم جاهز. يستغرق دقائق قليلة.</string>
+    <string name="daily_reminder_channel_name">تذكير اللغز اليومي</string>
+    <string name="daily_reminder_channel_desc">تذكير واحد في اليوم للغز اليومي. يمكنك إيقافه من الإعدادات.</string>
+    <string name="daily_card_title">لغز اليوم</string>
+    <string name="daily_card_cd">لغز اليوم رقم %1$d، %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  تم الحل خلال %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  اللغز نفسه للجميع</string>
+    <string name="daily_card_next_in">اللغز التالي بعد %1$s</string>
+    <string name="daily_card_view_result">عرض النتيجة</string>
+    <string name="daily_card_play">العب</string>
+    <string name="daily_result_title">تم حل اللغز اليومي #%1$d ✅</string>
+    <string name="daily_result_first_try">من المحاولة الأولى</string>
+    <plurals name="daily_result_tries">
+        <item quantity="zero">%d محاولة</item>
+        <item quantity="one">محاولة واحدة</item>
+        <item quantity="two">%d محاولتان</item>
+        <item quantity="few">%d محاولات</item>
+        <item quantity="many">%d محاولة</item>
+        <item quantity="other">%d محاولة</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="zero">🔥 سلسلة %d يوم</item>
+        <item quantity="one">🔥 سلسلة يوم واحد</item>
+        <item quantity="two">🔥 سلسلة %d يومين</item>
+        <item quantity="few">🔥 سلسلة %d أيام</item>
+        <item quantity="many">🔥 سلسلة %d يومًا</item>
+        <item quantity="other">🔥 سلسلة %d يوم</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="zero">غطّى تجميد السلسلة %d يوم فائت، فبقيت سلسلتك قائمة.</item>
+        <item quantity="one">غطّى تجميد السلسلة يومك الفائت، فبقيت سلسلتك قائمة.</item>
+        <item quantity="two">غطّى تجميد السلسلة %d يومين فائتين، فبقيت سلسلتك قائمة.</item>
+        <item quantity="few">غطّى تجميد السلسلة %d أيام فائتة، فبقيت سلسلتك قائمة.</item>
+        <item quantity="many">غطّى تجميد السلسلة %d يومًا فائتًا، فبقيت سلسلتك قائمة.</item>
+        <item quantity="other">غطّى تجميد السلسلة %d يوم فائت، فبقيت سلسلتك قائمة.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">حصلت على تجميد سلسلة ليوم الطوارئ.</string>
+    <string name="daily_result_coins">+%d عملات</string>
+    <string name="daily_result_card_cd">بطاقة النتيجة القابلة للمشاركة. لا تعرض الإجابة.</string>
+    <string name="daily_result_share_image">مشاركة كبطاقة صورة</string>
+    <string name="daily_result_share_text">مشاركة كنص</string>
+    <string name="welcome_back_title">أهلًا بعودتك</string>
+    <string name="welcome_back_msg_streak">غبت %1$d يومًا وما زالت سلسلتك البالغة %2$d يومًا قائمة. لغز اليوم #%3$d جاهز.</string>
+    <string name="welcome_back_msg_best">مرّت %1$d يومًا. كانت أفضل سلسلة لك %2$d يومًا، ولغز اليوم #%3$d فرصة جيدة لبدء سلسلة جديدة.</string>
+    <string name="welcome_back_msg_plain">مرّت %1$d يومًا. لغز اليوم #%2$d جاهز، وهو نفسه للجميع.</string>
+    <string name="welcome_back_play">العب لغز اليوم</string>
+    <string name="welcome_back_dismiss">إغلاق</string>
+    <string name="reminder_on_note">التذكير مفعّل. يمكنك تغيير الوقت أو إيقافه من الإعدادات.</string>
+    <string name="reminder_later_note">لا مشكلة. يمكنك تفعيل التذكير لاحقًا من الإعدادات.</string>
+    <string name="reminder_offer_title">هل تريد تذكيرًا بلغز الغد؟</string>
+    <string name="reminder_offer_body">إشعار واحد في اليوم، فقط إذا لم تحل اللغز بعد، ليسهل عليك الحفاظ على سلسلتك. بدون إعلانات. يمكنك إيقافه في أي وقت من الإعدادات.</string>
+    <string name="reminder_offer_yes">ذكّرني</string>
+    <string name="reminder_offer_no">ليس الآن</string>
+    <string name="daily_settings_title">اللغز اليومي</string>
+    <string name="daily_settings_reminder">التذكير اليومي</string>
+    <string name="daily_settings_reminder_desc">إشعار واحد في اليوم، فقط إذا لم تحل لغز اليوم.</string>
+    <string name="daily_settings_blocked">الإشعارات محظورة لتطبيق RiddleVerse على هذا الهاتف.</string>
+    <string name="daily_settings_open_settings">فتح إعدادات الإشعارات</string>
+    <string name="daily_settings_time">وقت التذكير</string>
+    <string name="daily_settings_time_cd">ذكّرني في %1$s</string>
+    <string name="guest_tour_title">جديد هنا؟ خذ جولة مدتها 20 ثانية</string>
+    <string name="guest_tour_subtitle">اضغط لترى كيف يعمل RiddleVerse</string>
+    <string name="guest_tour_dismiss">إغلاق الجولة</string>
+    <string name="guest_save_title">هل تريد حفظ تقدمك؟</string>
+    <string name="guest_save_body">أنشئ حسابًا مجانيًا للاحتفاظ بنتيجتك وسلسلتك إذا غيّرت هاتفك، وللانضمام إلى لوحة المتصدرين. سيُنقل كل ما أنجزته حتى الآن.</string>
+    <string name="guest_save_yes">احفظ تقدمي</string>
+    <string name="guest_save_not_now">ليس الآن</string>
+    <string name="guest_save_never">لا تسألني مرة أخرى</string>
 </resources>

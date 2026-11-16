@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Предварительная сборка</string>
+    <string name="auth_title_sign_in">Вход</string>
+    <string name="auth_title_create">Создать аккаунт</string>
+    <string name="auth_email_hint">Эл. почта</string>
+    <string name="auth_password_hint">Пароль</string>
+    <string name="auth_show_password">Показать пароль</string>
+    <string name="auth_sign_in">Войти</string>
+    <string name="auth_create">Создать аккаунт</string>
+    <string name="auth_toggle_to_create">Впервые здесь? Создайте аккаунт</string>
+    <string name="auth_toggle_to_sign_in">Уже есть аккаунт? Войти</string>
+    <string name="auth_or">или</string>
+    <string name="auth_loading">Загрузка</string>
+    <string name="auth_google_config_error">Вход через Google недоступен в этой сборке. Пожалуйста, войдите с помощью эл. почты и пароля.</string>
+    <string name="auth_confirm_email">Аккаунт создан. Проверьте почту, подтвердите адрес, а затем войдите.</string>
+</resources>

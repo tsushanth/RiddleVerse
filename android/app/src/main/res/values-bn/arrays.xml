@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>বহুনির্বাচনী</item>
+        <item>অ্যানাগ্রাম</item>
+        <item>ক্রসওয়ার্ড</item>
+        <item>শব্দ খোঁজা</item>
+    </string-array>
+</resources>

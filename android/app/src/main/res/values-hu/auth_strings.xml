@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Előzetes verzió</string>
+    <string name="auth_title_sign_in">Bejelentkezés</string>
+    <string name="auth_title_create">Fiók létrehozása</string>
+    <string name="auth_email_hint">E-mail</string>
+    <string name="auth_password_hint">Jelszó</string>
+    <string name="auth_show_password">Jelszó megjelenítése</string>
+    <string name="auth_sign_in">Bejelentkezés</string>
+    <string name="auth_create">Fiók létrehozása</string>
+    <string name="auth_toggle_to_create">Új vagy itt? Hozz létre egy fiókot</string>
+    <string name="auth_toggle_to_sign_in">Már van fiókod? Jelentkezz be</string>
+    <string name="auth_or">vagy</string>
+    <string name="auth_loading">Betöltés</string>
+    <string name="auth_google_config_error">A Google-bejelentkezés ebben a buildben nem érhető el. Kérjük, jelentkezz be helyette az e-mail-címeddel és a jelszavaddal.</string>
+    <string name="auth_confirm_email">A fiók létrejött. Erősítsd meg az e-mailedben, majd jelentkezz be.</string>
+</resources>

@@ -382,4 +382,71 @@
     <string name="lang_switch_prompt">%1$s में बदलें?</string>
     <string name="lang_switch_action">बदलें</string>
     <string name="lang_not_now">अभी नहीं</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">रीफ़्रेश करें</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="daily_reminder_title">आज की पहेली तैयार है</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">अपनी %d दिन की स्ट्रीक बनाए रखें</item>
+        <item quantity="other">अपनी %d दिन की स्ट्रीक बनाए रखें</item>
+    </plurals>
+    <string name="daily_reminder_body">एक पहेली, सबके लिए एक जैसी। इसमें बस कुछ मिनट लगते हैं।</string>
+    <string name="daily_reminder_body_streak">आज की पहेली तैयार है। इसमें बस कुछ मिनट लगते हैं।</string>
+    <string name="daily_reminder_channel_name">दैनिक पहेली रिमाइंडर</string>
+    <string name="daily_reminder_channel_desc">दैनिक पहेली के लिए दिन में एक रिमाइंडर। आप इसे सेटिंग्स में बंद कर सकते हैं।</string>
+    <string name="daily_card_title">आज की पहेली</string>
+    <string name="daily_card_cd">आज की पहेली नंबर %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  %3$s में हल की</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  सबके लिए एक ही पहेली</string>
+    <string name="daily_card_next_in">अगली पहेली %1$s में</string>
+    <string name="daily_card_view_result">नतीजा देखें</string>
+    <string name="daily_card_play">खेलें</string>
+    <string name="daily_result_title">दैनिक #%1$d हल हो गई ✅</string>
+    <string name="daily_result_first_try">पहली कोशिश में</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d कोशिश</item>
+        <item quantity="other">%d कोशिशें</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 %d दिन की स्ट्रीक</item>
+        <item quantity="other">🔥 %d दिन की स्ट्रीक</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">स्ट्रीक फ़्रीज़ ने आपका छूटा हुआ दिन संभाल लिया, इसलिए आपकी स्ट्रीक बची रही।</item>
+        <item quantity="other">स्ट्रीक फ़्रीज़ ने आपके %d छूटे हुए दिन संभाल लिए, इसलिए आपकी स्ट्रीक बची रही।</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">आपने मुश्किल दिन के लिए एक स्ट्रीक फ़्रीज़ कमाया।</string>
+    <string name="daily_result_coins">+%d सिक्के</string>
+    <string name="daily_result_card_cd">आपका शेयर करने लायक नतीजा कार्ड। इसमें जवाब नहीं दिखता।</string>
+    <string name="daily_result_share_image">इमेज कार्ड शेयर करें</string>
+    <string name="daily_result_share_text">टेक्स्ट के रूप में शेयर करें</string>
+    <string name="welcome_back_title">वापसी पर स्वागत है</string>
+    <string name="welcome_back_msg_streak">आप %1$d दिन दूर रहे और आपकी %2$d दिन की स्ट्रीक अभी भी चालू है। आज की पहेली #%3$d तैयार है।</string>
+    <string name="welcome_back_msg_best">%1$d दिन हो गए हैं। आपकी सबसे लंबी स्ट्रीक %2$d दिन की थी, और आज की पहेली #%3$d नई स्ट्रीक शुरू करने का अच्छा मौका है।</string>
+    <string name="welcome_back_msg_plain">%1$d दिन हो गए हैं। आज की पहेली #%2$d तैयार है, सबके लिए एक जैसी।</string>
+    <string name="welcome_back_play">आज की पहेली खेलें</string>
+    <string name="welcome_back_dismiss">बंद करें</string>
+    <string name="reminder_on_note">रिमाइंडर चालू है। आप समय बदल सकते हैं या इसे सेटिंग्स में बंद कर सकते हैं।</string>
+    <string name="reminder_later_note">कोई बात नहीं। आप रिमाइंडर बाद में सेटिंग्स में चालू कर सकते हैं।</string>
+    <string name="reminder_offer_title">कल की पहेली का रिमाइंडर चाहिए?</string>
+    <string name="reminder_offer_body">दिन में एक नोटिफ़िकेशन, केवल तब जब आपने पहेली अभी हल न की हो, ताकि आपकी स्ट्रीक बनाए रखना आसान रहे। इसमें कोई विज्ञापन नहीं है। आप इसे कभी भी सेटिंग्स में बंद कर सकते हैं।</string>
+    <string name="reminder_offer_yes">मुझे याद दिलाएं</string>
+    <string name="reminder_offer_no">अभी नहीं</string>
+    <string name="daily_settings_title">दैनिक पहेली</string>
+    <string name="daily_settings_reminder">दैनिक रिमाइंडर</string>
+    <string name="daily_settings_reminder_desc">दिन में एक नोटिफ़िकेशन, केवल तब जब आपने आज की पहेली हल न की हो।</string>
+    <string name="daily_settings_blocked">इस फ़ोन पर RiddleVerse के नोटिफ़िकेशन बंद हैं।</string>
+    <string name="daily_settings_open_settings">नोटिफ़िकेशन सेटिंग्स खोलें</string>
+    <string name="daily_settings_time">रिमाइंडर का समय</string>
+    <string name="daily_settings_time_cd">मुझे %1$s बजे याद दिलाएं</string>
+    <string name="guest_tour_title">नए हैं? 20 सेकंड का टूर लें</string>
+    <string name="guest_tour_subtitle">RiddleVerse कैसे काम करता है, यह देखने के लिए टैप करें</string>
+    <string name="guest_tour_dismiss">टूर बंद करें</string>
+    <string name="guest_save_title">अपनी प्रगति सेव करें?</string>
+    <string name="guest_save_body">फ़ोन बदलने पर अपना स्कोर और स्ट्रीक बनाए रखने और लीडरबोर्ड से जुड़ने के लिए एक मुफ़्त अकाउंट बनाएं। अब तक का आपका सारा काम साथ चला जाएगा।</string>
+    <string name="guest_save_yes">मेरी प्रगति सेव करें</string>
+    <string name="guest_save_not_now">अभी नहीं</string>
+    <string name="guest_save_never">दोबारा न पूछें</string>
 </resources>

@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -127,7 +128,7 @@ private fun CrownsBoard(args: SpatialArgs, puzzle: CrownsPuzzle) {
         args = args,
         status = "$crowns/$n",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.canUndo() && !done) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo() && !done) {
                 game.undo(); hintCell = -1; toast = ""; commit()
             }
             SpatialAction(Icons.Default.Lightbulb, "Hint", enabled = !done) {

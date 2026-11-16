@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">پیش نظارہ بلڈ</string>
+    <string name="auth_title_sign_in">سائن اِن کریں</string>
+    <string name="auth_title_create">اکاؤنٹ بنائیں</string>
+    <string name="auth_email_hint">ای میل</string>
+    <string name="auth_password_hint">پاس ورڈ</string>
+    <string name="auth_show_password">پاس ورڈ دکھائیں</string>
+    <string name="auth_sign_in">سائن اِن کریں</string>
+    <string name="auth_create">اکاؤنٹ بنائیں</string>
+    <string name="auth_toggle_to_create">نئے ہیں؟ اکاؤنٹ بنائیں</string>
+    <string name="auth_toggle_to_sign_in">پہلے سے اکاؤنٹ ہے؟ سائن اِن کریں</string>
+    <string name="auth_or">یا</string>
+    <string name="auth_loading">لوڈ ہو رہا ہے</string>
+    <string name="auth_google_config_error">اس بلڈ میں Google سائن اِن دستیاب نہیں ہے۔ براہ کرم اس کے بجائے اپنی ای میل اور پاس ورڈ سے سائن اِن کریں۔</string>
+    <string name="auth_confirm_email">اکاؤنٹ بن گیا۔ تصدیق کے لیے اپنی ای میل دیکھیں، پھر سائن اِن کریں۔</string>
+</resources>

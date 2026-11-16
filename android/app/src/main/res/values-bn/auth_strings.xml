@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">প্রিভিউ বিল্ড</string>
+    <string name="auth_title_sign_in">সাইন ইন</string>
+    <string name="auth_title_create">অ্যাকাউন্ট তৈরি করুন</string>
+    <string name="auth_email_hint">ইমেইল</string>
+    <string name="auth_password_hint">পাসওয়ার্ড</string>
+    <string name="auth_show_password">পাসওয়ার্ড দেখান</string>
+    <string name="auth_sign_in">সাইন ইন</string>
+    <string name="auth_create">অ্যাকাউন্ট তৈরি করুন</string>
+    <string name="auth_toggle_to_create">নতুন? একটি অ্যাকাউন্ট তৈরি করুন</string>
+    <string name="auth_toggle_to_sign_in">আগে থেকেই অ্যাকাউন্ট আছে? সাইন ইন করুন</string>
+    <string name="auth_or">অথবা</string>
+    <string name="auth_loading">লোড হচ্ছে</string>
+    <string name="auth_google_config_error">এই বিল্ডে Google সাইন-ইন উপলব্ধ নেই। অনুগ্রহ করে ইমেইল ও পাসওয়ার্ড দিয়ে সাইন ইন করুন।</string>
+    <string name="auth_confirm_email">অ্যাকাউন্ট তৈরি হয়েছে। নিশ্চিত করতে আপনার ইমেইল দেখুন, তারপর সাইন ইন করুন।</string>
+</resources>

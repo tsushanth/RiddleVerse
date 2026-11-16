@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">เวอร์ชันตัวอย่าง</string>
+    <string name="auth_title_sign_in">เข้าสู่ระบบ</string>
+    <string name="auth_title_create">สร้างบัญชี</string>
+    <string name="auth_email_hint">อีเมล</string>
+    <string name="auth_password_hint">รหัสผ่าน</string>
+    <string name="auth_show_password">แสดงรหัสผ่าน</string>
+    <string name="auth_sign_in">เข้าสู่ระบบ</string>
+    <string name="auth_create">สร้างบัญชี</string>
+    <string name="auth_toggle_to_create">มาใหม่ใช่ไหม? สร้างบัญชี</string>
+    <string name="auth_toggle_to_sign_in">มีบัญชีอยู่แล้ว? เข้าสู่ระบบ</string>
+    <string name="auth_or">หรือ</string>
+    <string name="auth_loading">กำลังโหลด</string>
+    <string name="auth_google_config_error">การเข้าสู่ระบบด้วย Google ไม่พร้อมใช้งานในเวอร์ชันนี้ โปรดเข้าสู่ระบบด้วยอีเมลและรหัสผ่านแทน</string>
+    <string name="auth_confirm_email">สร้างบัญชีแล้ว ตรวจสอบอีเมลเพื่อยืนยันบัญชี แล้วเข้าสู่ระบบ</string>
+</resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">Bilmece</string>
+    <string name="riddle_stars_desc">%2$d yıldızdan %1$d</string>
+    <string name="riddle_streak">Seri: %1$d</string>
+    <string name="riddle_streak_desc">Üst üste doğru cevap: %1$d</string>
+    <string name="riddle_hint_button">İpucu %1$d / %2$d</string>
+    <string name="riddle_hint_button_none">Başka ipucu yok</string>
+    <string name="riddle_hint_desc">%2$d ipucundan %1$d. ipucunu göster. Her ipucu puanınızdan bir yıldız düşer.</string>
+    <string name="riddle_hint_none_desc">Tüm ipuçları gösteriliyor</string>
+    <string name="riddle_hint_line">İpucu %1$d: %2$s</string>
+    <string name="riddle_skip">Atla</string>
+    <string name="riddle_skip_desc">Bu bilmeceyi atla</string>
+    <string name="riddle_reveal">Göster</string>
+    <string name="riddle_reveal_desc">Cevabı göster</string>
+    <string name="riddle_your_answer">Cevabınız</string>
+    <string name="riddle_check">Kontrol et</string>
+    <string name="riddle_check_desc">Cevabınızı kontrol edin</string>
+    <string name="riddle_wrong">Pek değil. Tekrar deneyin veya bir ipucu alın.</string>
+    <string name="riddle_empty">Önce bir cevap yazın.</string>
+    <string name="riddle_correct">Doğru! Cevap: %1$s.</string>
+    <string name="riddle_revealed">Cevap: %1$s.</string>
+    <string name="riddle_stars_result">Kazanılan yıldız: %2$d üzerinden %1$d (kullanılan ipucu: %3$d)</string>
+    <string name="riddle_next">Sonraki bilmece</string>
+    <string name="riddle_share">Bilmeceyi paylaş</string>
+    <string name="riddle_share_desc">Bu bilmeceyi bir arkadaşınızla paylaşın</string>
+    <string name="riddle_share_text">Bu bilmeceyi çözebilir misiniz?\n\n%1$s\n\nRiddleVerse\'te daha fazla bilmece oynayın: %2$s</string>
+    <string name="riddle_confirm_reveal_title">Cevap gösterilsin mi?</string>
+    <string name="riddle_confirm_reveal_body">Bu bilmece çözülmemiş sayılır ve seriniz sıfırlanır.</string>
+    <string name="riddle_confirm_skip_title">Bu bilmece atlansın mı?</string>
+    <string name="riddle_confirm_skip_body">Seriniz sıfırlanır.</string>
+    <string name="riddle_confirm_yes">Evet</string>
+    <string name="riddle_confirm_no">İptal</string>
+    <string name="riddle_tier_easy">Kolay</string>
+    <string name="riddle_tier_medium">Orta</string>
+    <string name="riddle_tier_hard">Zor</string>
+    <string name="riddle_tier_desc">Zorluk: %1$s</string>
+</resources>

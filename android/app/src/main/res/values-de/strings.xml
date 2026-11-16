@@ -382,4 +382,71 @@
     <string name="lang_switch_prompt">Zu %1$s wechseln?</string>
     <string name="lang_switch_action">Wechseln</string>
     <string name="lang_not_now">Nicht jetzt</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Aktualisieren</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="daily_reminder_title">Das heutige Rätsel ist bereit</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Halte deine %d-Tage-Serie am Laufen</item>
+        <item quantity="other">Halte deine %d-Tage-Serie am Laufen</item>
+    </plurals>
+    <string name="daily_reminder_body">Ein Rätsel, für alle dasselbe. Es dauert nur ein paar Minuten.</string>
+    <string name="daily_reminder_body_streak">Das heutige Rätsel ist bereit. Es dauert nur ein paar Minuten.</string>
+    <string name="daily_reminder_channel_name">Erinnerung ans tägliche Rätsel</string>
+    <string name="daily_reminder_channel_desc">Eine Erinnerung pro Tag für das tägliche Rätsel. Du kannst sie in den Einstellungen ausschalten.</string>
+    <string name="daily_card_title">Das heutige Rätsel</string>
+    <string name="daily_card_cd">Heutiges Rätsel Nummer %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  gelöst in %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  dasselbe Rätsel für alle</string>
+    <string name="daily_card_next_in">Nächstes Rätsel in %1$s</string>
+    <string name="daily_card_view_result">Ergebnis ansehen</string>
+    <string name="daily_card_play">Spielen</string>
+    <string name="daily_result_title">Täglich #%1$d gelöst ✅</string>
+    <string name="daily_result_first_try">im ersten Versuch</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d Versuch</item>
+        <item quantity="other">%d Versuche</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 %d Tag Serie</item>
+        <item quantity="other">🔥 %d Tage Serie</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Ein Serienschutz hat deinen verpassten Tag abgedeckt, deine Serie ist also erhalten geblieben.</item>
+        <item quantity="other">Ein Serienschutz hat %d verpasste Tage abgedeckt, deine Serie ist also erhalten geblieben.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Du hast einen Serienschutz für schlechte Tage verdient.</string>
+    <string name="daily_result_coins">+%d Münzen</string>
+    <string name="daily_result_card_cd">Deine teilbare Ergebniskarte. Sie zeigt die Antwort nicht an.</string>
+    <string name="daily_result_share_image">Bildkarte teilen</string>
+    <string name="daily_result_share_text">Als Text teilen</string>
+    <string name="welcome_back_title">Willkommen zurück</string>
+    <string name="welcome_back_msg_streak">Du warst %1$d Tage weg und deine %2$d-Tage-Serie ist noch aktiv. Das heutige Rätsel #%3$d ist bereit.</string>
+    <string name="welcome_back_msg_best">Es sind %1$d Tage vergangen. Deine beste Serie war %2$d Tage lang, und mit dem heutigen Rätsel #%3$d kannst du eine neue beginnen.</string>
+    <string name="welcome_back_msg_plain">Es sind %1$d Tage vergangen. Das heutige Rätsel #%2$d ist bereit, für alle dasselbe.</string>
+    <string name="welcome_back_play">Heutiges Rätsel spielen</string>
+    <string name="welcome_back_dismiss">Schließen</string>
+    <string name="reminder_on_note">Erinnerung ist an. Du kannst die Uhrzeit ändern oder sie in den Einstellungen ausschalten.</string>
+    <string name="reminder_later_note">Kein Problem. Du kannst die Erinnerung später in den Einstellungen einschalten.</string>
+    <string name="reminder_offer_title">Erinnerung an das morgige Rätsel erhalten?</string>
+    <string name="reminder_offer_body">Eine Benachrichtigung pro Tag, nur wenn du es noch nicht gelöst hast, damit du deine Serie leicht halten kannst. Ohne Werbung. Du kannst sie jederzeit in den Einstellungen ausschalten.</string>
+    <string name="reminder_offer_yes">Erinnere mich</string>
+    <string name="reminder_offer_no">Nicht jetzt</string>
+    <string name="daily_settings_title">Tägliches Rätsel</string>
+    <string name="daily_settings_reminder">Tägliche Erinnerung</string>
+    <string name="daily_settings_reminder_desc">Eine Benachrichtigung pro Tag, nur wenn du das heutige Rätsel noch nicht gelöst hast.</string>
+    <string name="daily_settings_blocked">Benachrichtigungen für RiddleVerse sind auf diesem Telefon blockiert.</string>
+    <string name="daily_settings_open_settings">Benachrichtigungseinstellungen öffnen</string>
+    <string name="daily_settings_time">Uhrzeit der Erinnerung</string>
+    <string name="daily_settings_time_cd">Erinnere mich um %1$s</string>
+    <string name="guest_tour_title">Neu hier? Mach die 20-Sekunden-Tour</string>
+    <string name="guest_tour_subtitle">Tippe, um zu sehen, wie RiddleVerse funktioniert</string>
+    <string name="guest_tour_dismiss">Tour schließen</string>
+    <string name="guest_save_title">Fortschritt speichern?</string>
+    <string name="guest_save_body">Erstelle ein kostenloses Konto, um deine Punktzahl und deine Serie bei einem Telefonwechsel zu behalten und an der Bestenliste teilzunehmen. Alles, was du bisher getan hast, wird übernommen.</string>
+    <string name="guest_save_yes">Meinen Fortschritt speichern</string>
+    <string name="guest_save_not_now">Nicht jetzt</string>
+    <string name="guest_save_never">Nicht mehr fragen</string>
 </resources>

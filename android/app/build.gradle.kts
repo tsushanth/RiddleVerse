@@ -47,6 +47,15 @@ android {
         buildConfig = true
     }
 
+    // The in-app language picker (AppCompatDelegate.setApplicationLocales) offers languages other than the device language.
+    // With the default language splits Play only delivers the device language's strings, so on Android 8-12 a player who
+    // picks Hindi on an English phone would keep English. Ship every language in the base APK (strings only, a few hundred KB).
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     packaging {
         resources {
             excludes += setOf(

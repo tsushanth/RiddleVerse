@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Version préliminaire</string>
+    <string name="auth_title_sign_in">Se connecter</string>
+    <string name="auth_title_create">Créer un compte</string>
+    <string name="auth_email_hint">E-mail</string>
+    <string name="auth_password_hint">Mot de passe</string>
+    <string name="auth_show_password">Afficher le mot de passe</string>
+    <string name="auth_sign_in">Se connecter</string>
+    <string name="auth_create">Créer un compte</string>
+    <string name="auth_toggle_to_create">Nouveau ici ? Créez un compte</string>
+    <string name="auth_toggle_to_sign_in">Vous avez déjà un compte ? Connectez-vous</string>
+    <string name="auth_or">ou</string>
+    <string name="auth_loading">Chargement</string>
+    <string name="auth_google_config_error">La connexion Google n\'est pas disponible dans cette version. Connectez-vous plutôt avec votre e-mail et votre mot de passe.</string>
+    <string name="auth_confirm_email">Compte créé. Vérifiez votre e-mail pour le confirmer, puis connectez-vous.</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">نسخهٔ پیش‌نمایش</string>
+    <string name="auth_title_sign_in">ورود</string>
+    <string name="auth_title_create">ایجاد حساب</string>
+    <string name="auth_email_hint">ایمیل</string>
+    <string name="auth_password_hint">گذرواژه</string>
+    <string name="auth_show_password">نمایش گذرواژه</string>
+    <string name="auth_sign_in">ورود</string>
+    <string name="auth_create">ایجاد حساب</string>
+    <string name="auth_toggle_to_create">تازه آمده‌اید؟ یک حساب بسازید</string>
+    <string name="auth_toggle_to_sign_in">حساب دارید؟ وارد شوید</string>
+    <string name="auth_or">یا</string>
+    <string name="auth_loading">در حال بارگذاری</string>
+    <string name="auth_google_config_error">ورود با Google در این نسخه در دسترس نیست. لطفاً با ایمیل و گذرواژه وارد شوید.</string>
+    <string name="auth_confirm_email">حساب ایجاد شد. برای تأیید آن ایمیل خود را بررسی کنید، سپس وارد شوید.</string>
+</resources>

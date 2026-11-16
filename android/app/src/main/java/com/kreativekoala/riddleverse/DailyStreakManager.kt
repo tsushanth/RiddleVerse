@@ -60,7 +60,7 @@ object DailyStreakManager {
     private const val TAG = "DailyStreakManager"
 
     private fun getTodayString(): String {
-        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         return sdf.format(Date())
     }
 

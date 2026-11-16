@@ -382,4 +382,75 @@
     <string name="lang_switch_prompt">Passare a %1$s?</string>
     <string name="lang_switch_action">Cambia</string>
     <string name="lang_not_now">Non ora</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Aggiorna</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="daily_reminder_title">L\'indovinello di oggi è pronto</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Mantieni la tua serie di %d giorno</item>
+        <item quantity="many">Mantieni la tua serie di %d di giorni</item>
+        <item quantity="other">Mantieni la tua serie di %d giorni</item>
+    </plurals>
+    <string name="daily_reminder_body">Un solo indovinello, uguale per tutti. Bastano un paio di minuti.</string>
+    <string name="daily_reminder_body_streak">L\'indovinello di oggi è pronto. Bastano un paio di minuti.</string>
+    <string name="daily_reminder_channel_name">Promemoria dell\'indovinello del giorno</string>
+    <string name="daily_reminder_channel_desc">Un promemoria al giorno per l\'indovinello del giorno. Puoi disattivarlo in Impostazioni.</string>
+    <string name="daily_card_title">L\'indovinello di oggi</string>
+    <string name="daily_card_cd">Indovinello di oggi numero %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  risolto in %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  lo stesso indovinello per tutti</string>
+    <string name="daily_card_next_in">Prossimo indovinello tra %1$s</string>
+    <string name="daily_card_view_result">Vedi risultato</string>
+    <string name="daily_card_play">Gioca</string>
+    <string name="daily_result_title">Indovinello del giorno #%1$d risolto ✅</string>
+    <string name="daily_result_first_try">al primo tentativo</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d tentativo</item>
+        <item quantity="many">%d di tentativi</item>
+        <item quantity="other">%d tentativi</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 Serie di %d giorno</item>
+        <item quantity="many">🔥 Serie di %d di giorni</item>
+        <item quantity="other">🔥 Serie di %d giorni</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Un congelamento della serie ha coperto il giorno che hai saltato, quindi la tua serie è salva.</item>
+        <item quantity="many">Un congelamento della serie ha coperto %d di giorni saltati, quindi la tua serie è salva.</item>
+        <item quantity="other">Un congelamento della serie ha coperto %d giorni saltati, quindi la tua serie è salva.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Hai guadagnato un congelamento della serie per i giorni difficili.</string>
+    <string name="daily_result_coins">+%d monete</string>
+    <string name="daily_result_card_cd">La tua scheda del risultato da condividere. Non mostra la risposta.</string>
+    <string name="daily_result_share_image">Condividi come immagine</string>
+    <string name="daily_result_share_text">Condividi come testo</string>
+    <string name="welcome_back_title">Bentornato</string>
+    <string name="welcome_back_msg_streak">Sei stato via %1$d giorni e la tua serie di %2$d giorni è ancora attiva. L\'indovinello di oggi #%3$d è pronto.</string>
+    <string name="welcome_back_msg_best">Sono passati %1$d giorni. La tua serie migliore è stata di %2$d giorni, e l\'indovinello di oggi #%3$d è un buon momento per iniziarne una nuova.</string>
+    <string name="welcome_back_msg_plain">Sono passati %1$d giorni. L\'indovinello di oggi #%2$d è pronto, uguale per tutti.</string>
+    <string name="welcome_back_play">Gioca l\'indovinello di oggi</string>
+    <string name="welcome_back_dismiss">Chiudi</string>
+    <string name="reminder_on_note">Promemoria attivo. Puoi cambiare l\'orario o disattivarlo in Impostazioni.</string>
+    <string name="reminder_later_note">Nessun problema. Puoi attivare il promemoria più tardi in Impostazioni.</string>
+    <string name="reminder_offer_title">Vuoi un promemoria per l\'indovinello di domani?</string>
+    <string name="reminder_offer_body">Una notifica al giorno, solo se non l\'hai ancora risolto, così è facile mantenere la tua serie. Senza pubblicità. Puoi disattivarla quando vuoi in Impostazioni.</string>
+    <string name="reminder_offer_yes">Ricordamelo</string>
+    <string name="reminder_offer_no">Non ora</string>
+    <string name="daily_settings_title">Indovinello del giorno</string>
+    <string name="daily_settings_reminder">Promemoria giornaliero</string>
+    <string name="daily_settings_reminder_desc">Una notifica al giorno, solo se non hai ancora risolto l\'indovinello di oggi.</string>
+    <string name="daily_settings_blocked">Le notifiche per RiddleVerse sono bloccate su questo telefono.</string>
+    <string name="daily_settings_open_settings">Apri impostazioni notifiche</string>
+    <string name="daily_settings_time">Orario del promemoria</string>
+    <string name="daily_settings_time_cd">Ricordamelo alle %1$s</string>
+    <string name="guest_tour_title">Sei nuovo? Fai il tour di 20 secondi</string>
+    <string name="guest_tour_subtitle">Tocca per scoprire come funziona RiddleVerse</string>
+    <string name="guest_tour_dismiss">Chiudi il tour</string>
+    <string name="guest_save_title">Salvare i tuoi progressi?</string>
+    <string name="guest_save_body">Crea un account gratuito per mantenere punteggio e serie se cambi telefono e per partecipare alla classifica. Tutto ciò che hai fatto finora verrà trasferito.</string>
+    <string name="guest_save_yes">Salva i miei progressi</string>
+    <string name="guest_save_not_now">Non ora</string>
+    <string name="guest_save_never">Non chiedermelo più</string>
 </resources>

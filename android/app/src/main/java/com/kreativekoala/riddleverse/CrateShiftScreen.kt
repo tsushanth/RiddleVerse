@@ -4,6 +4,9 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -72,7 +75,7 @@ private fun CrateShiftBoard(args: SpatialArgs, level: CrateLevel) {
         args = args,
         status = "Moves ${game.moves}",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
                 game.undo(); hintDir = -1; message = ""; commit()
             }
             SpatialAction(Icons.Default.Refresh, "Restart") { game.restart(); hintDir = -1; message = ""; commit() }
@@ -161,10 +164,10 @@ private fun CrateShiftBoard(args: SpatialArgs, level: CrateLevel) {
             Modifier.fillMaxWidth().padding(bottom = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
         ) {
-            PadButton(Icons.Default.KeyboardArrowLeft, "Move left") { go(3) }
+            PadButton(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move left") { go(3) }
             PadButton(Icons.Default.KeyboardArrowUp, "Move up") { go(0) }
             PadButton(Icons.Default.KeyboardArrowDown, "Move down") { go(2) }
-            PadButton(Icons.Default.KeyboardArrowRight, "Move right") { go(1) }
+            PadButton(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move right") { go(1) }
         }
     }
 

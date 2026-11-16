@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -64,28 +65,28 @@ fun DailyPuzzleHomeCard(modifier: Modifier = Modifier) {
             .clip(RoundedCornerShape(20.dp))
             .background(Brush.horizontalGradient(listOf(RvViolet, RvVioletEdge)))
             .clickable { context.startActivity(Intent(context, DailyPuzzleActivity::class.java)) }
-            .semantics { contentDescription = "Today's puzzle number ${spec.number}, $gameName" }
+            .semantics { contentDescription = context.getString(R.string.daily_card_cd, spec.number, gameName) }
     ) {
         Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Today's puzzle", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone, modifier = Modifier.weight(1f))
+                Text(stringResource(R.string.daily_card_title), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone, modifier = Modifier.weight(1f))
                 RvPill(text = "🔥 $streak", tone = if (streak > 0) RvToneSun else RvToneGrape)
             }
             Text(
-                text = if (result != null) "#${spec.number}  $gameName  solved in ${DailyShareText.formatTime(result.seconds)}"
-                else "#${spec.number}  $gameName  •  same puzzle for everyone",
+                text = if (result != null) stringResource(R.string.daily_card_solved, spec.number, gameName, DailyShareText.formatTime(result.seconds))
+                else stringResource(R.string.daily_card_unsolved, spec.number, gameName),
                 fontSize = 14.sp, color = RvOnTone, maxLines = 2, overflow = TextOverflow.Ellipsis,
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    "Next puzzle in ${countdown(untilNext)}",
+                    stringResource(R.string.daily_card_next_in, countdown(untilNext)),
                     fontSize = 12.sp, color = RvOnTone.copy(alpha = 0.85f), modifier = Modifier.weight(1f),
                 )
                 Box(
                     Modifier.background(if (result != null) RvMint else RvSun, RoundedCornerShape(50))
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
-                    Text(if (result != null) "View result" else "Play", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone)
+                    Text(if (result != null) stringResource(R.string.daily_card_view_result) else stringResource(R.string.daily_card_play), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone)
                 }
             }
         }
@@ -107,32 +108,32 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        Text("Daily #${share.number} solved ✅", fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = RvInk, textAlign = TextAlign.Center)
+        Text(stringResource(R.string.daily_result_title, share.number), fontSize = 26.sp, fontWeight = FontWeight.ExtraBold, color = RvInk, textAlign = TextAlign.Center)
         Text(
             "${share.gameName}  •  ${DailyShareText.formatTime(share.seconds)}  •  " +
-                if (share.attempts == 1) "first try" else "${share.attempts} tries",
+                if (share.attempts == 1) context.getString(R.string.daily_result_first_try) else context.resources.getQuantityString(R.plurals.daily_result_tries, share.attempts, share.attempts),
             fontSize = 16.sp, color = RvInkSoft, textAlign = TextAlign.Center,
         )
         if (share.streak > 0) {
-            Text("🔥 ${share.streak} day streak", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RvFlame)
+            Text(context.resources.getQuantityString(R.plurals.daily_result_streak, share.streak, share.streak), fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RvFlame)
         }
         if (record.freezesUsed > 0) {
             Text(
-                "A streak freeze covered ${if (record.freezesUsed == 1) "your missed day" else "${record.freezesUsed} missed days"}, so your streak survived.",
+                context.resources.getQuantityString(R.plurals.daily_result_freeze_used, record.freezesUsed, record.freezesUsed),
                 fontSize = 14.sp, color = RvInkSoft, textAlign = TextAlign.Center,
             )
         }
         if (record.freezeEarned) {
-            Text("You earned a streak freeze for a rainy day.", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvGrape, textAlign = TextAlign.Center)
+            Text(stringResource(R.string.daily_result_freeze_earned), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvGrape, textAlign = TextAlign.Center)
         }
         record.reward?.let { r ->
-            Text("+${r.coins} coins", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
+            Text(stringResource(R.string.daily_result_coins, r.coins), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
             r.specialReward?.let { Text(it, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvGrape) }
         }
 
         Image(
             bitmap = card.asImageBitmap(),
-            contentDescription = "Your shareable result card. It does not show the answer.",
+            contentDescription = stringResource(R.string.daily_result_card_cd),
             modifier = Modifier.fillMaxWidth(0.8f).aspectRatio(1f).clip(RoundedCornerShape(20.dp)),
         )
 
@@ -142,7 +143,7 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
                 AnalyticsManager.getInstance()?.track(AnalyticsEvent("daily_puzzle_shared", mapOf("kind" to "image", "number" to share.number)))
             },
             modifier = Modifier.fillMaxWidth(), tone = RvToneViolet,
-        ) { Text("Share image card", color = RvOnTone, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+        ) { Text(stringResource(R.string.daily_result_share_image), color = RvOnTone, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
 
         RvChunkyButton(
             onClick = {
@@ -150,14 +151,14 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
                 AnalyticsManager.getInstance()?.track(AnalyticsEvent("daily_puzzle_shared", mapOf("kind" to "text", "number" to share.number)))
             },
             modifier = Modifier.fillMaxWidth(), tone = RvToneSun,
-        ) { Text("Share as text", color = RvOnTone, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
+        ) { Text(stringResource(R.string.daily_result_share_text), color = RvOnTone, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
 
         ReminderOfferCard()
         SupporterOfferCard()
 
-        Text("Next puzzle in ${countdown(DailyPuzzleSchedule.millisUntilNext(now))}", fontSize = 14.sp, color = RvInkSoft)
+        Text(stringResource(R.string.daily_card_next_in, countdown(DailyPuzzleSchedule.millisUntilNext(now))), fontSize = 14.sp, color = RvInkSoft)
         Box(Modifier.clip(RoundedCornerShape(50)).clickable(onClick = onDone).padding(horizontal = 24.dp, vertical = 12.dp)) {
-            Text("Done", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvViolet)
+            Text(stringResource(R.string.done), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvViolet)
         }
     }
 }

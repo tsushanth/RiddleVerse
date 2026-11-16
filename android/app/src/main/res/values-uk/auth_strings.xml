@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Попередня збірка</string>
+    <string name="auth_title_sign_in">Увійти</string>
+    <string name="auth_title_create">Створити обліковий запис</string>
+    <string name="auth_email_hint">Електронна пошта</string>
+    <string name="auth_password_hint">Пароль</string>
+    <string name="auth_show_password">Показати пароль</string>
+    <string name="auth_sign_in">Увійти</string>
+    <string name="auth_create">Створити обліковий запис</string>
+    <string name="auth_toggle_to_create">Вперше тут? Створіть обліковий запис</string>
+    <string name="auth_toggle_to_sign_in">Уже маєте обліковий запис? Увійти</string>
+    <string name="auth_or">або</string>
+    <string name="auth_loading">Завантаження</string>
+    <string name="auth_google_config_error">Вхід через Google недоступний у цій збірці. Натомість увійдіть за допомогою електронної пошти та пароля.</string>
+    <string name="auth_confirm_email">Обліковий запис створено. Перевірте пошту, щоб підтвердити його, а потім увійдіть.</string>
+</resources>

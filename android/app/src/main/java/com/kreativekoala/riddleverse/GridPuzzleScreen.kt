@@ -31,7 +31,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -449,7 +449,7 @@ private fun SignOverlay(spec: GridSpec, modifier: Modifier) {
 @Composable
 private fun GridControls(state: GridPlayState, height: Dp) {
     Row(Modifier.fillMaxWidth().height(height), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        ControlButton("Undo", Icons.Filled.Undo, enabled = state.undoDepth > 0, modifier = Modifier.weight(1f)) { state.undo() }
+        ControlButton("Undo", Icons.AutoMirrored.Filled.Undo, enabled = state.undoDepth > 0, modifier = Modifier.weight(1f)) { state.undo() }
         ControlButton("Erase", Icons.Filled.Clear, enabled = state.selected >= 0 && !state.isGiven(state.selected), modifier = Modifier.weight(1f)) { state.erase() }
         if (state.usesNotes) {
             ControlButton(if (state.notesMode) "Notes on" else "Notes", Icons.Filled.Edit, active = state.notesMode, modifier = Modifier.weight(1f)) {

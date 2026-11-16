@@ -10,6 +10,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.gestures.*
@@ -695,7 +697,7 @@ fun NaturalFindObjectHeader(
                     onClick = { onViewModeChange(ObjectViewMode.PORTRAIT_ZOOMABLE) }
                 )
                 ObjectViewModeButton(
-                    icon = Icons.Default.List,
+                    icon = Icons.AutoMirrored.Filled.List,
                     label = "Objects",
                     isSelected = viewMode == ObjectViewMode.OBJECTS_LIST,
                     onClick = { onViewModeChange(ObjectViewMode.OBJECTS_LIST) }
@@ -725,7 +727,7 @@ fun NaturalFindObjectHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = RvInk)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = RvInk)
                 }
 
                 Column(

@@ -378,4 +378,69 @@
     <string name="lang_switch_prompt">Overschakelen naar %1$s?</string>
     <string name="lang_switch_action">Wisselen</string>
     <string name="lang_not_now">Niet nu</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Vernieuwen</string>
+    <string name="daily_reminder_title">De puzzel van vandaag staat klaar</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Hou je reeks van %d dag vol</item>
+        <item quantity="other">Hou je reeks van %d dagen vol</item>
+    </plurals>
+    <string name="daily_reminder_body">Eén puzzel, voor iedereen dezelfde. Het kost maar een paar minuten.</string>
+    <string name="daily_reminder_body_streak">De puzzel van vandaag staat klaar. Het kost maar een paar minuten.</string>
+    <string name="daily_reminder_channel_name">Herinnering voor de dagelijkse puzzel</string>
+    <string name="daily_reminder_channel_desc">Eén herinnering per dag voor de dagelijkse puzzel. Je kunt dit uitzetten in Instellingen.</string>
+    <string name="daily_card_title">Puzzel van vandaag</string>
+    <string name="daily_card_cd">Puzzel van vandaag nummer %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  opgelost in %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  dezelfde puzzel voor iedereen</string>
+    <string name="daily_card_next_in">Volgende puzzel over %1$s</string>
+    <string name="daily_card_view_result">Resultaat bekijken</string>
+    <string name="daily_card_play">Spelen</string>
+    <string name="daily_result_title">Dagelijkse #%1$d opgelost ✅</string>
+    <string name="daily_result_first_try">in één keer</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d poging</item>
+        <item quantity="other">%d pogingen</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 Reeks van %d dag</item>
+        <item quantity="other">🔥 Reeks van %d dagen</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Een reeksbescherming dekte je gemiste dag, zodat je reeks bleef bestaan.</item>
+        <item quantity="other">Een reeksbescherming dekte %d gemiste dagen, zodat je reeks bleef bestaan.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Je hebt een reeksbescherming verdiend voor een slechte dag.</string>
+    <string name="daily_result_coins">+%d munten</string>
+    <string name="daily_result_card_cd">Je deelbare resultaatkaart. Het antwoord wordt niet getoond.</string>
+    <string name="daily_result_share_image">Afbeeldingskaart delen</string>
+    <string name="daily_result_share_text">Als tekst delen</string>
+    <string name="welcome_back_title">Welkom terug</string>
+    <string name="welcome_back_msg_streak">Je was %1$d dagen weg en je reeks van %2$d dagen loopt nog. De puzzel van vandaag, #%3$d, staat klaar.</string>
+    <string name="welcome_back_msg_best">Het is %1$d dagen geleden. Je beste reeks was %2$d dagen, en de puzzel van vandaag, #%3$d, is een mooi moment om een nieuwe te beginnen.</string>
+    <string name="welcome_back_msg_plain">Het is %1$d dagen geleden. De puzzel van vandaag, #%2$d, staat klaar, voor iedereen dezelfde.</string>
+    <string name="welcome_back_play">Puzzel van vandaag spelen</string>
+    <string name="welcome_back_dismiss">Sluiten</string>
+    <string name="reminder_on_note">Herinnering aan. Je kunt de tijd wijzigen of de herinnering uitzetten in Instellingen.</string>
+    <string name="reminder_later_note">Geen probleem. Je kunt de herinnering later aanzetten in Instellingen.</string>
+    <string name="reminder_offer_title">Een herinnering voor de puzzel van morgen?</string>
+    <string name="reminder_offer_body">Eén melding per dag, alleen als je de puzzel nog niet hebt opgelost, zodat je reeks makkelijk blijft doorlopen. Geen advertenties. Je kunt dit op elk moment uitzetten in Instellingen.</string>
+    <string name="reminder_offer_yes">Herinner me</string>
+    <string name="reminder_offer_no">Niet nu</string>
+    <string name="daily_settings_title">Dagelijkse puzzel</string>
+    <string name="daily_settings_reminder">Dagelijkse herinnering</string>
+    <string name="daily_settings_reminder_desc">Eén melding per dag, alleen als je de puzzel van vandaag nog niet hebt opgelost.</string>
+    <string name="daily_settings_blocked">Meldingen zijn geblokkeerd voor RiddleVerse op deze telefoon.</string>
+    <string name="daily_settings_open_settings">Meldingsinstellingen openen</string>
+    <string name="daily_settings_time">Tijd van herinnering</string>
+    <string name="daily_settings_time_cd">Herinner me om %1$s</string>
+    <string name="guest_tour_title">Nieuw hier? Volg de rondleiding van 20 seconden</string>
+    <string name="guest_tour_subtitle">Tik om te zien hoe RiddleVerse werkt</string>
+    <string name="guest_tour_dismiss">De rondleiding sluiten</string>
+    <string name="guest_save_title">Je voortgang opslaan?</string>
+    <string name="guest_save_body">Maak een gratis account aan om je score en reeks te behouden als je van telefoon wisselt, en om mee te doen aan het scorebord. Alles wat je tot nu toe hebt gedaan, gaat mee.</string>
+    <string name="guest_save_yes">Mijn voortgang opslaan</string>
+    <string name="guest_save_not_now">Niet nu</string>
+    <string name="guest_save_never">Niet meer vragen</string>
 </resources>

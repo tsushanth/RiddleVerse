@@ -3,7 +3,7 @@ package com.kreativekoala.riddleverse
 
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.Icons
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -702,7 +702,7 @@ fun ProperImageVortexHeader(
     ) {
         IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.back),
                 tint = RvInk
             )

@@ -290,4 +290,65 @@
     <string name="lang_switch_prompt">Chuyển sang %1$s?</string>
     <string name="lang_switch_action">Chuyển</string>
     <string name="lang_not_now">Để sau</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Làm mới</string>
+    <string name="daily_reminder_title">Câu đố hôm nay đã sẵn sàng</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">Giữ vững chuỗi %d ngày của bạn</item>
+    </plurals>
+    <string name="daily_reminder_body">Một câu đố, giống nhau cho mọi người. Chỉ mất vài phút.</string>
+    <string name="daily_reminder_body_streak">Câu đố hôm nay đã sẵn sàng. Chỉ mất vài phút.</string>
+    <string name="daily_reminder_channel_name">Nhắc nhở câu đố hàng ngày</string>
+    <string name="daily_reminder_channel_desc">Mỗi ngày một lời nhắc cho câu đố hàng ngày. Bạn có thể tắt trong Cài đặt.</string>
+    <string name="daily_card_title">Câu đố hôm nay</string>
+    <string name="daily_card_cd">Câu đố hôm nay số %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  đã giải trong %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  cùng một câu đố cho mọi người</string>
+    <string name="daily_card_next_in">Câu đố tiếp theo sau %1$s</string>
+    <string name="daily_card_view_result">Xem kết quả</string>
+    <string name="daily_card_play">Chơi</string>
+    <string name="daily_result_title">Câu đố hàng ngày #%1$d đã giải ✅</string>
+    <string name="daily_result_first_try">ngay lần đầu</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d lần thử</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 Chuỗi %d ngày</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">Một lượt đóng băng chuỗi đã bảo vệ %d ngày bạn bỏ lỡ, nên chuỗi của bạn vẫn được giữ.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Bạn nhận được một lượt đóng băng chuỗi để dùng khi cần.</string>
+    <string name="daily_result_coins">+%d xu</string>
+    <string name="daily_result_card_cd">Thẻ kết quả để chia sẻ của bạn. Thẻ không hiện đáp án.</string>
+    <string name="daily_result_share_image">Chia sẻ thẻ hình ảnh</string>
+    <string name="daily_result_share_text">Chia sẻ dạng văn bản</string>
+    <string name="welcome_back_title">Chào mừng bạn quay lại</string>
+    <string name="welcome_back_msg_streak">Bạn đã vắng mặt %1$d ngày và chuỗi %2$d ngày của bạn vẫn còn. Câu đố hôm nay #%3$d đã sẵn sàng.</string>
+    <string name="welcome_back_msg_best">Đã %1$d ngày rồi. Chuỗi tốt nhất của bạn là %2$d ngày, và câu đố hôm nay #%3$d là dịp tốt để bắt đầu một chuỗi mới.</string>
+    <string name="welcome_back_msg_plain">Đã %1$d ngày rồi. Câu đố hôm nay #%2$d đã sẵn sàng, giống nhau cho mọi người.</string>
+    <string name="welcome_back_play">Chơi câu đố hôm nay</string>
+    <string name="welcome_back_dismiss">Đóng</string>
+    <string name="reminder_on_note">Đã bật nhắc nhở. Bạn có thể đổi giờ hoặc tắt trong Cài đặt.</string>
+    <string name="reminder_later_note">Không sao. Bạn có thể bật nhắc nhở sau trong Cài đặt.</string>
+    <string name="reminder_offer_title">Nhận lời nhắc cho câu đố ngày mai?</string>
+    <string name="reminder_offer_body">Mỗi ngày một thông báo, chỉ khi bạn chưa giải câu đố, giúp bạn dễ giữ chuỗi. Không có quảng cáo. Bạn có thể tắt bất cứ lúc nào trong Cài đặt.</string>
+    <string name="reminder_offer_yes">Nhắc tôi</string>
+    <string name="reminder_offer_no">Để sau</string>
+    <string name="daily_settings_title">Câu đố hàng ngày</string>
+    <string name="daily_settings_reminder">Nhắc nhở hàng ngày</string>
+    <string name="daily_settings_reminder_desc">Mỗi ngày một thông báo, chỉ khi bạn chưa giải câu đố hôm nay.</string>
+    <string name="daily_settings_blocked">Thông báo của RiddleVerse đang bị chặn trên điện thoại này.</string>
+    <string name="daily_settings_open_settings">Mở cài đặt thông báo</string>
+    <string name="daily_settings_time">Giờ nhắc</string>
+    <string name="daily_settings_time_cd">Nhắc tôi lúc %1$s</string>
+    <string name="guest_tour_title">Mới dùng lần đầu? Xem hướng dẫn 20 giây</string>
+    <string name="guest_tour_subtitle">Nhấn để xem RiddleVerse hoạt động thế nào</string>
+    <string name="guest_tour_dismiss">Đóng hướng dẫn</string>
+    <string name="guest_save_title">Lưu tiến trình của bạn?</string>
+    <string name="guest_save_body">Tạo tài khoản miễn phí để giữ điểm và chuỗi của bạn khi đổi điện thoại, và để tham gia bảng xếp hạng. Mọi thứ bạn đã làm cho đến giờ sẽ được chuyển sang.</string>
+    <string name="guest_save_yes">Lưu tiến trình của tôi</string>
+    <string name="guest_save_not_now">Để sau</string>
+    <string name="guest_save_never">Không hỏi lại</string>
 </resources>

@@ -175,7 +175,7 @@ object ForYouRanking {
 data class AppLanguage(val tag: String, val nativeName: String)
 
 object AppLanguages {
-    /** English (the default resources) plus the 19 translated locales. Keep in sync with xml/locales_config.xml. */
+    /** English (the default resources) plus the 29 translated locales. Keep in sync with xml/locales_config.xml. */
     val ALL: List<AppLanguage> = listOf(
         AppLanguage("en", "English"),
         AppLanguage("es", "Español"),
@@ -196,8 +196,21 @@ object AppLanguages {
         AppLanguage("vi", "Tiếng Việt"),
         AppLanguage("id", "Bahasa Indonesia"),
         AppLanguage("ms", "Bahasa Melayu"),
-        AppLanguage("tl", "Filipino")
+        AppLanguage("tl", "Filipino"),
+        AppLanguage("cs", "Čeština"),
+        AppLanguage("el", "Ελληνικά"),
+        AppLanguage("fi", "Suomi"),
+        AppLanguage("hu", "Magyar"),
+        AppLanguage("ro", "Română"),
+        AppLanguage("sv", "Svenska"),
+        AppLanguage("uk", "Українська"),
+        AppLanguage("fa", "فارسی"),
+        AppLanguage("ur", "اردو"),
+        AppLanguage("bn", "বাংলা")
     )
+
+    /** Languages written right to left. */
+    val RTL_TAGS: Set<String> = setOf("ar", "fa", "ur", "he")
 
     /**
      * Maps any Android locale (language, script, country) to one of the [ALL] tags, or null if the

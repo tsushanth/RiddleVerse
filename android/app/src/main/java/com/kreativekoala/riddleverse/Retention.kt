@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.app.Application
 import android.app.Activity
 import android.content.Context
@@ -45,11 +46,13 @@ object WelcomeBackRules {
         return if (gap >= AWAY_AFTER_DAYS) gap.coerceAtMost(3650).toInt() else 0
     }
 
-    /** Body text; never guilt-trips, never promises anything we cannot keep. */
-    fun message(awayDays: Int, streakAlive: Int, bestStreak: Int, puzzleNumber: Int): String = when {
-        streakAlive > 0 -> "You were away $awayDays days and your $streakAlive-day streak is still alive. Today's puzzle #$puzzleNumber is ready."
-        bestStreak > 1 -> "It has been $awayDays days. Your best streak was $bestStreak days, and today's puzzle #$puzzleNumber is a good day to start a new one."
-        else -> "It has been $awayDays days. Today's puzzle #$puzzleNumber is ready, the same for everyone."
+    /** Which body text to show, as a string resource plus its arguments; never guilt-trips, never promises anything we cannot keep. */
+    class Msg(@androidx.annotation.StringRes val res: Int, val args: List<Any>)
+
+    fun message(awayDays: Int, streakAlive: Int, bestStreak: Int, puzzleNumber: Int): Msg = when {
+        streakAlive > 0 -> Msg(R.string.welcome_back_msg_streak, listOf(awayDays, streakAlive, puzzleNumber))
+        bestStreak > 1 -> Msg(R.string.welcome_back_msg_best, listOf(awayDays, bestStreak, puzzleNumber))
+        else -> Msg(R.string.welcome_back_msg_plain, listOf(awayDays, puzzleNumber))
     }
 }
 
@@ -127,14 +130,14 @@ fun WelcomeBackCard(modifier: Modifier = Modifier) {
     val streak = DailyPuzzleStore.displayStreak(context, day)
     val best = DailyPuzzleStore.streakState(context).best
     Card(
-        modifier = modifier.fillMaxWidth().semantics { contentDescription = "Welcome back" },
+        modifier = modifier.fillMaxWidth().semantics { contentDescription = context.getString(R.string.welcome_back_title) },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(containerColor = RvSurfaceRaised),
         border = BorderStroke(2.dp, RvOutline),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Welcome back", fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
-            Text(WelcomeBackRules.message(away, streak, best, spec.number), fontSize = 14.sp, color = RvInkSoft)
+            Text(stringResource(R.string.welcome_back_title), fontSize = 18.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
+            Text(WelcomeBackRules.message(away, streak, best, spec.number).let { stringResource(it.res, *it.args.toTypedArray()) }, fontSize = 14.sp, color = RvInkSoft)
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     Modifier.clip(RoundedCornerShape(50)).background(RvSun)
@@ -143,11 +146,11 @@ fun WelcomeBackCard(modifier: Modifier = Modifier) {
                             context.startActivity(Intent(context, DailyPuzzleActivity::class.java))
                         }
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) { Text("Play today's puzzle", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
+                ) { Text(stringResource(R.string.welcome_back_play), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
                 Box(
                     Modifier.clip(RoundedCornerShape(50)).clickable { Retention.dismissWelcomeBack(context); away = 0 }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) { Text("Dismiss", fontSize = 14.sp, color = RvInkSoft) }
+                ) { Text(stringResource(R.string.welcome_back_dismiss), fontSize = 14.sp, color = RvInkSoft) }
             }
         }
     }
@@ -169,7 +172,7 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
         Funnel.log("reminder_enabled")
         DailyReminder.markOfferShown(context)
         visible = false
-        note = "Reminder on. You can change the time or turn it off in Settings."
+        note = context.getString(R.string.reminder_on_note)
     }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -178,7 +181,7 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
             Funnel.log("notif_permission_denied")
             DailyReminder.markOfferShown(context)
             visible = false
-            note = "No problem. You can turn the reminder on later in Settings."
+            note = context.getString(R.string.reminder_later_note)
         }
     }
 
@@ -193,9 +196,9 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
         border = BorderStroke(2.dp, RvOutline),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Get a reminder for tomorrow's puzzle?", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
+            Text(stringResource(R.string.reminder_offer_title), fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
             Text(
-                "One notification a day, only if you have not solved it yet, so your streak is easy to keep. No ads in it. You can turn it off any time in Settings.",
+                stringResource(R.string.reminder_offer_body),
                 fontSize = 13.sp, color = RvInkSoft,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -207,12 +210,12 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
                             } else enable()
                         }
                         .padding(horizontal = 16.dp, vertical = 8.dp)
-                ) { Text("Remind me", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
+                ) { Text(stringResource(R.string.reminder_offer_yes), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
                 Box(
                     Modifier.clip(RoundedCornerShape(50))
                         .clickable { DailyReminder.markOfferShown(context); visible = false }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
-                ) { Text("Not now", fontSize = 14.sp, color = RvInkSoft) }
+                ) { Text(stringResource(R.string.reminder_offer_no), fontSize = 14.sp, color = RvInkSoft) }
             }
         }
     }
@@ -238,12 +241,12 @@ fun DailyPuzzleSettingsSection() {
         }
     }
 
-    SettingsSection(title = "Daily puzzle") {
+    SettingsSection(title = stringResource(R.string.daily_settings_title)) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f)) {
-                    Text("Daily reminder", fontWeight = FontWeight.Medium, color = RvInk)
-                    Text("One notification a day, only if you have not solved today's puzzle.", fontSize = 12.sp, color = RvInkSoft)
+                    Text(stringResource(R.string.daily_settings_reminder), fontWeight = FontWeight.Medium, color = RvInk)
+                    Text(stringResource(R.string.daily_settings_reminder_desc), fontSize = 12.sp, color = RvInkSoft)
                 }
                 Switch(
                     checked = enabled,
@@ -256,9 +259,9 @@ fun DailyPuzzleSettingsSection() {
                 )
             }
             if (blocked) {
-                Text("Notifications are blocked for RiddleVerse on this phone.", fontSize = 12.sp, color = RvInkSoft)
+                Text(stringResource(R.string.daily_settings_blocked), fontSize = 12.sp, color = RvInkSoft)
                 Text(
-                    "Open notification settings",
+                    stringResource(R.string.daily_settings_open_settings),
                     fontSize = 13.sp, fontWeight = FontWeight.Bold, color = RvViolet,
                     modifier = Modifier.clickable {
                         context.startActivity(
@@ -270,7 +273,7 @@ fun DailyPuzzleSettingsSection() {
                 )
             }
             if (enabled) {
-                Text("Reminder time", fontSize = 12.sp, color = RvInkSoft)
+                Text(stringResource(R.string.daily_settings_time), fontSize = 12.sp, color = RvInkSoft)
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ReminderPolicy.HOUR_CHOICES.forEach { h ->
                         val sel = h == hour
@@ -279,8 +282,8 @@ fun DailyPuzzleSettingsSection() {
                                 .background(if (sel) RvSun else RvSurfaceRaised)
                                 .clickable { hour = h; DailyReminder.setHour(context, h) }
                                 .padding(horizontal = 14.dp, vertical = 8.dp)
-                                .semantics { contentDescription = "Remind me at ${hourLabel(h)}" }
-                        ) { Text(hourLabel(h), fontSize = 13.sp, fontWeight = if (sel) FontWeight.ExtraBold else FontWeight.Normal, color = if (sel) RvOnTone else RvInk) }
+                                .semantics { contentDescription = context.getString(R.string.daily_settings_time_cd, hourLabel(context, h)) }
+                        ) { Text(hourLabel(context, h), fontSize = 13.sp, fontWeight = if (sel) FontWeight.ExtraBold else FontWeight.Normal, color = if (sel) RvOnTone else RvInk) }
                     }
                 }
             }
@@ -292,6 +295,8 @@ fun DailyPuzzleSettingsSection() {
     }
 }
 
-private fun hourLabel(h: Int): String = when {
-    h == 0 -> "12 AM"; h < 12 -> "$h AM"; h == 12 -> "12 PM"; else -> "${h - 12} PM"
+/** Hour of day in the player's own clock style ("6 PM", "18:00", "午後6時"...). */
+private fun hourLabel(context: Context, h: Int): String {
+    val cal = java.util.Calendar.getInstance().apply { set(java.util.Calendar.HOUR_OF_DAY, h.coerceIn(0, 23)); set(java.util.Calendar.MINUTE, 0) }
+    return android.text.format.DateFormat.getTimeFormat(context).format(cal.time)
 }

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Preview build</string>
+    <string name="auth_title_sign_in">Mag-sign in</string>
+    <string name="auth_title_create">Gumawa ng account</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Password</string>
+    <string name="auth_show_password">Ipakita ang password</string>
+    <string name="auth_sign_in">Mag-sign in</string>
+    <string name="auth_create">Gumawa ng account</string>
+    <string name="auth_toggle_to_create">Bago ka rito? Gumawa ng account</string>
+    <string name="auth_toggle_to_sign_in">May account ka na? Mag-sign in</string>
+    <string name="auth_or">o</string>
+    <string name="auth_loading">Naglo-load</string>
+    <string name="auth_google_config_error">Hindi available ang Google sign-in sa build na ito. Mag-sign in na lang gamit ang iyong email at password.</string>
+    <string name="auth_confirm_email">Nagawa na ang account. Tingnan ang iyong email para kumpirmahin ito, pagkatapos ay mag-sign in.</string>
+</resources>

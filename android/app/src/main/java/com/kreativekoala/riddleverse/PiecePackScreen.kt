@@ -7,6 +7,7 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -68,7 +69,7 @@ fun PiecePackScreen(args: SpatialArgs) {
         args = args,
         status = "${game.linesCleared}/${cfg.targetLines} lines",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
                 game.undoMove(); done = false; selectedSlot = -1; hintMove = null; commit()
             }
             SpatialAction(Icons.Default.Refresh, "Restart") {

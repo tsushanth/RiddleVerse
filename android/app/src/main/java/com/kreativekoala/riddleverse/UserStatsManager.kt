@@ -347,13 +347,13 @@ class UserStatsManager private constructor(val context: Context) {
     // ================================
 
     private fun getCurrentDateString(): String {
-        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
     }
 
     private fun getYesterdayDateString(): String {
         val yesterday = Calendar.getInstance()
         yesterday.add(Calendar.DAY_OF_YEAR, -1)
-        return SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(yesterday.time)
+        return SimpleDateFormat("yyyy-MM-dd", Locale.US).format(yesterday.time)
     }
 
     private fun getCurrentWeekString(): String {

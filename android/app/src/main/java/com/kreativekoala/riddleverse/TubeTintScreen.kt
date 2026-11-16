@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -79,7 +80,7 @@ private fun TubeTintBoard(args: SpatialArgs, puzzle: TubeTintPuzzle) {
         args = args,
         status = "Moves ${game.moves}",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
                 game.undo(); selected = -1; hintPair = null; commit()
             }
             SpatialAction(Icons.Default.Refresh, "Restart") {

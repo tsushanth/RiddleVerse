@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Δοκιμαστική έκδοση</string>
+    <string name="auth_title_sign_in">Σύνδεση</string>
+    <string name="auth_title_create">Δημιουργία λογαριασμού</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Κωδικός πρόσβασης</string>
+    <string name="auth_show_password">Εμφάνιση κωδικού</string>
+    <string name="auth_sign_in">Σύνδεση</string>
+    <string name="auth_create">Δημιουργία λογαριασμού</string>
+    <string name="auth_toggle_to_create">Είστε νέος εδώ; Δημιουργήστε λογαριασμό</string>
+    <string name="auth_toggle_to_sign_in">Έχετε ήδη λογαριασμό; Σύνδεση</string>
+    <string name="auth_or">ή</string>
+    <string name="auth_loading">Φόρτωση</string>
+    <string name="auth_google_config_error">Η σύνδεση με Google δεν είναι διαθέσιμη σε αυτή την έκδοση. Συνδεθείτε με το email και τον κωδικό σας.</string>
+    <string name="auth_confirm_email">Ο λογαριασμός δημιουργήθηκε. Ελέγξτε το email σας για επιβεβαίωση και μετά συνδεθείτε.</string>
+</resources>

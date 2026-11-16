@@ -60,7 +60,7 @@ object DailyPuzzleStore {
         val p = prefs(c)
         if (p.getBoolean(K_MIGRATED, false)) return
         val old = c.applicationContext.getSharedPreferences(OLD_PREFS, Context.MODE_PRIVATE)
-        val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val fmt = SimpleDateFormat("yyyy-MM-dd", Locale.US)
         val cal = Calendar.getInstance()
         val todayLocal = fmt.format(cal.time)
         cal.add(Calendar.DAY_OF_YEAR, -1)

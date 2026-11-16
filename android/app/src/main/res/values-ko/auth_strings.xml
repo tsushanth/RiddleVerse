@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">미리보기 빌드</string>
+    <string name="auth_title_sign_in">로그인</string>
+    <string name="auth_title_create">계정 만들기</string>
+    <string name="auth_email_hint">이메일</string>
+    <string name="auth_password_hint">비밀번호</string>
+    <string name="auth_show_password">비밀번호 표시</string>
+    <string name="auth_sign_in">로그인</string>
+    <string name="auth_create">계정 만들기</string>
+    <string name="auth_toggle_to_create">처음이세요? 계정 만들기</string>
+    <string name="auth_toggle_to_sign_in">이미 계정이 있나요? 로그인</string>
+    <string name="auth_or">또는</string>
+    <string name="auth_loading">로딩 중</string>
+    <string name="auth_google_config_error">이 빌드에서는 Google 로그인을 사용할 수 없어요. 이메일과 비밀번호로 로그인해 주세요.</string>
+    <string name="auth_confirm_email">계정이 만들어졌어요. 이메일을 확인해 인증한 다음 로그인하세요.</string>
+</resources>

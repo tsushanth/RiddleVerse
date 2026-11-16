@@ -290,4 +290,69 @@
     <string name="lang_switch_prompt">%1$s diline geçilsin mi?</string>
     <string name="lang_switch_action">Geç</string>
     <string name="lang_not_now">Şimdi değil</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Yenile</string>
+    <string name="daily_reminder_title">Bugünün bulmacası hazır</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">%d günlük serinizi sürdürün</item>
+        <item quantity="other">%d günlük serinizi sürdürün</item>
+    </plurals>
+    <string name="daily_reminder_body">Herkes için aynı tek bir bulmaca. Birkaç dakika sürer.</string>
+    <string name="daily_reminder_body_streak">Bugünün bulmacası hazır. Birkaç dakika sürer.</string>
+    <string name="daily_reminder_channel_name">Günlük bulmaca hatırlatıcısı</string>
+    <string name="daily_reminder_channel_desc">Günlük bulmaca için günde bir hatırlatma. Ayarlar\'dan kapatabilirsiniz.</string>
+    <string name="daily_card_title">Bugünün bulmacası</string>
+    <string name="daily_card_cd">Bugünün %1$d numaralı bulmacası, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  %3$s içinde çözüldü</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  herkes için aynı bulmaca</string>
+    <string name="daily_card_next_in">Sonraki bulmaca: %1$s sonra</string>
+    <string name="daily_card_view_result">Sonucu gör</string>
+    <string name="daily_card_play">Oyna</string>
+    <string name="daily_result_title">Günlük #%1$d çözüldü ✅</string>
+    <string name="daily_result_first_try">ilk denemede</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d denemede</item>
+        <item quantity="other">%d denemede</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 %d günlük seri</item>
+        <item quantity="other">🔥 %d günlük seri</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Seri dondurma, kaçırdığınız günü kapattı, böylece seriniz devam ediyor.</item>
+        <item quantity="other">Seri dondurma, kaçırdığınız %d günü kapattı, böylece seriniz devam ediyor.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Zor günler için bir seri dondurma kazandınız.</string>
+    <string name="daily_result_coins">+%d jeton</string>
+    <string name="daily_result_card_cd">Paylaşılabilir sonuç kartınız. Cevabı göstermez.</string>
+    <string name="daily_result_share_image">Görsel kartı paylaş</string>
+    <string name="daily_result_share_text">Metin olarak paylaş</string>
+    <string name="welcome_back_title">Tekrar hoş geldiniz</string>
+    <string name="welcome_back_msg_streak">%1$d gündür yoktunuz ve %2$d günlük seriniz hâlâ devam ediyor. Bugünün #%3$d numaralı bulmacası hazır.</string>
+    <string name="welcome_back_msg_best">%1$d gün oldu. En iyi seriniz %2$d gündü ve bugünün #%3$d numaralı bulmacası yeni bir seriye başlamak için iyi bir gün.</string>
+    <string name="welcome_back_msg_plain">%1$d gün oldu. Bugünün #%2$d numaralı bulmacası hazır, herkes için aynı.</string>
+    <string name="welcome_back_play">Bugünün bulmacasını oyna</string>
+    <string name="welcome_back_dismiss">Kapat</string>
+    <string name="reminder_on_note">Hatırlatıcı açık. Saati değiştirebilir veya Ayarlar\'dan kapatabilirsiniz.</string>
+    <string name="reminder_later_note">Sorun değil. Hatırlatıcıyı daha sonra Ayarlar\'dan açabilirsiniz.</string>
+    <string name="reminder_offer_title">Yarının bulmacası için hatırlatma alınsın mı?</string>
+    <string name="reminder_offer_body">Günde bir bildirim, yalnızca henüz çözmediyseniz, böylece serinizi korumak kolay olur. İçinde reklam yok. İstediğiniz zaman Ayarlar\'dan kapatabilirsiniz.</string>
+    <string name="reminder_offer_yes">Hatırlat</string>
+    <string name="reminder_offer_no">Şimdi değil</string>
+    <string name="daily_settings_title">Günlük bulmaca</string>
+    <string name="daily_settings_reminder">Günlük hatırlatıcı</string>
+    <string name="daily_settings_reminder_desc">Günde bir bildirim, yalnızca bugünün bulmacasını çözmediyseniz.</string>
+    <string name="daily_settings_blocked">Bu telefonda RiddleVerse için bildirimler engellendi.</string>
+    <string name="daily_settings_open_settings">Bildirim ayarlarını aç</string>
+    <string name="daily_settings_time">Hatırlatma saati</string>
+    <string name="daily_settings_time_cd">Beni %1$s saatinde hatırlat</string>
+    <string name="guest_tour_title">Yeni misiniz? 20 saniyelik tura göz atın</string>
+    <string name="guest_tour_subtitle">RiddleVerse\'ün nasıl çalıştığını görmek için dokunun</string>
+    <string name="guest_tour_dismiss">Turu kapat</string>
+    <string name="guest_save_title">İlerlemeniz kaydedilsin mi?</string>
+    <string name="guest_save_body">Telefon değiştirirseniz skorunuzu ve serinizi korumak ve sıralamaya katılmak için ücretsiz bir hesap oluşturun. Şimdiye kadar yaptığınız her şey taşınır.</string>
+    <string name="guest_save_yes">İlerlememi kaydet</string>
+    <string name="guest_save_not_now">Şimdi değil</string>
+    <string name="guest_save_never">Bir daha sorma</string>
 </resources>

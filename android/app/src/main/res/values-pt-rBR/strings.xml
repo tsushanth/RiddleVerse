@@ -382,4 +382,73 @@
     <string name="lang_switch_prompt">Mudar para %1$s?</string>
     <string name="lang_switch_action">Mudar</string>
     <string name="lang_not_now">Agora não</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Atualizar</string>
+    <string name="daily_reminder_title">O puzzle de hoje está pronto</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="one">Mantenha sua sequência de %d dia</item>
+        <item quantity="many">Mantenha sua sequência de %d de dias</item>
+        <item quantity="other">Mantenha sua sequência de %d dias</item>
+    </plurals>
+    <string name="daily_reminder_body">Um puzzle, igual para todos. Leva alguns minutinhos.</string>
+    <string name="daily_reminder_body_streak">O puzzle de hoje está pronto. Leva alguns minutinhos.</string>
+    <string name="daily_reminder_channel_name">Lembrete do puzzle diário</string>
+    <string name="daily_reminder_channel_desc">Um lembrete por dia para o puzzle diário. Você pode desativá-lo nas Configurações.</string>
+    <string name="daily_card_title">Puzzle de hoje</string>
+    <string name="daily_card_cd">Puzzle de hoje, número %1$d, %2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  resolvido em %3$s</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  o mesmo puzzle para todos</string>
+    <string name="daily_card_next_in">Próximo puzzle em %1$s</string>
+    <string name="daily_card_view_result">Ver resultado</string>
+    <string name="daily_card_play">Jogar</string>
+    <string name="daily_result_title">Diário #%1$d resolvido ✅</string>
+    <string name="daily_result_first_try">de primeira</string>
+    <plurals name="daily_result_tries">
+        <item quantity="one">%d tentativa</item>
+        <item quantity="many">%d de tentativas</item>
+        <item quantity="other">%d tentativas</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="one">🔥 Sequência de %d dia</item>
+        <item quantity="many">🔥 Sequência de %d de dias</item>
+        <item quantity="other">🔥 Sequência de %d dias</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="one">Um congelamento de sequência cobriu seu dia perdido, então sua sequência continuou.</item>
+        <item quantity="many">Um congelamento de sequência cobriu %d de dias perdidos, então sua sequência continuou.</item>
+        <item quantity="other">Um congelamento de sequência cobriu %d dias perdidos, então sua sequência continuou.</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">Você ganhou um congelamento de sequência para um dia de chuva.</string>
+    <string name="daily_result_coins">+%d moedas</string>
+    <string name="daily_result_card_cd">Seu cartão de resultado para compartilhar. Ele não mostra a resposta.</string>
+    <string name="daily_result_share_image">Compartilhar cartão como imagem</string>
+    <string name="daily_result_share_text">Compartilhar como texto</string>
+    <string name="welcome_back_title">Bem-vindo de volta</string>
+    <string name="welcome_back_msg_streak">Você ficou %1$d dias fora e sua sequência de %2$d dias continua firme. O puzzle de hoje, #%3$d, está pronto.</string>
+    <string name="welcome_back_msg_best">Já se passaram %1$d dias. Sua melhor sequência foi de %2$d dias, e o puzzle de hoje, #%3$d, é um bom dia para começar uma nova.</string>
+    <string name="welcome_back_msg_plain">Já se passaram %1$d dias. O puzzle de hoje, #%2$d, está pronto, igual para todos.</string>
+    <string name="welcome_back_play">Jogar o puzzle de hoje</string>
+    <string name="welcome_back_dismiss">Dispensar</string>
+    <string name="reminder_on_note">Lembrete ativado. Você pode mudar o horário ou desativá-lo nas Configurações.</string>
+    <string name="reminder_later_note">Sem problema. Você pode ativar o lembrete depois, nas Configurações.</string>
+    <string name="reminder_offer_title">Receber um lembrete do puzzle de amanhã?</string>
+    <string name="reminder_offer_body">Uma notificação por dia, só se você ainda não tiver resolvido, para ficar fácil manter sua sequência. Sem anúncios. Você pode desativar quando quiser nas Configurações.</string>
+    <string name="reminder_offer_yes">Lembrar-me</string>
+    <string name="reminder_offer_no">Agora não</string>
+    <string name="daily_settings_title">Puzzle diário</string>
+    <string name="daily_settings_reminder">Lembrete diário</string>
+    <string name="daily_settings_reminder_desc">Uma notificação por dia, só se você ainda não tiver resolvido o puzzle de hoje.</string>
+    <string name="daily_settings_blocked">As notificações do RiddleVerse estão bloqueadas neste celular.</string>
+    <string name="daily_settings_open_settings">Abrir configurações de notificação</string>
+    <string name="daily_settings_time">Horário do lembrete</string>
+    <string name="daily_settings_time_cd">Lembrar-me às %1$s</string>
+    <string name="guest_tour_title">Novo por aqui? Faça o tour de 20 segundos</string>
+    <string name="guest_tour_subtitle">Toque para ver como o RiddleVerse funciona</string>
+    <string name="guest_tour_dismiss">Dispensar o tour</string>
+    <string name="guest_save_title">Salvar seu progresso?</string>
+    <string name="guest_save_body">Crie uma conta grátis para manter sua pontuação e sequência se você trocar de celular e para entrar no ranking. Tudo o que você já fez será transferido.</string>
+    <string name="guest_save_yes">Salvar meu progresso</string>
+    <string name="guest_save_not_now">Agora não</string>
+    <string name="guest_save_never">Não perguntar novamente</string>
 </resources>
