@@ -174,12 +174,15 @@ class HomeDiscoveryLogicTest {
         assertNull(AppLanguages.supportedTagFor("zh", country = "TW"))
         assertNull(AppLanguages.supportedTagFor("zh", script = "Hant"))
         assertEquals("es", AppLanguages.supportedTagFor("es", country = "MX"))
-        assertNull(AppLanguages.supportedTagFor("sv"))
+        assertEquals("sv", AppLanguages.supportedTagFor("sv"))
+        assertEquals("fa", AppLanguages.supportedTagFor("fa", country = "IR"))
+        assertEquals("ur", AppLanguages.supportedTagFor("ur"))
+        assertNull(AppLanguages.supportedTagFor("sw"))
     }
 
     @Test fun languageListMatchesTwentyShippedLocales() {
-        assertEquals(20, AppLanguages.ALL.size)   // English + the 19 translated locales
-        assertEquals(20, AppLanguages.ALL.map { it.tag }.toSet().size)
+        assertEquals(30, AppLanguages.ALL.size)   // English + the 29 translated locales
+        assertEquals(30, AppLanguages.ALL.map { it.tag }.toSet().size)
         assertNotNull(AppLanguages.byTag("ar"))
     }
 }

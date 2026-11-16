@@ -452,7 +452,7 @@ fun LanguageSuggestionChip() {
         cfg.setLocale(Locale.forLanguageTag(lang.tag))
         context.createConfigurationContext(cfg)
     }
-    val direction = if (lang.tag == "ar") LayoutDirection.Rtl else LayoutDirection.Ltr
+    val direction = if (lang.tag in AppLanguages.RTL_TAGS) LayoutDirection.Rtl else LayoutDirection.Ltr
     CompositionLocalProvider(LocalLayoutDirection provides direction) {
         Card(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
