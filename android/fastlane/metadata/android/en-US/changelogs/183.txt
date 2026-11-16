@@ -1,0 +1,1 @@
+RiddleVerse is now available in 29 languages, including Arabic, Hindi, Urdu, Bengali, Persian, Czech and more. The daily puzzle card, reminders and sign-in are translated, and arrows flip correctly in right-to-left languages. The puzzles themselves are still in English. Translations are machine-made and may read oddly in places.
