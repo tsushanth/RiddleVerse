@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>اختيار من متعدد</item>
+        <item>كلمات مبعثرة</item>
+        <item>كلمات متقاطعة</item>
+        <item>البحث عن الكلمات</item>
+    </string-array>
+</resources>

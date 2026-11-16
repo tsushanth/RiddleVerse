@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">نسخة تجريبية</string>
+    <string name="auth_title_sign_in">تسجيل الدخول</string>
+    <string name="auth_title_create">إنشاء حساب</string>
+    <string name="auth_email_hint">البريد الإلكتروني</string>
+    <string name="auth_password_hint">كلمة المرور</string>
+    <string name="auth_show_password">إظهار كلمة المرور</string>
+    <string name="auth_sign_in">تسجيل الدخول</string>
+    <string name="auth_create">إنشاء حساب</string>
+    <string name="auth_toggle_to_create">جديد هنا؟ أنشئ حسابًا</string>
+    <string name="auth_toggle_to_sign_in">لديك حساب بالفعل؟ تسجيل الدخول</string>
+    <string name="auth_or">أو</string>
+    <string name="auth_loading">جارٍ التحميل</string>
+    <string name="auth_google_config_error">تسجيل الدخول عبر Google غير متاح في هذه النسخة. يرجى تسجيل الدخول بالبريد الإلكتروني وكلمة المرور بدلًا من ذلك.</string>
+    <string name="auth_confirm_email">تم إنشاء الحساب. تحقق من بريدك الإلكتروني لتأكيده، ثم سجّل الدخول.</string>
+</resources>

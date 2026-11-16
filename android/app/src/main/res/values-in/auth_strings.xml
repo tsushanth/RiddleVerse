@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">Build pratinjau</string>
+    <string name="auth_title_sign_in">Masuk</string>
+    <string name="auth_title_create">Buat akun</string>
+    <string name="auth_email_hint">Email</string>
+    <string name="auth_password_hint">Kata sandi</string>
+    <string name="auth_show_password">Tampilkan kata sandi</string>
+    <string name="auth_sign_in">Masuk</string>
+    <string name="auth_create">Buat akun</string>
+    <string name="auth_toggle_to_create">Baru di sini? Buat akun</string>
+    <string name="auth_toggle_to_sign_in">Sudah punya akun? Masuk</string>
+    <string name="auth_or">atau</string>
+    <string name="auth_loading">Memuat</string>
+    <string name="auth_google_config_error">Masuk dengan Google tidak tersedia di build ini. Silakan masuk dengan email dan kata sandi Anda.</string>
+    <string name="auth_confirm_email">Akun dibuat. Periksa email Anda untuk mengonfirmasi, lalu masuk.</string>
+</resources>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="auth_preview_hint">प्रीव्यू बिल्ड</string>
+    <string name="auth_title_sign_in">साइन इन</string>
+    <string name="auth_title_create">अकाउंट बनाएं</string>
+    <string name="auth_email_hint">ईमेल</string>
+    <string name="auth_password_hint">पासवर्ड</string>
+    <string name="auth_show_password">पासवर्ड दिखाएं</string>
+    <string name="auth_sign_in">साइन इन</string>
+    <string name="auth_create">अकाउंट बनाएं</string>
+    <string name="auth_toggle_to_create">नए हैं? अकाउंट बनाएं</string>
+    <string name="auth_toggle_to_sign_in">पहले से अकाउंट है? साइन इन करें</string>
+    <string name="auth_or">या</string>
+    <string name="auth_loading">लोड हो रहा है</string>
+    <string name="auth_google_config_error">इस बिल्ड में Google साइन-इन उपलब्ध नहीं है। कृपया अपने ईमेल और पासवर्ड से साइन इन करें।</string>
+    <string name="auth_confirm_email">अकाउंट बन गया। उसकी पुष्टि के लिए अपना ईमेल देखें, फिर साइन इन करें।</string>
+</resources>

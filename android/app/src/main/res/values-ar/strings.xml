@@ -376,4 +376,7 @@
     <string name="lang_switch_prompt">التبديل إلى %1$s؟</string>
     <string name="lang_switch_action">تبديل</string>
     <string name="lang_not_now">ليس الآن</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">تحديث</string>
 </resources>

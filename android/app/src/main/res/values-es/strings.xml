@@ -382,4 +382,7 @@
     <string name="lang_switch_prompt">¿Cambiar a %1$s?</string>
     <string name="lang_switch_action">Cambiar</string>
     <string name="lang_not_now">Ahora no</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Actualizar</string>
 </resources>

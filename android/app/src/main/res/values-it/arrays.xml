@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string-array name="puzzle_formats">
+        <item>Scelta multipla</item>
+        <item>Anagramma</item>
+        <item>Cruciverba</item>
+        <item>Cerca parole</item>
+    </string-array>
+</resources>

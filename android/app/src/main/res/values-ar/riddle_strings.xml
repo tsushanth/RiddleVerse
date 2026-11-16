@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">لغز</string>
+    <string name="riddle_stars_desc">%1$d من %2$d نجوم</string>
+    <string name="riddle_streak">السلسلة: %1$d</string>
+    <string name="riddle_streak_desc">الإجابات الصحيحة المتتالية: %1$d</string>
+    <string name="riddle_hint_button">تلميح %1$d من %2$d</string>
+    <string name="riddle_hint_button_none">لا مزيد من التلميحات</string>
+    <string name="riddle_hint_desc">عرض التلميح %1$d من %2$d. كل تلميح يخصم نجمة واحدة من نتيجتك.</string>
+    <string name="riddle_hint_none_desc">تم عرض جميع التلميحات</string>
+    <string name="riddle_hint_line">تلميح %1$d: %2$s</string>
+    <string name="riddle_skip">تخطي</string>
+    <string name="riddle_skip_desc">تخطي هذا اللغز</string>
+    <string name="riddle_reveal">إظهار</string>
+    <string name="riddle_reveal_desc">إظهار الإجابة</string>
+    <string name="riddle_your_answer">إجابتك</string>
+    <string name="riddle_check">تحقق</string>
+    <string name="riddle_check_desc">تحقق من إجابتك</string>
+    <string name="riddle_wrong">اقتربت. حاول مرة أخرى أو استعن بتلميح.</string>
+    <string name="riddle_empty">اكتب إجابة أولًا.</string>
+    <string name="riddle_correct">صحيح! الإجابة هي %1$s.</string>
+    <string name="riddle_revealed">الإجابة هي %1$s.</string>
+    <string name="riddle_stars_result">النجوم المكتسبة: %1$d من %2$d (التلميحات المستخدمة: %3$d)</string>
+    <string name="riddle_next">اللغز التالي</string>
+    <string name="riddle_share">مشاركة اللغز</string>
+    <string name="riddle_share_desc">شارك هذا اللغز مع صديق</string>
+    <string name="riddle_share_text">هل تستطيع حل هذا اللغز؟\n\n%1$s\n\nالعب المزيد من الألغاز في RiddleVerse: %2$s</string>
+    <string name="riddle_confirm_reveal_title">إظهار الإجابة؟</string>
+    <string name="riddle_confirm_reveal_body">سيُحتسب هذا اللغز غير محلول وستُعاد سلسلتك إلى الصفر.</string>
+    <string name="riddle_confirm_skip_title">تخطي هذا اللغز؟</string>
+    <string name="riddle_confirm_skip_body">ستُعاد سلسلتك إلى الصفر.</string>
+    <string name="riddle_confirm_yes">نعم</string>
+    <string name="riddle_confirm_no">إلغاء</string>
+    <string name="riddle_tier_easy">سهل</string>
+    <string name="riddle_tier_medium">متوسط</string>
+    <string name="riddle_tier_hard">صعب</string>
+    <string name="riddle_tier_desc">مستوى الصعوبة: %1$s</string>
+</resources>

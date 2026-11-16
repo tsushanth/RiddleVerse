@@ -382,4 +382,7 @@
     <string name="lang_switch_prompt">%1$s में बदलें?</string>
     <string name="lang_switch_action">बदलें</string>
     <string name="lang_not_now">अभी नहीं</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">रीफ़्रेश करें</string>
 </resources>

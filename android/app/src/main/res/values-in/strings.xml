@@ -290,4 +290,7 @@
     <string name="lang_switch_prompt">Ganti ke %1$s?</string>
     <string name="lang_switch_action">Ganti</string>
     <string name="lang_not_now">Nanti saja</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">Segarkan</string>
 </resources>

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- needs native review (machine translation) -->
+    <string name="riddle_title">पहेली</string>
+    <string name="riddle_stars_desc">%2$d में से %1$d स्टार</string>
+    <string name="riddle_streak">लगातार: %1$d</string>
+    <string name="riddle_streak_desc">लगातार सही उत्तर: %1$d</string>
+    <string name="riddle_hint_button">संकेत %1$d/%2$d</string>
+    <string name="riddle_hint_button_none">और संकेत नहीं हैं</string>
+    <string name="riddle_hint_desc">%2$d में से संकेत %1$d दिखाएं। हर संकेत से आपके स्कोर से एक स्टार कम हो जाता है।</string>
+    <string name="riddle_hint_none_desc">सभी संकेत दिखाए जा चुके हैं</string>
+    <string name="riddle_hint_line">संकेत %1$d: %2$s</string>
+    <string name="riddle_skip">छोड़ें</string>
+    <string name="riddle_skip_desc">यह पहेली छोड़ें</string>
+    <string name="riddle_reveal">प्रकट करें</string>
+    <string name="riddle_reveal_desc">उत्तर प्रकट करें</string>
+    <string name="riddle_your_answer">आपका उत्तर</string>
+    <string name="riddle_check">जांचें</string>
+    <string name="riddle_check_desc">अपना उत्तर जांचें</string>
+    <string name="riddle_wrong">बिल्कुल सही नहीं। फिर कोशिश करें या संकेत लें।</string>
+    <string name="riddle_empty">पहले कोई उत्तर लिखें।</string>
+    <string name="riddle_correct">सही! उत्तर है %1$s।</string>
+    <string name="riddle_revealed">उत्तर है %1$s।</string>
+    <string name="riddle_stars_result">अर्जित स्टार: %2$d में से %1$d (उपयोग किए गए संकेत: %3$d)</string>
+    <string name="riddle_next">अगली पहेली</string>
+    <string name="riddle_share">पहेली साझा करें</string>
+    <string name="riddle_share_desc">यह पहेली किसी दोस्त के साथ साझा करें</string>
+    <string name="riddle_share_text">क्या आप यह पहेली सुलझा सकते हैं?\n\n%1$s\n\nRiddleVerse में और पहेलियां खेलें: %2$s</string>
+    <string name="riddle_confirm_reveal_title">उत्तर प्रकट करें?</string>
+    <string name="riddle_confirm_reveal_body">यह पहेली अनसुलझी गिनी जाएगी और आपका लगातार सिलसिला रीसेट हो जाएगा।</string>
+    <string name="riddle_confirm_skip_title">यह पहेली छोड़ें?</string>
+    <string name="riddle_confirm_skip_body">आपका लगातार सिलसिला रीसेट हो जाएगा।</string>
+    <string name="riddle_confirm_yes">हाँ</string>
+    <string name="riddle_confirm_no">रद्द करें</string>
+    <string name="riddle_tier_easy">आसान</string>
+    <string name="riddle_tier_medium">मध्यम</string>
+    <string name="riddle_tier_hard">कठिन</string>
+    <string name="riddle_tier_desc">कठिनाई: %1$s</string>
+</resources>
