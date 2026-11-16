@@ -12,6 +12,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.foundation.gestures.*
@@ -519,7 +521,7 @@ fun WaldoPuzzleHeader(
                     onClick = { onViewModeChange(WaldoViewMode.ZOOMABLE_VIEW) }
                 )
                 WaldoViewModeButton(
-                    icon = Icons.Default.List,
+                    icon = Icons.AutoMirrored.Filled.List,
                     label = "Objects",
                     isSelected = viewMode == WaldoViewMode.OBJECTS_LIST,
                     onClick = { onViewModeChange(WaldoViewMode.OBJECTS_LIST) }
@@ -549,7 +551,7 @@ fun WaldoPuzzleHeader(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                    Icon(Icons.Default.ArrowBack, stringResource(R.string.back), tint = Color.White)
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = Color.White)
                 }
 
                 Column(

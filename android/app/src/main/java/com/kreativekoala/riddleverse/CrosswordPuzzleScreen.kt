@@ -6,8 +6,8 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Help
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Refresh
@@ -306,7 +306,7 @@ fun CrosswordPuzzleScreen(
                     modifier = Modifier.size(48.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(R.string.back),
                         tint = RvInk,
                         modifier = Modifier.size(24.dp)
@@ -453,7 +453,7 @@ fun CrosswordPuzzleScreen(
                                     modifier = Modifier.size(48.dp)
                                 ) {
                                     Icon(
-                                        imageVector = Icons.Default.ArrowForward,
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                         contentDescription = "More hint",
                                         tint = RvVioletEdge,
                                         modifier = Modifier.size(20.dp)
@@ -797,7 +797,7 @@ fun EnhancedCompletionDialog(
                         modifier = Modifier.align(Alignment.TopEnd)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.close),
                             tint = RvInk,
                             modifier = Modifier.size(20.dp)
@@ -1467,7 +1467,7 @@ fun HintsDialog(
                                         modifier = Modifier.size(32.dp)
                                     ) {
                                         Icon(
-                                            imageVector = Icons.Default.ArrowForward,
+                                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                                             contentDescription = "More hint",
                                             tint = RvSky,
                                             modifier = Modifier.size(16.dp)

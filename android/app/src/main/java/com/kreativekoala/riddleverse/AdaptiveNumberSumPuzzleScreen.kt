@@ -8,7 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Pause
 import com.kreativekoala.riddleverse.ui.theme.RvInkSoft
 import com.kreativekoala.riddleverse.ui.theme.RvSurface
@@ -750,7 +750,7 @@ internal fun AdaptiveCompactHud(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
             }
             if (onPause != null) {
                 IconButton(onClick = onPause, modifier = Modifier.size(48.dp)) {

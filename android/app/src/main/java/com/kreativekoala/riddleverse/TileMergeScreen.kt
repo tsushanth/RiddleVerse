@@ -5,11 +5,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -103,14 +103,14 @@ fun TileMergeScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Undo, contentDescription = "Undo last move, $undosLeft left")
+                    Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = "Undo last move, $undosLeft left")
                     Text(" $undosLeft", fontSize = 14.sp)
                 }
             }
-            DirButton(Icons.Default.ArrowBack, "Move tiles left", Modifier.weight(1f)) { doMove(MergeDir.LEFT) }
+            DirButton(Icons.AutoMirrored.Filled.ArrowBack, "Move tiles left", Modifier.weight(1f)) { doMove(MergeDir.LEFT) }
             DirButton(Icons.Default.ArrowUpward, "Move tiles up", Modifier.weight(1f)) { doMove(MergeDir.UP) }
             DirButton(Icons.Default.ArrowDownward, "Move tiles down", Modifier.weight(1f)) { doMove(MergeDir.DOWN) }
-            DirButton(Icons.Default.ArrowForward, "Move tiles right", Modifier.weight(1f)) { doMove(MergeDir.RIGHT) }
+            DirButton(Icons.AutoMirrored.Filled.ArrowForward, "Move tiles right", Modifier.weight(1f)) { doMove(MergeDir.RIGHT) }
         }
         if (won && continuing && !showResult) {
             TextButton(onClick = { ended = true }, modifier = Modifier.heightIn(min = 48.dp).align(Alignment.CenterHorizontally)) {

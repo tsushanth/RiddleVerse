@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -106,7 +107,7 @@ private fun PixelLogicBoard(args: SpatialArgs, puzzle: NonogramPuzzle) {
         args = args,
         status = "$filled/$target",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
                 game.undo(); mistakes = null; commit()
             }
             SpatialAction(Icons.Default.Lightbulb, "Hint") {

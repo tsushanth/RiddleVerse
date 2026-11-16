@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -114,7 +115,7 @@ private fun TrailBoard(args: SpatialArgs, p: TrailPuzzle) {
         args = args,
         status = "Cells ${game.length}/${p.cells}",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.length > 1 && !done) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.length > 1 && !done) {
                 if (game.undo()) changed()
             }
             SpatialAction(Icons.Default.Refresh, "Reset", enabled = !done) { game.reset(); changed() }

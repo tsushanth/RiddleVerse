@@ -1,7 +1,7 @@
 package com.kreativekoala.riddleverse
 
 import androidx.compose.foundation.background
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -756,7 +756,7 @@ private fun McHeader(
     ) {
         IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
             Icon(
-                imageVector = Icons.Default.ArrowBack,
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = stringResource(R.string.back),
                 tint = RvInk
             )

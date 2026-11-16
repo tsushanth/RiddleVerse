@@ -4,6 +4,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -73,7 +74,7 @@ private fun ConduitBoard(args: SpatialArgs, puzzle: ConduitPuzzle) {
         args = args,
         status = "Powered $poweredCount/${n * n}",
         controls = {
-            SpatialAction(Icons.Default.Undo, "Undo", enabled = game.canUndo()) { game.undo(); hintTile = -1; commit() }
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) { game.undo(); hintTile = -1; commit() }
             SpatialAction(Icons.Default.Refresh, "Restart") { game.restart(); hintTile = -1; commit() }
             SpatialAction(Icons.Default.Lightbulb, "Hint") { hintTile = game.hint(); tick++ }
             SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }

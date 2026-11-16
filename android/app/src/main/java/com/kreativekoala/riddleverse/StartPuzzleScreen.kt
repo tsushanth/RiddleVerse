@@ -75,7 +75,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
@@ -2562,7 +2562,7 @@ fun StartPuzzleScreen(
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
                         Icon(
-                            imageVector = Icons.Default.ArrowForward,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                             contentDescription = null,
                             tint = RvOnTone.copy(alpha = 0.8f),
                             modifier = Modifier.size(16.dp)
@@ -3579,7 +3579,7 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                     fontSize = 14.sp
                 )
                 Icon(
-                    imageVector = Icons.Default.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "vs",
                     tint = RvSunEdge,
                     modifier = Modifier.size(20.dp)
@@ -3730,7 +3730,7 @@ private fun SubscriptionTierCard(
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Default.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = "Select",
                     tint = if (isRecommended) RvSunEdge else RvInkSoft,
                     modifier = Modifier.size(20.dp)
@@ -3853,7 +3853,7 @@ private fun AlternativeActionCard(
             }
 
             Icon(
-                imageVector = Icons.Default.ArrowForward,
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = "Go",
                 tint = RvInkSoft,
                 modifier = Modifier.size(16.dp)

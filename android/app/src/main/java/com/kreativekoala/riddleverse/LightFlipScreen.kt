@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Undo
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -98,7 +98,7 @@ fun LightFlipScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
                 onClick = { game = game.undo(); hint = -1 },
                 enabled = game.canUndo && !solved,
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Icon(Icons.Default.Undo, contentDescription = null); Text("  Undo") }
+            ) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null); Text("  Undo") }
             FilledTonalButton(
                 onClick = { hint = game.hintCell() ?: -1; game = game.withHintUsed() },
                 enabled = !solved,
