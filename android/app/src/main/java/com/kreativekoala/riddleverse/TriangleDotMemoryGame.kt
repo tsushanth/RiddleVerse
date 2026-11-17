@@ -1,3 +1,4 @@
+@file:Suppress("UnusedBoxWithConstraintsScope") // pre-existing: the scope is not needed here; left as is to keep this change small
 package com.kreativekoala.riddleverse
 
 import com.kreativekoala.riddleverse.ui.theme.*

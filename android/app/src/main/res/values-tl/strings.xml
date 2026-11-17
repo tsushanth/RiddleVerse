@@ -406,7 +406,7 @@
         <item quantity="other">🔥 %d araw na streak</item>
     </plurals>
     <plurals name="daily_result_freeze_used">
-        <item quantity="one">Sinalo ng streak freeze ang araw na hindi mo nalaro, kaya buhay pa ang iyong streak.</item>
+        <item quantity="one">Sinalo ng streak freeze ang %d araw na hindi mo nalaro, kaya buhay pa ang iyong streak.</item>
         <item quantity="other">Sinalo ng streak freeze ang %d araw na hindi mo nalaro, kaya buhay pa ang iyong streak.</item>
     </plurals>
     <string name="daily_result_freeze_earned">Nakakuha ka ng streak freeze para sa maulang araw.</string>

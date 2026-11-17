@@ -415,7 +415,7 @@
         <item quantity="other">🔥 Sequência de %d dias</item>
     </plurals>
     <plurals name="daily_result_freeze_used">
-        <item quantity="one">Um congelamento de sequência cobriu seu dia perdido, então sua sequência continuou.</item>
+        <item quantity="one">Um congelamento de sequência cobriu %d dia perdido, então sua sequência continuou.</item>
         <item quantity="many">Um congelamento de sequência cobriu %d de dias perdidos, então sua sequência continuou.</item>
         <item quantity="other">Um congelamento de sequência cobriu %d dias perdidos, então sua sequência continuou.</item>
     </plurals>

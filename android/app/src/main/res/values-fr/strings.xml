@@ -417,7 +417,7 @@
         <item quantity="other">🔥 Série de %d jours</item>
     </plurals>
     <plurals name="daily_result_freeze_used">
-        <item quantity="one">Un gel de série a couvert votre jour manqué, votre série est donc intacte.</item>
+        <item quantity="one">Un gel de série a couvert %d jour manqué, votre série est donc intacte.</item>
         <item quantity="many">Un gel de série a couvert %d de jours manqués, votre série est donc intacte.</item>
         <item quantity="other">Un gel de série a couvert %d jours manqués, votre série est donc intacte.</item>
     </plurals>

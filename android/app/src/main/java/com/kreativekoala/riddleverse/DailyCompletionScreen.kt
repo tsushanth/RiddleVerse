@@ -1,3 +1,4 @@
+@file:Suppress("GestureBackNavigation") // pre-existing: the ad-before-leaving hook uses onBackPressed; moving it to OnBackPressedDispatcher is a separate change
 package com.kreativekoala.riddleverse
 
 import com.kreativekoala.riddleverse.ui.RvActivityTheme

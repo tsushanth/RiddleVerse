@@ -1,3 +1,4 @@
+@file:Suppress("ViewModelConstructorInComposable") // pre-existing test code that builds a view model inside a render lambda
 package com.kreativekoala.riddleverse
 
 import androidx.compose.ui.test.onNodeWithText

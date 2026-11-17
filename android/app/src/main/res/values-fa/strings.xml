@@ -318,7 +318,7 @@
         <item quantity="other">🔥 رشتهٔ %d روزه</item>
     </plurals>
     <plurals name="daily_result_freeze_used">
-        <item quantity="one">یک یخ‌زدگی رشته، روز از دست‌رفتهٔ شما را پوشش داد و رشتهٔ شما حفظ شد.</item>
+        <item quantity="one">یک یخ‌زدگی رشته، %d روز از دست‌رفته را پوشش داد و رشتهٔ شما حفظ شد.</item>
         <item quantity="other">یک یخ‌زدگی رشته، %d روز از دست‌رفته را پوشش داد و رشتهٔ شما حفظ شد.</item>
     </plurals>
     <string name="daily_result_freeze_earned">یک یخ‌زدگی رشته برای روز بارانی به دست آوردید.</string>
