@@ -1,3 +1,4 @@
+@file:Suppress("UnusedBoxWithConstraintsScope") // pre-existing: the scope is not needed here; left as is to keep this change small
 // SymbolSwipePuzzleScreen.kt
 package com.kreativekoala.riddleverse
 

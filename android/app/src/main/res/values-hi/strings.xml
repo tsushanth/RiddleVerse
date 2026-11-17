@@ -414,7 +414,7 @@
         <item quantity="other">🔥 %d दिन की स्ट्रीक</item>
     </plurals>
     <plurals name="daily_result_freeze_used">
-        <item quantity="one">स्ट्रीक फ़्रीज़ ने आपका छूटा हुआ दिन संभाल लिया, इसलिए आपकी स्ट्रीक बची रही।</item>
+        <item quantity="one">स्ट्रीक फ़्रीज़ ने आपका %d छूटा हुआ दिन संभाल लिया, इसलिए आपकी स्ट्रीक बची रही।</item>
         <item quantity="other">स्ट्रीक फ़्रीज़ ने आपके %d छूटे हुए दिन संभाल लिए, इसलिए आपकी स्ट्रीक बची रही।</item>
     </plurals>
     <string name="daily_result_freeze_earned">आपने मुश्किल दिन के लिए एक स्ट्रीक फ़्रीज़ कमाया।</string>
