@@ -61,41 +61,7 @@ class TutorialPreferences(private val context: Context) {
     /**
      * Check if this puzzle type has an interactive tutorial available
      */
-    fun hasInteractiveTutorial(puzzleType: String): Boolean {
-        val supportedTypes = setOf(
-            // Original interactive tutorials
-            "crypto", "wordsnake", "division", "subtraction",
-            "antonyms", "antonymballoon", "memorysquares", "synonyms",
-            "mathestimation", "discounts", "conversion", "crossword",
-            "pinballdeflector", "imagepuzzle", "image puzzle",
-            // Wave 1 simple tutorials
-            "numbersum", "symbolswipe", "wordsearch", "averages",
-            // Wave 2 simple tutorials
-            "symmetry", "colortextmatching", "numbersequence", "percentage",
-            // Wave 3 simple tutorials - Math
-            "mathcomparison", "mathexpression", "mathcrossword", "tipbubble",
-            // Wave 3 simple tutorials - Memory
-            "memorystory", "memorysequencing", "memoryretention",
-            "memoryprevioussingle", "memorypreviouspair", "triangledotmemory",
-            // Wave 3 simple tutorials - Word/Language
-            "swipeword", "jumbleinput", "wordprefix", "letterset", "sentencetransitions",
-            // Wave 3 simple tutorials - Matching/Pattern
-            "colorshapematching", "imagematch", "match",
-            // Wave 3 simple tutorials - Visual/Image
-            "imagevortex", "imagequestion", "finddifferences", "findobject",
-            "waldopuzzle", "uniqueobject", "progressivereveal", "realorai",
-            // Wave 3 simple tutorials - Logic/Other
-            "flowpuzzle", "contextswitch", "dualcard", "multimatchmusic",
-            "geographycity", "geographycountry",
-            // Basic types
-            "qa", "multiplechoice"
-        )
-        // classic + word + spatial puzzles ship their own tutorials
-        return puzzleType.lowercase().replace(" ", "").replace("_", "") in supportedTypes ||
-            ClassicPuzzles.isClassic(puzzleType) ||
-            WordPuzzleRegistry.isWordPuzzleType(puzzleType) ||
-            SpatialPuzzles.isSpatial(puzzleType)
-    }
+    fun hasInteractiveTutorial(puzzleType: String): Boolean = TutorialRegistry.hasTutorial(puzzleType)
 
     /**
      * Check if tutorial should auto-show for first-time users

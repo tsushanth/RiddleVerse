@@ -835,7 +835,7 @@ fun StartPuzzleScreen(
 
     // Existing tutorial logic
     if (showTutorial) {
-        when (type.lowercase()) {
+        when (TutorialRegistry.dispatchKey(type)) {
             // --- word puzzles (feat/puzzles-word) ---
             in WordPuzzleRegistry.TYPES -> {
                 WordPuzzleTutorialScreen(
@@ -1449,15 +1449,8 @@ fun StartPuzzleScreen(
                                     Log.e("StartPuzzleScreen", "Tutorial start tracking failed", e)
                                 }
 
-                                when (type.lowercase()) {
-                                    // --- word puzzles (feat/puzzles-word) ---
-                                    in WordPuzzleRegistry.TYPES -> showTutorial = true
-                                    "\\uD83D\\uDDBC\\uFE0F image puzzle", "imagepuzzle", "crypto","wordsnake","division", "antonyms", "antonymballoon", "memorysquares", "synonyms",
-                                    "mathestimation", "discounts", "conversion", "crossword", "pinballdeflector" -> {
-                                        showTutorial = true
-                                    }
-                                    // --- grid puzzles (feat/puzzles-grid) ---
-                                    "sudoku", "binarygrid", "cagemath", "signgrid" -> showTutorial = true
+                                when {
+                                    TutorialRegistry.hasTutorial(type) -> showTutorial = true
                                     else -> {
                                         try {
                                             AnalyticsManager.getInstance()?.track(AnalyticsEvent("tutorial_not_available_clicked", mapOf(
@@ -1574,15 +1567,8 @@ fun StartPuzzleScreen(
                             Log.e("StartPuzzleScreen", "Tutorial start tracking failed", e)
                         }
 
-                        when (type.lowercase()) {
-                            // --- word puzzles (feat/puzzles-word) ---
-                            in WordPuzzleRegistry.TYPES -> showTutorial = true
-                            "crypto","wordsnake","division", "antonyms", "antonymballoon", "memorysquares", "synonyms",
-                            "mathestimation", "discounts", "conversion", "crossword", "pinballdeflector" -> {
-                                showTutorial = true
-                            }
-                            // --- grid puzzles (feat/puzzles-grid) ---
-                            "sudoku", "binarygrid", "cagemath", "signgrid" -> showTutorial = true
+                        when {
+                            TutorialRegistry.hasTutorial(type) -> showTutorial = true
                             else -> {
                                 Toast.makeText(
                                     context,
