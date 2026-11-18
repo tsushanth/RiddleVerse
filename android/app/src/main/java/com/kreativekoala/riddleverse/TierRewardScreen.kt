@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.StringRes
 import androidx.compose.ui.res.stringResource
 import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
 import com.kreativekoala.riddleverse.ui.theme.RvGrape
@@ -70,49 +71,55 @@ fun TierRewardScreen(onBack: () -> Unit = {}) {
         listOf(
             TierRewardInfo(
                 tier = "Bronze",
+                tierNameRes = R.string.stats_tier_bronze,
                 emoji = "🥉",
                 xpRequired = 0,
-                rewards = listOf("🎮 Basic Puzzles", "📊 Progress Tracking", "🏅 Bronze Badge"),
+                rewards = listOf(R.string.stats_reward_basic_puzzles, R.string.stats_reward_progress_tracking, R.string.stats_reward_bronze_badge),
                 isUnlocked = tierInfo.totalXP >= 0,
                 color = Color(0xFFD2691E)
             ),
             TierRewardInfo(
                 tier = "Silver",
+                tierNameRes = R.string.stats_tier_silver,
                 emoji = "🥈",
                 xpRequired = 500,
-                rewards = listOf("🎨 Silver Theme", "⭐ Score Boost", "📈 Advanced Stats"),
+                rewards = listOf(R.string.stats_reward_silver_theme, R.string.stats_reward_score_boost, R.string.stats_reward_advanced_stats),
                 isUnlocked = tierInfo.totalXP >= 500,
                 color = Color(0xFFC0C0C0)
             ),
             TierRewardInfo(
                 tier = "Gold",
+                tierNameRes = R.string.stats_tier_gold,
                 emoji = "🥇",
                 xpRequired = 1500,
-                rewards = listOf("👑 Gold Badge", "🔥 Streak Bonus", "🎯 Elite Challenges"),
+                rewards = listOf(R.string.stats_reward_gold_badge_crown, R.string.stats_reward_streak_bonus, R.string.stats_reward_elite_challenges),
                 isUnlocked = tierInfo.totalXP >= 1500,
                 color = Color(0xFFFFD700)
             ),
             TierRewardInfo(
                 tier = "Platinum",
+                tierNameRes = R.string.stats_tier_platinum,
                 emoji = "💎",
                 xpRequired = 3000,
-                rewards = listOf("💎 Platinum Theme", "🏆 Leaderboard Access", "🌟 Exclusive Puzzles"),
+                rewards = listOf(R.string.stats_reward_platinum_theme, R.string.stats_reward_leaderboard_access, R.string.stats_reward_exclusive_puzzles),
                 isUnlocked = tierInfo.totalXP >= 3000,
                 color = Color(0xFF98D8E8)
             ),
             TierRewardInfo(
                 tier = "Diamond",
+                tierNameRes = R.string.stats_tier_diamond,
                 emoji = "💠",
                 xpRequired = 6000,
-                rewards = listOf("💠 Diamond Badge", "🎭 Custom Avatar", "⚡ Speed Boosts"),
+                rewards = listOf(R.string.stats_reward_diamond_badge, R.string.stats_reward_custom_avatar, R.string.stats_reward_speed_boosts),
                 isUnlocked = tierInfo.totalXP >= 6000,
                 color = Color(0xFFB9F2FF)
             ),
             TierRewardInfo(
                 tier = "Master",
+                tierNameRes = R.string.xa_difficulty_master,
                 emoji = "👑",
                 xpRequired = 10000,
-                rewards = listOf("👑 Master Crown", "🌟 Ultimate Rewards", "🎪 VIP Features"),
+                rewards = listOf(R.string.stats_reward_master_crown, R.string.stats_reward_ultimate_rewards, R.string.stats_reward_vip_features),
                 isUnlocked = tierInfo.totalXP >= 10000,
                 color = RvGrape
             )
@@ -138,12 +145,12 @@ fun TierRewardScreen(onBack: () -> Unit = {}) {
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    "Tier Rewards",
+                    stringResource(R.string.stats_tier_rewards_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "Unlock rewards as you progress",
+                    stringResource(R.string.stats_tier_rewards_subtitle),
                     fontSize = 14.sp,
                     color = Color.Gray
                 )
@@ -159,7 +166,7 @@ fun TierRewardScreen(onBack: () -> Unit = {}) {
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
-                    "${tierInfo.totalXP} XP",
+                    stringResource(R.string.home_xp_amount, tierInfo.totalXP),
                     color = RvOnTone,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -230,13 +237,13 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                 ) {
                     Column {
                         Text(
-                            "${getTierEmoji(tierInfo.currentTier)} ${tierInfo.currentTier} Tier",
+                            "${getTierEmoji(tierInfo.currentTier)} ${stringResource(R.string.stats_tier_with_label, stringResource(tierInfo.currentTierRes))}",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvInk
                         )
                         Text(
-                            "Level ${currentLevel.level}",
+                            stringResource(R.string.stats_level_number, currentLevel.level),
                             fontSize = 16.sp,
                             color = RvInkSoft
                         )
@@ -244,14 +251,14 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
 
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            "${tierInfo.totalXP} XP",
+                            stringResource(R.string.home_xp_amount, tierInfo.totalXP),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvInk
                         )
                         if (tierInfo.currentTier != tierInfo.nextTier) {
                             Text(
-                                "Next: ${tierInfo.nextTier}",
+                                stringResource(R.string.stats_next_tier, stringResource(tierInfo.nextTierRes)),
                                 fontSize = 12.sp,
                                 color = RvInkSoft
                             )
@@ -269,12 +276,12 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "Progress to ${tierInfo.nextTier}",
+                                stringResource(R.string.stats_progress_to_tier, stringResource(tierInfo.nextTierRes)),
                                 fontSize = 14.sp,
                                 color = RvInkSoft
                             )
                             Text(
-                                "${tierInfo.pointsToNextTier - tierInfo.pointsInTier} XP to go",
+                                stringResource(R.string.stats_xp_to_go, tierInfo.pointsToNextTier - tierInfo.pointsInTier),
                                 fontSize = 12.sp,
                                 color = RvInkSoft
                             )
@@ -295,7 +302,7 @@ fun CurrentTierProgressCard(tierInfo: TierInfo, currentLevel: UserLevel) {
                 } else {
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        "🎉 Maximum tier achieved! 🎉",
+                        stringResource(R.string.stats_max_tier_short),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk,
@@ -374,7 +381,7 @@ fun TierRewardCard(
                 } else {
                     Icon(
                         imageVector = Icons.Default.Lock,
-                        contentDescription = "Locked",
+                        contentDescription = stringResource(R.string.common_locked),
                         tint = Color.Gray,
                         modifier = Modifier.size(28.dp)
                     )
@@ -390,7 +397,7 @@ fun TierRewardCard(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = tierReward.tier,
+                        text = stringResource(tierReward.tierNameRes),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (tierReward.isUnlocked || isCurrentTier) {
@@ -410,7 +417,7 @@ fun TierRewardCard(
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                "CURRENT",
+                                stringResource(R.string.stats_badge_current),
                                 color = RvInk,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
@@ -426,7 +433,7 @@ fun TierRewardCard(
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                "UNLOCKED",
+                                stringResource(R.string.stats_badge_unlocked),
                                 color = RvOnTone,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold
@@ -436,7 +443,7 @@ fun TierRewardCard(
                 }
 
                 Text(
-                    text = "${tierReward.xpRequired} XP required",
+                    text = stringResource(R.string.stats_xp_required, tierReward.xpRequired),
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -445,7 +452,7 @@ fun TierRewardCard(
                 // Rewards list
                 tierReward.rewards.forEach { reward ->
                     Text(
-                        text = "• $reward",
+                        text = "• ${stringResource(reward)}",
                         fontSize = 12.sp,
                         color = if (tierReward.isUnlocked) {
                             RvSuccess
@@ -473,7 +480,7 @@ fun TierRewardCard(
                     )
 
                     Text(
-                        "${tierReward.xpRequired - currentXP} XP to unlock",
+                        stringResource(R.string.stats_xp_to_unlock, tierReward.xpRequired - currentXP),
                         fontSize = 10.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(top = 4.dp)
@@ -487,9 +494,11 @@ fun TierRewardCard(
 // Data class for tier reward information
 data class TierRewardInfo(
     val tier: String,
+    @StringRes val tierNameRes: Int,
     val emoji: String,
     val xpRequired: Int,
-    val rewards: List<String>,
+    /** String resource ids of the reward labels. */
+    val rewards: List<Int>,
     val isUnlocked: Boolean,
     val color: Color
 )

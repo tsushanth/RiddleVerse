@@ -1,5 +1,10 @@
 package com.kreativekoala.riddleverse
 
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+
 /**
  * Turns a puzzle type key ("numbersequence", "memoryprevioussingle", "storyPuzzle", "find_object")
  * into text a player can read ("Number Sequence", "Memory Previous Single", "Story Puzzle", "Find Object").
@@ -8,6 +13,10 @@ package com.kreativekoala.riddleverse
  *  1. the proper game name from [NewGameInfo] (grid, classic, spatial and word games),
  *  2. the home-screen title from [QuizCategories] (so the start screen matches the card that was tapped),
  *  3. [humanize], which never fails: it splits camelCase / separators / known words and Title-Cases the result.
+ *
+ * The no-Context overloads return the English source text (tests, logs, wire-adjacent uses). Anything a player
+ * sees must use the overloads that take a [Context] (or [displayName] / [categoryLabelText] in Compose) so the
+ * name follows the app language.
  */
 object PuzzleTypeNames {
 
@@ -19,6 +28,25 @@ object PuzzleTypeNames {
         quizTitle(key)?.let { return it }
         EXTRA_NAMES[key.lowercase()]?.let { return it }
         return humanize(key)
+    }
+
+    /** Visible name for [type] in the app language. Unknown keys fall back to the English [humanize] result. */
+    fun display(context: Context, type: String?): String {
+        val key = type?.trim().orEmpty()
+        if (key.isEmpty()) return context.getString(R.string.cat_extra_puzzle)
+        val titleRes = CatalogText.titleRes(key)
+        if (titleRes != 0) return context.getString(titleRes)
+        val extraRes = CatalogText.extraNameRes(key)
+        if (extraRes != 0) return context.getString(extraRes)
+        return display(key)
+    }
+
+    /** Visible name for [type] in the app language, for Compose (recomposes when the language changes). */
+    @Composable
+    fun displayName(type: String?): String {
+        val context = LocalContext.current
+        LocalConfiguration.current
+        return display(context, type)
     }
 
     /** The Categories-tab card for [key] (covers QuizCategories, spatial and word registries), or null. */
@@ -41,6 +69,31 @@ object PuzzleTypeNames {
         if (key.isEmpty()) return null
         NewGameInfo.of(key)?.let { return it.category }
         return card(key)?.let { labelForFilter(it.filterCategory) }
+    }
+
+    /** [categoryLabel] in the app language. */
+    fun categoryLabel(context: Context, type: String?): String? {
+        val key = type?.trim().orEmpty()
+        if (key.isEmpty()) return null
+        val english = categoryLabel(key) ?: return null
+        return localizeLabel(context, english)
+    }
+
+    /** [categoryLabel] in the app language, for Compose. */
+    @Composable
+    fun categoryLabelText(type: String?): String? {
+        val context = LocalContext.current
+        LocalConfiguration.current
+        return categoryLabel(context, type)
+    }
+
+    /** [labelForFilter] in the app language. */
+    fun labelForFilter(context: Context, filter: String): String = localizeLabel(context, labelForFilter(filter))
+
+    /** Turns an English skill-area label ("Logic Games") into the app-language text; unknown labels are returned unchanged. */
+    fun localizeLabel(context: Context, englishLabel: String): String {
+        val res = CatalogText.labelRes(englishLabel)
+        return if (res != 0) context.getString(res) else englishLabel
     }
 
     fun labelForFilter(filter: String): String = when (filter) {

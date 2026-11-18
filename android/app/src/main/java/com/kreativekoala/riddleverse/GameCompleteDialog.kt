@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -60,6 +61,7 @@ fun GameCompleteDialog(
     val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     var leaderboard by remember { mutableStateOf<List<GameScoreEntry>>(emptyList()) }
     var leaderboardLoading by remember { mutableStateOf(true) }
+    val defaultPlayerName = stringResource(R.string.browse_remix_default_player)
 
     LaunchedEffect(result.gameId) {
         withContext(Dispatchers.IO) {
@@ -75,7 +77,7 @@ fun GameCompleteDialog(
                     val entries = (0 until scores.length()).map { i ->
                         val s = scores.getJSONObject(i)
                         GameScoreEntry(
-                            username = s.optString("username", "Player"),
+                            username = s.optString("username", defaultPlayerName),
                             score = s.optInt("score", 0),
                             userId = s.optString("userId", "")
                         )
@@ -141,7 +143,7 @@ fun GameCompleteDialog(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Game Complete!",
+                        text = stringResource(R.string.game_complete),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -162,7 +164,7 @@ fun GameCompleteDialog(
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Score",
+                                text = stringResource(R.string.score_label),
                                 fontSize = 14.sp,
                                 color = RvInkSoft
                             )
@@ -186,7 +188,7 @@ fun GameCompleteDialog(
                             .padding(12.dp)
                     ) {
                         Text(
-                            text = "🏆 Leaderboard",
+                            text = "🏆 ${stringResource(R.string.leaderboard)}",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvSunEdge,
@@ -200,7 +202,7 @@ fun GameCompleteDialog(
                             )
                         } else if (leaderboard.isEmpty()) {
                             Text(
-                                text = "Be the first on the leaderboard!",
+                                text = stringResource(R.string.done_be_first_on_leaderboard),
                                 fontSize = 12.sp,
                                 color = RvInkSoft,
                                 textAlign = TextAlign.Center,
@@ -255,7 +257,7 @@ fun GameCompleteDialog(
                         )
                     ) {
                         Text(
-                            text = "\uD83D\uDD04  Play Again",
+                            text = "\uD83D\uDD04  ${stringResource(R.string.play_again)}",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone
@@ -280,7 +282,7 @@ fun GameCompleteDialog(
                     if (!canAfford) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "You have $coinBalance coins — need ${CoinManager.CONTINUE_COST}",
+                            text = stringResource(R.string.done_coins_need, coinBalance, CoinManager.CONTINUE_COST),
                             fontSize = 12.sp,
                             color = RvErrorEdge,
                             textAlign = TextAlign.Center
@@ -295,7 +297,7 @@ fun GameCompleteDialog(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
-                            text = "Back to Home",
+                            text = stringResource(R.string.back_to_home),
                             fontSize = 15.sp,
                             color = RvInkSoft
                         )

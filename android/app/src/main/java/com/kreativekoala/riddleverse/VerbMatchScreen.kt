@@ -149,8 +149,8 @@ fun MatchScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
                             text = when {
-                                showResult && isCorrect -> "\uD83C\uDF89 Correct!"
-                                showResult -> "\u274C Wrong! Answer: $correctAnswer"
+                                showResult && isCorrect -> "\uD83C\uDF89 ${stringResource(R.string.correct)}"
+                                showResult -> "\u274C ${stringResource(R.string.xb_wrong_answer_is, correctAnswer)}"
                                 else -> "Match the Answer"
                             },
                             color = when {
@@ -230,7 +230,7 @@ fun MatchScreen(
                         disabledContentColor = RvInkSoft
                     )
                 ) {
-                    Text("\uD83D\uDCA1 Hint", fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text("\uD83D\uDCA1 ${stringResource(R.string.hint)}", fontSize = 16.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
 
                 if (!showResult) {
@@ -256,7 +256,7 @@ fun MatchScreen(
             GroupECompactHud(
                 timer = String.format("%d:%02d", remainingTime / 60, remainingTime % 60),
                 onBack = onBack,
-                subtitle = "Question $questionNumber of $totalQuestions \u2022 $difficulty",
+                subtitle = "${stringResource(R.string.xb_question_of, questionNumber, totalQuestions)} \u2022 ${localizedDifficulty(difficulty)}",
                 urgent = remainingTime <= 10
             )
 

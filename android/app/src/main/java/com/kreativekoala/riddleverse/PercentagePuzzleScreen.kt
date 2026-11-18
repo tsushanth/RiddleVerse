@@ -459,7 +459,7 @@ fun AdaptivePercentagePuzzleHeader(
             )
 
             Text(
-                text = difficultyLevel.name,
+                text = localizedDifficulty(difficultyLevel.name),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = RvInkSoft,
@@ -595,7 +595,7 @@ fun AdaptivePercentageTopGameBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = "${stringResource(R.string.level_label)} ${level.level}",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -696,7 +696,7 @@ private fun PercentageHud(
                 )
             }
             Text(
-                text = "Level ${level.level}",
+                text = "${stringResource(R.string.level_label)} ${level.level}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,

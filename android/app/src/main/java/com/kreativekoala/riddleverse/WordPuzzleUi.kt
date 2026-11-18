@@ -175,7 +175,7 @@ fun WordKey(
 @Composable
 fun WordKeyboard(
     keyStates: Map<Char, LetterState>, enabled: Boolean,
-    onLetter: (Char) -> Unit, onDelete: () -> Unit, onEnter: () -> Unit, enterLabel: String = "ENTER", showActions: Boolean = true,
+    onLetter: (Char) -> Unit, onDelete: () -> Unit, onEnter: () -> Unit, enterLabel: String = stringResource(R.string.xb_enter), showActions: Boolean = true,
     keyHeight: Dp = 54.dp
 ) {
     val neutral = MaterialTheme.colorScheme.surface
@@ -184,7 +184,7 @@ fun WordKeyboard(
     Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         rows.forEachIndexed { idx, letters ->
             Row(Modifier.fillMaxWidth().padding(horizontal = if (idx == 1) 14.dp else 0.dp)) {
-                if (idx == 2 && showActions) WordKey(enterLabel, "Submit", 1.6f, enabled, MaterialTheme.colorScheme.primary,
+                if (idx == 2 && showActions) WordKey(enterLabel, stringResource(R.string.submit), 1.6f, enabled, MaterialTheme.colorScheme.primary,
                     MaterialTheme.colorScheme.onPrimary, onEnter, scope = this, height = keyHeight)
                 letters.forEach { c ->
                     val st = keyStates[c] ?: LetterState.UNKNOWN
@@ -194,7 +194,7 @@ fun WordKeyboard(
                         { onLetter(c) }, scope = this, height = keyHeight
                     )
                 }
-                if (idx == 2 && showActions) WordKey("⌫", "Delete", 1.6f, enabled, neutral, onNeutral, onDelete, scope = this, height = keyHeight)
+                if (idx == 2 && showActions) WordKey("⌫", stringResource(R.string.browse_delete), 1.6f, enabled, neutral, onNeutral, onDelete, scope = this, height = keyHeight)
             }
         }
     }
@@ -225,7 +225,7 @@ private fun androidx.compose.ui.semantics.SemanticsPropertyReceiver.liveRegionPo
 @Composable
 fun WordPuzzleResultCard(
     success: Boolean, headline: String, lines: List<String>, score: Int,
-    stats: WordPuzzleStatsSnapshot?, shareText: String?, continueLabel: String = "Continue", onContinue: () -> Unit
+    stats: WordPuzzleStatsSnapshot?, shareText: String?, continueLabel: String = stringResource(R.string.continue_label), onContinue: () -> Unit
 ) {
     val context = LocalContext.current
     Card(
@@ -240,7 +240,7 @@ fun WordPuzzleResultCard(
             lines.forEach {
                 Text(it, fontSize = 15.sp, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
-            if (success) Text("+$score points", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = WordPuzzleColors.correct)
+            if (success) Text(stringResource(R.string.xb_plus_points, score), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = WordPuzzleColors.correct)
             if (stats != null) {
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -252,7 +252,7 @@ fun WordPuzzleResultCard(
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 if (shareText != null) {
                     OutlinedButton(onClick = { shareWordPuzzleText(context, shareText) }, modifier = Modifier.heightIn(min = 48.dp)) {
-                        Text("Share")
+                        Text(stringResource(R.string.share))
                     }
                 }
                 Button(onClick = onContinue, modifier = Modifier.heightIn(min = 48.dp)) { Text(continueLabel) }

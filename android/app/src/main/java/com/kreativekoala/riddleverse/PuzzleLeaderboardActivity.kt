@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
 
 fun formatScore(score: Int): String {
@@ -39,8 +40,8 @@ fun formatScore(score: Int): String {
     }
 }
 
-fun formatLeaderboardTime(timeInMs: Long): String {
-    if (timeInMs <= 0) return "N/A"
+fun formatLeaderboardTime(context: android.content.Context, timeInMs: Long): String {
+    if (timeInMs <= 0) return context.getString(R.string.stats_not_available)
 
     val seconds = timeInMs / 1000
     val minutes = seconds / 60
@@ -49,7 +50,7 @@ fun formatLeaderboardTime(timeInMs: Long): String {
     return if (minutes > 0) {
         "${minutes}:${remainingSeconds.toString().padStart(2, '0')}"
     } else {
-        "${remainingSeconds}s"
+        context.getString(R.string.stats_seconds_short, remainingSeconds)
     }
 }
 
@@ -61,8 +62,8 @@ class PuzzleLeaderboardActivity : AppCompatActivity() {
 
         // Extract data from intent
         val puzzleId = intent.getStringExtra("puzzleId") ?: ""
-        val puzzleName = intent.getStringExtra("puzzleName") ?: "Custom Puzzle"
-        val puzzleCreator = intent.getStringExtra("puzzleCreator") ?: "Unknown"
+        val puzzleName = intent.getStringExtra("puzzleName") ?: getString(R.string.cat_extra_custom)
+        val puzzleCreator = intent.getStringExtra("puzzleCreator") ?: getString(R.string.done_unknown_creator_label)
         val totalPlayers = intent.getIntExtra("totalPlayers", 0)
         val userRank = intent.getIntExtra("userRank", 0)
         val userScore = intent.getIntExtra("userScore", 0)
@@ -124,7 +125,7 @@ fun PuzzleLeaderboardScreen(
     onBackPressed: () -> Unit
 ) {
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Rankings", "Statistics")
+    val tabs = listOf(stringResource(R.string.stats_tab_rankings), stringResource(R.string.stats_tab_statistics))
 
     Scaffold(
         topBar = {
@@ -137,7 +138,7 @@ fun PuzzleLeaderboardScreen(
                             fontWeight = FontWeight.Bold
                         )
                         Text(
-                            text = "by $puzzleCreator",
+                            text = stringResource(R.string.browse_by_creator_lower, puzzleCreator),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -323,7 +324,7 @@ fun LeaderboardRankings(
         // Header
         item {
             Text(
-                text = "Top Players ($totalPlayers total)",
+                text = stringResource(R.string.stats_top_players_total, totalPlayers),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 8.dp)
@@ -420,7 +421,7 @@ fun TopPlayerCard(
                     )
                     if (player.timeTaken != null && player.timeTaken > 0) {
                         Text(
-                            text = "Time: ${formatLeaderboardTime(player.timeTaken)}",
+                            text = stringResource(R.string.stats_time_value, formatLeaderboardTime(LocalContext.current, player.timeTaken)),
                             fontSize = 12.sp,
                             color = RvInkSoft.copy(alpha = 0.8f)
                         )
@@ -485,7 +486,7 @@ fun RegularPlayerCard(
                 )
                 if (player.timeTaken != null && player.timeTaken > 0) {
                     Text(
-                        text = "Time: ${formatLeaderboardTime(player.timeTaken)}",
+                        text = stringResource(R.string.stats_time_value, formatLeaderboardTime(LocalContext.current, player.timeTaken)),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -569,7 +570,7 @@ fun StatisticsOverviewCard(
                 )
 
                 StatisticItem(
-                    label = "Completions",
+                    label = stringResource(R.string.stats_completions),
                     value = statistics.totalCompletions.toString(),
                     icon = "✅"
                 )
@@ -630,20 +631,20 @@ fun StatisticsDetailsCard(statistics: LeaderboardStatistics) {
 
             StatisticsRow(
                 icon = "⏱️",
-                label = "Average Time",
-                value = formatLeaderboardTime(statistics.averageTime)
+                label = stringResource(R.string.stats_average_time),
+                value = formatLeaderboardTime(LocalContext.current, statistics.averageTime)
             )
 
             StatisticsRow(
                 icon = "🎯",
-                label = "Average Score",
-                value = "%.1f points".format(statistics.averageScore)
+                label = stringResource(R.string.stats_average_score),
+                value = stringResource(R.string.stats_points_value, statistics.averageScore)
             )
 
             StatisticsRow(
                 icon = "📊",
-                label = "Total Completions",
-                value = "${statistics.totalCompletions} times"
+                label = stringResource(R.string.stats_total_completions),
+                value = LocalContext.current.resources.getQuantityString(R.plurals.stats_times, statistics.totalCompletions, statistics.totalCompletions)
             )
         }
     }
@@ -669,7 +670,7 @@ fun RecordsCard(statistics: LeaderboardStatistics) {
                 StatisticsRow(
                     icon = "⚡",
                     label = stringResource(R.string.fastest_time),
-                    value = formatLeaderboardTime(statistics.fastestTime)
+                    value = formatLeaderboardTime(LocalContext.current, statistics.fastestTime)
                 )
             }
 
@@ -684,7 +685,7 @@ fun RecordsCard(statistics: LeaderboardStatistics) {
             if ((statistics.fastestTime == null || statistics.fastestTime <= 0) &&
                 (statistics.highestScore == null || statistics.highestScore <= 0)) {
                 Text(
-                    text = "No records available yet",
+                    text = stringResource(R.string.stats_no_records_yet),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -736,7 +737,7 @@ fun EmptyLeaderboardState(modifier: Modifier = Modifier) {
     ) {
         Icon(
             imageVector = Icons.Default.EmojiEvents,
-            contentDescription = "No leaderboard data",
+            contentDescription = stringResource(R.string.stats_no_leaderboard_data),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -751,7 +752,7 @@ fun EmptyLeaderboardState(modifier: Modifier = Modifier) {
         )
 
         Text(
-            text = "Be the first to complete this puzzle and claim the top spot!",
+            text = stringResource(R.string.stats_be_first_to_complete),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -769,7 +770,7 @@ fun EmptyStatisticsState(modifier: Modifier = Modifier) {
     ) {
         Icon(
             imageVector = Icons.Default.BarChart,
-            contentDescription = "No statistics data",
+            contentDescription = stringResource(R.string.stats_no_statistics_data),
             modifier = Modifier.size(64.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -777,14 +778,14 @@ fun EmptyStatisticsState(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "No Statistics Available",
+            text = stringResource(R.string.stats_no_statistics_title),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
 
         Text(
-            text = "Statistics will appear once players start completing this puzzle.",
+            text = stringResource(R.string.stats_statistics_will_appear),
             fontSize = 14.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,

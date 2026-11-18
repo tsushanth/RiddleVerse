@@ -1,6 +1,7 @@
 // Enhanced SimpleImageMatchPuzzleScreen.kt with URL validation and fallback
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalContext
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.foundation.BorderStroke
@@ -133,6 +134,7 @@ fun SimpleImageMatchPuzzleScreenWrapper(
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val xbContext = LocalContext.current
     var urlWarnings by remember { mutableStateOf<List<String>>(emptyList()) }
 
     // Parse puzzle data with FIXED parsing logic
@@ -333,7 +335,7 @@ fun SimpleImageMatchPuzzleScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error parsing puzzle data: ${e.message}", e)
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -342,7 +344,7 @@ fun SimpleImageMatchPuzzleScreenWrapper(
     // Rest of the composable remains the same...
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading image puzzle...")
+            LoadingScreen(message = stringResource(R.string.common_loading_image_puzzle))
         }
 
         hasError -> {
@@ -372,7 +374,7 @@ fun SimpleImageMatchPuzzleScreenWrapper(
             SimpleImageMatchPuzzleScreen(
                 puzzleData = puzzleData!!,
                 difficulty = currentPuzzle.difficulty ?: "Medium",
-                round = "ROUND ${if (viewModel.isCustomPuzzleFlow) viewModel.currentQuestionNumber else viewModel.currentPuzzleNumber} of ${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}",
+                round = stringResource(R.string.xb_round_of, viewModel.getCurrentNumber(), viewModel.getTotalCount()),
                 urlWarnings = urlWarnings,
                 onPuzzleComplete = { score, correctAnswers ->
                     Log.d(TAG, "🎉 Image puzzle completed! Score: $score, Correct: $correctAnswers")
@@ -415,6 +417,7 @@ fun SimpleImageMatchPuzzleScreen(
 
     // Feedback state
     var showFeedback by remember { mutableStateOf<String?>(null) }
+    val xbContext = LocalContext.current
     var feedbackColor by remember { mutableStateOf(Color.Green) }
 
     // Warning display state
@@ -511,7 +514,7 @@ fun SimpleImageMatchPuzzleScreen(
                     ) {
                         Icon(
                             Icons.Default.Close,
-                            contentDescription = "Dismiss",
+                            contentDescription = stringResource(R.string.welcome_back_dismiss),
                             tint = Color.Yellow,
                             modifier = Modifier.size(16.dp)
                         )
@@ -624,12 +627,12 @@ fun SimpleImageMatchPuzzleScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Question ${currentQuestionIndex + 1} of ${puzzleData.totalQuestions}",
+                                text = stringResource(R.string.xb_question_of, currentQuestionIndex + 1, puzzleData.totalQuestions),
                                 color = Color.Gray,
                                 fontSize = 12.sp
                             )
                             Text(
-                                text = currentQuestion.difficulty.uppercase(),
+                                text = localizedDifficulty(currentQuestion.difficulty).uppercase(),
                                 color = when (currentQuestion.difficulty.lowercase()) {
                                     "easy" -> Color.Green
                                     "hard" -> Color.Red
@@ -732,11 +735,11 @@ fun SimpleImageMatchPuzzleScreen(
 
                     if (isCorrect) {
                         correctAnswers++
-                        showFeedback = "🎉 Correct! ${currentQuestion.answer}"
+                        showFeedback = "🎉 " + xbContext.getString(R.string.xb_correct_answer, currentQuestion.answer)
                         feedbackColor = Color.Green
                     } else {
                         wrongAnswers++
-                        showFeedback = "❌ Wrong! The correct answer is: ${currentQuestion.answer}"
+                        showFeedback = "❌ " + xbContext.getString(R.string.xb_wrong_correct_answer_is, currentQuestion.answer)
                         feedbackColor = Color.Red
                     }
 
@@ -839,7 +842,7 @@ fun SimpleImageMatchHeader(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = difficulty.uppercase(),
+                    text = localizedDifficulty(difficulty).uppercase(),
                     color = Color.White,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -896,7 +899,7 @@ fun SimpleImageMatchHeader(
                 repeat(totalQuestions) { index ->
                     Icon(
                         Icons.Default.Star,
-                        contentDescription = "Progress",
+                        contentDescription = stringResource(R.string.progress),
                         tint = if (index < correctAnswers) Color.Yellow else Color.Gray,
                         modifier = Modifier.size(16.dp)
                     )

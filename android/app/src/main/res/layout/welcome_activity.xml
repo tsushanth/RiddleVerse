@@ -28,7 +28,7 @@
             android:maxWidth="220dp"
             android:maxHeight="220dp"
             android:src="@drawable/question_marks"
-            android:contentDescription="Question Marks" />
+            android:contentDescription="@string/layout_question_marks_cd" />
 
         <View
             android:layout_width="match_parent"
@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:minHeight="52dp"
             android:layout_marginTop="16dp"
-            android:text="Get Started"
+            android:text="@string/layout_welcome_get_started"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:background="@drawable/button_orange_rounded" />
@@ -55,7 +55,7 @@
             android:minHeight="48dp"
             android:gravity="center"
             android:layout_marginTop="8dp"
-            android:text="Already have an account? Log in"
+            android:text="@string/layout_welcome_have_account"
             android:textColor="@android:color/white"
             android:textSize="14sp" />
     </LinearLayout>

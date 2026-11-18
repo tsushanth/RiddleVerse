@@ -464,7 +464,7 @@ fun ImagePuzzleScreenWrapper(
             Log.e(TAG, "🔄 Raw question data: ${currentPuzzle.question}")
             Log.e(TAG, "🔄 Raw answer data: ${currentPuzzle.answer}")
             Log.e(TAG, "🔄 Is custom puzzle flow: ${viewModel.isCustomPuzzleFlow}")
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = context.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -475,7 +475,7 @@ fun ImagePuzzleScreenWrapper(
     // Rest of the composable remains the same...
     when {
         isLoading -> {
-            AILoadingScreen(message = "Loading image puzzle...")
+            AILoadingScreen(message = stringResource(R.string.common_loading_image_puzzle))
         }
 
         hasError -> {
@@ -773,7 +773,7 @@ fun AdaptiveImagePuzzleScreen(
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error loading puzzle: ${e.message}", e)
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = context.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -837,7 +837,7 @@ fun AdaptiveImagePuzzleScreen(
     ) {
         when {
             isLoading -> {
-                AILoadingScreen(message = "Loading image puzzle...")
+                AILoadingScreen(message = stringResource(R.string.common_loading_image_puzzle))
             }
 
             hasError -> {
@@ -1023,7 +1023,7 @@ private fun AdaptiveImagePuzzleHeader(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInkSoft.copy(alpha = 0.8f)
@@ -1128,7 +1128,7 @@ private fun AdaptiveImagePuzzleHeader(
                 )
             }
             Text(
-                text = "Score: $currentScore",
+                text = stringResource(R.string.xa_score_value, currentScore),
                 fontSize = 12.sp,
                 color = RvInk
             )
@@ -1157,20 +1157,20 @@ private fun AdaptationNotificationCard(
         ) {
             Icon(
                 Icons.Default.TrendingUp,
-                contentDescription = "Difficulty adjusted",
+                contentDescription = stringResource(R.string.xa_difficulty_adjusted),
                 tint = RvInk,
                 modifier = Modifier.size(20.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Puzzle Adapted!",
+                    text = stringResource(R.string.xa_puzzle_adapted),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
                 )
                 Text(
-                    text = adaptationInfo?.adjustmentReason ?: "",
+                    text = adaptationInfo?.adjustmentReason.asString(),
                     fontSize = 12.sp,
                     color = RvInkSoft.copy(alpha = 0.9f)
                 )
@@ -1181,7 +1181,7 @@ private fun AdaptationNotificationCard(
             ) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.welcome_back_dismiss),
                     tint = RvInk,
                     modifier = Modifier.size(16.dp)
                 )
@@ -1839,7 +1839,7 @@ fun PreviewOverlayDialog(
             ) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Close preview",
+                    contentDescription = stringResource(R.string.close),
                     tint = Color.White
                 )
             }
@@ -1886,7 +1886,7 @@ fun PreviewOverlayDialog(
                         onClick = onDismiss,
                         colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF10B981)),
                         modifier = Modifier.fillMaxWidth()
-                    ) { Text("Close", color = Color.White) }
+                    ) { Text(stringResource(R.string.close), color = Color.White) }
                 }
             }
         }
@@ -2085,7 +2085,7 @@ private fun AdaptiveImagePuzzleCompletionScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = if (completedPieces == puzzleData.totalPieces) "Puzzle Complete!" else "Time's Up!",
+            text = if (completedPieces == puzzleData.totalPieces) stringResource(R.string.puzzle_complete) else stringResource(R.string.common_times_up),
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = if (completedPieces == puzzleData.totalPieces) Color.Green else Color.Red,
@@ -2191,7 +2191,7 @@ private fun AdaptiveImagePuzzleCompletionScreen(
                         Text(formatTime(timeUsed), fontSize = 14.sp, color = RvInk)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Hints", fontSize = 12.sp, color = RvInkSoft)
+                        Text(stringResource(R.string.common_hints), fontSize = 12.sp, color = RvInkSoft)
                         Text("$hintsUsed", fontSize = 14.sp, color = RvInk)
                     }
                 }
@@ -3007,7 +3007,7 @@ private fun FullScreenImageViewer(
         ) {
             Icon(
                 Icons.Default.Close,
-                contentDescription = "Close full screen",
+                contentDescription = stringResource(R.string.close),
                 tint = RvInk,
                 modifier = Modifier.size(24.dp)
             )

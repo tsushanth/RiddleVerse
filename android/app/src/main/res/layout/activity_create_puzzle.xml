@@ -45,7 +45,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="🎯 Create Custom Puzzle"
+                    android:text="@string/create_layout_title"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#2E3440"
@@ -93,7 +93,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Personalize Your Puzzle"
+                            android:text="@string/create_layout_personalize"
                             android:textSize="20sp"
                             android:textStyle="bold"
                             android:textColor="#2E3440"
@@ -104,7 +104,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Create custom puzzles on any topic you're passionate about. Choose your format, difficulty, and let our AI generate engaging questions just for you!"
+                        android:text="@string/create_layout_intro"
                         android:textSize="16sp"
                         android:textColor="#4C566A"
                         android:layout_marginTop="12dp" />
@@ -136,7 +136,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="What's your puzzle topic?"
+                        android:text="@string/create_layout_topic_question"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#2E3440"
@@ -149,7 +149,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:minHeight="60dp"
-                    android:hint="Enter your custom topic..."
+                    android:hint="@string/create_layout_topic_hint"
                     android:textSize="16sp"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
@@ -181,7 +181,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Number of puzzles"
+                        android:text="@string/create_layout_number_of_puzzles"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#2E3440"
@@ -226,7 +226,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
-                        android:text="(1-10 puzzles)"
+                        android:text="@string/create_layout_puzzle_range"
                         android:textSize="14sp"
                         android:textColor="#6C757D" />
 
@@ -257,7 +257,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Puzzle format"
+                        android:text="@string/create_layout_puzzle_format"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#2E3440"
@@ -298,7 +298,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Suggested Topics"
+                        android:text="@string/create_layout_suggested_topics"
                         android:textSize="20sp"
                         android:textStyle="bold"
                         android:textColor="#2E3440"
@@ -309,7 +309,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tap any topic below to use it, or scroll horizontally to explore more options!"
+                    android:text="@string/create_layout_suggested_hint"
                     android:textSize="14sp"
                     android:textColor="#6C757D"
                     android:layout_marginBottom="16dp" />
@@ -328,7 +328,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                     android:minHeight="60dp"
-                android:text="🚀 Generate Puzzle"
+                android:text="@string/create_generate_puzzle"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"

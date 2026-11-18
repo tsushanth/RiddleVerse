@@ -218,7 +218,7 @@ fun ValuePropPage1() {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                "Train Your Brain Daily",
+                stringResource(R.string.onb_welcome_p1_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -228,7 +228,7 @@ fun ValuePropPage1() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "Sharpen your mind with math, word puzzles, and brain teasers designed to boost cognitive skills",
+                stringResource(R.string.onb_welcome_p1_desc),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 color = RvInkSoft.copy(alpha = 0.9f),
@@ -240,7 +240,7 @@ fun ValuePropPage1() {
             // Feature highlights
             FeatureRow(
                 icon = "🔢",
-                text = "Math & Logic Puzzles",
+                text = stringResource(R.string.onb_welcome_p1_feature_math),
                 color = RvInkSoft.copy(alpha = 0.8f)
             )
 
@@ -248,7 +248,7 @@ fun ValuePropPage1() {
 
             FeatureRow(
                 icon = "📝",
-                text = "Word & Language Games",
+                text = stringResource(R.string.onb_welcome_p1_feature_word),
                 color = RvInkSoft.copy(alpha = 0.8f)
             )
 
@@ -256,7 +256,7 @@ fun ValuePropPage1() {
 
             FeatureRow(
                 icon = "⚡",
-                text = "Quick Daily Challenges",
+                text = stringResource(R.string.onb_welcome_p1_feature_daily),
                 color = RvInkSoft.copy(alpha = 0.8f)
             )
         }
@@ -291,7 +291,7 @@ fun ValuePropPage2() {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                "Track Your Progress",
+                stringResource(R.string.onb_intro_progress_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -301,7 +301,7 @@ fun ValuePropPage2() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "Level up, earn badges, and see your improvement over time with detailed analytics",
+                stringResource(R.string.onb_welcome_p2_desc),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 color = RvInkSoft.copy(alpha = 0.9f),
@@ -344,7 +344,7 @@ fun ValuePropPage3() {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                "Compete & Achieve",
+                stringResource(R.string.onb_welcome_p3_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -354,7 +354,7 @@ fun ValuePropPage3() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "Challenge friends, climb leaderboards, and unlock exclusive rewards as you master each puzzle type",
+                stringResource(R.string.onb_welcome_p3_desc),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 color = RvInkSoft.copy(alpha = 0.9f),
@@ -397,7 +397,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                "Ready to Start?",
+                stringResource(R.string.onb_welcome_p4_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
@@ -407,7 +407,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "Join thousands of puzzle enthusiasts and start your brain training journey today!",
+                stringResource(R.string.onb_welcome_p4_desc),
                 fontSize = 18.sp,
                 textAlign = TextAlign.Center,
                 color = RvInkSoft.copy(alpha = 0.9f),
@@ -428,7 +428,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
                 shape = RoundedCornerShape(28.dp)
             ) {
                 Text(
-                    "Let's Get Started!",
+                    stringResource(R.string.onb_welcome_p4_button),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -437,7 +437,7 @@ fun GetStartedPage(onComplete: () -> Unit) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                "Free to play • No ads during puzzles",
+                stringResource(R.string.onb_welcome_p4_footer),
                 fontSize = 14.sp,
                 color = RvInkSoft.copy(alpha = 0.7f),
                 textAlign = TextAlign.Center
@@ -555,13 +555,13 @@ fun ProgressVisualizationCard() {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "Level 5",
+                    stringResource(R.string.onb_sample_level),
                     color = RvInk,
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Text(
-                    "⭐ 1,250 XP",
+                    "⭐ ${stringResource(R.string.onb_sample_xp)}",
                     color = RvInk,
                     fontSize = 14.sp
                 )
@@ -581,8 +581,8 @@ fun ProgressVisualizationCard() {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("🔥 5 day streak", color = RvInk, fontSize = 12.sp)
-                Text("65% to Level 6", color = RvInk, fontSize = 12.sp)
+                Text("🔥 ${stringResource(R.string.onb_sample_streak)}", color = RvInk, fontSize = 12.sp)
+                Text(stringResource(R.string.onb_sample_next_level, 65, 6), color = RvInk, fontSize = 12.sp)
             }
         }
     }
@@ -596,9 +596,9 @@ fun AchievementShowcase() {
     ) {
         items(3) { index ->
             val achievements = listOf(
-                Triple("🥇", "Math Master", "Solved 100 math puzzles"),
-                Triple("⚡", "Speed Demon", "5 puzzles under 30 seconds"),
-                Triple("🔥", "Streak King", "10 day solving streak")
+                Triple("🥇", stringResource(R.string.onb_sample_ach1_title), stringResource(R.string.onb_sample_ach1_desc)),
+                Triple("⚡", stringResource(R.string.onb_sample_ach2_title), stringResource(R.string.onb_sample_ach2_desc)),
+                Triple("🔥", stringResource(R.string.onb_sample_ach3_title), stringResource(R.string.onb_sample_ach3_desc))
             )
 
             Card(

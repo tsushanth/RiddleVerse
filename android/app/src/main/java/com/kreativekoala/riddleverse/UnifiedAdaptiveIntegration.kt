@@ -1,6 +1,7 @@
 // UnifiedAdaptiveIntegration.kt - Unified system for all adaptive puzzle screens
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
@@ -215,7 +216,7 @@ fun AdaptiveUnifiedHeader(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             tint = RvInk,
                             modifier = Modifier.size(20.dp)
                         )
@@ -230,7 +231,7 @@ fun AdaptiveUnifiedHeader(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Pause,
-                                contentDescription = "Pause",
+                                contentDescription = stringResource(R.string.common_pause),
                                 tint = RvInk,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -240,7 +241,7 @@ fun AdaptiveUnifiedHeader(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Level ${level.level}",
+                        text = "${stringResource(R.string.level_label)} ${level.level}",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk,
@@ -249,7 +250,7 @@ fun AdaptiveUnifiedHeader(
 
                     if (challengeNumber != null && totalChallenges != null) {
                         Text(
-                            text = "Challenge $challengeNumber of $totalChallenges",
+                            text = stringResource(R.string.xb_challenge_of, challengeNumber, totalChallenges),
                             fontSize = 12.sp,
                             color = RvInkSoft
                         )
@@ -324,7 +325,7 @@ fun AdaptiveUnifiedHeader(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Score: $score",
+                        text = "${stringResource(R.string.score_label)}: $score",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvSuccess,
@@ -381,7 +382,7 @@ fun UnifiedAdaptationNotification(
             ) {
                 Icon(
                     Icons.Default.TrendingUp,
-                    contentDescription = "Difficulty adjusted",
+                    contentDescription = stringResource(R.string.xa_difficulty_adjusted),
                     tint = RvInk,
                     modifier = Modifier.size(20.dp)
                 )
@@ -394,7 +395,7 @@ fun UnifiedAdaptationNotification(
                         color = RvInk
                     )
                     Text(
-                        text = adaptationInfo?.adjustmentReason ?: "",
+                        text = adaptationInfo?.adjustmentReason.asString(),
                         fontSize = 10.sp,
                         color = RvInkSoft.copy(alpha = 0.9f)
                     )
@@ -405,7 +406,7 @@ fun UnifiedAdaptationNotification(
                 ) {
                     Icon(
                         Icons.Default.Close,
-                        contentDescription = "Dismiss",
+                        contentDescription = stringResource(R.string.welcome_back_dismiss),
                         tint = RvInk,
                         modifier = Modifier.size(16.dp)
                     )
@@ -491,7 +492,7 @@ fun CompactRankingDisplay(
                 color = RvGrape
             )
             Text(
-                text = competitiveInsight.performanceLevel.displayName,
+                text = androidx.compose.ui.res.stringResource(competitiveInsight.performanceLevel.labelRes),
                 fontSize = 8.sp,
                 color = Color.Gray
             )

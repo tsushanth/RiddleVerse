@@ -378,7 +378,7 @@ fun MemorySquaresPuzzleScreen(
                     repeat(hearts) { index ->
                         Icon(
                             Icons.Default.Favorite,
-                            contentDescription = "Life",
+                            contentDescription = stringResource(R.string.xb_life),
                             tint = if (index < currentLives) Color(0xFFFFCDD2) else Color(0xFF5D4037),
                             modifier = Modifier
                                 .size(24.dp)
@@ -397,11 +397,11 @@ fun MemorySquaresPuzzleScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("LEVEL $level", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
+                Text("${stringResource(R.string.level_label).uppercase()} $level", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
                 if (totalScore > 0) {
-                    Text("SCORE $totalScore", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
+                    Text("${stringResource(R.string.score_label).uppercase()} $totalScore", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
                 }
-                Text(difficulty.uppercase(), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
+                Text(localizedDifficulty(difficulty).uppercase(), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = RvOnTone, maxLines = 1)
             }
         },
         phase = {
@@ -467,7 +467,7 @@ fun MemorySquaresPuzzleScreen(
                     }
                     else -> {
                         Text(
-                            text = if (isCorrect) "✓ Perfect!" else "✗ Try Again!",
+                            text = if (isCorrect) "✓ ${stringResource(R.string.xa_perfect)}" else "✗ ${stringResource(R.string.try_again)}!",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isCorrect) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
@@ -551,7 +551,7 @@ fun MemorySquaresPuzzleScreen(
             },
             title = {
                 Text(
-                    text = if (isCorrect) "🎉 Perfect Memory!" else if (currentLives > 0) "💪 Good Effort!" else "🎯 ${stringResource(R.string.game_over)}",
+                    text = if (isCorrect) "🎉 ${stringResource(R.string.xb_perfect_memory)}" else if (currentLives > 0) "💪 ${stringResource(R.string.xb_good_effort)}" else "🎯 ${stringResource(R.string.game_over)}",
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )

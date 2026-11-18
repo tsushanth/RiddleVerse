@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +85,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
     var totalScore by remember { mutableStateOf(0) }
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
+    val msgContext = LocalContext.current
     var isComplete by remember { mutableStateOf(false) }
     var selectedCellType by remember { mutableStateOf<CellType?>(null) }
     var answerData by remember { mutableStateOf<org.json.JSONObject?>(null) }
@@ -191,7 +193,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                 totalAnswers++
                 gameCompleted = true
                 showFeedback = true
-                feedbackMessage = "Time's up! ⏰"
+                feedbackMessage = "${msgContext.getString(R.string.times_up)} ⏰"
                 onGameComplete(false, totalScore)
             }
         }
@@ -220,7 +222,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
                 isComplete = true
                 gameCompleted = true
 
-                feedbackMessage = "🎉 Perfect! All equations are correct! +$score points"
+                feedbackMessage = "🎉 ${msgContext.getString(R.string.xa_equations_correct_points, score)}"
                 showFeedback = true
 
                 // Record successful performance
@@ -532,7 +534,7 @@ fun AdaptiveMathCrosswordPuzzleScreen(
             },
             title = {
                 Text(
-                    text = if (isComplete) "🎉 Completed!" else "💡 Hint",
+                    text = if (isComplete) "🎉 ${stringResource(R.string.xa_completed_exclaim)}" else "💡 ${stringResource(R.string.hint)}",
                     fontWeight = FontWeight.Bold
                 )
             },

@@ -1,5 +1,7 @@
 package com.kreativekoala.riddleverse.auth
 
+import androidx.annotation.StringRes
+import com.kreativekoala.riddleverse.R
 import org.json.JSONObject
 
 /**
@@ -198,23 +200,26 @@ object SupabaseAuthCore {
         )
     }
 
-    /** Readable, non-leaky message for the UI. */
-    fun userMessage(e: AuthException): String = when (e.failure) {
-        AuthFailure.INVALID_CREDENTIALS -> "Incorrect email or password."
-        AuthFailure.EMAIL_NOT_CONFIRMED -> "Please confirm your email first. Check your inbox for the confirmation link, then sign in."
-        AuthFailure.USER_EXISTS -> "An account with this email already exists. Try signing in instead."
-        AuthFailure.WEAK_PASSWORD -> "That password is too weak. Use at least 8 characters."
-        AuthFailure.RATE_LIMITED -> "Too many attempts. Please wait a minute and try again."
-        AuthFailure.INVALID_TOKEN -> "Your session could not be verified. Please sign in again."
-        AuthFailure.BRIDGE_UNAVAILABLE -> "Sign-in is temporarily unavailable. Please try again in a few minutes."
-        AuthFailure.NETWORK -> "Can't reach the server. Check your connection and try again."
-        AuthFailure.SERVER -> "The sign-in service had a problem. Please try again shortly."
-        AuthFailure.UNKNOWN -> "Something went wrong. Please try again."
+    /** Readable, non-leaky message for the UI, as a string resource id (resolve with the UI context). */
+    @StringRes
+    fun userMessageRes(e: AuthException): Int = when (e.failure) {
+        AuthFailure.INVALID_CREDENTIALS -> R.string.onb_auth_err_invalid_credentials
+        AuthFailure.EMAIL_NOT_CONFIRMED -> R.string.onb_auth_err_email_not_confirmed
+        AuthFailure.USER_EXISTS -> R.string.onb_auth_err_user_exists
+        AuthFailure.WEAK_PASSWORD -> R.string.onb_auth_err_weak_password
+        AuthFailure.RATE_LIMITED -> R.string.onb_auth_err_rate_limited
+        AuthFailure.INVALID_TOKEN -> R.string.onb_auth_err_invalid_token
+        AuthFailure.BRIDGE_UNAVAILABLE -> R.string.onb_auth_err_bridge_unavailable
+        AuthFailure.NETWORK -> R.string.onb_auth_err_network
+        AuthFailure.SERVER -> R.string.onb_auth_err_server
+        AuthFailure.UNKNOWN -> R.string.onb_auth_err_unknown
     }
 
-    fun validateInput(email: String, password: String): String? = when {
-        !Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$").matches(email.trim()) -> "Enter a valid email address."
-        password.length < 8 -> "Password must be at least 8 characters."
+    /** Returns a string resource id describing the first input problem, or null when the input is valid. */
+    @StringRes
+    fun validateInputRes(email: String, password: String): Int? = when {
+        !Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$").matches(email.trim()) -> R.string.onb_auth_err_invalid_email
+        password.length < 8 -> R.string.onb_auth_err_password_short
         else -> null
     }
 }

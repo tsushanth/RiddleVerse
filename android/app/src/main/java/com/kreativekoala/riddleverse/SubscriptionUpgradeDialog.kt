@@ -120,11 +120,11 @@ fun SubscriptionUpgradeDialog(
         appId = "riddleverse",
         appName = "RiddleVerse",
         features = listOf(
-            PaywallFeature("\u2728", "Unlimited Games", "Create without limits"),
-            PaywallFeature("\uD83C\uDFAF", "Play All Games", "Access every community game"),
-            PaywallFeature("\u26A1", "Priority Speed", "Faster game generation"),
-            PaywallFeature("\uD83D\uDCB0", "Share Your Games", "Publish games for others to play"),
-            PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
+            PaywallFeature("\u2728", stringResource(R.string.home_paywall_unlimited_title), stringResource(R.string.home_paywall_unlimited_desc)),
+            PaywallFeature("\uD83C\uDFAF", stringResource(R.string.home_paywall_play_all_title), stringResource(R.string.home_paywall_play_all_desc)),
+            PaywallFeature("\u26A1", stringResource(R.string.home_paywall_speed_title), stringResource(R.string.home_paywall_speed_desc)),
+            PaywallFeature("\uD83D\uDCB0", stringResource(R.string.home_paywall_share_title), stringResource(R.string.home_paywall_share_desc)),
+            PaywallFeature("\uD83C\uDFC6", stringResource(R.string.home_paywall_leaderboards_title), stringResource(R.string.home_paywall_leaderboards_desc))
         ),
         products = paywallProducts,
         theme = PaywallTheme(accent = RvViolet, accent2 = RvSky),
@@ -303,12 +303,12 @@ fun CoinStoreDialog(onDismiss: () -> Unit) {
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Unable to load coin packages.", color = RvInk, fontSize = 15.sp)
+                    Text(stringResource(R.string.home_coin_packages_error), color = RvInk, fontSize = 15.sp)
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = onDismiss,
                         colors = ButtonDefaults.buttonColors(containerColor = RvViolet)
-                    ) { Text("Close") }
+                    ) { Text(stringResource(R.string.close)) }
                 }
             }
         }
@@ -363,8 +363,8 @@ fun CoinPurchaseSection() {
                     Text("💰", fontSize = 24.sp)
                     Spacer(modifier = Modifier.width(12.dp))
                     Column(modifier = Modifier.weight(1f)) {
-                        Text("Coins", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
-                        Text("Balance: ${coinManager.balance} coins", fontSize = 14.sp, color = RvSunEdge)
+                        Text(stringResource(R.string.common_coins), fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
+                        Text(stringResource(R.string.home_coin_balance, coinManager.balance), fontSize = 14.sp, color = RvSunEdge)
                     }
                 }
                 Button(
@@ -372,12 +372,12 @@ fun CoinPurchaseSection() {
                     colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
                     shape = RoundedCornerShape(20.dp)
                 ) {
-                    Text("Buy Coins", fontSize = 12.sp, maxLines = 1, softWrap = false)
+                    Text(stringResource(R.string.buy_coins), fontSize = 12.sp, maxLines = 1, softWrap = false)
                 }
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                "Spend coins to create games, unlock harder challenges, and more.",
+                stringResource(R.string.home_coin_spend_hint),
                 fontSize = 12.sp, color = RvInkSoft
             )
         }
@@ -475,11 +475,11 @@ fun HardPaywallGate(
         appId = "riddleverse",
         appName = "RiddleVerse",
         features = listOf(
-            PaywallFeature("\u2728", "Unlimited Games", "Create without limits"),
-            PaywallFeature("\uD83C\uDFAF", "Play All Games", "Access every community game"),
-            PaywallFeature("\u26A1", "Priority Speed", "Faster game generation"),
-            PaywallFeature("\uD83D\uDCB0", "Share Your Games", "Publish games for others to play"),
-            PaywallFeature("\uD83C\uDFC6", "Leaderboards", "Compete globally")
+            PaywallFeature("\u2728", stringResource(R.string.home_paywall_unlimited_title), stringResource(R.string.home_paywall_unlimited_desc)),
+            PaywallFeature("\uD83C\uDFAF", stringResource(R.string.home_paywall_play_all_title), stringResource(R.string.home_paywall_play_all_desc)),
+            PaywallFeature("\u26A1", stringResource(R.string.home_paywall_speed_title), stringResource(R.string.home_paywall_speed_desc)),
+            PaywallFeature("\uD83D\uDCB0", stringResource(R.string.home_paywall_share_title), stringResource(R.string.home_paywall_share_desc)),
+            PaywallFeature("\uD83C\uDFC6", stringResource(R.string.home_paywall_leaderboards_title), stringResource(R.string.home_paywall_leaderboards_desc))
         ),
         products = paywallProducts,
         theme = PaywallTheme(accent = RvViolet, accent2 = RvSky),

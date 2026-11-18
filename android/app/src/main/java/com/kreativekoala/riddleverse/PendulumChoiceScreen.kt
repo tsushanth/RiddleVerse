@@ -223,7 +223,7 @@ fun PendulumChoiceScreen(
                     )
                 ) {
                     Text(
-                        text = if (isCorrect) "🎉 Correct!" else "❌ Wrong! Answer: $correctAnswer",
+                        text = if (isCorrect) "🎉 ${stringResource(R.string.correct)}" else "❌ ${stringResource(R.string.xb_wrong_answer_is, correctAnswer)}",
                         color = RvInk,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
@@ -260,7 +260,7 @@ fun PendulumChoiceScreen(
                     .heightIn(min = 48.dp),
                 enabled = !showResult
             ) {
-                Text("💡 Hint", fontSize = 14.sp)
+                Text("💡 ${stringResource(R.string.hint)}", fontSize = 14.sp)
             }
         }
     }

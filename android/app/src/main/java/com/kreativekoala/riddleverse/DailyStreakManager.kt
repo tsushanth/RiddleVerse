@@ -3,6 +3,9 @@ package com.kreativekoala.riddleverse
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.StringRes
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -46,7 +49,8 @@ data class DailyData(
 data class StreakReward(
     val coins: Int,
     val streakDay: Int,
-    val specialReward: String? = null
+    /** Label for a milestone day (7, 14, 30, 50, 100), or null on other days. */
+    @StringRes val specialRewardRes: Int? = null
 )
 
 // Daily system manager
@@ -108,18 +112,18 @@ object DailyStreakManager {
         }
 
         val specialReward = when (streakDay) {
-            7 -> "🎯 Week Warrior!"
-            14 -> "🔥 Two Week Champion!"
-            30 -> "👑 Monthly Master!"
-            50 -> "🏆 Dedication Hero!"
-            100 -> "💎 Century Legend!"
+            7 -> R.string.stats_streak_reward_week
+            14 -> R.string.stats_streak_reward_two_weeks
+            30 -> R.string.stats_streak_reward_month
+            50 -> R.string.stats_streak_reward_fifty
+            100 -> R.string.stats_streak_reward_hundred
             else -> null
         }
 
         return StreakReward(
             coins = baseCoins + bonusCoins,
             streakDay = streakDay,
-            specialReward = specialReward
+            specialRewardRes = specialReward
         )
     }
 
@@ -267,7 +271,7 @@ fun DailyStreakGiftDialog(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
+                        contentDescription = stringResource(R.string.close),
                         tint = RvInkSoft,
                         modifier = Modifier.size(24.dp)
                     )
@@ -294,7 +298,7 @@ fun DailyStreakGiftDialog(
             ) {
                 // Title
                 Text(
-                    text = if (!giftOpened) "Daily Reward!" else "Congratulations! 🎉",
+                    text = if (!giftOpened) stringResource(R.string.stats_daily_reward_title) else stringResource(R.string.stats_congratulations),
                     fontSize = 26.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = com.kreativekoala.riddleverse.ui.theme.RvInk,
@@ -323,7 +327,7 @@ fun DailyStreakGiftDialog(
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    text = "Current streak: $previousStreak days",
+                                    text = LocalContext.current.resources.getQuantityString(R.plurals.stats_current_streak_days, previousStreak, previousStreak),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.ExtraBold,
                                     color = com.kreativekoala.riddleverse.ui.theme.RvSunEdge
@@ -335,14 +339,14 @@ fun DailyStreakGiftDialog(
                     }
 
                     Text(
-                        text = if (!giftOpened) "Tap the gift to open your reward!" else "Opening...",
+                        text = if (!giftOpened) stringResource(R.string.stats_tap_gift_to_open) else stringResource(R.string.stats_opening),
                         fontSize = 16.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center
                     )
                 } else {
                     Text(
-                        text = "Here's your reward for day $newStreak!",
+                        text = stringResource(R.string.stats_reward_for_day, newStreak),
                         fontSize = 16.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center
@@ -399,7 +403,7 @@ fun DailyStreakGiftDialog(
                         // Bow
                         Icon(
                             imageVector = Icons.Default.CardGiftcard,
-                            contentDescription = "Gift",
+                            contentDescription = stringResource(R.string.stats_gift),
                             tint = RvSun,
                             modifier = Modifier.size(32.dp)
                         )
@@ -479,9 +483,9 @@ fun DailyStreakGiftDialog(
 
                             Text(
                                 text = if (newStreak == 1) {
-                                    "Day 1 🎯"
+                                    stringResource(R.string.stats_day_one)
                                 } else {
-                                    "$newStreak Day Streak! 🔥"
+                                    stringResource(R.string.stats_day_streak, newStreak)
                                 },
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
@@ -499,7 +503,7 @@ fun DailyStreakGiftDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.MonetizationOn,
-                                contentDescription = "Coins",
+                                contentDescription = stringResource(R.string.common_coins),
                                 tint = RvSun,
                                 modifier = Modifier
                                     .size(48.dp)
@@ -517,7 +521,7 @@ fun DailyStreakGiftDialog(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // Special reward message
-                        streakReward.specialReward?.let { specialReward ->
+                        streakReward.specialRewardRes?.let { specialReward ->
                             Card(
                                 colors = CardDefaults.cardColors(
                                     containerColor = RvGrape
@@ -525,7 +529,7 @@ fun DailyStreakGiftDialog(
                                 shape = RoundedCornerShape(16.dp)
                             ) {
                                 Text(
-                                    text = specialReward,
+                                    text = stringResource(specialReward),
                                     fontSize = 18.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = RvOnTone,
@@ -539,18 +543,18 @@ fun DailyStreakGiftDialog(
 
                         // Streak encouragement message
                         Text(
-                            text = when (newStreak) {
-                                1 -> "Welcome back! Start your streak journey! 🚀"
-                                2 -> "Great job! You're building a habit! 💪"
-                                3 -> "Three days strong! Keep it up! 🎯"
-                                7 -> "One week complete! You're on fire! 🔥"
-                                14 -> "Two weeks! Incredible dedication! 🏆"
-                                30 -> "One month! You're a champion! 👑"
-                                in 2..6 -> "Keep the momentum going! 🌟"
-                                in 8..13 -> "You're building an amazing streak! ⭐"
-                                in 15..29 -> "Outstanding consistency! 💎"
-                                else -> "Legendary streak! You're unstoppable! 🚀"
-                            },
+                            text = stringResource(when (newStreak) {
+                                1 -> R.string.stats_streak_enc_1
+                                2 -> R.string.stats_streak_enc_2
+                                3 -> R.string.stats_streak_enc_3
+                                7 -> R.string.stats_streak_enc_7
+                                14 -> R.string.stats_streak_enc_14
+                                30 -> R.string.stats_streak_enc_30
+                                in 2..6 -> R.string.stats_streak_enc_2_6
+                                in 8..13 -> R.string.stats_streak_enc_8_13
+                                in 15..29 -> R.string.stats_streak_enc_15_29
+                                else -> R.string.stats_streak_enc_more
+                            }),
                             fontSize = 14.sp,
                             color = RvInkSoft,
                             textAlign = TextAlign.Center
@@ -577,7 +581,7 @@ fun DailyStreakGiftDialog(
                         shape = RoundedCornerShape(24.dp)
                     ) {
                         Text(
-                            text = "Let's Play! 🎮",
+                            text = "${stringResource(R.string.lets_play)} 🎮",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone
@@ -585,7 +589,7 @@ fun DailyStreakGiftDialog(
                     }
                 } else if (!giftOpened) {
                     Text(
-                        text = "👆 Tap the gift above!",
+                        text = stringResource(R.string.stats_tap_gift_above),
                         fontSize = 14.sp,
                         color = RvGrape,
                         textAlign = TextAlign.Center,

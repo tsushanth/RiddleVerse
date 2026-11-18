@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.widthIn
@@ -246,7 +247,7 @@ fun MultipleChoicePuzzleScreen(
                     exit = fadeOut(animationSpec = tween(300))
                 ) {
                     Text(
-                        "+2 In-Time Bonus!",
+                        stringResource(R.string.xb_in_time_bonus),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (useEnhancedTheme) themeColors.accent else RvSuccessEdge,
@@ -395,14 +396,14 @@ fun EnhancedHeaderRow(
         IconButton(onClick = onBack) {
             Icon(
                 Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = stringResource(R.string.back),
                 tint = RvInk
             )
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                "Question $questionNumber of $totalQuestions",
+                stringResource(R.string.xb_question_of, questionNumber, totalQuestions),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = RvInk
@@ -424,7 +425,7 @@ fun EnhancedHeaderRow(
             IconButton(onClick = { onMenuExpanded(true) }) {
                 Icon(
                     Icons.Default.MoreVert,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(R.string.tab_settings),
                     tint = RvInk
                 )
             }
@@ -442,12 +443,12 @@ fun EnhancedHeaderRow(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 Icons.Default.Email,
-                                contentDescription = "Share Puzzle",
+                                contentDescription = stringResource(R.string.share_puzzle),
                                 modifier = Modifier.size(20.dp),
                                 tint = RvSuccess
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Share Puzzle")
+                            Text(stringResource(R.string.share_puzzle))
                         }
                     }
                 )
@@ -675,7 +676,7 @@ fun EnhancedResultDisplay(
     ) {
         if (isCorrectAnswer == true) {
             Text(
-                "\uD83C\uDF89 Excellent!",
+                "\uD83C\uDF89 ${stringResource(R.string.xa_excellent)}",
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (useEnhancedTheme) themeColors.primary else RvSuccess
@@ -685,7 +686,7 @@ fun EnhancedResultDisplay(
             }
         } else if (isCorrectAnswer == false) {
             Text(
-                "\u274C Incorrect! Correct: $correctAnswer",
+                "\u274C ${stringResource(R.string.xb_incorrect_correct, correctAnswer)}",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvError,
@@ -730,7 +731,7 @@ fun EnhancedHintButton(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                "Need a Hint?",
+                stringResource(R.string.xb_need_a_hint),
                 color = if (useEnhancedTheme) themeColors.accent else RvSunEdge,
                 fontWeight = FontWeight.Medium
             )

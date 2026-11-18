@@ -360,7 +360,7 @@ fun CrosswordPuzzleScreen(
                     ) {
                         if (totalScore > 0) {
                             Text(
-                                text = "Score: $totalScore",
+                                text = stringResource(R.string.xa_score_value, totalScore),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvVioletEdge
@@ -837,7 +837,7 @@ fun EnhancedCompletionDialog(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = "Final Score: $totalScore",
+                            text = stringResource(R.string.xa_final_score_value, totalScore),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvSky

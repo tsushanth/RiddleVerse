@@ -88,6 +88,22 @@ fun createWrapperConfig(
 }
 
 /**
+ * Display name for a difficulty value coming from the server or the app ("easy", "Medium", ...).
+ * The wire value is never changed; unknown values (e.g. "medium+") are shown as they are.
+ */
+fun localizedDifficulty(context: android.content.Context, raw: String): String = when (raw.trim().lowercase()) {
+    "easy" -> context.getString(R.string.riddle_tier_easy)
+    "medium" -> context.getString(R.string.riddle_tier_medium)
+    "hard" -> context.getString(R.string.riddle_tier_hard)
+    "expert" -> context.getString(R.string.common_difficulty_expert)
+    "advanced" -> context.getString(R.string.common_difficulty_advanced)
+    else -> raw
+}
+
+@Composable
+fun localizedDifficulty(raw: String): String = localizedDifficulty(androidx.compose.ui.platform.LocalContext.current, raw)
+
+/**
  * Standard loading state composable for wrappers
  */
 @Composable

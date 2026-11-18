@@ -49,7 +49,10 @@ object DiscoveryCatalog {
         "find_differences", "imagematch", "trainrouting"
     )
 
-    /** One-line pitch for the New row. Games without an entry fall back to the registry subtitle. */
+    /**
+     * One-line pitch for the New row (English source; the UI shows the [CatalogText] string of the same type).
+     * Games without an entry fall back to the registry subtitle.
+     */
     val TAGLINES: Map<String, String> = mapOf(
         "wordhive" to "Build words from seven letters",
         "sudoku" to "Every row, column and box, once",
@@ -91,8 +94,11 @@ object DiscoveryCatalog {
 
 enum class ForYouReason { CONTINUE, SIMILAR, EASY_WIN, QUICK_START }
 
-/** [basis] is the display title of the game a SIMILAR pick was derived from. */
-data class ForYouPick(val game: GameRef, val reason: ForYouReason, val basis: String? = null)
+/**
+ * [basis] is the English title of the game a SIMILAR pick was derived from; [basisType] is that game's type id,
+ * which the UI turns into the title in the app language (never show [basis] directly).
+ */
+data class ForYouPick(val game: GameRef, val reason: ForYouReason, val basis: String? = null, val basisType: String? = null)
 
 object ForYouRanking {
     const val DEFAULT_LIMIT = 8
@@ -130,10 +136,10 @@ object ForYouRanking {
         val byType = all.filter { !isTriaged(it) }.associateBy { it.type }
         val played = history.filter { it.plays > 0 && it.type in byType }
         val out = LinkedHashMap<String, ForYouPick>()
-        fun add(type: String, reason: ForYouReason, basis: String? = null) {
+        fun add(type: String, reason: ForYouReason, basis: String? = null, basisType: String? = null) {
             if (out.size >= limit || type in out) return
             val g = byType[type] ?: return
-            out[type] = ForYouPick(g, reason, basis)
+            out[type] = ForYouPick(g, reason, basis, basisType)
         }
 
         // 1. most recently played type (non-triaged), then 2. types similar to it
@@ -141,12 +147,12 @@ object ForYouRanking {
         if (recent != null) {
             val recentGame = byType.getValue(recent.type)
             add(recent.type, ForYouReason.CONTINUE)
-            similarTo(recent.type).forEach { add(it, ForYouReason.SIMILAR, recentGame.title) }
+            similarTo(recent.type).forEach { add(it, ForYouReason.SIMILAR, recentGame.title, recentGame.type) }
             // a couple of same-family siblings the recommendation map does not know about; capped so a
             // large family (English has ~15 games) cannot crowd out the easy winners below
             all.filter { it.filterCategory == recentGame.filterCategory && it.type !in out && byType.containsKey(it.type) }
                 .take(MAX_SIBLINGS)
-                .forEach { add(it.type, ForYouReason.SIMILAR, recentGame.title) }
+                .forEach { add(it.type, ForYouReason.SIMILAR, recentGame.title, recentGame.type) }
         }
 
         // 3. easy winners: high win rate over enough plays, best first

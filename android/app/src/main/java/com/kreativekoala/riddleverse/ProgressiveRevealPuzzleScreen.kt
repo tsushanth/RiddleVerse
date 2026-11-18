@@ -102,6 +102,7 @@ fun ProgressiveRevealPuzzleScreenWrapper(
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val xbContext = LocalContext.current
     val context = LocalContext.current
     val mediaCache = remember { MediaCacheManager.getInstance(context) }
 
@@ -233,7 +234,7 @@ fun ProgressiveRevealPuzzleScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing progressive puzzle data: ${e.message}", e)
-            errorMessage = "Failed to load progressive puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.xb_failed_to_load_progressive_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -242,7 +243,7 @@ fun ProgressiveRevealPuzzleScreenWrapper(
     // Render based on state
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading progressive reveal puzzle...")
+            LoadingScreen(message = stringResource(R.string.xb_loading_progressive_reveal_puzzle))
         }
 
         hasError -> {
@@ -261,7 +262,7 @@ fun ProgressiveRevealPuzzleScreenWrapper(
         puzzleData != null -> {
             ProgressiveRevealPuzzleScreen(
                 puzzleData = puzzleData!!,
-                round = "ROUND ${if (viewModel.isCustomPuzzleFlow) viewModel.currentQuestionNumber else viewModel.currentPuzzleNumber} of ${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}",
+                round = stringResource(R.string.xb_round_of, viewModel.getCurrentNumber(), viewModel.getTotalCount()),
                 onPuzzleComplete = { score, isCorrect ->
                     Log.d(TAG, "Progressive puzzle completed! Score: $score, Correct: $isCorrect")
                     handlePuzzleCompletion(isCorrect, isCorrect, score)
@@ -501,7 +502,7 @@ fun ProgressiveRevealPuzzleScreen(
                         )
 
                         Text(
-                            text = currentBlurLevel?.description ?: "Clear",
+                            text = currentBlurLevel?.description ?: stringResource(R.string.clear),
                             color = Color.Gray,
                             fontSize = 12.sp
                         )
@@ -574,7 +575,7 @@ fun ProgressiveRevealPuzzleScreen(
                             )
 
                             Text(
-                                text = currentClue.difficulty.uppercase(),
+                                text = localizedDifficulty(currentClue.difficulty).uppercase(),
                                 color = when (currentClue.difficulty.lowercase()) {
                                     "hardest" -> Color.Red
                                     "hard" -> Color.Cyan
@@ -615,7 +616,7 @@ fun ProgressiveRevealPuzzleScreen(
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
-                                    text = if (showHint) "Hide Hint" else "Show Hint",
+                                    text = if (showHint) stringResource(R.string.xb_hide_hint) else stringResource(R.string.xa_show_hint),
                                     fontSize = 14.sp
                                 )
                             }
@@ -732,7 +733,7 @@ fun ProgressiveRevealPuzzleScreen(
                                 ),
                                 modifier = Modifier.weight(1f)
                             ) {
-                                Text("Submit", fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.submit), fontWeight = FontWeight.Bold)
                             }
 
                             // Next clue button
@@ -742,7 +743,7 @@ fun ProgressiveRevealPuzzleScreen(
                                     colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Next Clue")
+                                    Text(stringResource(R.string.xb_next_clue))
                                 }
                             } else {
                                 Button(
@@ -750,7 +751,7 @@ fun ProgressiveRevealPuzzleScreen(
                                     colors = ButtonDefaults.buttonColors(containerColor = Color.Magenta),
                                     modifier = Modifier.weight(1f)
                                 ) {
-                                    Text("Reveal")
+                                    Text(stringResource(R.string.reveal))
                                 }
                             }
                         }
@@ -794,19 +795,19 @@ fun ProgressiveRevealPuzzleScreen(
 
                         if (isCorrect) {
                             Text(
-                                text = "Congratulations!",
+                                text = stringResource(R.string.xa_congratulations),
                                 color = Color.Green,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
-                                text = "You earned $score points!",
+                                text = stringResource(R.string.xb_you_earned_points, score),
                                 color = Color.White,
                                 fontSize = 14.sp
                             )
                         } else {
                             Text(
-                                text = if (score > 0) "You earned $score points" else "Better luck next time!",
+                                text = if (score > 0) stringResource(R.string.xb_you_earned_points, score) else stringResource(R.string.xb_better_luck_next_time),
                                 color = Color.White,
                                 fontSize = 14.sp
                             )
@@ -876,12 +877,12 @@ fun ProgressiveRevealHeader(
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBack) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back", tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back), tint = Color.White)
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = difficulty.uppercase(),
+                    text = localizedDifficulty(difficulty).uppercase(),
                     color = Color.White,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold

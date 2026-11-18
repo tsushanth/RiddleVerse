@@ -329,7 +329,7 @@ fun PriceOrderingPuzzleScreen(
                     modifier = Modifier.weight(1f, fill = false)
                 )
                 Text(
-                    text = "Score: $score",
+                    text = stringResource(R.string.xa_score_value, score),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInk,
@@ -338,7 +338,7 @@ fun PriceOrderingPuzzleScreen(
                 )
                 if (attempts > 0) {
                     Text(
-                        text = "Attempt: $attempts",
+                        text = stringResource(R.string.xa_attempt_value, attempts),
                         fontSize = 14.sp,
                         color = RvInkSoft,
                         maxLines = 1
@@ -432,7 +432,7 @@ private fun CompactDiscountHud(
             )
         }
         Text(
-            text = "Level ${level.level}",
+            text = stringResource(R.string.stats_level_number, level.level),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = RvInk,
@@ -506,7 +506,7 @@ fun EnhancedDiscountTopGameBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk

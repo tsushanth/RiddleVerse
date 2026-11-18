@@ -446,7 +446,7 @@ fun CalculatorGrid(
             enabled = currentInput.isNotEmpty()
         ) {
             Text(
-                text = "SUBMIT",
+                text = stringResource(R.string.submit).uppercase(),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (currentInput.isNotEmpty()) RvOnTone else RvInkSoft
@@ -667,7 +667,7 @@ fun EnhancedAveragesTopGameBar(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Level ${level.level}",
+                text = stringResource(R.string.stats_level_number, level.level),
                 fontSize = if (compact) 16.sp else 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,

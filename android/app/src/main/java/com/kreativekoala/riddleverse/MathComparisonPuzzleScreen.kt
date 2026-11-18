@@ -523,7 +523,7 @@ fun MathComparisonPuzzleScreen(
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
-                                        if (isCorrect) "✅ Correct!" else "❌ Wrong answer. Lives: $livesRemaining",
+                                        if (isCorrect) "✅ ${stringResource(R.string.correct)}" else "❌ ${stringResource(R.string.xa_wrong_answer_lives, livesRemaining)}",
                                         color = RvOnTone,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium,
@@ -613,7 +613,7 @@ private fun EnhancedMathComparisonTopBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk,

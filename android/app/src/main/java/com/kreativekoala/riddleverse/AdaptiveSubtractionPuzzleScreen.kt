@@ -30,6 +30,8 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.math.*
 import kotlin.random.Random
+import androidx.compose.ui.res.stringResource
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 // Data class for subtraction puzzles
 data class SubtractionPuzzle(
@@ -320,7 +322,7 @@ fun AdaptiveSubtractionPuzzleScreen(
                     ) {
                         if (totalScore > 0) {
                             Text(
-                                text = "Score: $totalScore",
+                                text = stringResource(R.string.xa_score_value, totalScore),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
@@ -329,7 +331,7 @@ fun AdaptiveSubtractionPuzzleScreen(
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = currentDifficultyLevel.name.uppercase(),
+                                text = rvDifficultyLabel(currentDifficultyLevel.name).uppercase(),
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.Cyan
@@ -344,7 +346,7 @@ fun AdaptiveSubtractionPuzzleScreen(
 
                         if (attempts > 0) {
                             Text(
-                                text = "Attempt: $attempts",
+                                text = stringResource(R.string.xa_attempt_value, attempts),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.White.copy(alpha = 0.8f)
@@ -572,7 +574,7 @@ fun AdaptiveSubtractionTopGameBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.back),
                     tint = Color.White,
                     modifier = Modifier.size(28.dp)
                 )
@@ -580,14 +582,14 @@ fun AdaptiveSubtractionTopGameBar(
 
             Icon(
                 imageVector = Icons.Default.Pause,
-                contentDescription = "Pause",
+                contentDescription = stringResource(R.string.common_pause),
                 tint = Color.White.copy(alpha = 0.7f),
                 modifier = Modifier.size(24.dp)
             )
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -595,7 +597,7 @@ fun AdaptiveSubtractionTopGameBar(
 
                 // Adaptive difficulty indicator
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Cyan

@@ -1,6 +1,11 @@
 package com.kreativekoala.riddleverse
 
-/** Start-screen display name, category and benefits for the grid, classic, spatial and word games. */
+import android.content.Context
+
+/**
+ * Start-screen display name, category and benefits for the grid, classic, spatial and word games.
+ * The text in [Info] is the English source; use [name], [category] and [benefits] with a Context for what a player sees.
+ */
 object NewGameInfo {
     class Info(val name: String, val category: String, val benefits: List<String>)
 
@@ -38,4 +43,24 @@ object NewGameInfo {
     )
 
     fun of(type: String): Info? = table[type.lowercase()]
+
+    /** Game name in the app language, or null when [type] is not one of these games. */
+    fun name(context: Context, type: String): String? {
+        val info = of(type) ?: return null
+        val res = CatalogText.titleRes(type)
+        return if (res != 0) context.getString(res) else info.name
+    }
+
+    /** Skill-area label ("Logic Games", ...) in the app language, or null when [type] is not one of these games. */
+    fun category(context: Context, type: String): String? {
+        val info = of(type) ?: return null
+        return PuzzleTypeNames.localizeLabel(context, info.category)
+    }
+
+    /** The BENEFITS bullets in the app language, or null when [type] is not one of these games. */
+    fun benefits(context: Context, type: String): List<String>? {
+        val info = of(type) ?: return null
+        val res = CatalogText.benefitRes(type) ?: return info.benefits
+        return res.map { context.getString(it) }
+    }
 }

@@ -550,7 +550,7 @@ private fun EnhancedMathExpressionTopBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -967,8 +967,8 @@ fun GameOverOverlay(
             ) {
                 Text(
                     text = when (gameState) {
-                        GameState.WON -> "🎉 Excellent!"
-                        GameState.TIME_UP -> "⏰ Time's Up!"
+                        GameState.WON -> "🎉 ${stringResource(R.string.xa_excellent)}"
+                        GameState.TIME_UP -> "⏰ ${stringResource(R.string.common_times_up)}"
                         else -> stringResource(R.string.game_over)
                     },
                     fontSize = 24.sp,

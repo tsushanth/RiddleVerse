@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.view.accessibility.AccessibilityManager
 import androidx.compose.animation.core.Animatable
@@ -115,18 +116,18 @@ private fun TrailBoard(args: SpatialArgs, p: TrailPuzzle) {
         args = args,
         status = "Cells ${game.length}/${p.cells}",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.length > 1 && !done) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.length > 1 && !done) {
                 if (game.undo()) changed()
             }
-            SpatialAction(Icons.Default.Refresh, "Reset", enabled = !done) { game.reset(); changed() }
-            SpatialAction(Icons.Default.Lightbulb, "Hint", enabled = !done) {
+            SpatialAction(Icons.Default.Refresh, stringResource(R.string.reset), enabled = !done) { game.reset(); changed() }
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint), enabled = !done) {
                 val h = game.hint(3)
                 saved.value = game.encode()
                 hintCells = h
                 message = if (h.isEmpty()) "" else "The next squares are marked"
                 tick++
             }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         Text(
@@ -270,8 +271,8 @@ private fun TrailBoard(args: SpatialArgs, p: TrailPuzzle) {
         SpatialResultDialog(
             success = true, title = "Trail complete!",
             detail = "Every square covered with one line. Score $s",
-            stars = game.stars(), primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) },
-            secondaryLabel = "Play again",
+            stars = game.stars(), primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) },
+            secondaryLabel = stringResource(R.string.play_again),
             onSecondary = {
                 scope.launch { win.snapTo(0f) }
                 game.reset(); done = false; showResult = false; changed()

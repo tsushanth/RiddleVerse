@@ -28,6 +28,8 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun AdaptiveSymmetryPuzzleScreen(
@@ -79,6 +81,7 @@ fun AdaptiveSymmetryPuzzleScreen(
     var showFeedback by remember { mutableStateOf(false) }
     var isCorrect by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
+    val msgContext = LocalContext.current
     var score by remember { mutableStateOf(0) }
     var totalScore by remember { mutableStateOf(0) }
     var timeRemaining by remember { mutableStateOf(currentDifficultyLevel.timeLimit) }
@@ -175,7 +178,7 @@ fun AdaptiveSymmetryPuzzleScreen(
                         timeSpent < 1.0 -> "Lightning fast! ⚡️"
                         timeSpent < 2.0 -> "Super quick! 🚀"
                         timeSpent < 4.0 -> "Nice speed! ✨"
-                        else -> "Perfect! 🎯"
+                        else -> "${msgContext.getString(R.string.xa_perfect)} 🎯"
                     }
 
                     recordPerformance(true, (timeSpent * 1000).toLong())
@@ -215,7 +218,7 @@ fun AdaptiveSymmetryPuzzleScreen(
             isTimerRunning = false
             showFeedback = true
             isCorrect = false
-            feedbackMessage = "Time's up! ⏰"
+            feedbackMessage = "${msgContext.getString(R.string.times_up)} ⏰"
             currentStreak = 0
             totalAnswers++
 
@@ -352,7 +355,7 @@ fun AdaptiveSymmetryPuzzleScreen(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                 )
                 Text(
-                    text = currentDifficultyLevel.description,
+                    text = currentDifficultyLevel.descriptionText(),
                     fontSize = 12.sp,
                     color = RvVioletEdge,
                     fontWeight = FontWeight.Medium,
@@ -511,14 +514,14 @@ fun AdaptiveSymmetryTopBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInkSoft
                 )
 
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSky
@@ -629,14 +632,14 @@ fun AdaptiveSymmetrySpeedFeedback(
             if (isCorrect) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "+$score pts",
+                    text = stringResource(R.string.xa_plus_pts_value, score),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSuccess
                 )
 
                 Text(
-                    text = "Difficulty: ${difficultyLevel.name} • Speed Bonus! ⚡",
+                    text = "${stringResource(R.string.riddle_tier_desc, rvDifficultyLabel(difficultyLevel.name))} • ${stringResource(R.string.xa_speed_bonus)} ⚡",
                     fontSize = 12.sp,
                     color = RvSuccess,
                     fontWeight = FontWeight.Medium

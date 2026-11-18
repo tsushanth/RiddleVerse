@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -223,7 +224,7 @@ fun ColorTextMatchingScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading adaptive puzzle...")
+                Text(stringResource(R.string.xb_loading_adaptive_puzzle))
             }
         }
     }

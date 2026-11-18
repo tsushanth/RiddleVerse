@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -139,7 +140,7 @@ fun ClassicScaffold(
     val chrome: @Composable ColumnScope.(Boolean) -> Unit = { side ->
         Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
             }
             Text(
                 title, fontSize = 20.sp, fontWeight = FontWeight.Bold,
@@ -219,7 +220,7 @@ fun ClassicResultDialog(
         },
         confirmButton = {
             Button(onClick = onContinue, modifier = Modifier.heightIn(min = 48.dp)) {
-                Text(if (success) "Continue" else "Next puzzle")
+                Text(stringResource(if (success) R.string.continue_label else R.string.next_puzzle))
             }
         },
     )

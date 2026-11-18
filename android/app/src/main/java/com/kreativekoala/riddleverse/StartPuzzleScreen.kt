@@ -27,6 +27,8 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.annotation.StringRes
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import android.app.Activity
@@ -117,7 +119,7 @@ class StartPuzzleActivity : AppCompatActivity() {
         val dailyTopic = intent.getStringExtra("dailyTopic") // NEW
         val userEmail = intent.getStringExtra("userEmail") // NEW
         val puzzleType = intent.getStringExtra("puzzleType") ?: "Unknown"
-        val title = intent.getStringExtra("title")?.takeIf { it.isNotBlank() } ?: PuzzleTypeNames.display(puzzleType)
+        val title = intent.getStringExtra("title")?.takeIf { it.isNotBlank() } ?: PuzzleTypeNames.display(this, puzzleType)
         val isCustomPuzzle = intent.getBooleanExtra("isCustomPuzzle", false)
         val customPuzzleId = intent.getStringExtra("customPuzzleId")
 
@@ -243,52 +245,56 @@ class StartPuzzleActivity : AppCompatActivity() {
 /**
  * Generate difficulty insight based on puzzle type and difficulty
  */
-fun generateDifficultyInsight(puzzleType: String, difficulty: String): String {
+@StringRes
+fun difficultyInsightRes(puzzleType: String, difficulty: String): Int {
     return when (puzzleType.lowercase()) {
         "math" -> when (difficulty) {
-            "Easy" -> "Basic arithmetic and simple word problems"
-            "Medium" -> "Multi-step problems requiring logical thinking"
-            "Hard" -> "Complex calculations and advanced concepts"
-            else -> "Mathematical problem solving"
+            "Easy" -> R.string.done_insight_math_easy
+            "Medium" -> R.string.done_insight_math_medium
+            "Hard" -> R.string.done_insight_math_hard
+            else -> R.string.done_insight_math_other
         }
         "anagram" -> when (difficulty) {
-            "Easy" -> "Short words with common letter patterns"
-            "Medium" -> "Medium-length words with mixed patterns"
-            "Hard" -> "Long words with complex arrangements"
-            else -> "Word rearrangement challenges"
+            "Easy" -> R.string.done_insight_anagram_easy
+            "Medium" -> R.string.done_insight_anagram_medium
+            "Hard" -> R.string.done_insight_anagram_hard
+            else -> R.string.done_insight_anagram_other
         }
         "trivia" -> when (difficulty) {
-            "Easy" -> "General knowledge and common facts"
-            "Medium" -> "Specific knowledge across various topics"
-            "Hard" -> "Specialized knowledge and obscure facts"
-            else -> "Knowledge-based questions"
+            "Easy" -> R.string.done_insight_trivia_easy
+            "Medium" -> R.string.done_insight_trivia_medium
+            "Hard" -> R.string.done_insight_trivia_hard
+            else -> R.string.done_insight_trivia_other
         }
         "wordsearch" -> when (difficulty) {
-            "Easy" -> "Small grids with horizontal/vertical words"
-            "Medium" -> "Medium grids with diagonal patterns"
-            "Hard" -> "Large grids with complex word placement"
-            else -> "Hidden word finding challenges"
+            "Easy" -> R.string.done_insight_wordsearch_easy
+            "Medium" -> R.string.done_insight_wordsearch_medium
+            "Hard" -> R.string.done_insight_wordsearch_hard
+            else -> R.string.done_insight_wordsearch_other
         }
         "crypto" -> when (difficulty) {
-            "Easy" -> "Simple substitution ciphers"
-            "Medium" -> "Mixed cipher techniques"
-            "Hard" -> "Complex encryption patterns"
-            else -> "Code-breaking challenges"
+            "Easy" -> R.string.done_insight_crypto_easy
+            "Medium" -> R.string.done_insight_crypto_medium
+            "Hard" -> R.string.done_insight_crypto_hard
+            else -> R.string.done_insight_crypto_other
         }
         "wordsnake" -> when (difficulty) {
-            "Easy" -> "Short word chains with clear connections"
-            "Medium" -> "Longer chains requiring word association"
-            "Hard" -> "Complex paths with challenging connections"
-            else -> "Word connection puzzles"
+            "Easy" -> R.string.done_insight_wordsnake_easy
+            "Medium" -> R.string.done_insight_wordsnake_medium
+            "Hard" -> R.string.done_insight_wordsnake_hard
+            else -> R.string.done_insight_wordsnake_other
         }
         else -> when (difficulty) {
-            "Easy" -> "Beginner-friendly challenges"
-            "Medium" -> "Moderate difficulty requiring focus"
-            "Hard" -> "Advanced puzzles for experienced solvers"
-            else -> "Cognitive training exercises"
+            "Easy" -> R.string.done_insight_default_easy
+            "Medium" -> R.string.done_insight_default_medium
+            "Hard" -> R.string.done_insight_default_hard
+            else -> R.string.done_insight_default_other
         }
     }
 }
+
+fun generateDifficultyInsight(context: Context, puzzleType: String, difficulty: String): String =
+    context.getString(difficultyInsightRes(puzzleType, difficulty))
 
 /**
  * Generate top scores based on high score
@@ -365,14 +371,12 @@ fun showGroupCompletionDialog(
     sourceGroupId: String
 ) {
     val dialog = androidx.appcompat.app.AlertDialog.Builder(activity)
-        .setTitle("🎉 Puzzle Type Completed!")
+        .setTitle("🎉 ${activity.getString(R.string.done_group_completed_title)}")
         .setMessage(
-            "Excellent work! You've completed all 5 $puzzleType puzzles.\n\n" +
-                    "Score: $score points\n\n" +
-                    if (sourceGroupName != null) "Next puzzle type in '$sourceGroupName' is now unlocked!"
-                    else "You can continue with the next puzzle type in your group."
+            if (sourceGroupName != null) activity.getString(R.string.done_group_dialog_msg_named, puzzleType, score, sourceGroupName)
+            else activity.getString(R.string.done_group_dialog_msg_generic, puzzleType, score)
         )
-        .setPositiveButton("Continue Group") { _, _ ->
+        .setPositiveButton(activity.getString(R.string.done_continue_group)) { _, _ ->
             // Set result and finish to return to group
             val resultIntent = Intent().apply {
                 putExtra("groupCompleted", true)
@@ -381,7 +385,7 @@ fun showGroupCompletionDialog(
             activity.setResult(Activity.RESULT_OK, resultIntent) // CHANGED THIS LINE
             activity.finish()
         }
-        .setNegativeButton("Home") { _, _ ->
+        .setNegativeButton(activity.getString(R.string.home)) { _, _ ->
             // Go to home
             activity.finish()
         }
@@ -394,9 +398,9 @@ fun showGroupCompletionDialog(
 // ADD: Regular completion dialog for non-group puzzles
 fun showRegularCompletionDialog(activity: AppCompatActivity, score: Int) {
     val dialog = androidx.appcompat.app.AlertDialog.Builder(activity)
-        .setTitle("🎉 Puzzle Completed!")
-        .setMessage("Great job! Your score: $score points")
-        .setPositiveButton("Continue") { _, _ ->
+        .setTitle("🎉 ${activity.getString(R.string.puzzle_completed)}")
+        .setMessage(activity.getString(R.string.done_great_job_score, score))
+        .setPositiveButton(activity.getString(R.string.continue_label)) { _, _ ->
             activity.finish()
         }
         .setCancelable(false)
@@ -654,7 +658,7 @@ fun StartPuzzleScreen(
 
     // 🔧 FIXED: Use new architecture for difficulty insight
     val difficultyInsight = remember(type, selectedDifficulty) {
-        generateDifficultyInsight(type, selectedDifficulty)
+        generateDifficultyInsight(context, type, selectedDifficulty)
     }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -846,7 +850,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Image puzzle tutorial completed! Ready to solve some picture puzzles?", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_image), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -862,7 +866,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Crypto tutorial completed! Ready to crack some secret codes?", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_crypto), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -876,7 +880,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Word Snake tutorial completed! Ready to build some snake paths?", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_wordsnake), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -890,7 +894,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Tutorial completed! Ready to play?", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_generic), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -904,7 +908,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Division tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_division), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -918,7 +922,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Conversion tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_conversion), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -932,7 +936,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Discount tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_discount), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -946,7 +950,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Memory Squares tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_memorysquares), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -960,7 +964,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Synonym tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_synonym), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -974,7 +978,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Antonym tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_antonym), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -988,7 +992,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Crossword tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_crossword), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -1002,7 +1006,7 @@ fun StartPuzzleScreen(
                     onTutorialComplete = {
                         showTutorial = false
                         tutorialPrefs.markTutorialSeen(type)
-                        Toast.makeText(context, "Pinball Deflector tutorial completed!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.done_tutorial_completed_pinball), Toast.LENGTH_SHORT).show()
                     },
                     onTutorialSkipped = {
                         showTutorial = false
@@ -1465,7 +1469,7 @@ fun StartPuzzleScreen(
                                         }
                                         Toast.makeText(
                                             context,
-                                            "Interactive tutorial for ${getPuzzleDisplayName(type)} - Coming soon!",
+                                            context.getString(R.string.done_tutorial_coming_soon, getPuzzleDisplayName(type)),
                                             Toast.LENGTH_LONG
                                         ).show()
                                     }
@@ -1501,7 +1505,7 @@ fun StartPuzzleScreen(
             ) {
                 // Every word must show on a 320dp phone even at font scale 2.0: wrap to 3 lines, shrink 36sp -> 18sp if still too wide.
                 com.kreativekoala.riddleverse.ui.AutoShrinkText(
-                    text = if (isDailyPuzzle) "Daily $quizTitle" else quizTitle,
+                    text = if (isDailyPuzzle) stringResource(R.string.done_daily_title, quizTitle) else quizTitle,
                     maxSize = 36.sp,
                     minSize = 18.sp,
                     maxLines = 3,
@@ -1511,7 +1515,7 @@ fun StartPuzzleScreen(
                 )
 
                 Text(
-                    text = if (isDailyPuzzle) "Your personalized daily challenge" else getPuzzleCategory(type),
+                    text = if (isDailyPuzzle) stringResource(R.string.done_personalized_daily_challenge) else getPuzzleCategory(type),
                     fontSize = 18.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center,
@@ -1538,13 +1542,13 @@ fun StartPuzzleScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Star,
-                            contentDescription = "From Group",
+                            contentDescription = stringResource(R.string.done_from_group_cd),
                             tint = RvViolet,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "From: $sourceGroupName",
+                            text = stringResource(R.string.done_from_group, sourceGroupName),
                             fontSize = 12.sp,
                             color = RvInk
                         )
@@ -1582,7 +1586,7 @@ fun StartPuzzleScreen(
                             else -> {
                                 Toast.makeText(
                                     context,
-                                    "Interactive tutorial for ${getPuzzleDisplayName(type)} - Coming soon!",
+                                    context.getString(R.string.done_tutorial_coming_soon, getPuzzleDisplayName(type)),
                                     Toast.LENGTH_LONG
                                 ).show()
                                 showTutorialBanner = false
@@ -1615,13 +1619,13 @@ fun StartPuzzleScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         StatCard(
-                            title = "HIGH SCORE",
+                            title = stringResource(R.string.done_stat_high_score),
                             value = stats.highScore.toString(),
                             modifier = Modifier.weight(1f)
                         )
 
                         StatCard(
-                            title = "DIFFICULTY",
+                            title = stringResource(R.string.done_stat_difficulty),
                             value = stats.difficulty,
                             modifier = Modifier.weight(1f)
                         )
@@ -1636,7 +1640,7 @@ fun StartPuzzleScreen(
 
                     // Advanced Stats
                     Text(
-                        text = "ADVANCED STATS:",
+                        text = stringResource(R.string.done_advanced_stats),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInkSoft,
@@ -1648,13 +1652,13 @@ fun StartPuzzleScreen(
                         horizontalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         StatCard(
-                            title = "TIME TRAINED",
-                            value = "${"%.1f".format(stats.timesTrained)} hrs",
+                            title = stringResource(R.string.done_stat_time_trained),
+                            value = stringResource(R.string.done_hours_short, "%.1f".format(stats.timesTrained)),
                             modifier = Modifier.weight(1f)
                         )
 
                         StatCard(
-                            title = "WINS",
+                            title = stringResource(R.string.done_stat_wins),
                             value = stats.wins.toString(),
                             modifier = Modifier.weight(1f)
                         )
@@ -1688,7 +1692,7 @@ fun StartPuzzleScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Info,
-                            contentDescription = "Error",
+                            contentDescription = stringResource(R.string.common_error),
                             tint = RvWarningEdge,
                             modifier = Modifier.size(20.dp)
                         )
@@ -1697,9 +1701,9 @@ fun StartPuzzleScreen(
 
                         Text(
                             text = when {
-                                error.contains("No puzzles found") -> "No daily puzzles available for ${dailyTopic ?: "this topic"} today."
-                                error.contains("Network error") -> "Connection issue. Please check your internet."
-                                else -> "Unable to load puzzle. Please try again."
+                                error.contains("No puzzles found") -> stringResource(R.string.done_no_daily_puzzles_for_topic, dailyTopic ?: stringResource(R.string.done_this_topic))
+                                error.contains("Network error") -> stringResource(R.string.done_connection_issue_short)
+                                else -> stringResource(R.string.done_unable_to_load_puzzle_retry)
                             },
                             fontSize = 12.sp,
                             color = RvInk,
@@ -1711,7 +1715,7 @@ fun StartPuzzleScreen(
                             contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
                         ) {
                             Text(
-                                text = "Dismiss",
+                                text = stringResource(R.string.welcome_back_dismiss),
                                 fontSize = 12.sp,
                                 color = RvWarningEdge
                             )
@@ -2151,10 +2155,10 @@ fun StartPuzzleScreen(
                                 Log.e("RedesignedStartPuzzle", "❌ Daily puzzle load failed: $errorMsg")
 
                                 val userMessage = when {
-                                    errorMsg.contains("No puzzles found") -> "No daily puzzles available for $dailyTopic today. Try again later!"
-                                    errorMsg.contains("Network error") -> "Connection issue. Please check your internet and try again."
-                                    errorMsg.contains("parsing") -> "Something went wrong loading your puzzle. Please try again."
-                                    else -> "Failed to load daily puzzle. Please try again."
+                                    errorMsg.contains("No puzzles found") -> context.getString(R.string.done_no_daily_puzzles_try_later, dailyTopic)
+                                    errorMsg.contains("Network error") -> context.getString(R.string.done_connection_issue_retry)
+                                    errorMsg.contains("parsing") -> context.getString(R.string.done_something_went_wrong_loading)
+                                    else -> context.getString(R.string.done_failed_to_load_daily_puzzle)
                                 }
 
                                 Toast.makeText(context, userMessage, Toast.LENGTH_LONG).show()
@@ -2174,7 +2178,7 @@ fun StartPuzzleScreen(
                             onSuccess = { isLoading = false },
                             onError = {
                                 isLoading = false
-                                Toast.makeText(context, "Failed to load custom puzzle", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.done_failed_to_load_custom_puzzle), Toast.LENGTH_SHORT).show()
                             }
                         )
                     }
@@ -2196,7 +2200,7 @@ fun StartPuzzleScreen(
                             onSuccess = { isLoading = false },
                             onError = {
                                 isLoading = false
-                                Toast.makeText(context, "Failed to load puzzle", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.done_failed_to_load_puzzle), Toast.LENGTH_SHORT).show()
                             },
                             onLimitReached = { limitInfo ->
                                 isLoading = false
@@ -2437,7 +2441,7 @@ fun StartPuzzleScreen(
                                         onSuccess = { isLoading = false },
                                         onError = {
                                             isLoading = false
-                                            Toast.makeText(context, "Failed to load custom puzzle", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.done_failed_to_load_custom_puzzle), Toast.LENGTH_SHORT).show()
                                         }
                                     )
                                 }
@@ -2457,7 +2461,7 @@ fun StartPuzzleScreen(
                                         onSuccess = { isLoading = false },
                                         onError = {
                                             isLoading = false
-                                            Toast.makeText(context, "Failed to load puzzle", Toast.LENGTH_SHORT).show()
+                                            Toast.makeText(context, context.getString(R.string.done_failed_to_load_puzzle), Toast.LENGTH_SHORT).show()
                                         },
                                         onLimitReached = { limitInfo ->
                                             isLoading = false
@@ -2490,15 +2494,15 @@ fun StartPuzzleScreen(
                             )
                             Text(
                                 text = when {
-                                    !isDailyPuzzle && !isCustomPuzzle && prefetchInProgress -> "Preparing..."
-                                    !isDailyPuzzle && !isCustomPuzzle && prefetchedPuzzle != null -> "Starting..."
-                                    else -> "Loading..."
+                                    !isDailyPuzzle && !isCustomPuzzle && prefetchInProgress -> stringResource(R.string.browse_preparing)
+                                    !isDailyPuzzle && !isCustomPuzzle && prefetchedPuzzle != null -> stringResource(R.string.done_starting)
+                                    else -> stringResource(R.string.loading)
                                 }
                             )
                         }
                     } else {
                         Text(
-                            text = "🎮 Start Playing",
+                            text = stringResource(R.string.done_start_playing),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone
@@ -2506,7 +2510,7 @@ fun StartPuzzleScreen(
                         if (!isDailyPuzzle && !isCustomPuzzle && prefetchedPuzzle != null) {
                             Icon(
                                 imageVector = Icons.Default.CheckCircle,
-                                contentDescription = "Ready",
+                                contentDescription = stringResource(R.string.home_filter_ready),
                                 tint = RvSuccess,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -2555,7 +2559,7 @@ fun StartPuzzleScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "Earn coins",
+                            stringResource(R.string.done_earn_coins),
                             fontSize = 11.sp,
                             maxLines = 1,
                             softWrap = false,
@@ -2708,7 +2712,7 @@ fun BenefitsSection(puzzleType: String) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "BENEFITS:",
+            text = stringResource(R.string.done_benefits_heading),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = RvInkSoft,
@@ -2765,7 +2769,7 @@ fun TopScoresSection(topScores: List<Int>) {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "TOP 10 SCORES:",
+            text = stringResource(R.string.done_top_10_scores),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = RvInkSoft,
@@ -2867,7 +2871,7 @@ fun GameConfigurationSection(
 
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
-                    contentDescription = if (isExpanded) "Collapse" else "Expand",
+                    contentDescription = stringResource(if (isExpanded) R.string.done_collapse else R.string.done_expand),
                     tint = RvInkSoft
                 )
             }
@@ -2889,7 +2893,7 @@ fun GameConfigurationSection(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Info,
-                                contentDescription = "Difficulty Info",
+                                contentDescription = stringResource(R.string.done_difficulty_info_cd),
                                 tint = RvViolet,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -2918,7 +2922,7 @@ fun GameConfigurationSection(
                             FilterChip(
                                 selected = selectedDifficulty == level,
                                 onClick = { onDifficultyChanged(level) },
-                                label = { Text(level) },
+                                label = { Text(rvDifficultyLabel(level)) },
                                 modifier = Modifier.weight(1f),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = RvViolet,
@@ -2947,12 +2951,12 @@ fun GameConfigurationSection(
                                 label = {
                                     Text(
                                         when(option) {
-                                            "Default" -> "Q&A"
-                                            "multipleChoice" -> "Multiple Choice"
-                                            "Match Screen" -> "Word Match"
-                                            "Swipe Word Screen" -> "Swipe Cards"
-                                            "Jumble Input Screen" -> "Word Jumble"
-                                            "Falling Game Screen" -> "Space Game"
+                                            "Default" -> stringResource(R.string.cat_extra_q_a)
+                                            "multipleChoice" -> stringResource(R.string.cat_extra_multiple_choice)
+                                            "Match Screen" -> stringResource(R.string.done_mode_word_match)
+                                            "Swipe Word Screen" -> stringResource(R.string.done_mode_swipe_cards)
+                                            "Jumble Input Screen" -> stringResource(R.string.done_mode_word_jumble)
+                                            "Falling Game Screen" -> stringResource(R.string.done_mode_space_game)
                                             else -> option
                                         }
                                     )
@@ -3022,7 +3026,7 @@ private fun fetchFromAPIWithMediaCaching(
                         puzzleType = type,
                         difficulty = difficulty,
                         estimatedWaitTime = json.optInt("estimatedWaitMinutes", 2),
-                        message = json.optString("message", "New puzzles are being generated"),
+                        message = json.optString("message", context.getString(R.string.done_new_puzzles_generating)),
                         remainingPuzzles = json.optInt("remainingPuzzles", 0),
                         isInitialSetup = json.optBoolean("initialSetup", false),
                         notificationEnabled = json.optBoolean("notificationEnabled", true)
@@ -3046,7 +3050,7 @@ private fun fetchFromAPIWithMediaCaching(
                         monthlyLimit = limitInfoJson.optJSONObject("limits")?.optInt("monthlyLimit", 100) ?: 100,
                         resetTime = limitInfoJson.optString("resetTime", ""),
                         upgradeUrl = limitInfoJson.optString("upgradeUrl", "/upgrade"),
-                        message = limitInfoJson.optString("message", "Generation limit reached")
+                        message = limitInfoJson.optString("message", context.getString(R.string.done_generation_limit_reached))
                     )
 
                     limitManager.saveLimitInfo(type, limitInfo)
@@ -3233,7 +3237,7 @@ private fun RegenerationStatusCard(
                 )
                 Icon(
                     imageVector = Icons.Default.Whatshot,
-                    contentDescription = "Generating",
+                    contentDescription = stringResource(R.string.done_generating_cd),
                     tint = RvViolet,
                     modifier = Modifier.size(32.dp)
                 )
@@ -3243,9 +3247,9 @@ private fun RegenerationStatusCard(
 
             Text(
                 text = if (regenerationInfo.isInitialSetup)
-                    "Setting Up New Puzzles"
+                    stringResource(R.string.done_setting_up_new_puzzles)
                 else
-                    "Generating Fresh Puzzles",
+                    stringResource(R.string.done_generating_fresh_puzzles),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,
@@ -3267,19 +3271,19 @@ private fun RegenerationStatusCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 InfoChip(
-                    label = "Type",
+                    label = stringResource(R.string.done_info_type),
                     value = getPuzzleDisplayName(regenerationInfo.puzzleType)
                 )
                 InfoChip(
-                    label = "Difficulty",
-                    value = regenerationInfo.difficulty.capitalize()
+                    label = stringResource(R.string.done_info_difficulty),
+                    value = rvDifficultyLabel(regenerationInfo.difficulty.capitalize())
                 )
             }
 
             if (timeRemaining > 0) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Estimated time: ${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}",
+                    text = stringResource(R.string.done_estimated_time, "${timeRemaining / 60}:${String.format("%02d", timeRemaining % 60)}"),
                     fontSize = 12.sp,
                     color = RvInkSoft
                 )
@@ -3325,7 +3329,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Your Current Usage",
+                    text = stringResource(R.string.done_your_current_usage),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -3333,7 +3337,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
 
                 Icon(
                     imageVector = Icons.Default.BarChart,
-                    contentDescription = "Usage Stats",
+                    contentDescription = stringResource(R.string.done_usage_stats_cd),
                     tint = RvViolet,
                     modifier = Modifier.size(20.dp)
                 )
@@ -3347,7 +3351,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
             ) {
                 // Daily quota
                 UsageIndicator(
-                    label = "Daily",
+                    label = stringResource(R.string.stats_daily),
                     used = limitInfo.dailyUsed,
                     total = limitInfo.dailyLimit,
                     color = RvSky,
@@ -3358,7 +3362,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
 
                 // Monthly quota
                 UsageIndicator(
-                    label = "Monthly",
+                    label = stringResource(R.string.done_usage_monthly),
                     used = limitInfo.monthlyUsed,
                     total = limitInfo.monthlyLimit,
                     color = RvGrape,
@@ -3369,7 +3373,7 @@ private fun CurrentUsageCard(limitInfo: RegenerationLimitManager.LimitInfo) {
             if (limitInfo.resetTime.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Limits reset: ${formatResetTime(limitInfo.resetTime)}",
+                    text = stringResource(R.string.done_limits_reset, formatResetTime(LocalContext.current, limitInfo.resetTime)),
                     fontSize = 11.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center,
@@ -3421,7 +3425,7 @@ private fun UsageIndicator(
         )
 
         Text(
-            text = "of $total",
+            text = stringResource(R.string.done_of_total, total),
             fontSize = 10.sp,
             color = RvInkSoft
         )
@@ -3460,7 +3464,7 @@ private fun UpgradeOptionsSection(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        contentDescription = "Premium",
+                        contentDescription = stringResource(R.string.premium_label),
                         tint = RvSunEdge,
                         modifier = Modifier.size(24.dp)
                     )
@@ -3470,13 +3474,13 @@ private fun UpgradeOptionsSection(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Skip the Wait!",
+                        text = stringResource(R.string.skip_the_wait),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
                     )
                     Text(
-                        text = "Get instant puzzle generation",
+                        text = stringResource(R.string.get_instant_generation),
                         fontSize = 14.sp,
                         color = RvInkSoft
                     )
@@ -3523,7 +3527,7 @@ private fun UpgradeOptionsSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "No ads • Unlimited generations • Priority processing • Cancel anytime",
+                    text = stringResource(R.string.done_premium_perks_unlimited),
                     fontSize = 12.sp,
                     color = RvInkSoft
                 )
@@ -3552,7 +3556,7 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "Wait Time",
+                    text = stringResource(R.string.wait_time),
                     fontSize = 12.sp,
                     color = RvInkSoft
                 )
@@ -3563,7 +3567,7 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                     color = RvError
                 )
                 Text(
-                    text = "minutes",
+                    text = stringResource(R.string.done_minutes_unit),
                     fontSize = 10.sp,
                     color = RvInkSoft
                 )
@@ -3574,13 +3578,13 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "vs",
+                    text = stringResource(R.string.done_vs),
                     color = RvInkSoft,
                     fontSize = 14.sp
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "vs",
+                    contentDescription = stringResource(R.string.done_vs),
                     tint = RvSunEdge,
                     modifier = Modifier.size(20.dp)
                 )
@@ -3592,18 +3596,18 @@ private fun WaitTimeComparisonCard(timeRemaining: Int) {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "Premium",
+                    text = stringResource(R.string.premium_label),
                     fontSize = 12.sp,
                     color = RvSunEdge
                 )
                 Text(
-                    text = "Instant",
+                    text = stringResource(R.string.instant),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSunEdge
                 )
                 Text(
-                    text = "generation",
+                    text = stringResource(R.string.done_generation_unit),
                     fontSize = 10.sp,
                     color = RvInkSoft
                 )
@@ -3621,7 +3625,7 @@ private fun SubscriptionTierCard(
 ) {
     val isPurchasing = subscriptionManager.purchaseState is PurchaseState.Purchasing
     val pkg = subscriptionManager.getPackageForTier(tier)
-    val displayPrice = pkg?.product?.price?.formatted ?: tier.price
+    val displayPrice = pkg?.product?.price?.formatted ?: stringResource(tier.priceRes)
 
     // Check for intro/trial offer
     val introPrice = pkg?.product?.subscriptionOptions
@@ -3630,10 +3634,10 @@ private fun SubscriptionTierCard(
     val hasFreeTrial = introPrice != null
     val trialDuration = introPrice?.billingPeriod?.let { period ->
         when {
-            period.unit.name == "DAY" -> "${period.value}-day free trial"
-            period.unit.name == "WEEK" -> "${period.value}-week free trial"
-            period.unit.name == "MONTH" -> "${period.value}-month free trial"
-            else -> "Free trial"
+            period.unit.name == "DAY" -> stringResource(R.string.done_trial_days, period.value)
+            period.unit.name == "WEEK" -> stringResource(R.string.done_trial_weeks, period.value)
+            period.unit.name == "MONTH" -> stringResource(R.string.done_trial_months, period.value)
+            else -> stringResource(R.string.done_free_trial)
         }
     }
 
@@ -3667,7 +3671,7 @@ private fun SubscriptionTierCard(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = tier.displayName,
+                        text = stringResource(tier.displayNameRes),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -3682,7 +3686,7 @@ private fun SubscriptionTierCard(
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
-                                text = if (hasFreeTrial) "FREE TRIAL" else "RECOMMENDED",
+                                text = if (hasFreeTrial) stringResource(R.string.done_free_trial_caps) else stringResource(R.string.done_recommended_caps),
                                 fontSize = 8.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvOnTone,
@@ -3701,7 +3705,7 @@ private fun SubscriptionTierCard(
                         modifier = Modifier.padding(top = 2.dp)
                     )
                     Text(
-                        text = "then $displayPrice",
+                        text = stringResource(R.string.done_then_price, displayPrice),
                         fontSize = 12.sp,
                         color = RvInkSoft
                     )
@@ -3716,7 +3720,7 @@ private fun SubscriptionTierCard(
                 }
 
                 Text(
-                    text = if (tier.dailyLimit == -1) "Unlimited daily" else "${tier.dailyLimit} daily",
+                    text = if (tier.dailyLimit == -1) stringResource(R.string.done_unlimited_daily) else stringResource(R.string.done_n_daily, tier.dailyLimit),
                     fontSize = 12.sp,
                     color = RvInkSoft
                 )
@@ -3731,7 +3735,7 @@ private fun SubscriptionTierCard(
             } else {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "Select",
+                    contentDescription = stringResource(R.string.done_select_cd),
                     tint = if (isRecommended) RvSunEdge else RvInkSoft,
                     modifier = Modifier.size(20.dp)
                 )
@@ -3755,7 +3759,7 @@ private fun PremiumUserSection() {
         ) {
             Icon(
                 imageVector = Icons.Default.Star,
-                contentDescription = "Premium",
+                contentDescription = stringResource(R.string.premium_label),
                 tint = RvSunEdge,
                 modifier = Modifier.size(32.dp)
             )
@@ -3764,13 +3768,13 @@ private fun PremiumUserSection() {
 
             Column {
                 Text(
-                    text = "Premium Member",
+                    text = stringResource(R.string.premium_member),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
                 )
                 Text(
-                    text = "Thanks for your support! New puzzles will be ready shortly.",
+                    text = stringResource(R.string.done_premium_thanks),
                     fontSize = 14.sp,
                     color = RvInkSoft
                 )
@@ -3783,7 +3787,7 @@ private fun PremiumUserSection() {
 private fun AlternativeActionsSection(onBack: () -> Unit) {
     Column {
         Text(
-            text = "Or try these alternatives:",
+            text = stringResource(R.string.done_try_alternatives),
             fontSize = 14.sp,
             color = RvInkSoft,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -3794,15 +3798,15 @@ private fun AlternativeActionsSection(onBack: () -> Unit) {
         ) {
             AlternativeActionCard(
                 icon = Icons.Default.FavoriteBorder,
-                title = "Browse Existing Puzzles",
-                subtitle = "Play puzzles you've created before",
+                title = stringResource(R.string.done_alt_browse_title),
+                subtitle = stringResource(R.string.done_alt_browse_subtitle),
                 onClick = { onBack() }
             )
 
             AlternativeActionCard(
                 icon = Icons.Default.Lightbulb,
-                title = "Try Different Categories",
-                subtitle = "Explore other puzzle types",
+                title = stringResource(R.string.done_alt_categories_title),
+                subtitle = stringResource(R.string.done_alt_categories_subtitle),
                 onClick = { onBack() }
             )
         }
@@ -3854,7 +3858,7 @@ private fun AlternativeActionCard(
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Go",
+                contentDescription = stringResource(R.string.done_go_cd),
                 tint = RvInkSoft,
                 modifier = Modifier.size(16.dp)
             )
@@ -3889,10 +3893,10 @@ private fun ActionButtonsSection(
                     color = RvOnTone
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Checking...")
+                Text(stringResource(R.string.done_checking))
             } else {
                 Text(
-                    text = if (timeRemaining <= 0) "Try Now" else "Check Progress",
+                    text = if (timeRemaining <= 0) stringResource(R.string.done_try_now) else stringResource(R.string.done_check_progress),
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -3907,7 +3911,7 @@ private fun ActionButtonsSection(
             shape = RoundedCornerShape(24.dp)
         ) {
             Text(
-                text = "Back to Home",
+                text = stringResource(R.string.back_to_home),
                 color = RvViolet
             )
         }
@@ -3915,7 +3919,7 @@ private fun ActionButtonsSection(
 }
 
 // Helper function for reset time formatting
-private fun formatResetTime(resetTimeIso: String): String {
+private fun formatResetTime(context: Context, resetTimeIso: String): String {
     return try {
         val format = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", java.util.Locale.US)
         format.timeZone = java.util.TimeZone.getTimeZone("UTC")
@@ -3926,26 +3930,26 @@ private fun formatResetTime(resetTimeIso: String): String {
             val durationMs = resetTime.time - now.time
 
             when {
-                durationMs <= 0 -> "now"
+                durationMs <= 0 -> context.getString(R.string.create_reset_now)
                 java.util.concurrent.TimeUnit.MILLISECONDS.toDays(durationMs) > 0 -> {
-                    val days = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(durationMs)
-                    "in ${days} day${if (days == 1L) "" else "s"}"
+                    val days = java.util.concurrent.TimeUnit.MILLISECONDS.toDays(durationMs).toInt()
+                    context.resources.getQuantityString(R.plurals.create_reset_in_days, days, days)
                 }
                 java.util.concurrent.TimeUnit.MILLISECONDS.toHours(durationMs) > 0 -> {
-                    val hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(durationMs)
-                    "in ${hours} hour${if (hours == 1L) "" else "s"}"
+                    val hours = java.util.concurrent.TimeUnit.MILLISECONDS.toHours(durationMs).toInt()
+                    context.resources.getQuantityString(R.plurals.create_reset_in_hours, hours, hours)
                 }
                 java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(durationMs) > 0 -> {
-                    val minutes = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(durationMs)
-                    "in ${minutes} minute${if (minutes == 1L) "" else "s"}"
+                    val minutes = java.util.concurrent.TimeUnit.MILLISECONDS.toMinutes(durationMs).toInt()
+                    context.resources.getQuantityString(R.plurals.create_reset_in_minutes, minutes, minutes)
                 }
-                else -> "soon"
+                else -> context.getString(R.string.create_reset_soon)
             }
         } else {
-            "later"
+            context.getString(R.string.create_reset_later)
         }
     } catch (e: Exception) {
-        "later"
+        context.getString(R.string.create_reset_later)
     }
 }
 
@@ -3980,7 +3984,7 @@ private fun SubscriptionPromptCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Star,
-                        contentDescription = "Premium",
+                        contentDescription = stringResource(R.string.premium_label),
                         tint = RvSunEdge,
                         modifier = Modifier.size(20.dp)
                     )
@@ -3990,13 +3994,13 @@ private fun SubscriptionPromptCard(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Skip the Wait!",
+                        text = stringResource(R.string.skip_the_wait),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
                     )
                     Text(
-                        text = "Get instant puzzle generation",
+                        text = stringResource(R.string.get_instant_generation),
                         fontSize = 12.sp,
                         color = RvInkSoft
                     )
@@ -4016,7 +4020,7 @@ private fun SubscriptionPromptCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Wait Time",
+                        text = stringResource(R.string.wait_time),
                         fontSize = 10.sp,
                         color = RvInkSoft
                     )
@@ -4027,7 +4031,7 @@ private fun SubscriptionPromptCard(
                         color = RvError
                     )
                     Text(
-                        text = "minutes",
+                        text = stringResource(R.string.done_minutes_unit),
                         fontSize = 10.sp,
                         color = RvInkSoft
                     )
@@ -4035,7 +4039,7 @@ private fun SubscriptionPromptCard(
 
                 // VS indicator
                 Text(
-                    text = "vs",
+                    text = stringResource(R.string.done_vs),
                     color = RvInkSoft,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
@@ -4046,18 +4050,18 @@ private fun SubscriptionPromptCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = "Premium",
+                        text = stringResource(R.string.premium_label),
                         fontSize = 10.sp,
                         color = RvSunEdge
                     )
                     Text(
-                        text = "Instant",
+                        text = stringResource(R.string.instant),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvSunEdge
                     )
                     Text(
-                        text = "generation",
+                        text = stringResource(R.string.done_generation_unit),
                         fontSize = 10.sp,
                         color = RvInkSoft
                     )
@@ -4078,7 +4082,7 @@ private fun SubscriptionPromptCard(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "No ads • Free coins monthly • Priority processing",
+                    text = stringResource(R.string.done_premium_perks_short),
                     fontSize = 11.sp,
                     color = RvInkSoft
                 )
@@ -4106,7 +4110,7 @@ private fun SubscriptionPromptCard(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Upgrade Now",
+                        text = stringResource(R.string.upgrade_now),
                         color = RvInk,
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp
@@ -4136,13 +4140,13 @@ private fun MinimalSubscriptionPrompt(
         ) {
             Column {
                 Text(
-                    text = "Tired of waiting?",
+                    text = stringResource(R.string.done_tired_of_waiting),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInk
                 )
                 Text(
-                    text = "Get instant generation with Premium",
+                    text = stringResource(R.string.done_get_instant_with_premium),
                     fontSize = 12.sp,
                     color = RvInkSoft
                 )
@@ -4155,51 +4159,55 @@ private fun MinimalSubscriptionPrompt(
                 ),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Upgrade", fontSize = 12.sp)
+                Text(stringResource(R.string.upgrade), fontSize = 12.sp)
             }
         }
     }
 }
 
 // Helper functions
+@Composable
 fun getPuzzleCategory(puzzleType: String): String {
-    NewGameInfo.of(puzzleType)?.let { return it.category }
-    PuzzleTypeNames.categoryLabel(puzzleType)?.let { return it }
+    val context = LocalContext.current
+    NewGameInfo.category(context, puzzleType)?.let { return it }
+    PuzzleTypeNames.categoryLabel(context, puzzleType)?.let { return it }
     return when (puzzleType.lowercase()) {
-        "wordassociation", "synonyms", "anagram", "connotationwords" -> "Speaking"
-        "math", "mathestimation", "division", "subtraction" -> "Mathematics"
-        "memorysquares", "memorystory", "memorysequencing" -> "Memory"
-        "crossword", "wordsearch" -> "Word Games"
-        else -> "General"
+        "wordassociation", "synonyms", "anagram", "connotationwords" -> stringResource(R.string.done_cat_speaking)
+        "math", "mathestimation", "division", "subtraction" -> stringResource(R.string.done_cat_mathematics)
+        "memorysquares", "memorystory", "memorysequencing" -> stringResource(R.string.cat_filter_memory)
+        "crossword", "wordsearch" -> stringResource(R.string.cat_label_word_games)
+        else -> stringResource(R.string.cat_label_general)
     }
 }
 
+@Composable
 fun getPuzzleBenefits(puzzleType: String): List<String> {
-    NewGameInfo.of(puzzleType)?.let { return it.benefits }
+    val context = LocalContext.current
+    NewGameInfo.benefits(context, puzzleType)?.let { return it }
     return when (puzzleType.lowercase()) {
         "wordassociation" -> listOf(
-            "Stop mixing up commonly confused words.",
-            "Eliminate distracting errors in your speaking."
+            stringResource(R.string.done_benefit_wordassoc_1),
+            stringResource(R.string.done_benefit_wordassoc_2)
         )
         "math", "mathestimation" -> listOf(
-            "Improve numerical reasoning skills.",
-            "Enhance problem-solving speed and accuracy."
+            stringResource(R.string.done_benefit_math_1),
+            stringResource(R.string.done_benefit_math_2)
         )
         "memorysquares", "memorystory" -> listOf(
-            "Strengthen working memory capacity.",
-            "Improve focus and attention span."
+            stringResource(R.string.done_benefit_memory_1),
+            stringResource(R.string.done_benefit_memory_2)
         )
         "synonyms" -> listOf(
-            "Expand your vocabulary range.",
-            "Improve word choice in communication."
+            stringResource(R.string.done_benefit_synonyms_1),
+            stringResource(R.string.done_benefit_synonyms_2)
         )
         "imagepuzzle" -> listOf(
-            "Improve spatial reasoning and visual processing.",
-            "Enhance pattern recognition and problem-solving skills."
+            stringResource(R.string.done_benefit_image_1),
+            stringResource(R.string.done_benefit_image_2)
         )
         else -> listOf(
-            "Enhance cognitive flexibility.",
-            "Improve pattern recognition skills."
+            stringResource(R.string.done_benefit_default_1),
+            stringResource(R.string.done_benefit_default_2)
         )
     }
 }
@@ -4274,9 +4282,9 @@ fun fetchCustomPuzzleAndStart(
                             Handler(Looper.getMainLooper()).post {
                                 showPuzzleRejectionDialog(
                                     context = context,
-                                    puzzleName = puzzleSet?.optString("name") ?: "Unknown Puzzle",
-                                    creator = puzzleSet?.optString("creator") ?: "Unknown Creator",
-                                    format = puzzleSet?.optString("format") ?: "Unknown Format",
+                                    puzzleName = puzzleSet?.optString("name") ?: context.getString(R.string.done_unknown_puzzle),
+                                    creator = puzzleSet?.optString("creator") ?: context.getString(R.string.done_unknown_creator_label),
+                                    format = puzzleSet?.optString("format") ?: context.getString(R.string.done_unknown_format),
                                     status = status,
                                     onDismiss = {
                                         onError("Puzzle topic rejected by content review")
@@ -4418,12 +4426,12 @@ fun showPuzzleRejectionDialog(
     onDismiss: () -> Unit
 ) {
     val title = when (status) {
-        "failed" -> "Topic Rejected"
-        "regenerating" -> "Puzzle Regenerating"
-        else -> "Content Review Required"
+        "failed" -> context.getString(R.string.done_rejection_title_failed)
+        "regenerating" -> context.getString(R.string.done_rejection_title_regenerating)
+        else -> context.getString(R.string.done_rejection_title_review)
     }
 
-    val message = "This topic has been flagged by our content review system as potentially inappropriate. This is an automated process and may occasionally flag content incorrectly."
+    val message = context.getString(R.string.done_rejection_message)
 
     try {
         // 🔧 FIX: Use Material3 AlertDialog instead of AppCompat
@@ -4433,11 +4441,9 @@ fun showPuzzleRejectionDialog(
                     .setTitle("🚫 $title")
                     .setMessage(
                         "$message\n\n" +
-                                "Puzzle: \"$puzzleName\"\n" +
-                                "Creator: $creator\n" +
-                                "Format: $format"
+                                context.getString(R.string.done_rejection_details, puzzleName, creator, format)
                     )
-                    .setPositiveButton("OK") { dialog, _ ->
+                    .setPositiveButton(context.getString(R.string.ok)) { dialog, _ ->
                         dialog.dismiss()
                         onDismiss()
                     }
@@ -4449,14 +4455,14 @@ fun showPuzzleRejectionDialog(
             } catch (e: Exception) {
                 Log.e("PuzzleRejection", "❌ Failed to show Material3 dialog", e)
                 // Fallback to toast
-                Toast.makeText(context, "Puzzle topic rejected: $puzzleName", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.done_puzzle_topic_rejected, puzzleName), Toast.LENGTH_LONG).show()
                 onDismiss()
             }
         }
     } catch (e: Exception) {
         Log.e("PuzzleRejection", "❌ Failed to post to main thread", e)
         // Fallback to toast
-        Toast.makeText(context, "Puzzle topic rejected: $puzzleName", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.done_puzzle_topic_rejected, puzzleName), Toast.LENGTH_LONG).show()
         onDismiss()
     }
 }

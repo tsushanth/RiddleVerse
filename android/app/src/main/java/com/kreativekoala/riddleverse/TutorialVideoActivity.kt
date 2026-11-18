@@ -107,7 +107,7 @@ fun TutorialVideoScreen(
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayCircleOutline,
-                    contentDescription = "Video Error",
+                    contentDescription = stringResource(R.string.xb_video_error),
                     tint = Color.White,
                     modifier = Modifier.size(64.dp)
                 )
@@ -115,7 +115,7 @@ fun TutorialVideoScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Unable to load tutorial video",
+                    text = stringResource(R.string.xb_tutorial_video_unavailable),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
@@ -124,7 +124,7 @@ fun TutorialVideoScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Please check your connection and try again",
+                    text = stringResource(R.string.xb_check_connection_try_again),
                     color = Color.White.copy(alpha = 0.7f),
                     fontSize = 14.sp
                 )
@@ -157,7 +157,7 @@ fun TutorialVideoScreen(
                 Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
-                    text = "Loading Tutorial...",
+                    text = stringResource(R.string.xb_loading_tutorial),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Medium
@@ -198,7 +198,7 @@ fun TutorialVideoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "RiddleVerse Tutorial",
+                    text = stringResource(R.string.xb_riddleverse_tutorial),
                     color = Color.White,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold
@@ -216,7 +216,7 @@ fun TutorialVideoScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Replay,
-                            contentDescription = "Restart",
+                            contentDescription = stringResource(R.string.xa_restart),
                             tint = Color.White
                         )
                     }
@@ -270,12 +270,12 @@ fun SimpleTutorialScreen(
 
         // Tutorial content
         val tutorialSteps = listOf(
-            "🧩" to "Choose from various puzzle categories like Math, Anagram, Trivia, and more",
-            "⚙️" to "Set your preferred difficulty in Settings or adjust per puzzle",
-            "🎮" to "Select different game modes for variety - Q&A, Multiple Choice, Word Match, etc.",
-            "🏆" to "Earn points for correct answers and climb the leaderboard",
-            "📊" to "Track your progress and achievements in the dashboard",
-            "🎯" to "Create custom puzzles and share with the community"
+            "🧩" to stringResource(R.string.xb_tutorial_video_step_1),
+            "⚙️" to stringResource(R.string.xb_tutorial_video_step_2),
+            "🎮" to stringResource(R.string.xb_tutorial_video_step_3),
+            "🏆" to stringResource(R.string.xb_tutorial_video_step_4),
+            "📊" to stringResource(R.string.xb_tutorial_video_step_5),
+            "🎯" to stringResource(R.string.xb_tutorial_video_step_6)
         )
 
         tutorialSteps.forEachIndexed { index, (emoji, text) ->

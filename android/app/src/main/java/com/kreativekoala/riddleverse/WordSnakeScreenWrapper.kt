@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalContext
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
@@ -22,6 +23,7 @@ fun WordSnakeScreenWrapper(
     // State for the puzzle data
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+    val xbContext = LocalContext.current
 
     // Create unique key for state reset
     val puzzleKey = currentPuzzle.puzzleId
@@ -43,14 +45,14 @@ fun WordSnakeScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error parsing word snake puzzle: ${e.message}")
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.common_failed_to_load_puzzle, e.message)
             isLoading = false
         }
     }
 
     // Show loading state
     if (isLoading) {
-        WSLoadingScreen(message = "Loading Word Snake puzzle...")
+        WSLoadingScreen(message = stringResource(R.string.xb_loading_word_snake_puzzle))
         return
     }
 
@@ -120,7 +122,7 @@ fun ErrorScreen(
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Error",
+                text = stringResource(R.string.common_error),
                 style = MaterialTheme.typography.headlineMedium
             )
             Spacer(modifier = Modifier.height(8.dp))

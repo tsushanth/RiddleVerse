@@ -165,7 +165,7 @@ fun ColorTextMatchingPuzzleScreen(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "TIME ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
+                        text = "${stringResource(R.string.time_label).uppercase()} ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
                         color = RvInk,
                         fontWeight = FontWeight.Bold
                     )
@@ -178,7 +178,7 @@ fun ColorTextMatchingPuzzleScreen(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "SCORE $currentScore",
+                        text = "${stringResource(R.string.score_label).uppercase()} $currentScore",
                         color = RvInk,
                         fontWeight = FontWeight.Bold
                     )

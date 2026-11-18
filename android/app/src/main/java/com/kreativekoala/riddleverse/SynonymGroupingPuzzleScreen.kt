@@ -413,7 +413,7 @@ fun SynonymGroupingPuzzleScreen(
                             border = BorderStroke(2.dp, RvOutline)
                         ) {
                             Text(
-                                text = wordText ?: "Loading...",
+                                text = wordText ?: stringResource(R.string.loading),
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvInk,

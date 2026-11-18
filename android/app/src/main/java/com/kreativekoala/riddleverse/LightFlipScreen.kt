@@ -22,6 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 
 // --- classic puzzles (feat/puzzles-classic) --- Light Flip screen
 
@@ -46,9 +47,9 @@ fun LightFlipScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
         subtitle = "Tap a light to flip it and its neighbours. Turn them all off.",
         stats = listOf(
             "Taps" to game.moves.toString(),
-            "Par" to game.par.toString(),
+            stringResource(R.string.xa_stat_par) to game.par.toString(),
             "Lights on" to Integer.bitCount(game.lights).toString(),
-            "Best" to (best?.toString() ?: "-"),
+            stringResource(R.string.xa_stat_best) to (best?.toString() ?: "-"),
         ),
         onBack = onBack,
     ) {
@@ -98,12 +99,12 @@ fun LightFlipScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
                 onClick = { game = game.undo(); hint = -1 },
                 enabled = game.canUndo && !solved,
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null); Text("  Undo") }
+            ) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null); Text("  " + stringResource(R.string.xa_undo)) }
             FilledTonalButton(
                 onClick = { hint = game.hintCell() ?: -1; game = game.withHintUsed() },
                 enabled = !solved,
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Icon(Icons.Default.Lightbulb, contentDescription = null); Text("  Hint (${game.hintsUsed})") }
+            ) { Icon(Icons.Default.Lightbulb, contentDescription = null); Text("  " + stringResource(R.string.xa_hint_count, game.hintsUsed)) }
         }
     }
 
@@ -114,8 +115,8 @@ fun LightFlipScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
             headline = "All lights off!",
             lines = buildList {
                 add("Taps: ${game.moves} (par ${game.par})")
-                if (game.hintsUsed > 0) add("Hints used: ${game.hintsUsed}")
-                if (newBest) add("New best!")
+                if (game.hintsUsed > 0) add(stringResource(R.string.xa_hints_used_value, game.hintsUsed))
+                if (newBest) add(stringResource(R.string.xa_new_best))
             },
             onContinue = { if (!reported) { reported = true; onFinish(true, score) } },
         )

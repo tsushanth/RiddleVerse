@@ -105,8 +105,8 @@ fun LeaderboardScreen() {
                     val userId = obj.optString("userId", "")
                     fetchedUsers.add(
                         User(
-                            name = obj.optString("name", "Unknown"),
-                            score = "${obj.optInt("score", 0)} pts",
+                            name = obj.optString("name", context.getString(R.string.done_unknown_creator_label)),
+                            score = context.getString(R.string.stats_score_pts, obj.optInt("score", 0)),
                             isHighlighted = userId == currentUserEmail,
                             avatarNumber = (1..9).random()
                         )
@@ -156,11 +156,11 @@ fun LeaderboardScreen() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Sign in to join the leaderboard", modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.stats_leaderboard_sign_in_prompt), modifier = Modifier.weight(1f), fontWeight = FontWeight.SemiBold)
                     androidx.compose.material3.TextButton(
                         onClick = { context.startActivity(GuestGate.signInIntent(context)) },
                         modifier = Modifier.heightIn(min = 48.dp)
-                    ) { Text("Sign in") }
+                    ) { Text(stringResource(R.string.auth_title_sign_in)) }
                 }
             }
         }
@@ -177,7 +177,7 @@ fun LeaderboardScreen() {
                     .padding(vertical = 24.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp) // Optional spacing between avatars
             ) {
-                val fallbackUser = @androidx.compose.runtime.Composable { User(name = "", score = "0 pts", avatarNumber = (1..9).random()) }
+                val fallbackUser = @androidx.compose.runtime.Composable { User(name = "", score = stringResource(R.string.stats_score_pts, 0), avatarNumber = (1..9).random()) }
                 listOf(
                     topUsers.getOrNull(1) ?: fallbackUser(),
                     topUsers.getOrNull(0) ?: fallbackUser(),

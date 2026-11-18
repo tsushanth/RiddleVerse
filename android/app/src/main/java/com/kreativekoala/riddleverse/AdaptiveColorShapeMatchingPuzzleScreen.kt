@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -387,7 +388,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                             color = RvInk
                         )
                         Text(
-                            text = adaptationInfo?.adjustmentReason ?: "",
+                            text = adaptationInfo?.adjustmentReason.asString(),
                             fontSize = 10.sp,
                             color = RvInkSoft.copy(alpha = 0.9f)
                         )
@@ -552,7 +553,7 @@ fun AdaptiveColorShapeMatchingPuzzleScreen(
                     )
 
                     Text(
-                        text = "Score: $totalScore",
+                        text = stringResource(R.string.xa_score_value, totalScore),
                         fontSize = 14.sp,
                         color = RvInkSoft
                     )
@@ -610,7 +611,7 @@ fun AdaptiveColorShapeTopBar(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk,
@@ -645,7 +646,7 @@ fun AdaptiveColorShapeTopBar(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSky
@@ -663,7 +664,7 @@ fun AdaptiveColorShapeTopBar(
                 )
 
                 Text(
-                    text = "Score: $score",
+                    text = stringResource(R.string.xa_score_value, score),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSuccess

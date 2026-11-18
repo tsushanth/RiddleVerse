@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.runtime.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
@@ -38,11 +39,12 @@ enum class SubscriptionTier(val value: String) {
     PREMIUM("premium"),           // Monthly billing
     PREMIUM_YEARLY("premium_yearly");  // Yearly billing (better value)
 
-    val displayName: String
+    @get:StringRes
+    val displayNameRes: Int
         get() = when (this) {
-            FREE -> "Free"
-            PREMIUM -> "Premium Monthly"
-            PREMIUM_YEARLY -> "Premium Yearly"
+            FREE -> R.string.home_tier_free
+            PREMIUM -> R.string.home_tier_premium_monthly
+            PREMIUM_YEARLY -> R.string.home_tier_premium_yearly
         }
 
     val dailyLimit: Int
@@ -57,11 +59,13 @@ enum class SubscriptionTier(val value: String) {
             PREMIUM, PREMIUM_YEARLY -> -1 // Unlimited for both Premium billing options
         }
 
-    val price: String
+    /** Fallback price label for when the store has not returned a localized price. */
+    @get:StringRes
+    val priceRes: Int
         get() = when (this) {
-            FREE -> "Free"
-            PREMIUM -> "$5.99/month"
-            PREMIUM_YEARLY -> "$24.99/year"
+            FREE -> R.string.home_tier_free
+            PREMIUM -> R.string.onb_tier_price_monthly
+            PREMIUM_YEARLY -> R.string.onb_tier_price_yearly
         }
 
     val productId: String
@@ -88,28 +92,28 @@ enum class SubscriptionTier(val value: String) {
             PREMIUM_YEARLY -> 500 // First month effectively 1,200 coins total
         }
 
-    val benefits: List<String>
+    val benefits: List<TierBenefit>
         get() = when (this) {
             FREE -> listOf(
-                "Access to all puzzle types",
-                "10 puzzle generations per day",
-                "Ad-supported experience",
-                "Earn coins through gameplay"
+                TierBenefit(R.string.onb_tier_benefit_all_types),
+                TierBenefit(R.string.onb_tier_benefit_gen_per_day, listOf(dailyLimit)),
+                TierBenefit(R.string.onb_tier_benefit_ad_supported),
+                TierBenefit(R.string.onb_tier_benefit_earn_coins)
             )
             PREMIUM -> listOf(
-                "Ad-free experience",
-                "150 free coins every month + 150 bonus on signup",
-                "Unlimited puzzle generations",
-                "Priority support",
-                "Premium puzzle themes"
+                TierBenefit(R.string.onb_tier_benefit_ad_free),
+                TierBenefit(R.string.onb_tier_benefit_coins, listOf(monthlyCoins, signupBonus)),
+                TierBenefit(R.string.onb_tier_benefit_unlimited_gen),
+                TierBenefit(R.string.onb_tier_benefit_priority_support),
+                TierBenefit(R.string.onb_tier_benefit_themes)
             )
             PREMIUM_YEARLY -> listOf(
-                "Ad-free experience",
-                "700 free coins every month + 500 bonus on signup",
-                "Unlimited puzzle generations",
-                "Priority support",
-                "Premium puzzle themes",
-                "Best value — save 65%"
+                TierBenefit(R.string.onb_tier_benefit_ad_free),
+                TierBenefit(R.string.onb_tier_benefit_coins, listOf(monthlyCoins, signupBonus)),
+                TierBenefit(R.string.onb_tier_benefit_unlimited_gen),
+                TierBenefit(R.string.onb_tier_benefit_priority_support),
+                TierBenefit(R.string.onb_tier_benefit_themes),
+                TierBenefit(R.string.onb_tier_benefit_best_value, listOf(65))
             )
         }
 
@@ -120,6 +124,11 @@ enum class SubscriptionTier(val value: String) {
             return values().find { it.value == value } ?: FREE
         }
     }
+}
+
+/** One benefit line of a tier: a string resource plus its format arguments. Resolve with [text]. */
+data class TierBenefit(@StringRes val res: Int, val args: List<Any> = emptyList()) {
+    fun text(context: Context): String = context.getString(res, *args.toTypedArray())
 }
 
 // MARK: - Purchase State
@@ -198,7 +207,7 @@ class SubscriptionManager private constructor(
     fun purchasePackage(activity: Activity, pkg: Package) {
         if (purchaseState == PurchaseState.Purchasing) return
         // The backend grants monthly coins / bonuses to the account; a guest purchase would never be credited there.
-        if (!GuestGate.requireAccount(activity, "subscribe")) return
+        if (!GuestGate.requireAccount(activity, GuestFeature.SUBSCRIBE)) return
         purchaseState = PurchaseState.Purchasing
 
         Purchases.sharedInstance.purchase(
@@ -239,7 +248,7 @@ class SubscriptionManager private constructor(
             }
 
             override fun onError(error: PurchasesError) {
-                purchaseState = PurchaseState.Failed("Failed to restore purchases: ${error.message}")
+                purchaseState = PurchaseState.Failed(context.getString(R.string.onb_sub_restore_failed, error.message.orEmpty()))
                 Log.e(TAG, "Restore failed: ${error.message}")
             }
         })

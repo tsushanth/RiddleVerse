@@ -2,6 +2,7 @@ package com.kreativekoala.riddleverse
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.StringRes
 import java.util.Calendar
 import kotlin.math.pow
 
@@ -18,19 +19,19 @@ class ProgressionEngine(
     companion object {
         // Achievement definitions
         val ACHIEVEMENT_DEFINITIONS = listOf(
-            Achievement("first_correct", "First Success", "Solve your first puzzle", "🎯"),
-            Achievement("streak_3", "On a Roll", "Get 3 correct in a row", "🔥", maxProgress = 3),
-            Achievement("streak_10", "Unstoppable", "Get 10 correct in a row", "⚡", maxProgress = 10),
-            Achievement("streak_25", "Legendary", "Get 25 correct in a row", "🏆", maxProgress = 25),
-            Achievement("speed_demon", "Speed Demon", "Solve 5 puzzles under 30s", "💨", maxProgress = 5),
-            Achievement("math_master", "Math Master", "Solve 25 math puzzles", "🧮", maxProgress = 25),
-            Achievement("word_wizard", "Word Wizard", "Solve 25 word puzzles", "📚", maxProgress = 25),
-            Achievement("level_5", "Rising Star", "Reach level 5", "⭐", maxProgress = 5),
-            Achievement("level_10", "Expert", "Reach level 10", "👑", maxProgress = 10),
-            Achievement("level_20", "Master", "Reach level 20", "💎", maxProgress = 20),
-            Achievement("hundred_points", "Century", "Score 100+ points in one puzzle", "💯"),
-            Achievement("perfect_week", "Perfect Week", "Play 7 days in a row", "📅", maxProgress = 7),
-            Achievement("daily_streak_30", "Month Master", "30 day streak", "🗓️", maxProgress = 30)
+            Achievement("first_correct", R.string.stats_ach_first_correct_title, R.string.stats_ach_first_correct_desc, "🎯"),
+            Achievement("streak_3", R.string.stats_ach_streak_3_title, R.string.stats_ach_streak_3_desc, "🔥", maxProgress = 3),
+            Achievement("streak_10", R.string.stats_ach_streak_10_title, R.string.stats_ach_streak_10_desc, "⚡", maxProgress = 10),
+            Achievement("streak_25", R.string.stats_ach_streak_25_title, R.string.stats_ach_streak_25_desc, "🏆", maxProgress = 25),
+            Achievement("speed_demon", R.string.onb_sample_ach2_title, R.string.stats_ach_speed_demon_desc, "💨", maxProgress = 5),
+            Achievement("math_master", R.string.onb_sample_ach1_title, R.string.stats_ach_math_master_desc, "🧮", maxProgress = 25),
+            Achievement("word_wizard", R.string.stats_ach_word_wizard_title, R.string.stats_ach_word_wizard_desc, "📚", maxProgress = 25),
+            Achievement("level_5", R.string.stats_ach_level_5_title, R.string.stats_ach_level_5_desc, "⭐", maxProgress = 5),
+            Achievement("level_10", R.string.common_difficulty_expert, R.string.stats_ach_level_10_desc, "👑", maxProgress = 10),
+            Achievement("level_20", R.string.xa_difficulty_master, R.string.stats_ach_level_20_desc, "💎", maxProgress = 20),
+            Achievement("hundred_points", R.string.stats_ach_hundred_points_title, R.string.stats_ach_hundred_points_desc, "💯"),
+            Achievement("perfect_week", R.string.stats_ach_perfect_week_title, R.string.stats_ach_perfect_week_desc, "📅", maxProgress = 7),
+            Achievement("daily_streak_30", R.string.stats_ach_daily_streak_30_title, R.string.stats_ach_daily_streak_30_desc, "🗓️", maxProgress = 30)
         )
     }
 
@@ -163,17 +164,20 @@ class ProgressionEngine(
         val progress = if (pointsToNextTier > 0) pointsInTier.toFloat() / pointsToNextTier else 1f
 
         val rewards = when (nextTier) {
-            "Silver" -> listOf("🥈 Silver Badge", "🎨 Theme Pack")
-            "Gold" -> listOf("🥇 Gold Badge", "👑 Crown Icon")
-            "Platinum" -> listOf("💎 Platinum Badge", "🌟 Exclusive Themes")
-            "Diamond" -> listOf("💠 Diamond Badge", "🎭 Custom Avatar")
-            "Master" -> listOf("👑 Master Crown", "🌟 Ultimate Rewards")
-            else -> listOf("🎁 Special Reward")
+            "Silver" -> listOf(R.string.stats_reward_silver_badge, R.string.stats_reward_theme_pack)
+            "Gold" -> listOf(R.string.stats_reward_gold_badge, R.string.stats_reward_crown_icon)
+            "Platinum" -> listOf(R.string.stats_reward_platinum_badge, R.string.stats_reward_exclusive_themes)
+            "Diamond" -> listOf(R.string.stats_reward_diamond_badge, R.string.stats_reward_custom_avatar)
+            "Master" -> listOf(R.string.stats_reward_master_crown, R.string.stats_reward_ultimate_rewards)
+            else -> listOf(R.string.stats_reward_special)
         }
 
+        val shownNextTier = if (currentTierIndex == ProgressionMath.TIER_THRESHOLDS.size - 1) currentTier else nextTier
         return TierInfo(
             currentTier = currentTier,
-            nextTier = if (currentTierIndex == ProgressionMath.TIER_THRESHOLDS.size - 1) currentTier else nextTier,
+            nextTier = shownNextTier,
+            currentTierRes = tierNameRes(currentTier),
+            nextTierRes = tierNameRes(shownNextTier),
             pointsInTier = pointsInTier,
             pointsToNextTier = pointsToNextTier,
             progressPercentage = progress,
@@ -397,8 +401,8 @@ data class StreakInfo(
 
 data class Achievement(
     val id: String,
-    val title: String,
-    val description: String,
+    @StringRes val titleRes: Int,
+    @StringRes val descriptionRes: Int,
     val icon: String,
     val isUnlocked: Boolean = false,
     val progress: Int = 0,
@@ -409,12 +413,16 @@ data class Achievement(
 }
 
 data class TierInfo(
+    /** Persisted/compared tier id ("Bronze", "Silver", ...); never shown. Show [currentTierRes] / [nextTierRes]. */
     val currentTier: String,
     val nextTier: String,
+    @StringRes val currentTierRes: Int,
+    @StringRes val nextTierRes: Int,
     val pointsInTier: Int,
     val pointsToNextTier: Int,
     val progressPercentage: Float,
-    val nextTierRewards: List<String>,
+    /** String resource ids of the reward labels. */
+    val nextTierRewards: List<Int>,
     val currentLevel: Int = 1,
     val totalXP: Int = 0
 )

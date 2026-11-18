@@ -27,6 +27,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.abs
 import kotlin.math.min
+import androidx.compose.ui.res.stringResource
 
 // --- spatial puzzles (feat/puzzles-spatial) ---
 // Crate Shift: push every crate onto a target. Swipe on the board or use the arrow pad.
@@ -75,17 +76,17 @@ private fun CrateShiftBoard(args: SpatialArgs, level: CrateLevel) {
         args = args,
         status = "Moves ${game.moves}",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.canUndo()) {
                 game.undo(); hintDir = -1; message = ""; commit()
             }
-            SpatialAction(Icons.Default.Refresh, "Restart") { game.restart(); hintDir = -1; message = ""; commit() }
-            SpatialAction(Icons.Default.Lightbulb, "Hint") {
+            SpatialAction(Icons.Default.Refresh, stringResource(R.string.xa_restart)) { game.restart(); hintDir = -1; message = ""; commit() }
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint)) {
                 val d = game.hint()
                 hintDir = d
                 message = if (d < 0) "No way forward from here. Undo or restart." else "Arrow shows the next move"
                 tick++
             }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         Text(
@@ -176,7 +177,7 @@ private fun CrateShiftBoard(args: SpatialArgs, level: CrateLevel) {
         SpatialResultDialog(
             success = true, title = "All crates in place!",
             detail = "${game.moves} moves (par ${level.par}), ${game.pushes} pushes.  Score $s",
-            stars = game.stars(), primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) },
+            stars = game.stars(), primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) },
             secondaryLabel = "Retry for more stars",
             onSecondary = { game.restart(); done = false; commit() }
         )

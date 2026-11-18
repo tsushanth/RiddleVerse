@@ -1,6 +1,7 @@
 package com.kreativekoala.riddleverse
 
 import android.content.Context
+import androidx.annotation.StringRes
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -56,7 +57,7 @@ class CompetitiveRankingManager private constructor() {
         val oldPercentile: Int,
         val newPercentile: Int,
         val percentileGain: Int,
-        val rankingMessage: String,
+        val rankingMessage: StatsText,
         val showAnimation: Boolean
     ) {
         val improved: Boolean get() = newPercentile > oldPercentile
@@ -67,17 +68,17 @@ class CompetitiveRankingManager private constructor() {
         val totalPlayers: Int,
         val scoreToNextPercentile: Int?,
         val nextPercentileTarget: Int,
-        val competitiveMessage: String,
+        val competitiveMessage: StatsText,
         val performanceLevel: PerformanceLevel
     )
 
-    enum class PerformanceLevel(val displayName: String, val emoji: String) {
-        BEGINNER("Beginner", "🌱"),
-        DEVELOPING("Developing", "📈"),
-        SKILLED("Skilled", "⭐"),
-        ADVANCED("Advanced", "🏆"),
-        EXPERT("Expert", "👑"),
-        ELITE("Elite", "💎")
+    enum class PerformanceLevel(@StringRes val labelRes: Int, val emoji: String) {
+        BEGINNER(R.string.xa_difficulty_beginner, "🌱"),
+        DEVELOPING(R.string.stats_level_developing, "📈"),
+        SKILLED(R.string.stats_level_skilled, "⭐"),
+        ADVANCED(R.string.common_difficulty_advanced, "🏆"),
+        EXPERT(R.string.common_difficulty_expert, "👑"),
+        ELITE(R.string.stats_level_elite, "💎")
     }
 
     /**
@@ -369,26 +370,26 @@ class CompetitiveRankingManager private constructor() {
         }
     }
 
-    private fun generateRankingMessage(oldPercentile: Int, newPercentile: Int, gain: Int): String {
+    private fun generateRankingMessage(oldPercentile: Int, newPercentile: Int, gain: Int): StatsText {
         return when {
-            gain >= 20 -> "🚀 Incredible jump! You're now in the top ${100 - newPercentile}% of players!"
-            gain >= 10 -> "⭐ Amazing improvement! You moved up $gain percentile points!"
-            gain >= 5 -> "📈 Nice progress! You're climbing the leaderboard!"
-            gain > 0 -> "👍 Small but steady improvement! Keep it up!"
-            else -> "🎯 You maintained your ranking at ${newPercentile}th percentile!"
+            gain >= 20 -> StatsText(R.string.stats_rank_msg_incredible, listOf(100 - newPercentile))
+            gain >= 10 -> StatsText(R.plurals.stats_rank_msg_amazing, listOf(gain), quantity = gain)
+            gain >= 5 -> StatsText(R.string.stats_rank_msg_nice_progress)
+            gain > 0 -> StatsText(R.string.stats_rank_msg_small_steady)
+            else -> StatsText(R.string.stats_rank_msg_maintained, listOf(newPercentile))
         }
     }
 
-    private fun generateCompetitiveMessage(percentile: Int, totalPlayers: Int): String {
+    private fun generateCompetitiveMessage(percentile: Int, totalPlayers: Int): StatsText {
         val playersBelow = ((percentile / 100.0) * totalPlayers).toInt()
 
         return when {
-            percentile >= 95 -> "🏆 Elite performer! You're better than ${playersBelow} out of $totalPlayers players!"
-            percentile >= 85 -> "👑 Expert level! You outperform ${playersBelow} players!"
-            percentile >= 70 -> "⭐ Advanced skill! You're ahead of ${playersBelow} players!"
-            percentile >= 50 -> "📈 Above average! You beat ${playersBelow} players!"
-            percentile >= 25 -> "🌱 Room to grow! ${totalPlayers - playersBelow} players to catch up to!"
-            else -> "🎯 Just getting started! Lots of room for improvement!"
+            percentile >= 95 -> StatsText(R.plurals.stats_competitive_elite, listOf(playersBelow, totalPlayers), quantity = totalPlayers)
+            percentile >= 85 -> StatsText(R.plurals.stats_competitive_expert, listOf(playersBelow), quantity = playersBelow)
+            percentile >= 70 -> StatsText(R.plurals.stats_competitive_advanced, listOf(playersBelow), quantity = playersBelow)
+            percentile >= 50 -> StatsText(R.plurals.stats_competitive_above_average, listOf(playersBelow), quantity = playersBelow)
+            percentile >= 25 -> StatsText(R.plurals.stats_competitive_room_to_grow, listOf(totalPlayers - playersBelow), quantity = totalPlayers - playersBelow)
+            else -> StatsText(R.string.stats_competitive_just_starting)
         }
     }
 

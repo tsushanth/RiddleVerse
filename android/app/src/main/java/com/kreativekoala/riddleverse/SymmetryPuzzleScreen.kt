@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalContext
 import com.kreativekoala.riddleverse.ui.theme.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -63,6 +64,7 @@ fun SymmetryPuzzleScreen(
     var currentHearts by remember { mutableStateOf(hearts) }
     var puzzleStartTime by remember { mutableStateOf(System.currentTimeMillis()) }
     var requiredCells by remember { mutableStateOf(0) }
+    val xbContext = LocalContext.current
 
     // Parse puzzle data
     LaunchedEffect(puzzleData) {
@@ -93,16 +95,16 @@ fun SymmetryPuzzleScreen(
                 if (correct) {
                     score = calculateSpeedScore(timeSpent, parsedData!!.gridSize, difficulty)
                     feedbackMessage = when {
-                        timeSpent < 2.0 -> "Lightning fast! ⚡️"
-                        timeSpent < 4.0 -> "Super quick! 🚀"
-                        timeSpent < 7.0 -> "Nice speed! ✨"
-                        else -> "Perfect! 🎯"
+                        timeSpent < 2.0 -> xbContext.getString(R.string.xb_sym_lightning_fast) + " ⚡️"
+                        timeSpent < 4.0 -> xbContext.getString(R.string.xb_sym_super_quick) + " 🚀"
+                        timeSpent < 7.0 -> xbContext.getString(R.string.xb_sym_nice_speed) + " ✨"
+                        else -> xbContext.getString(R.string.xa_perfect) + " 🎯"
                     }
                 } else {
                     currentHearts = maxOf(0, currentHearts - 1)
                     feedbackMessage = when {
-                        timeSpent < 3.0 -> "Too fast! Look closer 👀"
-                        else -> "Not quite right 🤔"
+                        timeSpent < 3.0 -> xbContext.getString(R.string.xb_sym_too_fast) + " 👀"
+                        else -> xbContext.getString(R.string.xb_not_quite_right) + " 🤔"
                     }
                 }
 
@@ -127,7 +129,7 @@ fun SymmetryPuzzleScreen(
             isTimerRunning = false
             showFeedback = true
             isCorrect = false
-            feedbackMessage = "Time's up! ⏰"
+            feedbackMessage = xbContext.getString(R.string.common_times_up) + " ⏰"
             onSubmitAnswer(false)
         }
     }
@@ -354,7 +356,7 @@ fun SymmetrySpeedFeedback(
             if (isCorrect) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "+$score pts",
+                    text = stringResource(R.string.xb_plus_points_short, score),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF2E7D32)
@@ -510,7 +512,7 @@ fun SymmetryFeedback(
             if (isCorrect) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "Score: +$score points",
+                    text = stringResource(R.string.xb_score_plus_points, score),
                     fontSize = 14.sp,
                     color = Color(0xFF2E7D32)
                 )

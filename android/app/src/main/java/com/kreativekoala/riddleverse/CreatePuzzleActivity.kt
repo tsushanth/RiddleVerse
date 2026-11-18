@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.ViewGroup
 import android.widget.*
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import okhttp3.*
@@ -43,7 +44,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 data class ValidationResult(val isValid: Boolean, val errorMessage: String)
 
 data class TopicCategory(
-    val name: String,
+    @StringRes val nameRes: Int,
     val topics: List<String>,
     val colors: IntArray,
     val emoji: String
@@ -85,6 +86,76 @@ class CreatePuzzleActivity : AppCompatActivity() {
         "Word Search"
     )
 
+    /**
+     * [puzzleFormats] holds the wire values: they are compared with contains() and POSTed to the server as "format",
+     * so they stay English. What the spinner shows is [puzzleFormatLabels] (same order).
+     */
+    private fun puzzleFormatLabels(): List<String> = listOf(
+        "🖼️ " + getString(R.string.cat_imagepuzzle_title),
+        "🎵 " + getString(R.string.browse_filter_music_puzzle),
+        getString(R.string.cat_extra_multiple_choice),
+        getString(R.string.create_format_qa),
+        getString(R.string.create_format_anagrams),
+        getString(R.string.cat_crossword_title),
+        getString(R.string.cat_wordsnake_title),
+        getString(R.string.cat_wordsearch_title)
+    )
+
+    /** Wire value of the format chosen in the spinner. */
+    private fun selectedFormat(): String =
+        puzzleFormats.getOrElse(formatDropdown.selectedItemPosition) { puzzleFormats[0] }
+
+    private enum class FormatKind { CROSSWORD, WORD_SEARCH, ANAGRAM, IMAGE, MUSIC, OTHER }
+
+    private fun formatKind(format: String): FormatKind = when {
+        format.contains("Crossword") -> FormatKind.CROSSWORD
+        format.contains("Word Search") -> FormatKind.WORD_SEARCH
+        format.contains("Anagram") -> FormatKind.ANAGRAM
+        format.contains("Image Puzzle") -> FormatKind.IMAGE
+        format.contains("Music Puzzle") -> FormatKind.MUSIC
+        else -> FormatKind.OTHER
+    }
+
+    private fun generateLabel(format: String): String = when (formatKind(format)) {
+        FormatKind.CROSSWORD -> "🧩 " + getString(R.string.create_generate_crossword)
+        FormatKind.WORD_SEARCH -> "🔍 " + getString(R.string.create_generate_word_search)
+        FormatKind.ANAGRAM -> "🔤 " + getString(R.string.create_generate_anagrams)
+        FormatKind.IMAGE -> "🖼️ " + getString(R.string.create_generate_image_puzzle)
+        FormatKind.MUSIC -> "🎵 " + getString(R.string.create_generate_music_puzzle)
+        FormatKind.OTHER -> "🚀 " + getString(R.string.create_generate_puzzle)
+    }
+
+    private fun quickGenerateLabel(format: String): String {
+        val n = numPuzzles
+        val res = resources
+        return when (formatKind(format)) {
+            FormatKind.WORD_SEARCH -> "🔍 " + res.getQuantityString(R.plurals.create_quick_generate_word_search, n, n)
+            FormatKind.CROSSWORD -> "🧩 " + res.getQuantityString(R.plurals.create_quick_generate_crossword, n, n)
+            FormatKind.ANAGRAM -> "🔤 " + res.getQuantityString(R.plurals.create_quick_generate_anagrams, n, n)
+            FormatKind.IMAGE -> "🖼️ " + res.getQuantityString(R.plurals.create_quick_generate_image_puzzle, n, n)
+            FormatKind.MUSIC -> "🎵 " + res.getQuantityString(R.plurals.create_quick_generate_music_puzzle, n, n)
+            FormatKind.OTHER -> "🎯 " + res.getQuantityString(R.plurals.create_quick_generate, n, n)
+        }
+    }
+
+    private fun creatingLabel(format: String): String = when (formatKind(format)) {
+        FormatKind.WORD_SEARCH -> "🔍 " + getString(R.string.create_creating_word_search)
+        FormatKind.CROSSWORD -> "🧩 " + getString(R.string.create_creating_crossword)
+        FormatKind.ANAGRAM -> "🔤 " + getString(R.string.create_creating_anagrams)
+        FormatKind.IMAGE -> "🖼️ " + getString(R.string.create_creating_image)
+        FormatKind.MUSIC -> "🎵 " + getString(R.string.create_creating_music)
+        FormatKind.OTHER -> "🔄 " + getString(R.string.create_creating_puzzle)
+    }
+
+    private fun startedMessage(format: String): String = when (formatKind(format)) {
+        FormatKind.WORD_SEARCH -> "🔍 " + getString(R.string.create_started_word_search)
+        FormatKind.CROSSWORD -> "🧩 " + getString(R.string.create_started_crossword)
+        FormatKind.ANAGRAM -> "🔤 " + getString(R.string.create_started_anagrams)
+        FormatKind.IMAGE -> "🖼️ " + getString(R.string.create_started_image)
+        FormatKind.MUSIC -> "🎵 " + getString(R.string.create_started_music)
+        FormatKind.OTHER -> "🎉 " + getString(R.string.create_started_puzzle)
+    }
+
     private fun initializeWordValidator() {
         lifecycleScope.launch {
             try {
@@ -101,7 +172,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     // Create a comprehensive list of all suggested topics
     private fun getAllSuggestedTopics(): Set<String> {
         val allTopics = mutableSetOf<String>()
-        val selectedFormat = formatDropdown.selectedItem?.toString() ?: "Image Puzzle"
+        val selectedFormat = selectedFormat()
         val categories = getTopicCategoriesForFormat(selectedFormat)
 
         categories.forEach { category ->
@@ -129,37 +200,37 @@ class CreatePuzzleActivity : AppCompatActivity() {
     private fun getImagePuzzleTopics(): List<TopicCategory> {
         return listOf(
             TopicCategory(
-                "🌅 Nature Scenes",
+                R.string.create_cat_nature_scenes,
                 listOf("Mountain Landscape", "Ocean Sunset", "Forest Path", "Waterfall", "Desert Dunes", "Cherry Blossoms"),
                 intArrayOf(Color.parseColor("#4ECDC4"), Color.parseColor("#44A08D")),
                 "🌅"
             ),
             TopicCategory(
-                "🏛️ Architecture",
+                R.string.create_cat_architecture,
                 listOf("Ancient Castle", "Modern Skyscraper", "Gothic Cathedral", "Japanese Temple", "Art Deco Building", "Futuristic City"),
                 intArrayOf(Color.parseColor("#FFE066"), Color.parseColor("#FF9472")),
                 "🏛️"
             ),
             TopicCategory(
-                "🐾 Animals",
+                R.string.create_cat_animals,
                 listOf("Majestic Lion", "Colorful Butterfly", "Wise Owl", "Playful Dolphins", "Arctic Wolf", "Tropical Birds"),
                 intArrayOf(Color.parseColor("#A8E6CF"), Color.parseColor("#7FD8BE")),
                 "🐾"
             ),
             TopicCategory(
-                "🎨 Artistic Styles",
+                R.string.create_cat_artistic_styles,
                 listOf("Van Gogh Style", "Watercolor Art", "Digital Fantasy", "Abstract Colors", "Impressionist", "Pixel Art"),
                 intArrayOf(Color.parseColor("#FF6B6B"), Color.parseColor("#FF8E8E")),
                 "🎨"
             ),
             TopicCategory(
-                "🌌 Fantasy Worlds",
+                R.string.create_cat_fantasy_worlds,
                 listOf("Magical Forest", "Space Galaxy", "Underwater City", "Floating Islands", "Crystal Cave", "Dragon's Lair"),
                 intArrayOf(Color.parseColor("#A29BFE"), Color.parseColor("#6C5CE7")),
                 "🌌"
             ),
             TopicCategory(
-                "🏞️ Scenic Views",
+                R.string.create_cat_scenic_views,
                 listOf("Country Cottage", "City Skyline", "Beach Paradise", "Snowy Mountains", "Autumn Valley", "Starry Night"),
                 intArrayOf(Color.parseColor("#74B9FF"), Color.parseColor("#0984E3")),
                 "🏞️"
@@ -170,7 +241,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     private fun getMusicPuzzleTopics(): List<TopicCategory> {
         return listOf(
             TopicCategory(
-                "🎤 Famous Artists",
+                R.string.create_cat_famous_artists,
                 listOf(
                     // ✅ These artists are explicitly supported by the server
                     "Michael Jackson",
@@ -184,7 +255,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                 "🎤"
             ),
             TopicCategory(
-                "🌍 World Music",
+                R.string.create_cat_world_music,
                 listOf(
                     // ✅ These country/language patterns are supported by the server
                     "Spanish Music",
@@ -197,7 +268,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                 "🌍"
             ),
             TopicCategory(
-                "🎸 Music Genres",
+                R.string.create_cat_music_genres,
                 listOf(
                     // ✅ These general music keywords are supported
                     "Pop Music",
@@ -209,7 +280,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                 "🎸"
             ),
             TopicCategory(
-                "🎵 Music Eras",
+                R.string.create_cat_music_eras,
                 listOf(
                     // ✅ These contain music keywords and should work
                     "80s Music",
@@ -256,44 +327,44 @@ class CreatePuzzleActivity : AppCompatActivity() {
         // If none of the supported patterns match, suggest alternatives
         return ValidationResult(
             false,
-            "For music puzzles, try: famous artists (e.g., 'Michael Jackson'), genres (e.g., 'Pop Music'), or regions (e.g., 'Spanish Music')"
+            getString(R.string.create_music_topic_suggestion)
         )
     }
 
     private fun getGeneralPuzzleTopics(): List<TopicCategory> {
         return listOf(
             TopicCategory(
-                "🎬 Entertainment",
+                R.string.create_cat_entertainment,
                 listOf("Disney Movies", "Marvel Heroes", "Harry Potter", "Star Wars"),
                 intArrayOf(Color.parseColor("#FF6B6B"), Color.parseColor("#FF8E8E")),
                 "🎬"
             ),
             TopicCategory(
-                "🔬 Science",
+                R.string.onb_topic_science,
                 listOf("Space", "Animals", "Human Body", "Chemistry"),
                 intArrayOf(Color.parseColor("#4ECDC4"), Color.parseColor("#44A08D")),
                 "🔬"
             ),
             TopicCategory(
-                "🏛️ History",
+                R.string.onb_topic_history,
                 listOf("Ancient Egypt", "World Wars", "Famous Leaders", "Inventions"),
                 intArrayOf(Color.parseColor("#FFE066"), Color.parseColor("#FF9472")),
                 "🏛️"
             ),
             TopicCategory(
-                "⚽ Sports",
+                R.string.onb_topic_sports,
                 listOf("Soccer", "Basketball", "Olympics", "Tennis"),
                 intArrayOf(Color.parseColor("#00B894"), Color.parseColor("#00CEC9")),
                 "⚽"
             ),
             TopicCategory(
-                "🍕 Food",
+                R.string.create_cat_food,
                 listOf("Italian Cuisine", "Desserts", "Healthy Foods", "World Foods"),
                 intArrayOf(Color.parseColor("#FDCB6E"), Color.parseColor("#E17055")),
                 "🍕"
             ),
             TopicCategory(
-                "🌍 Geography",
+                R.string.cat_filter_geography,
                 listOf("Countries", "Capital Cities", "Famous Landmarks", "Natural Wonders"),
                 intArrayOf(Color.parseColor("#74B9FF"), Color.parseColor("#0984E3")),
                 "🌍"
@@ -378,7 +449,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
             background = createElevatedCard(Color.WHITE, 16)
             setPadding(60, 40, 60, 40)
             textSize = 16f
-            hint = "✨ Enter topic (max 3 words) or tap categories below..."
+            hint = "✨ " + getString(R.string.create_topic_hint)
             setHintTextColor(Color.parseColor("#9E9E9E"))
             setTextColor(Color.parseColor("#2E3440"))
             imeOptions = EditorInfo.IME_ACTION_DONE
@@ -428,11 +499,11 @@ class CreatePuzzleActivity : AppCompatActivity() {
             textSize = 18f
             setTypeface(null, Typeface.BOLD)
             setPadding(60, 40, 60, 40)
-            text = "🖼️ Generate Image Puzzle"
+            text = generateLabel(puzzleFormats[0])
         }
 
         // Setup dropdown with image puzzle as default
-        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, puzzleFormats)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, puzzleFormatLabels())
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         formatDropdown.adapter = adapter
 
@@ -443,31 +514,31 @@ class CreatePuzzleActivity : AppCompatActivity() {
         formatDropdown.setSelection(0) // Set image puzzle as default
         formatDropdown.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedFormat = parent.getItemAtPosition(position).toString()
+                val selectedFormat = puzzleFormats[position]
 
                 when {
                     selectedFormat.contains("Crossword") -> {
-                        generateButton.text = "🧩 Generate Crossword"
+                        generateButton.text = generateLabel(selectedFormat)
                         updatePuzzleCounterForFormat("crossword")
                     }
                     selectedFormat.contains("Word Search") -> {
-                        generateButton.text = "🔍 Generate Word Search"
+                        generateButton.text = generateLabel(selectedFormat)
                         updatePuzzleCounterForFormat("wordsearch")
                     }
                     selectedFormat.contains("Anagram") -> {
-                        generateButton.text = "🔤 Generate Anagrams"
+                        generateButton.text = generateLabel(selectedFormat)
                         updatePuzzleCounterForFormat("anagram")
                     }
                     selectedFormat.contains("Image Puzzle") -> {
-                        generateButton.text = "🖼️ Generate Image Puzzle"
+                        generateButton.text = generateLabel(selectedFormat)
                         updatePuzzleCounterForFormat("image")
                     }
                     selectedFormat.contains("Music Puzzle") -> {
-                        generateButton.text = "🎵 Generate Music Puzzle"
+                        generateButton.text = generateLabel(selectedFormat)
                         updatePuzzleCounterForFormat("music")
                     }
                     else -> {
-                        generateButton.text = "🚀 Generate Puzzle"
+                        generateButton.text = generateLabel(selectedFormat)
                         updatePuzzleCounterForFormat("default")
                     }
                 }
@@ -478,7 +549,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>) {
-                generateButton.text = "🖼️ Generate Image Puzzle"
+                generateButton.text = generateLabel(puzzleFormats[0])
             }
         }
     }
@@ -495,7 +566,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
         if (topicInput.hasFocus()) return
         imageHintView?.let { (it.parent as? ViewGroup)?.removeView(it) }
         val hint = TextView(this).apply {
-            text = "🖼️ Image puzzles create beautiful jigsaw puzzles from AI-generated images! (tap to hide)"
+            text = "🖼️ " + getString(R.string.create_image_hint)
             textSize = 12f
             setTextColor(Color.parseColor("#1976D2"))
             setPadding(20, 12, 20, 12)
@@ -572,27 +643,27 @@ class CreatePuzzleActivity : AppCompatActivity() {
         // Quick validation first
         when {
             cleanTopic.length < 2 -> {
-                showValidationWarning("Topic needs at least 2 characters", WarningLevel.INFO)
+                showValidationWarning(getString(R.string.create_warn_min_chars), WarningLevel.INFO)
                 isTopicValid = false
                 return
             }
             cleanTopic.length > 100 -> {
-                showValidationWarning("Topic too long (max 100 characters)", WarningLevel.ERROR)
+                showValidationWarning(getString(R.string.create_warn_too_long), WarningLevel.ERROR)
                 isTopicValid = false
                 return
             }
             cleanTopic.split("\\s+".toRegex()).filter { it.isNotBlank() }.size > 3 -> {
-                showValidationWarning("Maximum 3 words allowed", WarningLevel.ERROR)
+                showValidationWarning(getString(R.string.create_warn_max_words), WarningLevel.ERROR)
                 isTopicValid = false
                 return
             }
             !cleanTopic.any { it.isLetter() } -> {
-                showValidationWarning("Topic must contain letters", WarningLevel.ERROR)
+                showValidationWarning(getString(R.string.create_warn_needs_letters), WarningLevel.ERROR)
                 isTopicValid = false
                 return
             }
             containsInappropriateContent(cleanTopic) -> {
-                showValidationWarning("Topic contains inappropriate content", WarningLevel.ERROR)
+                showValidationWarning(getString(R.string.create_topic_inappropriate), WarningLevel.ERROR)
                 isTopicValid = false
                 return
             }
@@ -632,16 +703,16 @@ class CreatePuzzleActivity : AppCompatActivity() {
                         // Check for common typos and suggest corrections
                         val suggestions = localWordValidator?.getSuggestions(cleanWord, 3) ?: emptyList()
                         if (suggestions.isNotEmpty()) {
-                            validationResults.add("Did you mean: ${suggestions.joinToString(", ")}?")
+                            validationResults.add(getString(R.string.create_did_you_mean, suggestions.joinToString(", ")))
                             allWordsValid = false
                         } else {
                             // Check if it's likely random text
                             if (isLikelyRandomText(cleanWord)) {
-                                validationResults.add("'$word' looks like random text")
+                                validationResults.add(getString(R.string.create_looks_random, word))
                                 allWordsValid = false
                             } else {
                                 // Might be a proper noun or specialized term
-                                validationResults.add("'$word' not found in dictionary")
+                                validationResults.add(getString(R.string.create_not_in_dictionary, word))
                             }
                         }
                     }
@@ -650,7 +721,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                 // Provide feedback
                 when {
                     !hasRealWords && words.size == 1 && isLikelyRandomText(words[0]) -> {
-                        showValidationWarning("This looks like random text. Try a real topic!", WarningLevel.ERROR)
+                        showValidationWarning(getString(R.string.create_warn_random_text), WarningLevel.ERROR)
                         isTopicValid = false
                     }
                     !hasRealWords && validationResults.isNotEmpty() -> {
@@ -663,7 +734,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                         isTopicValid = true
                     }
                     !allWordsValid && validationResults.size > 1 -> {
-                        showValidationWarning("Multiple words not recognized", WarningLevel.WARNING)
+                        showValidationWarning(getString(R.string.create_warn_multi_unrecognized), WarningLevel.WARNING)
                         isTopicValid = false
                     }
                     else -> {
@@ -681,7 +752,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
 
     // Format-specific validation (especially for music)
     private fun validateFormatSpecific(topic: String) {
-        val selectedFormat = formatDropdown.selectedItem.toString()
+        val selectedFormat = selectedFormat()
 
         if (selectedFormat.contains("Music Puzzle")) {
             val musicValidation = validateMusicTopic(topic)
@@ -702,7 +773,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     private fun validateWithoutDictionary(topic: String) {
         when {
             isLikelyRandomText(topic) -> {
-                showValidationWarning("This looks like random text. Try a real topic!", WarningLevel.WARNING)
+                showValidationWarning(getString(R.string.create_warn_random_text), WarningLevel.WARNING)
                 isTopicValid = false
             }
             else -> {
@@ -836,15 +907,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     private fun showQuickActions() {
         quickActionsContainer.removeAllViews()
 
-        val selectedFormat = formatDropdown.selectedItem.toString()
-        val buttonText = when {
-            selectedFormat.contains("Word Search") -> "🔍 Quick Generate Word Search (${numPuzzles} puzzles)"
-            selectedFormat.contains("Crossword") -> "🧩 Quick Generate Crossword (${numPuzzles} puzzles)"
-            selectedFormat.contains("Anagram") -> "🔤 Quick Generate Anagrams (${numPuzzles} puzzles)"
-            selectedFormat.contains("Image Puzzle") -> "🖼️ Quick Generate Image Puzzle (${numPuzzles} ${if (numPuzzles == 1) "puzzle" else "puzzles"})"
-            selectedFormat.contains("Music Puzzle") -> "🎵 Quick Generate Music Puzzle (${numPuzzles} ${if (numPuzzles == 1) "puzzle" else "puzzles"})"
-            else -> "🎯 Quick Generate (${numPuzzles} puzzles)"
-        }
+        val buttonText = quickGenerateLabel(selectedFormat())
 
         val quickGenerateButton = Button(this).apply {
             text = buttonText
@@ -896,7 +959,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
             setPadding(32, 16, 32, 16)
 
             setOnClickListener {
-                val selectedFormat = formatDropdown.selectedItem.toString()
+                val selectedFormat = selectedFormat()
                 val minPuzzles = 1
                 numPuzzles = (numPuzzles - 1).coerceAtLeast(minPuzzles)
                 updateCounterDisplays()
@@ -941,7 +1004,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
             setPadding(32, 16, 32, 16)
 
             setOnClickListener {
-                val selectedFormat = formatDropdown.selectedItem.toString()
+                val selectedFormat = selectedFormat()
                 val maxPuzzles = when {
                     selectedFormat.contains("Image Puzzle") -> 3
                     selectedFormat.contains("Music Puzzle") -> 5
@@ -976,15 +1039,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
             val quickCounter = numberRow?.getChildAt(1) as? TextView
             quickCounter?.text = numPuzzles.toString()
 
-            val selectedFormat = formatDropdown.selectedItem.toString()
-            val buttonText = when {
-                selectedFormat.contains("Word Search") -> "🔍 Quick Generate Word Search (${numPuzzles} puzzles)"
-                selectedFormat.contains("Crossword") -> "🧩 Quick Generate Crossword (${numPuzzles} puzzles)"
-                selectedFormat.contains("Anagram") -> "🔤 Quick Generate Anagrams (${numPuzzles} puzzles)"
-                selectedFormat.contains("Image Puzzle") -> "🖼️ Quick Generate Image Puzzle (${numPuzzles} ${if (numPuzzles == 1) "puzzle" else "puzzles"})"
-                selectedFormat.contains("Music Puzzle") -> "🎵 Quick Generate Music Puzzle (${numPuzzles} ${if (numPuzzles == 1) "puzzle" else "puzzles"})"
-                else -> "🎯 Quick Generate (${numPuzzles} puzzles)"
-            }
+            val buttonText = quickGenerateLabel(selectedFormat())
 
             val quickGenerateButton = quickActionsContainer.getChildAt(0) as? Button
             quickGenerateButton?.text = buttonText
@@ -1019,7 +1074,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
         }
 
         incrementButton.setOnClickListener {
-            val selectedFormat = formatDropdown.selectedItem.toString()
+            val selectedFormat = selectedFormat()
             val maxPuzzles = when {
                 selectedFormat.contains("Image Puzzle") -> 3
                 selectedFormat.contains("Music Puzzle") -> 5
@@ -1049,7 +1104,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     private fun setupTopicCategories() {
         categoriesContainer.removeAllViews()
 
-        val selectedFormat = formatDropdown.selectedItem?.toString() ?: "🖼️ Image Puzzle"
+        val selectedFormat = selectedFormat()
         val topicCategories = getTopicCategoriesForFormat(selectedFormat)
 
         for (category in topicCategories) {
@@ -1091,7 +1146,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
 
             // Category name with topic count
             val nameText = TextView(this@CreatePuzzleActivity).apply {
-                text = "${category.name.substringAfter(" ")} (${category.topics.size} topics)"
+                text = resources.getQuantityString(R.plurals.create_category_topics, category.topics.size, getString(category.nameRes), category.topics.size)
                 textSize = 16f // Reduced size
                 setTypeface(null, Typeface.BOLD)
                 setTextColor(Color.WHITE)
@@ -1278,7 +1333,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
         val topic = topicInput.text.toString().trim()
 
         if (topic.isEmpty()) {
-            Toast.makeText(this, "Please enter a topic to generate a puzzle.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.create_enter_topic_toast), Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -1288,7 +1343,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
             return
         }
 
-        val selectedFormat = formatDropdown.selectedItem.toString()
+        val selectedFormat = selectedFormat()
         val fbUser = FirebaseAuth.getInstance().currentUser
         // Anonymous users have an EMPTY (not null) display name; the server rejects an empty userId with 400, which
         // this screen used to hide. Fall back to the Firebase uid, then to "guest_user".
@@ -1306,14 +1361,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
         }
 
         generateButton.apply {
-            text = when {
-                selectedFormat.contains("Word Search") -> "🔍 Creating Word Search..."
-                selectedFormat.contains("Crossword") -> "🧩 Creating Crossword..."
-                selectedFormat.contains("Anagram") -> "🔤 Creating Anagrams..."
-                selectedFormat.contains("Image Puzzle") -> "🖼️ Generating AI Image..."
-                selectedFormat.contains("Music Puzzle") -> "🎵 Creating Music Quiz..."
-                else -> "🔄 Creating Puzzle..."
-            }
+            text = creatingLabel(selectedFormat)
             isEnabled = false
             background = createVibrantGradientCard(
                 Color.parseColor("#BDBDBD"),
@@ -1343,8 +1391,8 @@ class CreatePuzzleActivity : AppCompatActivity() {
             override fun onFailure(call: Call, e: IOException) {
                 Log.w("CreatePuzzle", "generate-riddle failed: ${e.javaClass.simpleName}: ${e.message}")
                 runOnUiThread {
-                    val msg = if (e is java.io.InterruptedIOException) "The server did not answer in time. Please try again."
-                    else "Could not reach the server. Check your connection and try again."
+                    val msg = if (e is java.io.InterruptedIOException) getString(R.string.create_err_timeout)
+                    else getString(R.string.create_err_unreachable)
                     Toast.makeText(appContext, msg, Toast.LENGTH_LONG).show()
                     if (!isFinishing && !isDestroyed) resetGenerateButton()
                 }
@@ -1365,7 +1413,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                 if (!response.isSuccessful || jobId.isBlank()) {
                     Log.w("CreatePuzzle", "generate-riddle not accepted: HTTP ${response.code} body=${responseBody?.take(200)}")
                     runOnUiThread {
-                        val msg = serverError ?: if (response.isSuccessful) "The server did not start your puzzle. Please try again." else "Server error (${response.code}). Please try again."
+                        val msg = serverError ?: if (response.isSuccessful) getString(R.string.create_err_not_started) else getString(R.string.create_err_server_code, response.code)
                         Toast.makeText(appContext, msg, Toast.LENGTH_LONG).show()
                         if (!isFinishing && !isDestroyed) resetGenerateButton()
                     }
@@ -1377,14 +1425,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
                 }
 
                 runOnUiThread {
-                    val successMessage = when {
-                        selectedFormat.contains("Word Search") -> "🔍 Word Search creation started!"
-                        selectedFormat.contains("Crossword") -> "🧩 Crossword creation started!"
-                        selectedFormat.contains("Anagram") -> "🔤 Anagram creation started!"
-                        selectedFormat.contains("Image Puzzle") -> "🖼️ AI Image Puzzle generation started! This may take 2-3 minutes."
-                        selectedFormat.contains("Music Puzzle") -> "🎵 Music Quiz creation started!"
-                        else -> "🎉 Puzzle creation started!"
-                    }
+                    val successMessage = startedMessage(selectedFormat)
                     Toast.makeText(appContext, successMessage, Toast.LENGTH_LONG).show()
                     if (!isFinishing && !isDestroyed) {
                         setResult(RESULT_OK, resultIntent)
@@ -1397,15 +1438,8 @@ class CreatePuzzleActivity : AppCompatActivity() {
 
     private fun resetGenerateButton() {
         generateButton.apply {
-            val selectedFormat = formatDropdown.selectedItem.toString()
-            text = when {
-                selectedFormat.contains("Crossword") -> "🧩 Generate Crossword"
-                selectedFormat.contains("Word Search") -> "🔍 Generate Word Search"
-                selectedFormat.contains("Anagram") -> "🔤 Generate Anagrams"
-                selectedFormat.contains("Image Puzzle") -> "🖼️ Generate Image Puzzle"
-                selectedFormat.contains("Music Puzzle") -> "🎵 Generate Music Puzzle"
-                else -> "🚀 Generate Puzzle"
-            }
+            val selectedFormat = selectedFormat()
+            text = generateLabel(selectedFormat)
             isEnabled = true
             background = createModernGradientButton()
             clearAnimation()
@@ -1417,15 +1451,15 @@ class CreatePuzzleActivity : AppCompatActivity() {
 
         // Basic validation (length, characters, etc.)
         if (cleanTopic.length < 2) {
-            return ValidationResult(false, "Topic must be at least 2 characters long")
+            return ValidationResult(false, getString(R.string.create_err_min_length))
         }
         if (cleanTopic.length > 100) {
-            return ValidationResult(false, "Topic must be less than 100 characters")
+            return ValidationResult(false, getString(R.string.create_err_max_length))
         }
 
         val words = cleanTopic.split("\\s+".toRegex()).filter { it.isNotBlank() }
         if (words.size > 3) {
-            return ValidationResult(false, "Topic can only have 3 words maximum. Please use a shorter topic.")
+            return ValidationResult(false, getString(R.string.create_err_max_words))
         }
 
         // Check for inappropriate content (existing logic)
@@ -1438,12 +1472,12 @@ class CreatePuzzleActivity : AppCompatActivity() {
         val topicLower = cleanTopic.lowercase()
         for (blockedWord in blockedWords) {
             if (topicLower.contains(blockedWord)) {
-                return ValidationResult(false, "Topic contains inappropriate content")
+                return ValidationResult(false, getString(R.string.create_topic_inappropriate))
             }
         }
 
         // ✅ SPECIAL VALIDATION FOR MUSIC PUZZLES
-        val selectedFormat = formatDropdown.selectedItem.toString()
+        val selectedFormat = selectedFormat()
         if (selectedFormat.contains("Music Puzzle")) {
             return validateMusicTopic(cleanTopic)
         }
@@ -1451,11 +1485,11 @@ class CreatePuzzleActivity : AppCompatActivity() {
         // For non-music puzzles, use existing validation
         val allowedPattern = Regex("^[a-zA-Z0-9\\s\\-_'.&çğıöşüÇĞIİÖŞÜ]+$")
         if (!allowedPattern.matches(cleanTopic)) {
-            return ValidationResult(false, "Topic contains invalid characters. Only letters, numbers, and basic punctuation allowed.")
+            return ValidationResult(false, getString(R.string.create_err_invalid_chars))
         }
 
         if (!cleanTopic.any { it.isLetter() }) {
-            return ValidationResult(false, "Topic must contain at least one letter")
+            return ValidationResult(false, getString(R.string.create_err_needs_letter))
         }
 
         return ValidationResult(true, "")
@@ -1465,7 +1499,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
     private fun showMusicPuzzleHint() {
         Toast.makeText(
             this,
-            "🎵 Music puzzles work best with: Famous artists (Michael Jackson), Music genres (Pop Music), or World music (Spanish Music)",
+            "🎵 " + getString(R.string.create_music_hint),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -1548,7 +1582,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
         }
 
         val stepIndicator = TextView(this).apply {
-            text = "Step ${currentTutorialStep + 1} of ${tutorialManager.getTutorialSteps().size}"
+            text = getString(R.string.create_tutorial_step_of, currentTutorialStep + 1, tutorialManager.getTutorialSteps().size)
             textSize = 12f
             setTextColor(Color.parseColor("#1976D2"))
             setTypeface(null, Typeface.BOLD)

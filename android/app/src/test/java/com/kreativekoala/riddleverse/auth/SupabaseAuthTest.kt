@@ -105,15 +105,15 @@ class SupabaseAuthTest {
 
     @Test fun userMessagesAreReadable() {
         AuthFailure.values().forEach {
-            val m = SupabaseAuthCore.userMessage(AuthException(it))
-            assertTrue(m.isNotBlank()); assertFalse(m.contains("_"))
+            val m = SupabaseAuthCore.userMessageRes(AuthException(it))
+            assertTrue(m != 0)
         }
     }
 
     @Test fun inputValidation() {
-        assertNotNull(SupabaseAuthCore.validateInput("nope", "12345678"))
-        assertNotNull(SupabaseAuthCore.validateInput("a@b.co", "short"))
-        assertNull(SupabaseAuthCore.validateInput("a@b.co", "12345678"))
+        assertNotNull(SupabaseAuthCore.validateInputRes("nope", "12345678"))
+        assertNotNull(SupabaseAuthCore.validateInputRes("a@b.co", "short"))
+        assertNull(SupabaseAuthCore.validateInputRes("a@b.co", "12345678"))
     }
 
     // ---- refresh decision

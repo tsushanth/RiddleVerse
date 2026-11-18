@@ -18,6 +18,9 @@ object DailyShareText {
         "https://play.google.com/store/apps/details?id=com.kreativekoala.riddleverse" +
             "&utm_source=share&utm_medium=daily&utm_campaign=card"
 
+    /** English template for [headline]; the app passes the localized string `done_share_headline` instead. %1$d = number, %2$s = time. */
+    const val DEFAULT_HEADLINE_TEMPLATE = "RiddleVerse Daily #%1\$d ✅ %2\$s"
+
     private const val MAX_SQUARES = 6
 
     /** 1:42, 0:07, 1:05:09. Negative input reads 0:00. */
@@ -37,12 +40,12 @@ object DailyShareText {
     }
 
     /** "RiddleVerse Daily #123 ✅ 1:42 🔥5" */
-    fun headline(r: DailyShareResult): String {
+    fun headline(r: DailyShareResult, template: String = DEFAULT_HEADLINE_TEMPLATE): String {
         val flame = if (r.streak > 0) " 🔥${r.streak}" else ""
-        return "RiddleVerse Daily #${r.number} ✅ ${formatTime(r.seconds)}$flame"
+        return String.format(template, r.number, formatTime(r.seconds)) + flame
     }
 
     /** Full text for the share sheet: headline, game + tries grid, then the Play link. */
-    fun build(r: DailyShareResult): String =
-        headline(r) + "\n" + r.gameName + " " + attemptGrid(r.attempts) + "\n" + PLAY_URL
+    fun build(r: DailyShareResult, headlineTemplate: String = DEFAULT_HEADLINE_TEMPLATE): String =
+        headline(r, headlineTemplate) + "\n" + r.gameName + " " + attemptGrid(r.attempts) + "\n" + PLAY_URL
 }

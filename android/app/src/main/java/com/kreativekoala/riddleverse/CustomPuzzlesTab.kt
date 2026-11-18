@@ -55,6 +55,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
+import androidx.annotation.StringRes
 import androidx.compose.foundation.BorderStroke
 import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
 import java.time.OffsetDateTime
@@ -85,23 +86,23 @@ import kotlinx.coroutines.delay
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.util.TimeZone
 
-enum class PuzzleFilter(val displayName: String) {
-    ALL("All"),
-    IMAGE_PUZZLE("Image Puzzle"),
-    MUSIC_PUZZLE("Music Puzzle"),
-    CROSSWORD("Crossword"),
-    WORD_SEARCH("Word Search"),
-    MULTIPLE_CHOICE("Multiple Choice"),
-    ANAGRAM("Anagram"),
-    RIDDLES("Riddles"),
-    TRIVIA("Trivia"),
-    PUZZLES("Puzzles"),
-    WORD_GAMES("Word Games"),
-    EASY("Easy"),
-    MEDIUM("Medium"),
-    HARD("Hard"),
-    FEATURED("Featured"),
-    TRENDING("Trending"),
+enum class PuzzleFilter(@StringRes val labelRes: Int) {
+    ALL(R.string.home_filter_all),
+    IMAGE_PUZZLE(R.string.cat_imagepuzzle_title),
+    MUSIC_PUZZLE(R.string.browse_filter_music_puzzle),
+    CROSSWORD(R.string.cat_crossword_title),
+    WORD_SEARCH(R.string.cat_wordsearch_title),
+    MULTIPLE_CHOICE(R.string.cat_extra_multiple_choice),
+    ANAGRAM(R.string.cat_anagram_title),
+    RIDDLES(R.string.cat_riddles_title),
+    TRIVIA(R.string.cat_trivia_title),
+    PUZZLES(R.string.tab_puzzles),
+    WORD_GAMES(R.string.cat_label_word_games),
+    EASY(R.string.riddle_tier_easy),
+    MEDIUM(R.string.riddle_tier_medium),
+    HARD(R.string.riddle_tier_hard),
+    FEATURED(R.string.subtab_featured),
+    TRENDING(R.string.browse_filter_trending),
 }
 
 @Composable
@@ -215,12 +216,13 @@ fun FilterChipsRow(
         contentPadding = PaddingValues(horizontal = 16.dp)
     ) {
         items(PuzzleFilter.values()) { filter ->
+            val filterLabel = stringResource(filter.labelRes)
             FilterChip(
                 selected = selectedFilter == filter,
                 onClick = { onFilterSelected(filter) },
                 label = {
                     Text(
-                        text = filter.displayName,
+                        text = filterLabel,
                         fontSize = 12.sp,
                         fontWeight = if (selectedFilter == filter) FontWeight.Bold else FontWeight.Normal
                     )
@@ -228,7 +230,7 @@ fun FilterChipsRow(
                 leadingIcon = {
                     Icon(
                         imageVector = getFilterIcon(filter),
-                        contentDescription = filter.displayName,
+                        contentDescription = filterLabel,
                         modifier = Modifier.size(16.dp)
                     )
                 },
@@ -368,7 +370,7 @@ fun SortBottomSheet(
                     Spacer(modifier = Modifier.width(12.dp))
 
                     Text(
-                        text = sort.displayName,
+                        text = stringResource(sort.labelRes),
                         fontSize = 16.sp
                     )
                 }
@@ -429,6 +431,7 @@ fun EnhancedPuzzleCard(
     onClick: () -> Unit,
     onLeaderboardClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val puzzleIcon = getPuzzleIcon(puzzle.topic, puzzle.format)
     val themeColors = puzzle.themeColors ?: generateThemeFromTopic(puzzle.topic)
     val headerTones = listOf(RvToneViolet, RvToneSky, RvToneMint, RvToneCoral, RvToneGrape)
@@ -521,7 +524,7 @@ fun EnhancedPuzzleCard(
                                 contentColor = RvOnTone
                             ) {
                                 Text(
-                                    text = "YOURS",
+                                    text = stringResource(R.string.browse_yours),
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold
                                 )
@@ -560,7 +563,7 @@ fun EnhancedPuzzleCard(
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Default.Star,
-                                    contentDescription = "Rating",
+                                    contentDescription = stringResource(R.string.browse_cd_rating),
                                     tint = RvSunEdge,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -579,13 +582,13 @@ fun EnhancedPuzzleCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "Plays",
+                                contentDescription = stringResource(R.string.browse_cd_plays),
                                 tint = RvInkSoft,
                                 modifier = Modifier.size(16.dp)
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
-                                text = "${puzzle.playCount} plays",
+                                text = context.resources.getQuantityString(R.plurals.browse_plays_count, puzzle.playCount, puzzle.playCount),
                                 fontSize = 12.sp,
                                 color = RvInkSoft
                             )
@@ -604,13 +607,13 @@ fun EnhancedPuzzleCard(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Person,
-                            contentDescription = "Creator",
+                            contentDescription = stringResource(R.string.browse_cd_creator),
                             tint = RvInkSoft,
                             modifier = Modifier.size(16.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "By ${puzzle.creator}",
+                            text = stringResource(R.string.browse_by_creator, puzzle.creator),
                             fontSize = 12.sp,
                             color = RvInkSoft
                         )
@@ -749,9 +752,9 @@ fun SectionHeader(
 @Composable
 fun StatusBadge(status: String) {
     val (backgroundColor, textColor, text) = when (status) {
-        "pending" -> Triple(RvWarning.copy(alpha = 0.2f), RvSunEdge, "Processing")
-        "failed" -> Triple(RvError.copy(alpha = 0.15f), RvErrorEdge, "Failed")
-        "completed" -> Triple(RvSuccess.copy(alpha = 0.15f), RvSuccessEdge, "Ready")
+        "pending" -> Triple(RvWarning.copy(alpha = 0.2f), RvSunEdge, stringResource(R.string.home_payout_status_processing))
+        "failed" -> Triple(RvError.copy(alpha = 0.15f), RvErrorEdge, stringResource(R.string.home_payout_status_failed))
+        "completed" -> Triple(RvSuccess.copy(alpha = 0.15f), RvSuccessEdge, stringResource(R.string.home_filter_ready))
         else -> Triple(RvSurface, RvInkSoft, status)
     }
 
@@ -775,13 +778,19 @@ fun DifficultyBadge(difficulty: String) {
         "hard" -> Pair(RvError.copy(alpha = 0.15f), RvErrorEdge)
         else -> Pair(RvSurface, RvInkSoft)
     }
+    val difficultyLabel = when (difficulty.lowercase()) {
+        "easy" -> stringResource(R.string.riddle_tier_easy)
+        "medium" -> stringResource(R.string.riddle_tier_medium)
+        "hard" -> stringResource(R.string.riddle_tier_hard)
+        else -> difficulty
+    }
 
     Badge(
         containerColor = backgroundColor,
         contentColor = textColor
     ) {
         Text(
-            text = difficulty.uppercase(),
+            text = difficultyLabel.uppercase(),
             fontSize = 8.sp,
             fontWeight = FontWeight.Bold
         )
@@ -958,8 +967,8 @@ fun fetchPuzzleLeaderboard(
                             userRank = json.optInt("userRank").takeIf { it > 0 },
                             userScore = json.optInt("userScore").takeIf { it > 0 },
                             totalPlayers = json.optInt("totalPlayers", 0),
-                            puzzleName = json.optString("puzzleName", "Custom Puzzle"),        // ← Add this
-                            puzzleCreator = json.optString("puzzleCreator", "Unknown"),       // ← Add this
+                            puzzleName = json.optString("puzzleName").takeIf { it.isNotBlank() },        // null -> caller shows a localized fallback
+                            puzzleCreator = json.optString("puzzleCreator").takeIf { it.isNotBlank() },       // null -> caller shows a localized fallback
                             isEmpty = json.optBoolean("isEmpty", false),
                             statistics = statistics
                         )

@@ -104,9 +104,10 @@ fun NewGamesRow(onPuzzleTypeSelected: (String) -> Unit) {
         CappedFontScale(1.15f) {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(games, key = { it.type }) { g ->
-                    val tagline = DiscoveryCatalog.TAGLINES[g.type] ?: getQuizCategoryForType(g.type)?.subtitle.orEmpty()
+                    val taglineRes = CatalogText.taglineRes(g.type)
+                    val tagline = if (taglineRes != 0) stringResource(taglineRes) else getQuizCategoryForType(g.type)?.subtitleText().orEmpty()
                     DiscoveryCard(
-                        type = g.type, title = g.title, caption = tagline, captionLines = 2,
+                        type = g.type, title = PuzzleTypeNames.displayName(g.type), caption = tagline, captionLines = 2,
                         width = 164.dp, artHeight = 104.dp, showNewPill = true
                     ) {
                         trackDiscoveryTap("new", g.type)
@@ -150,12 +151,15 @@ fun PickedForYouRow(onPuzzleTypeSelected: (String) -> Unit) {
                 items(picks, key = { it.game.type }) { p ->
                     val reason = when (p.reason) {
                         ForYouReason.CONTINUE -> stringResource(R.string.foryou_reason_continue)
-                        ForYouReason.SIMILAR -> stringResource(R.string.foryou_reason_similar, p.basis ?: "")
+                        ForYouReason.SIMILAR -> stringResource(
+                            R.string.foryou_reason_similar,
+                            p.basisType?.let { PuzzleTypeNames.displayName(it) } ?: p.basis ?: ""
+                        )
                         ForYouReason.EASY_WIN -> stringResource(R.string.foryou_reason_winner)
                         ForYouReason.QUICK_START -> stringResource(R.string.foryou_reason_quick)
                     }
                     DiscoveryCard(
-                        type = p.game.type, title = p.game.title, caption = reason, captionLines = 1,
+                        type = p.game.type, title = PuzzleTypeNames.displayName(p.game.type), caption = reason, captionLines = 1,
                         width = 132.dp, artHeight = 84.dp, showNewPill = false
                     ) {
                         trackDiscoveryTap("for_you_" + p.reason.name.lowercase(), p.game.type)

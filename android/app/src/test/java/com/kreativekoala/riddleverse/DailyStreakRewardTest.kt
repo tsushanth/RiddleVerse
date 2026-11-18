@@ -20,7 +20,7 @@ class DailyStreakRewardTest {
         val week = DailyStreakManager.calculateStreakReward(7)
         assertEquals(15 + 50, week.coins)
         assertEquals(7, week.streakDay)
-        assertTrue(week.specialReward != null)
+        assertTrue(week.specialRewardRes != null)
 
         assertEquals(20 + 100, DailyStreakManager.calculateStreakReward(14).coins)
         assertEquals(25 + 200, DailyStreakManager.calculateStreakReward(30).coins)
@@ -30,7 +30,7 @@ class DailyStreakRewardTest {
 
     @Test fun nonMilestoneDays_haveNoSpecialReward() {
         for (day in listOf(1, 2, 6, 8, 13, 29, 31, 99, 101)) {
-            assertNull("day $day", DailyStreakManager.calculateStreakReward(day).specialReward)
+            assertNull("day $day", DailyStreakManager.calculateStreakReward(day).specialRewardRes)
         }
     }
 

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -94,7 +95,7 @@ fun CrosswordScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -181,7 +182,7 @@ fun WordPrefixScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -355,7 +356,7 @@ fun MemoryPreviousPairScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading memory puzzle...")
+                Text(stringResource(R.string.xb_loading_memory_puzzle))
             }
         }
     }
@@ -467,7 +468,7 @@ fun MemoryPreviousSingleScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading adaptive memory puzzle...")
+                Text(stringResource(R.string.xb_loading_adaptive_memory_puzzle))
             }
         }
     }

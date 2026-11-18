@@ -829,7 +829,7 @@ private fun EnhancedSequencingTopBar(
                 )
             }
             Text(
-                text = "Level ${level.level}",
+                text = "${stringResource(R.string.level_label)} ${level.level}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,

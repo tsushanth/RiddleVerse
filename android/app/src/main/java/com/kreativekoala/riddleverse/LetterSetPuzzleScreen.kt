@@ -103,7 +103,7 @@ fun LetterSetScreenWrapper(
     } else {
         // Fallback error screen
         ErrorScreen(
-            message = "Failed to parse letter set puzzle data",
+            message = stringResource(R.string.xa_failed_to_parse_letter_set),
             onBack = onBack
         )
     }
@@ -160,7 +160,7 @@ fun EnhancedLetterSetGameScreen(
             Log.d(TAG, "✅ Word validator initialized successfully!")
         } catch (e: Exception) {
             Log.e(TAG, "❌ Failed to initialize word validator", e)
-            validatorError = "Failed to load dictionary: ${e.message}"
+            validatorError = context.getString(R.string.xa_failed_to_load_dictionary, e.message)
             isValidatorLoading = false
         }
     }
@@ -304,7 +304,7 @@ fun EnhancedLetterSetGameScreen(
 
     // Show loading screen while initializing
     if (isValidatorLoading) {
-        LoadingScreen("Loading dictionary...\nPreparing ${puzzle.letterSet} puzzle")
+        LoadingScreen(stringResource(R.string.xa_loading_dictionary_preparing, puzzle.letterSet))
         return
     }
 
@@ -833,7 +833,7 @@ fun EnhancedCelebration(
 
                 if (timeBonus) {
                     Text(
-                        text = "⚡ Time Bonus Earned!",
+                        text = "⚡ ${stringResource(R.string.xa_time_bonus_earned)}",
                         fontSize = 14.sp,
                         color = RvSky,
                         fontWeight = FontWeight.Bold
@@ -1145,7 +1145,7 @@ fun FoundWordsList(
                     )
 
                     Text(
-                        text = "${wordData?.points ?: 0} pts",
+                        text = stringResource(R.string.xa_pts_value, wordData?.points ?: 0),
                         fontSize = 12.sp,
                         color = RvInkSoft
                     )
@@ -1206,7 +1206,7 @@ fun LetterSetCelebration(
 
                 if (timeBonus) {
                     Text(
-                        text = "⚡ Time Bonus!",
+                        text = "⚡ ${stringResource(R.string.xa_time_bonus)}",
                         fontSize = 14.sp,
                         color = RvSky,
                         fontWeight = FontWeight.Bold
@@ -1447,7 +1447,7 @@ fun ErrorScreen(
     ) {
         Icon(
             imageVector = Icons.Default.Error,
-            contentDescription = "Error",
+            contentDescription = stringResource(R.string.common_error),
             modifier = Modifier.size(64.dp),
             tint = Color.Red
         )
@@ -1455,7 +1455,7 @@ fun ErrorScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Oops!",
+            text = stringResource(R.string.xa_oops),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
@@ -1471,7 +1471,7 @@ fun ErrorScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Button(onClick = onBack) {
-            Text("Go Back")
+            Text(stringResource(R.string.go_back))
         }
     }
 }

@@ -69,7 +69,7 @@ fun RealDataTierProgressDashboard(onBackClick: () -> Unit) {
                     Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                 }
                 Text(
-                    "Progress Dashboard",
+                    stringResource(R.string.stats_progress_dashboard),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -140,13 +140,13 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
             ) {
                 Column {
                     Text(
-                        "${getTierEmoji(tierInfo.currentTier)} ${tierInfo.currentTier}",
+                        "${getTierEmoji(tierInfo.currentTier)} ${stringResource(tierInfo.currentTierRes)}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
                     )
                     Text(
-                        "Level ${tierInfo.currentLevel}",
+                        stringResource(R.string.stats_level_number, tierInfo.currentLevel),
                         fontSize = 16.sp,
                         color = RvInkSoft
                     )
@@ -154,14 +154,14 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        "${tierInfo.totalXP} XP",
+                        stringResource(R.string.home_xp_amount, tierInfo.totalXP),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
                     )
                     if (tierInfo.currentTier != tierInfo.nextTier) {
                         Text(
-                            "${tierInfo.pointsToNextTier - tierInfo.pointsInTier} to ${tierInfo.nextTier}",
+                            stringResource(R.string.stats_xp_to_next_tier, tierInfo.pointsToNextTier - tierInfo.pointsInTier, stringResource(tierInfo.nextTierRes)),
                             fontSize = 12.sp,
                             color = RvInkSoft
                         )
@@ -186,7 +186,7 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    "Next Tier Rewards:",
+                    stringResource(R.string.stats_next_tier_rewards),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInk
@@ -202,7 +202,7 @@ fun RealTierProgressCard(tierInfo: TierInfo, globalStats: GlobalStatsInfo) {
                 }
             } else {
                 Text(
-                    "🎉 Maximum tier achieved! You're a puzzle master!",
+                    stringResource(R.string.stats_max_tier_master),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInk,
@@ -239,7 +239,7 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    if (challenge.isCompleted) "🏆 Weekly Challenge Complete!" else "🎯 Weekly Challenge",
+                    if (challenge.isCompleted) stringResource(R.string.stats_weekly_complete) else stringResource(R.string.stats_weekly_challenge),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = if (challenge.isCompleted) RvOnTone else RvMintEdge
@@ -255,7 +255,7 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                "Complete ${challenge.weeklyGoal} puzzles this week",
+                LocalContext.current.resources.getQuantityString(R.plurals.stats_weekly_goal, challenge.weeklyGoal, challenge.weeklyGoal),
                 fontSize = 16.sp,
                 color = if (challenge.isCompleted) RvOnTone else RvInk
             )
@@ -279,12 +279,12 @@ fun RealWeeklyChallengeCard(challenge: WeeklyChallengeInfo) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    "${challenge.weeklyProgress}/${challenge.weeklyGoal} completed",
+                    stringResource(R.string.stats_progress_completed, challenge.weeklyProgress, challenge.weeklyGoal),
                     fontSize = 14.sp,
                     color = if (challenge.isCompleted) RvOnTone else RvInk
                 )
                 Text(
-                    if (challenge.isCompleted) "✅ ${challenge.weeklyReward} XP earned!" else "Reward: ${challenge.weeklyReward} XP",
+                    if (challenge.isCompleted) stringResource(R.string.stats_xp_earned, challenge.weeklyReward) else stringResource(R.string.stats_reward_xp, challenge.weeklyReward),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = if (challenge.isCompleted) RvOnTone else RvMintEdge
@@ -339,12 +339,12 @@ fun RealSeasonalEventCard(event: SeasonalEventInfo) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    if (event.isCompleted) "🎉 Event Complete!" else "${event.progress}/${event.maxProgress}",
+                    if (event.isCompleted) stringResource(R.string.stats_event_complete) else "${event.progress}/${event.maxProgress}",
                     fontSize = 14.sp,
                     color = if (event.isCompleted) RvOnTone else RvInk
                 )
                 Text(
-                    "Ends ${formatEventTime(event.endTime)}",
+                    stringResource(R.string.stats_ends_on, formatEventTime(event.endTime)),
                     fontSize = 12.sp,
                     color = if (event.isCompleted) RvOnTone.copy(alpha = 0.8f) else RvInkSoft
                 )
@@ -363,7 +363,7 @@ fun RealStatisticsOverviewCard(globalStats: GlobalStatsInfo, streakInfo: StreakD
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                "📊 Your Statistics",
+                stringResource(R.string.stats_your_statistics),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvGrapeEdge
@@ -376,10 +376,10 @@ fun RealStatisticsOverviewCard(globalStats: GlobalStatsInfo, streakInfo: StreakD
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                DashboardStatItem("Games", globalStats.totalGamesPlayed.toString(), "🎮")
-                DashboardStatItem("Level", globalStats.currentLevel.toString(), "🏆")
-                DashboardStatItem("Total XP", globalStats.totalXP.toString(), "⭐")
-                DashboardStatItem("Streak", streakInfo.currentQuestionStreak.toString(), "🔥")
+                DashboardStatItem(stringResource(R.string.tab_games), globalStats.totalGamesPlayed.toString(), "🎮")
+                DashboardStatItem(stringResource(R.string.level_label), globalStats.currentLevel.toString(), "🏆")
+                DashboardStatItem(stringResource(R.string.stats_total_xp), globalStats.totalXP.toString(), "⭐")
+                DashboardStatItem(stringResource(R.string.streak_label), streakInfo.currentQuestionStreak.toString(), "🔥")
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -389,10 +389,10 @@ fun RealStatisticsOverviewCard(globalStats: GlobalStatsInfo, streakInfo: StreakD
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                DashboardStatItem("Hours", String.format("%.1f", globalStats.totalTimeHours), "⏰")
-                DashboardStatItem("Avg XP", globalStats.averageXPPerGame.toString(), "📊")
-                DashboardStatItem("Daily", streakInfo.currentDailyStreak.toString(), "📅")
-                DashboardStatItem("Rank", globalStats.rank, "🏅")
+                DashboardStatItem(stringResource(R.string.stats_hours), String.format("%.1f", globalStats.totalTimeHours), "⏰")
+                DashboardStatItem(stringResource(R.string.stats_avg_xp), globalStats.averageXPPerGame.toString(), "📊")
+                DashboardStatItem(stringResource(R.string.stats_daily), streakInfo.currentDailyStreak.toString(), "📅")
+                DashboardStatItem(stringResource(R.string.rank_label), globalStats.rank, "🏅")
             }
         }
     }
@@ -408,7 +408,7 @@ fun RealPuzzleTypePerformanceCard(puzzleStats: List<PuzzlePerformanceInfo>) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                "🎮 Puzzle Performance",
+                stringResource(R.string.stats_puzzle_performance),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvSkyEdge
@@ -423,7 +423,7 @@ fun RealPuzzleTypePerformanceCard(puzzleStats: List<PuzzlePerformanceInfo>) {
 
             if (puzzleStats.isEmpty()) {
                 Text(
-                    "Complete some puzzles to see your performance stats!",
+                    stringResource(R.string.stats_complete_puzzles_prompt),
                     fontSize = 14.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center,
@@ -448,14 +448,14 @@ fun RealPuzzleStatRow(stat: PuzzlePerformanceInfo) {
                 fontWeight = FontWeight.Medium
             )
             Text(
-                "${stat.totalSolved} solved • ${(stat.accuracy * 100).toInt()}% accuracy • High: ${stat.highScore}",
+                stringResource(R.string.stats_puzzle_stat_line, stat.totalSolved, (stat.accuracy * 100).toInt(), stat.highScore),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
         }
 
         Text(
-            "${stat.averageTime.toInt()}s avg",
+            stringResource(R.string.stats_seconds_avg, stat.averageTime.toInt()),
             fontSize = 12.sp,
             color = RvSkyEdge,
             fontWeight = FontWeight.Medium
@@ -475,7 +475,7 @@ fun RealDailyStreakCard(streakInfo: StreakDisplayInfo) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                "🔥 Daily Streak",
+                "🔥 ${stringResource(R.string.daily_streak)}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (streakInfo.streakActive) RvOnTone else RvCoralEdge
@@ -488,20 +488,20 @@ fun RealDailyStreakCard(streakInfo: StreakDisplayInfo) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 DashboardStatItem(
-                    "Current",
+                    stringResource(R.string.common_current),
                     streakInfo.currentDailyStreak.toString(),
                     "🔥",
                     textColor = if (streakInfo.streakActive) RvOnTone else RvInk
                 )
                 DashboardStatItem(
-                    "Best Ever",
+                    stringResource(R.string.stats_best_ever),
                     streakInfo.longestDailyStreak.toString(),
                     "🏆",
                     textColor = if (streakInfo.streakActive) RvOnTone else RvInk
                 )
                 DashboardStatItem(
-                    "Status",
-                    if (streakInfo.hasPlayedToday) "Active" else "Inactive",
+                    stringResource(R.string.stats_status),
+                    if (streakInfo.hasPlayedToday) stringResource(R.string.stats_active) else stringResource(R.string.stats_inactive),
                     "✅",
                     textColor = if (streakInfo.streakActive) RvOnTone else RvInk
                 )
@@ -530,7 +530,7 @@ fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<Puzzle
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                "⏱️ Time Analytics",
+                stringResource(R.string.stats_time_analytics),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvMintEdge
@@ -543,7 +543,7 @@ fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<Puzzle
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 DashboardStatItem(
-                    "Total Hours",
+                    stringResource(R.string.stats_total_hours),
                     String.format("%.1f", globalStats.totalTimeHours),
                     "⏰"
                 )
@@ -553,15 +553,15 @@ fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<Puzzle
                 } else 0
 
                 DashboardStatItem(
-                    "Avg/Game",
-                    "${avgTime}s",
+                    stringResource(R.string.stats_avg_per_game),
+                    stringResource(R.string.stats_seconds_short, avgTime),
                     "⚡"
                 )
 
                 val fastestPuzzle = puzzleStats.minByOrNull { it.averageTime }
                 DashboardStatItem(
-                    "Fastest Type",
-                    fastestPuzzle?.puzzleType?.take(8) ?: "None",
+                    stringResource(R.string.stats_fastest_type),
+                    fastestPuzzle?.puzzleType?.take(8) ?: stringResource(R.string.stats_none),
                     "🚀"
                 )
             }
@@ -572,8 +572,10 @@ fun GameTimeAnalyticsCard(globalStats: GlobalStatsInfo, puzzleStats: List<Puzzle
                 val days = (globalStats.totalTimeHours / 24).toInt()
                 val hours = (globalStats.totalTimeHours % 24).toInt()
 
+                val resources = LocalContext.current.resources
                 Text(
-                    "🎯 You've spent ${if (days > 0) "${days} days and " else ""}${hours} hours sharpening your mind!",
+                    if (days > 0) resources.getQuantityString(R.plurals.stats_time_spent_days_hours, days, days, hours)
+                    else resources.getQuantityString(R.plurals.stats_time_spent_hours, hours, hours),
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center,
                     color = RvMintEdge,
@@ -597,7 +599,7 @@ fun WelcomeNewUserCard() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                "🎉 Welcome to Puzzle Universe!",
+                stringResource(R.string.stats_welcome_title),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvMintEdge,
@@ -607,7 +609,7 @@ fun WelcomeNewUserCard() {
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                "Start playing puzzles to unlock your progress dashboard. Every game earns XP, builds streaks, and unlocks achievements!",
+                stringResource(R.string.stats_welcome_body),
                 fontSize = 14.sp,
                 color = RvInkSoft,
                 textAlign = TextAlign.Center
@@ -616,7 +618,7 @@ fun WelcomeNewUserCard() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                "🎯 Complete your first puzzle to begin your journey!",
+                stringResource(R.string.stats_welcome_cta),
                 fontSize = 12.sp,
                 color = RvMintEdge,
                 textAlign = TextAlign.Center,
@@ -651,13 +653,13 @@ fun DashboardStatItem(
 }
 
 @Composable
-fun RewardChip(reward: String) {
+fun RewardChip(@androidx.annotation.StringRes reward: Int) {
     Surface(
         color = RvSurfaceRaised.copy(alpha = 0.8f),
         shape = RoundedCornerShape(12.dp)
     ) {
         Text(
-            reward,
+            stringResource(reward),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
             fontSize = 12.sp,
             color = RvInk
@@ -678,6 +680,16 @@ fun getTierColor(tier: String): Color {
     }
 }
 
+/** Display name for a tier id ("Bronze", ...). The id itself is what gets compared; only show this. */
+fun tierNameRes(tier: String): Int = when (tier) {
+    "Silver" -> R.string.stats_tier_silver
+    "Gold" -> R.string.stats_tier_gold
+    "Platinum" -> R.string.stats_tier_platinum
+    "Diamond" -> R.string.stats_tier_diamond
+    "Master" -> R.string.xa_difficulty_master
+    else -> R.string.stats_tier_bronze
+}
+
 fun getTierEmoji(tier: String): String {
     return when (tier) {
         "Bronze" -> "🥉"
@@ -690,10 +702,11 @@ fun getTierEmoji(tier: String): String {
     }
 }
 
+@Composable
 fun formatTimeLeft(ms: Long): String {
     val days = ms / (24 * 60 * 60 * 1000)
     val hours = (ms / (60 * 60 * 1000)) % 24
-    return "${days}d ${hours}h"
+    return stringResource(R.string.stats_time_left_short, days, hours)
 }
 
 fun formatEventTime(timestamp: Long): String {

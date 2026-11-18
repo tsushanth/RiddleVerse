@@ -157,14 +157,14 @@ fun FallingGameScreen(
                     }
                     Column {
                         Text(
-                            "Question $questionNumber/$totalQuestions",
+                            stringResource(R.string.xb_question_slash, questionNumber, totalQuestions),
                             color = RvOnTone,
                             fontSize = 12.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            difficulty,
+                            localizedDifficulty(difficulty),
                             color = RvOnTone.copy(alpha = 0.85f),
                             fontSize = 12.sp,
                             maxLines = 1
@@ -173,7 +173,7 @@ fun FallingGameScreen(
                 }
 
                 Text(
-                    "Score: $gameScore",
+                    "${stringResource(R.string.score_label)}: $gameScore",
                     color = RvOnTone,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -185,7 +185,7 @@ fun FallingGameScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             Icons.Default.Timer,
-                            contentDescription = "Timer",
+                            contentDescription = stringResource(R.string.xa_timer),
                             tint = RvOnTone,
                             modifier = Modifier.size(16.dp)
                         )
@@ -202,7 +202,7 @@ fun FallingGameScreen(
                         repeat(lives) {
                             Icon(
                                 Icons.Default.Favorite,
-                                contentDescription = "Life",
+                                contentDescription = stringResource(R.string.xb_life),
                                 tint = Color(0xFFFF8A80),
                                 modifier = Modifier.size(16.dp)
                             )
@@ -373,7 +373,7 @@ fun FallingGameScreen(
                 )
             ) {
                 Text(
-                    text = if (isCorrect) "🎉 Correct! +10 Points" else "❌ Wrong! Answer: $correctAnswer",
+                    text = if (isCorrect) "🎉 ${stringResource(R.string.xb_correct_plus_ten_points)}" else "❌ ${stringResource(R.string.xb_wrong_answer_is, correctAnswer)}",
                     color = RvInk,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
@@ -398,7 +398,7 @@ fun FallingGameScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "💥 Game Over!",
+                        "💥 ${stringResource(R.string.game_over)}",
                         color = Color.Red,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
@@ -437,14 +437,14 @@ fun FallingGameScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "⏰ Time's Up!",
+                        "⏰ ${stringResource(R.string.common_times_up)}",
                         color = Color(0xFFFF9800),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(
-                        "Answer: $correctAnswer",
+                        stringResource(R.string.xb_answer_value, correctAnswer),
                         color = RvInk,
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center

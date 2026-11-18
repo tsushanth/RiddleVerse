@@ -132,6 +132,7 @@ fun SimpleMultiMatchMusicPuzzleScreenWrapper(
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val xbContext = LocalContext.current
     var isLoadingMedia by remember { mutableStateOf(false) }
     var mediaCacheProgress by remember { mutableStateOf(0f) }
 
@@ -250,7 +251,7 @@ fun SimpleMultiMatchMusicPuzzleScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing puzzle data: ${e.message}", e)
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
             isLoadingMedia = false
@@ -261,8 +262,8 @@ fun SimpleMultiMatchMusicPuzzleScreenWrapper(
         isLoading || isLoadingMedia -> {
             MusicLoadingScreen(
                 message = when {
-                    isLoadingMedia -> "Preparing audio files..."
-                    else -> "Loading music puzzle..."
+                    isLoadingMedia -> stringResource(R.string.xb_preparing_audio_files)
+                    else -> stringResource(R.string.common_loading_music_puzzle)
                 },
                 progress = if (isLoadingMedia) mediaCacheProgress else null
             )
@@ -285,7 +286,7 @@ fun SimpleMultiMatchMusicPuzzleScreenWrapper(
             SimpleMultiMatchMusicPuzzleScreen(
                 puzzleData = puzzleData!!,
                 difficulty = currentPuzzle.difficulty ?: "Medium",
-                round = "ROUND ${if (viewModel.isCustomPuzzleFlow) viewModel.currentQuestionNumber else viewModel.currentPuzzleNumber} of ${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}",
+                round = stringResource(R.string.xb_round_of, viewModel.getCurrentNumber(), viewModel.getTotalCount()),
                 onPuzzleComplete = { score, correctAnswers ->
                     Log.d(TAG, "Music puzzle completed! Score: $score, Correct: $correctAnswers")
                     val isComplete = correctAnswers >= puzzleData!!.totalQuestions
@@ -344,7 +345,7 @@ fun MusicLoadingScreen(
 
             if (progress != null) {
                 Text(
-                    text = "Downloading audio files for offline playback",
+                    text = stringResource(R.string.xb_downloading_audio_offline),
                     color = Color.Gray,
                     fontSize = 12.sp,
                     textAlign = TextAlign.Center
@@ -587,7 +588,7 @@ fun SimpleMultiMatchMusicPuzzleScreen(
 
                     if (isCorrect) {
                         correctAnswers++
-                        showFeedback = "🎉 Correct! Great job!"
+                        showFeedback = "🎉 " + context.getString(R.string.xb_correct_great_job)
                         feedbackColor = Color.Green
 
                         // Remove question and answer
@@ -609,7 +610,7 @@ fun SimpleMultiMatchMusicPuzzleScreen(
 
                     } else {
                         wrongAnswers++
-                        showFeedback = "❌ Wrong! Try again"
+                        showFeedback = "❌ " + context.getString(R.string.common_wrong_try_again)
                         feedbackColor = Color.Red
                     }
 
@@ -674,7 +675,7 @@ fun MusicSampleItem(
             ) {
                 Icon(
                     if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = if (isPlaying) "Pause" else "Play",
+                    contentDescription = if (isPlaying) stringResource(R.string.common_pause) else stringResource(R.string.play),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
@@ -796,7 +797,7 @@ fun SimpleMultiMatchHeader(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = difficulty.uppercase(),
+                    text = localizedDifficulty(difficulty).uppercase(),
                     color = Color.White,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -843,7 +844,7 @@ fun SimpleMultiMatchHeader(
                 repeat(totalQuestions) { index ->
                     Icon(
                         Icons.Default.Star,
-                        contentDescription = "Progress",
+                        contentDescription = stringResource(R.string.progress),
                         tint = if (index < correctAnswers) Color.Yellow else Color.Gray,
                         modifier = Modifier.size(16.dp)
                     )
@@ -921,7 +922,7 @@ fun SimpleErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error",
+                text = "⚠️ ${stringResource(R.string.common_error)}",
                 color = Color.Red,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold

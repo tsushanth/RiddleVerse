@@ -190,10 +190,10 @@ class MyApplication : Application() {
             val channels = listOf(
                 NotificationChannel(
                     NOTIFICATION_CHANNEL_ID,
-                    "Daily Puzzle Notifications",
+                    DailyReminder.localized(this@MyApplication).getString(R.string.xb_channel_daily_puzzles_name),
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply {
-                    description = "Notifications for new daily puzzles"
+                    description = DailyReminder.localized(this@MyApplication).getString(R.string.xb_channel_daily_puzzles_desc)
                     enableLights(true)
                     enableVibration(true)
                     setShowBadge(true)

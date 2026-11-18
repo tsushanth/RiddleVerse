@@ -19,6 +19,7 @@ import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import com.kreativekoala.riddleverse.ui.theme.RvWarning
 import com.kreativekoala.riddleverse.ui.theme.RvWarningEdge
 import android.content.Intent
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 import android.media.AudioAttributes
 import android.media.SoundPool
 import android.util.Log
@@ -102,7 +103,7 @@ fun ScrollableNoPuzzlesContent(
             // Warning Icon
             Icon(
                 imageVector = Icons.Default.Warning,
-                contentDescription = "No Puzzles",
+                contentDescription = stringResource(R.string.done_no_puzzles_cd),
                 modifier = Modifier.size(120.dp),
                 tint = RvWarning
             )
@@ -117,7 +118,7 @@ fun ScrollableNoPuzzlesContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "No More Puzzles Available",
+                        text = stringResource(R.string.done_no_more_puzzles_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvWarningEdge,
@@ -127,7 +128,7 @@ fun ScrollableNoPuzzlesContent(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "You've completed all available ${getPuzzleDisplayName(puzzleType)} puzzles at $difficulty difficulty!",
+                        text = stringResource(R.string.done_all_puzzles_completed_at_difficulty, getPuzzleDisplayName(puzzleType), rvDifficultyLabel(difficulty).lowercase()),
                         fontSize = 16.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center,
@@ -137,7 +138,7 @@ fun ScrollableNoPuzzlesContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Generate new puzzles to continue playing.",
+                        text = stringResource(R.string.done_generate_to_continue),
                         fontSize = 14.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center,
@@ -207,7 +208,7 @@ fun ScrollableNoPuzzlesContent(
                             tint = RvOnTone
                         )
                         Text(
-                            "Generate New Puzzles",
+                            stringResource(R.string.done_generate_new_puzzles),
                             color = RvOnTone,
                             fontWeight = FontWeight.Bold
                         )
@@ -284,7 +285,7 @@ fun ScrollableGenerationContent(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Generating New Puzzles",
+                        text = stringResource(R.string.done_generating_title),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvSky,
@@ -294,7 +295,7 @@ fun ScrollableGenerationContent(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "We're creating fresh ${getPuzzleDisplayName(puzzleType)} puzzles at $difficulty difficulty just for you!",
+                        text = stringResource(R.string.done_generating_body, getPuzzleDisplayName(puzzleType), rvDifficultyLabel(difficulty).lowercase()),
                         fontSize = 16.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center,
@@ -304,7 +305,7 @@ fun ScrollableGenerationContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "This usually takes 30-60 seconds...",
+                        text = stringResource(R.string.done_generating_wait),
                         fontSize = 14.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center
@@ -440,6 +441,11 @@ fun DailyCompletionScreen(
             }
 
             is CompletionType.NoPuzzlesFound -> {
+                val generationRequestSentMsg = stringResource(R.string.done_generation_request_sent)
+                val generationStartedToast = stringResource(
+                    R.string.done_generation_started_toast,
+                    getPuzzleDisplayName(completionType.puzzleType)
+                )
                 ScrollableNoPuzzlesContent(
                     puzzleType = completionType.puzzleType,
                     difficulty = completionType.difficulty,
@@ -448,7 +454,7 @@ fun DailyCompletionScreen(
                     showGenerationSuccess = showGenerationSuccess,
                     onGeneratePuzzles = {
                         isGenerating = true
-                        generationStatus = "Generation request sent! More puzzles will be available soon."
+                        generationStatus = generationRequestSentMsg
 
                         kickOffPuzzleGeneration(
                             puzzleType = completionType.puzzleType,
@@ -456,7 +462,7 @@ fun DailyCompletionScreen(
                         ) {
                             Toast.makeText(
                                 context,
-                                "✅ Puzzle generation started! Check back in a few minutes for new ${getPuzzleDisplayName(completionType.puzzleType)} puzzles.",
+                                generationStartedToast,
                                 Toast.LENGTH_LONG
                             ).show()
                             onReturnHome()
@@ -556,7 +562,7 @@ private fun BrainStatic(painter: Painter) {
 
     Image(
         painter = painter,
-        contentDescription = "Brain",
+        contentDescription = stringResource(R.string.done_brain_cd),
         modifier = Modifier
             .fillMaxSize(0.82f)
             .graphicsLayer {
@@ -606,7 +612,7 @@ private fun BrainWithColorFill(painter: Painter) {
 
     Image(
         painter = painter,
-        contentDescription = "Brain (color fill)",
+        contentDescription = stringResource(R.string.done_brain_cd),
         modifier = brainMod,
         contentScale = ContentScale.Fit
     )
@@ -865,8 +871,8 @@ fun EnhancedSuccessContentWithRanking(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = when {
-                            isGroupCompletion -> "🎯 Puzzle Type Complete!"
-                            isCustomPuzzle -> "Custom Puzzle Complete!"
+                            isGroupCompletion -> stringResource(R.string.done_group_complete_title)
+                            isCustomPuzzle -> stringResource(R.string.done_custom_puzzle_complete)
                             else -> stringResource(R.string.puzzle_complete)
                         },
                         fontSize = 28.sp,
@@ -879,7 +885,7 @@ fun EnhancedSuccessContentWithRanking(
                     if (isGroupCompletion && sourceGroupName != null) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "🏆 All 5 ${getPuzzleDisplayName(puzzleType)} puzzles completed!\nNext puzzle type in '$sourceGroupName' unlocked!",
+                            text = stringResource(R.string.done_group_unlocked_banner, getPuzzleDisplayName(puzzleType), sourceGroupName),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             color = RvSuccess,
@@ -956,8 +962,7 @@ fun EnhancedSuccessContentWithRanking(
                         timeLimit = 70,
                         livesAllowed = 3,
                         basePoints = 100,
-                        complexityMultiplier = 1.0f,
-                        description = "Medium difficulty - balanced challenge for most players"
+                        complexityMultiplier = 1.0f
                     ),
                     adaptationInfo = adaptationInfo
                 )
@@ -1016,7 +1021,7 @@ fun EnhancedSuccessContentWithRanking(
                                     fontSize = 16.sp
                                 )
                                 Text(
-                                    "Remix & earn coins when others play",
+                                    stringResource(R.string.done_remix_earn_coins),
                                     fontSize = 12.sp,
                                     color = RvOnTone.copy(alpha = 0.85f)
                                 )
@@ -1114,7 +1119,7 @@ fun PuzzleRecommendationsSection(
                 )
                 Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "Try These Next",
+                    text = stringResource(R.string.done_try_these_next),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
@@ -1198,7 +1203,7 @@ fun PuzzleRecommendationItem(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "✨ New to You",
+                                text = stringResource(R.string.done_new_to_you),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = RvOnTone,
                                 fontWeight = FontWeight.Bold,
@@ -1213,7 +1218,7 @@ fun PuzzleRecommendationItem(
                             shape = RoundedCornerShape(8.dp)
                         ) {
                             Text(
-                                text = "NEW",
+                                text = stringResource(R.string.home_new_badge),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = RvOnTone,
                                 fontWeight = FontWeight.Bold,
@@ -1236,7 +1241,7 @@ fun PuzzleRecommendationItem(
 
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = "Start puzzle",
+                contentDescription = stringResource(R.string.start_puzzle),
                 tint = RvSuccess,
                 modifier = Modifier.size(24.dp)
             )
@@ -1371,7 +1376,7 @@ fun PuzzleStatisticsCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "${getPuzzleDisplayName(puzzleType)} Statistics",
+                text = stringResource(R.string.done_stats_title, getPuzzleDisplayName(puzzleType)),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,
@@ -1389,7 +1394,7 @@ fun PuzzleStatisticsCard(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = RvInk)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Loading your stats...", color = RvInkSoft, fontSize = 12.sp)
+                        Text(stringResource(R.string.done_loading_stats), color = RvInkSoft, fontSize = 12.sp)
                     }
                 }
             } else if (stats != null) {
@@ -1398,7 +1403,7 @@ fun PuzzleStatisticsCard(
             } else {
                 // Error state
                 Text(
-                    "Unable to load statistics",
+                    stringResource(R.string.done_stats_unavailable),
                     color = RvInkSoft,
                     modifier = Modifier.padding(40.dp)
                 )
@@ -1462,14 +1467,14 @@ fun ProgressChart(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "RECENT PROGRESS",
+                    text = stringResource(R.string.done_recent_progress),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInkSoft
                 )
 
                 Text(
-                    text = "${data.lastOrNull() ?: 0}% last session",
+                    text = stringResource(R.string.done_last_session_pct, data.lastOrNull() ?: 0),
                     fontSize = 10.sp,
                     color = RvSuccess
                 )
@@ -1502,8 +1507,8 @@ fun ProgressChart(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("7d ago", fontSize = 8.sp, color = RvInkSoft)
-                Text("Today", fontSize = 8.sp, color = RvInkSoft)
+                Text(stringResource(R.string.done_seven_days_ago), fontSize = 8.sp, color = RvInkSoft)
+                Text(stringResource(R.string.done_today), fontSize = 8.sp, color = RvInkSoft)
             }
         }
     }
@@ -1520,7 +1525,7 @@ fun CompletionTopScoresSection(topScores: List<Int>) {
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
-                text = "TOP 5 SCORES",
+                text = stringResource(R.string.done_top_5_scores),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInkSoft,
@@ -1574,7 +1579,7 @@ fun DifficultyProgressIndicator(
             modifier = Modifier.padding(12.dp)
         ) {
             Text(
-                text = "DIFFICULTY PROGRESSION",
+                text = stringResource(R.string.done_difficulty_progression),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInkSoft,
@@ -1586,7 +1591,7 @@ fun DifficultyProgressIndicator(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "CURRENT\n$currentScore",
+                    text = stringResource(R.string.done_current_score, currentScore),
                     fontSize = 12.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center
@@ -1634,7 +1639,7 @@ fun DifficultyProgressIndicator(
                 }
 
                 Text(
-                    text = "NEXT UP\n$nextLevelAt",
+                    text = stringResource(R.string.done_next_up_score, nextLevelAt),
                     fontSize = 12.sp,
                     color = RvSuccess,
                     textAlign = TextAlign.Center
@@ -1652,13 +1657,13 @@ fun RealStatsContent(stats: PuzzleTypeStatistics) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         CompletionStatCard(
-            title = "HIGH SCORE",
-            value = if (stats.highScore > 0) stats.highScore.toString() else "Not played",
+            title = stringResource(R.string.done_stat_high_score),
+            value = if (stats.highScore > 0) stats.highScore.toString() else stringResource(R.string.done_not_played),
             modifier = Modifier.weight(1f)
         )
 
         CompletionStatCard(
-            title = "ACCURACY",
+            title = stringResource(R.string.accuracy).uppercase(),
             value = "${stats.accuracy}%",
             modifier = Modifier.weight(1f)
         )
@@ -1672,13 +1677,13 @@ fun RealStatsContent(stats: PuzzleTypeStatistics) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         CompletionStatCard(
-            title = "TIME TRAINED",
-            value = if (stats.timeSpent > 0) "${String.format("%.1f", stats.timeSpent)} hrs" else "0 hrs",
+            title = stringResource(R.string.done_stat_time_trained),
+            value = stringResource(R.string.done_hours_short, if (stats.timeSpent > 0) String.format("%.1f", stats.timeSpent) else "0"),
             modifier = Modifier.weight(1f)
         )
 
         CompletionStatCard(
-            title = "TOTAL WINS",
+            title = stringResource(R.string.done_stat_total_wins),
             value = stats.wins.toString(),
             modifier = Modifier.weight(1f)
         )
@@ -1720,14 +1725,14 @@ fun RealStatsContent(stats: PuzzleTypeStatistics) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "Start Your Journey!",
+                    stringResource(R.string.done_start_journey_title),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    "Play more puzzles to unlock detailed statistics",
+                    stringResource(R.string.done_start_journey_body),
                     fontSize = 12.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center
@@ -1862,7 +1867,7 @@ fun EnhancedPerformanceCard(
             ) {
                 Text("🎯", fontSize = 24.sp)
                 Text(
-                    text = "Earned: $animatedPoints Points",
+                    text = stringResource(R.string.done_earned_points, animatedPoints),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSky
@@ -1877,7 +1882,7 @@ fun EnhancedPerformanceCard(
                 ) {
                     Text("🔥", fontSize = 20.sp)
                     Text(
-                        "Streak: $animatedStreak ${if (animatedStreak == 1) "Day" else "Days"}",
+                        LocalContext.current.resources.getQuantityString(R.plurals.done_streak_days, animatedStreak, animatedStreak),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvCoral
@@ -1897,7 +1902,7 @@ fun EnhancedPerformanceCard(
                 ) {
                     Text("📊", fontSize = 18.sp)
                     Text(
-                        "Session Performance",
+                        stringResource(R.string.done_session_performance),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvSurfaceRaised
@@ -1923,14 +1928,14 @@ fun EnhancedPerformanceCard(
                     )
 
                     EnhancedSessionStatItem(
-                        label = "Correct",
+                        label = stringResource(R.string.done_correct),
                         value = "${stats.correctAnswers}/${stats.totalAnswers}",
                         icon = "✅",
                         color = RvSuccess
                     )
 
                     EnhancedSessionStatItem(
-                        label = "Time",
+                        label = stringResource(R.string.time_label),
                         value = "${stats.totalTimeSeconds / 60}:${String.format("%02d", stats.totalTimeSeconds % 60)}",
                         icon = "⏱️",
                         color = RvGrape
@@ -1947,7 +1952,7 @@ fun EnhancedPerformanceCard(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            "⚡ Best streak this session: ${stats.bestStreak}",
+                            stringResource(R.string.done_best_streak_session, stats.bestStreak),
                             fontSize = 14.sp,
                             color = RvSuccess,
                             fontWeight = FontWeight.Bold,
@@ -1959,7 +1964,7 @@ fun EnhancedPerformanceCard(
 
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                "🏆 Total Score: $totalUserScore",
+                stringResource(R.string.done_total_score_line, totalUserScore),
                 fontSize = 14.sp,
                 color = RvInkSoft,
                 fontWeight = FontWeight.Medium
@@ -2018,6 +2023,14 @@ fun FloatingActionButtonsRow(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val shareGroupText = stringResource(R.string.done_share_group, sourceGroupName.orEmpty())
+    val shareCustomText = stringResource(R.string.done_share_custom, earnedPoints)
+    val shareStandardText = stringResource(R.string.done_share_standard, streakDays, earnedPoints)
+    val shareSessionSuffix = sessionStats?.let { stats ->
+        stringResource(R.string.done_share_session_suffix, stats.correctAnswers, stats.totalAnswers, (stats.winRate * 100).toInt())
+    }
+    val shareChooserTitle = stringResource(R.string.done_share_chooser_title)
+    val continueGroupLabel = stringResource(R.string.done_continue_group)
 
     Card(
         modifier = modifier
@@ -2039,20 +2052,18 @@ fun FloatingActionButtonsRow(
             ExtendedFloatingActionButton(
                 onClick = {
                     val shareText = when {
-                        isGroupCompletion -> "🎯 I just completed all 5 puzzles in a puzzle type on RiddleVerse! Next type unlocked in '$sourceGroupName'!"
-                        isCustomPuzzle -> "🏆 I just completed a custom puzzle on RiddleVerse and earned $earnedPoints points!"
-                        else -> "🏆 I just completed a puzzle on RiddleVerse! 🔥 $streakDays-day streak and earned $earnedPoints points!"
+                        isGroupCompletion -> shareGroupText
+                        isCustomPuzzle -> shareCustomText
+                        else -> shareStandardText
                     }
 
-                    val fullShareText = sessionStats?.let { stats ->
-                        "$shareText Got ${stats.correctAnswers}/${stats.totalAnswers} correct with ${(stats.winRate * 100).toInt()}% accuracy! 🎯"
-                    } ?: shareText
+                    val fullShareText = shareSessionSuffix?.let { "$shareText $it" } ?: shareText
 
                     val intent = Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_TEXT, fullShareText)
                     }
-                    context.startActivity(Intent.createChooser(intent, "Share your achievement"))
+                    context.startActivity(Intent.createChooser(intent, shareChooserTitle))
                 },
                 modifier = Modifier.weight(1f),
                 containerColor = RvSuccess,
@@ -2082,12 +2093,12 @@ fun FloatingActionButtonsRow(
             ) {
                 Icon(
                     imageVector = if (isGroupCompletion) Icons.Default.Refresh else Icons.Default.Home,
-                    contentDescription = if (isGroupCompletion) "Continue Group" else stringResource(R.string.home),
+                    contentDescription = if (isGroupCompletion) continueGroupLabel else stringResource(R.string.home),
                     modifier = Modifier.size(20.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    if (isGroupCompletion) "Continue Group" else stringResource(R.string.home),
+                    if (isGroupCompletion) continueGroupLabel else stringResource(R.string.home),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )

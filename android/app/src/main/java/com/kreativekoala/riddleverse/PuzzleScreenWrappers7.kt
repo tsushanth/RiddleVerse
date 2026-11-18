@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -104,7 +105,7 @@ fun MathComparisonScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading adaptive math comparison puzzle...")
+                Text(stringResource(R.string.xb_loading_adaptive_math_comparison_puzzle))
             }
         }
     }
@@ -207,7 +208,7 @@ fun WordSearchScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -305,7 +306,7 @@ fun MathEstimationScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading adaptive math estimation puzzle...")
+                Text(stringResource(R.string.xb_loading_adaptive_math_estimation_puzzle))
             }
         }
     }
@@ -624,7 +625,7 @@ fun TipBubbleScreenWrapper(
  * Simple loading screen component
  */
 @Composable
-fun LoadingScreen(message: String = "Loading...") {
+fun LoadingScreen(message: String = stringResource(R.string.loading)) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

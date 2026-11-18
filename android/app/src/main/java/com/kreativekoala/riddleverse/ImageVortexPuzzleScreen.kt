@@ -649,7 +649,7 @@ fun ImageVortexPuzzleScreen(
 
                         if (bestStreak > 1) {
                             Text(
-                                text = "Best streak: $bestStreak",
+                                text = stringResource(R.string.xa_best_streak_value, bestStreak),
                                 fontSize = 12.sp,
                                 color = warnOrange,
                                 maxLines = 1

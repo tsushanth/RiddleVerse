@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.rememberScrollState
@@ -78,10 +79,10 @@ fun WordLadderScreen(
             val keyH = (if (LocalWordSideBySide.current) WordFit.keyHeight(vp, 110f) else ((vp - 230f - 56f) / 3f).coerceIn(36f, 54f)).dp
             WordPuzzleMessage(message)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                WordActionButton("Undo", "Remove the last word", enabled = chain.size > 1) {
+                WordActionButton(stringResource(R.string.xa_undo), "Remove the last word", enabled = chain.size > 1) {
                     chainEnc = chain.dropLast(1).joinToString(","); candidate = chain[chain.size - 2]; selected = -1
                 }
-                WordActionButton("Hint", "Show the next word on a shortest path") {
+                WordActionButton(stringResource(R.string.hint), "Show the next word on a shortest path") {
                     val path = graph.shortestPath(chain.last(), puzzle.target)
                     if (path != null && path.size > 1) {
                         val nxt = path[1]
@@ -90,7 +91,7 @@ fun WordLadderScreen(
                         message = "Change letter ${pos + 1} to ${nxt[pos].uppercaseChar()}"
                     } else message = "No path from here - undo a step"
                 }
-                WordActionButton("Give up", "Reveal the solution and end this puzzle") { gaveUp = true }
+                WordActionButton(stringResource(R.string.give_up), "Reveal the solution and end this puzzle") { gaveUp = true }
             }
             Spacer(Modifier.height(4.dp))
             WordKeyboard(

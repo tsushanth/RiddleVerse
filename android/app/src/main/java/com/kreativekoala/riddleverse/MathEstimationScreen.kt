@@ -253,7 +253,7 @@ fun EstimationPuzzleScreen(
                 )
                 if (attempts > 0) {
                     Text(
-                        text = "Attempt: $attempts",
+                        text = stringResource(R.string.xa_attempt_value, attempts),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvInkSoft,
@@ -613,7 +613,7 @@ fun EnhancedEstimationTopGameBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk

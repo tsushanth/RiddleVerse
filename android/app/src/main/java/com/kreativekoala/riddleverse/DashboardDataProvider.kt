@@ -2,6 +2,11 @@ package com.kreativekoala.riddleverse
 
 import android.content.Context
 import android.util.Log
+import androidx.annotation.AnyRes
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,6 +20,14 @@ class DashboardDataProvider(
     private val userStatsManager: UserStatsManager,
     private val progressionEngine: ProgressionEngine
 ) {
+
+    /** Strings come from the app language (the player's in-app choice), not just the device language. */
+    private val res: Context get() = DailyReminder.localized(context)
+
+    private fun str(@StringRes id: Int, vararg args: Any): String = res.getString(id, *args)
+
+    private fun plural(@PluralsRes id: Int, quantity: Int, vararg args: Any): String =
+        res.resources.getQuantityString(id, quantity, *args)
 
     // ================================
     // MAIN DASHBOARD DATA
@@ -105,13 +118,13 @@ class DashboardDataProvider(
      */
     private fun generateStreakMessage(questionStreak: Int, dailyStreak: Int, hasPlayedToday: Boolean): String {
         return when {
-            dailyStreak >= 30 -> "🔥 Incredible! ${dailyStreak} days strong!"
-            dailyStreak >= 7 -> "🎉 Amazing streak! ${dailyStreak} days!"
-            questionStreak >= 10 -> "⚡ You're unstoppable! ${questionStreak} in a row!"
-            questionStreak >= 3 -> "🚀 On fire! ${questionStreak} correct answers!"
-            hasPlayedToday -> "✨ Great job playing today!"
-            dailyStreak > 0 -> "💪 Keep your ${dailyStreak}-day streak alive!"
-            else -> "🎯 Start your streak today!"
+            dailyStreak >= 30 -> plural(R.plurals.stats_streak_msg_incredible, dailyStreak, dailyStreak)
+            dailyStreak >= 7 -> plural(R.plurals.stats_streak_msg_amazing, dailyStreak, dailyStreak)
+            questionStreak >= 10 -> str(R.string.stats_streak_msg_unstoppable, questionStreak)
+            questionStreak >= 3 -> plural(R.plurals.stats_streak_msg_on_fire, questionStreak, questionStreak)
+            hasPlayedToday -> str(R.string.stats_streak_msg_great_job)
+            dailyStreak > 0 -> plural(R.plurals.stats_streak_msg_keep_alive, dailyStreak, dailyStreak)
+            else -> str(R.string.stats_streak_msg_start)
         }
     }
 
@@ -150,7 +163,7 @@ class DashboardDataProvider(
      * Format puzzle type name for display
      */
     private fun formatPuzzleTypeName(puzzleType: String): String {
-        return PuzzleTypeNames.display(puzzleType)
+        return PuzzleTypeNames.display(res, puzzleType)
     }
 
     /**
@@ -158,11 +171,11 @@ class DashboardDataProvider(
      */
     private fun calculateProgressStatus(stats: UserPuzzleStats): String {
         return when {
-            stats.totalPlays == 0 -> "Not Started"
-            stats.winRate >= 0.9f -> "Mastered"
-            stats.winRate >= 0.75f -> "Advanced"
-            stats.winRate >= 0.5f -> "Improving"
-            else -> "Learning"
+            stats.totalPlays == 0 -> str(R.string.stats_status_not_started)
+            stats.winRate >= 0.9f -> str(R.string.stats_status_mastered)
+            stats.winRate >= 0.75f -> str(R.string.common_difficulty_advanced)
+            stats.winRate >= 0.5f -> str(R.string.stats_status_improving)
+            else -> str(R.string.stats_status_learning)
         }
     }
 
@@ -171,10 +184,10 @@ class DashboardDataProvider(
      */
     private fun recommendDifficulty(stats: UserPuzzleStats): String {
         return when {
-            stats.winRate >= 0.85f && stats.totalPlays >= 10 -> "Hard"
-            stats.winRate >= 0.7f && stats.totalPlays >= 5 -> "Medium"
-            stats.winRate < 0.6f -> "Easy"
-            else -> "Medium"
+            stats.winRate >= 0.85f && stats.totalPlays >= 10 -> str(R.string.riddle_tier_hard)
+            stats.winRate >= 0.7f && stats.totalPlays >= 5 -> str(R.string.riddle_tier_medium)
+            stats.winRate < 0.6f -> str(R.string.riddle_tier_easy)
+            else -> str(R.string.riddle_tier_medium)
         }
     }
 
@@ -183,10 +196,10 @@ class DashboardDataProvider(
      */
     private fun generateImprovementTip(puzzleType: String, stats: UserPuzzleStats): String {
         return when {
-            stats.totalPlays == 0 -> "Try your first ${formatPuzzleTypeName(puzzleType)} puzzle!"
-            stats.winRate < 0.5f -> "Practice makes perfect! Try easier difficulty."
-            stats.winRate >= 0.85f -> "You're excelling! Ready for harder challenges?"
-            else -> "Keep practicing to improve your accuracy!"
+            stats.totalPlays == 0 -> str(R.string.stats_tip_first_puzzle, formatPuzzleTypeName(puzzleType))
+            stats.winRate < 0.5f -> str(R.string.stats_tip_try_easier)
+            stats.winRate >= 0.85f -> str(R.string.stats_tip_excelling)
+            else -> str(R.string.stats_tip_keep_practicing)
         }
     }
 
@@ -216,7 +229,7 @@ class DashboardDataProvider(
             totalHours = globalStats.totalTimePlayedHours,
             averageSessionTime = averageSessionTime,
             totalSessions = globalStats.totalGamesPlayed,
-            fastestPuzzleType = fastestPuzzleType?.let { formatPuzzleTypeName(it.key) } ?: "None",
+            fastestPuzzleType = fastestPuzzleType?.let { formatPuzzleTypeName(it.key) } ?: str(R.string.stats_none),
             mostProductiveHour = productiveHours.first,
             dailyAverageMinutes = calculateDailyAverageMinutes(),
             timeDistribution = getTimeDistribution(),
@@ -233,7 +246,7 @@ class DashboardDataProvider(
         // For now, return the overall most played
         val allStats = userStatsManager.getAllUserStats()
         val mostPlayed = allStats.maxByOrNull { it.value.totalPlays }
-        return mostPlayed?.let { formatPuzzleTypeName(it.key) } ?: "None"
+        return mostPlayed?.let { formatPuzzleTypeName(it.key) } ?: str(R.string.stats_none)
     }
 
     /**
@@ -242,7 +255,7 @@ class DashboardDataProvider(
     private fun getProductiveHours(): Pair<String, String> {
         // This would need hourly tracking to implement fully
         // For now, return generic productive hours
-        return Pair("7-9 PM", "Most active time")
+        return Pair(str(R.string.stats_productive_hours), str(R.string.stats_most_active_time))
     }
 
     /**
@@ -292,11 +305,11 @@ class DashboardDataProvider(
         val hours = (totalHours % 24).toInt()
 
         return when {
-            totalHours >= 100 -> "🏆 Over ${days} days of brain training!"
-            totalHours >= 24 -> "🎯 ${days} days and ${hours}h of mental exercise!"
-            totalHours >= 10 -> "🧠 ${totalHours.toInt()} hours of puzzle solving!"
-            totalHours >= 1 -> "⚡ ${totalHours.toInt()} hours of cognitive training!"
-            else -> "🚀 Start your puzzle journey!"
+            totalHours >= 100 -> plural(R.plurals.stats_time_msg_over_days, days, days)
+            totalHours >= 24 -> plural(R.plurals.stats_time_msg_days_and_hours, days, days, hours)
+            totalHours >= 10 -> plural(R.plurals.stats_time_msg_puzzle_solving, totalHours.toInt(), totalHours.toInt())
+            totalHours >= 1 -> plural(R.plurals.stats_time_msg_cognitive, totalHours.toInt(), totalHours.toInt())
+            else -> str(R.string.stats_time_msg_start)
         }
     }
 
@@ -312,31 +325,31 @@ class DashboardDataProvider(
 
         return when (currentMonth) {
             Calendar.OCTOBER -> SeasonalEventInfo(
-                eventName = "Halloween Challenge",
-                description = "Complete spooky puzzles to earn Halloween rewards!",
+                eventName = str(R.string.stats_event_halloween_name),
+                description = str(R.string.stats_event_halloween_desc),
                 progress = getSeasonalProgress("halloween"),
                 maxProgress = 31,
                 endTime = getEndOfMonth(Calendar.OCTOBER),
                 theme = "🎃",
-                rewards = listOf("🎃 Halloween Badge", "👻 Spooky Theme", "🍬 Bonus XP")
+                rewards = listOf(str(R.string.stats_event_halloween_badge), str(R.string.stats_event_halloween_theme), str(R.string.stats_event_halloween_bonus))
             )
             Calendar.DECEMBER -> SeasonalEventInfo(
-                eventName = "Winter Wonderland",
-                description = "Solve puzzles to unlock winter themes and rewards!",
+                eventName = str(R.string.stats_event_winter_name),
+                description = str(R.string.stats_event_winter_desc),
                 progress = getSeasonalProgress("winter"),
                 maxProgress = 25,
                 endTime = getEndOfMonth(Calendar.DECEMBER),
                 theme = "❄️",
-                rewards = listOf("❄️ Winter Badge", "🎄 Holiday Theme", "⛄ Snow Effects")
+                rewards = listOf(str(R.string.stats_event_winter_badge), str(R.string.stats_event_winter_theme), str(R.string.stats_event_winter_effects))
             )
             Calendar.FEBRUARY -> SeasonalEventInfo(
-                eventName = "Love & Logic",
-                description = "Share the love of puzzles this Valentine's month!",
+                eventName = str(R.string.stats_event_valentine_name),
+                description = str(R.string.stats_event_valentine_desc),
                 progress = getSeasonalProgress("valentine"),
                 maxProgress = 14,
                 endTime = getEndOfMonth(Calendar.FEBRUARY),
                 theme = "💕",
-                rewards = listOf("💕 Love Badge", "🌹 Romance Theme", "💝 Double XP")
+                rewards = listOf(str(R.string.stats_event_valentine_badge), str(R.string.stats_event_valentine_theme), str(R.string.stats_event_valentine_double_xp))
             )
             else -> null
         }
@@ -395,11 +408,11 @@ class DashboardDataProvider(
         weeklyData: WeeklyActivityData
     ): String {
         return when {
-            !dailyData.hasPlayedToday -> "🌟 Start your daily puzzle journey!"
-            dailyData.todayCount >= 10 -> "🔥 Amazing! ${dailyData.todayCount} puzzles today!"
-            dailyData.todayCount >= 5 -> "💪 Great work! ${dailyData.todayCount} completed today!"
-            weeklyData.weeklyProgress >= 20 -> "🎯 Almost at your weekly goal!"
-            else -> "✨ Keep going! You're doing great!"
+            !dailyData.hasPlayedToday -> str(R.string.stats_motivation_start)
+            dailyData.todayCount >= 10 -> plural(R.plurals.stats_motivation_amazing, dailyData.todayCount, dailyData.todayCount)
+            dailyData.todayCount >= 5 -> plural(R.plurals.stats_motivation_great_work, dailyData.todayCount, dailyData.todayCount)
+            weeklyData.weeklyProgress >= 20 -> str(R.string.stats_motivation_almost_weekly)
+            else -> str(R.string.stats_motivation_keep_going)
         }
     }
 
@@ -441,12 +454,12 @@ class DashboardDataProvider(
      */
     private fun calculateApproximateRank(totalXP: Int): String {
         return when {
-            totalXP >= 10000 -> "Top 1%"
-            totalXP >= 5000 -> "Top 5%"
-            totalXP >= 2000 -> "Top 10%"
-            totalXP >= 1000 -> "Top 25%"
-            totalXP >= 500 -> "Top 50%"
-            else -> "Getting Started"
+            totalXP >= 10000 -> str(R.string.stats_rank_top_percent, 1)
+            totalXP >= 5000 -> str(R.string.stats_rank_top_percent, 5)
+            totalXP >= 2000 -> str(R.string.stats_rank_top_percent, 10)
+            totalXP >= 1000 -> str(R.string.stats_rank_top_percent, 25)
+            totalXP >= 500 -> str(R.string.stats_rank_top_percent, 50)
+            else -> str(R.string.stats_rank_getting_started)
         }
     }
 
@@ -457,23 +470,23 @@ class DashboardDataProvider(
         val stats = mutableListOf<String>()
 
         if (globalStats.totalGamesPlayed >= 100) {
-            stats.add("🎮 ${globalStats.totalGamesPlayed}+ games played")
+            stats.add(plural(R.plurals.stats_lifetime_games, globalStats.totalGamesPlayed, globalStats.totalGamesPlayed))
         }
 
         if (globalStats.totalTimePlayedHours >= 10) {
-            stats.add("⏰ ${globalStats.totalTimePlayedHours.toInt()}+ hours of brain training")
+            stats.add(plural(R.plurals.stats_lifetime_hours, globalStats.totalTimePlayedHours.toInt(), globalStats.totalTimePlayedHours.toInt()))
         }
 
         if (globalStats.totalXP >= 1000) {
-            stats.add("⭐ ${globalStats.totalXP}+ XP earned")
+            stats.add(str(R.string.stats_lifetime_xp, globalStats.totalXP))
         }
 
         val daysSinceJoin = ((System.currentTimeMillis() - globalStats.joinDate) / (24 * 60 * 60 * 1000f)).toInt()
         if (daysSinceJoin >= 30) {
-            stats.add("📅 ${daysSinceJoin} days of puzzle solving")
+            stats.add(plural(R.plurals.stats_lifetime_days, daysSinceJoin, daysSinceJoin))
         }
 
-        return stats.ifEmpty { listOf("🚀 Just getting started!") }
+        return stats.ifEmpty { listOf(str(R.string.stats_lifetime_just_started)) }
     }
 
     // ================================
@@ -484,16 +497,16 @@ class DashboardDataProvider(
      * Format last played timestamp
      */
     private fun formatLastPlayed(timestamp: Long): String {
-        if (timestamp == 0L) return "Never"
+        if (timestamp == 0L) return str(R.string.stats_never)
 
         val now = System.currentTimeMillis()
         val diff = now - timestamp
 
         return when {
-            diff < 60_000 -> "Just now"
-            diff < 3_600_000 -> "${diff / 60_000}m ago"
-            diff < 86_400_000 -> "${diff / 3_600_000}h ago"
-            diff < 604_800_000 -> "${diff / 86_400_000}d ago"
+            diff < 60_000 -> str(R.string.stats_just_now)
+            diff < 3_600_000 -> str(R.string.browse_time_minutes_ago, diff / 60_000)
+            diff < 86_400_000 -> str(R.string.browse_time_hours_ago, diff / 3_600_000)
+            diff < 604_800_000 -> str(R.string.browse_time_days_ago, diff / 86_400_000)
             else -> SimpleDateFormat("MMM dd", Locale.getDefault()).format(Date(timestamp))
         }
     }
@@ -616,3 +629,26 @@ data class GlobalStatsInfo(
     val rank: String,
     val lifetimeStats: List<String>
 )
+
+/**
+ * A UI string carried as a resource id plus arguments, so logic classes stay free of a Context and the UI layer
+ * resolves it in the player's current language. When [quantity] is set, [res] is a plurals resource.
+ */
+data class StatsText(
+    @AnyRes val res: Int,
+    val args: List<Any> = emptyList(),
+    val quantity: Int? = null
+) {
+    fun resolve(context: Context): String {
+        val a = args.toTypedArray()
+        return if (quantity != null) context.resources.getQuantityString(res, quantity, *a)
+        else context.getString(res, *a)
+    }
+}
+
+/** Resolves a [StatsText] (or an empty string for null) in the current composition's language. */
+@Composable
+fun StatsText?.asString(): String {
+    val context = LocalContext.current
+    return this?.resolve(context) ?: ""
+}

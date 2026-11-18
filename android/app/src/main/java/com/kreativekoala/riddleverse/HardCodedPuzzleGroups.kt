@@ -192,9 +192,20 @@ object HardcodedPuzzleGroups {
             )
         )
 
+        // The names above are the English source; with a context the player sees the app-language name.
+        // (Descriptions are not shown anywhere, so they have no string resources.)
+        val groups = if (context != null) {
+            baseGroups.map { group ->
+                val nameRes = CatalogText.groupNameRes(group.id)
+                if (nameRes != 0) group.copy(name = context.getString(nameRes)) else group
+            }
+        } else {
+            baseGroups
+        }
+
         // ADDED: Populate actual completion status if context and userId are provided
         return if (context != null && userId != null) {
-            baseGroups.map { group ->
+            groups.map { group ->
                 val completedTypes = GroupCompletionManager.getCompletedTypes(context, userId, group.id)
                 group.copy(
                     completedTypes = completedTypes
@@ -202,7 +213,7 @@ object HardcodedPuzzleGroups {
                 )
             }
         } else {
-            baseGroups
+            groups
         }
     }
 

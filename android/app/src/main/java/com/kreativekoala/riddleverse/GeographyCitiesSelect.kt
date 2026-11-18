@@ -538,7 +538,7 @@ fun GeographyDragDropPuzzleScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "TIME ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
+                                text = "${stringResource(R.string.time_label).uppercase()} ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
                                 color = RvInk,
                                 fontSize = 14.sp,
                                 maxLines = 1,
@@ -553,7 +553,7 @@ fun GeographyDragDropPuzzleScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "SCORE $totalScore",
+                                text = "${stringResource(R.string.score_label).uppercase()} $totalScore",
                                 color = RvInk,
                                 fontSize = 14.sp,
                                 maxLines = 1,
@@ -1079,7 +1079,7 @@ private fun PrecisePlacementScreen(
                         modifier = Modifier.heightIn(min = 48.dp)
                     ) {
                         Text(
-                            text = if (showHints) "Hide" else "Hint",
+                            text = if (showHints) stringResource(R.string.xa_hide) else stringResource(R.string.hint),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvInk
@@ -1840,7 +1840,7 @@ fun GeographyGridTestingScreen(
                 onClick = onBack,
                 colors = ButtonDefaults.buttonColors(containerColor = RvSky)
             ) {
-                Text("← Back", color = RvOnTone)
+                Text("← ${stringResource(R.string.back)}", color = RvOnTone)
             }
 
             Text(

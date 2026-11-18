@@ -68,7 +68,7 @@ fun LevelProgressBar(
 
                 if (!compact) {
                     Text(
-                        text = "${level.currentXP}/${level.xpToNextLevel} XP",
+                        text = stringResource(R.string.done_xp_progress, level.currentXP, level.xpToNextLevel),
                         maxLines = 1,
                         softWrap = false,
                         fontSize = 10.sp,
@@ -160,7 +160,7 @@ fun StreakDisplay(
                         fontSize = if (compact) 14.sp else 16.sp
                     )
                     Text(
-                        text = "${streakInfo.dailyStreak}d",
+                        text = stringResource(R.string.done_days_short, streakInfo.dailyStreak),
                         fontSize = if (compact) 12.sp else 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvCoralEdge
@@ -203,7 +203,7 @@ fun EnhancedStreakDisplay(
         if (streakInfo.currentDailyStreak > 0) {
             StreakItem(
                 emoji = "🔥",
-                value = "${streakInfo.currentDailyStreak}d",
+                value = stringResource(R.string.done_days_short, streakInfo.currentDailyStreak),
                 label = if (showBonusInfo && streakInfo.dailyStreakBonus > 1.0f) "×${streakInfo.dailyStreakBonus}" else null,
                 color = RvCoralEdge
             )
@@ -315,7 +315,7 @@ fun PuzzleHeader(
             ) {
                 if (currentScore > 0) {
                     Text(
-                        text = "$currentScore pts",
+                        text = stringResource(R.string.stats_score_pts, currentScore),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvSunEdge

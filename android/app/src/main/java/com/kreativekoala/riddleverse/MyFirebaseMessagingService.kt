@@ -64,8 +64,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun handlePuzzleReadyNotification(remoteMessage: RemoteMessage) {
-        val title = remoteMessage.notification?.title ?: "🎯 Puzzles Ready!"
-        val body = remoteMessage.notification?.body ?: "New puzzles are now available!"
+        val title = remoteMessage.notification?.title ?: "🎯 " + DailyReminder.localized(this).getString(R.string.xb_notif_puzzles_ready_title)
+        val body = remoteMessage.notification?.body ?: DailyReminder.localized(this).getString(R.string.xb_notif_puzzles_ready_body)
 
         val puzzleType = remoteMessage.data["puzzleType"]
         val difficulty = remoteMessage.data["difficulty"]
@@ -91,8 +91,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun handleDailyPuzzleNotification(remoteMessage: RemoteMessage) {
-        val title = remoteMessage.notification?.title ?: "🧩 New Daily Puzzles Ready!"
-        val body = remoteMessage.notification?.body ?: "Fresh puzzles are waiting for you!"
+        val title = remoteMessage.notification?.title ?: "🧩 " + DailyReminder.localized(this).getString(R.string.xb_notif_daily_puzzles_title)
+        val body = remoteMessage.notification?.body ?: DailyReminder.localized(this).getString(R.string.xb_notif_daily_puzzles_body)
 
         val topics = remoteMessage.data["topics"]
         val puzzleCount = remoteMessage.data["puzzleCount"]
@@ -135,7 +135,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun handleGenericNotification(remoteMessage: RemoteMessage) {
         val title = remoteMessage.notification?.title ?: "PuzzleVerse"
-        val body = remoteMessage.notification?.body ?: "You have a new notification"
+        val body = remoteMessage.notification?.body ?: DailyReminder.localized(this).getString(R.string.xb_notif_generic_body)
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP

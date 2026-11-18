@@ -24,6 +24,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.kreativekoala.riddleverse.util.DebugLogger
 import kotlinx.coroutines.delay
 import kotlin.math.*
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 private const val TAG = "AdaptiveAverage"
 
@@ -385,7 +386,7 @@ fun AdaptivePuzzleHeader(
         )
 
         Text(
-            text = difficultyLevel.name,
+            text = rvDifficultyLabel(difficultyLevel.name),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = RvSky,
@@ -527,7 +528,7 @@ fun AdaptiveAveragesTopGameBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -535,7 +536,7 @@ fun AdaptiveAveragesTopGameBar(
 
                 // Adaptive difficulty indicator
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvSky

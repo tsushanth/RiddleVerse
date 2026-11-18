@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -114,7 +115,7 @@ fun SlideTilesScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Bo
             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
         ) {
             Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null)
-            Text("  Undo")
+            Text("  " + stringResource(R.string.xa_undo))
         }
     }
 

@@ -56,7 +56,7 @@ fun DailyPuzzleHomeCard(modifier: Modifier = Modifier) {
     val spec = remember(day) { DailyPuzzleSchedule.specFor(day) }
     val result = DailyPuzzleStore.resultFor(context, day)
     val streak = DailyPuzzleStore.displayStreak(context, day)
-    val gameName = PuzzleTypeNames.display(spec.type)
+    val gameName = PuzzleTypeNames.display(context, spec.type)
     val untilNext = DailyPuzzleSchedule.millisUntilNext(now)
 
     Box(
@@ -99,7 +99,7 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
     val context = LocalContext.current
     val result = record.result
     val share = remember(result) { DailyPuzzleStore.shareResultOf(context, result) }
-    val card = remember(share) { DailyShareCard.render(share) }
+    val card = remember(share) { DailyShareCard.render(context, share) }
     val now = rememberNowMillis()
 
     Column(
@@ -128,7 +128,7 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
         }
         record.reward?.let { r ->
             Text(stringResource(R.string.daily_result_coins, r.coins), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvSunEdge)
-            r.specialReward?.let { Text(it, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvGrape) }
+            r.specialRewardRes?.let { Text(stringResource(it), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvGrape) }
         }
 
         Image(

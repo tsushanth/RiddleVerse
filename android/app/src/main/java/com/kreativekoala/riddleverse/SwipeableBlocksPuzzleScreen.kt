@@ -778,7 +778,7 @@ fun EnhancedConversionTopGameBar(
                     repeat(hearts) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
-                            contentDescription = "Heart",
+                            contentDescription = stringResource(R.string.xa_heart),
                             tint = Color(0xFFFF69B4),
                             modifier = Modifier.size(20.dp)
                         )
@@ -827,7 +827,7 @@ fun EnhancedConversionTopGameBar(
 
                     if (attempts > 0) {
                         Text(
-                            text = "Attempts: $attempts",
+                            text = stringResource(R.string.xb_attempts_value, attempts),
                             color = RvInkSoft,
                             fontSize = 12.sp
                         )

@@ -1,6 +1,7 @@
 // WaldoPuzzleScreenWrapper.kt - Enhanced hidden-object search puzzle with Dual Detection
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.kreativekoala.riddleverse.ui.theme.*
@@ -125,6 +126,7 @@ fun WaldoPuzzleScreenWrapper(
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val xbContext = LocalContext.current
 
     // Parse puzzle data on first composition
     var loadAttempt by remember { mutableStateOf(0) }
@@ -132,7 +134,7 @@ fun WaldoPuzzleScreenWrapper(
     LaunchedEffect(currentPuzzle.puzzleId, loadAttempt) {
         kotlinx.coroutines.delay(20_000)
         if (isLoading && puzzleData == null) {
-            errorMessage = "This puzzle is taking too long to load. Please try again."
+            errorMessage = xbContext.getString(R.string.common_puzzle_load_timeout)
             hasError = true
             isLoading = false
         }
@@ -165,7 +167,7 @@ fun WaldoPuzzleScreenWrapper(
             // Validate image readiness
             if (imageUrl.isEmpty() || imageUrl == "null" || imageUrl.contains("PLACEHOLDER")) {
                 Log.e(TAG, "❌ Image not ready yet: '$imageUrl'")
-                errorMessage = "Image is still being generated. Please try again in a moment."
+                errorMessage = xbContext.getString(R.string.common_image_still_generating)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -173,7 +175,7 @@ fun WaldoPuzzleScreenWrapper(
 
             if (!imageUrl.startsWith("http")) {
                 Log.e(TAG, "❌ Invalid image URL format: '$imageUrl'")
-                errorMessage = "Invalid image URL. Please try again."
+                errorMessage = xbContext.getString(R.string.common_invalid_image_url)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -277,7 +279,7 @@ fun WaldoPuzzleScreenWrapper(
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error parsing puzzle data: ${e.message}", e)
             Log.e(TAG, "📄 Raw question data: ${currentPuzzle.question}")
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -285,7 +287,7 @@ fun WaldoPuzzleScreenWrapper(
 
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading enhanced Waldo puzzle...")
+            LoadingScreen(message = stringResource(R.string.xb_loading_waldo_puzzle))
         }
 
         hasError -> {
@@ -308,7 +310,7 @@ fun WaldoPuzzleScreenWrapper(
             WaldoPuzzleScreen(
                 puzzleData = puzzleData!!,
                 difficulty = currentPuzzle.difficulty ?: "Medium",
-                round = "ROUND ${if (viewModel.isCustomPuzzleFlow) viewModel.currentQuestionNumber else viewModel.currentPuzzleNumber} of ${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}",
+                round = stringResource(R.string.xb_round_of, viewModel.getCurrentNumber(), viewModel.getTotalCount()),
                 onPuzzleComplete = { score, foundCount ->
                     Log.d(TAG, "🎉 Enhanced Waldo puzzle completed! Found: $foundCount/${puzzleData!!.totalObjects}, Score: $score")
                     val isComplete = foundCount >= puzzleData!!.totalObjects
@@ -321,7 +323,7 @@ fun WaldoPuzzleScreenWrapper(
         else -> {
             // Not loading, no error, no data: previously rendered nothing (blank white screen).
             WaldoErrorScreen(
-                message = "The puzzle could not be loaded. Please try again.",
+                message = stringResource(R.string.common_puzzle_load_failed),
                 onRetry = {
                     isLoading = true
                     hasError = false
@@ -567,7 +569,7 @@ fun WaldoPuzzleHeader(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = "${difficulty.uppercase()} · $round",
+                        text = "${localizedDifficulty(difficulty).uppercase()} · $round",
                         color = Color.White,
                         fontSize = 12.sp,
                         maxLines = 1,
@@ -991,14 +993,14 @@ fun WaldoObjectCard(
                 if (isFound) {
                     Icon(
                         Icons.Default.CheckCircle,
-                        "Found",
+                        stringResource(R.string.found),
                         tint = Color.Green,
                         modifier = Modifier.size(32.dp)
                     )
                 } else {
                     Icon(
                         Icons.Default.Search,
-                        "Not found",
+                        stringResource(R.string.xb_not_found),
                         tint = Color.Gray,
                         modifier = Modifier.size(24.dp)
                     )
@@ -1037,12 +1039,12 @@ fun WaldoObjectCard(
                         ) {
                             Icon(
                                 Icons.Default.Lightbulb,
-                                "Hint",
+                                stringResource(R.string.hint),
                                 tint = Color.Black,
                                 modifier = Modifier.size(16.dp)
                             )
                             Text(
-                                "Hint",
+                                stringResource(R.string.hint),
                                 color = Color.Black,
                                 fontSize = 12.sp
                             )
@@ -1106,7 +1108,7 @@ fun WaldoProgressBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Found: $foundCount/$totalObjects",
+            text = "${stringResource(R.string.found)}: $foundCount/$totalObjects",
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
@@ -1119,14 +1121,14 @@ fun WaldoProgressBar(
             trackColor = Color(0xFF444444)
         )
         Text(
-            text = "Wrong: $wrongClicks",
+            text = stringResource(R.string.xb_wrong_count, wrongClicks),
             color = if (wrongClicks > 5) RvCoral else Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1
         )
         Text(
-            text = "Hints: $hintsUsed/3",
+            text = "${stringResource(R.string.common_hints)}: $hintsUsed/3",
             color = Color.Yellow,
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
@@ -1152,7 +1154,7 @@ fun WaldoErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error",
+                text = "⚠️ ${stringResource(R.string.common_error)}",
                 color = Color.Red,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -1170,14 +1172,14 @@ fun WaldoErrorScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(onClick = onRetry) {
-                    Text("Retry")
+                    Text(stringResource(R.string.retry))
                 }
 
                 Button(
                     onClick = onSkip,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
-                    Text("Skip")
+                    Text(stringResource(R.string.skip))
                 }
             }
         }

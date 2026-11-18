@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,7 +57,7 @@ fun BotUpsellSheet(
                     IconButton(onClick = onDismiss, modifier = Modifier.size(24.dp)) {
                         Icon(
                             imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
+                            contentDescription = stringResource(R.string.close),
                             tint = RvInkSoft,
                             modifier = Modifier.size(20.dp)
                         )
@@ -66,7 +67,7 @@ fun BotUpsellSheet(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Want more puzzles?",
+                    text = stringResource(R.string.browse_bot_upsell_title),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
@@ -76,7 +77,7 @@ fun BotUpsellSheet(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Continue with our bot for free puzzles beyond your daily limit!",
+                    text = stringResource(R.string.browse_bot_upsell_body),
                     fontSize = 14.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center,
@@ -120,7 +121,7 @@ fun BotUpsellSheet(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Or upgrade for unlimited in-app access",
+                    text = stringResource(R.string.browse_bot_upsell_upgrade_hint),
                     fontSize = 12.sp,
                     color = RvInkSoft,
                     textAlign = TextAlign.Center
@@ -142,7 +143,7 @@ private fun openTelegramBot(context: Context) {
             val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$TELEGRAM_BOT_USERNAME"))
             context.startActivity(webIntent)
         } catch (e2: Exception) {
-            Toast.makeText(context, "Could not open Telegram. Search for @$TELEGRAM_BOT_USERNAME", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.browse_bot_telegram_open_failed, TELEGRAM_BOT_USERNAME), Toast.LENGTH_LONG).show()
         }
     }
 }
@@ -153,6 +154,6 @@ private fun openWhatsAppBot(context: Context) {
         val whatsappIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$WHATSAPP_BOT_NUMBER"))
         context.startActivity(whatsappIntent)
     } catch (e: Exception) {
-        Toast.makeText(context, "Could not open WhatsApp", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.browse_bot_whatsapp_open_failed), Toast.LENGTH_LONG).show()
     }
 }

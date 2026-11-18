@@ -212,7 +212,7 @@ fun EnhancedWordFillTopBar(
                     )
                 }
 
-                Icon(Icons.Default.Pause, contentDescription = "Pause", tint = RvInk)
+                Icon(Icons.Default.Pause, contentDescription = stringResource(R.string.common_pause), tint = RvInk)
 
                 Column {
                     Text(
@@ -233,7 +233,7 @@ fun EnhancedWordFillTopBar(
                 repeat(lives) {
                     Icon(
                         Icons.Default.Favorite,
-                        contentDescription = "Heart",
+                        contentDescription = stringResource(R.string.xa_heart),
                         tint = RvInk,
                         modifier = Modifier.size(20.dp)
                     )

@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.json.JSONArray
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 // Simplified data classes
 data class SimpleImageQuestionPuzzleData(
@@ -124,7 +125,7 @@ fun ImageQuestionScreenWrapper(
             // Validate image readiness
             if (imageUrl.isEmpty() || imageUrl == "null" || imageUrl.contains("PLACEHOLDER")) {
                 Log.e(TAG, "Image not ready yet: '$imageUrl'")
-                errorMessage = "Image is still being generated. Please try again in a moment."
+                errorMessage = context.getString(R.string.common_image_still_generating)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -132,7 +133,7 @@ fun ImageQuestionScreenWrapper(
 
             if (!imageUrl.startsWith("http")) {
                 Log.e(TAG, "Invalid image URL format: '$imageUrl'")
-                errorMessage = "Invalid image URL. Please try again."
+                errorMessage = context.getString(R.string.common_invalid_image_url)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -222,7 +223,7 @@ fun ImageQuestionScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing puzzle data: ${e.message}", e)
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = context.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -232,8 +233,8 @@ fun ImageQuestionScreenWrapper(
         isLoading || isLoadingMedia -> {
             IQLoadingScreen(
                 message = when {
-                    isLoadingMedia -> "Preparing image..."
-                    else -> "Loading image question puzzle..."
+                    isLoadingMedia -> stringResource(R.string.xa_preparing_image)
+                    else -> stringResource(R.string.xa_loading_image_question_puzzle)
                 }
             )
         }
@@ -465,7 +466,7 @@ fun SimpleImageQuestionHeader(
 
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = difficulty.uppercase(),
+                text = rvDifficultyLabel(difficulty).uppercase(),
                 color = Color.White,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold
@@ -546,7 +547,7 @@ fun StudyImagePhase(
                 )
 
                 Text(
-                    text = "Loading image...",
+                    text = stringResource(R.string.xa_loading_image),
                     color = Color.Yellow,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
@@ -784,7 +785,7 @@ fun AnsweringQuestionsPhase(
                                 .padding(8.dp)
                         ) {
                             Text(
-                                text = "-${IMAGE_REVEAL_PENALTY * imageRevealCount} pts",
+                                text = stringResource(R.string.xa_minus_pts_value, IMAGE_REVEAL_PENALTY * imageRevealCount),
                                 color = Color.White,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
@@ -1137,7 +1138,7 @@ fun ResultsPhase(
     ) {
         item {
             Text(
-                text = "🎉 Results",
+                text = "🎉 ${stringResource(R.string.xa_results)}",
                 color = Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -1165,7 +1166,7 @@ fun ResultsPhase(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Base Score: $baseScore",
+                            text = stringResource(R.string.xa_base_score_value, baseScore),
                             color = Color.White,
                             fontSize = 16.sp
                         )
@@ -1204,7 +1205,7 @@ fun ResultsPhase(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Correct: $correctAnswers/$totalQuestions",
+                        text = stringResource(R.string.xa_correct_ratio, correctAnswers, totalQuestions),
                         color = Color.White,
                         fontSize = 18.sp
                     )
@@ -1639,7 +1640,7 @@ fun ProgressIndicator(
             trackColor = Color(0xFF444444)
         )
         Text(
-            text = "Correct: $correctCount",
+            text = stringResource(R.string.xa_correct_value, correctCount),
             color = Color(0xFF4CD9A0),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
@@ -1699,7 +1700,7 @@ fun IQErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error",
+                text = "⚠️ ${stringResource(R.string.common_error)}",
                 color = Color.Red,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold

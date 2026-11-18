@@ -50,10 +50,10 @@ class SpeechRecognizerHelper(private val context: Context) {
             override fun onError(error: Int) {
                 onListeningCallback?.invoke(false)
                 val errorMsg = when (error) {
-                    SpeechRecognizer.ERROR_AUDIO -> "Audio recording error"
-                    SpeechRecognizer.ERROR_NO_MATCH -> "No speech detected"
-                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> "Speech timeout"
-                    else -> "Recognition error"
+                    SpeechRecognizer.ERROR_AUDIO -> context.getString(R.string.xb_speech_error_audio)
+                    SpeechRecognizer.ERROR_NO_MATCH -> context.getString(R.string.xb_speech_error_no_match)
+                    SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> context.getString(R.string.xb_speech_error_timeout)
+                    else -> context.getString(R.string.xb_speech_error_generic)
                 }
                 onErrorCallback?.invoke(errorMsg)
             }

@@ -3,6 +3,7 @@ package com.kreativekoala.riddleverse
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -218,8 +219,22 @@ object GuestPrefs {
 // Soft gates
 // ---------------------------------------------------------------------------------------------------------------
 
+/** What a guest was trying to do when the soft gate appeared. [analyticsKey] is the funnel value; the dialog title is localized. */
+enum class GuestFeature(val analyticsKey: String, @StringRes val titleRes: Int) {
+    CREATE_PUZZLES("create puzzles", R.string.onb_gate_title_create_puzzles),
+    PLAY_DAILY_QUIZZES("play daily quizzes", R.string.onb_gate_title_play_daily_quizzes),
+    BUY_COINS("buy coins", R.string.onb_gate_title_buy_coins),
+    SUBSCRIBE("subscribe", R.string.onb_gate_title_subscribe)
+}
+
 object GuestGate {
+    /**
+     * Sentinel stored in GameGenerationViewModel.errorMessage and compared against (needsSignIn). Keep the value; to
+     * show it to the user use [SIGN_IN_TO_CREATE_RES] (localized, same English text).
+     */
     const val SIGN_IN_TO_CREATE = "Sign in to create games. It is free and takes under a minute."
+
+    @StringRes const val SIGN_IN_TO_CREATE_RES = R.string.onb_gate_sign_in_to_create
 
     fun isGuest(): Boolean = GuestRules.isGuest(FirebaseAuth.getInstance().currentUser)
 
@@ -229,20 +244,20 @@ object GuestGate {
 
     /**
      * Returns true when the caller may go ahead. For a guest it shows a short "sign in to <feature>" dialog and
-     * returns false. [feature] is a verb phrase: "create puzzles", "buy a subscription".
+     * returns false.
      */
-    fun requireAccount(activity: Activity, feature: String): Boolean {
+    fun requireAccount(activity: Activity, feature: GuestFeature): Boolean {
         if (!isGuest()) return true
-        Funnel.log(FunnelStep.GUEST_GATE_SHOWN, mapOf("feature" to feature))
+        Funnel.log(FunnelStep.GUEST_GATE_SHOWN, mapOf("feature" to feature.analyticsKey))
         if (activity.isFinishing || activity.isDestroyed) return false
         AlertDialog.Builder(activity)
-            .setTitle("Sign in to $feature")
-            .setMessage("Your puzzles and progress so far stay on this phone and move to your account when you sign in. It is free.")
-            .setPositiveButton("Sign in or create account") { _, _ ->
-                Funnel.log(FunnelStep.GUEST_GATE_SIGN_IN, mapOf("feature" to feature))
+            .setTitle(feature.titleRes)
+            .setMessage(R.string.onb_gate_message)
+            .setPositiveButton(R.string.common_sign_in_or_create) { _, _ ->
+                Funnel.log(FunnelStep.GUEST_GATE_SIGN_IN, mapOf("feature" to feature.analyticsKey))
                 activity.startActivity(signInIntent(activity))
             }
-            .setNegativeButton("Not now", null)
+            .setNegativeButton(R.string.guest_save_not_now, null)
             .show()
         return false
     }

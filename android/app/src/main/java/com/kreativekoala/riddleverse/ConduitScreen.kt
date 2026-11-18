@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
 
 // --- spatial puzzles (feat/puzzles-spatial) ---
 // Conduit: tap tiles to rotate them clockwise until every pipe is powered by the source.
@@ -74,10 +75,10 @@ private fun ConduitBoard(args: SpatialArgs, puzzle: ConduitPuzzle) {
         args = args,
         status = "Powered $poweredCount/${n * n}",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) { game.undo(); hintTile = -1; commit() }
-            SpatialAction(Icons.Default.Refresh, "Restart") { game.restart(); hintTile = -1; commit() }
-            SpatialAction(Icons.Default.Lightbulb, "Hint") { hintTile = game.hint(); tick++ }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.canUndo()) { game.undo(); hintTile = -1; commit() }
+            SpatialAction(Icons.Default.Refresh, stringResource(R.string.xa_restart)) { game.restart(); hintTile = -1; commit() }
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint)) { hintTile = game.hint(); tick++ }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         Text(
@@ -144,7 +145,7 @@ private fun ConduitBoard(args: SpatialArgs, puzzle: ConduitPuzzle) {
         SpatialResultDialog(
             success = true, title = "All lit up!",
             detail = "${game.moves} rotations (par ${puzzle.par}).  Score $s",
-            stars = game.stars(), primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) }
+            stars = game.stars(), primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) }
         )
     }
 }

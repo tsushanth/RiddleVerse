@@ -2,10 +2,12 @@ package com.kreativekoala.riddleverse
 
 import android.app.Activity
 import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.google.firebase.auth.FirebaseAuth
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.ProductType
@@ -41,13 +43,17 @@ class CoinManager private constructor() {
         }
 
         val COIN_PACKS = listOf(
-            CoinPack("com.kreativekoala.riddleverse.coins.100", 100, "100 Coins"),
-            CoinPack("com.kreativekoala.riddleverse.coins.500", 500, "500 Coins"),
-            CoinPack("com.kreativekoala.riddleverse.coins.1200", 1200, "1,200 Coins")
+            CoinPack("com.kreativekoala.riddleverse.coins.100", 100),
+            CoinPack("com.kreativekoala.riddleverse.coins.500", 500),
+            CoinPack("com.kreativekoala.riddleverse.coins.1200", 1200)
         )
     }
 
-    data class CoinPack(val productId: String, val coins: Int, val label: String)
+    data class CoinPack(val productId: String, val coins: Int) {
+        /** Localized pack name shown on the purchase buttons (e.g. "100 Coins"). */
+        val label: String
+            @Composable get() = LocalContext.current.resources.getQuantityString(R.plurals.browse_coin_pack, coins, coins)
+    }
 
     data class GameEarning(
         val gameId: String,
@@ -88,13 +94,20 @@ class CoinManager private constructor() {
 
     var balance by mutableIntStateOf(0)
     var isPurchasing by mutableStateOf(false)
-    var purchaseMessage by mutableStateOf<String?>(null)
+    var purchaseMessage by mutableStateOf<UiText?>(null)
     var creatorEarnings by mutableStateOf<CreatorEarningsData?>(null)
     var isLoadingEarnings by mutableStateOf(false)
     var payoutEligibility by mutableStateOf<PayoutEligibility?>(null)
     var isLoadingPayout by mutableStateOf(false)
     var payoutHistory by mutableStateOf<List<PayoutRequest>>(emptyList())
-    var payoutMessage by mutableStateOf<String?>(null)
+    var payoutMessage by mutableStateOf<UiText?>(null)
+    /** True when [payoutMessage] reports a failure (the UI colours it as an error). */
+    var payoutMessageIsError by mutableStateOf(false)
+
+    private fun showPayoutMessage(message: UiText, isError: Boolean) {
+        payoutMessage = message
+        payoutMessageIsError = isError
+    }
 
     val canContinue: Boolean get() = balance >= CONTINUE_COST
     val canAffordRemix: Boolean get() = balance >= REMIX_COST
@@ -513,7 +526,10 @@ class CoinManager private constructor() {
                             } else {
                                 withContext(Dispatchers.Main) {
                                     isLoadingPayout = false
-                                    payoutMessage = result.optString("error", "Failed to connect Stripe")
+                                    showPayoutMessage(
+                                        if (result.has("error")) UiText.Raw(result.optString("error")) else UiText.Res(R.string.create_stripe_connect_failed),
+                                        isError = true
+                                    )
                                 }
                             }
                         } else {
@@ -523,14 +539,14 @@ class CoinManager private constructor() {
                         Log.e(TAG, "Connect Stripe error", e)
                         withContext(Dispatchers.Main) {
                             isLoadingPayout = false
-                            payoutMessage = "Connection failed"
+                            showPayoutMessage(UiText.Res(R.string.browse_connection_failed), isError = true)
                         }
                     }
                 }
             }
         }.addOnFailureListener {
             isLoadingPayout = false
-            payoutMessage = "Authentication failed"
+            showPayoutMessage(UiText.Res(R.string.create_authentication_failed), isError = true)
         }
     }
 
@@ -562,9 +578,9 @@ class CoinManager private constructor() {
         }
     }
 
-    fun requestPayout(coinsAmount: Int, onResult: (Boolean, String?) -> Unit) {
+    fun requestPayout(coinsAmount: Int, onResult: (Boolean, UiText?) -> Unit) {
         val user = FirebaseAuth.getInstance().currentUser ?: run {
-            onResult(false, "Not signed in")
+            onResult(false, UiText.Res(R.string.create_not_signed_in))
             return
         }
         val userId = user.uid
@@ -599,34 +615,37 @@ class CoinManager private constructor() {
                                 if (success) {
                                     val newBalance = result.optInt("newBalance", balance)
                                     balance = newBalance
-                                    payoutMessage = "Payout requested! \$${result.optDouble("usdAmount", 0.0)} is on the way."
+                                    showPayoutMessage(
+                                        UiText.Res(R.string.create_payout_requested, listOf(result.optDouble("usdAmount", 0.0))),
+                                        isError = false
+                                    )
                                     checkPayoutEligibility()
                                     fetchPayoutHistory()
                                     onResult(true, null)
                                 } else {
-                                    val error = result.optString("error", "Payout failed")
-                                    payoutMessage = error
+                                    val error = if (result.has("error")) UiText.Raw(result.optString("error")) else UiText.Res(R.string.create_payout_failed)
+                                    showPayoutMessage(error, isError = true)
                                     onResult(false, error)
                                 }
                             }
                         } else {
                             withContext(Dispatchers.Main) {
                                 isLoadingPayout = false
-                                onResult(false, "No response")
+                                onResult(false, UiText.Res(R.string.create_no_response))
                             }
                         }
                     } catch (e: Exception) {
                         Log.e(TAG, "Request payout error", e)
                         withContext(Dispatchers.Main) {
                             isLoadingPayout = false
-                            onResult(false, "Request failed")
+                            onResult(false, UiText.Res(R.string.create_request_failed))
                         }
                     }
                 }
             }
         }.addOnFailureListener {
             isLoadingPayout = false
-            onResult(false, "Authentication failed")
+            onResult(false, UiText.Res(R.string.create_authentication_failed))
         }
     }
 
@@ -703,10 +722,10 @@ class CoinManager private constructor() {
 
     fun launchPurchase(activity: Activity, pack: CoinPack) {
         // Coins live on the server under the account id: a guest purchase would have nowhere to be credited.
-        if (!GuestGate.requireAccount(activity, "buy coins")) return
+        if (!GuestGate.requireAccount(activity, GuestFeature.BUY_COINS)) return
         val product = storeProducts.firstOrNull { it.id == pack.productId }
         if (product == null) {
-            purchaseMessage = "Product not available"
+            purchaseMessage = UiText.Res(R.string.create_product_unavailable)
             return
         }
 
@@ -723,7 +742,7 @@ class CoinManager private constructor() {
                 override fun onError(error: PurchasesError, userCancelled: Boolean) {
                     isPurchasing = false
                     if (!userCancelled) {
-                        purchaseMessage = "Purchase failed: ${error.message}"
+                        purchaseMessage = UiText.Res(R.string.create_purchase_failed, listOf(error.message))
                         Log.e(TAG, "Coin purchase failed: ${error.message}")
                     }
                 }
@@ -760,7 +779,7 @@ class CoinManager private constructor() {
                         val newBalance = result.optInt("newBalance", balance)
                         withContext(Dispatchers.Main) {
                             balance = newBalance
-                            purchaseMessage = "Coins added!"
+                            purchaseMessage = UiText.Res(R.string.create_coins_added)
                         }
                     }
                 } catch (e: Exception) {

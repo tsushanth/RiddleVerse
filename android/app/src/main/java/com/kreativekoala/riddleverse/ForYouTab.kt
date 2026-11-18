@@ -4,6 +4,7 @@ import com.kreativekoala.riddleverse.ui.CappedFontScale
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.annotation.StringRes
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import com.google.firebase.auth.FirebaseAuth
 import com.kreativekoala.riddleverse.QuizCategories.getQuizCategoryForType
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -151,7 +153,7 @@ fun ForYouTab(
                         color = RvInk
                     )
                     Text(
-                        text = "${availablePuzzleTypes.size} puzzle types ready",
+                        text = context.resources.getQuantityString(R.plurals.cat_foryou_types_ready, availablePuzzleTypes.size, availablePuzzleTypes.size),
                         fontSize = 14.sp,
                         color = if (availablePuzzleTypes.isNotEmpty()) RvSuccessEdge else RvInkSoft
                     )
@@ -206,7 +208,7 @@ fun ForYouTab(
                             color = MaterialTheme.colorScheme.primary
                         )
                         Text(
-                            text = "Loading your personalized puzzles...",
+                            text = stringResource(R.string.cat_foryou_loading),
                             fontSize = 14.sp,
                             color = RvInkSoft
                         )
@@ -440,6 +442,7 @@ fun FavoritesSection(
     onPuzzleSelected: (String) -> Unit
 ) {
     val availableFavorites = favorites.filter { availablePuzzleTypes.contains(it.puzzleType) }
+    val resources = LocalContext.current.resources
 
     if (availableFavorites.isNotEmpty()) {
         Column(
@@ -458,7 +461,7 @@ fun FavoritesSection(
                         color = RvInk
                     )
                     Text(
-                        text = "${availableFavorites.size}/${favorites.size} ready",
+                        text = stringResource(R.string.cat_foryou_ready_fraction, availableFavorites.size, favorites.size),
                         fontSize = 12.sp,
                         color = if (availableFavorites.isNotEmpty()) RvSuccessEdge else RvSunEdge
                     )
@@ -470,7 +473,7 @@ fun FavoritesSection(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "FAVORITES",
+                        text = stringResource(R.string.cat_foryou_badge_favorites),
                         maxLines = 1,
                         softWrap = false,
                         color = RvOnTone,
@@ -486,7 +489,7 @@ fun FavoritesSection(
                 items(availableFavorites) { favorite ->
                     PuzzleCard(
                         puzzleType = favorite.puzzleType,
-                        subtitle = "${favorite.totalPlays} plays • ${(favorite.winRate * 100).toInt()}% win",
+                        subtitle = resources.getQuantityString(R.plurals.cat_foryou_plays_win, favorite.totalPlays, favorite.totalPlays, (favorite.winRate * 100).toInt()),
                         backgroundColor = RvSky,
                         onClick = { onPuzzleSelected(favorite.puzzleType) }
                     )
@@ -504,6 +507,7 @@ fun TrendingSection(
 ) {
     val context = LocalContext.current
     val availableTrending = trending.filter { availablePuzzleTypes.contains(it.puzzleType) }
+    val trendingToast = context.resources.getQuantityString(R.plurals.cat_foryou_trending_toast, trending.size, trending.size)
 
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -515,7 +519,7 @@ fun TrendingSection(
                     // Show toast indicating all trending puzzles are displayed
                     Toast.makeText(
                         context,
-                        "Showing all ${trending.size} trending puzzles",
+                        trendingToast,
                         Toast.LENGTH_SHORT
                     ).show()
                 },
@@ -530,7 +534,7 @@ fun TrendingSection(
                     color = RvInk
                 )
                 Text(
-                    text = "${availableTrending.size}/${trending.size} ready • Tap to see all",
+                    text = stringResource(R.string.cat_foryou_ready_tap_all, availableTrending.size, trending.size),
                     fontSize = 12.sp,
                     color = if (availableTrending.isNotEmpty()) RvSuccessEdge else RvSunEdge
                 )
@@ -546,7 +550,7 @@ fun TrendingSection(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "TRENDING",
+                        text = stringResource(R.string.cat_foryou_badge_trending),
                         maxLines = 1,
                         softWrap = false,
                         color = RvOnTone,
@@ -557,7 +561,7 @@ fun TrendingSection(
 
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "View all trending",
+                    contentDescription = stringResource(R.string.cat_foryou_cd_view_all_trending),
                     tint = RvSuccessEdge,
                     modifier = Modifier.size(20.dp)
                 )
@@ -570,7 +574,7 @@ fun TrendingSection(
             items(availableTrending) { trending ->
                 PuzzleCard(
                     puzzleType = trending.puzzleType,
-                    subtitle = "#${trending.rank} • ${trending.recentStarts} recent plays",
+                    subtitle = context.resources.getQuantityString(R.plurals.cat_foryou_rank_recent_plays, trending.recentStarts, trending.rank, trending.recentStarts),
                     backgroundColor = RvSuccessEdge,
                     showRankBadge = true,
                     rank = trending.rank,
@@ -606,7 +610,7 @@ fun RecommendedSection(
                         color = RvInk
                     )
                     Text(
-                        text = "${availableRecommended.size}/${recommended.size} ready",
+                        text = stringResource(R.string.cat_foryou_ready_fraction, availableRecommended.size, recommended.size),
                         fontSize = 12.sp,
                         color = if (availableRecommended.isNotEmpty()) RvSuccessEdge else RvSunEdge
                     )
@@ -618,7 +622,7 @@ fun RecommendedSection(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "FOR YOU",
+                        text = stringResource(R.string.cat_foryou_badge_for_you),
                         maxLines = 1,
                         softWrap = false,
                         color = RvOnTone,
@@ -632,9 +636,15 @@ fun RecommendedSection(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(availableRecommended) { recommended ->
+                    val reasonText = when {
+                        recommended.reasonRes == 0 -> recommended.reason
+                        recommended.basisType != null ->
+                            stringResource(recommended.reasonRes, PuzzleTypeNames.displayName(recommended.basisType))
+                        else -> stringResource(recommended.reasonRes)
+                    }
                     PuzzleCard(
                         puzzleType = recommended.puzzleType,
-                        subtitle = recommended.reason,
+                        subtitle = reasonText,
                         backgroundColor = RvGrape,
                         showRecBadge = true,
                         onClick = { onPuzzleSelected(recommended.puzzleType) }
@@ -690,7 +700,7 @@ fun PuzzleCard(
                 if (imageResource != null) {
                     Image(
                         painter = painterResource(id = imageResource),
-                        contentDescription = "${category?.title ?: puzzleType} preview",
+                        contentDescription = stringResource(R.string.cat_game_preview_cd, PuzzleTypeNames.displayName(puzzleType)),
                         modifier = Modifier
                             .fillMaxSize()
                             .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp)),
@@ -739,7 +749,7 @@ fun PuzzleCard(
                                 .padding(horizontal = 4.dp, vertical = 2.dp)
                         ) {
                             Text(
-                                text = "REC",
+                                text = stringResource(R.string.cat_foryou_badge_rec),
                                 fontSize = 7.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = backgroundColor
@@ -757,7 +767,7 @@ fun PuzzleCard(
                     .padding(8.dp)
             ) {
                 Text(
-                    text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                    text = PuzzleTypeNames.displayName(puzzleType),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
@@ -810,7 +820,7 @@ fun FavoriteQuickCard(
             if (imageResource != null) {
                 Image(
                     painter = painterResource(id = imageResource),
-                    contentDescription = "${category?.title ?: favorite.puzzleType} preview",
+                    contentDescription = stringResource(R.string.cat_game_preview_cd, PuzzleTypeNames.displayName(favorite.puzzleType)),
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp)),
@@ -841,7 +851,7 @@ fun FavoriteQuickCard(
 
                     if (imageResource == null) {
                     Text(
-                            text = category?.title ?: PuzzleTypeNames.display(favorite.puzzleType),
+                            text = PuzzleTypeNames.displayName(favorite.puzzleType),
                             fontSize = 10.sp,
                             lineHeight = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -856,7 +866,7 @@ fun FavoriteQuickCard(
             // Clean label band under the image
             if (imageResource != null) {
                 Text(
-                    text = category?.title ?: PuzzleTypeNames.display(favorite.puzzleType),
+                    text = PuzzleTypeNames.displayName(favorite.puzzleType),
                     fontSize = 10.sp,
                     lineHeight = 11.sp,
                     fontWeight = FontWeight.ExtraBold,
@@ -905,26 +915,28 @@ fun RandomChallengeCard(
             ) {
                 Icon(
                     imageVector = if (isEnabled) Icons.Default.Shuffle else Icons.Default.HourglassEmpty,
-                    contentDescription = "Random Challenge",
+                    contentDescription = stringResource(R.string.cat_foryou_cd_random),
                     tint = RvOnTone,
                     modifier = Modifier.size(20.dp)
                 )
 
                 Text(
-                    text = if (isEnabled) "Surprise" else stringResource(R.string.loading),
+                    text = if (isEnabled) stringResource(R.string.cat_foryou_surprise_me) else stringResource(R.string.loading),
                     color = RvOnTone,
                     fontSize = 8.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
 
-                Text(
-                    text = if (isEnabled) "Me!" else "...",
-                    color = RvOnTone,
-                    fontSize = 8.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
+                if (!isEnabled) {
+                    Text(
+                        text = "...",
+                        color = RvOnTone,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
@@ -937,6 +949,7 @@ fun PuzzleGroupsSection(
     onGroupSelected: (PuzzleGroup) -> Unit
 ) {
     val context = LocalContext.current
+    val collectionsToast = context.resources.getQuantityString(R.plurals.cat_foryou_collections_toast, groups.size, groups.size)
 
     // Filter groups to only show those with at least one available puzzle
     val availableGroups = groups.filter { group ->
@@ -956,7 +969,7 @@ fun PuzzleGroupsSection(
                         // Show toast indicating where to view all collections
                         Toast.makeText(
                             context,
-                            "Viewing all ${groups.size} puzzle collections",
+                            collectionsToast,
                             Toast.LENGTH_SHORT
                         ).show()
                     },
@@ -971,7 +984,7 @@ fun PuzzleGroupsSection(
                         color = RvInk
                     )
                     Text(
-                        text = "${availableGroups.size} collections ready • Tap to see all",
+                        text = stringResource(R.string.cat_foryou_collections_ready_tap_all, availableGroups.size),
                         fontSize = 12.sp,
                         color = if (availableGroups.isNotEmpty()) RvSuccessEdge else RvSunEdge
                     )
@@ -987,7 +1000,7 @@ fun PuzzleGroupsSection(
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
                         Text(
-                            text = "COLLECTIONS",
+                            text = stringResource(R.string.cat_foryou_badge_collections),
                         maxLines = 1,
                         softWrap = false,
                             color = RvOnTone,
@@ -998,7 +1011,7 @@ fun PuzzleGroupsSection(
 
                     Icon(
                         imageVector = Icons.Default.ChevronRight,
-                        contentDescription = "View all collections",
+                        contentDescription = stringResource(R.string.cat_foryou_cd_view_all_collections),
                         tint = RvViolet,
                         modifier = Modifier.size(20.dp)
                     )
@@ -1028,6 +1041,10 @@ fun PuzzleGroupCard(
 ) {
     val availablePuzzlesInGroup = group.puzzleTypes.count { availablePuzzleTypes.contains(it) }
     val totalPuzzlesInGroup = group.puzzleTypes.size
+    val difficultyLabel = if (group.difficulty == "Mixed") stringResource(R.string.cat_mixed) else rvDifficultyLabel(group.difficulty)
+    val typesAndDifficulty = LocalContext.current.resources.getQuantityString(
+        R.plurals.cat_group_types_difficulty, group.puzzleTypes.size, group.puzzleTypes.size, difficultyLabel
+    )
     val progress = if (group.totalTypes > 0) {
         group.completedCount.toFloat() / group.totalTypes.toFloat()
     } else 0f
@@ -1131,7 +1148,7 @@ fun PuzzleGroupCard(
                     }
 
                     Text(
-                        text = "${group.puzzleTypes.size} puzzle types • ${group.difficulty}",
+                        text = typesAndDifficulty,
                         fontSize = 10.sp,
                         color = RvOnTone.copy(alpha = 0.8f),
                         maxLines = 1,
@@ -1153,8 +1170,12 @@ data class TrendingPuzzle(
 
 data class RecommendedPuzzle(
     val puzzleType: String,
+    // English source text and fallback: when [reasonRes] is set the UI shows that string instead
+    // (with the name of [basisType] as its argument when [basisType] is set)
     val reason: String,
-    val similarityScore: Double
+    val similarityScore: Double,
+    @StringRes val reasonRes: Int = 0,
+    val basisType: String? = null
 )
 
 data class UserFavoritePuzzle(
@@ -1220,6 +1241,8 @@ suspend fun getPersonalizedRecommendations(
                         recommendations.add(RecommendedPuzzle(
                             puzzleType = suggestedType,
                             reason = "Based on ${category?.title ?: PuzzleTypeNames.display(favorite.puzzleType)}",
+                            reasonRes = R.string.cat_foryou_based_on,
+                            basisType = favorite.puzzleType,
                             similarityScore = 0.8
                         ))
                     }
@@ -1230,11 +1253,11 @@ suspend fun getPersonalizedRecommendations(
         // If we still don't have enough, add guaranteed reliable puzzles
         if (recommendations.size < 4) {
             val reliableRecommendations = listOf(
-                RecommendedPuzzle("memorysquares", "Great for memory training", 0.9),
-                RecommendedPuzzle("colormatching", "Quick visual challenge", 0.8),
-                RecommendedPuzzle("triangledotmemory", "Pattern recognition", 0.7),
-                RecommendedPuzzle("symbolswipe", "Fast-paced reaction game", 0.6),
-                RecommendedPuzzle("mathcomparison", "Number sense training", 0.5)
+                RecommendedPuzzle("memorysquares", "Great for memory training", 0.9, R.string.cat_foryou_reliable_memorysquares),
+                RecommendedPuzzle("colormatching", "Quick visual challenge", 0.8, R.string.cat_foryou_reliable_colormatching),
+                RecommendedPuzzle("triangledotmemory", "Pattern recognition", 0.7, R.string.cat_triangledotmemory_subtitle),
+                RecommendedPuzzle("symbolswipe", "Fast-paced reaction game", 0.6, R.string.cat_foryou_reliable_symbolswipe),
+                RecommendedPuzzle("mathcomparison", "Number sense training", 0.5, R.string.cat_foryou_reliable_mathcomparison)
             )
 
             reliableRecommendations.forEach { reliableRec ->
@@ -1282,7 +1305,7 @@ fun DailyQuickActionCard(
             if (imageResource != null) {
                 Image(
                     painter = painterResource(id = imageResource),
-                    contentDescription = "${category?.title ?: puzzleType} preview",
+                    contentDescription = stringResource(R.string.cat_game_preview_cd, PuzzleTypeNames.displayName(puzzleType)),
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp)),
@@ -1309,7 +1332,7 @@ fun DailyQuickActionCard(
                             .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
                         Text(
-                            text = "TODAY",
+                            text = stringResource(R.string.cat_foryou_badge_today),
                             color = RvSuccessEdge,
                             fontSize = 6.sp,
                             fontWeight = FontWeight.Bold
@@ -1327,7 +1350,7 @@ fun DailyQuickActionCard(
 
                     if (imageResource == null) {
                     Text(
-                            text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                            text = PuzzleTypeNames.displayName(puzzleType),
                             fontSize = 10.sp,
                             lineHeight = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -1376,7 +1399,7 @@ fun RecentQuickCard(
             if (imageResource != null) {
                 Image(
                     painter = painterResource(id = imageResource),
-                    contentDescription = "${category?.title ?: puzzleType} preview",
+                    contentDescription = stringResource(R.string.cat_game_preview_cd, PuzzleTypeNames.displayName(puzzleType)),
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(RoundedCornerShape(16.dp)),
@@ -1403,7 +1426,7 @@ fun RecentQuickCard(
                             .padding(horizontal = 4.dp, vertical = 1.dp)
                     ) {
                         Text(
-                            text = "RECENT",
+                            text = stringResource(R.string.cat_foryou_badge_recent),
                             color = RvGrape,
                             fontSize = 6.sp,
                             fontWeight = FontWeight.Bold
@@ -1421,7 +1444,7 @@ fun RecentQuickCard(
 
                     if (imageResource == null) {
                     Text(
-                            text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                            text = PuzzleTypeNames.displayName(puzzleType),
                             fontSize = 10.sp,
                             lineHeight = 11.sp,
                             fontWeight = FontWeight.Bold,
@@ -1436,7 +1459,7 @@ fun RecentQuickCard(
             // Clean label band under the image
             if (imageResource != null) {
                 Text(
-                    text = category?.title ?: PuzzleTypeNames.display(puzzleType),
+                    text = PuzzleTypeNames.displayName(puzzleType),
                     fontSize = 10.sp,
                     lineHeight = 11.sp,
                     fontWeight = FontWeight.ExtraBold,

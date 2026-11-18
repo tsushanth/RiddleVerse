@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import androidx.compose.ui.res.stringResource
 
 // --- word puzzles (feat/puzzles-word) --- "Code Cracker": deduce a hidden colour code
 
@@ -107,7 +108,7 @@ fun CodeCrackerScreen(
                             currentEnc = "-".repeat(cfg.positions); selected = 0
                         }
                     }
-                }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text("Check", maxLines = 1, softWrap = false) }
+                }, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) { Text(stringResource(R.string.check), maxLines = 1, softWrap = false) }
             }
         })
     ) {

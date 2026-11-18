@@ -215,7 +215,7 @@ fun SubscriptionPuzzleScreen(
                 )
                 if (attempts > 0) {
                     Text(
-                        text = "Attempt: $attempts",
+                        text = stringResource(R.string.xb_attempt_value, attempts),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvInkSoft,

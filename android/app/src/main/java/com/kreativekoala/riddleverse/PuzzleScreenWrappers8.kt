@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -225,7 +226,7 @@ fun CryptoWordScreenWithTimer(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Text(
-                    text = "🎉 Puzzle Solved! Score: $finalScore",
+                    text = "🎉 ${stringResource(R.string.xb_puzzle_solved_score, finalScore)}",
                     modifier = Modifier.padding(12.dp),
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.Center
@@ -285,10 +286,10 @@ fun CryptoWordScreenWithTimer(
             onDismissRequest = { showHint = false },
             confirmButton = {
                 Button(onClick = { showHint = false }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
-            title = { Text("💡 Hint") },
+            title = { Text("💡 ${stringResource(R.string.hint)}") },
             text = { Text("The message contains: ${puzzleData.targetWord}") }
         )
     }
@@ -317,17 +318,17 @@ fun CryptoWordScreenWithTimer(
                         onComplete(false, 0) // Failed with 0 score
                     }
                 ) {
-                    Text("Try Again")
+                    Text(stringResource(R.string.try_again))
                 }
             },
             dismissButton = {
                 Button(onClick = onBack) {
-                    Text("Back")
+                    Text(stringResource(R.string.back))
                 }
             },
-            title = { Text("💔 Game Over") },
+            title = { Text("💔 ${stringResource(R.string.common_game_over)}") },
             text = {
-                Text("You've lost all your hearts! Better luck next time.")
+                Text(stringResource(R.string.common_hearts_all_lost))
             }
         )
     }
@@ -361,7 +362,7 @@ private fun QuoteRevealDialog(
                 )
             ) {
                 Text(
-                    text = "Continue",
+                    text = stringResource(R.string.continue_label),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = RvOnTone
@@ -379,14 +380,14 @@ private fun QuoteRevealDialog(
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
                 Text(
-                    text = "Puzzle Complete!",
+                    text = stringResource(R.string.puzzle_complete),
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Score: $finalScore points",
+                    text = stringResource(R.string.xb_score_points, finalScore),
                     style = MaterialTheme.typography.titleMedium,
                     color = RvSuccess,
                     fontWeight = FontWeight.Medium,
@@ -498,7 +499,7 @@ private fun CryptoPuzzleHeader(
     ) {
         // Back button
         IconButton(onClick = onBack) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
         }
 
         // Game info row
@@ -540,7 +541,7 @@ private fun CryptoPuzzleHeader(
 
         // Hint button
         IconButton(onClick = onHint) {
-            Icon(Icons.Default.Help, contentDescription = "Hint")
+            Icon(Icons.Default.Help, contentDescription = stringResource(R.string.hint))
         }
     }
 }

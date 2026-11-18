@@ -108,12 +108,12 @@ fun RankingImprovementCard(
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "Global Ranking",
+                                text = stringResource(R.string.done_global_ranking),
                                 fontSize = 14.sp,
                                 color = RvInkSoft
                             )
                             Text(
-                                text = "${rankingImprovement.newPercentile}th percentile",
+                                text = stringResource(R.string.done_nth_percentile, rankingImprovement.newPercentile),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvInk
@@ -126,7 +126,7 @@ fun RankingImprovementCard(
 
                 // Improvement message
                 Text(
-                    text = rankingImprovement.rankingMessage,
+                    text = rankingImprovement.rankingMessage.asString(),
                     fontSize = 14.sp,
                     color = RvInk,
                     textAlign = TextAlign.Center,
@@ -143,7 +143,7 @@ fun RankingImprovementCard(
                         shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "📈 +${rankingImprovement.percentileGain} percentile points!",
+                            text = stringResource(R.string.done_percentile_points_gain, rankingImprovement.percentileGain),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvSuccess,
@@ -224,7 +224,7 @@ fun RankingImprovementAnimation(
 
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                    contentDescription = "to",
+                    contentDescription = stringResource(R.string.done_to_cd),
                     tint = RvInkSoft,
                     modifier = Modifier.size(20.dp)
                 )
@@ -239,7 +239,7 @@ fun RankingImprovementAnimation(
         }
 
         Text(
-            text = "Global Percentile",
+            text = stringResource(R.string.done_global_percentile),
             fontSize = 14.sp,
             color = RvInkSoft
         )
@@ -308,7 +308,7 @@ fun AdaptiveDifficultyProgressCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "🧠 AI Adaptation Results",
+                    text = stringResource(R.string.done_ai_adaptation_results),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -316,7 +316,7 @@ fun AdaptiveDifficultyProgressCard(
 
                 Icon(
                     Icons.Default.Psychology,
-                    contentDescription = "AI Analysis",
+                    contentDescription = stringResource(R.string.done_ai_analysis_cd),
                     tint = RvSky,
                     modifier = Modifier.size(24.dp)
                 )
@@ -370,7 +370,7 @@ fun DifficultyLevelComparison(
         // Old difficulty
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Previous",
+                text = stringResource(R.string.done_previous),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -396,7 +396,7 @@ fun DifficultyLevelComparison(
                 modifier = Modifier.size(32.dp)
             )
             Text(
-                text = if (isIncrease) stringResource(R.string.level_up) else "Adjusted",
+                text = if (isIncrease) stringResource(R.string.level_up) else stringResource(R.string.done_adjusted),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (isIncrease) RvSuccess else RvSky
@@ -406,7 +406,7 @@ fun DifficultyLevelComparison(
         // New difficulty
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "Current",
+                text = stringResource(R.string.common_current),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -417,7 +417,7 @@ fun DifficultyLevelComparison(
                 color = if (isIncrease) RvSuccess else RvSky
             )
             Text(
-                text = "${newDifficulty.gridSize}×${newDifficulty.gridSize} • ${newDifficulty.targetCount} targets",
+                text = stringResource(R.string.done_grid_and_targets, newDifficulty.gridSize, newDifficulty.targetCount),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -440,7 +440,7 @@ fun CurrentDifficultyDisplay(currentDifficulty: DifficultyManager.DifficultyLeve
     ) {
         Column {
             Text(
-                text = "Current Level",
+                text = stringResource(R.string.stats_current_level),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -454,18 +454,18 @@ fun CurrentDifficultyDisplay(currentDifficulty: DifficultyManager.DifficultyLeve
 
         Column(horizontalAlignment = Alignment.End) {
             Text(
-                text = "Challenge Details",
+                text = stringResource(R.string.done_challenge_details),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
             Text(
-                text = "${currentDifficulty.gridSize}×${currentDifficulty.gridSize} grid",
+                text = stringResource(R.string.done_grid_size, currentDifficulty.gridSize),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = RvInk
             )
             Text(
-                text = "${currentDifficulty.targetCount} targets • ${currentDifficulty.livesAllowed} lives",
+                text = stringResource(R.string.done_targets_and_lives, currentDifficulty.targetCount, currentDifficulty.livesAllowed),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -477,7 +477,7 @@ fun CurrentDifficultyDisplay(currentDifficulty: DifficultyManager.DifficultyLeve
 fun AdaptationReasoningSection(adaptationInfo: DifficultyManager.AdaptiveConfig) {
     Column {
         Text(
-            text = "🎯 Why This Change?",
+            text = stringResource(R.string.done_why_this_change),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             color = RvInk,
@@ -485,7 +485,7 @@ fun AdaptationReasoningSection(adaptationInfo: DifficultyManager.AdaptiveConfig)
         )
 
         Text(
-            text = adaptationInfo.adjustmentReason,
+            text = adaptationInfo.adjustmentReason.asString(),
             fontSize = 12.sp,
             color = RvInkSoft,
             lineHeight = 16.sp
@@ -499,7 +499,7 @@ fun AdaptationReasoningSection(adaptationInfo: DifficultyManager.AdaptiveConfig)
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "AI Confidence:",
+                text = stringResource(R.string.done_ai_confidence),
                 fontSize = 11.sp,
                 color = RvInkSoft
             )
@@ -547,13 +547,13 @@ fun NextChallengePreview(difficulty: DifficultyManager.DifficultyLevel) {
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = "Next Challenge Preview",
+                text = stringResource(R.string.done_next_challenge_preview),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvGrape
             )
             Text(
-                text = "You'll face ${difficulty.gridSize}×${difficulty.gridSize} grids with ${difficulty.targetCount} targets to memorize in ${difficulty.memorizeTime} seconds",
+                text = stringResource(R.string.done_next_challenge_desc, difficulty.gridSize, difficulty.targetCount, difficulty.memorizeTime),
                 fontSize = 11.sp,
                 color = RvInkSoft,
                 lineHeight = 14.sp
@@ -617,7 +617,7 @@ fun EnhancedCompletionContentWithRanking(
                     CircularProgressIndicator(color = RvInk, modifier = Modifier.size(32.dp))
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Analyzing performance...",
+                        text = stringResource(R.string.done_analyzing_performance),
                         color = RvInkSoft,
                         fontSize = 12.sp
                     )
@@ -684,7 +684,7 @@ fun RankingImprovementCard(
                     fontSize = 24.sp
                 )
                 Text(
-                    text = "Performance Ranking",
+                    text = stringResource(R.string.done_performance_ranking),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvOnTone
@@ -701,7 +701,7 @@ fun RankingImprovementCard(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Previous",
+                        text = stringResource(R.string.done_previous),
                         fontSize = 12.sp,
                         color = RvOnTone.copy(alpha = 0.8f)
                     )
@@ -721,7 +721,7 @@ fun RankingImprovementCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.TrendingUp,
-                            contentDescription = "Improvement",
+                            contentDescription = stringResource(R.string.done_improvement_cd),
                             tint = RvOnTone,
                             modifier = Modifier.size(20.dp)
                         )
@@ -735,7 +735,7 @@ fun RankingImprovementCard(
                 } else if (improvement.percentileGain == 0) {
                     Icon(
                         imageVector = Icons.Default.HorizontalRule,
-                        contentDescription = "No change",
+                        contentDescription = stringResource(R.string.done_no_change_cd),
                         tint = RvOnTone.copy(alpha = 0.7f),
                         modifier = Modifier.size(20.dp)
                     )
@@ -743,7 +743,7 @@ fun RankingImprovementCard(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Current",
+                        text = stringResource(R.string.common_current),
                         fontSize = 12.sp,
                         color = RvOnTone.copy(alpha = 0.8f)
                     )
@@ -764,7 +764,7 @@ fun RankingImprovementCard(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Text(
-                    text = improvement.rankingMessage,
+                    text = improvement.rankingMessage.asString(),
                     fontSize = 14.sp,
                     color = RvOnTone,
                     fontWeight = FontWeight.Medium,
@@ -777,7 +777,7 @@ fun RankingImprovementCard(
             if (improvement.newPercentile >= 90) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "🎖️ Elite Performer",
+                    text = stringResource(R.string.done_elite_performer),
                     fontSize = 12.sp,
                     color = RvOnTone,
                     fontWeight = FontWeight.Bold
@@ -785,7 +785,7 @@ fun RankingImprovementCard(
             } else if (improvement.newPercentile >= 75) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "⭐ Advanced Player",
+                    text = stringResource(R.string.done_advanced_player),
                     fontSize = 12.sp,
                     color = RvOnTone,
                     fontWeight = FontWeight.Bold
@@ -793,7 +793,7 @@ fun RankingImprovementCard(
             } else if (improvement.newPercentile >= 50) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "📈 Above Average",
+                    text = stringResource(R.string.done_above_average),
                     fontSize = 12.sp,
                     color = RvOnTone,
                     fontWeight = FontWeight.Bold
@@ -834,7 +834,7 @@ fun DifficultyAdaptationCard(
                     fontSize = 20.sp
                 )
                 Text(
-                    text = if (hasLevelChange) "Difficulty Updated!" else "Performance Analysis",
+                    text = if (hasLevelChange) stringResource(R.string.done_difficulty_updated) else stringResource(R.string.done_performance_analysis),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvOnTone
@@ -852,7 +852,7 @@ fun DifficultyAdaptationCard(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Previous",
+                            text = stringResource(R.string.done_previous),
                             fontSize = 12.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
@@ -866,14 +866,14 @@ fun DifficultyAdaptationCard(
 
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = "Arrow",
+                        contentDescription = stringResource(R.string.done_arrow_cd),
                         tint = RvOnTone,
                         modifier = Modifier.size(20.dp)
                     )
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Current",
+                            text = stringResource(R.string.common_current),
                             fontSize = 12.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
@@ -892,7 +892,7 @@ fun DifficultyAdaptationCard(
                         Spacer(modifier = Modifier.height(8.dp))
                         if (oldDifficulty != null) {
                             Text(
-                                text = "Level ${oldDifficulty.index + 1} → ${newDifficulty.index + 1}",
+                                text = stringResource(R.string.done_level_change, oldDifficulty.index + 1, newDifficulty.index + 1),
                                 fontSize = 12.sp,
                                 color = RvOnTone.copy(alpha = 0.7f)
                             )
@@ -902,14 +902,14 @@ fun DifficultyAdaptationCard(
             } else {
                 // Current difficulty info
                 Text(
-                    text = "Current Difficulty: ${newDifficulty.name}",
+                    text = stringResource(R.string.done_current_difficulty, newDifficulty.name),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvOnTone
                 )
 
                 Text(
-                    text = "Level ${newDifficulty.index + 1}",
+                    text = stringResource(R.string.stats_level_number, newDifficulty.index + 1),
                     fontSize = 12.sp,
                     color = RvOnTone.copy(alpha = 0.7f)
                 )
@@ -921,7 +921,7 @@ fun DifficultyAdaptationCard(
 
                 // Adjustment reason
                 Text(
-                    text = info.adjustmentReason,
+                    text = info.adjustmentReason.asString(),
                     fontSize = 13.sp,
                     color = RvOnTone.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center
@@ -936,7 +936,7 @@ fun DifficultyAdaptationCard(
                     ) {
                         Text("🎯", fontSize = 12.sp)
                         Text(
-                            text = "High confidence adjustment",
+                            text = stringResource(R.string.done_high_confidence_adjustment),
                             fontSize = 11.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
@@ -957,7 +957,7 @@ fun DifficultyAdaptationCard(
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "${newDifficulty.timeLimit}s",
+                            text = stringResource(R.string.stats_seconds_short, newDifficulty.timeLimit),
                             fontSize = 11.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
@@ -985,7 +985,7 @@ fun DifficultyAdaptationCard(
                             fontSize = 14.sp
                         )
                         Text(
-                            text = "${newDifficulty.basePoints}pt",
+                            text = stringResource(R.string.done_points_short, newDifficulty.basePoints),
                             fontSize = 11.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )

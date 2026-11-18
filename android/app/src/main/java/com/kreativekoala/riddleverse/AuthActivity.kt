@@ -201,7 +201,7 @@ class AuthActivity : AppCompatActivity() {
         } catch (e: Exception) {
             isSignInInProgress = false
             Log.e(TAG, "Failed to launch sign-in intent", e)
-            Toast.makeText(this, "Sign-in initialization failed", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.onb_auth_sign_in_init_failed, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -229,7 +229,7 @@ class AuthActivity : AppCompatActivity() {
                     completeSignIn("google", task.result?.additionalUserInfo?.isNewUser ?: false)
                 } else {
                     Log.w(TAG, "signInWithCredential:failure", task.exception)
-                    Toast.makeText(this, "Firebase authentication failed", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.onb_auth_finish_failed, Toast.LENGTH_SHORT).show()
                 }
             }
     }
@@ -350,14 +350,14 @@ class AuthActivity : AppCompatActivity() {
             CommonStatusCodes.DEVELOPER_ERROR -> {
                 // Status code 10 - Configuration error
                 // Package/SHA not registered for Google Sign-In (e.g. preview/.dev builds).
-                showAuthError("Google sign-in isn't available for this build. Please use email sign-in below.")
+                showAuthError(getString(R.string.onb_auth_google_dev_error))
                 Log.e(TAG, "DEVELOPER_ERROR (10) - Check configuration:\n" +
                         "1. Verify R.string.default_web_client_id matches Firebase Console\n" +
                         "2. Ensure SHA-1 fingerprints are registered\n" +
                         "3. Check google-services.json is up-to-date")
             }
             else -> {
-                Toast.makeText(this, "Sign-in failed: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.onb_auth_sign_in_failed_code, e.statusCode), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -468,8 +468,8 @@ class AuthActivity : AppCompatActivity() {
         if (emailBusy) return
         val email = findViewById<EditText>(R.id.emailInput).text.toString()
         val pw = findViewById<EditText>(R.id.passwordInput).text.toString()
-        val invalid = SupabaseAuthCore.validateInput(email, pw)
-        if (invalid != null) { showAuthError(invalid); return }
+        val invalid = SupabaseAuthCore.validateInputRes(email, pw)
+        if (invalid != null) { showAuthError(getString(invalid)); return }
         showAuthError(null)
         setEmailBusy(true)
         val repo = SupabaseAuth.repository(this)
@@ -496,11 +496,11 @@ class AuthActivity : AppCompatActivity() {
             } catch (e: AuthException) {
                 setEmailBusy(false)
                 Log.w(TAG, "email auth failed: ${e.failure}")
-                showAuthError(SupabaseAuthCore.userMessage(e))
+                showAuthError(getString(SupabaseAuthCore.userMessageRes(e)))
             } catch (e: Exception) {
                 setEmailBusy(false)
                 Log.w(TAG, "email auth failed unexpectedly: ${e.javaClass.simpleName}")
-                showAuthError(SupabaseAuthCore.userMessage(AuthException(AuthFailure.UNKNOWN)))
+                showAuthError(getString(SupabaseAuthCore.userMessageRes(AuthException(AuthFailure.UNKNOWN))))
             }
         }
     }
@@ -512,7 +512,7 @@ class AuthActivity : AppCompatActivity() {
             } else {
                 setEmailBusy(false)
                 Log.w(TAG, "signInWithCustomToken failed: ${task.exception?.javaClass?.simpleName}")
-                showAuthError("Couldn't finish signing in. Please try again.")
+                showAuthError(getString(R.string.onb_auth_finish_failed))
             }
         }
     }
@@ -532,7 +532,7 @@ class AuthActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 // Network/503/etc: fall back to the manual form; stored session is kept for next time.
                 setEmailBusy(false)
-                val msg = (e as? AuthException)?.let { SupabaseAuthCore.userMessage(it) }
+                val msg = (e as? AuthException)?.let { getString(SupabaseAuthCore.userMessageRes(it)) }
                 Log.w(TAG, "silent restore failed: ${(e as? AuthException)?.failure ?: e.javaClass.simpleName}")
                 showAuthError(msg)
             }

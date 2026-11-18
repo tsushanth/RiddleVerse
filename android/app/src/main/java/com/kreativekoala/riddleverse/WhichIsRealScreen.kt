@@ -60,6 +60,7 @@ fun RealOrAiScreenWrapper(
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val xbContext = LocalContext.current
     var timeLimit by remember { mutableStateOf(90000) }
     var hasSubmittedAnswer by remember { mutableStateOf(false) }
     val mediaCache = remember { MediaCacheManager.getInstance(context) }
@@ -128,7 +129,7 @@ fun RealOrAiScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "Error parsing puzzle data: ${e.message}", e)
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -137,7 +138,7 @@ fun RealOrAiScreenWrapper(
     // Render based on state
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading Real or AI puzzle...")
+            LoadingScreen(message = stringResource(R.string.xb_loading_real_or_ai_puzzle))
         }
 
         hasError -> {
@@ -238,7 +239,7 @@ private fun ROAISimpleErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error Loading Puzzle",
+                text = "⚠️ ${stringResource(R.string.error_loading_puzzle)}",
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -254,11 +255,11 @@ private fun ROAISimpleErrorScreen(
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 OutlinedButton(onClick = onSkip) {
-                    Text("Skip Puzzle")
+                    Text(stringResource(R.string.skip_puzzle))
                 }
 
                 Button(onClick = onRetry) {
-                    Text("Retry")
+                    Text(stringResource(R.string.retry))
                 }
             }
         }
@@ -567,7 +568,7 @@ fun WhichIsRealScreen(
                                     shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Text(
-                                        "Continue to Next Puzzle",
+                                        stringResource(R.string.xb_continue_to_next_puzzle),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -725,7 +726,7 @@ fun WhichIsRealWelcomeScreen(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    "Start Challenge",
+                    stringResource(R.string.xb_start_challenge),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -1014,13 +1015,13 @@ fun ImageCard(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = Icons.Default.BrokenImage,
-                            contentDescription = "Image failed to load",
+                            contentDescription = stringResource(R.string.xb_image_failed_to_load),
                             tint = RvOnTone,
                             modifier = Modifier.size(48.dp)
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Image unavailable",
+                            text = stringResource(R.string.xb_image_unavailable),
                             color = RvOnTone,
                             fontSize = 12.sp
                         )
@@ -1104,7 +1105,7 @@ fun ResultSection(
                 )
                 Column {
                     Text(
-                        text = if (userWasCorrect) "Correct! 🎉" else "Not quite...",
+                        text = if (userWasCorrect) "${stringResource(R.string.correct)} 🎉" else stringResource(R.string.xb_not_quite),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvOnTone
@@ -1222,7 +1223,7 @@ fun ReasoningDialog(
                         ),
                         border = BorderStroke(2.dp, RvOutline)
                     ) {
-                        Text("Skip")
+                        Text(stringResource(R.string.skip))
                     }
 
                     Button(
@@ -1313,7 +1314,7 @@ fun CommunityReasoningDialog(
                         containerColor = RvViolet
                     )
                 ) {
-                    Text("Close")
+                    Text(stringResource(R.string.close))
                 }
             }
         }

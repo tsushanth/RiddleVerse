@@ -34,6 +34,7 @@ import kotlin.math.max
 import kotlin.math.min
 import androidx.compose.ui.res.stringResource
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 // FIXED: Proper progression-based configuration
 data class AdaptiveImageVortexConfig(
@@ -153,6 +154,11 @@ fun AdaptiveImageVortexPuzzleScreen(
     var timeRemaining by remember { mutableIntStateOf(totalTimeSeconds) }
 
     val haptics = LocalHapticFeedback.current
+    val msgPerfectAllNew = stringResource(R.string.xa_vortex_perfect_all_new)
+    val msgTimesUpFaster = stringResource(R.string.xa_vortex_times_up_faster)
+    val msgTimesUp = stringResource(R.string.times_up)
+    val msgCongratulations = stringResource(R.string.xa_congratulations)
+    val msgGameOver = stringResource(R.string.common_game_over)
 
     // Declare endGame function
     fun endGame(success: Boolean, message: String) {
@@ -232,7 +238,7 @@ fun AdaptiveImageVortexPuzzleScreen(
             if (allNewImagesSelected) {
                 // Level complete!
                 reactionTimes = reactionTimes + reactionTime
-                handleLevelResult(true, "Perfect! Found all new images!")
+                handleLevelResult(true, msgPerfectAllNew)
             } else {
                 // Correct but more to find
                 Log.d(TAG, "✅ Correct selection, but more new images to find")
@@ -328,7 +334,7 @@ fun AdaptiveImageVortexPuzzleScreen(
             // Time's up - auto fail
             if (gamePhase == IVGamePhase.WAITING_FOR_ANSWER && responseTimeRemaining <= 0) {
                 Log.d(TAG, "⏰ Response time up! Auto-failing level $currentLevel")
-                handleLevelResult(false, "Time's up! Try to be faster next time.")
+                handleLevelResult(false, msgTimesUpFaster)
             }
         }
     }
@@ -339,7 +345,7 @@ fun AdaptiveImageVortexPuzzleScreen(
             delay(1000L)
             timeRemaining--
         } else if (timeRemaining == 0) {
-            endGame(false, "Time's up!")
+            endGame(false, msgTimesUp)
         }
     }
 
@@ -368,7 +374,7 @@ fun AdaptiveImageVortexPuzzleScreen(
                 selectedImageIds = emptySet()
             } else {
                 // Game complete
-                endGame(feedbackCorrect, if (feedbackCorrect) "Congratulations!" else "Game Over")
+                endGame(feedbackCorrect, if (feedbackCorrect) msgCongratulations else msgGameOver)
             }
         }
     }
@@ -710,7 +716,7 @@ fun ProperImageVortexHeader(
 
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = difficulty.uppercase(),
+                text = rvDifficultyLabel(difficulty).uppercase(),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,
@@ -1001,7 +1007,7 @@ fun ProgressCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Level: $currentLevel / $totalLevels",
+                    text = stringResource(R.string.xa_level_progress, currentLevel, totalLevels),
                     fontSize = 14.sp,
                     color = RvInk,
                     maxLines = 1,
@@ -1036,13 +1042,13 @@ fun ProgressCard(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Correct: $correctAnswers",
+                        text = stringResource(R.string.xa_correct_value, correctAnswers),
                         fontSize = 12.sp,
                         color = Color(0xFF15803D),
                         maxLines = 1
                     )
                     Text(
-                        text = "Total: $totalAttempts",
+                        text = stringResource(R.string.xa_total_value, totalAttempts),
                         fontSize = 12.sp,
                         color = RvInkSoft,
                         maxLines = 1
@@ -1087,7 +1093,7 @@ fun FeedbackOverlay(
                 )
 
                 Text(
-                    text = if (isCorrect) "Excellent!" else "Try Again!",
+                    text = if (isCorrect) stringResource(R.string.xa_excellent) else stringResource(R.string.xa_try_again_exclaim),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -1102,7 +1108,7 @@ fun FeedbackOverlay(
 
                 if (isCorrect && streak > 1) {
                     Text(
-                        text = "🔥 Streak: $streak",
+                        text = "🔥 ${stringResource(R.string.xa_streak_value, streak)}",
                         fontSize = 14.sp,
                         color = RvInk,
                         fontWeight = FontWeight.Bold
