@@ -110,6 +110,10 @@ class TutorialRegistryTest {
     @Test fun registryGroupsProvideContentForEveryType() {
         for (t in SpatialPuzzles.TYPES) assertNotNull("spatial $t", SpatialPuzzles.tutorialContent(t))
         for (t in ClassicPuzzles.types) assertNotNull("classic $t", ClassicPuzzles.tutorialFor(t))
+        for (t in GridGame.values()) {
+            assertTrue("grid rules $t", GridPuzzleFactory.rulesRes(t) != 0)
+            assertTrue("grid tip $t", GridPuzzleFactory.tipRes(t) != 0)
+        }
     }
 
     @Test fun unknownAndBlankTypesHaveNoTutorial() {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Rellena cada casilla vacía para que cada fila, cada columna y cada recuadro contenga cada dígito exactamente una vez. Usa el lápiz para anotar candidatos. Cada puzle tiene una única solución.</string>
+    <string name="tut_grid_binary_rules">Rellena cada casilla con 0 o 1. No pueden tocarse más de dos dígitos iguales en una fila o columna, cada fila y columna tiene tantos 0 como 1, y no hay dos filas (ni dos columnas) idénticas.</string>
+    <string name="tut_grid_cagemath_rules">Rellena la cuadrícula con dígitos para que ninguno se repita en una fila o columna. El número y el signo de la esquina de una jaula marcan el objetivo: los dígitos de la jaula deben sumar, restar, multiplicar o dividir para dar ese resultado. Una jaula con solo un número es una casilla. Los dígitos pueden repetirse dentro de una jaula si están en filas y columnas distintas.</string>
+    <string name="tut_grid_signgrid_rules">Rellena la cuadrícula para que ningún dígito se repita en una fila o columna. Un signo entre dos casillas apunta a la menor: la casilla del extremo estrecho contiene el dígito más pequeño.</string>
+    <string name="tut_grid_sudoku_tip">Toca una casilla y luego un dígito. Activa el lápiz para anotar candidatos; con 3 errores termina el puzle.</string>
+    <string name="tut_grid_binary_tip">Si dos unos están juntos, las casillas de ambos extremos deben ser 0.</string>
+    <string name="tut_grid_cagemath_tip">Empieza por las jaulas de una casilla y los productos grandes, y luego usa filas y columnas para acotar el resto.</string>
+    <string name="tut_grid_signgrid_tip">El dígito más grande nunca puede ir en el extremo estrecho de un signo.</string>
+</resources>

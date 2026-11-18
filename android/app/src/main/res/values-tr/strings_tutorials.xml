@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Her boş kareyi, her satır, sütun ve kutuda her rakam tam bir kez olacak şekilde doldurun. Aday rakamları not etmek için kalemi kullanın. Her bulmacanın tam olarak tek bir çözümü vardır.</string>
+    <string name="tut_grid_binary_rules">Her kareyi 0 veya 1 ile doldurun. Bir satır veya sütunda ikiden fazla aynı rakam yan yana gelemez, her satır ve sütunda eşit sayıda 0 ve 1 bulunur ve hiçbir iki satır (veya iki sütun) aynı olamaz.</string>
+    <string name="tut_grid_cagemath_rules">Izgarayı, hiçbir rakam satır veya sütunda tekrar etmeyecek şekilde doldurun. Kafesin köşesindeki sayı ve işaret hedefi verir: kafesteki rakamlar toplanarak, çıkarılarak, çarpılarak veya bölünerek bu hedefi vermelidir. Yalnızca sayı olan kafes tek bir karedir. Rakamlar farklı satır ve sütunlardaysa kafes içinde tekrar edebilir.</string>
+    <string name="tut_grid_signgrid_rules">Izgarayı, hiçbir rakam satır veya sütunda tekrar etmeyecek şekilde doldurun. İki kare arasındaki işaret küçük olanı gösterir: dar uçtaki kare daha küçük rakamı taşır.</string>
+    <string name="tut_grid_sudoku_tip">Bir kareye, sonra bir rakama dokunun. Adayları not etmek için kalemi açın; 3 hata bulmacayı bitirir.</string>
+    <string name="tut_grid_binary_tip">İki 1 yan yana ise iki uçtaki kareler 0 olmalıdır.</string>
+    <string name="tut_grid_cagemath_tip">Tek karelik kafeslerden ve büyük çarpımlardan başlayın, sonra kalanı satır ve sütunlarla daraltın.</string>
+    <string name="tut_grid_signgrid_tip">En büyük rakam hiçbir zaman bir işaretin dar ucunda olamaz.</string>
+</resources>

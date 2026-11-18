@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.annotation.StringRes
 import org.json.JSONObject
 
 /** The grid-logic games added by feat/puzzles-grid. [key] is the puzzleType string used app-wide. */
@@ -97,6 +98,23 @@ object GridPuzzleFactory {
         GridGame.SIGN_GRID -> "Digits never repeat in a line and every sign must hold"
     }
 
+    /** Rules text in the app language (the in-game rules dialog and the first-launch tutorial). */
+    @StringRes fun rulesRes(game: GridGame): Int = when (game) {
+        GridGame.SUDOKU -> R.string.tut_grid_sudoku_rules
+        GridGame.BINAIRO -> R.string.tut_grid_binary_rules
+        GridGame.CAGE_MATH -> R.string.tut_grid_cagemath_rules
+        GridGame.SIGN_GRID -> R.string.tut_grid_signgrid_rules
+    }
+
+    /** One-line tip shown under the rules in the first-launch tutorial. */
+    @StringRes fun tipRes(game: GridGame): Int = when (game) {
+        GridGame.SUDOKU -> R.string.tut_grid_sudoku_tip
+        GridGame.BINAIRO -> R.string.tut_grid_binary_tip
+        GridGame.CAGE_MATH -> R.string.tut_grid_cagemath_tip
+        GridGame.SIGN_GRID -> R.string.tut_grid_signgrid_tip
+    }
+
+    /** English rules text (source/fallback; players see [rulesRes]). */
     fun rulesFor(game: GridGame): String = when (game) {
         GridGame.SUDOKU -> "Fill every empty cell so each row, each column and each box contains every digit exactly once. " +
             "Use the pencil tool to jot candidate digits. Every puzzle has exactly one solution."

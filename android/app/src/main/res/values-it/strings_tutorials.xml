@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Riempi ogni casella vuota in modo che ogni riga, ogni colonna e ogni riquadro contenga ogni cifra esattamente una volta. Usa la matita per annotare i candidati. Ogni puzzle ha una sola soluzione.</string>
+    <string name="tut_grid_binary_rules">Riempi ogni casella con 0 o 1. Non possono essere adiacenti più di due cifre uguali in una riga o colonna, ogni riga e colonna ha tanti 0 quanti 1, e non esistono due righe (o due colonne) identiche.</string>
+    <string name="tut_grid_cagemath_rules">Riempi la griglia di cifre senza ripeterne nessuna in una riga o colonna. Il numero e il segno nell\'angolo di una gabbia indicano l\'obiettivo: le cifre della gabbia devono sommarsi, sottrarsi, moltiplicarsi o dividersi per ottenerlo. Una gabbia con solo un numero è una sola casella. Le cifre possono ripetersi in una gabbia se sono in righe e colonne diverse.</string>
+    <string name="tut_grid_signgrid_rules">Riempi la griglia senza ripetere nessuna cifra in una riga o colonna. Un segno tra due caselle punta alla più piccola: la casella dal lato stretto contiene la cifra minore.</string>
+    <string name="tut_grid_sudoku_tip">Tocca una casella, poi una cifra. Attiva la matita per annotare i candidati; con 3 errori il puzzle finisce.</string>
+    <string name="tut_grid_binary_tip">Se due 1 sono affiancati, le caselle ai due estremi devono essere 0.</string>
+    <string name="tut_grid_cagemath_tip">Parti dalle gabbie di una casella e dai prodotti grandi, poi usa righe e colonne per restringere il resto.</string>
+    <string name="tut_grid_signgrid_tip">La cifra più grande non può mai stare dal lato stretto di un segno.</string>
+</resources>

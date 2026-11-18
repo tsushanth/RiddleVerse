@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Completează fiecare căsuță goală astfel încât fiecare rând, fiecare coloană și fiecare bloc să conțină fiecare cifră exact o dată. Folosește creionul pentru a nota candidații. Fiecare puzzle are exact o soluție.</string>
+    <string name="tut_grid_binary_rules">Completează fiecare căsuță cu 0 sau 1. Nu pot fi alăturate mai mult de două cifre identice într-un rând sau o coloană, fiecare rând și coloană are tot atâția 0 câți 1, iar două rânduri (sau două coloane) nu pot fi identice.</string>
+    <string name="tut_grid_cagemath_rules">Completează grila cu cifre fără să se repete vreuna într-un rând sau o coloană. Numărul și semnul din colțul unei cuști dau ținta: cifrele cuștii trebuie să se adune, scadă, înmulțească sau împartă pentru a o da. O cușcă doar cu un număr este o singură căsuță. Cifrele se pot repeta într-o cușcă dacă sunt pe rânduri și coloane diferite.</string>
+    <string name="tut_grid_signgrid_rules">Completează grila fără să repeți vreo cifră într-un rând sau o coloană. Un semn între două căsuțe arată spre cea mai mică: căsuța de la capătul îngust are cifra mai mică.</string>
+    <string name="tut_grid_sudoku_tip">Atinge o căsuță, apoi o cifră. Pornește creionul pentru a nota candidații; 3 greșeli încheie puzzle-ul.</string>
+    <string name="tut_grid_binary_tip">Dacă două de 1 stau alături, căsuțele de la ambele capete trebuie să fie 0.</string>
+    <string name="tut_grid_cagemath_tip">Începe cu cuștile de o căsuță și produsele mari, apoi folosește rândurile și coloanele pentru a restrânge restul.</string>
+    <string name="tut_grid_signgrid_tip">Cea mai mare cifră nu poate sta niciodată la capătul îngust al unui semn.</string>
+</resources>

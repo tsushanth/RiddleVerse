@@ -3,6 +3,7 @@ package com.kreativekoala.riddleverse
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 
 /** Bridges the normal puzzle flow (PuzzleScreen dispatch) to the grid-logic games. */
 @Composable
@@ -34,22 +35,18 @@ fun GridTutorialScreen(
     onTutorialSkipped: () -> Unit
 ) {
     val game = GridGame.fromKey(type) ?: GridGame.SUDOKU
-    val (tip, colors) = when (game) {
-        GridGame.SUDOKU -> "Tap a cell, then a digit. Use Notes to pencil in candidates; 3 mistakes ends the puzzle." to
-            listOf(Color(0xFF2193b0), Color(0xFF6dd5ed))
-        GridGame.BINAIRO -> "If two 1s sit side by side, the cells on both ends must be 0." to
-            listOf(Color(0xFF232526), Color(0xFF536976))
-        GridGame.CAGE_MATH -> "Start with single-cell cages and big products, then use rows and columns to narrow the rest." to
-            listOf(Color(0xFFf7971e), Color(0xFFffd200))
-        GridGame.SIGN_GRID -> "The biggest digit can never sit at the narrow end of a sign." to
-            listOf(Color(0xFF11998e), Color(0xFF38ef7d))
+    val colors = when (game) {
+        GridGame.SUDOKU -> listOf(Color(0xFF2193b0), Color(0xFF6dd5ed))
+        GridGame.BINAIRO -> listOf(Color(0xFF232526), Color(0xFF536976))
+        GridGame.CAGE_MATH -> listOf(Color(0xFFf7971e), Color(0xFFffd200))
+        GridGame.SIGN_GRID -> listOf(Color(0xFF11998e), Color(0xFF38ef7d))
     }
     SimpleTutorialScreen(
         content = SimpleTutorialContent(
-            title = game.title,
+            title = PuzzleTypeNames.displayName(game.key),
             emoji = game.emoji,
-            instruction = GridPuzzleFactory.rulesFor(game),
-            tip = tip,
+            instruction = stringResource(GridPuzzleFactory.rulesRes(game)),
+            tip = stringResource(GridPuzzleFactory.tipRes(game)),
             backgroundColor = colors
         ),
         onComplete = onTutorialComplete,

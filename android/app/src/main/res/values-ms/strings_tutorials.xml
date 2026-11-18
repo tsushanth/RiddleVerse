@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Isi setiap petak kosong supaya setiap baris, lajur dan kotak mengandungi setiap digit tepat sekali. Gunakan alat pensel untuk mencatat digit calon. Setiap teka-teki ada satu penyelesaian sahaja.</string>
+    <string name="tut_grid_binary_rules">Isi setiap petak dengan 0 atau 1. Tidak boleh ada lebih daripada dua digit sama bersebelahan dalam satu baris atau lajur, setiap baris dan lajur mempunyai bilangan 0 dan 1 yang sama, dan tiada dua baris (atau dua lajur) yang serupa.</string>
+    <string name="tut_grid_cagemath_rules">Isi grid dengan digit supaya tiada yang berulang dalam baris atau lajur. Nombor dan tanda di sudut sangkar memberi sasaran: digit dalam sangkar mesti ditambah, ditolak, didarab atau dibahagi untuk mencapainya. Sangkar yang hanya ada nombor ialah satu petak. Digit boleh berulang dalam sangkar jika berada dalam baris dan lajur berbeza.</string>
+    <string name="tut_grid_signgrid_rules">Isi grid supaya tiada digit berulang dalam baris atau lajur. Tanda di antara dua petak menunjuk ke yang lebih kecil: petak di hujung sempit memegang digit yang lebih kecil.</string>
+    <string name="tut_grid_sudoku_tip">Ketik sebuah petak, kemudian sebuah digit. Hidupkan pensel untuk mencatat calon; 3 kesilapan menamatkan teka-teki.</string>
+    <string name="tut_grid_binary_tip">Jika dua digit 1 bersebelahan, petak di kedua-dua hujung mesti 0.</string>
+    <string name="tut_grid_cagemath_tip">Mulakan dengan sangkar satu petak dan hasil darab besar, kemudian gunakan baris dan lajur untuk mengecilkan baki.</string>
+    <string name="tut_grid_signgrid_tip">Digit terbesar tidak boleh berada di hujung sempit sesuatu tanda.</string>
+</resources>

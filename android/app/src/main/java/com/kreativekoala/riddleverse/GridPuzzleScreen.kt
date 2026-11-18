@@ -191,7 +191,7 @@ fun GridPuzzleContent(
         AlertDialog(
             onDismissRequest = { showRules = false },
             title = { Text(stringResource(R.string.xa_how_to_play_game, spec.game.title)) },
-            text = { Text(GridPuzzleFactory.rulesFor(spec.game)) },
+            text = { Text(stringResource(GridPuzzleFactory.rulesRes(spec.game))) },
             confirmButton = { TextButton(onClick = { showRules = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.got_it)) } }
         )
     }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Isi setiap kotak kosong agar setiap baris, kolom, dan kotak besar berisi setiap angka tepat satu kali. Gunakan alat pensil untuk mencatat angka kandidat. Setiap teka-teki hanya punya satu solusi.</string>
+    <string name="tut_grid_binary_rules">Isi setiap kotak dengan 0 atau 1. Tidak boleh ada lebih dari dua angka sama berdampingan dalam satu baris atau kolom, setiap baris dan kolom memiliki jumlah 0 dan 1 yang sama, dan tidak ada dua baris (atau dua kolom) yang identik.</string>
+    <string name="tut_grid_cagemath_rules">Isi kisi dengan angka agar tidak ada yang berulang di baris atau kolom. Angka dan tanda di sudut sangkar menunjukkan target: angka dalam sangkar harus dijumlahkan, dikurangkan, dikalikan, atau dibagi hingga mencapai target itu. Sangkar yang hanya berisi angka adalah satu kotak. Angka boleh berulang dalam sangkar jika berada di baris dan kolom berbeda.</string>
+    <string name="tut_grid_signgrid_rules">Isi kisi agar tidak ada angka yang berulang di baris atau kolom. Tanda di antara dua kotak menunjuk ke yang lebih kecil: kotak di ujung sempit berisi angka yang lebih kecil.</string>
+    <string name="tut_grid_sudoku_tip">Ketuk sebuah kotak, lalu sebuah angka. Aktifkan pensil untuk mencatat kandidat; 3 kesalahan mengakhiri teka-teki.</string>
+    <string name="tut_grid_binary_tip">Jika dua angka 1 berdampingan, kotak di kedua ujungnya harus 0.</string>
+    <string name="tut_grid_cagemath_tip">Mulai dari sangkar satu kotak dan hasil kali besar, lalu gunakan baris dan kolom untuk mempersempit sisanya.</string>
+    <string name="tut_grid_signgrid_tip">Angka terbesar tidak pernah bisa berada di ujung sempit sebuah tanda.</string>
+</resources>

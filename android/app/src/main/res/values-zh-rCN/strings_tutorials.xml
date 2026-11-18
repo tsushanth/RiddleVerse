@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">填满每个空格，使每一行、每一列和每个宫格中的每个数字都恰好出现一次。可以用铅笔工具记下候选数字。每道题都只有一个解。</string>
+    <string name="tut_grid_binary_rules">在每个格子里填入 0 或 1。同一行或同一列中不能有超过两个相同的数字相邻，每一行和每一列中 0 和 1 的个数相等，并且不能有两行（或两列）完全相同。</string>
+    <string name="tut_grid_cagemath_rules">在网格中填入数字，使每一行和每一列中都没有重复。笼子角落的数字和符号是目标：笼子里的数字经过加、减、乘或除必须得到它。只有数字的笼子就是一个格子。如果数字位于不同的行和列，笼子内部可以重复。</string>
+    <string name="tut_grid_signgrid_rules">填满网格，使每一行和每一列中都没有重复数字。两个格子之间的符号指向较小的一个：窄端的格子里是较小的数字。</string>
+    <string name="tut_grid_sudoku_tip">点按一个格子，再点按一个数字。打开铅笔可记下候选数字；错 3 次游戏结束。</string>
+    <string name="tut_grid_binary_tip">如果两个 1 并排，两端的格子必须是 0。</string>
+    <string name="tut_grid_cagemath_tip">先从单格笼子和较大的乘积入手，再用行和列缩小其余格子的范围。</string>
+    <string name="tut_grid_signgrid_tip">最大的数字绝不可能出现在符号的窄端。</string>
+</resources>

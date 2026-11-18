@@ -1,6 +1,6 @@
 {
   "_note": "Per-file count of hard-coded user-visible English literals in src/main. NoHardcodedUiStringsTest fails if a count rises or a new file adds any. Lower counts are fine. Regenerate deliberately with scripts/update-hardcoded-baseline.sh; see docs/hardcoded-ui-strings-guard.md.",
-  "total": 1726,
+  "total": 1722,
   "files": {
     "src/main/java/com/kreativekoala/riddleverse/AdManager.kt": {"count": 6, "h": ["5ac9bba2", "9c0ce279", "cb0adcfa", "d16c84df", "f5bfb53b", "f5bfb53b"]},
     "src/main/java/com/kreativekoala/riddleverse/AdaptiveAveragePuzzleScreen.kt": {"count": 3, "h": ["59174c67", "efea3b10", "f77c3547"]},
@@ -66,7 +66,6 @@
     "src/main/java/com/kreativekoala/riddleverse/GeographyCountriesSelect.kt": {"count": 34, "h": ["0020d822", "0022350b", "01b2f826", "0f3e73ba", "1ae3dfbb", "2179de03", "27239243", "2d165532", "304eb835", "50992c5d", "541ca90d", "62202988", "62ccf826", "62e0c555", "6a718294", "6b7937a9", "7c1626eb", "7c8dda4a", "7c8dffd4", "89237b95", "8ee2e560", "b151d9a5", "b40566ac", "b9aa75c6", "c60a5967", "c74ec8c9", "c94ee86d", "cd063363", "d1a335d3", "daef43b8", "e184eb5a", "e29d04ce", "e504fcfc", "fc0b973f"]},
     "src/main/java/com/kreativekoala/riddleverse/GridPuzzleFactory.kt": {"count": 8, "h": ["08a52cde", "20dcf4ea", "3826086e", "42c9ad14", "b3fb7d65", "b63b925c", "e3b72d4a", "fb60e94a"]},
     "src/main/java/com/kreativekoala/riddleverse/GridPuzzleScreen.kt": {"count": 4, "h": ["0726508f", "23559eb6", "83859040", "dfd01367"]},
-    "src/main/java/com/kreativekoala/riddleverse/GridPuzzleScreenWrapper.kt": {"count": 4, "h": ["283ed13c", "4b269035", "b5ca3d1c", "b8928f60"]},
     "src/main/java/com/kreativekoala/riddleverse/GuestMode.kt": {"count": 3, "h": ["2299b8d1", "793039e8", "a23d7d40"]},
     "src/main/java/com/kreativekoala/riddleverse/HardCodedPuzzleGroups.kt": {"count": 16, "h": ["07c95da2", "103fc23d", "12807d1a", "12f96eeb", "17faf256", "20529f9a", "36342845", "3ab3f1ca", "7b5ab721", "a834b6c0", "b5d65292", "b8e9572b", "d648e630", "da8e28fb", "f0dd4ffe", "fbd7cdaa"]},
     "src/main/java/com/kreativekoala/riddleverse/HomeActivity.kt": {"count": 1, "h": ["0028bf0a"]},

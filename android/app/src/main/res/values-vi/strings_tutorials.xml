@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Điền vào mọi ô trống sao cho mỗi hàng, mỗi cột và mỗi khối chứa mỗi chữ số đúng một lần. Dùng bút chì để ghi chú các chữ số có thể. Mỗi câu đố chỉ có đúng một lời giải.</string>
+    <string name="tut_grid_binary_rules">Điền mỗi ô bằng 0 hoặc 1. Không được có quá hai chữ số giống nhau liền kề trong một hàng hoặc cột, mỗi hàng và cột có số 0 bằng số 1, và không có hai hàng (hoặc hai cột) giống hệt nhau.</string>
+    <string name="tut_grid_cagemath_rules">Điền các chữ số vào lưới sao cho không chữ số nào lặp lại trong hàng hoặc cột. Số và dấu ở góc lồng cho biết mục tiêu: các chữ số trong lồng phải cộng, trừ, nhân hoặc chia ra mục tiêu đó. Lồng chỉ có một số là một ô duy nhất. Chữ số có thể lặp lại trong một lồng nếu nằm ở các hàng và cột khác nhau.</string>
+    <string name="tut_grid_signgrid_rules">Điền lưới sao cho không chữ số nào lặp lại trong hàng hoặc cột. Dấu giữa hai ô chỉ về ô nhỏ hơn: ô ở đầu hẹp chứa chữ số nhỏ hơn.</string>
+    <string name="tut_grid_sudoku_tip">Chạm vào một ô, rồi chạm vào một chữ số. Bật bút chì để ghi chú các khả năng; sai 3 lần là kết thúc câu đố.</string>
+    <string name="tut_grid_binary_tip">Nếu hai số 1 nằm cạnh nhau, các ô ở hai đầu phải là 0.</string>
+    <string name="tut_grid_cagemath_tip">Bắt đầu từ các lồng một ô và các tích lớn, rồi dùng hàng và cột để thu hẹp phần còn lại.</string>
+    <string name="tut_grid_signgrid_tip">Chữ số lớn nhất không bao giờ nằm ở đầu hẹp của một dấu.</string>
+</resources>
