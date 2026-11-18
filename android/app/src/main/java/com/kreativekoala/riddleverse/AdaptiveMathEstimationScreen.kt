@@ -34,6 +34,7 @@ import com.kreativekoala.riddleverse.ui.theme.RvSky
 import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 import com.kreativekoala.riddleverse.ui.theme.RvSurface
 import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @Composable
 fun AdaptiveMathEstimationScreen(
@@ -296,7 +297,7 @@ fun AdaptiveMathEstimationScreen(
                 // Both hud() variants (AdaptiveCompactHud and AdaptiveUnifiedHeader) already show
                 // the score with a "hud_score" tag - repeating it here doubled it on screen.
                 Text(
-                    text = "${currentDifficultyLevel.name} • ${currentPuzzle.numbers.size} numbers",
+                    text = "${rvDifficultyLabel(currentDifficultyLevel.name)} • ${currentPuzzle.numbers.size} numbers",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInkSoft,
@@ -485,7 +486,7 @@ fun AdaptiveEstimationInstructionsCard(
 
             // Adaptive difficulty information
             Text(
-                text = "🎯 ${difficultyLevel.name}: ${difficultyLevel.targetCount} numbers",
+                text = "🎯 ${rvDifficultyLabel(difficultyLevel.name)}: ${difficultyLevel.targetCount} numbers",
                 fontSize = 12.sp,
                 color = RvInkSoft,
                 fontWeight = FontWeight.Medium

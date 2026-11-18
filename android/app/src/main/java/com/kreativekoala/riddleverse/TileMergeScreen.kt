@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -125,8 +126,8 @@ fun TileMergeScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
             properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
             title = { Text("You made ${cfg.target}!", fontWeight = FontWeight.Bold) },
             text = { Text("Finish now, or keep going to push your score higher (the move limit no longer applies).") },
-            confirmButton = { Button(onClick = { ended = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Finish") } },
-            dismissButton = { OutlinedButton(onClick = { continuing = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Keep going") } },
+            confirmButton = { Button(onClick = { ended = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.xb_finish)) } },
+            dismissButton = { OutlinedButton(onClick = { continuing = true }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.xb_keep_going)) } },
         )
     }
     if (showResult) {

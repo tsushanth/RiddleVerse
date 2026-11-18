@@ -468,7 +468,7 @@ fun DualCardPuzzleScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (showFeedback) {
                     Text(
-                        text = if (isCorrectAnswer) "Correct! ✓" else "Wrong! ✗",
+                        text = if (isCorrectAnswer) "${stringResource(R.string.correct)} ✓" else "${stringResource(R.string.wrong)} ✗",
                         color = if (isCorrectAnswer) RvMintEdge else RvCoralEdge,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -611,7 +611,7 @@ private fun EnhancedDualTaskTopBar(
                 }
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk,
@@ -634,7 +634,7 @@ private fun EnhancedDualTaskTopBar(
                     repeat(hearts) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
-                            contentDescription = "Heart",
+                            contentDescription = stringResource(R.string.xa_heart),
                             tint = RvCoralEdge,
                             modifier = Modifier.size(16.dp)
                         )

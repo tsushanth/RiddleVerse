@@ -21,12 +21,14 @@ import androidx.compose.ui.graphics.Color
 import android.app.Activity
 import android.os.Build
 import android.view.WindowManager
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -73,6 +75,8 @@ fun GamePreviewScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val view = LocalView.current
+    val context = LocalContext.current
+    val publishFailedFallback = stringResource(R.string.browse_publish_failed)
 
     // Extend game into display cutout area for full-screen experience
     DisposableEffect(Unit) {
@@ -152,7 +156,7 @@ fun GamePreviewScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     CircularProgressIndicator(color = RvInk)
-                    Text("Modifying game...", color = RvInk, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.browse_modifying_game), color = RvInk, fontWeight = FontWeight.Bold)
                     if (modifyPhase.isNotEmpty()) {
                         Text(modifyPhase, color = RvInkSoft.copy(alpha = 0.7f), fontSize = 12.sp)
                     }
@@ -183,8 +187,8 @@ fun GamePreviewScreen(
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Game ready! 🎮", color = RvInk, fontWeight = FontWeight.Bold)
-                    Text("Publish your game so other players can find and play it!", color = RvSun, fontSize = 12.sp)
+                    Text("${stringResource(R.string.browse_game_ready_toast)} 🎮", color = RvInk, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.browse_publish_hint), color = RvSun, fontSize = 12.sp)
                 }
             }
         }
@@ -219,12 +223,12 @@ fun GamePreviewScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                     Text("🎮", fontSize = 32.sp)
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text("Publish before you go!", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
+                    Text(stringResource(R.string.browse_publish_before_you_go), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
                 }
             },
             text = {
                 Text(
-                    "Publish your game so other players can find and play it. Publish now to go live!",
+                    stringResource(R.string.browse_publish_dialog_body),
                     fontSize = 14.sp,
                     color = RvInkSoft.copy(alpha = 0.8f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -240,13 +244,14 @@ fun GamePreviewScreen(
                                 publishError = null
                                 try {
                                     publishAndShare(
+                                        context = context,
                                         gameId = activeGameId,
                                         bundleBase64 = activeBundleBase64,
                                         prompt = prompt
                                     )
                                     isPublished = true
                                 } catch (e: Exception) {
-                                    publishError = e.localizedMessage ?: "Failed to publish"
+                                    publishError = e.localizedMessage ?: publishFailedFallback
                                 }
                                 isPublishing = false
                             }
@@ -255,12 +260,12 @@ fun GamePreviewScreen(
                     colors = ButtonDefaults.buttonColors(containerColor = RvSuccess),
                     shape = RoundedCornerShape(10.dp)
                 ) {
-                    Text("Publish", fontWeight = FontWeight.Bold, color = RvOnTone)
+                    Text(stringResource(R.string.browse_publish), fontWeight = FontWeight.Bold, color = RvOnTone)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showCloseDialog = false; onClose() }) {
-                    Text("Leave without saving", color = RvInkSoft)
+                    Text(stringResource(R.string.browse_leave_without_saving), color = RvInkSoft)
                 }
             },
             containerColor = RvSurfaceRaised
@@ -274,12 +279,12 @@ fun GamePreviewScreen(
             title = { Text(stringResource(R.string.modify_game)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Describe what's wrong or what to change:", fontSize = 14.sp, color = RvInkSoft)
+                    Text(stringResource(R.string.browse_describe_whats_wrong), fontSize = 14.sp, color = RvInkSoft)
                     OutlinedTextField(
                         value = modifyDescription,
                         onValueChange = { if (it.length <= 500) modifyDescription = it },
                         modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp),
-                        label = { Text("What needs fixing?") }
+                        label = { Text(stringResource(R.string.browse_what_needs_fixing)) }
                     )
                     Text(
                         "${modifyDescription.length}/500",
@@ -339,7 +344,7 @@ fun GamePreviewScreen(
 
 // MARK: - Publish & Share
 
-private suspend fun publishAndShare(gameId: String?, bundleBase64: String, prompt: String) {
+private suspend fun publishAndShare(context: Context, gameId: String?, bundleBase64: String, prompt: String) {
     withContext(Dispatchers.IO) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: "anonymous"
         val displayName = FirebaseAuth.getInstance().currentUser?.displayName
@@ -368,7 +373,7 @@ private suspend fun publishAndShare(gameId: String?, bundleBase64: String, promp
         android.util.Log.d("PublishShare", "Save response ${response.code}: $responseBody")
         response.close()
         if (!response.isSuccessful) {
-            throw Exception("Save failed (${response.code}): $responseBody")
+            throw Exception(context.getString(R.string.browse_save_failed, response.code, responseBody))
         }
     }
 }

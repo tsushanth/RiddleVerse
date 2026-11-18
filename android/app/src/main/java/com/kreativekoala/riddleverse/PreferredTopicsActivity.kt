@@ -2,6 +2,7 @@ package com.kreativekoala.riddleverse
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -66,6 +67,32 @@ val topicColors = listOf(
     RvSun.copy(alpha = 0.3f),
     RvGrape.copy(alpha = 0.25f)
 )
+
+/** Stored topic names stay English (they are saved and sent to the puzzle generator); only the label shown is localized. */
+@StringRes
+private fun sampleTopicLabelRes(topic: String): Int? = when (topic) {
+    "Math" -> R.string.cat_math_title
+    "Logic" -> R.string.cat_filter_logic
+    "History" -> R.string.onb_topic_history
+    "Science" -> R.string.onb_topic_science
+    "Trivia" -> R.string.cat_trivia_title
+    "Riddles" -> R.string.cat_riddles_title
+    "Programming" -> R.string.onb_topic_programming
+    "Literature" -> R.string.onb_topic_literature
+    "Geography" -> R.string.cat_filter_geography
+    "Art" -> R.string.onb_topic_art
+    "Music" -> R.string.onb_topic_music
+    "Sports" -> R.string.onb_topic_sports
+    "Movies" -> R.string.onb_topic_movies
+    "Technology" -> R.string.onb_topic_technology
+    "Nature" -> R.string.onb_topic_nature
+    "Psychology" -> R.string.onb_topic_psychology
+    else -> null
+}
+
+@Composable
+private fun topicDisplayName(topic: String): String =
+    sampleTopicLabelRes(topic)?.let { stringResource(it) } ?: topic
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -252,7 +279,7 @@ fun ExplanationCard() {
             modifier = Modifier.padding(20.dp)
         ) {
             Text(
-                text = "🎯 Personalize Your Experience",
+                text = "🎯 ${stringResource(R.string.onb_topics_personalize_title)}",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvMintEdge
@@ -261,7 +288,7 @@ fun ExplanationCard() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Select topics you're interested in to receive personalized daily quizzes. We'll generate 5 questions each day based on your preferences!",
+                text = stringResource(R.string.onb_topics_personalize_desc),
                 fontSize = 14.sp,
                 color = RvInk,
                 lineHeight = 20.sp
@@ -315,7 +342,7 @@ fun PopularTopicsSection(
                     )
                 ) {
                     Text(
-                        text = topic,
+                        text = topicDisplayName(topic),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         fontSize = 14.sp,
                         fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
@@ -362,7 +389,7 @@ fun AddCustomTopicSection(
                     modifier = Modifier.weight(1f),
                     placeholder = {
                         Text(
-                            "Enter your topic...",
+                            stringResource(R.string.onb_topics_enter_hint),
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     },
@@ -386,7 +413,7 @@ fun AddCustomTopicSection(
                     )
                 ) {
                     Text(
-                        "Add",
+                        stringResource(R.string.onb_topics_add),
                         fontWeight = FontWeight.SemiBold
                     )
                 }
@@ -461,7 +488,7 @@ fun SelectedTopicsSection(
                     )
 
                     Text(
-                        text = "Select topics above to get started",
+                        text = stringResource(R.string.onb_topics_select_above),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -501,7 +528,7 @@ fun SelectedTopicChip(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = topic,
+                text = topicDisplayName(topic),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
@@ -511,7 +538,7 @@ fun SelectedTopicChip(
 
             Icon(
                 imageVector = Icons.Default.Close,
-                contentDescription = "Remove $topic",
+                contentDescription = stringResource(R.string.onb_topics_remove, topicDisplayName(topic)),
                 modifier = Modifier
                     .size(16.dp)
                     .clickable { onRemove() },
@@ -562,7 +589,7 @@ fun BottomActionButton(
                         )
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "🎯 Generating your daily puzzles...",
+                            text = "🎯 ${stringResource(R.string.onb_topics_generating)}",
                             fontSize = 14.sp,
                             color = RvSkyEdge
                         )
@@ -616,7 +643,7 @@ fun BottomActionButton(
                         Text(stringResource(R.string.saving))
                     } else {
                         Text(
-                            "Save & Generate Daily Puzzles",
+                            stringResource(R.string.onb_topics_save_generate),
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 13.sp
                         )
@@ -627,7 +654,7 @@ fun BottomActionButton(
             if (selectedTopics.isEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "💡 Select at least one topic to continue",
+                    text = "💡 ${stringResource(R.string.onb_topics_select_one)}",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     textAlign = TextAlign.Center,
@@ -651,7 +678,7 @@ private fun saveTopicsAndGeneratePuzzles(
     if (FirebaseAuth.getInstance().currentUser?.email.isNullOrBlank()) {
         context.getSharedPreferences(GuestDataMigration.TOPICS_PREFS, android.content.Context.MODE_PRIVATE)
             .edit().putString(GuestDataMigration.TOPICS_KEY, selectedTopics.joinToString("\n")).apply()
-        Toast.makeText(context, "Topics saved on this phone. Sign in to get daily puzzles on them.", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, R.string.onb_topics_saved_local, Toast.LENGTH_LONG).show()
         onComplete()
         return
     }
@@ -666,7 +693,7 @@ private fun saveTopicsAndGeneratePuzzles(
             // Show immediate success message and exit
             Toast.makeText(
                 context,
-                "🎉 Topics saved! Your daily puzzles are being generated.",
+                "🎉 ${context.getString(R.string.onb_topics_saved_generating)}",
                 Toast.LENGTH_LONG
             ).show()
 
@@ -692,7 +719,7 @@ private fun saveTopicsAndGeneratePuzzles(
                         if (responseCode == 200) {
                             Toast.makeText(
                                 context,
-                                "✨ Daily puzzles ready! Check your notifications.",
+                                "✨ ${context.getString(R.string.onb_topics_puzzles_ready)}",
                                 Toast.LENGTH_SHORT
                             ).show()
                         }
@@ -707,7 +734,7 @@ private fun saveTopicsAndGeneratePuzzles(
             onSavingStateChange(false)
             Toast.makeText(
                 context,
-                "Failed to save topics: ${e.message}",
+                context.getString(R.string.onb_topics_save_failed, e.message.orEmpty()),
                 Toast.LENGTH_LONG
             ).show()
         }

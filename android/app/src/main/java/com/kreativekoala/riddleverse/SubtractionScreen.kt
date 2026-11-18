@@ -187,7 +187,7 @@ fun MathDifferenceGameScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Score: $totalScore",
+                    text = "${stringResource(R.string.score_label)}: $totalScore",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
@@ -196,7 +196,7 @@ fun MathDifferenceGameScreen(
                 )
                 if (attempts > 0) {
                     Text(
-                        text = "Attempt: $attempts",
+                        text = stringResource(R.string.xb_attempt_value, attempts),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvInkSoft,
@@ -400,7 +400,7 @@ fun CalculatorGrid(
                 ) {
                     Text(
                         text = if (currentInput.isEmpty()) {
-                            if (isAnswered) "Submitted" else "0"
+                            if (isAnswered) stringResource(R.string.xb_submitted) else "0"
                         } else {
                             currentInput
                         },
@@ -451,8 +451,9 @@ fun CalculatorGrid(
                 )
 
                 CalculatorButton(
-                    text = if (isAnswered) "SENT" else "SUBMIT",
+                    text = if (isAnswered) stringResource(R.string.xb_sent).uppercase() else stringResource(R.string.submit).uppercase(),
                     onClick = onSubmit,
+                    isSubmit = true,
                     modifier = keyModifier(Modifier.weight(1f)),
                     isSpecial = true,
                     isEnabled = !isAnswered
@@ -469,9 +470,10 @@ fun CalculatorButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     isSpecial: Boolean = false,
-    isEnabled: Boolean = true
+    isEnabled: Boolean = true,
+    isSubmit: Boolean = false
 ) {
-    val isAction = text == "SUBMIT" || text == "SENT"
+    val isAction = isSubmit
     Card(
         modifier = modifier
             .heightIn(min = 48.dp)
@@ -552,7 +554,7 @@ fun EnhancedSubtractionTopGameBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = "${stringResource(R.string.level_label)} ${level.level}",
                     fontSize = aCapSp(18f, 1.15f),
                     fontWeight = FontWeight.Bold,
                     color = RvInk,

@@ -285,7 +285,7 @@ fun SwipeWordScreen(
                         CircularProgressIndicator(color = RvInk)
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Loading next word...",
+                            text = stringResource(R.string.xb_loading_next_word),
                             color = RvInk,
                             fontWeight = FontWeight.Bold,
                             fontSize = 18.sp

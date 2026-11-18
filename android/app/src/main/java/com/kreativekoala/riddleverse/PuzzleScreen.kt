@@ -668,8 +668,8 @@ fun PuzzleScreen(
                     Text(stringResource(R.string.ok))
                 }
             },
-            title = { Text("💡 Hint") },
-            text = { Text(currentPuzzle.hint ?: "No hint available") }
+            title = { Text("💡 ${stringResource(R.string.hint)}") },
+            text = { Text(currentPuzzle.hint ?: stringResource(R.string.no_hint_available)) }
         )
     }
 }

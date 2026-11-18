@@ -34,6 +34,7 @@ import com.kreativekoala.riddleverse.ui.theme.RvOutline
 import com.kreativekoala.riddleverse.ui.theme.RvSkyEdge
 import com.kreativekoala.riddleverse.ui.theme.RvSurface
 import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 // Data class for subscription puzzles
 data class SubscriptionPuzzle(
@@ -387,7 +388,7 @@ fun AdaptiveSubscriptionPuzzleScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "${currentDifficultyLevel.name} • ${currentPuzzle.frequency.capitalize()} → Annual",
+                    text = "${rvDifficultyLabel(currentDifficultyLevel.name)} • ${currentPuzzle.frequency.capitalize()} → Annual",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvInkSoft,
@@ -397,7 +398,7 @@ fun AdaptiveSubscriptionPuzzleScreen(
                 )
                 if (attempts > 0) {
                     Text(
-                        text = "Attempt: $attempts",
+                        text = stringResource(R.string.xa_attempt_value, attempts),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvInkSoft,
@@ -561,7 +562,7 @@ fun AdaptiveSubscriptionTopGameBar(
 
                 // Adaptive difficulty indicator
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvSkyEdge

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
@@ -80,22 +81,22 @@ private fun TubeTintBoard(args: SpatialArgs, puzzle: TubeTintPuzzle) {
         args = args,
         status = "Moves ${game.moves}",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.canUndo()) {
                 game.undo(); selected = -1; hintPair = null; commit()
             }
-            SpatialAction(Icons.Default.Refresh, "Restart") {
+            SpatialAction(Icons.Default.Refresh, stringResource(R.string.xa_restart)) {
                 game.restart(); selected = -1; hintPair = null; commit()
             }
             SpatialAction(Icons.Default.Add, "Add tube", enabled = !game.extraTubeAdded) {
                 game.addTube(); selected = -1; commit()
             }
-            SpatialAction(Icons.Default.Lightbulb, "Hint") {
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint)) {
                 val h = game.hint()
                 if (h != null) { hintPair = h; selected = -1; message = "Pour tube ${h[0] + 1} into tube ${h[1] + 1}" }
                 else message = "No path from here. Try Undo, Restart or Add tube."
                 tick++
             }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         if (message.isNotEmpty()) {
@@ -136,7 +137,7 @@ private fun TubeTintBoard(args: SpatialArgs, puzzle: TubeTintPuzzle) {
             success = true, title = "Sorted!",
             detail = "${game.moves} moves.  Score $s",
             stars = when { game.hintsUsed == 0 && !game.extraTubeAdded -> 3; game.hintsUsed <= 1 -> 2; else -> 1 },
-            primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) }
+            primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) }
         )
     }
 }

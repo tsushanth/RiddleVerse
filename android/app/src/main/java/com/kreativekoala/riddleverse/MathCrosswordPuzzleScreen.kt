@@ -34,6 +34,7 @@ import com.kreativekoala.riddleverse.ui.theme.RvSky
 import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 import com.kreativekoala.riddleverse.ui.theme.RvSurface
 import com.kreativekoala.riddleverse.ui.theme.RvWarning
+import androidx.compose.ui.platform.LocalContext
 
 data class MathCrosswordCell(
     val row: Int,
@@ -90,6 +91,7 @@ fun MathCrosswordPuzzleScreen(
     var score by remember { mutableStateOf(0) }
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
+    val msgContext = LocalContext.current
     var isComplete by remember { mutableStateOf(false) }
     var timeLeft by remember { mutableStateOf(parseTimer(timer)) }
     var isTimerRunning by remember { mutableStateOf(true) }
@@ -128,7 +130,7 @@ fun MathCrosswordPuzzleScreen(
         if (timeLeft == 0) {
             isTimerRunning = false
             showFeedback = true
-            feedbackMessage = "Time's up! ⏰"
+            feedbackMessage = "${msgContext.getString(R.string.times_up)} ⏰"
             onSubmitAnswer(false)
         }
     }
@@ -146,7 +148,7 @@ fun MathCrosswordPuzzleScreen(
                 val timeBonus = timeLeft * 10
                 score = 1000 + timeBonus
                 showFeedback = true
-                feedbackMessage = "Perfect! All equations are correct! 🎉"
+                feedbackMessage = "${msgContext.getString(R.string.xa_equations_all_correct)} 🎉"
                 onSubmitAnswer(true)
             } else if (!isValid && checkAllCellsFilled(currentGrid)) {
                 // All cells filled but equations are wrong
@@ -421,7 +423,7 @@ fun MathCrosswordPuzzleScreen(
 
                             // Show completion message
                             showFeedback = true
-                            feedbackMessage = "Puzzle completed! All answers revealed. 📖"
+                            feedbackMessage = "${msgContext.getString(R.string.xa_puzzle_completed_revealed)} 📖"
                             score = kotlin.math.max(100, timeLeft * 5) // Reduced score for giving up
 
                         } catch (e: Exception) {
@@ -447,7 +449,7 @@ fun MathCrosswordPuzzleScreen(
                             val timeBonus = timeLeft * 10
                             score = 1000 + timeBonus
                             showFeedback = true
-                            feedbackMessage = "Perfect! All equations are correct! 🎉"
+                            feedbackMessage = "${msgContext.getString(R.string.xa_equations_all_correct)} 🎉"
                             onSubmitAnswer(true)
                         } else {
                             // Show which equations are wrong
@@ -494,7 +496,7 @@ fun MathCrosswordPuzzleScreen(
             },
             title = {
                 Text(
-                    text = if (isComplete) "🎉 Completed!" else "💡 Hint",
+                    text = if (isComplete) "🎉 ${stringResource(R.string.xa_completed_exclaim)}" else "💡 ${stringResource(R.string.hint)}",
                     fontWeight = FontWeight.Bold
                 )
             },

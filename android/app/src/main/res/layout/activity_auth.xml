@@ -112,6 +112,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            android:text="Sign in with Google" />
+            android:text="@string/layout_auth_sign_in_google" />
     </LinearLayout>
 </ScrollView>

@@ -138,7 +138,7 @@ fun GameWebView(
                             if (it.messageLevel() == ConsoleMessage.MessageLevel.ERROR && !hasReportedError) {
                                 hasReportedError = true
                                 Handler(Looper.getMainLooper()).post {
-                                    onGameError("Game error: ${it.message()}")
+                                    onGameError(context.getString(R.string.browse_webview_game_error, it.message()))
                                 }
                             }
                         }
@@ -156,10 +156,10 @@ fun GameWebView(
                         super.onReceivedError(view, request, error)
                         if (request?.isForMainFrame == true && !hasReportedError) {
                             hasReportedError = true
-                            val desc = error?.description?.toString() ?: "Unknown error"
+                            val desc = error?.description?.toString() ?: context.getString(R.string.browse_webview_unknown_error)
                             Log.e(TAG, "Main frame error: $desc")
                             Handler(Looper.getMainLooper()).post {
-                                onGameError("Game failed to load: $desc")
+                                onGameError(context.getString(R.string.browse_webview_load_failed, desc))
                             }
                         }
                     }
@@ -209,7 +209,7 @@ fun GameWebView(
                                         if (result == "false") {
                                             Log.w(TAG, "Blank screen detected")
                                             hasReportedError = true
-                                            onGameError("Game failed to render — the screen appears blank")
+                                            onGameError(context.getString(R.string.browse_webview_blank_screen))
                                         }
                                     }
                                 }

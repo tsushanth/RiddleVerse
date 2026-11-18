@@ -19,6 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -66,13 +67,13 @@ fun TelegramBotBanner() {
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Play RiddleVerse on Telegram!",
+                        text = stringResource(R.string.home_telegram_title),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = RvOnTone
                     )
                     Text(
-                        text = "Quiz your group chat • @Riddleverse_bot",
+                        text = stringResource(R.string.home_telegram_subtitle),
                         fontSize = 12.sp,
                         color = RvOnTone.copy(alpha = 0.9f),
                         maxLines = 1,
@@ -89,7 +90,7 @@ fun TelegramBotBanner() {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Dismiss",
+                        contentDescription = stringResource(R.string.welcome_back_dismiss),
                         tint = RvOnTone.copy(alpha = 0.9f),
                         modifier = Modifier.size(16.dp)
                     )

@@ -4,6 +4,9 @@ import android.app.NotificationManager
 import android.content.Context
 import android.util.Base64
 import android.util.Log
+import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -29,6 +32,24 @@ import java.io.ByteArrayInputStream
 import java.io.File
 import java.util.UUID
 import java.util.zip.ZipInputStream
+
+/**
+ * Text that is resolved to a string only at the UI layer, so view models and managers never hold a Context.
+ * [Res] is a localized string resource (args may themselves be [UiText]); [Raw] is text that came from the server or
+ * an exception and is shown as received.
+ */
+sealed class UiText {
+    data class Raw(val value: String) : UiText()
+    data class Res(@StringRes val id: Int, val args: List<Any> = emptyList()) : UiText()
+
+    fun asString(context: Context): String = when (this) {
+        is Raw -> value
+        is Res -> context.getString(id, *args.map { if (it is UiText) it.asString(context) else it }.toTypedArray())
+    }
+
+    @Composable
+    fun asString(): String = asString(LocalContext.current)
+}
 
 // Unified generation mode
 sealed class GenerationMode {
@@ -65,14 +86,14 @@ class GameGenerationViewModel : ViewModel() {
 
     // Generation state
     var isGenerating by mutableStateOf(false)
-    var buildPhase by mutableStateOf("")
-    var buildDetail by mutableStateOf("")
+    var buildPhase by mutableStateOf<UiText?>(null)
+    var buildDetail by mutableStateOf<UiText?>(null)
     var progressPercent by mutableFloatStateOf(0f)
     var estimatedSecondsRemaining by mutableIntStateOf(0)
-    var errorMessage by mutableStateOf<String?>(null)
+    var errorMessage by mutableStateOf<UiText?>(null)
 
     /** True while the visible error is the guest "sign in to create" prompt (UI adds a Sign in button). */
-    val needsSignIn: Boolean get() = errorMessage == GuestGate.SIGN_IN_TO_CREATE
+    val needsSignIn: Boolean get() = errorMessage == UiText.Res(GuestGate.SIGN_IN_TO_CREATE_RES)
 
     // Rate limit upsell state
     var showRateLimitUpsell by mutableStateOf(false)
@@ -118,7 +139,7 @@ class GameGenerationViewModel : ViewModel() {
         // Generating a game costs real model time and is attributed to a creator account: guests are asked to sign in
         // first (they can still browse and play games).
         if (GuestGate.isGuest()) {
-            errorMessage = GuestGate.SIGN_IN_TO_CREATE
+            errorMessage = UiText.Res(GuestGate.SIGN_IN_TO_CREATE_RES)
             Funnel.log(FunnelStep.GUEST_GATE_SHOWN, mapOf("feature" to "create_game"))
             return
         }
@@ -127,7 +148,7 @@ class GameGenerationViewModel : ViewModel() {
         errorMessage = null
         showRateLimitUpsell = false
         showHardPaywall = false
-        buildDetail = ""
+        buildDetail = null
         progressPercent = 0f
         estimatedSecondsRemaining = 0
         resultGameId = null
@@ -135,12 +156,12 @@ class GameGenerationViewModel : ViewModel() {
         when (mode) {
             is GenerationMode.Custom -> {
                 isRemixGeneration = false
-                buildPhase = "Connecting..."
+                buildPhase = UiText.Res(R.string.create_connecting)
                 currentPrompt = mode.prompt
             }
             is GenerationMode.Remix -> {
                 isRemixGeneration = true
-                buildPhase = "Preparing remix..."
+                buildPhase = UiText.Res(R.string.create_preparing_remix)
                 currentPrompt = mode.remixDescription
                 remixResultTitle = mode.title
             }
@@ -176,7 +197,7 @@ class GameGenerationViewModel : ViewModel() {
                     showCompletionBanner = true
                 }
             } else if (errorMessage == null && !showRateLimitUpsell) {
-                errorMessage = "Failed to generate game. Please try again."
+                errorMessage = UiText.Res(R.string.create_failed_generate)
             }
         }
     }
@@ -206,13 +227,13 @@ class GameGenerationViewModel : ViewModel() {
 
             val title = prompt.take(40).split(". ").first()
             val bodyText = if (isRemixGeneration) {
-                "Your game \"$title\" is ready! Find it in Explore > Custom Games."
+                context.getString(R.string.create_notification_remix_ready, title)
             } else {
-                "Your game \"$title\" has been created. Tap to play!"
+                context.getString(R.string.create_notification_game_created, title)
             }
             val notification = NotificationCompat.Builder(context, "puzzle_notifications")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Game Ready!")
+                .setContentTitle(context.getString(R.string.game_ready))
                 .setContentText(bodyText)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
@@ -246,8 +267,8 @@ class GameGenerationViewModel : ViewModel() {
         generationJob?.cancel()
         stopProgressInterpolation()
         isGenerating = false
-        buildPhase = ""
-        buildDetail = ""
+        buildPhase = null
+        buildDetail = null
         progressPercent = 0f
     }
 
@@ -258,8 +279,8 @@ class GameGenerationViewModel : ViewModel() {
         bundleDirPath = null
         bundleBase64 = null
         resultGameId = null
-        buildPhase = ""
-        buildDetail = ""
+        buildPhase = null
+        buildDetail = null
         progressPercent = 0f
     }
 
@@ -302,7 +323,7 @@ class GameGenerationViewModel : ViewModel() {
                 val response = client.newCall(request).execute()
                 if (!response.isSuccessful) {
                     Log.e(TAG, "$logPrefix HTTP ${response.code}")
-                    var serverError = "Server error (${response.code})"
+                    var serverError: String? = null
                     var canUseCoinsFlag = false
                     var coinCost = 10
                     try {
@@ -319,7 +340,7 @@ class GameGenerationViewModel : ViewModel() {
                     // Hard paywall — lifetime limit reached, must subscribe
                     if (response.code == 403) {
                         try {
-                            val errJson2 = JSONObject(serverError)
+                            val errJson2 = JSONObject(serverError ?: "")
                             if (errJson2.optBoolean("requiresSubscription", false)) {
                                 withContext(Dispatchers.Main) { showHardPaywall = true }
                                 return@withContext null
@@ -339,7 +360,7 @@ class GameGenerationViewModel : ViewModel() {
                     }
 
                     withContext(Dispatchers.Main) {
-                        errorMessage = serverError
+                        errorMessage = serverErrorText(serverError, response.code)
                     }
                     return@withContext null
                 }
@@ -374,8 +395,8 @@ class GameGenerationViewModel : ViewModel() {
                                         val phaseSecs = eventJson.optLong("phaseDurationSeconds", 0)
                                         val eta = eventJson.optInt("estimatedSecondsRemaining", 0)
                                         withContext(Dispatchers.Main) {
-                                            buildPhase = message
-                                            buildDetail = detail
+                                            buildPhase = serverText(message)
+                                            buildDetail = serverText(detail)
                                             progressPercent = pct
                                             estimatedSecondsRemaining = eta
                                             phaseStartPct = pct
@@ -391,8 +412,9 @@ class GameGenerationViewModel : ViewModel() {
                                     "error" -> {
                                         val errMsg = eventJson.optString("error", "Unknown error")
                                         Log.e(TAG, "$logPrefix SSE error: $errMsg")
+                                        val hasServerError = eventJson.has("error")
                                         withContext(Dispatchers.Main) {
-                                            errorMessage = errMsg
+                                            errorMessage = if (hasServerError) UiText.Raw(errMsg) else UiText.Res(R.string.browse_webview_unknown_error)
                                         }
                                         return@withContext null
                                     }
@@ -409,14 +431,14 @@ class GameGenerationViewModel : ViewModel() {
                 if (bundleBase64Result == null) {
                     Log.e(TAG, "$logPrefix: no bundle in response")
                     withContext(Dispatchers.Main) {
-                        errorMessage = "Build completed but no game bundle received. Please try again."
+                        errorMessage = UiText.Res(R.string.create_no_bundle)
                     }
                     return@withContext null
                 }
 
                 withContext(Dispatchers.Main) {
-                    buildPhase = "Extracting game..."
-                    buildDetail = ""
+                    buildPhase = UiText.Res(R.string.create_extracting_game)
+                    buildDetail = null
                     progressPercent = 95f
                 }
 
@@ -424,7 +446,7 @@ class GameGenerationViewModel : ViewModel() {
                 if (dir == null) {
                     Log.e(TAG, "$logPrefix zip extraction failed")
                     withContext(Dispatchers.Main) {
-                        errorMessage = "Failed to extract game bundle. Please try again."
+                        errorMessage = UiText.Res(R.string.create_extract_failed)
                     }
                     return@withContext null
                 }
@@ -434,11 +456,11 @@ class GameGenerationViewModel : ViewModel() {
                 Log.e(TAG, "Stream error", e)
                 withContext(Dispatchers.Main) {
                     errorMessage = when {
-                        e is java.net.SocketTimeoutException -> "Connection timed out. Please check your network and try again."
-                        e is java.net.UnknownHostException -> "Cannot reach server. Please check your internet connection."
-                        e is java.net.ConnectException -> "Cannot connect to server. Please try again later."
-                        e.message?.contains("timeout", ignoreCase = true) == true -> "Request timed out. Please try again."
-                        else -> "Connection error: ${e.localizedMessage ?: "Unknown error"}"
+                        e is java.net.SocketTimeoutException -> UiText.Res(R.string.create_connection_timed_out)
+                        e is java.net.UnknownHostException -> UiText.Res(R.string.create_cannot_reach_server)
+                        e is java.net.ConnectException -> UiText.Res(R.string.create_cannot_connect_server)
+                        e.message?.contains("timeout", ignoreCase = true) == true -> UiText.Res(R.string.create_request_timed_out)
+                        else -> UiText.Res(R.string.browse_connection_error, listOf(exceptionText(e)))
                     }
                 }
                 null
@@ -502,7 +524,7 @@ class GameGenerationViewModel : ViewModel() {
                 submitResp.close()
                 val jobId = submitJson.optString("jobId", "")
                 if (jobId.isBlank()) {
-                    withContext(Dispatchers.Main) { errorMessage = "Server did not return a jobId" }
+                    withContext(Dispatchers.Main) { errorMessage = UiText.Res(R.string.create_no_job_id) }
                     return@withContext null
                 }
                 Log.d(TAG, "$logPrefix jobId=$jobId; polling every ${POLL_INTERVAL_MS}ms")
@@ -532,7 +554,7 @@ class GameGenerationViewModel : ViewModel() {
                             // 15 consecutive fails ≈ 45s of no signal → give up
                             if (consecutivePollErrors >= 15) {
                                 withContext(Dispatchers.Main) {
-                                    errorMessage = "Lost contact with build server. Try again."
+                                    errorMessage = UiText.Res(R.string.create_lost_contact)
                                 }
                                 return@withContext null
                             }
@@ -551,8 +573,8 @@ class GameGenerationViewModel : ViewModel() {
                         val eta = pollJson.optInt("estimatedSecondsRemaining", 0)
 
                         withContext(Dispatchers.Main) {
-                            buildPhase = message
-                            buildDetail = detail
+                            buildPhase = serverText(message)
+                            buildDetail = serverText(detail)
                             progressPercent = pct
                             estimatedSecondsRemaining = eta
                             phaseStartPct = pct
@@ -576,7 +598,10 @@ class GameGenerationViewModel : ViewModel() {
                             val errMsg = pollJson.optString("error", "Generation failed")
                             val reason = pollJson.optString("reason", "")
                             Log.e(TAG, "$logPrefix job failed reason=$reason: $errMsg")
-                            withContext(Dispatchers.Main) { errorMessage = errMsg }
+                            val hasServerError = pollJson.has("error")
+                            withContext(Dispatchers.Main) {
+                                errorMessage = if (hasServerError) UiText.Raw(errMsg) else UiText.Res(R.string.browse_generation_failed)
+                            }
                             return@withContext null
                         }
                     } catch (e: Exception) {
@@ -584,7 +609,7 @@ class GameGenerationViewModel : ViewModel() {
                         consecutivePollErrors++
                         if (consecutivePollErrors >= 15) {
                             withContext(Dispatchers.Main) {
-                                errorMessage = "Network unstable. Please try again."
+                                errorMessage = UiText.Res(R.string.create_network_unstable)
                             }
                             return@withContext null
                         }
@@ -593,7 +618,7 @@ class GameGenerationViewModel : ViewModel() {
 
                 if (bundleBase64Result == null) {
                     withContext(Dispatchers.Main) {
-                        errorMessage = "Game generation timed out after 30 minutes. Try a simpler prompt."
+                        errorMessage = UiText.Res(R.string.create_generation_timed_out)
                     }
                     return@withContext null
                 }
@@ -605,15 +630,15 @@ class GameGenerationViewModel : ViewModel() {
                 } catch (_: Exception) {}
 
                 withContext(Dispatchers.Main) {
-                    buildPhase = "Extracting game..."
-                    buildDetail = ""
+                    buildPhase = UiText.Res(R.string.create_extracting_game)
+                    buildDetail = null
                     progressPercent = 95f
                 }
 
                 val dir = extractGameBundle(context, bundleBase64Result!!)
                 if (dir == null) {
                     withContext(Dispatchers.Main) {
-                        errorMessage = "Failed to extract game bundle. Please try again."
+                        errorMessage = UiText.Res(R.string.create_extract_failed)
                     }
                     return@withContext null
                 }
@@ -623,9 +648,9 @@ class GameGenerationViewModel : ViewModel() {
                 Log.e(TAG, "Poll error", e)
                 withContext(Dispatchers.Main) {
                     errorMessage = when {
-                        e is java.net.UnknownHostException -> "Cannot reach server. Please check your internet connection."
-                        e is java.net.ConnectException -> "Cannot connect to server. Please try again later."
-                        else -> "Generation error: ${e.localizedMessage ?: "Unknown error"}"
+                        e is java.net.UnknownHostException -> UiText.Res(R.string.create_cannot_reach_server)
+                        e is java.net.ConnectException -> UiText.Res(R.string.create_cannot_connect_server)
+                        else -> UiText.Res(R.string.create_generation_error, listOf(exceptionText(e)))
                     }
                 }
                 null
@@ -633,11 +658,20 @@ class GameGenerationViewModel : ViewModel() {
         }
     }
 
+    /** Status text from the server is shown as received; an empty message shows nothing (the UI has its own default). */
+    private fun serverText(text: String): UiText? = if (text.isEmpty()) null else UiText.Raw(text)
+
+    private fun serverErrorText(serverError: String?, httpCode: Int): UiText =
+        if (serverError != null) UiText.Raw(serverError) else UiText.Res(R.string.create_server_error, listOf(httpCode))
+
+    private fun exceptionText(e: Exception): UiText =
+        e.localizedMessage?.let { UiText.Raw(it) } ?: UiText.Res(R.string.browse_webview_unknown_error)
+
     // Shared error handler for both the sync submit and the polling submit.
     // Sets the correct paywall/rate-limit state and returns null so the caller
     // can early-return.
     private suspend fun handleSubmitError(response: Response): GenerationResult? {
-        var serverError = "Server error (${response.code})"
+        var serverError: String? = null
         var canUseCoinsFlag = false
         var coinCost = 10
         try {
@@ -664,7 +698,7 @@ class GameGenerationViewModel : ViewModel() {
             }
             return null
         }
-        withContext(Dispatchers.Main) { errorMessage = serverError }
+        withContext(Dispatchers.Main) { errorMessage = serverErrorText(serverError, response.code) }
         return null
     }
 

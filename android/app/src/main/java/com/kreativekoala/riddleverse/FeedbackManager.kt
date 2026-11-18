@@ -382,13 +382,13 @@ data class FeedbackData(
     /**
      * Generate main feedback message
      */
-    val mainMessage: String
-        get() = customMessage ?: if (isCorrect) {
+    fun mainMessage(context: android.content.Context): String =
+        customMessage ?: if (isCorrect) {
             progressionResult?.let { result ->
-                "Correct! +${result.scoreBreakdown.totalScore} points"
-            } ?: "Correct!"
+                context.getString(R.string.done_feedback_correct_points, result.scoreBreakdown.totalScore)
+            } ?: context.getString(R.string.correct)
         } else {
-            "Try again! Keep practicing! 💪"
+            context.getString(R.string.done_feedback_try_again)
         }
 
     /**

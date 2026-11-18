@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 
 // --- classic puzzles (feat/puzzles-classic) --- Disc Tower screen
 
@@ -73,9 +74,9 @@ fun DiscTowerScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
         level = level,
         subtitle = "Move all $discs discs to the right-hand peg. Never put a bigger disc on a smaller one.",
         stats = listOf(
-            "Moves" to game.moves.toString(),
-            "Par" to game.par.toString(),
-            "Best" to (best?.toString() ?: "-"),
+            stringResource(R.string.xa_stat_moves) to game.moves.toString(),
+            stringResource(R.string.xa_stat_par) to game.par.toString(),
+            stringResource(R.string.xa_stat_best) to (best?.toString() ?: "-"),
         ),
         onBack = onBack,
     ) {
@@ -130,7 +131,7 @@ fun DiscTowerScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
                 onClick = { game = game.undo(); selected = -1; message = "" },
                 enabled = game.canUndo && !solved,
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null); Text("  Undo") }
+            ) { Icon(Icons.AutoMirrored.Filled.Undo, contentDescription = null); Text("  " + stringResource(R.string.xa_undo)) }
             FilledTonalButton(
                 onClick = {
                     game.hintMove()?.let { (f, t) ->
@@ -141,7 +142,7 @@ fun DiscTowerScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
                 },
                 enabled = !solved,
                 modifier = Modifier.weight(1f).heightIn(min = 48.dp),
-            ) { Icon(Icons.Default.Lightbulb, contentDescription = null); Text("  Hint ($hintsUsed)") }
+            ) { Icon(Icons.Default.Lightbulb, contentDescription = null); Text("  " + stringResource(R.string.xa_hint_count, hintsUsed)) }
         }
     }
 
@@ -151,9 +152,9 @@ fun DiscTowerScreen(tier: Int, level: String, onBack: () -> Unit, onFinish: (Boo
             success = true,
             headline = "Tower moved!",
             lines = buildList {
-                add("Moves: ${game.moves} (best possible ${game.par})")
-                if (hintsUsed > 0) add("Hints used: $hintsUsed")
-                if (newBest) add("New best!")
+                add(stringResource(R.string.xa_moves_best_possible, game.moves, game.par))
+                if (hintsUsed > 0) add(stringResource(R.string.xa_hints_used_value, hintsUsed))
+                if (newBest) add(stringResource(R.string.xa_new_best))
             },
             onContinue = { if (!reported) { reported = true; onFinish(true, score) } },
         )

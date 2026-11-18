@@ -31,6 +31,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 data class ColorShapeChallenge(
     val shapeColor: Color,
@@ -162,7 +163,7 @@ private fun DifficultyBadge(
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = difficulty.uppercase(),
+            text = rvDifficultyLabel(difficulty).uppercase(),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = textColor
@@ -505,7 +506,7 @@ fun ColorShapeMatchingPuzzleScreen(
                     )
 
                     Text(
-                        text = "Score: $score",
+                        text = stringResource(R.string.xa_score_value, score),
                         fontSize = 14.sp,
                         color = RvInkSoft
                     )

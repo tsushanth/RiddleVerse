@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -51,7 +53,7 @@ fun DifficultySettingsSection() {
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = "Default Difficulty",
+            text = stringResource(R.string.default_difficulty),
             fontWeight = FontWeight.SemiBold,
             fontSize = 18.sp,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -72,7 +74,7 @@ fun DifficultySettingsSection() {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Tune,
-                        contentDescription = "Difficulty Settings",
+                        contentDescription = stringResource(R.string.stats_difficulty_settings),
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(24.dp)
                     )
@@ -81,7 +83,7 @@ fun DifficultySettingsSection() {
 
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Set your preferred difficulty level",
+                            text = stringResource(R.string.stats_set_preferred_difficulty),
                             fontSize = 14.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -112,7 +114,7 @@ fun DifficultySettingsSection() {
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Text(
-                            text = difficulty,
+                            text = rvDifficultyLabel(difficulty),
                             fontSize = 16.sp,
                             modifier = Modifier.weight(1f)
                         )
@@ -120,7 +122,7 @@ fun DifficultySettingsSection() {
                         if (selectedDifficulty == difficulty) {
                             Icon(
                                 imageVector = Icons.Default.Check,
-                                contentDescription = "Selected",
+                                contentDescription = stringResource(R.string.stats_selected),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -152,7 +154,7 @@ fun DifficultySettingsSection() {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     Text(
-                        text = "You can still change difficulty when starting any puzzle",
+                        text = stringResource(R.string.stats_difficulty_change_note),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

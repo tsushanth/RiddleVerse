@@ -21,7 +21,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,7 +66,7 @@ fun MemorySquaresAnalyticsScreen(
 
             Icon(
                 Icons.Default.Analytics,
-                contentDescription = "Analytics",
+                contentDescription = stringResource(R.string.stats_analytics),
                 tint = RvInk
             )
         }
@@ -92,13 +94,13 @@ fun MemorySquaresAnalyticsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Current Level",
+                                text = stringResource(R.string.stats_current_level),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Icon(
                                 Icons.Default.TrendingUp,
-                                contentDescription = "Level",
+                                contentDescription = stringResource(R.string.level_label),
                                 tint = Color(0xFF4CAF50)
                             )
                         }
@@ -106,14 +108,14 @@ fun MemorySquaresAnalyticsScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Text(
-                            text = currentDifficulty.name,
+                            text = rvDifficultyLabel(currentDifficulty.name),
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF2196F3)
                         )
 
                         Text(
-                            text = "${currentDifficulty.gridSize}×${currentDifficulty.gridSize} grid • ${currentDifficulty.targetCount} targets",
+                            text = stringResource(R.string.stats_grid_targets, currentDifficulty.gridSize, currentDifficulty.targetCount),
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
@@ -125,21 +127,21 @@ fun MemorySquaresAnalyticsScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             MetricChip(
-                                label = "Memorize Time",
-                                value = "${currentDifficulty.memorizeTime}s",
+                                label = stringResource(R.string.stats_memorize_time),
+                                value = stringResource(R.string.stats_seconds_short, currentDifficulty.memorizeTime),
                                 icon = Icons.Default.Timer,
                                 color = Color(0xFFFF9800)
                             )
 
                             MetricChip(
-                                label = "Lives",
+                                label = stringResource(R.string.stats_lives),
                                 value = "${currentDifficulty.livesAllowed}",
                                 icon = Icons.Default.Favorite,
                                 color = Color(0xFFF44336)
                             )
 
                             MetricChip(
-                                label = "Points",
+                                label = stringResource(R.string.stats_points),
                                 value = "${currentDifficulty.basePoints}",
                                 icon = Icons.Default.Star,
                                 color = Color(0xFF9C27B0)
@@ -173,7 +175,7 @@ fun MemorySquaresAnalyticsScreen(
                             )
                             Icon(
                                 Icons.Default.Assessment,
-                                contentDescription = "Stats",
+                                contentDescription = stringResource(R.string.stats_stats),
                                 tint = Color(0xFF673AB7)
                             )
                         }
@@ -188,21 +190,21 @@ fun MemorySquaresAnalyticsScreen(
                                 StatCard(
                                     title = stringResource(R.string.accuracy),
                                     value = "${analytics["averageAccuracy"]}%",
-                                    subtitle = "Average",
+                                    subtitle = stringResource(R.string.cat_average_title),
                                     color = getAccuracyColor(analytics["averageAccuracy"] as? Int ?: 0)
                                 )
 
                                 StatCard(
                                     title = stringResource(R.string.avg_time),
-                                    value = "${analytics["averageTime"]}s",
-                                    subtitle = "Per game",
+                                    value = stringResource(R.string.stats_seconds_short, analytics["averageTime"] as? Int ?: 0),
+                                    subtitle = stringResource(R.string.stats_per_game),
                                     color = Color(0xFF00BCD4)
                                 )
 
                                 StatCard(
                                     title = stringResource(R.string.streak_label),
                                     value = "${analytics["currentStreak"]}",
-                                    subtitle = "Current",
+                                    subtitle = stringResource(R.string.common_current),
                                     color = if ((analytics["currentStreak"] as? Int ?: 0) > 0)
                                         Color(0xFFFF6F00) else Color.Gray
                                 )
@@ -215,16 +217,20 @@ fun MemorySquaresAnalyticsScreen(
                                 horizontalArrangement = Arrangement.SpaceEvenly
                             ) {
                                 StatCard(
-                                    title = "Games",
+                                    title = stringResource(R.string.tab_games),
                                     value = "${analytics["gamesPlayed"]}",
-                                    subtitle = "Played",
+                                    subtitle = stringResource(R.string.stats_played),
                                     color = RvInkSoft
                                 )
 
                                 StatCard(
-                                    title = "Trend",
-                                    value = "${analytics["trend"]}",
-                                    subtitle = "Performance",
+                                    title = stringResource(R.string.stats_trend),
+                                    value = when (analytics["trend"]) {
+                                        "Improving" -> stringResource(R.string.stats_status_improving)
+                                        "Declining" -> stringResource(R.string.stats_trend_declining)
+                                        else -> stringResource(R.string.stats_trend_stable)
+                                    },
+                                    subtitle = stringResource(R.string.stats_performance),
                                     color = when (analytics["trend"]) {
                                         "Improving" -> Color(0xFF4CAF50)
                                         "Declining" -> Color(0xFFF44336)
@@ -233,15 +239,15 @@ fun MemorySquaresAnalyticsScreen(
                                 )
 
                                 StatCard(
-                                    title = "Adaptations",
+                                    title = stringResource(R.string.stats_adaptations),
                                     value = "${analytics["adaptationCount"]}",
-                                    subtitle = "This session",
+                                    subtitle = stringResource(R.string.stats_this_session),
                                     color = Color(0xFF3F51B5)
                                 )
                             }
                         } else {
                             Text(
-                                text = "Play a few games to see your performance analytics!",
+                                text = stringResource(R.string.stats_play_few_games),
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth().padding(20.dp),
                                 color = Color.Gray
@@ -269,13 +275,13 @@ fun MemorySquaresAnalyticsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Difficulty Journey",
+                                text = stringResource(R.string.stats_difficulty_journey),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Icon(
                                 Icons.Default.Timeline,
-                                contentDescription = "Journey",
+                                contentDescription = stringResource(R.string.stats_journey),
                                 tint = Color(0xFF795548)
                             )
                         }
@@ -305,13 +311,13 @@ fun MemorySquaresAnalyticsScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Adaptive Insights",
+                                text = stringResource(R.string.stats_adaptive_insights),
                                 fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold
                             )
                             Icon(
                                 Icons.Default.Lightbulb,
-                                contentDescription = "Insights",
+                                contentDescription = stringResource(R.string.stats_insights),
                                 tint = Color(0xFFFFC107)
                             )
                         }
@@ -441,19 +447,19 @@ fun DifficultyProgressionTimeline(currentDifficulty: DifficultyManager.Difficult
                     when {
                         isCurrentLevel -> Icon(
                             Icons.Default.RadioButtonChecked,
-                            contentDescription = "Current",
+                            contentDescription = stringResource(R.string.common_current),
                             tint = RvInk,
                             modifier = Modifier.size(16.dp)
                         )
                         isPastLevel -> Icon(
                             Icons.Default.CheckCircle,
-                            contentDescription = "Completed",
+                            contentDescription = stringResource(R.string.completed),
                             tint = RvInk,
                             modifier = Modifier.size(16.dp)
                         )
                         else -> Icon(
                             Icons.Default.Circle,
-                            contentDescription = "Future",
+                            contentDescription = stringResource(R.string.stats_future),
                             tint = RvInkSoft.copy(alpha = 0.5f),
                             modifier = Modifier.size(16.dp)
                         )
@@ -463,7 +469,7 @@ fun DifficultyProgressionTimeline(currentDifficulty: DifficultyManager.Difficult
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = level,
+                    text = rvDifficultyLabel(level),
                     fontSize = 8.sp,
                     fontWeight = if (isCurrentLevel) FontWeight.Bold else FontWeight.Normal,
                     color = if (isCurrentLevel) Color(0xFF2196F3) else Color.Gray,
@@ -483,8 +489,8 @@ fun InsightCards(analytics: Map<String, Any>, currentDifficulty: DifficultyManag
         // Adaptive AI Explanation
         InsightCard(
             icon = Icons.Default.Psychology,
-            title = "How Adaptive Difficulty Works",
-            description = "The AI monitors your accuracy, speed, and streak to automatically adjust challenge level. Perfect games increase difficulty, while struggles reduce it for optimal learning.",
+            title = stringResource(R.string.stats_insight_how_title),
+            description = stringResource(R.string.stats_insight_how_desc),
             color = Color(0xFF9C27B0)
         )
 
@@ -497,22 +503,22 @@ fun InsightCards(analytics: Map<String, Any>, currentDifficulty: DifficultyManag
             when {
                 accuracy >= 90 -> InsightCard(
                     icon = Icons.Default.EmojiEvents,
-                    title = "Excellent Memory Skills!",
-                    description = "Your ${accuracy}% accuracy shows strong spatial memory. The AI may increase difficulty to keep you challenged.",
+                    title = stringResource(R.string.stats_insight_excellent_title),
+                    description = stringResource(R.string.stats_insight_excellent_desc, accuracy),
                     color = Color(0xFF4CAF50)
                 )
 
                 accuracy >= 70 -> InsightCard(
                     icon = Icons.Default.TrendingUp,
-                    title = "Good Progress",
-                    description = "Your ${accuracy}% accuracy is solid. Keep practicing pattern recognition and chunking strategies.",
+                    title = stringResource(R.string.stats_insight_good_title),
+                    description = stringResource(R.string.stats_insight_good_desc, accuracy),
                     color = Color(0xFF2196F3)
                 )
 
                 accuracy < 50 -> InsightCard(
                     icon = Icons.Default.School,
-                    title = "Learning Mode",
-                    description = "The AI detected struggles and reduced difficulty. Focus on creating mental stories to link square positions.",
+                    title = stringResource(R.string.stats_insight_learning_title),
+                    description = stringResource(R.string.stats_insight_learning_desc),
                     color = Color(0xFFFF9800)
                 )
             }
@@ -520,8 +526,8 @@ fun InsightCards(analytics: Map<String, Any>, currentDifficulty: DifficultyManag
             if (streak >= 3) {
                 InsightCard(
                     icon = Icons.Default.LocalFireDepartment,
-                    title = "On Fire! 🔥",
-                    description = "Your ${streak}-game streak shows mastery! Expect the AI to challenge you with larger grids soon.",
+                    title = stringResource(R.string.stats_insight_fire_title),
+                    description = LocalContext.current.resources.getQuantityString(R.plurals.stats_insight_fire_desc, streak, streak),
                     color = Color(0xFFFF6F00)
                 )
             }
@@ -529,15 +535,15 @@ fun InsightCards(analytics: Map<String, Any>, currentDifficulty: DifficultyManag
             when (trend) {
                 "Improving" -> InsightCard(
                     icon = Icons.Default.TrendingUp,
-                    title = "Improving Performance",
-                    description = "Your skills are developing! The adaptive system will gradually increase complexity as you improve.",
+                    title = stringResource(R.string.stats_insight_improving_title),
+                    description = stringResource(R.string.stats_insight_improving_desc),
                     color = Color(0xFF4CAF50)
                 )
 
                 "Declining" -> InsightCard(
                     icon = Icons.Default.SupportAgent,
-                    title = "Difficulty Adjusted",
-                    description = "The AI noticed recent struggles and reduced difficulty to help rebuild confidence and skills.",
+                    title = stringResource(R.string.stats_insight_adjusted_title),
+                    description = stringResource(R.string.stats_insight_adjusted_desc),
                     color = Color(0xFF2196F3)
                 )
             }
@@ -547,22 +553,22 @@ fun InsightCards(analytics: Map<String, Any>, currentDifficulty: DifficultyManag
         when {
             currentDifficulty.gridSize <= 4 -> InsightCard(
                 icon = Icons.Default.TipsAndUpdates,
-                title = "Beginner Memory Tip",
-                description = "Try the 'story method': create a mental story connecting the highlighted squares. For example, imagine a path or shape.",
+                title = stringResource(R.string.stats_insight_tip_beginner_title),
+                description = stringResource(R.string.stats_insight_tip_beginner_desc),
                 color = RvInkSoft
             )
 
             currentDifficulty.gridSize == 5 -> InsightCard(
                 icon = Icons.Default.Extension,
-                title = "Chunking Strategy",
-                description = "Group nearby squares into patterns or shapes. Your brain remembers 3-4 groups better than individual positions.",
+                title = stringResource(R.string.stats_insight_tip_chunking_title),
+                description = stringResource(R.string.stats_insight_tip_chunking_desc),
                 color = RvInkSoft
             )
 
             currentDifficulty.gridSize >= 6 -> InsightCard(
                 icon = Icons.Default.Memory,
-                title = "Advanced Technique",
-                description = "Use the 'palace method': imagine familiar locations and place each square there. This leverages spatial memory.",
+                title = stringResource(R.string.stats_insight_tip_advanced_title),
+                description = stringResource(R.string.stats_insight_tip_advanced_desc),
                 color = RvInkSoft
             )
         }

@@ -146,13 +146,13 @@ class MainActivity : AppCompatActivity() {
                             }
                         )
                     }
-                    Toast.makeText(this@MainActivity, "Signed in successfully!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MainActivity, R.string.onb_main_signed_in, Toast.LENGTH_SHORT).show()
                     startActivity(Intent(this@MainActivity, HomeActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     })
                     finish()
                 } else {
-                    Toast.makeText(this@MainActivity, "Sign-in failed. Please try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@MainActivity, R.string.onb_main_sign_in_failed, Toast.LENGTH_LONG).show()
                     navigateToDefaultScreen()
                 }
             }
@@ -185,7 +185,7 @@ class MainActivity : AppCompatActivity() {
                         finish()
                     } else {
                         Log.e("MainActivity", "Failed to fetch puzzle data or empty puzzle list")
-                        Toast.makeText(this, "Failed to load puzzle.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, R.string.onb_main_load_puzzle_failed, Toast.LENGTH_LONG).show()
                         navigateToDefaultScreen()
                     }
                 }
@@ -469,7 +469,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "🧩 CREATE • SOLVE • CONQUER 🏆",
+                        text = "🧩 ${stringResource(R.string.onb_main_tagline)} 🏆",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
@@ -479,7 +479,7 @@ fun WelcomeScreen(onGetStartedClick: () -> Unit) {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = "Craft mind-bending puzzles,\nchallenge friends worldwide &\ndominate the leaderboards!",
+                        text = stringResource(R.string.onb_main_blurb),
                         fontSize = 14.sp,
                         color = Color.Gray,
                         textAlign = TextAlign.Center,

@@ -37,8 +37,8 @@ fun RewardCelebrationPanel(
     targetScore: Int = remember { Random.nextInt(80, 280) },
     streakToday: Int = remember { Random.nextInt(1, 7) },
     streakGoal: Int = 7,
-    rewardTitle: String = "Reward Unlocked",
-    rewardSubtitle: String = "+${remember { Random.nextInt(50, 250) }} XP",
+    rewardTitle: String = stringResource(R.string.done_reward_unlocked),
+    rewardSubtitle: String = stringResource(R.string.done_plus_xp, remember { Random.nextInt(50, 250) }),
 ) {
     // pick ONE extra FX each time this panel is shown
     val cExtraFx = remember { CExtraFx.entries.random() } // Randomized among the 5
@@ -206,7 +206,7 @@ private fun CardFlipRewardReveal(
             ) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Text(
-                        "Tap to Reveal",
+                        stringResource(R.string.done_tap_to_reveal),
                         color = RvInkSoft.copy(alpha = 0.7f),
                         fontSize = 18.sp
                     )

@@ -1234,7 +1234,7 @@ fun AdaptiveMathComparisonPuzzleScreen(
                             ) {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
-                                        if (isCorrect) "✅ Correct!" else "❌ Wrong answer. Lives: $currentHearts",
+                                        if (isCorrect) "✅ ${stringResource(R.string.correct)}" else "❌ ${stringResource(R.string.xa_wrong_answer_lives, currentHearts)}",
                                         color = RvOnTone,
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium,
@@ -1346,7 +1346,7 @@ private fun AdaptiveMathComparisonTopBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -1468,7 +1468,7 @@ private fun AdaptiveMathNotificationCard(
         ) {
             Icon(
                 Icons.Default.Functions,
-                contentDescription = "Math adapted",
+                contentDescription = stringResource(R.string.xa_math_adapted),
                 tint = RvInk,
                 modifier = Modifier.size(20.dp)
             )
@@ -1481,7 +1481,7 @@ private fun AdaptiveMathNotificationCard(
                     color = RvInk
                 )
                 Text(
-                    text = adaptationInfo?.adjustmentReason ?: "",
+                    text = adaptationInfo?.adjustmentReason.asString(),
                     fontSize = 10.sp,
                     color = RvInkSoft.copy(alpha = 0.9f)
                 )
@@ -1492,7 +1492,7 @@ private fun AdaptiveMathNotificationCard(
             ) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.welcome_back_dismiss),
                     tint = RvInk,
                     modifier = Modifier.size(16.dp)
                 )

@@ -359,7 +359,7 @@ fun AdaptiveCryptoWordScreenWithTimer(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                 ) {
                     Text(
-                        text = "🎉 Puzzle Solved! Score: $finalScore",
+                        text = "🎉 ${stringResource(R.string.xa_puzzle_solved_score, finalScore)}",
                         modifier = Modifier.padding(8.dp).fillMaxWidth(),
                         style = MaterialTheme.typography.titleMedium,
                         textAlign = TextAlign.Center,
@@ -494,7 +494,7 @@ fun AdaptiveCryptoWordScreenWithTimer(
             },
             title = { Text(stringResource(R.string.game_over)) },
             text = {
-                Text("You've lost all your hearts! Better luck next time.")
+                Text(stringResource(R.string.common_hearts_all_lost))
             }
         )
     }
@@ -549,7 +549,7 @@ private fun AdaptiveCryptoPuzzleHeader(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Level ${level.level}",
+                text = stringResource(R.string.stats_level_number, level.level),
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.Gray
@@ -811,7 +811,7 @@ private fun AdaptiveMultiWordRowDisplay(
                         Box(modifier = Modifier.size(cell), contentAlignment = Alignment.Center) {
                             Icon(
                                 Icons.Default.Lock,
-                                contentDescription = "Locked",
+                                contentDescription = stringResource(R.string.common_locked),
                                 tint = RvFlame,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -946,7 +946,7 @@ private fun AdaptiveQuoteRevealDialog(
                 )
             ) {
                 Text(
-                    text = "Continue",
+                    text = stringResource(R.string.continue_label),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -971,7 +971,7 @@ private fun AdaptiveQuoteRevealDialog(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Score: $finalScore points",
+                    text = stringResource(R.string.xa_score_points, finalScore),
                     style = MaterialTheme.typography.titleMedium,
                     color = RvSuccess,
                     fontWeight = FontWeight.Medium,

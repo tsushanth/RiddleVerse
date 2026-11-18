@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import com.kreativekoala.riddleverse.ui.CappedFontScale
 import kotlinx.coroutines.delay
 import org.json.JSONObject
+import androidx.compose.ui.res.stringResource
 
 // --- linkup (feat/game-linkup) --- "Linkup" screen. Text is English-only like the other word games.
 
@@ -84,7 +85,7 @@ fun LinkupScreen(
                 Button(
                     onClick = { submit() }, enabled = state.selected.size == LinkupRules.GROUP_SIZE,
                     modifier = Modifier.heightIn(min = 48.dp).semantics { contentDescription = "Submit the four selected tiles" }
-                ) { Text("Submit") }
+                ) { Text(stringResource(R.string.submit)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 val left = LinkupRules.hintsLeft(state, profile)

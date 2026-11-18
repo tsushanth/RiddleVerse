@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -106,7 +107,7 @@ fun AntonymBalloonScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -224,7 +225,7 @@ fun SynonymGroupingScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -313,7 +314,7 @@ fun MemoryStoryScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -427,7 +428,7 @@ fun MemorySequencingScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }
@@ -514,7 +515,7 @@ fun MemoryRetentionScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading next puzzle...")
+                Text(stringResource(R.string.loading_next_puzzle))
             }
         }
     }

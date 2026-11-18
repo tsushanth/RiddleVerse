@@ -522,7 +522,7 @@ fun WordSnakeScreen(
                         .heightIn(min = 48.dp)
                         .testTag("snake_clear")
                 ) {
-                    Text("CLEAR", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text(stringResource(R.string.clear).uppercase(), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
 
                 OutlinedButton(
@@ -556,7 +556,7 @@ fun WordSnakeScreen(
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("RESET", fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                    Text(stringResource(R.string.reset).uppercase(), fontSize = 14.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 }
             }
         }
@@ -611,7 +611,7 @@ fun WordSnakeScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Help,
-                            contentDescription = "Hints",
+                            contentDescription = stringResource(R.string.common_hints),
                             tint = RvInk
                         )
                     }

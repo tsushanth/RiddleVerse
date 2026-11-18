@@ -32,6 +32,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -406,7 +407,7 @@ fun AdaptiveMathExpressionPuzzleScreen(
                                 gameCompleted = true
                                 onBack()
                             },
-                            subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore \u2022 $correctAnswers/${adaptiveConfig.targetExpressions}",
+                            subtitle = "${rvDifficultyLabel(currentDifficultyLevel.name)} \u2022 ${stringResource(R.string.score_label)} $totalScore \u2022 $correctAnswers/${adaptiveConfig.targetExpressions}",
                             lives = currentHearts,
                             urgent = timeLeft <= 30,
                             onPause = { isPaused = !isPaused }
@@ -995,9 +996,9 @@ fun AdaptiveGameOverOverlay(
             ) {
                 Text(
                     text = when (gameState) {
-                        AdaptiveGameState.WON -> "🎉 Excellent!"
-                        AdaptiveGameState.TIME_UP -> "⏰ Time's Up!"
-                        AdaptiveGameState.LOST -> "💔 Game Over"
+                        AdaptiveGameState.WON -> "🎉 ${stringResource(R.string.xa_excellent)}"
+                        AdaptiveGameState.TIME_UP -> "⏰ ${stringResource(R.string.common_times_up)}"
+                        AdaptiveGameState.LOST -> "💔 ${stringResource(R.string.common_game_over)}"
                         else -> stringResource(R.string.game_over)
                     },
                     fontSize = 24.sp,

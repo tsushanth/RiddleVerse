@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -96,9 +97,9 @@ fun WordHiveScreen(
         // Pinned (measured): action rows are always on screen; the honeycomb scales into what is left.
         bottomBar = if (finished) null else ({
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                WordActionButton("Delete", "Delete last letter", enabled = entry.isNotEmpty()) { entry = entry.dropLast(1) }
+                WordActionButton(stringResource(R.string.browse_delete), "Delete last letter", enabled = entry.isNotEmpty()) { entry = entry.dropLast(1) }
                 WordActionButton("Shuffle", "Shuffle outer letters") { shuffleSeed += 1 }
-                Button(onClick = { submit() }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Enter") }
+                Button(onClick = { submit() }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.xb_enter_button)) }
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 WordActionButton("Hint (-10 pts)", "Show the start of a word you have not found") {
@@ -110,7 +111,7 @@ fun WordHiveScreen(
                         message = "Try: ${w.take(2).uppercase()}... (${w.length} letters)"
                     }
                 }
-                WordActionButton(if (success) "Finish" else "Give up", if (success) "Finish with your rank" else "Give up and see results") { finished = true }
+                WordActionButton(if (success) stringResource(R.string.xb_finish) else stringResource(R.string.give_up), if (success) "Finish with your rank" else "Give up and see results") { finished = true }
             }
             if (success) Text("Goal reached! Keep going for a higher rank or finish.", fontSize = 13.sp,
                 color = WordPuzzleColors.correct, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))

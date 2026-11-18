@@ -845,14 +845,14 @@ private fun FeedbackDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = if (isCorrect) "Excellent!" else "Not quite",
+                text = if (isCorrect) stringResource(R.string.xa_excellent) else stringResource(R.string.xa_not_quite),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
         },
         text = {
             Column {
-                Text("Score: $score points")
+                Text(stringResource(R.string.xa_score_points, score))
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Correct items: ${correctAnswers.joinToString(", ")}")
                 if (!isCorrect) {

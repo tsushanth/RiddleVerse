@@ -28,6 +28,8 @@ import kotlinx.coroutines.delay
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import androidx.compose.ui.res.stringResource
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 // Enhanced conversion puzzle with adaptive difficulty
 data class AdaptiveConversionPuzzle(
@@ -758,7 +760,7 @@ fun AdaptiveConversionTopGameBar(
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.back),
                     tint = RvInk,
                     modifier = Modifier.size(28.dp)
                 )
@@ -776,7 +778,7 @@ fun AdaptiveConversionTopGameBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -784,7 +786,7 @@ fun AdaptiveConversionTopGameBar(
 
                 // Adaptive difficulty indicator
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color.Cyan

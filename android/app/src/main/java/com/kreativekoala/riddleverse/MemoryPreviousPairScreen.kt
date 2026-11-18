@@ -545,7 +545,7 @@ fun MemoryPreviousPairPuzzleScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Correct: $correctAnswers/$totalQuestions",
+                    text = stringResource(R.string.xa_correct_ratio, correctAnswers, totalQuestions),
                     color = RvInkSoft,
                     fontSize = 14.sp,
                     maxLines = 1
@@ -561,7 +561,7 @@ fun MemoryPreviousPairPuzzleScreen(
                 }
                 if (!compact && bestStreak > 1) {
                     Text(
-                        text = "🔥 Best streak: $bestStreak",
+                        text = "🔥 ${stringResource(R.string.xa_best_streak_value, bestStreak)}",
                         color = darkOrange,
                         fontSize = 12.sp,
                         maxLines = 1

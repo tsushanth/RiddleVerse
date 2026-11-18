@@ -65,12 +65,14 @@ fun GameRemixSheet(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-    val displayName = PuzzleTypeNames.display(puzzleType)
+    val displayName = PuzzleTypeNames.display(context, puzzleType)
 
     val currentUserName = FirebaseAuth.getInstance().currentUser?.displayName
         ?: FirebaseAuth.getInstance().currentUser?.email?.substringBefore("@")
-        ?: "Player"
-    var gameTitle by remember { mutableStateOf("$displayName Custom $currentUserName") }
+        ?: stringResource(R.string.browse_remix_default_player)
+    val defaultGameTitle = stringResource(R.string.browse_remix_default_title, displayName, currentUserName)
+    val myGameTitle = stringResource(R.string.browse_remix_my_game_title, displayName)
+    var gameTitle by remember { mutableStateOf(defaultGameTitle) }
     var remixDescription by remember { mutableStateOf("") }
     var showGamePlay by remember { mutableStateOf(false) }
     var isListening by remember { mutableStateOf(false) }
@@ -155,10 +157,10 @@ fun GameRemixSheet(
         else -> RvSuccessEdge
     }
     val qualityLabel = when (qualityLevel) {
-        0 -> if (remixDescription.isEmpty()) "0/500" else "Too short"
-        1 -> "Basic"
-        2 -> "Good"
-        else -> "Great detail!"
+        0 -> if (remixDescription.isEmpty()) "0/500" else stringResource(R.string.browse_remix_quality_too_short)
+        1 -> stringResource(R.string.browse_remix_quality_basic)
+        2 -> stringResource(R.string.browse_remix_quality_good)
+        else -> stringResource(R.string.browse_remix_quality_great)
     }
     val qualityProgress = (descLen.toFloat() / 150f).coerceAtMost(1f)
 
@@ -206,7 +208,7 @@ fun GameRemixSheet(
         val desc = remixDescription.trim()
         if (desc.isEmpty()) return
 
-        val effectiveTitle = gameTitle.trim().ifEmpty { "My $displayName Game" }
+        val effectiveTitle = gameTitle.trim().ifEmpty { myGameTitle }
 
         vm.isOnRemixSheet = true
         vm.startRemixGeneration(
@@ -277,7 +279,7 @@ fun GameRemixSheet(
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Remix: $displayName", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RvInk)
+                    Text(stringResource(R.string.browse_remix_title, displayName), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = RvInk)
                     Text(stringResource(R.string.create_your_version), fontSize = 12.sp, color = RvInkSoft)
                 }
                 Spacer(modifier = Modifier.weight(1f))
@@ -306,8 +308,8 @@ fun GameRemixSheet(
                     ) {
                         Icon(Icons.Default.Star, null, tint = RvSuccessEdge, modifier = Modifier.size(36.dp))
                         Column {
-                            Text("Create and share your own games", fontWeight = FontWeight.Bold, color = RvInk)
-                            Text("Remix this game and publish it for others to play", fontSize = 12.sp, color = RvInkSoft)
+                            Text(stringResource(R.string.create_share_games), fontWeight = FontWeight.Bold, color = RvInk)
+                            Text(stringResource(R.string.browse_remix_marketing_body), fontSize = 12.sp, color = RvInkSoft)
                         }
                     }
                 }
@@ -319,7 +321,7 @@ fun GameRemixSheet(
                     OutlinedTextField(
                         value = gameTitle, onValueChange = { gameTitle = it },
                         modifier = Modifier.fillMaxWidth(), singleLine = true,
-                        placeholder = { Text("My $displayName Game", color = RvInkSoft) },
+                        placeholder = { Text(myGameTitle, color = RvInkSoft) },
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = RvGrape, unfocusedBorderColor = RvOutline,
                             focusedContainerColor = RvSurface, unfocusedContainerColor = RvSurface,
@@ -338,7 +340,7 @@ fun GameRemixSheet(
                         onValueChange = { if (it.length <= 500) remixDescription = it },
                         modifier = Modifier.fillMaxWidth().height(120.dp),
                         placeholder = {
-                            Text("Describe gameplay changes, visual style, theme, difficulty tweaks, scoring rules...",
+                            Text(stringResource(R.string.browse_remix_description_placeholder),
                                 color = RvInkSoft)
                         },
                         colors = OutlinedTextFieldDefaults.colors(
@@ -386,13 +388,13 @@ fun GameRemixSheet(
                                 ) {
                                     Icon(
                                         imageVector = if (isListening) Icons.Default.Mic else Icons.Default.MicOff,
-                                        contentDescription = "Voice",
+                                        contentDescription = stringResource(R.string.browse_remix_voice),
                                         tint = if (isListening) RvError else RvViolet,
                                         modifier = Modifier.size(18.dp)
                                     )
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        if (isListening) "Listening..." else "Voice",
+                                        if (isListening) stringResource(R.string.browse_remix_listening) else stringResource(R.string.browse_remix_voice),
                                         fontSize = 12.sp, color = RvInkSoft
                                     )
                                 }
@@ -408,10 +410,10 @@ fun GameRemixSheet(
                                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Icon(Icons.Default.Image, "Attach image", tint = RvViolet, modifier = Modifier.size(18.dp))
+                                    Icon(Icons.Default.Image, stringResource(R.string.browse_remix_attach_image), tint = RvViolet, modifier = Modifier.size(18.dp))
                                     Spacer(modifier = Modifier.width(6.dp))
                                     Text(
-                                        if (selectedImageBase64 != null) "Image added" else "Reference",
+                                        if (selectedImageBase64 != null) stringResource(R.string.browse_remix_image_added) else stringResource(R.string.browse_remix_reference),
                                         fontSize = 12.sp, color = RvInkSoft
                                     )
                                 }
@@ -436,8 +438,8 @@ fun GameRemixSheet(
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 when (qualityLevel) {
-                                    0 -> "Tip: Describe gameplay mechanics, visual style, and rules for best results"
-                                    else -> "Add more detail — describe controls, scoring, difficulty, and visual style"
+                                    0 -> stringResource(R.string.browse_remix_tip_describe)
+                                    else -> stringResource(R.string.browse_remix_tip_add_detail)
                                 },
                                 fontSize = 11.sp, color = RvInkSoft
                             )
@@ -456,26 +458,33 @@ fun GameRemixSheet(
                     ) {
                         Image(
                             bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "Reference",
+                            contentDescription = stringResource(R.string.browse_remix_reference),
                             modifier = Modifier.size(56.dp).clip(RoundedCornerShape(16.dp)),
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(stringResource(R.string.reference_image), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = RvInk)
-                            Text("AI will use this as visual context", fontSize = 11.sp, color = RvInkSoft)
+                            Text(stringResource(R.string.browse_remix_image_context), fontSize = 11.sp, color = RvInkSoft)
                         }
                         IconButton(onClick = { selectedImageBitmap = null; selectedImageBase64 = null }) {
-                            Icon(Icons.Default.Close, "Remove", tint = RvInkSoft, modifier = Modifier.size(16.dp))
+                            Icon(Icons.Default.Close, stringResource(R.string.browse_remove), tint = RvInkSoft, modifier = Modifier.size(16.dp))
                         }
                     }
                 }
 
                 // Quick Ideas
                 Column {
-                    Text("Quick Ideas", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
+                    Text(stringResource(R.string.browse_remix_quick_ideas), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
                     Spacer(modifier = Modifier.height(8.dp))
-                    val suggestions = listOf("Make it harder", "Space theme", "Add a timer", "More questions", "Neon colors", "Kids friendly")
+                    val suggestions = listOf(
+                        stringResource(R.string.browse_remix_idea_harder),
+                        stringResource(R.string.browse_remix_idea_space),
+                        stringResource(R.string.browse_remix_idea_timer),
+                        stringResource(R.string.browse_remix_idea_questions),
+                        stringResource(R.string.browse_remix_idea_neon),
+                        stringResource(R.string.browse_remix_idea_kids)
+                    )
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         suggestions.take(3).forEach { s ->
                             RemixChip(s) { remixDescription = if (remixDescription.isEmpty()) s else "$remixDescription, ${s.lowercase()}" }
@@ -498,10 +507,10 @@ fun GameRemixSheet(
                     ) {
                         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                             Icon(Icons.Default.Warning, null, tint = RvError, modifier = Modifier.size(16.dp))
-                            Text(error, fontSize = 12.sp, color = RvInk)
+                            Text(error.asString(), fontSize = 12.sp, color = RvInk)
                             if (vm.needsSignIn) {
                                 val ctx = androidx.compose.ui.platform.LocalContext.current
-                                TextButton(onClick = { ctx.startActivity(GuestGate.signInIntent(ctx)) }) { Text("Sign in") }
+                                TextButton(onClick = { ctx.startActivity(GuestGate.signInIntent(ctx)) }) { Text(stringResource(R.string.auth_title_sign_in)) }
                             }
                         }
                     }
@@ -560,7 +569,7 @@ fun GameRemixSheet(
                         modifier = Modifier.width(250.dp),
                         color = RvSunEdge
                     )
-                    Text(vm.buildPhase, fontSize = 14.sp, color = RvInkSoft)
+                    Text(vm.buildPhase?.asString().orEmpty(), fontSize = 14.sp, color = RvInkSoft)
                     Text(stringResource(R.string.this_may_take_2_5_minutes), fontSize = 12.sp, color = RvInkSoft)
 
                     // Notify Me When Done button
@@ -580,11 +589,11 @@ fun GameRemixSheet(
                     }
 
                     Text(
-                        "You can leave this screen \u2014 we'll notify you!",
+                        stringResource(R.string.browse_remix_leave_notify),
                         fontSize = 11.sp, color = RvInkSoft
                     )
                     Text(
-                        "Your game will appear in Explore > Custom Games",
+                        stringResource(R.string.browse_remix_appears_in_custom),
                         fontSize = 11.sp, color = RvInkSoft
                     )
 
@@ -612,7 +621,7 @@ fun GameRemixSheet(
                         Icon(Icons.Default.Schedule, null, tint = RvSunEdge, modifier = Modifier.size(48.dp))
                         Text(stringResource(R.string.free_generations_used_up), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RvInk)
                         Text(
-                            "You've used all 5 free generations this hour.\nSpend ${vm.rateLimitCoinCost} coins to create this game now.",
+                            context.resources.getQuantityString(R.plurals.browse_rate_limit_body, vm.rateLimitCoinCost, vm.rateLimitCoinCost),
                             fontSize = 14.sp, color = RvInkSoft,
                             textAlign = TextAlign.Center
                         )
@@ -637,9 +646,9 @@ fun GameRemixSheet(
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         Icon(Icons.Default.Star, null, tint = Color.Yellow, modifier = Modifier.size(20.dp))
                                         Spacer(modifier = Modifier.width(8.dp))
-                                        Text("Use ${vm.rateLimitCoinCost} Coins", fontWeight = FontWeight.Bold, color = RvOnTone)
+                                        Text(context.resources.getQuantityString(R.plurals.browse_use_coins, vm.rateLimitCoinCost, vm.rateLimitCoinCost), fontWeight = FontWeight.Bold, color = RvOnTone)
                                         Spacer(modifier = Modifier.width(6.dp))
-                                        Text("($coinBalance available)", fontSize = 11.sp, color = RvOnTone.copy(alpha = 0.6f))
+                                        Text(stringResource(R.string.browse_coins_available, coinBalance), fontSize = 11.sp, color = RvOnTone.copy(alpha = 0.6f))
                                     }
                                 }
                             }
@@ -680,7 +689,7 @@ fun GameRemixSheet(
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Text(stringResource(R.string.subscribe_for_unlimited), fontWeight = FontWeight.Bold, color = RvOnTone)
                                     }
-                                    Text("Unlimited generations + monthly coins", fontSize = 11.sp, color = RvOnTone.copy(alpha = 0.6f))
+                                    Text(stringResource(R.string.browse_unlimited_generations_monthly_coins), fontSize = 11.sp, color = RvOnTone.copy(alpha = 0.6f))
                                 }
                             }
                         }
@@ -701,7 +710,7 @@ fun GameRemixSheet(
                 title = { Text(stringResource(R.string.buy_coins), color = RvInk, fontWeight = FontWeight.Bold) },
                 text = {
                     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("Purchase coins to create more games:", color = RvInkSoft, fontSize = 14.sp)
+                        Text(stringResource(R.string.browse_purchase_coins_prompt), color = RvInkSoft, fontSize = 14.sp)
                         CoinManager.COIN_PACKS.forEach { pack ->
                             Button(
                                 onClick = {
@@ -714,7 +723,7 @@ fun GameRemixSheet(
                                 shape = RoundedCornerShape(16.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = RvSky)
                             ) {
-                                Text("${pack.coins} Coins", fontWeight = FontWeight.SemiBold, color = RvOnTone)
+                                Text(context.resources.getQuantityString(R.plurals.browse_coin_pack, pack.coins, pack.coins), fontWeight = FontWeight.SemiBold, color = RvOnTone)
                             }
                         }
                     }

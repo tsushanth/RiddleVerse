@@ -1098,7 +1098,7 @@ fun AdaptiveMemoryPreviousPairScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Correct: $correctAnswers/$totalQuestions",
+                    text = stringResource(R.string.xa_correct_ratio, correctAnswers, totalQuestions),
                     color = RvInkSoft,
                     fontSize = 14.sp,
                     maxLines = 1
@@ -1114,7 +1114,7 @@ fun AdaptiveMemoryPreviousPairScreen(
                 }
                 if (!compact && bestStreak > 1) {
                     Text(
-                        text = "🔥 Best streak: $bestStreak",
+                        text = "🔥 ${stringResource(R.string.xa_best_streak_value, bestStreak)}",
                         color = darkOrange,
                         fontSize = 12.sp,
                         maxLines = 1
@@ -1195,7 +1195,7 @@ private fun AdaptiveMemoryPairTopBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -1218,7 +1218,7 @@ private fun AdaptiveMemoryPairTopBar(
                     repeat(hearts) {
                         Icon(
                             imageVector = Icons.Default.Favorite,
-                            contentDescription = "Heart",
+                            contentDescription = stringResource(R.string.xa_heart),
                             tint = Color(0xFFFF69B4),
                             modifier = Modifier.size(16.dp)
                         )
@@ -1290,7 +1290,7 @@ private fun AdaptivePairNotificationCard(
         ) {
             Icon(
                 Icons.Default.Psychology,
-                contentDescription = "Adapted",
+                contentDescription = stringResource(R.string.xa_adapted),
                 tint = RvInk,
                 modifier = Modifier.size(20.dp)
             )
@@ -1303,7 +1303,7 @@ private fun AdaptivePairNotificationCard(
                     color = RvInk
                 )
                 Text(
-                    text = adaptationInfo?.adjustmentReason ?: "",
+                    text = adaptationInfo?.adjustmentReason.asString(),
                     fontSize = 10.sp,
                     color = RvInkSoft.copy(alpha = 0.9f)
                 )
@@ -1314,7 +1314,7 @@ private fun AdaptivePairNotificationCard(
             ) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.welcome_back_dismiss),
                     tint = RvInk,
                     modifier = Modifier.size(16.dp)
                 )
@@ -1440,7 +1440,7 @@ private fun AdaptiveScoreCard(
             ) {
                 if (totalScore > 0) {
                     Text(
-                        text = "Adaptive Score: $totalScore",
+                        text = stringResource(R.string.xa_adaptive_score_value, totalScore),
                         color = RvSuccess,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
@@ -1455,7 +1455,7 @@ private fun AdaptiveScoreCard(
                 }
 
                 Text(
-                    text = "Correct: $correctAnswers/$totalQuestions",
+                    text = stringResource(R.string.xa_correct_ratio, correctAnswers, totalQuestions),
                     color = RvDisabled,
                     fontSize = 14.sp
                 )
@@ -1481,7 +1481,7 @@ private fun AdaptiveScoreCard(
 
                     if (bestStreak > 1) {
                         Text(
-                            text = "🔥 Best streak: $bestStreak",
+                            text = "🔥 ${stringResource(R.string.xa_best_streak_value, bestStreak)}",
                             color = RvFlame,
                             fontSize = 12.sp
                         )

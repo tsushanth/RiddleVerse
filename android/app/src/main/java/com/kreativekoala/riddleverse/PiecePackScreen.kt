@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -69,18 +70,18 @@ fun PiecePackScreen(args: SpatialArgs) {
         args = args,
         status = "${game.linesCleared}/${cfg.targetLines} lines",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.canUndo()) {
                 game.undoMove(); done = false; selectedSlot = -1; hintMove = null; commit()
             }
-            SpatialAction(Icons.Default.Refresh, "Restart") {
+            SpatialAction(Icons.Default.Refresh, stringResource(R.string.xa_restart)) {
                 game.restart(); done = false; selectedSlot = -1; hintMove = null; commit()
             }
-            SpatialAction(Icons.Default.Lightbulb, "Hint", enabled = !over) {
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint), enabled = !over) {
                 hintMove = game.hint(); selectedSlot = -1
                 message = if (hintMove == null) "No piece fits" else "Suggested spot outlined"
                 tick++
             }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         Text(
@@ -181,7 +182,7 @@ fun PiecePackScreen(args: SpatialArgs) {
                     success = true, title = "Target reached!",
                     detail = "Cleared ${game.linesCleared} lines with ${game.piecesPlaced} pieces.  Score $s",
                     stars = when { game.piecesLeft() >= cfg.pieceBudget / 3 -> 3; game.piecesLeft() >= cfg.pieceBudget / 6 -> 2; else -> 1 },
-                    primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) }
+                    primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) }
                 )
             }
             PiecePackStatus.PLAYING -> {}
@@ -189,7 +190,7 @@ fun PiecePackScreen(args: SpatialArgs) {
                 success = false,
                 title = if (game.status == PiecePackStatus.STUCK) "No piece fits" else "Out of pieces",
                 detail = "You cleared ${game.linesCleared} of ${cfg.targetLines} lines. Undo a move, or try again.",
-                primaryLabel = "Try again", onPrimary = { game.restart(); done = false; commit() },
+                primaryLabel = stringResource(R.string.try_again), onPrimary = { game.restart(); done = false; commit() },
                 secondaryLabel = "Undo last move", onSecondary = { game.undoMove(); done = false; commit() }
             )
         }

@@ -37,32 +37,32 @@ fun OnboardingScreen(
     val onboardingPages = listOf(
         OnboardingPage(
             icon = Icons.Default.EmojiObjects,
-            title = "Welcome to RiddleVerse!",
-            description = "Challenge your mind with engaging puzzles, quizzes, and brain teasers. From math problems to word games, we have something for everyone.",
+            title = stringResource(R.string.onb_intro_welcome_title),
+            description = stringResource(R.string.onb_intro_welcome_desc),
             color = RvGrape
         ),
         OnboardingPage(
             icon = Icons.Default.Extension,
-            title = "Explore Puzzle Categories",
-            description = "Browse through different types of puzzles including Division, Subtraction, Word Association, Memory Games, and many more. Each category offers unique challenges.",
+            title = stringResource(R.string.onb_intro_explore_title),
+            description = stringResource(R.string.onb_intro_explore_desc),
             color = RvSky
         ),
         OnboardingPage(
             icon = Icons.Default.TrendingUp,
-            title = "Track Your Progress",
-            description = "Complete daily puzzles to build your streak, earn achievements, and see your improvement over time. Challenge yourself to reach new milestones!",
+            title = stringResource(R.string.onb_intro_progress_title),
+            description = stringResource(R.string.onb_intro_progress_desc),
             color = RvViolet
         ),
         OnboardingPage(
             icon = Icons.Default.School,
-            title = "Learn as You Play",
-            description = "New to a puzzle type? Look for tutorial prompts that explain how each game works. You can always access help when you need it.",
+            title = stringResource(R.string.onb_intro_learn_title),
+            description = stringResource(R.string.onb_intro_learn_desc),
             color = RvMint
         ),
         OnboardingPage(
             icon = Icons.Default.Rocket,
-            title = "Ready to Begin?",
-            description = "You're all set! Tap 'Get Started' to explore puzzles, create custom games, and start your journey to becoming a puzzle master.",
+            title = stringResource(R.string.onb_intro_ready_title),
+            description = stringResource(R.string.onb_intro_ready_desc),
             color = RvCoral
         )
     )

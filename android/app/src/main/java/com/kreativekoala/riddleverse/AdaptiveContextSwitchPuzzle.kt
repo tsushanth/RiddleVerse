@@ -1007,7 +1007,7 @@ private fun AdaptiveContextSwitchHeader(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Level ${level.level}",
+                text = stringResource(R.string.stats_level_number, level.level),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -1079,7 +1079,7 @@ private fun AdaptiveContextNotificationCard(
         ) {
             Icon(
                 Icons.Default.Psychology,
-                contentDescription = "Adapted",
+                contentDescription = stringResource(R.string.xa_adapted),
                 tint = RvOnTone,
                 modifier = Modifier.size(20.dp)
             )
@@ -1092,7 +1092,7 @@ private fun AdaptiveContextNotificationCard(
                     color = RvOnTone
                 )
                 Text(
-                    text = adaptationInfo?.adjustmentReason ?: "",
+                    text = adaptationInfo?.adjustmentReason.asString(),
                     fontSize = 10.sp,
                     color = RvOnTone.copy(alpha = 0.9f)
                 )
@@ -1103,7 +1103,7 @@ private fun AdaptiveContextNotificationCard(
             ) {
                 Icon(
                     Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.welcome_back_dismiss),
                     tint = RvOnTone,
                     modifier = Modifier.size(16.dp)
                 )
@@ -1172,7 +1172,7 @@ private fun AdaptiveInterferencePhase(
         subtitle = task.instruction,
         action = {
             CsPrimaryAction(
-                text = "Continue →",
+                text = "${stringResource(R.string.continue_label)} →",
                 enabled = when (task.type) {
                     "simple_math" -> answers.size == task.items.size && answers.all { it.isNotEmpty() }
                     "working_memory_update" -> answers.isNotEmpty()
@@ -1295,7 +1295,7 @@ private fun AdaptiveRecognitionPhase(
             if (adaptiveConfig.attentionalControl) "\n⚠️ Items are arranged to test attention control" else "",
         action = {
             CsPrimaryAction(
-                text = "Submit Answer ✓",
+                text = "${stringResource(R.string.submit_answer)} ✓",
                 enabled = selectedAnswers.isNotEmpty(),
                 onClick = onSubmit
             )
@@ -1623,7 +1623,7 @@ private fun AdaptiveContextFeedbackDialog(
         },
         text = {
             Column {
-                Text("${stringResource(R.string.score_label)}: $score points")
+                Text(stringResource(R.string.xa_score_points, score))
                 Text("Difficulty: ${adaptiveConfig.description}")
                 Spacer(modifier = Modifier.height(8.dp))
                 Text("Correct items: ${correctAnswers.joinToString(", ")}")

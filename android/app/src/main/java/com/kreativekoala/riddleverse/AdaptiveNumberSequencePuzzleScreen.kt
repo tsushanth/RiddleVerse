@@ -43,6 +43,8 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -96,6 +98,7 @@ fun AdaptiveNumberSequencePuzzleScreen(
     var gameStarted by remember { mutableStateOf(false) }
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
+    val msgContext = LocalContext.current
     var feedbackColor by remember { mutableStateOf(RvError) }
     var currentStreak by remember { mutableStateOf(0) }
     var gamesPlayedThisSession by remember { mutableStateOf(0) }
@@ -312,7 +315,7 @@ fun AdaptiveNumberSequencePuzzleScreen(
     LaunchedEffect(currentHearts) {
         if (currentHearts == 0 && gameStarted && !gameCompleted) {
             gameCompleted = true
-            feedbackMessage = "💔 Game Over! Final Score: $totalScore"
+            feedbackMessage = "💔 ${msgContext.getString(R.string.xa_game_over_final_score, totalScore)}"
             feedbackColor = RvError
             showFeedback = true
             delay(2000)
@@ -370,7 +373,7 @@ fun AdaptiveNumberSequencePuzzleScreen(
                         gameCompleted = true
                         onBack()
                     },
-                    subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore",
+                    subtitle = "${rvDifficultyLabel(currentDifficultyLevel.name)} \u2022 ${stringResource(R.string.score_label)} $totalScore",
                     lives = currentHearts,
                     urgent = timeLeft <= 30,
                     onPause = { isPaused = !isPaused }
@@ -448,14 +451,14 @@ fun AdaptiveNumberSequencePuzzleScreen(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "${currentDifficultyLevel.name} \u2022 Range: ${adaptiveConfig.numberRange.first}-${adaptiveConfig.numberRange.last} \u2022 ${adaptiveConfig.numberCount} numbers per round",
+                                text = "${rvDifficultyLabel(currentDifficultyLevel.name)} \u2022 Range: ${adaptiveConfig.numberRange.first}-${adaptiveConfig.numberRange.last} \u2022 ${adaptiveConfig.numberCount} numbers per round",
                                 fontSize = 14.sp,
                                 textAlign = TextAlign.Center,
                                 color = RvInkSoft
                             )
                             if (!compact) {
                                 Text(
-                                    text = currentDifficultyLevel.description,
+                                    text = currentDifficultyLevel.descriptionText(),
                                     fontSize = 14.sp,
                                     textAlign = TextAlign.Center,
                                     color = RvInkSoft,
@@ -814,7 +817,7 @@ internal fun GroupECompactHud(
             actions()
             if (onPause != null) {
                 IconButton(onClick = onPause, modifier = Modifier.size(48.dp)) {
-                    Icon(Icons.Default.Pause, contentDescription = "Pause", tint = RvInk)
+                    Icon(Icons.Default.Pause, contentDescription = stringResource(R.string.common_pause), tint = RvInk)
                 }
             }
         }

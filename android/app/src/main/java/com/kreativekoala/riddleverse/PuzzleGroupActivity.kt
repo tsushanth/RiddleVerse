@@ -4,6 +4,7 @@ import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.app.Activity
 import android.content.Context
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -51,7 +52,7 @@ class PuzzleGroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val groupId = intent.getStringExtra("groupId") ?: ""
-        val groupName = intent.getStringExtra("groupName") ?: "Puzzle Group"
+        val groupName = intent.getStringExtra("groupName") ?: getString(R.string.done_puzzle_group_fallback)
         val puzzleTypes = intent.getStringArrayExtra("puzzleTypes")?.toList() ?: emptyList()
         val completedTypes = intent.getStringArrayExtra("completedTypes")?.toSet() ?: emptySet()
         val difficulty = intent.getStringExtra("difficulty") ?: "Mixed"
@@ -90,7 +91,7 @@ class PuzzleGroupActivity : AppCompatActivity() {
                         // Use launcher instead of direct startActivity
                         val intent = Intent(this@PuzzleGroupActivity, StartPuzzleActivity::class.java).apply {
                             putExtra("puzzleType", puzzleType)
-                            putExtra("title", PuzzleTypeNames.display(puzzleType))
+                            putExtra("title", PuzzleTypeNames.display(this@PuzzleGroupActivity, puzzleType))
                             putExtra("sourceGroupId", groupId)
                             putExtra("sourceGroupName", groupName)
                         }
@@ -245,7 +246,7 @@ fun PuzzleGroupContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "• Each puzzle type contains 5 challenges\n• Complete all 5 to unlock the next puzzle type\n• Try different types to discover your favorites!",
+                        text = stringResource(R.string.done_group_how_it_works_body),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -313,7 +314,7 @@ fun GroupProgressCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "$completed/$total puzzle types completed",
+                        text = stringResource(R.string.done_group_types_completed, completed, total),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -322,7 +323,7 @@ fun GroupProgressCard(
                 if (isCompleted) {
                     Icon(
                         imageVector = Icons.Default.CheckCircle,
-                        contentDescription = "Completed",
+                        contentDescription = stringResource(R.string.completed),
                         tint = RvSuccess,
                         modifier = Modifier.size(32.dp)
                     )
@@ -347,7 +348,10 @@ fun GroupProgressCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Difficulty: $difficulty • Each type has 5 puzzles",
+                text = stringResource(
+                    R.string.done_group_difficulty_line,
+                    if (difficulty == "Mixed") stringResource(R.string.cat_mixed) else rvDifficultyLabel(difficulty)
+                ),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -366,7 +370,7 @@ fun PuzzleTypeStepCard(
     onPuzzleClick: () -> Unit
 ) {
     // Get display name and icon for puzzle type (reuse from categories)
-    val displayInfo = getPuzzleTypeDisplayInfo(puzzleType)
+    val displayInfo = getPuzzleTypeDisplayInfo(LocalContext.current, puzzleType)
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -396,7 +400,7 @@ fun PuzzleTypeStepCard(
                     isCompleted -> {
                         Icon(
                             imageVector = Icons.Default.Check,
-                            contentDescription = "Completed",
+                            contentDescription = stringResource(R.string.completed),
                             tint = RvInk,
                             modifier = Modifier.size(12.dp)
                         )
@@ -418,7 +422,7 @@ fun PuzzleTypeStepCard(
                     else -> {
                         Icon(
                             imageVector = Icons.Default.Lock,
-                            contentDescription = "Locked",
+                            contentDescription = stringResource(R.string.common_locked),
                             tint = RvInkSoft,
                             modifier = Modifier.size(10.dp)
                         )
@@ -486,10 +490,10 @@ fun PuzzleTypeStepCard(
 
                         Text(
                             text = when {
-                                isCompleted -> "✓ All 5 puzzles completed"
-                                isCurrent -> "← Next to unlock"
-                                isUnlocked -> "5 puzzles available"
-                                else -> "🔒 Complete previous to unlock"
+                                isCompleted -> stringResource(R.string.done_group_type_completed)
+                                isCurrent -> stringResource(R.string.done_group_type_next)
+                                isUnlocked -> stringResource(R.string.done_group_type_available)
+                                else -> stringResource(R.string.done_group_type_locked)
                             },
                             fontSize = 12.sp,
                             color = when {
@@ -546,7 +550,7 @@ fun CompletionCard() {
         ) {
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
-                contentDescription = "Completed",
+                contentDescription = stringResource(R.string.completed),
                 tint = RvSun,
                 modifier = Modifier.size(48.dp)
             )
@@ -554,7 +558,7 @@ fun CompletionCard() {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "🎉 Group Completed!",
+                text = stringResource(R.string.done_group_completed_banner),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
@@ -563,7 +567,7 @@ fun CompletionCard() {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Amazing! You've mastered all puzzle types in this group. Ready for the next challenge?",
+                text = stringResource(R.string.done_group_completed_body),
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -588,28 +592,29 @@ data class PuzzleTypeDisplayInfo(
     val icon: ImageVector
 )
 
-fun getPuzzleTypeDisplayInfo(puzzleType: String): PuzzleTypeDisplayInfo {
-    return when (puzzleType.lowercase()) {
-        "math" -> PuzzleTypeDisplayInfo("Math", Icons.Default.Calculate)
-        "storypuzzle" -> PuzzleTypeDisplayInfo("Story Puzzle", Icons.Default.MenuBook)
-        "anagram" -> PuzzleTypeDisplayInfo("Anagram", Icons.Default.TextFields)
-        "antonyms" -> PuzzleTypeDisplayInfo("Antonyms", Icons.Default.BubbleChart)
-        "synonyms" -> PuzzleTypeDisplayInfo("Synonyms", Icons.Default.Link)
-        "memorysquares" -> PuzzleTypeDisplayInfo("Visual Memory", Icons.Default.GridView)
-        "memorystory" -> PuzzleTypeDisplayInfo("Audio Memory", Icons.Default.VolumeUp)
-        "trivia" -> PuzzleTypeDisplayInfo("Trivia", Icons.Default.Quiz)
-        "average" -> PuzzleTypeDisplayInfo("Average", Icons.Default.BarChart)
-        "division" -> PuzzleTypeDisplayInfo("Division", Icons.Default.Percent)
-        "mathestimation" -> PuzzleTypeDisplayInfo("Estimation", Icons.Default.TrendingUp)
-        "percentages" -> PuzzleTypeDisplayInfo("Percentage", Icons.Default.Percent)
-        "discounts" -> PuzzleTypeDisplayInfo("Discounts", Icons.Default.LocalOffer)
-        "purchasing" -> PuzzleTypeDisplayInfo("Purchasing", Icons.Default.CreditCard)
-        "conversion" -> PuzzleTypeDisplayInfo("Conversion", Icons.Default.SwapHoriz)
-        "connotationwords" -> PuzzleTypeDisplayInfo("Word Connotations", Icons.Default.Psychology)
-        "subtraction" -> PuzzleTypeDisplayInfo("Subtraction", Icons.Default.Remove)
-        "mathtipping" -> PuzzleTypeDisplayInfo("Tip Calculation", Icons.Default.RestaurantMenu)
-        else -> PuzzleTypeDisplayInfo(PuzzleTypeNames.display(puzzleType), Icons.Default.Extension)
+fun getPuzzleTypeDisplayInfo(context: Context, puzzleType: String): PuzzleTypeDisplayInfo {
+    val icon = when (puzzleType.lowercase()) {
+        "math" -> Icons.Default.Calculate
+        "storypuzzle" -> Icons.Default.MenuBook
+        "anagram" -> Icons.Default.TextFields
+        "antonyms" -> Icons.Default.BubbleChart
+        "synonyms" -> Icons.Default.Link
+        "memorysquares" -> Icons.Default.GridView
+        "memorystory" -> Icons.Default.VolumeUp
+        "trivia" -> Icons.Default.Quiz
+        "average" -> Icons.Default.BarChart
+        "division" -> Icons.Default.Percent
+        "mathestimation" -> Icons.Default.TrendingUp
+        "percentages" -> Icons.Default.Percent
+        "discounts" -> Icons.Default.LocalOffer
+        "purchasing" -> Icons.Default.CreditCard
+        "conversion" -> Icons.Default.SwapHoriz
+        "connotationwords" -> Icons.Default.Psychology
+        "subtraction" -> Icons.Default.Remove
+        "mathtipping" -> Icons.Default.RestaurantMenu
+        else -> Icons.Default.Extension
     }
+    return PuzzleTypeDisplayInfo(PuzzleTypeNames.display(context, puzzleType), icon)
 }
 
 // API function to fetch group completion status

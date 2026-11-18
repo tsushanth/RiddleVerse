@@ -173,7 +173,7 @@ object DailyPuzzleStore {
 
     fun shareResultOf(c: Context, r: DailySolveResult): DailyShareResult = DailyShareResult(
         number = DailyPuzzleSchedule.numberOf(r.day),
-        gameName = PuzzleTypeNames.display(r.type),
+        gameName = PuzzleTypeNames.display(c, r.type),
         seconds = r.seconds,
         attempts = r.attempts,
         streak = r.streak,

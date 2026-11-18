@@ -544,7 +544,7 @@ fun PinballDeflectorPuzzleScreen(
                     }
                     PinballGameState.SHOWING_RESULT -> {
                         Text(
-                            text = if (isCorrect) "Correct! 🎉" else "Incorrect ❌",
+                            text = if (isCorrect) "${stringResource(R.string.correct)} 🎉" else "${stringResource(R.string.xb_incorrect)} ❌",
                             color = if (isCorrect) RvMintEdge else RvCoralEdge,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
@@ -690,7 +690,7 @@ fun EnhancedPinballHeader(
                     }
 
                     Text(
-                        text = difficulty.uppercase(),
+                        text = localizedDifficulty(difficulty).uppercase(),
                         color = RvSunEdge,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold

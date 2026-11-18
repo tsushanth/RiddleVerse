@@ -331,7 +331,7 @@ fun UniqueObjectPuzzleScreen(
 
                 if (totalScore > 0) {
                     Text(
-                        text = "Score: $totalScore",
+                        text = "${stringResource(R.string.score_label)}: $totalScore",
                         color = RvInk,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -526,7 +526,7 @@ fun UniqueObjectPuzzleScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Keep looking! Hearts remaining: $currentHearts",
+                        text = stringResource(R.string.xb_keep_looking_hearts_remaining, currentHearts),
                         color = RvInk,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center

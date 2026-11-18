@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -175,7 +176,7 @@ fun SupporterOfferCard(modifier: Modifier = Modifier) {
         if (Supporter.flagOn(context) && !Supporter.isSupporter(context)) Supporter.loadPackage { pkg = it }
     }
     if (thanks) {
-        Text("Thank you for supporting RiddleVerse.", fontSize = 13.sp, color = RvInkSoft, modifier = modifier.fillMaxWidth())
+        Text(stringResource(R.string.home_supporter_thanks), fontSize = 13.sp, color = RvInkSoft, modifier = modifier.fillMaxWidth())
         return
     }
     val offered = pkg
@@ -188,10 +189,14 @@ fun SupporterOfferCard(modifier: Modifier = Modifier) {
         border = BorderStroke(2.dp, RvOutline),
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Like the daily puzzle?", fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
+            Text(stringResource(R.string.home_supporter_title), fontSize = 16.sp, fontWeight = FontWeight.ExtraBold, color = RvInk)
             Text(
-                "Become a supporter with a one-time purchase (${offered.product.price.formatted}). You keep playing everything for free either way. " +
-                    "As a thank-you, you can hold up to ${DailyStreakRules.SUPPORTER_MAX_FREEZES} streak freezes and earn one every ${DailyStreakRules.SUPPORTER_FREEZE_EVERY} days.",
+                stringResource(
+                    R.string.home_supporter_body,
+                    offered.product.price.formatted,
+                    DailyStreakRules.SUPPORTER_MAX_FREEZES,
+                    DailyStreakRules.SUPPORTER_FREEZE_EVERY,
+                ),
                 fontSize = 13.sp, color = RvInkSoft,
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -199,9 +204,9 @@ fun SupporterOfferCard(modifier: Modifier = Modifier) {
                     Modifier.clip(RoundedCornerShape(50)).background(RvSun).clickable {
                         (context as? Activity)?.let { a -> Supporter.purchase(a, offered) { ok -> if (ok) { Funnel.log("supporter_purchased"); thanks = true } } }
                     }.padding(horizontal = 16.dp, vertical = 8.dp)
-                ) { Text("Become a supporter", fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
+                ) { Text(stringResource(R.string.home_supporter_cta), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
                 Box(Modifier.clip(RoundedCornerShape(50)).clickable { Supporter.dismissForever(context); gone = true }.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                    Text("No thanks", fontSize = 14.sp, color = RvInkSoft)
+                    Text(stringResource(R.string.home_supporter_no_thanks), fontSize = 14.sp, color = RvInkSoft)
                 }
             }
         }

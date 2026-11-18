@@ -84,12 +84,12 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    "Badge Collection",
+                    stringResource(R.string.stats_badge_collection),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    "${unlockedAchievements.size}/${achievements.size} unlocked",
+                    stringResource(R.string.stats_badges_unlocked_count, unlockedAchievements.size, achievements.size),
                     fontSize = 14.sp,
                     color = RvInkSoft
                 )
@@ -146,7 +146,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
             if (recentlyUnlocked.isNotEmpty()) {
                 item {
                     Text(
-                        "✨ Recently Unlocked",
+                        "✨ ${stringResource(R.string.stats_recently_unlocked)}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = RvViolet,
@@ -170,7 +170,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
             if (inProgressAchievements.isNotEmpty()) {
                 item {
                     Text(
-                        "🎯 In Progress",
+                        "🎯 ${stringResource(R.string.stats_in_progress)}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = RvWarning,
@@ -192,7 +192,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
             if (otherUnlocked.isNotEmpty()) {
                 item {
                     Text(
-                        "🏆 Unlocked",
+                        "🏆 ${stringResource(R.string.stats_unlocked)}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = RvSuccess,
@@ -214,7 +214,7 @@ fun BadgeCollectionScreen(onBack: () -> Unit = {}) {
             if (purelyLocked.isNotEmpty()) {
                 item {
                     Text(
-                        "🔒 Locked",
+                        "🔒 ${stringResource(R.string.common_locked)}",
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = RvInkSoft,
@@ -270,13 +270,13 @@ fun EnhancedProgressSummaryCard(
                 ) {
                     Column {
                         Text(
-                            "${getTierEmoji(tierInfo.currentTier)} ${tierInfo.currentTier}",
+                            "${getTierEmoji(tierInfo.currentTier)} ${stringResource(tierInfo.currentTierRes)}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone
                         )
                         Text(
-                            "Level ${level.level}",
+                            stringResource(R.string.stats_level_number, level.level),
                             fontSize = 14.sp,
                             color = RvOnTone.copy(alpha = 0.9f)
                         )
@@ -284,13 +284,13 @@ fun EnhancedProgressSummaryCard(
 
                     Column(horizontalAlignment = Alignment.End) {
                         Text(
-                            "${level.totalXP} XP",
+                            stringResource(R.string.home_xp_amount, level.totalXP),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvOnTone
                         )
                         Text(
-                            "Total Earned",
+                            stringResource(R.string.stats_total_earned),
                             fontSize = 12.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
@@ -305,12 +305,12 @@ fun EnhancedProgressSummaryCard(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     EnhancedStatItem(
-                        "Games Played",
+                        stringResource(R.string.stats_games_played),
                         globalStats.totalGamesPlayed.toString(),
                         "🎮"
                     )
                     EnhancedStatItem(
-                        "Current Streak",
+                        stringResource(R.string.stats_current_streak),
                         streakInfo.currentQuestionStreak.toString(),
                         "⚡"
                     )
@@ -332,7 +332,7 @@ fun EnhancedProgressSummaryCard(
                 if (level.xpToNextLevel > 0) {
                     Column {
                         Text(
-                            "Next Level Progress",
+                            stringResource(R.string.stats_next_level_progress),
                             fontSize = 12.sp,
                             color = RvOnTone.copy(alpha = 0.8f)
                         )
@@ -348,7 +348,7 @@ fun EnhancedProgressSummaryCard(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            "${level.currentXP}/${level.xpToNextLevel} XP to Level ${level.level + 1}",
+                            stringResource(R.string.stats_xp_to_level, level.currentXP, level.xpToNextLevel, level.level + 1),
                             fontSize = 10.sp,
                             color = RvOnTone.copy(alpha = 0.7f)
                         )
@@ -365,10 +365,10 @@ fun CollectionStatsRow(total: Int, unlocked: Int, inProgress: Int) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        StatCard("Total", total.toString(), RvSky, "🏅")
-        StatCard("Unlocked", unlocked.toString(), RvSuccess, "✅")
-        StatCard("In Progress", inProgress.toString(), RvWarning, "⏳")
-        StatCard("Locked", (total - unlocked).toString(), RvInkSoft, "🔒")
+        StatCard(stringResource(R.string.stats_total), total.toString(), RvSky, "🏅")
+        StatCard(stringResource(R.string.stats_unlocked), unlocked.toString(), RvSuccess, "✅")
+        StatCard(stringResource(R.string.stats_in_progress), inProgress.toString(), RvWarning, "⏳")
+        StatCard(stringResource(R.string.common_locked), (total - unlocked).toString(), RvInkSoft, "🔒")
     }
 }
 
@@ -480,7 +480,7 @@ fun EnhancedAchievementBadgeItem(
             } else {
                 Icon(
                     imageVector = Icons.Default.Lock,
-                    contentDescription = "Locked",
+                    contentDescription = stringResource(R.string.common_locked),
                     tint = RvInkSoft,
                     modifier = Modifier.size(if (isHighlighted) 36.dp else 28.dp)
                 )
@@ -490,7 +490,7 @@ fun EnhancedAchievementBadgeItem(
         Spacer(modifier = Modifier.height(6.dp))
 
         Text(
-            text = achievement.title,
+            text = stringResource(achievement.titleRes),
             fontSize = if (isHighlighted) 13.sp else 11.sp,
             fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.Medium,
             maxLines = 2,

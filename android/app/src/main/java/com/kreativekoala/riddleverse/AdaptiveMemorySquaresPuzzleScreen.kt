@@ -30,6 +30,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 fun amrecordGamePerformance(
     difficultyManager: DifficultyManager,
@@ -458,7 +459,7 @@ fun AdaptiveMemorySquaresPuzzleScreen(
                     }
                     else -> {
                         Text(
-                            text = if (isCorrect) "✓ Perfect!" else "✗ Try Again!",
+                            text = if (isCorrect) "✓ ${stringResource(R.string.xa_perfect)}" else "✗ ${stringResource(R.string.xa_try_again_exclaim)}",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (isCorrect) Color(0xFFC8E6C9) else Color(0xFFFFCDD2),
@@ -564,9 +565,9 @@ fun AdaptiveMemorySquaresPuzzleScreen(
 
                     Text(
                         text = when {
-                            isCorrect -> "Perfect! You remembered all $targetCount squares!\n\nAccuracy: 100%\nStreak: $currentStreak 🔥"
-                            currentLives <= 0 -> "You found $correctCount/$targetCount squares ($accuracy%)\n\nStreak broken"
-                            else -> "You found $correctCount/$targetCount squares ($accuracy%)\n\nStreak: ${if (isCorrect) currentStreak else 0}"
+                            isCorrect -> "${stringResource(R.string.xa_memory_squares_perfect, targetCount, currentStreak)} 🔥"
+                            currentLives <= 0 -> stringResource(R.string.xa_memory_squares_found_broken, correctCount, targetCount, accuracy)
+                            else -> stringResource(R.string.xa_memory_squares_found_streak, correctCount, targetCount, accuracy, if (isCorrect) currentStreak else 0)
                         },
                         textAlign = TextAlign.Center
                     )
@@ -583,12 +584,12 @@ fun AdaptiveMemorySquaresPuzzleScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "🎯 Difficulty Adapted",
+                                        text = "🎯 ${stringResource(R.string.xa_difficulty_adapted)}",
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold
                                     )
                                     Text(
-                                        text = "Next: ${info.level.name}",
+                                        text = stringResource(R.string.stats_next_tier, rvDifficultyLabel(info.level.name)),
                                         fontSize = 12.sp
                                     )
                                 }

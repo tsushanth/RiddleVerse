@@ -43,6 +43,7 @@ import com.kreativekoala.riddleverse.ui.theme.RvSky
 import com.kreativekoala.riddleverse.ui.theme.RvSuccess
 import com.kreativekoala.riddleverse.ui.theme.RvSurfaceRaised
 import com.kreativekoala.riddleverse.ui.theme.RvWarning
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 
 
@@ -435,7 +436,7 @@ fun AdaptiveDualCardPuzzleScreen(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 if (showFeedback) {
                     Text(
-                        text = if (isCorrectAnswer) "Correct! ✓" else "Wrong! ✗",
+                        text = if (isCorrectAnswer) "${stringResource(R.string.correct)} ✓" else "${stringResource(R.string.wrong)} ✗",
                         color = if (isCorrectAnswer) RvMintEdge else RvCoralEdge,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -610,7 +611,7 @@ private fun AdaptiveDualCardTopBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -690,7 +691,7 @@ private fun AdaptiveDualCardTopBar(
                 }
 
                 Text(
-                    text = "🧠 ${currentDifficulty.name}",
+                    text = "🧠 ${rvDifficultyLabel(currentDifficulty.name)}",
                     color = RvInkSoft,
                     fontSize = 12.sp
                 )

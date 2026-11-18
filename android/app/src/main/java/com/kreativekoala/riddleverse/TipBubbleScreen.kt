@@ -383,20 +383,20 @@ fun TipBubblePuzzleScreen(
                     ) {
                         Icon(
                             Icons.Default.TrendingUp,
-                            contentDescription = "Difficulty adjusted",
+                            contentDescription = stringResource(R.string.xa_difficulty_adjusted),
                             tint = RvOnTone,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Difficulty Adapted!",
+                                text = stringResource(R.string.xb_difficulty_adapted),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvOnTone
                             )
                             Text(
-                                text = adaptationInfo?.adjustmentReason ?: "",
+                                text = adaptationInfo?.adjustmentReason.asString(),
                                 fontSize = 10.sp,
                                 color = RvOnTone.copy(alpha = 0.9f)
                             )
@@ -407,7 +407,7 @@ fun TipBubblePuzzleScreen(
                         ) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Dismiss",
+                                contentDescription = stringResource(R.string.welcome_back_dismiss),
                                 tint = RvOnTone,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -812,7 +812,7 @@ fun AdaptiveTipBubbleTopGameBar(
 
                     if (attempts > 0) {
                         Text(
-                            text = "Attempts: $attempts",
+                            text = stringResource(R.string.xb_attempts_value, attempts),
                             color = RvInkSoft,
                             fontSize = 12.sp
                         )

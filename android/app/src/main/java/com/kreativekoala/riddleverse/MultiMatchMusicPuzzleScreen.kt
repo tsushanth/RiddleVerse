@@ -179,7 +179,7 @@ fun BottomAnswerBar(
                 .weight(1f)
                 .heightIn(min = 56.dp)
         ) {
-            Text("Answer", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.xb_answer), fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
 
         // Hint (right)
@@ -206,6 +206,7 @@ fun MultiMatchMusicPuzzleScreenWrapper(
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
+    val xbContext = LocalContext.current
 
     // Parse puzzle data
     LaunchedEffect(currentPuzzle.puzzleId) {
@@ -283,7 +284,7 @@ fun MultiMatchMusicPuzzleScreenWrapper(
 
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error parsing puzzle data: ${e.message}", e)
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = xbContext.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -291,7 +292,7 @@ fun MultiMatchMusicPuzzleScreenWrapper(
 
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading music puzzle...")
+            LoadingScreen(message = stringResource(R.string.common_loading_music_puzzle))
         }
 
         hasError -> {
@@ -311,7 +312,7 @@ fun MultiMatchMusicPuzzleScreenWrapper(
             MultiMatchMusicPuzzleScreen(
                 puzzleData = puzzleData!!,
                 difficulty = currentPuzzle.difficulty ?: "Medium",
-                round = "ROUND ${if (viewModel.isCustomPuzzleFlow) viewModel.currentQuestionNumber else viewModel.currentPuzzleNumber} of ${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}",
+                round = stringResource(R.string.xb_round_of, viewModel.getCurrentNumber(), viewModel.getTotalCount()),
                 onPuzzleComplete = { score, correctAnswers ->
                     Log.d(TAG, "🎉 Music puzzle completed! Score: $score, Correct: $correctAnswers")
                     val isComplete = correctAnswers >= puzzleData!!.totalQuestions
@@ -344,6 +345,7 @@ fun MultiMatchMusicPuzzleScreen(
     var timeRemaining by remember { mutableStateOf(puzzleData.timeLimit / 1000) }
     var gameCompleted by remember { mutableStateOf(false) }
     var showFeedback by remember { mutableStateOf<String?>(null) }
+    val xbContext = LocalContext.current
     var feedbackColor by remember { mutableStateOf(RvSuccess) }
 
     // --- Circle state ---
@@ -615,7 +617,7 @@ fun MultiMatchMusicPuzzleScreen(
                     if (isCorrect) {
                         correctAnswers++
                         feedbackColor = RvSuccess
-                        showFeedback = "Correct! 🎉"
+                        showFeedback = xbContext.getString(R.string.correct) + " 🎉"
 
                         questionItems = questionItems.map { it ->
                             if (it.id == selectedQuestion!!.id) it.copy(isAnswered = true) else it
@@ -641,7 +643,7 @@ fun MultiMatchMusicPuzzleScreen(
                     } else {
                         wrongAnswers++
                         feedbackColor = RvError
-                        showFeedback = "Wrong! Try again 🤔"
+                        showFeedback = xbContext.getString(R.string.common_wrong_try_again) + " 🤔"
                     }
                     selectedQuestion = null
                     selectedAnswer = null
@@ -740,7 +742,7 @@ fun QuestionCircleItem(
             ) {
                 Icon(
                     if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
-                    contentDescription = if (isPlaying) "Pause" else "Play",
+                    contentDescription = if (isPlaying) stringResource(R.string.common_pause) else stringResource(R.string.play),
                     tint = RvInk,
                     modifier = Modifier.size(24.dp)
                 )
@@ -877,7 +879,7 @@ fun MultiMatchMusicHeader(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = difficulty.uppercase(),
+                    text = localizedDifficulty(difficulty).uppercase(),
                     color = RvInk,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
@@ -899,7 +901,7 @@ fun MultiMatchMusicHeader(
                 repeat(3) { index ->
                     Icon(
                         Icons.Default.Favorite,
-                        contentDescription = "Life",
+                        contentDescription = stringResource(R.string.xb_life),
                         tint = if (index < (3 - wrongAnswers.coerceAtMost(3))) RvCoralEdge else RvOutline,
                         modifier = Modifier.size(20.dp)
                     )
@@ -933,7 +935,7 @@ fun MultiMatchMusicHeader(
             )
             Icon(
                 Icons.Default.Star,
-                contentDescription = "Progress",
+                contentDescription = stringResource(R.string.progress),
                 tint = RvSunEdge,
                 modifier = Modifier.size(20.dp)
             )
@@ -1034,7 +1036,7 @@ fun MusicErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error",
+                text = "⚠️ ${stringResource(R.string.common_error)}",
                 color = RvError,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold

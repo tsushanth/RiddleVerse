@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -139,6 +140,7 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
     val scope = rememberCoroutineScope()
     val loader = remember { FirstPuzzleLoader(context) }
     var busy by remember { mutableStateOf(false) }
+    val playFirstPuzzleCd = stringResource(R.string.onb_first_run_play_cd)
 
     LaunchedEffect(Unit) {
         Funnel.log(FunnelStep.FIRST_RUN_SHOWN)
@@ -170,7 +172,7 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
             )
             Spacer(Modifier.height(12.dp))
             Text(
-                text = "Quick brain puzzles. No sign-up needed.",
+                text = stringResource(R.string.onb_first_run_tagline),
                 fontSize = 17.sp,
                 color = Color.White.copy(alpha = 0.92f),
                 textAlign = TextAlign.Center
@@ -187,7 +189,7 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
                         if (loaded != null) {
                             FirstRun.launchFirstPuzzle(context, loaded)
                         } else {
-                            Toast.makeText(context, "Could not load a puzzle. Opening the puzzle list instead.", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, R.string.onb_first_run_load_failed, Toast.LENGTH_LONG).show()
                             FirstRun.enterHomeAsGuest(context)
                         }
                         onFinished()
@@ -200,14 +202,14 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .heightIn(min = 64.dp)
-                    .semantics { contentDescription = "Play your first puzzle" }
+                    .semantics { contentDescription = playFirstPuzzleCd }
             ) {
                 if (busy) {
                     CircularProgressIndicator(color = Color.White, strokeWidth = 3.dp, modifier = Modifier.size(26.dp))
                 } else {
                     Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(28.dp))
                     Spacer(Modifier.size(8.dp))
-                    Text("Play", fontSize = 22.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.play), fontSize = 22.sp, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -220,7 +222,7 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
                 enabled = !busy,
                 modifier = Modifier.heightIn(min = 48.dp)
             ) {
-                Text("Already have an account? Sign in", color = Color.White, fontSize = 15.sp)
+                Text(stringResource(R.string.auth_toggle_to_sign_in), color = Color.White, fontSize = 15.sp)
             }
         }
     }

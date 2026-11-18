@@ -42,6 +42,7 @@ import kotlinx.coroutines.withContext
 import kotlin.math.PI
 import kotlin.math.min
 import kotlin.math.sin
+import androidx.compose.ui.res.stringResource
 
 // --- crowns (feat/game-crowns) ---
 // Crowns: place one crown per row, column and coloured region; no two crowns touch. Every region has a colour AND a
@@ -128,10 +129,10 @@ private fun CrownsBoard(args: SpatialArgs, puzzle: CrownsPuzzle) {
         args = args,
         status = "$crowns/$n",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo() && !done) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.canUndo() && !done) {
                 game.undo(); hintCell = -1; toast = ""; commit()
             }
-            SpatialAction(Icons.Default.Lightbulb, "Hint", enabled = !done) {
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint), enabled = !done) {
                 val h = game.hint()
                 if (h != null) {
                     hintCell = h.cell
@@ -143,7 +144,7 @@ private fun CrownsBoard(args: SpatialArgs, puzzle: CrownsPuzzle) {
             SpatialAction(Icons.Default.Delete, "Clear", enabled = !done && game.cells.any { it != 0 }) {
                 game.clear(); hintCell = -1; toast = ""; commit()
             }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         val message = when {
@@ -192,7 +193,7 @@ private fun CrownsBoard(args: SpatialArgs, puzzle: CrownsPuzzle) {
             success = true, title = "Crowned!",
             detail = "Hints used: ${game.hintsUsed}.  Score $s",
             stars = game.stars(),
-            primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) }
+            primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) }
         )
     }
 }

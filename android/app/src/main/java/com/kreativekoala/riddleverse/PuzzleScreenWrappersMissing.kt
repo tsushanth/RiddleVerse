@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -80,7 +81,7 @@ fun DiscountPriceScreenWrapper(
 
     // Show loading state while generating
     if (isLoading || discountPuzzle == null) {
-        LoadingScreen(message = "Generating discount puzzle...")
+        LoadingScreen(message = stringResource(R.string.xb_generating_discount_puzzle))
         return
     }
 
@@ -106,7 +107,7 @@ fun DiscountPriceScreenWrapper(
             else -> "2:00"
         },
         hearts = 3,
-        round = "ROUND ${if (viewModel.isCustomPuzzleFlow) viewModel.currentQuestionNumber else viewModel.currentPuzzleNumber} of ${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}",
+        round = stringResource(R.string.xb_round_of, viewModel.getCurrentNumber(), viewModel.getTotalCount()),
 
         // Use generated data
         items = priceItems,

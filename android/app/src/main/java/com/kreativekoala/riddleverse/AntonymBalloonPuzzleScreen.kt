@@ -49,6 +49,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 data class AntonymPair(
     val word1: String,
@@ -432,7 +433,7 @@ fun AntonymBalloonPuzzleScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     CircularProgressIndicator(color = Color(0xFF8A4DFF))
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Loading antonym puzzle...", color = RvInk)
+                    Text(stringResource(R.string.xa_loading_antonym_puzzle), color = RvInk)
                 }
             }
         } else {
@@ -469,7 +470,7 @@ fun AntonymBalloonPuzzleScreen(
                     ) {
                         Icon(
                             Icons.Default.Timer,
-                            contentDescription = "Timer",
+                            contentDescription = stringResource(R.string.xa_timer),
                             tint = if (timeRemaining <= 30) RvCoralEdge else RvGrapeEdge
                         )
                         Spacer(modifier = Modifier.width(4.dp))
@@ -482,7 +483,7 @@ fun AntonymBalloonPuzzleScreen(
                     }
 
                     Text(
-                        text = difficulty.uppercase(),
+                        text = rvDifficultyLabel(difficulty).uppercase(),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = RvInk,
@@ -497,7 +498,7 @@ fun AntonymBalloonPuzzleScreen(
                         repeat(hearts) { index ->
                             Icon(
                                 Icons.Default.Favorite,
-                                contentDescription = "Heart",
+                                contentDescription = stringResource(R.string.xa_heart),
                                 tint = if (index < currentHearts) RvCoralEdge else RvInkSoft.copy(alpha = 0.4f),
                                 modifier = Modifier.size(20.dp)
                             )
@@ -654,7 +655,7 @@ fun AntonymBalloonPuzzleScreen(
                         val success = matchedPairs == totalPairs
 
                         Text(
-                            text = if (success) "🎉 Puzzle Complete!" else "💔 Game Over",
+                            text = if (success) "🎉 ${stringResource(R.string.puzzle_complete)}" else "💔 ${stringResource(R.string.common_game_over)}",
                             fontSize = 24.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (success) RvSuccess else RvError
@@ -676,9 +677,9 @@ fun AntonymBalloonPuzzleScreen(
 
                         Text(
                             text = when {
-                                success -> "Great job matching all antonym pairs!"
-                                currentHearts <= 0 -> "No hearts remaining"
-                                else -> "Time's up!"
+                                success -> stringResource(R.string.xa_antonym_success)
+                                currentHearts <= 0 -> stringResource(R.string.xa_no_hearts_remaining)
+                                else -> stringResource(R.string.times_up)
                             },
                             fontSize = 16.sp,
                             color = RvInkSoft,
@@ -704,12 +705,12 @@ fun AntonymBalloonPuzzleScreen(
                                         horizontalArrangement = Arrangement.SpaceBetween
                                     ) {
                                         Text(
-                                            text = "Matches: $matchedPairs",
+                                            text = stringResource(R.string.xa_matches_value, matchedPairs),
                                             fontSize = 12.sp,
                                             color = RvInkSoft
                                         )
                                         Text(
-                                            text = "Mistakes: $wrongAttempts",
+                                            text = stringResource(R.string.xa_mistakes_value, wrongAttempts),
                                             fontSize = 12.sp,
                                             color = RvInkSoft
                                         )
@@ -738,7 +739,7 @@ fun AntonymBalloonPuzzleScreen(
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8A4DFF))
                         ) {
-                            Text("Continue", color = RvOnTone)
+                            Text(stringResource(R.string.continue_label), color = RvOnTone)
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -264,7 +265,7 @@ fun ImageVortexScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading adaptive visual attention puzzle...")
+                Text(stringResource(R.string.xb_loading_adaptive_visual_attention_puzzle))
             }
         }
     }
@@ -302,7 +303,7 @@ fun JumbleInputScreenWrapper(
     handlePuzzleCompletion: (Boolean, Boolean, Int) -> Unit
 ) {
     JumbleInputScreen(
-        clueText = currentPuzzle.hint ?: "No hint available",
+        clueText = currentPuzzle.hint ?: stringResource(R.string.no_hint_available),
         targetWord = currentPuzzle.answer,
         shuffledLetters = currentPuzzle.question.toCharArray().toList(),
         score = viewModel.localScore,

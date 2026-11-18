@@ -29,7 +29,7 @@ object DailyPuzzleFactory {
                     puzzleType = type,
                     question = JSONObject().put("seed", spec.seed).put("difficulty", d).put("game", type).toString(),
                     answer = "completed",
-                    hint = "Today's puzzle is the same for everyone.",
+                    hint = context.getString(R.string.done_daily_hint),
                     difficulty = d,
                     options = emptyList(),
                 ),

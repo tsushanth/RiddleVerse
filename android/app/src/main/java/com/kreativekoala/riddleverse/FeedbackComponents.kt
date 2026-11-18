@@ -426,7 +426,7 @@ fun EnhancedUniversalFeedbackOverlay(
 
                         // Main result message
                         Text(
-                            text = feedback.mainMessage,
+                            text = feedback.mainMessage(LocalContext.current),
                             fontSize = 28.sp,
                             fontWeight = FontWeight.Bold,
                             color = if (feedback.isCorrect) RvSuccessEdge else RvErrorEdge
@@ -449,12 +449,12 @@ fun EnhancedUniversalFeedbackOverlay(
                                     verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     Text(
-                                        text = "Your answer: ${feedback.userAnswer}",
+                                        text = stringResource(R.string.done_your_answer, feedback.userAnswer),
                                         fontSize = 16.sp,
                                         color = RvInk
                                     )
                                     Text(
-                                        text = "Correct answer: ${feedback.correctAnswer}",
+                                        text = stringResource(R.string.done_correct_answer, feedback.correctAnswer),
                                         fontSize = 16.sp,
                                         color = RvErrorEdge,
                                         fontWeight = FontWeight.Medium
@@ -462,7 +462,7 @@ fun EnhancedUniversalFeedbackOverlay(
                                 }
 
                                 Text(
-                                    text = "Keep trying! You've got this! 💪",
+                                    text = stringResource(R.string.done_keep_trying),
                                     fontSize = 16.sp,
                                     color = RvInkSoft,
                                     fontWeight = FontWeight.Medium
@@ -482,7 +482,7 @@ fun EnhancedUniversalFeedbackOverlay(
                                     color = RvSuccess
                                 )
                                 Text(
-                                    text = "Updating score...",
+                                    text = stringResource(R.string.done_updating_score),
                                     fontSize = 12.sp,
                                     color = RvInkSoft
                                 )
@@ -491,7 +491,7 @@ fun EnhancedUniversalFeedbackOverlay(
 
                         // Tap to continue hint
                         Text(
-                            text = "Tap to continue",
+                            text = stringResource(R.string.done_tap_to_continue),
                             fontSize = 12.sp,
                             color = RvInkSoft,
                             modifier = Modifier.padding(top = 8.dp)
@@ -542,7 +542,7 @@ private fun EnhancedScoreBreakdownView(scoreBreakdown: ScoreBreakdown) {
     ) {
         // Total score display
         Text(
-            text = "+${scoreBreakdown.totalScore} points",
+            text = stringResource(R.string.xb_plus_points, scoreBreakdown.totalScore),
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             color = RvSuccessEdge
@@ -559,18 +559,18 @@ private fun EnhancedScoreBreakdownView(scoreBreakdown: ScoreBreakdown) {
                     modifier = Modifier.padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    ScoreRowView("Base Score", scoreBreakdown.baseScore, RvSuccessEdge)
+                    ScoreRowView(stringResource(R.string.done_base_score), scoreBreakdown.baseScore, RvSuccessEdge)
 
                     if (scoreBreakdown.timeBonus > 0) {
-                        ScoreRowView("Time Bonus", scoreBreakdown.timeBonus, RvSkyEdge)
+                        ScoreRowView(stringResource(R.string.done_time_bonus), scoreBreakdown.timeBonus, RvSkyEdge)
                     }
 
                     if (scoreBreakdown.streakBonus > 0) {
-                        ScoreRowView("Streak Bonus", scoreBreakdown.streakBonus, RvWarningEdge)
+                        ScoreRowView(stringResource(R.string.done_streak_bonus), scoreBreakdown.streakBonus, RvWarningEdge)
                     }
 
                     if (scoreBreakdown.difficultyMultiplier > 1.0f) {
-                        val multiplierText = "${(scoreBreakdown.difficultyMultiplier * 100).toInt()}% difficulty"
+                        val multiplierText = stringResource(R.string.done_difficulty_multiplier_pct, (scoreBreakdown.difficultyMultiplier * 100).toInt())
                         Text(
                             text = multiplierText,
                             fontSize = 12.sp,
@@ -584,7 +584,7 @@ private fun EnhancedScoreBreakdownView(scoreBreakdown: ScoreBreakdown) {
 
         // XP gained
         Text(
-            text = "+${scoreBreakdown.xpGained} XP",
+            text = stringResource(R.string.done_plus_xp, scoreBreakdown.xpGained),
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             color = RvSkyEdge
@@ -614,21 +614,21 @@ private fun LevelUpView(levelUp: LevelUpInfo) {
             )
 
             Text(
-                text = "LEVEL UP!",
+                text = stringResource(R.string.level_up).uppercase(),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvSunEdge
             )
 
             Text(
-                text = "Level ${levelUp.oldLevel} → ${levelUp.newLevel}",
+                text = stringResource(R.string.done_level_change, levelUp.oldLevel, levelUp.newLevel),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
                 color = RvInk
             )
 
             Text(
-                text = "+${levelUp.rewardPoints} bonus points!",
+                text = stringResource(R.string.done_plus_bonus_points, levelUp.rewardPoints),
                 fontSize = 14.sp,
                 color = RvSuccessEdge
             )
@@ -661,13 +661,13 @@ fun EnhancedStreakBonusCard(
                         Text("⚡", fontSize = 20.sp)
                         Column {
                             Text(
-                                text = "${streakInfo.currentStreak} question streak!",
+                                text = stringResource(R.string.done_question_streak, streakInfo.currentStreak),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvSunEdge
                             )
                             Text(
-                                text = "×${streakInfo.streakMultiplier} score multiplier",
+                                text = stringResource(R.string.done_score_multiplier, streakInfo.streakMultiplier.toString()),
                                 fontSize = 12.sp,
                                 color = RvWarningEdge
                             )
@@ -683,13 +683,13 @@ fun EnhancedStreakBonusCard(
                         Text("🔥", fontSize = 20.sp)
                         Column {
                             Text(
-                                text = "${streakInfo.dailyStreak} day streak!",
+                                text = stringResource(R.string.done_day_streak_bang, streakInfo.dailyStreak),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvCoralEdge
                             )
                             Text(
-                                text = "Daily streak bonus active",
+                                text = stringResource(R.string.done_daily_streak_bonus_active),
                                 fontSize = 12.sp,
                                 color = RvCoral
                             )
@@ -708,7 +708,7 @@ private fun NewAchievementsView(achievements: List<Achievement>) {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "🏆 Achievement${if (achievements.size > 1) "s" else ""} Unlocked!",
+            text = stringResource(if (achievements.size > 1) R.string.done_achievements_unlocked else R.string.done_achievement_unlocked),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = RvGrapeEdge
@@ -733,13 +733,13 @@ private fun NewAchievementsView(achievements: List<Achievement>) {
                     )
                     Column {
                         Text(
-                            text = achievement.title,
+                            text = stringResource(achievement.titleRes),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvInk
                         )
                         Text(
-                            text = achievement.description,
+                            text = stringResource(achievement.descriptionRes),
                             fontSize = 12.sp,
                             color = RvGrapeEdge
                         )
@@ -750,7 +750,7 @@ private fun NewAchievementsView(achievements: List<Achievement>) {
 
         if (achievements.size > 2) {
             Text(
-                text = "+${achievements.size - 2} more achievements!",
+                text = LocalContext.current.resources.getQuantityString(R.plurals.done_more_achievements, achievements.size - 2, achievements.size - 2),
                 fontSize = 12.sp,
                 color = RvGrapeEdge
             )

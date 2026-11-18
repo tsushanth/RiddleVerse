@@ -377,8 +377,8 @@ class DailyCompletionActivity : AppCompatActivity() {
 
                     val leaderboardIntent = Intent(this, PuzzleLeaderboardActivity::class.java).apply {
                         putExtra("puzzleId", puzzleId)
-                        putExtra("puzzleName", leaderboard.puzzleName ?: "Custom Puzzle")
-                        putExtra("puzzleCreator", leaderboard.puzzleCreator ?: "Unknown")
+                        putExtra("puzzleName", leaderboard.puzzleName ?: getString(R.string.cat_extra_custom))
+                        putExtra("puzzleCreator", leaderboard.puzzleCreator ?: getString(R.string.home_creator_unknown))
                         putExtra("totalPlayers", leaderboard.totalPlayers)
                         putExtra("userRank", leaderboard.userRank ?: 0)
                         putExtra("userScore", leaderboard.userScore ?: 0)
@@ -398,7 +398,7 @@ class DailyCompletionActivity : AppCompatActivity() {
                     Log.e("DailyCompletion", "Failed to fetch leaderboard")
                     Toast.makeText(
                         this,
-                        "Could not load leaderboard for this puzzle",
+                        getString(R.string.home_toast_leaderboard_failed),
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -475,7 +475,7 @@ class DailyCompletionActivity : AppCompatActivity() {
                             Handler(Looper.getMainLooper()).post {
                                 Toast.makeText(
                                     this@DailyCompletionActivity,
-                                    "Score submitted to leaderboard!",
+                                    getString(R.string.done_leaderboard_score_submitted),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
@@ -533,13 +533,13 @@ class DailyCompletionActivity : AppCompatActivity() {
 
     private fun getPuzzleDisplayName(puzzleType: String): String {
         return when (puzzleType.lowercase()) {
-            "riddle" -> "Riddles"
-            "wordpuzzle" -> "Word Puzzles"
-            "logic" -> "Logic Puzzles"
-            "math" -> "Math Puzzles"
-            "trivia" -> "Trivia"
-            "brainteaser" -> "Brain Teasers"
-            else -> PuzzleTypeNames.display(puzzleType)
+            "riddle" -> getString(R.string.cat_riddles_title)
+            "wordpuzzle" -> getString(R.string.cat_group_word_puzzles_name)
+            "logic" -> getString(R.string.cat_group_logic_puzzles_name)
+            "math" -> getString(R.string.done_type_math_puzzles)
+            "trivia" -> getString(R.string.cat_trivia_title)
+            "brainteaser" -> getString(R.string.done_type_brain_teasers)
+            else -> PuzzleTypeNames.display(this, puzzleType)
         }
     }
 }
@@ -613,18 +613,17 @@ fun GroupCompletionDialog(
     AlertDialog(
         onDismissRequest = { /* Don't allow dismiss */ },
         title = {
-            Text("Puzzle Type Completed!")
+            Text(stringResource(R.string.done_group_completed_title))
         },
         text = {
             Text(
-                "Excellent work! You've completed all 5 $puzzleType puzzles.\n\n" +
-                        if (sourceGroupName != null) "Next puzzle type in '$sourceGroupName' is now unlocked!"
-                        else "You can continue with the next puzzle type in your group."
+                if (sourceGroupName != null) stringResource(R.string.done_group_completed_msg_named, puzzleType, sourceGroupName)
+                else stringResource(R.string.done_group_completed_msg_generic, puzzleType)
             )
         },
         confirmButton = {
             Button(onClick = onContinueGroup) {
-                Text("Continue Group")
+                Text(stringResource(R.string.done_continue_group))
             }
         },
         dismissButton = {

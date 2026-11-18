@@ -1,6 +1,7 @@
 // NumberSumPuzzleScreen.kt
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.platform.LocalContext
 import android.util.Log
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
@@ -84,6 +85,7 @@ fun NumberSumPuzzleScreen(
     val config = difficultyConfigs[difficulty.lowercase()]?.invoke() ?: generateMediumPuzzle()
 
     var timeLeft by remember { mutableStateOf(config.timeLimit) }
+    val xbContext = LocalContext.current
     var isPaused by remember { mutableStateOf(false) }
     var currentHearts by remember { mutableStateOf(hearts) }
     var gameCompleted by remember { mutableStateOf(false) }
@@ -215,7 +217,7 @@ fun NumberSumPuzzleScreen(
             val totalPoints = basePoints + timeBonus
             currentScore += totalPoints
 
-            completionMessage = "🎉 Perfect! +$totalPoints points"
+            completionMessage = "🎉 " + xbContext.getString(R.string.xb_perfect_plus_points, totalPoints)
             showCompletionMessage = true
 
             delay(2000)
@@ -334,7 +336,7 @@ fun NumberSumPuzzleScreen(
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Puzzle $level",
+                            text = stringResource(R.string.xb_puzzle_n, level),
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvInkSoft,
@@ -353,7 +355,7 @@ fun NumberSumPuzzleScreen(
 
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = "Score: $currentScore",
+                            text = "${stringResource(R.string.score_label)}: $currentScore",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Bold,
                             color = RvInk,
@@ -400,7 +402,7 @@ fun NumberSumPuzzleScreen(
                     )
                     // Always reserve the line so the layout does not jump when a tile is picked.
                     Text(
-                        text = if (currentSum > 0) "Current: $currentSum" else " ",
+                        text = if (currentSum > 0) "${stringResource(R.string.common_current)}: $currentSum" else " ",
                         fontSize = 14.sp,
                         color = RvInk,
                         maxLines = 1

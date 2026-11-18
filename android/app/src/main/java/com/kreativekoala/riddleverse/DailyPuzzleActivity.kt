@@ -20,6 +20,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.google.gson.Gson
 import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import com.kreativekoala.riddleverse.ui.theme.RvCanvas
@@ -91,7 +92,7 @@ private fun DailyPuzzleRoot(day: Long, onClose: () -> Unit) {
         Box(Modifier.fillMaxSize().background(RvCanvas), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 CircularProgressIndicator()
-                Text("Preparing today's puzzle", color = RvInk)
+                Text(stringResource(R.string.done_daily_preparing), color = RvInk)
             }
         }
         return
@@ -142,10 +143,10 @@ private fun DailyPuzzleRoot(day: Long, onClose: () -> Unit) {
     if (failed) {
         AlertDialog(
             onDismissRequest = {},
-            title = { Text("Not solved this time") },
-            text = { Text("It is the same puzzle for everyone today. Try again, your streak is safe until the day ends.") },
-            confirmButton = { TextButton(onClick = { failed = false; attempt++ }) { Text("Try again") } },
-            dismissButton = { TextButton(onClick = onClose) { Text("Back") } },
+            title = { Text(stringResource(R.string.done_daily_not_solved_title)) },
+            text = { Text(stringResource(R.string.done_daily_not_solved_body)) },
+            confirmButton = { TextButton(onClick = { failed = false; attempt++ }) { Text(stringResource(R.string.try_again)) } },
+            dismissButton = { TextButton(onClick = onClose) { Text(stringResource(R.string.back)) } },
         )
     }
 }

@@ -38,6 +38,7 @@ import kotlin.math.ceil
 import kotlin.math.sqrt
 import androidx.compose.ui.res.stringResource
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @Composable
 fun AdaptiveUniqueObjectPuzzleScreen(
@@ -200,7 +201,7 @@ fun AdaptiveUniqueObjectPuzzleScreen(
                 GroupECompactHud(
                     timer = displayTimer,
                     onBack = onBack,
-                    subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore" +
+                    subtitle = "${rvDifficultyLabel(currentDifficultyLevel.name)} \u2022 ${stringResource(R.string.score_label)} $totalScore" +
                         (if (currentStreak > 0) " \u2022 \uD83D\uDD25$currentStreak" else ""),
                     lives = currentHearts,
                     urgent = timerUrgent
@@ -246,7 +247,7 @@ fun AdaptiveUniqueObjectPuzzleScreen(
             )
             if (!compact) {
                 Text(
-                    text = currentDifficultyLevel.description,
+                    text = currentDifficultyLevel.descriptionText(),
                     color = RvInkSoft,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Center,
@@ -444,7 +445,7 @@ fun AdaptiveUniqueObjectPuzzleScreen(
                     )
 
                     Text(
-                        text = "Keep looking! Hearts remaining: $currentHearts",
+                        text = stringResource(R.string.xa_keep_looking_hearts, currentHearts),
                         color = RvInk,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center
@@ -501,12 +502,12 @@ fun AdaptiveUniqueObjectTopBar(
         // Level and difficulty
         Column(horizontalAlignment = Alignment.Start) {
             Text(
-                text = "Level ${level.level}",
+                text = stringResource(R.string.stats_level_number, level.level),
                 color = RvInk,
                 fontSize = 14.sp
             )
             Text(
-                text = currentDifficulty.name.uppercase(),
+                text = rvDifficultyLabel(currentDifficulty.name).uppercase(),
                 color = Color.Yellow,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold

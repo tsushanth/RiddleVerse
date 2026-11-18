@@ -60,6 +60,8 @@ import java.lang.Math.pow
 import kotlin.math.hypot
 import kotlin.math.pow
 import kotlin.math.sqrt
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
+import androidx.compose.ui.platform.LocalContext
 
 // Data classes for Find Differences puzzle
 data class FindDifferencesPuzzleData(
@@ -108,6 +110,7 @@ fun FindDifferencesScreenWrapper(
     handlePuzzleCompletion: (Boolean, Boolean, Int) -> Unit
 ) {
     val TAG = "FindDifferencesWrapper"
+    val context = LocalContext.current
     Log.d(TAG, "🖼️ Loading Find Differences puzzle: ${currentPuzzle.puzzleId}")
 
     // State for puzzle data
@@ -122,7 +125,7 @@ fun FindDifferencesScreenWrapper(
     LaunchedEffect(currentPuzzle.puzzleId, loadAttempt) {
         kotlinx.coroutines.delay(20_000)
         if (isLoading && puzzleData == null) {
-            errorMessage = "This puzzle is taking too long to load. Please try again."
+            errorMessage = context.getString(R.string.common_puzzle_load_timeout)
             hasError = true
             isLoading = false
         }
@@ -211,7 +214,7 @@ fun FindDifferencesScreenWrapper(
             // Only check for PLACEHOLDER if it's actually there, not just any URL
             if (imageUrl.contains("PLACEHOLDER") || imageUrl.contains("placeholder")) {
                 Log.e(TAG, "❌ Image still contains placeholder: '$imageUrl'")
-                errorMessage = "Image is still being generated. Please try again in a moment."
+                errorMessage = context.getString(R.string.common_image_still_generating)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -220,7 +223,7 @@ fun FindDifferencesScreenWrapper(
             // Validate URL format more flexibly
             if (!imageUrl.startsWith("http")) {
                 Log.e(TAG, "❌ Invalid image URL format: '$imageUrl'")
-                errorMessage = "Invalid image URL format. Please try again."
+                errorMessage = context.getString(R.string.common_invalid_image_url)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -354,7 +357,7 @@ fun FindDifferencesScreenWrapper(
             Log.e(TAG, "❌ Error parsing puzzle data: ${e.message}", e)
             Log.e(TAG, "📄 Raw question data: ${currentPuzzle.question}")
             Log.e(TAG, "📄 Question data type: ${currentPuzzle.question?.javaClass?.simpleName}")
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = context.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -362,7 +365,7 @@ fun FindDifferencesScreenWrapper(
 
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading find differences puzzle...")
+            LoadingScreen(message = stringResource(R.string.xa_loading_find_differences_puzzle))
         }
 
         hasError -> {
@@ -400,7 +403,7 @@ fun FindDifferencesScreenWrapper(
         else -> {
             // Not loading, no error, no data: previously rendered nothing (blank white screen).
             FdErrorScreen(
-                message = "The puzzle could not be loaded. Please try again.",
+                message = stringResource(R.string.common_puzzle_load_failed),
                 onRetry = {
                     isLoading = true
                     hasError = false
@@ -429,7 +432,7 @@ fun FdErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error",
+                text = "⚠️ ${stringResource(R.string.common_error)}",
                 color = Color.Red,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -447,14 +450,14 @@ fun FdErrorScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(onClick = onRetry) {
-                    Text("Retry")
+                    Text(stringResource(R.string.retry))
                 }
 
                 Button(
                     onClick = onSkip,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
                 ) {
-                    Text("Skip")
+                    Text(stringResource(R.string.skip))
                 }
             }
         }
@@ -692,7 +695,7 @@ fun FindDifferencesPuzzleScreen(
                 trackColor = Color(0xFF444444)
             )
             Text(
-                text = "Wrong: $wrongClicks/${puzzleData.gameSettings.maxWrongClicks}",
+                text = stringResource(R.string.xa_wrong_ratio, wrongClicks, puzzleData.gameSettings.maxWrongClicks),
                 color = if (wrongClicks >= puzzleData.gameSettings.maxWrongClicks * 0.8) RvCoral else Color.White,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
@@ -772,7 +775,7 @@ fun EnhancedFindDifferencesHeader(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = difficulty.uppercase(),
+                        text = rvDifficultyLabel(difficulty).uppercase(),
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -980,7 +983,7 @@ fun ZoomableImageView(
                         .size(40.dp)
                         .background(Color.Yellow.copy(alpha = 0.7f), CircleShape)
                 ) {
-                    Icon(Icons.Default.Lightbulb, "Hint", tint = Color.Black, modifier = Modifier.size(24.dp))
+                    Icon(Icons.Default.Lightbulb, stringResource(R.string.hint), tint = Color.Black, modifier = Modifier.size(24.dp))
                 }
             }
         }
@@ -1156,7 +1159,7 @@ fun LandscapeImageView(
                 ) {
                     Icon(
                         Icons.Default.Lightbulb,
-                        "Hint",
+                        stringResource(R.string.hint),
                         tint = Color.Black,
                         modifier = Modifier.size(24.dp)
                     )
@@ -1287,7 +1290,7 @@ fun ZoneHintCard(
                     ) {
                         Icon(
                             Icons.Default.Lightbulb,
-                            "Hint",
+                            stringResource(R.string.hint),
                             tint = Color.Black
                         )
                         Text(

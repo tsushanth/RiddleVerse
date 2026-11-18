@@ -288,7 +288,7 @@ fun DailyPuzzleSettingsSection() {
                 }
             }
             Text(
-                "Streak freezes: $freezes of ${DailyStreakRules.MAX_FREEZES}. A freeze quietly covers a missed day so your streak survives; you earn one every ${DailyStreakRules.FREEZE_EVERY} streak days.",
+                stringResource(R.string.stats_streak_freezes_info, freezes, DailyStreakRules.MAX_FREEZES, DailyStreakRules.FREEZE_EVERY),
                 fontSize = 12.sp, color = RvInkSoft,
             )
         }

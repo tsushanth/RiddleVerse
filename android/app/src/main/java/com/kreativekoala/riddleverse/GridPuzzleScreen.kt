@@ -79,6 +79,7 @@ import com.kreativekoala.riddleverse.ui.theme.RvViolet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
 
 // Cell tints
 private val SelectedFill = Color(0xFFD9D0FF)
@@ -189,9 +190,9 @@ fun GridPuzzleContent(
     if (showRules) {
         AlertDialog(
             onDismissRequest = { showRules = false },
-            title = { Text("How to play ${spec.game.title}") },
+            title = { Text(stringResource(R.string.xa_how_to_play_game, spec.game.title)) },
             text = { Text(GridPuzzleFactory.rulesFor(spec.game)) },
-            confirmButton = { TextButton(onClick = { showRules = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text("Got it") } }
+            confirmButton = { TextButton(onClick = { showRules = false }, modifier = Modifier.heightIn(min = 48.dp)) { Text(stringResource(R.string.got_it)) } }
         )
     }
 
@@ -201,18 +202,18 @@ fun GridPuzzleContent(
             // Back = Continue; tapping outside is ignored.
             onDismissRequest = { finished = true; onGameComplete(won, if (won) state.score() else 0) },
             properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = false),
-            title = { Text(if (won) "Solved!" else "Out of lives") },
+            title = { Text(if (won) stringResource(R.string.xa_solved) else stringResource(R.string.xa_out_of_lives)) },
             text = {
                 Text(
-                    if (won) "Time ${formatClock(state.elapsedSeconds)}  |  Mistakes ${state.mistakes}  |  Hints ${state.hintsUsed}\n+${state.score()} points"
-                    else "Three mistakes ends the puzzle. Try the next one!"
+                    if (won) stringResource(R.string.xa_grid_result_summary, formatClock(state.elapsedSeconds), state.mistakes, state.hintsUsed, state.score())
+                    else stringResource(R.string.xa_grid_three_mistakes)
                 )
             },
             confirmButton = {
                 TextButton(
                     onClick = { finished = true; onGameComplete(won, if (won) state.score() else 0) },
                     modifier = Modifier.heightIn(min = 48.dp)
-                ) { Text("Continue") }
+                ) { Text(stringResource(R.string.continue_label)) }
             }
         )
     }
@@ -224,7 +225,7 @@ private fun formatClock(sec: Int) = String.format("%02d:%02d", sec / 60, sec % 6
 private fun GridHeader(spec: GridSpec, state: GridPlayState, level: String, onBack: () -> Unit, height: Dp, onRules: () -> Unit) {
     Row(Modifier.fillMaxWidth().height(height), verticalAlignment = Alignment.CenterVertically) {
         IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = RvInk)
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
         }
         Column(Modifier.weight(1f)) {
             Text(spec.game.title, color = RvInk, fontWeight = FontWeight.Bold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -246,7 +247,7 @@ private fun GridHeader(spec: GridSpec, state: GridPlayState, level: String, onBa
             }
         }
         IconButton(onClick = onRules, modifier = Modifier.size(48.dp)) {
-            Icon(Icons.Filled.Info, contentDescription = "Rules", tint = RvViolet)
+            Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.xa_rules), tint = RvViolet)
         }
     }
 }
@@ -449,7 +450,7 @@ private fun SignOverlay(spec: GridSpec, modifier: Modifier) {
 @Composable
 private fun GridControls(state: GridPlayState, height: Dp) {
     Row(Modifier.fillMaxWidth().height(height), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        ControlButton("Undo", Icons.AutoMirrored.Filled.Undo, enabled = state.undoDepth > 0, modifier = Modifier.weight(1f)) { state.undo() }
+        ControlButton(stringResource(R.string.xa_undo), Icons.AutoMirrored.Filled.Undo, enabled = state.undoDepth > 0, modifier = Modifier.weight(1f)) { state.undo() }
         ControlButton("Erase", Icons.Filled.Clear, enabled = state.selected >= 0 && !state.isGiven(state.selected), modifier = Modifier.weight(1f)) { state.erase() }
         if (state.usesNotes) {
             ControlButton(if (state.notesMode) "Notes on" else "Notes", Icons.Filled.Edit, active = state.notesMode, modifier = Modifier.weight(1f)) {

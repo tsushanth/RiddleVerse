@@ -37,6 +37,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.PI
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -205,7 +206,7 @@ fun AdaptiveTriangleDotMemoryPuzzleScreen(
             GroupECompactHud(
                 timer = timerText,
                 onBack = onBack,
-                subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore",
+                subtitle = "${rvDifficultyLabel(currentDifficultyLevel.name)} \u2022 ${stringResource(R.string.score_label)} $totalScore",
                 lives = currentHearts,
                 urgent = timeRemaining <= 10 && gameState == "playing"
             )
@@ -418,13 +419,13 @@ fun AdaptiveTriangleDotTopBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     color = RvInk,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = currentDifficulty.name.uppercase(),
+                    text = rvDifficultyLabel(currentDifficulty.name).uppercase(),
                     color = RvSkyEdge,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -443,7 +444,7 @@ fun AdaptiveTriangleDotTopBar(
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
                 Text(
-                    text = "TIME $timer",
+                    text = "${stringResource(R.string.time_label).uppercase()} $timer",
                     color = RvInk,
                     fontWeight = FontWeight.Bold
                 )
@@ -457,7 +458,7 @@ fun AdaptiveTriangleDotTopBar(
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ) {
                     Text(
-                        text = "SCORE $score",
+                        text = "${stringResource(R.string.score_label).uppercase()} $score",
                         color = RvInk,
                         fontWeight = FontWeight.Bold
                     )
@@ -491,7 +492,7 @@ private fun AdaptiveTriangleDotInstructionsScreen(
 ) {
     GroupETriangleInstructionsBody(
         instructions = instructions,
-        extra = "\u26A1 Difficulty: ${difficulty.name} \u2022 Time Limit: ${difficulty.timeLimit}s",
+        extra = "\u26A1 Difficulty: ${rvDifficultyLabel(difficulty.name)} \u2022 Time Limit: ${difficulty.timeLimit}s",
         onStart = onStartGame
     )
 }
@@ -638,7 +639,7 @@ private fun AdaptiveTriangleDotCompletionScreen(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Difficulty: ${difficulty.name}",
+                    text = stringResource(R.string.riddle_tier_desc, rvDifficultyLabel(difficulty.name)),
                     fontSize = 14.sp,
                     color = RvInkSoft,
                     fontWeight = FontWeight.Medium

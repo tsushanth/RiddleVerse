@@ -37,6 +37,8 @@ import kotlinx.coroutines.delay
 import androidx.compose.ui.res.stringResource
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,6 +96,7 @@ fun AdaptiveSymbolSwipePuzzleScreen(
     var gameStarted by remember { mutableStateOf(!isFirstPuzzle) }
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
+    val msgContext = LocalContext.current
     var feedbackColor by remember { mutableStateOf(Color.Green) }
 
     // Symbol configuration
@@ -272,14 +275,14 @@ fun AdaptiveSymbolSwipePuzzleScreen(
             score += points
             totalScore += points
 
-            feedbackMessage = if (multiplier > 1) "Perfect! +$points (x${multiplier})" else "Correct! +$points"
+            feedbackMessage = if (multiplier > 1) msgContext.getString(R.string.xa_perfect_points_multiplier, points, multiplier) else msgContext.getString(R.string.xa_correct_points, points)
             feedbackColor = RvSuccess
         } else {
             consecutiveCorrect = 0
             multiplier = 1
             currentHearts = maxOf(0, currentHearts - 1)
 
-            feedbackMessage = "Wrong direction! Lives: $currentHearts"
+            feedbackMessage = msgContext.getString(R.string.xa_wrong_direction_lives, currentHearts)
             feedbackColor = Color(0xFFE91E63)
 
             if (currentHearts == 0) {
@@ -347,7 +350,7 @@ fun AdaptiveSymbolSwipePuzzleScreen(
                 GroupECompactHud(
                     timer = timerText,
                     onBack = onBack,
-                    subtitle = "${currentDifficultyLevel.name} \u2022 ${stringResource(R.string.score_label)} $totalScore \u2022 ${currentSymbolIndex}/${symbolSequence.size}",
+                    subtitle = "${rvDifficultyLabel(currentDifficultyLevel.name)} \u2022 ${stringResource(R.string.score_label)} $totalScore \u2022 ${currentSymbolIndex}/${symbolSequence.size}",
                     lives = currentHearts,
                     urgent = timeLeft <= 30,
                     onPause = { isPaused = !isPaused }
@@ -389,7 +392,7 @@ fun AdaptiveSymbolSwipePuzzleScreen(
                     title = "\uD83D\uDD04 Adaptive Symbol Swipe",
                     leftSymbol = leftSymbol,
                     rightSymbol = rightSymbol,
-                    extra = if (compact) null else currentDifficultyLevel.description,
+                    extra = if (compact) null else currentDifficultyLevel.descriptionText(),
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxWidth()
@@ -476,7 +479,7 @@ fun AdaptiveSymbolSwipePuzzleScreen(
                                 color = RvViolet
                             )
                             Text(
-                                text = currentDifficultyLevel.name,
+                                text = rvDifficultyLabel(currentDifficultyLevel.name),
                                 fontSize = 14.sp,
                                 color = RvInkSoft,
                                 textAlign = TextAlign.Center
@@ -547,7 +550,7 @@ fun AdaptiveSymbolSwipeTopBar(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "${currentDifficulty.name} • Puzzle $currentPuzzle/$totalPuzzles",
+                    text = "${rvDifficultyLabel(currentDifficulty.name)} • Puzzle $currentPuzzle/$totalPuzzles",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInkSoft
@@ -586,7 +589,7 @@ fun AdaptiveSymbolSwipeTopBar(
             }
 
             IconButton(onClick = onPause) {
-                Icon(Icons.Default.Pause, contentDescription = "Pause")
+                Icon(Icons.Default.Pause, contentDescription = stringResource(R.string.common_pause))
             }
         }
 

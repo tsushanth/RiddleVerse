@@ -4,6 +4,7 @@ package com.kreativekoala.riddleverse
 // Add this to your PuzzleScreenType enum:
 // NUMBER_SEQUENCE_SCREEN("Number Sequence Screen"),
 
+import androidx.compose.ui.platform.LocalContext
 import com.kreativekoala.riddleverse.ui.theme.*
 import android.util.Log
 import androidx.compose.animation.*
@@ -78,6 +79,7 @@ fun NumberSequencePuzzleScreen(
     )
 
     val config = difficultyConfigs[difficulty.lowercase()] ?: difficultyConfigs["medium"]!!
+    val xbContext = LocalContext.current
     val totalTimeInSeconds = config.numberCount * config.timePerNumber
 
     var timeLeft by remember { mutableStateOf(totalTimeInSeconds) }
@@ -216,7 +218,7 @@ fun NumberSequencePuzzleScreen(
             // Round completed successfully
             totalScore += (config.numberCount * 10) + (timeLeft * 2) // Bonus for time remaining
 
-            feedbackMessage = "🎉 Round $currentRound Complete! +${(config.numberCount * 10) + (timeLeft * 2)} points"
+            feedbackMessage = "🎉 " + xbContext.getString(R.string.xb_round_complete_points, currentRound, (config.numberCount * 10) + (timeLeft * 2))
             feedbackColor = RvSuccess
             showFeedback = true
 
@@ -237,7 +239,7 @@ fun NumberSequencePuzzleScreen(
     LaunchedEffect(currentHearts) {
         if (currentHearts == 0 && gameStarted && !gameCompleted) {
             gameCompleted = true
-            feedbackMessage = "💔 Game Over! Final Score: $totalScore"
+            feedbackMessage = "💔 " + xbContext.getString(R.string.xb_game_over_final_score, totalScore)
             feedbackColor = RvError
             showFeedback = true
             delay(2000)
@@ -270,7 +272,7 @@ fun NumberSequencePuzzleScreen(
                     gameCompleted = true
                     onBack()
                 },
-                subtitle = "${config.name} \u2022 Round $currentRound \u2022 ${stringResource(R.string.score_label)} $totalScore",
+                subtitle = "${localizedDifficulty(config.name)} \u2022 ${stringResource(R.string.xb_round_n, currentRound)} \u2022 ${stringResource(R.string.score_label)} $totalScore",
                 lives = currentHearts,
                 urgent = timeLeft <= 30,
                 onPause = { isPaused = !isPaused }

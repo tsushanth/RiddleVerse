@@ -42,7 +42,7 @@ val SpatialColorNames = listOf(
 )
 
 @Composable
-fun SpatialLoading(label: String = "Preparing puzzle") {
+fun SpatialLoading(label: String = stringResource(R.string.xb_preparing_puzzle)) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             CircularProgressIndicator()
@@ -75,7 +75,7 @@ fun SpatialGameShell(
             Column(Modifier.weight(1f)) {
                 Text(title, fontSize = 18.sp, fontWeight = FontWeight.Bold, maxLines = 1)
                 Text(
-                    "${args.difficulty}  |  ${args.level}",
+                    "${localizedDifficulty(args.difficulty)}  |  ${args.level}",
                     fontSize = 12.sp, maxLines = 1,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -174,10 +174,11 @@ fun SpatialResultDialog(
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
                 if (success && stars > 0) {
+                    val starsCd = stringResource(R.string.xb_stars_of_three, stars)
                     Text(
                         "★".repeat(stars) + "☆".repeat((3 - stars).coerceAtLeast(0)),
                         fontSize = 28.sp, color = Color(0xFFFFB020),
-                        modifier = Modifier.semantics { contentDescription = "$stars of 3 stars" }
+                        modifier = Modifier.semantics { contentDescription = starsCd }
                     )
                 }
                 Text(title, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)

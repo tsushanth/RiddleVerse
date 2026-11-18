@@ -30,7 +30,7 @@ object DailyShareCard {
     private val FLAME = Color.parseColor("#FF8C00")
 
     /** Draws the 1080x1080 card. Call off the main thread if you can; it is cheap but allocates ~4.6 MB. */
-    fun render(r: DailyShareResult): Bitmap {
+    fun render(context: Context, r: DailyShareResult): Bitmap {
         val bmp = Bitmap.createBitmap(SIZE, SIZE, Bitmap.Config.ARGB_8888)
         val c = Canvas(bmp)
         val w = SIZE.toFloat()
@@ -48,12 +48,16 @@ object DailyShareCard {
                 textAlign = Paint.Align.CENTER
                 typeface = if (bold) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
             }
+            // Translations can be longer than the English text: shrink to fit inside the panel.
+            val maxWidth = w - 200f
+            val measured = p.measureText(s)
+            if (measured > maxWidth) p.textSize = size * maxWidth / measured
             c.drawText(s, w / 2f, y, p)
         }
 
         text("RiddleVerse", 56f, SUN, 190f)
-        text("Daily #${r.number}", 112f, Color.WHITE, 320f)
-        text("SOLVED", 64f, MINT, 410f)
+        text(context.getString(R.string.done_card_daily_number, r.number), 112f, Color.WHITE, 320f)
+        text(context.getString(R.string.done_card_solved), 64f, MINT, 410f)
         text(DailyShareText.formatTime(r.seconds), 220f, Color.WHITE, 640f)
         text(r.gameName, 52f, Color.argb(220, 255, 255, 255), 725f, bold = false)
 
@@ -71,8 +75,8 @@ object DailyShareCard {
             x += box + gap
         }
 
-        if (r.streak > 0) text("🔥 ${r.streak} day streak", 64f, FLAME, 940f)
-        text("Play today's puzzle on Google Play", 40f, Color.argb(200, 255, 255, 255), 1005f, bold = false)
+        if (r.streak > 0) text(context.resources.getQuantityString(R.plurals.daily_result_streak, r.streak, r.streak), 64f, FLAME, 940f)
+        text(context.getString(R.string.done_card_play_prompt), 40f, Color.argb(200, 255, 255, 255), 1005f, bold = false)
         return bmp
     }
 
@@ -80,7 +84,7 @@ object DailyShareCard {
     fun save(context: Context, r: DailyShareResult): File {
         val dir = File(context.cacheDir, "shared_images").apply { mkdirs() }
         val file = File(dir, "riddleverse_daily_${r.number}.png")
-        val bmp = render(r)
+        val bmp = render(context, r)
         try {
             FileOutputStream(file).use { bmp.compress(Bitmap.CompressFormat.PNG, 100, it) }
         } finally {
@@ -93,9 +97,9 @@ object DailyShareCard {
     fun shareText(context: Context, r: DailyShareResult) {
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, DailyShareText.build(r))
+            putExtra(Intent.EXTRA_TEXT, DailyShareText.build(r, context.getString(R.string.done_share_headline)))
         }
-        context.startActivity(Intent.createChooser(send, "Share your daily result"))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.done_share_daily_chooser)))
     }
 
     /** Share sheet with the image card (plus the same text). Uses a FileProvider content URI: no storage permission. */
@@ -105,10 +109,10 @@ object DailyShareCard {
         val send = Intent(Intent.ACTION_SEND).apply {
             type = "image/png"
             putExtra(Intent.EXTRA_STREAM, uri)
-            putExtra(Intent.EXTRA_TEXT, DailyShareText.build(r))
+            putExtra(Intent.EXTRA_TEXT, DailyShareText.build(r, context.getString(R.string.done_share_headline)))
             clipData = android.content.ClipData.newRawUri("RiddleVerse Daily", uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(send, "Share your daily result").addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
+        context.startActivity(Intent.createChooser(send, context.getString(R.string.done_share_daily_chooser)).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION))
     }
 }

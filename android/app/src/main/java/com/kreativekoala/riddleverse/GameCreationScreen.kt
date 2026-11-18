@@ -141,12 +141,12 @@ fun GameCreationScreen(
 
     // Fallback suggestions in case API is unreachable
     val fallbackSuggestions = listOf(
-        Suggestion("Snake game", "A classic snake game with neon glow effects. Swipe to change direction. Speed increases every 5 points. Walls and self-bite end the game."),
-        Suggestion("Brick breaker", "A brick breaker game with colorful bricks. Drag paddle to bounce ball. Power-ups: wider paddle, multi-ball. 3 lives."),
-        Suggestion("Memory cards", "A memory card matching game with 6 pairs in a 3x4 grid. Tap to flip and find matches. Track moves and time."),
-        Suggestion("Whack-a-mole", "Whack-a-mole with emoji characters on a 3x3 grid. Tap moles to score. Golden moles = bonus. 30 second timer."),
-        Suggestion("Space invaders", "Space invaders — drag spaceship, tap to shoot. Aliens descend and shoot back. Wave system gets harder."),
-        Suggestion("Trivia quiz", "Science trivia with 10 questions, 4 options each. 15-second timer. Faster = more points.")
+        Suggestion(stringResource(R.string.create_idea_snake_label), stringResource(R.string.create_idea_snake_prompt)),
+        Suggestion(stringResource(R.string.create_idea_brick_label), stringResource(R.string.create_idea_brick_prompt)),
+        Suggestion(stringResource(R.string.create_idea_memory_label), stringResource(R.string.create_idea_memory_prompt)),
+        Suggestion(stringResource(R.string.create_idea_whack_label), stringResource(R.string.create_idea_whack_prompt)),
+        Suggestion(stringResource(R.string.create_idea_space_label), stringResource(R.string.create_idea_space_prompt)),
+        Suggestion(stringResource(R.string.create_idea_trivia_label), stringResource(R.string.create_idea_trivia_prompt))
     )
 
     var suggestions by remember { mutableStateOf(fallbackSuggestions) }
@@ -197,15 +197,15 @@ fun GameCreationScreen(
         else -> RvSuccessEdge
     }
     val qualityLabel = when (qualityLevel) {
-        0 -> if (promptText.isEmpty()) "0/500" else "Too short"
-        1 -> "Basic"
-        2 -> "Good"
-        else -> "Great detail!"
+        0 -> if (promptText.isEmpty()) "0/500" else stringResource(R.string.browse_remix_quality_too_short)
+        1 -> stringResource(R.string.browse_remix_quality_basic)
+        2 -> stringResource(R.string.browse_remix_quality_good)
+        else -> stringResource(R.string.browse_remix_quality_great)
     }
     val qualityProgress = (trimmedLength.toFloat() / 150f).coerceAtMost(1f)
     val qualityHint = when (qualityLevel) {
-        0 -> "Tip: Describe gameplay mechanics, visual style, and rules for best results"
-        1 -> "Add more detail \u2014 describe controls, scoring, difficulty, and visual style"
+        0 -> stringResource(R.string.browse_remix_tip_describe)
+        1 -> stringResource(R.string.browse_remix_tip_add_detail)
         else -> ""
     }
 
@@ -241,7 +241,7 @@ fun GameCreationScreen(
                                 color = RvError
                             ) {
                                 Text(
-                                    text = "NEW",
+                                    text = stringResource(R.string.home_new_badge),
                                     fontSize = 9.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = RvOnTone,
@@ -353,13 +353,13 @@ fun GameCreationScreen(
                     ) {
                         Icon(
                             imageVector = if (isListening) Icons.Default.Mic else Icons.Default.MicOff,
-                            contentDescription = "Voice",
+                            contentDescription = stringResource(R.string.browse_remix_voice),
                             tint = if (isListening) RvError else RvViolet,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (isListening) "Listening..." else "Voice",
+                            text = if (isListening) stringResource(R.string.browse_remix_listening) else stringResource(R.string.browse_remix_voice),
                             fontSize = 12.sp,
                             color = RvInkSoft
                         )
@@ -380,13 +380,13 @@ fun GameCreationScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Image,
-                            contentDescription = "Attach image",
+                            contentDescription = stringResource(R.string.browse_remix_attach_image),
                             tint = RvViolet,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = if (selectedImageBase64 != null) "Image added" else "Reference",
+                            text = if (selectedImageBase64 != null) stringResource(R.string.browse_remix_image_added) else stringResource(R.string.browse_remix_reference),
                             fontSize = 12.sp,
                             color = RvInkSoft
                         )
@@ -466,7 +466,7 @@ fun GameCreationScreen(
                                 color = RvInk
                             )
                             Text(
-                                text = "AI will use this as visual context",
+                                text = stringResource(R.string.browse_remix_image_context),
                                 fontSize = 11.sp,
                                 color = RvInkSoft
                             )
@@ -480,7 +480,7 @@ fun GameCreationScreen(
                         ) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Remove image",
+                                contentDescription = stringResource(R.string.create_remove_image),
                                 tint = RvInkSoft,
                                 modifier = Modifier.size(16.dp)
                             )
@@ -545,14 +545,14 @@ fun GameCreationScreen(
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text(
-                                    text = generationVM.buildPhase.ifEmpty { "Connecting..." },
+                                    text = (generationVM.buildPhase ?: UiText.Res(R.string.create_connecting)).asString(),
                                     color = RvInk,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 14.sp
                                 )
-                                if (generationVM.buildDetail.isNotEmpty()) {
+                                generationVM.buildDetail?.let { detail ->
                                     Text(
-                                        text = generationVM.buildDetail,
+                                        text = detail.asString(),
                                         color = RvInkSoft,
                                         fontSize = 11.sp
                                     )
@@ -587,7 +587,7 @@ fun GameCreationScreen(
                             )
                             if (generationVM.estimatedSecondsRemaining > 0) {
                                 Text(
-                                    text = formatETA(generationVM.estimatedSecondsRemaining),
+                                    text = formatETA(context, generationVM.estimatedSecondsRemaining),
                                     fontSize = 12.sp,
                                     color = RvInkSoft
                                 )
@@ -605,7 +605,7 @@ fun GameCreationScreen(
                                 Text("🔔", fontSize = 14.sp)
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Text(
-                                    "We'll notify you when it's ready!",
+                                    stringResource(R.string.create_notify_confirmed),
                                     fontSize = 12.sp,
                                     color = RvSuccessEdge
                                 )
@@ -668,9 +668,9 @@ fun GameCreationScreen(
                             Text("\uD83C\uDF89", fontSize = 24.sp)
                             Spacer(modifier = Modifier.width(12.dp))
                             Column {
-                                Text("Your game is ready", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
+                                Text(stringResource(R.string.create_game_ready_title), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RvInk)
                                 Text(
-                                    if (readyGameId != null) "It is saved under Games > Community and can be played now." else "It was built on this phone.",
+                                    if (readyGameId != null) stringResource(R.string.create_game_saved_community) else stringResource(R.string.create_game_built_locally),
                                     fontSize = 13.sp, color = RvInk
                                 )
                             }
@@ -681,12 +681,12 @@ fun GameCreationScreen(
                                 Button(
                                     onClick = { ChromeGameLauncher.launchGame(context, readyGameId, FirebaseAuth.getInstance().currentUser?.uid) },
                                     modifier = Modifier.weight(1f).heightIn(min = 48.dp)
-                                ) { Text("Play", maxLines = 1) }
+                                ) { Text(stringResource(R.string.play), maxLines = 1) }
                             }
                             OutlinedButton(
                                 onClick = { generationVM.clearResult(); promptText = "" },
                                 modifier = Modifier.weight(1f).heightIn(min = 48.dp)
-                            ) { Text("Create another", maxLines = 1, softWrap = false) }
+                            ) { Text(stringResource(R.string.create_another_game), maxLines = 1, softWrap = false) }
                         }
                     }
                 }
@@ -695,8 +695,11 @@ fun GameCreationScreen(
             // Error message
             val currentError = generationVM.errorMessage
             if (currentError != null) {
-                val isQuotaError = currentError.contains("usage limit", ignoreCase = true) ||
-                        currentError.contains("resets", ignoreCase = true)
+                // Only server-supplied text is inspected: it is the server that reports the quota case.
+                val serverErrorText = (currentError as? UiText.Raw)?.value
+                val isQuotaError = serverErrorText != null &&
+                        (serverErrorText.contains("usage limit", ignoreCase = true) ||
+                                serverErrorText.contains("resets", ignoreCase = true))
 
                 Card(
                     modifier = Modifier
@@ -721,14 +724,14 @@ fun GameCreationScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Column {
                             Text(
-                                text = if (isQuotaError) "Usage Limit Reached" else "Error",
+                                text = if (isQuotaError) stringResource(R.string.create_usage_limit_title) else stringResource(R.string.common_error),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp,
                                 color = RvInk
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = currentError,
+                                text = currentError.asString(),
                                 fontSize = 13.sp,
                                 color = RvInk
                             )
@@ -739,7 +742,7 @@ fun GameCreationScreen(
                                         context.startActivity(GuestGate.signInIntent(context))
                                     },
                                     modifier = Modifier.heightIn(min = 48.dp)
-                                ) { Text("Sign in or create account") }
+                                ) { Text(stringResource(R.string.common_sign_in_or_create)) }
                             }
                         }
                     }
@@ -771,7 +774,7 @@ fun GameCreationScreen(
                         Text(stringResource(R.string.free_generations_used_up), fontWeight = FontWeight.Bold, fontSize = 18.sp, color = RvInk)
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "You've used all 5 free generations this hour.\nSpend ${generationVM.rateLimitCoinCost} coins to create this game now.",
+                            context.resources.getQuantityString(R.plurals.browse_rate_limit_body, generationVM.rateLimitCoinCost, generationVM.rateLimitCoinCost),
                             color = RvInkSoft, fontSize = 14.sp, textAlign = TextAlign.Center
                         )
                         Spacer(Modifier.height(20.dp))
@@ -794,9 +797,9 @@ fun GameCreationScreen(
                                 ) {
                                     Text("\u2B50", fontSize = 16.sp)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("Use ${generationVM.rateLimitCoinCost} Coins", fontWeight = FontWeight.Bold, color = RvOnTone)
+                                    Text(context.resources.getQuantityString(R.plurals.browse_use_coins, generationVM.rateLimitCoinCost, generationVM.rateLimitCoinCost), fontWeight = FontWeight.Bold, color = RvOnTone)
                                     Spacer(Modifier.width(8.dp))
-                                    Text("(${coinManager.balance} available)", fontSize = 12.sp, color = RvInkSoft)
+                                    Text(stringResource(R.string.browse_coins_available, coinManager.balance), fontSize = 12.sp, color = RvInkSoft)
                                 }
                             }
                             Spacer(Modifier.height(8.dp))
@@ -897,13 +900,13 @@ fun GameCreationScreen(
     } // end Box
 }
 
-private fun formatETA(seconds: Int): String {
+private fun formatETA(context: android.content.Context, seconds: Int): String {
     return if (seconds < 60) {
-        "~${seconds}s remaining"
+        context.getString(R.string.create_eta_seconds, seconds)
     } else {
         val min = seconds / 60
         val sec = seconds % 60
-        "~${min}m ${sec}s remaining"
+        context.getString(R.string.create_eta_minutes, min, sec)
     }
 }
 

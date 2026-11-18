@@ -42,6 +42,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import org.json.JSONObject
 import kotlin.math.*
 import kotlin.random.Random
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @Composable
 fun FlowPuzzleScreenWrapper(
@@ -548,7 +549,7 @@ fun FlowPuzzleScreen(
                     maxLines = 1
                 )
                 Text(
-                    text = difficulty.uppercase(),
+                    text = rvDifficultyLabel(difficulty).uppercase(),
                     color = RvOnTone.copy(alpha = 0.8f),
                     fontSize = 14.sp,
                     maxLines = 1
@@ -576,13 +577,13 @@ fun FlowPuzzleScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Level: $level",
+                text = stringResource(R.string.xa_level_value, level),
                 color = RvOnTone,
                 fontSize = 14.sp,
                 maxLines = 1
             )
             Text(
-                text = "Moves: $moves",
+                text = stringResource(R.string.xa_moves_value, moves),
                 color = RvOnTone,
                 fontSize = 14.sp,
                 maxLines = 1
@@ -791,7 +792,7 @@ fun FlowPuzzleScreen(
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFA5D6A7))
                     ) {
                         Text(
-                            text = "✓ Puzzle Completed! Score: $score",
+                            text = "✓ ${stringResource(R.string.xa_puzzle_completed_score, score)}",
                             modifier = Modifier.padding(12.dp),
                             color = RvInk,
                             fontSize = 16.sp,

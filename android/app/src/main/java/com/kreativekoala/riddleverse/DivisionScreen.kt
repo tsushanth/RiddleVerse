@@ -39,6 +39,7 @@ import kotlin.math.*
 import kotlin.random.Random
 import com.kreativekoala.riddleverse.ui.theme.RvOnTone
 import com.kreativekoala.riddleverse.ui.theme.RvSurface
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 data class ValueButton(
     val value: Int,
@@ -425,7 +426,7 @@ fun DivisionPuzzleScreen(
                     modifier = Modifier.weight(1.3f).heightIn(min = 56.dp)
                 ) {
                     Text(
-                        text = "SUBMIT",
+                        text = stringResource(R.string.submit).uppercase(),
                         fontSize = aCapSp(18f, 1.3f),
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 1.sp,
@@ -516,7 +517,7 @@ fun AdaptiveDivisionProblemDisplay(
 
         // Difficulty indicator
         Text(
-            text = difficultyLevel.name.uppercase(),
+            text = rvDifficultyLabel(difficultyLevel.name).uppercase(),
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold,
             color = RvInkSoft,
@@ -676,7 +677,7 @@ fun AdaptiveDivisionTopGameBar(
 
                 Column {
                     Text(
-                        text = "Level ${level.level}",
+                        text = stringResource(R.string.stats_level_number, level.level),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk
@@ -684,7 +685,7 @@ fun AdaptiveDivisionTopGameBar(
 
                     // Adaptive difficulty indicator
                     Text(
-                        text = currentDifficulty.name,
+                        text = rvDifficultyLabel(currentDifficulty.name),
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvInkSoft
@@ -740,7 +741,7 @@ fun AdaptiveDivisionTopGameBar(
 
                 if (totalScore > 0) {
                     Text(
-                        text = "Score: $totalScore",
+                        text = stringResource(R.string.xa_score_value, totalScore),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvInk,

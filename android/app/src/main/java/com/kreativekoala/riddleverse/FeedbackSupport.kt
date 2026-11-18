@@ -33,7 +33,7 @@ fun submitFeedbackToServer(
 ) {
     val userId = FirebaseAuth.getInstance().currentUser?.email ?: ""
     if (userId.isEmpty()) {
-        onResult(false, "Please sign in to submit feedback")
+        onResult(false, context.getString(R.string.done_feedback_sign_in_required))
         return
     }
 
@@ -75,7 +75,7 @@ fun submitFeedbackToServer(
             override fun onFailure(call: Call, e: IOException) {
                 Log.e("FeedbackSubmission", "Failed to submit feedback", e)
                 Handler(Looper.getMainLooper()).post {
-                    onResult(false, "Network error - please try again")
+                    onResult(false, context.getString(R.string.done_feedback_network_error))
                 }
             }
 
@@ -85,7 +85,7 @@ fun submitFeedbackToServer(
                 Handler(Looper.getMainLooper()).post {
                     if (response.isSuccessful) {
                         Log.d("FeedbackSubmission", "Feedback submitted successfully")
-                        onResult(true, "Thank you for your feedback!")
+                        onResult(true, context.getString(R.string.home_toast_feedback_thanks))
 
                         AnalyticsManager.getInstance()?.track(AnalyticsEvent("feedback_submitted", mapOf(
                             "is_positive" to isPositive,
@@ -94,7 +94,7 @@ fun submitFeedbackToServer(
                         )))
                     } else {
                         Log.e("FeedbackSubmission", "Server error: ${response.code} - $responseBody")
-                        onResult(false, "Server error - please try again later")
+                        onResult(false, context.getString(R.string.done_feedback_server_error))
                     }
                 }
             }
@@ -102,7 +102,7 @@ fun submitFeedbackToServer(
 
     } catch (e: Exception) {
         Log.e("FeedbackSubmission", "Exception submitting feedback", e)
-        onResult(false, "Error submitting feedback - please try again")
+        onResult(false, context.getString(R.string.done_feedback_submit_error))
     }
 }
 
@@ -223,7 +223,7 @@ fun openFeedbackEmail(context: Context) {
         context.startActivity(intent)
     } catch (e: Exception) {
         Log.e("RatingDialog", "Failed to open email client", e)
-        Toast.makeText(context, "Please email us at support@riddleverse.com", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.done_feedback_email_us, "support@riddleverse.com"), Toast.LENGTH_LONG).show()
     }
 }
 

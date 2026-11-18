@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
@@ -111,7 +112,7 @@ fun ContextSwitchScreenWrapper(
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text("Loading adaptive context switch puzzle...")
+                Text(stringResource(R.string.xb_loading_adaptive_context_switch_puzzle))
             }
         }
     }

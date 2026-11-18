@@ -115,7 +115,8 @@ object PuzzleRecommendations {
 
     /**
      * Get display names for recommended puzzles, prioritising ones the user has never played.
-     * Requires a context to read UserStatsManager stats.
+     * Requires a context to read UserStatsManager stats; with a context the name and subtitle are in the
+     * app language (without one they are the English source text).
      */
     fun getRecommendationDisplayData(
         puzzleType: String,
@@ -138,8 +139,14 @@ object PuzzleRecommendations {
             val neverPlayed = statsManager?.getPuzzleStats(recommendedType)?.totalPlays == 0
             RecommendationData(
                 puzzleType = recommendedType,
-                displayName = category?.title ?: PuzzleTypeNames.display(recommendedType),
-                subtitle = if (neverPlayed) "You've never tried this!" else (category?.subtitle ?: "Brain Challenge"),
+                displayName = if (context != null) PuzzleTypeNames.display(context, recommendedType)
+                    else category?.title ?: PuzzleTypeNames.display(recommendedType),
+                subtitle = when {
+                    context != null && neverPlayed -> context.getString(R.string.cat_never_tried)
+                    context != null -> category?.localizedSubtitle(context) ?: context.getString(R.string.cat_fallback_brain_subtitle)
+                    neverPlayed -> "You've never tried this!"
+                    else -> category?.subtitle ?: "Brain Challenge"
+                },
                 isNew = neverPlayed || QuizCategories.isPuzzleTypeNew(recommendedType),
                 neverPlayed = neverPlayed
             )

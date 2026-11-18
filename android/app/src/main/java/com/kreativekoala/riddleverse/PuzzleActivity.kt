@@ -286,7 +286,7 @@ class PuzzleActivity : AppCompatActivity() {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(
-                                "🎉 Puzzle Type Completed!",
+                                "🎉 ${stringResource(R.string.done_group_completed_title)}",
                                 color = RvInk,
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.Bold
@@ -348,9 +348,9 @@ class PuzzleActivity : AppCompatActivity() {
 fun LeaderboardView(topScores: List<LeaderboardEntry>) {
     Spacer(modifier = Modifier.height(32.dp))
     Column(modifier = Modifier.padding(16.dp)) {
-        Text("🏆 Top 3 Scores", style = MaterialTheme.typography.titleMedium)
+        Text("🏆 ${stringResource(R.string.done_top_3_scores)}", style = MaterialTheme.typography.titleMedium)
         topScores.take(3).forEachIndexed { index, entry ->
-            Text("${index + 1}. ${entry.userId}: ${entry.score} pts in ${entry.timeTaken}s")
+            Text(stringResource(R.string.done_top_3_entry, index + 1, entry.userId, entry.score, entry.timeTaken ?: 0L))
         }
     }
 }
@@ -399,12 +399,12 @@ fun QAPuzzleScreen(
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
             }
             Text(
-                puzzle.puzzleType?.uppercase() ?: "PUZZLE",
+                puzzle.puzzleType?.uppercase() ?: stringResource(R.string.cat_extra_puzzle).uppercase(),
                 fontWeight = FontWeight.Bold
             )
             Box {
                 IconButton(onClick = { expanded = true }) {
-                    Icon(Icons.Default.MoreVert, contentDescription = "Settings")
+                    Icon(Icons.Default.MoreVert, contentDescription = stringResource(R.string.tab_settings))
                 }
 
                 DropdownMenu(
@@ -472,7 +472,7 @@ fun QAPuzzleScreen(
                 .background(RvViolet, shape = RoundedCornerShape(20.dp))
                 .padding(16.dp)
         ) {
-            Text("Q&A Puzzle", color = RvOnTone.copy(alpha = 0.85f), fontSize = 12.sp)
+            Text(stringResource(R.string.done_qa_puzzle), color = RvOnTone.copy(alpha = 0.85f), fontSize = 12.sp)
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 puzzle.question,
@@ -487,7 +487,7 @@ fun QAPuzzleScreen(
         OutlinedTextField(
             value = userAnswer,
             onValueChange = { userAnswer = it },
-            placeholder = { Text("Type your answer here") },
+            placeholder = { Text(stringResource(R.string.done_type_answer_here)) },
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(50))
@@ -510,7 +510,7 @@ fun QAPuzzleScreen(
         Button(
             onClick = {
                 if (puzzle == null || userAnswer.isEmpty()) {
-                    Toast.makeText(context, "Please enter your answer or anything to skip", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.done_enter_answer_or_skip), Toast.LENGTH_SHORT).show()
                 } else {
                     isCheckingAnswer = true
 
@@ -588,7 +588,7 @@ fun QAPuzzleScreen(
             ) {
                 if (isCorrectAnswer == true) {
                     Text(
-                        text = "🎉 Correct!",
+                        text = "🎉 ${stringResource(R.string.correct)}",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvSuccess
@@ -596,7 +596,7 @@ fun QAPuzzleScreen(
                     ConfettiAnimation()
                 } else if (isCorrectAnswer == false) {
                     Text(
-                        text = "❌ Incorrect!" + " The correct answer is: ${puzzle.answer}",
+                        text = stringResource(R.string.done_incorrect_correct_answer_is, puzzle.answer),
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvError
@@ -618,7 +618,7 @@ fun QAPuzzleScreen(
             exit = fadeOut(animationSpec = tween(300))
         ) {
             Text(
-                text = "+2 In-Time Bonus!",
+                text = stringResource(R.string.xb_in_time_bonus),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvSuccessEdge,
@@ -800,7 +800,7 @@ fun fetchNextPuzzle(
             }
         } catch (e: Exception) {
             Log.e("fetchNextPuzzle", "Error getting puzzle from queue", e)
-            onError("Unable to load puzzle: ${e.message}")
+            onError(context.getString(R.string.done_unable_to_load_puzzle, e.message ?: ""))
         }
     }
 }

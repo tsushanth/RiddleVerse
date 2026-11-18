@@ -181,7 +181,7 @@ fun RegenerationLimitCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.Info,
-                    contentDescription = "Generation Limit",
+                    contentDescription = stringResource(R.string.create_limit_cd),
                     tint = Color(0xFF1565C0),
                     modifier = Modifier.size(24.dp)
                 )
@@ -192,7 +192,7 @@ fun RegenerationLimitCard(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = "Dismiss",
+                        contentDescription = stringResource(R.string.welcome_back_dismiss),
                         tint = Color.Gray,
                         modifier = Modifier.size(20.dp)
                     )
@@ -202,12 +202,14 @@ fun RegenerationLimitCard(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = when (limitInfo.reason) {
-                    "daily_limit_exceeded" -> "Daily Generation Limit Reached"
-                    "monthly_limit_exceeded" -> "Monthly Generation Limit Reached"
-                    "rapid_fire_detected" -> "Rate Limit Active"
-                    else -> "Generation Limited"
-                },
+                text = stringResource(
+                    when (limitInfo.reason) {
+                        "daily_limit_exceeded" -> R.string.create_limit_daily_title
+                        "monthly_limit_exceeded" -> R.string.create_limit_monthly_title
+                        "rapid_fire_detected" -> R.string.create_limit_rate_title
+                        else -> R.string.create_limit_generic_title
+                    }
+                ),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvOnTone
@@ -216,7 +218,7 @@ fun RegenerationLimitCard(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = getEnhancedLimitMessage(puzzleType, limitInfo),
+                text = getEnhancedLimitMessage(LocalContext.current, puzzleType, limitInfo),
                 fontSize = 14.sp,
                 color = Color.Gray,
                 lineHeight = 20.sp
@@ -227,7 +229,7 @@ fun RegenerationLimitCard(
             // Usage progress bars
             if (limitInfo.reason.contains("daily")) {
                 UsageProgressBar(
-                    label = "Daily Usage",
+                    label = stringResource(R.string.create_limit_daily_usage),
                     used = limitInfo.dailyUsed,
                     total = limitInfo.dailyLimit,
                     color = Color(0xFF1565C0)
@@ -237,7 +239,7 @@ fun RegenerationLimitCard(
 
             if (limitInfo.reason.contains("monthly")) {
                 UsageProgressBar(
-                    label = "Monthly Usage",
+                    label = stringResource(R.string.create_limit_monthly_usage),
                     used = limitInfo.monthlyUsed,
                     total = limitInfo.monthlyLimit,
                     color = Color(0xFF1565C0)
@@ -248,7 +250,7 @@ fun RegenerationLimitCard(
             // Reset time info
             if (limitInfo.resetTime.isNotEmpty()) {
                 Text(
-                    text = "Resets: ${formatResetTime(limitInfo.resetTime)}",
+                    text = stringResource(R.string.create_limit_resets, formatResetTime(LocalContext.current, limitInfo.resetTime)),
                     fontSize = 12.sp,
                     color = Color.Gray,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -285,7 +287,7 @@ fun RegenerationLimitCard(
                     modifier = Modifier.weight(1f)
                 ) {
                     Text(
-                        text = if (limitInfo.reason == "rapid_fire_detected") stringResource(R.string.got_it) else "Play Available",
+                        text = if (limitInfo.reason == "rapid_fire_detected") stringResource(R.string.got_it) else stringResource(R.string.create_limit_play_available),
                         fontSize = 12.sp
                     )
                 }
@@ -334,29 +336,25 @@ fun UsageProgressBar(
 }
 
 // Helper functions
-private fun getEnhancedLimitMessage(puzzleType: String, limitInfo: RegenerationLimitManager.LimitInfo): String {
+private fun getEnhancedLimitMessage(context: Context, puzzleType: String, limitInfo: RegenerationLimitManager.LimitInfo): String {
     val displayName = getPuzzleDisplayName(puzzleType)
 
     return when (limitInfo.reason) {
         "daily_limit_exceeded" ->
-            "You've used all ${limitInfo.dailyLimit} daily puzzle generations for $displayName. " +
-                    "You can still play from existing puzzles, or upgrade for unlimited access."
+            context.getString(R.string.create_limit_daily_message, limitInfo.dailyLimit, displayName)
 
         "monthly_limit_exceeded" ->
-            "You've reached your monthly limit of ${limitInfo.monthlyLimit} puzzle generations. " +
-                    "Consider upgrading for unlimited monthly access to fresh puzzles."
+            context.getString(R.string.create_limit_monthly_message, limitInfo.monthlyLimit)
 
         "rapid_fire_detected" ->
-            "Please slow down! You're generating puzzles too quickly. " +
-                    "Wait a moment before trying again to help us manage server resources."
+            context.getString(R.string.create_limit_rapid_message)
 
         else ->
-            "Puzzle generation is temporarily limited. You can still play available puzzles " +
-                    "or try again later."
+            context.getString(R.string.create_limit_generic_message)
     }
 }
 
-private fun formatResetTime(resetTimeIso: String): String {
+private fun formatResetTime(context: Context, resetTimeIso: String): String {
     return try {
         // Parse ISO 8601 date string
         val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
@@ -368,25 +366,25 @@ private fun formatResetTime(resetTimeIso: String): String {
             val durationMs = resetTime.time - now.time
 
             when {
-                durationMs <= 0 -> "now"
+                durationMs <= 0 -> context.getString(R.string.create_reset_now)
                 TimeUnit.MILLISECONDS.toDays(durationMs) > 0 -> {
-                    val days = TimeUnit.MILLISECONDS.toDays(durationMs)
-                    "in ${days} day${if (days == 1L) "" else "s"}"
+                    val days = TimeUnit.MILLISECONDS.toDays(durationMs).toInt()
+                    context.resources.getQuantityString(R.plurals.create_reset_in_days, days, days)
                 }
                 TimeUnit.MILLISECONDS.toHours(durationMs) > 0 -> {
-                    val hours = TimeUnit.MILLISECONDS.toHours(durationMs)
-                    "in ${hours} hour${if (hours == 1L) "" else "s"}"
+                    val hours = TimeUnit.MILLISECONDS.toHours(durationMs).toInt()
+                    context.resources.getQuantityString(R.plurals.create_reset_in_hours, hours, hours)
                 }
                 TimeUnit.MILLISECONDS.toMinutes(durationMs) > 0 -> {
-                    val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs)
-                    "in ${minutes} minute${if (minutes == 1L) "" else "s"}"
+                    val minutes = TimeUnit.MILLISECONDS.toMinutes(durationMs).toInt()
+                    context.resources.getQuantityString(R.plurals.create_reset_in_minutes, minutes, minutes)
                 }
-                else -> "soon"
+                else -> context.getString(R.string.create_reset_soon)
             }
         } else {
-            "later"
+            context.getString(R.string.create_reset_later)
         }
     } catch (e: Exception) {
-        "later"
+        context.getString(R.string.create_reset_later)
     }
 }

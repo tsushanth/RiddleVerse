@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.delay
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 @Composable
 fun AdaptivePinballDeflectorPuzzleScreen(
@@ -492,7 +493,7 @@ fun AdaptivePinballDeflectorPuzzleScreen(
                         ) {
                             Icon(
                                 Icons.Default.TrendingUp,
-                                contentDescription = "Difficulty adjusted",
+                                contentDescription = stringResource(R.string.xa_difficulty_adjusted),
                                 tint = RvInk,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -505,7 +506,7 @@ fun AdaptivePinballDeflectorPuzzleScreen(
                                     color = RvInk
                                 )
                                 Text(
-                                    text = adaptationInfo?.adjustmentReason ?: "",
+                                    text = adaptationInfo?.adjustmentReason.asString(),
                                     fontSize = 10.sp,
                                     color = RvInkSoft.copy(alpha = 0.9f)
                                 )
@@ -516,7 +517,7 @@ fun AdaptivePinballDeflectorPuzzleScreen(
                             ) {
                                 Icon(
                                     Icons.Default.Close,
-                                    contentDescription = "Dismiss",
+                                    contentDescription = stringResource(R.string.welcome_back_dismiss),
                                     tint = RvInk,
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -542,7 +543,7 @@ fun AdaptivePinballDeflectorPuzzleScreen(
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
-                                text = "${currentDifficultyLevel.name} • ${puzzleData.matrixSize}x${puzzleData.matrixSize} • ${puzzleData.deflectors.size} deflectors",
+                                text = "${rvDifficultyLabel(currentDifficultyLevel.name)} • ${puzzleData.matrixSize}x${puzzleData.matrixSize} • ${puzzleData.deflectors.size} deflectors",
                                 color = RvSkyEdge,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Medium,
@@ -662,12 +663,12 @@ fun AdaptivePinballTopBar(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Level ${level.level}",
+                    text = stringResource(R.string.stats_level_number, level.level),
                     color = RvInkSoft,
                     fontSize = 14.sp
                 )
                 Text(
-                    text = currentDifficulty.name,
+                    text = rvDifficultyLabel(currentDifficulty.name),
                     color = RvSkyEdge,
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -724,7 +725,7 @@ fun AdaptivePinballTopBar(
                     }
 
                     Text(
-                        text = currentDifficulty.name.uppercase(),
+                        text = rvDifficultyLabel(currentDifficulty.name).uppercase(),
                         color = RvSunEdge,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold
@@ -732,7 +733,7 @@ fun AdaptivePinballTopBar(
 
                     if (attempts > 0) {
                         Text(
-                            text = "Attempt: $attempts",
+                            text = stringResource(R.string.xa_attempt_value, attempts),
                             color = RvInkSoft.copy(alpha = 0.8f),
                             fontSize = 12.sp
                         )

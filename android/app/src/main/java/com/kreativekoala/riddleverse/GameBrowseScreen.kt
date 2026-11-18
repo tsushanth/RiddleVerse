@@ -93,9 +93,9 @@ private object GamesCache {
                 val g = arr.getJSONObject(i)
                 BrowseGameData(
                     id = g.optString("id", ""),
-                    title = g.optString("title", "Untitled"),
+                    title = g.optString("title", context.getString(R.string.browse_untitled)),
                     creatorId = g.optString("creator_id", ""),
-                    creatorName = g.optString("creator_name", "Anonymous"),
+                    creatorName = g.optString("creator_name", context.getString(R.string.browse_anonymous)),
                     playCount = g.optInt("play_count", 0),
                     initialPrompt = g.optString("description", ""),
                     createdAt = g.optString("created_at", ""),
@@ -215,9 +215,9 @@ fun GameBrowseContent(context: android.content.Context) {
                                 parsed.add(
                                     BrowseGameData(
                                         id = g.optString("id", ""),
-                                        title = g.optString("title", "Untitled"),
+                                        title = g.optString("title", context.getString(R.string.browse_untitled)),
                                         creatorId = g.optString("creator_id", ""),
-                                        creatorName = g.optString("creator_name", "Anonymous"),
+                                        creatorName = g.optString("creator_name", context.getString(R.string.browse_anonymous)),
                                         playCount = g.optInt("play_count", 0),
                                         initialPrompt = g.optString("description", ""),
                                         createdAt = g.optString("created_at", ""),
@@ -254,16 +254,16 @@ fun GameBrowseContent(context: android.content.Context) {
                         withContext(Dispatchers.Main) {
                             if (cached != null) {
                                 games = cached
-                                errorMessage = "Showing saved games — couldn't refresh right now"
+                                errorMessage = context.getString(R.string.browse_showing_saved_games)
                             } else {
-                                errorMessage = "Empty response from server"
+                                errorMessage = context.getString(R.string.browse_empty_response)
                             }
                             isLoading = false
                             isLoadingMore = false
                         }
                     } else {
                         withContext(Dispatchers.Main) {
-                            errorMessage = "Empty response from server"
+                            errorMessage = context.getString(R.string.browse_empty_response)
                             isLoading = false
                             isLoadingMore = false
                         }
@@ -274,9 +274,9 @@ fun GameBrowseContent(context: android.content.Context) {
                     withContext(Dispatchers.Main) {
                         if (cached != null) {
                             games = cached
-                            errorMessage = "Showing saved games — couldn't refresh right now"
+                            errorMessage = context.getString(R.string.browse_showing_saved_games)
                         } else {
-                            errorMessage = "Failed to load games"
+                            errorMessage = context.getString(R.string.browse_failed_load_games)
                         }
                         isLoading = false
                         isLoadingMore = false
@@ -337,7 +337,7 @@ fun GameBrowseContent(context: android.content.Context) {
 
                     if (responseBody == null) {
                         withContext(Dispatchers.Main) {
-                            errorMessage = "Failed to load game"
+                            errorMessage = context.getString(R.string.browse_failed_load_game)
                             downloadingId = null
                         }
                         return@withContext
@@ -349,7 +349,7 @@ fun GameBrowseContent(context: android.content.Context) {
 
                     if (base64Bundle.isNullOrEmpty()) {
                         withContext(Dispatchers.Main) {
-                            errorMessage = "Game bundle not available"
+                            errorMessage = context.getString(R.string.browse_bundle_unavailable)
                             downloadingId = null
                         }
                         return@withContext
@@ -375,7 +375,7 @@ fun GameBrowseContent(context: android.content.Context) {
 
                     val indexFile = File(gameDir, "index.html")
                     if (!indexFile.exists()) {
-                        withContext(Dispatchers.Main) { errorMessage = "Game bundle missing index.html"; downloadingId = null }
+                        withContext(Dispatchers.Main) { errorMessage = context.getString(R.string.browse_bundle_missing_index); downloadingId = null }
                         return@withContext
                     }
 
@@ -384,7 +384,7 @@ fun GameBrowseContent(context: android.content.Context) {
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Download error", e)
-                    withContext(Dispatchers.Main) { errorMessage = "Failed to load game: ${e.message}"; downloadingId = null }
+                    withContext(Dispatchers.Main) { errorMessage = context.getString(R.string.browse_failed_load_game_detail, e.message); downloadingId = null }
                 }
             }
         }
@@ -410,14 +410,14 @@ fun GameBrowseContent(context: android.content.Context) {
                         // Restore on failure
                         withContext(Dispatchers.Main) {
                             games = (games + game).sortedByDescending { it.createdAt }
-                            errorMessage = "Failed to delete game"
+                            errorMessage = context.getString(R.string.browse_failed_delete_game)
                         }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Delete error", e)
                     withContext(Dispatchers.Main) {
                         games = (games + game).sortedByDescending { it.createdAt }
-                        errorMessage = "Failed to delete game"
+                        errorMessage = context.getString(R.string.browse_failed_delete_game)
                     }
                 } finally {
                     withContext(Dispatchers.Main) {
@@ -449,9 +449,9 @@ fun GameBrowseContent(context: android.content.Context) {
                             parsed.add(
                                 BrowseGameData(
                                     id = g.optString("id", ""),
-                                    title = g.optString("title", "Untitled"),
+                                    title = g.optString("title", context.getString(R.string.browse_untitled)),
                                     creatorId = g.optString("creator_id", ""),
-                                    creatorName = g.optString("creator_name", "Anonymous"),
+                                    creatorName = g.optString("creator_name", context.getString(R.string.browse_anonymous)),
                                     playCount = g.optInt("play_count", 0),
                                     initialPrompt = g.optString("description", ""),
                                     createdAt = g.optString("created_at", ""),
@@ -555,7 +555,7 @@ fun GameBrowseContent(context: android.content.Context) {
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = when (sortBy) {
-                                "trending" -> "Trending"
+                                "trending" -> stringResource(R.string.browse_filter_trending)
                                 "popular"  -> stringResource(R.string.most_played)
                                 else       -> stringResource(R.string.newest)
                             },
@@ -571,7 +571,7 @@ fun GameBrowseContent(context: android.content.Context) {
                     onDismissRequest = { showSortMenu = false }
                 ) {
                     DropdownMenuItem(
-                        text = { Text("Trending") },
+                        text = { Text(stringResource(R.string.browse_filter_trending)) },
                         onClick = { sortBy = "trending"; showSortMenu = false },
                         leadingIcon = {
                             if (sortBy == "trending") Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -626,7 +626,7 @@ fun GameBrowseContent(context: android.content.Context) {
                     item(key = "new_releases_carousel") {
                         Column {
                             Text(
-                                text = "New Releases",
+                                text = stringResource(R.string.browse_new_releases),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvInk,
@@ -755,14 +755,14 @@ fun GameBrowseContent(context: android.content.Context) {
                             Text("\uD83C\uDFAE", fontSize = 40.sp)
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                text = "Free Plays Used Up",
+                                text = stringResource(R.string.browse_free_plays_used_up),
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvInk
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                text = "You've used your $FREE_PLAYS_PER_GAME free plays for \"${game.title}\". Spend coins to keep playing!",
+                                text = stringResource(R.string.browse_free_plays_body, FREE_PLAYS_PER_GAME, game.title),
                                 fontSize = 14.sp,
                                 color = RvInkSoft,
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -777,7 +777,7 @@ fun GameBrowseContent(context: android.content.Context) {
                             ) {
                                 Icon(Icons.Default.Star, contentDescription = null, tint = Color.Yellow, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("${coinManager.balance} coins", color = Color.Yellow, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                                Text(context.resources.getQuantityString(R.plurals.browse_coins_balance, coinManager.balance, coinManager.balance), color = Color.Yellow, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                             }
                             Spacer(modifier = Modifier.height(20.dp))
                             Button(
@@ -805,7 +805,7 @@ fun GameBrowseContent(context: android.content.Context) {
                                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = RvOnTone, strokeWidth = 2.dp)
                                 } else {
                                     Text(
-                                        text = "\uD83D\uDD04  Play — \uD83E\uDE99 ${CoinManager.CONTINUE_COST} coins",
+                                        text = context.resources.getQuantityString(R.plurals.browse_play_for_coins, CoinManager.CONTINUE_COST, CoinManager.CONTINUE_COST),
                                         fontSize = 15.sp,
                                         fontWeight = FontWeight.Bold,
                                         color = RvOnTone
@@ -815,7 +815,7 @@ fun GameBrowseContent(context: android.content.Context) {
                             if (!coinManager.canContinue) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
-                                    text = "Not enough coins — need ${CoinManager.CONTINUE_COST}",
+                                    text = stringResource(R.string.browse_not_enough_coins, CoinManager.CONTINUE_COST),
                                     fontSize = 12.sp,
                                     color = RvError,
                                     textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -823,7 +823,7 @@ fun GameBrowseContent(context: android.content.Context) {
                             }
                             Spacer(modifier = Modifier.height(8.dp))
                             TextButton(onClick = { coinGateGame = null }, enabled = !isCoinGateSpending) {
-                                Text("Maybe Later", color = RvInkSoft)
+                                Text(stringResource(R.string.maybe_later), color = RvInkSoft)
                             }
                         }
                     }
@@ -853,7 +853,7 @@ fun GameBrowseContent(context: android.content.Context) {
 // Share game to Telegram (or fallback to share sheet)
 private fun shareGameToTelegram(context: android.content.Context, game: BrowseGameData) {
     val gameUrl = "${BuildConfig.API_BASE_URL}/api/game-creation/${game.id}"
-    val shareText = "Let's play ${game.title} on RiddleVerse! $gameUrl"
+    val shareText = context.getString(R.string.browse_share_text, game.title, gameUrl)
     val encodedText = Uri.encode(shareText)
 
     // Try Telegram deep link first
@@ -866,7 +866,7 @@ private fun shareGameToTelegram(context: android.content.Context, game: BrowseGa
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)
         }
-        context.startActivity(Intent.createChooser(shareIntent, "Share game"))
+        context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.browse_share_game)))
     }
 }
 
@@ -931,7 +931,7 @@ private fun BrowseGameCard(
                             color = RvInk.copy(alpha = 0.65f)
                         ) {
                             Text(
-                                text = "${game.levelCount} levels",
+                                text = context.resources.getQuantityString(R.plurals.browse_levels_count, game.levelCount, game.levelCount),
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = RvOnTone,
@@ -991,7 +991,7 @@ private fun BrowseGameCard(
                     }
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
-                        text = "by ${game.creatorName}",
+                        text = stringResource(R.string.browse_by_creator_lower, game.creatorName),
                         fontSize = 12.sp,
                         color = RvInkSoft
                     )
@@ -1089,7 +1089,7 @@ private fun BrowseGameCard(
                                 .size(40.dp)
                                 .background(RvGrape.copy(alpha = 0.2f), RoundedCornerShape(16.dp))
                         ) {
-                            Icon(Icons.Default.AutoAwesome, contentDescription = "Edit", tint = RvGrape, modifier = Modifier.size(18.dp))
+                            Icon(Icons.Default.AutoAwesome, contentDescription = stringResource(R.string.edit), tint = RvGrape, modifier = Modifier.size(18.dp))
                         }
                     }
 
@@ -1105,7 +1105,7 @@ private fun BrowseGameCard(
                             if (isDeleting) {
                                 CircularProgressIndicator(modifier = Modifier.size(16.dp), color = RvError, strokeWidth = 2.dp)
                             } else {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = RvError, modifier = Modifier.size(18.dp))
+                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.browse_delete), tint = RvError, modifier = Modifier.size(18.dp))
                             }
                         }
                     }
@@ -1117,7 +1117,7 @@ private fun BrowseGameCard(
                             .size(40.dp)
                             .background(RvSky.copy(alpha = 0.15f), RoundedCornerShape(16.dp))
                     ) {
-                        Icon(Icons.Default.Share, contentDescription = "Share", tint = RvSky, modifier = Modifier.size(18.dp))
+                        Icon(Icons.Default.Share, contentDescription = stringResource(R.string.share), tint = RvSky, modifier = Modifier.size(18.dp))
                     }
                 }
             }
@@ -1139,6 +1139,7 @@ fun GameCardLeaderboard(gameId: String) {
     var loading by remember { mutableStateOf(false) }
     val currentUserId = remember { com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: "" }
     val coroutineScope = rememberCoroutineScope()
+    val defaultPlayerName = stringResource(R.string.browse_remix_default_player)
 
     fun load() {
         if (loading) return
@@ -1155,7 +1156,7 @@ fun GameCardLeaderboard(gameId: String) {
                         val arr = json.optJSONArray("scores") ?: org.json.JSONArray()
                         entries = (0 until arr.length()).map { i ->
                             val s = arr.getJSONObject(i)
-                            GameScoreEntry(s.optString("username","Player"), s.optInt("score",0), s.optString("userId",""))
+                            GameScoreEntry(s.optString("username",defaultPlayerName), s.optInt("score",0), s.optString("userId",""))
                         }
                     }
                 } catch (_: Exception) {}
@@ -1178,7 +1179,7 @@ fun GameCardLeaderboard(gameId: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("🏆 Leaderboard", fontSize = 13.sp, color = RvSunEdge, fontWeight = FontWeight.SemiBold)
+            Text("🏆 ${stringResource(R.string.leaderboard)}", fontSize = 13.sp, color = RvSunEdge, fontWeight = FontWeight.SemiBold)
             androidx.compose.material3.Icon(
                 if (expanded) androidx.compose.material.icons.Icons.Default.KeyboardArrowUp
                 else androidx.compose.material.icons.Icons.Default.KeyboardArrowDown,
@@ -1195,7 +1196,7 @@ fun GameCardLeaderboard(gameId: String) {
                     color = RvViolet, strokeWidth = 2.dp
                 )
             } else if (entries.isEmpty()) {
-                Text("No scores yet — be the first!", fontSize = 12.sp, color = RvInkSoft)
+                Text(stringResource(R.string.browse_no_scores_be_first), fontSize = 12.sp, color = RvInkSoft)
             } else {
                 val medals = listOf("🥇","🥈","🥉")
                 entries.take(5).forEachIndexed { i, e ->
@@ -1224,16 +1225,16 @@ data class GameEditVersion(
     val displayMessage: String get() = if (message.startsWith("Tweak: ")) message.removePrefix("Tweak: ") else message
 }
 
-private fun relativeTimeFromIso(isoDate: String): String {
+private fun relativeTimeFromIso(isoDate: String, context: android.content.Context): String {
     if (isoDate.isEmpty()) return ""
     return try {
         val instant = java.time.OffsetDateTime.parse(isoDate).toInstant()
         val seconds = java.time.Duration.between(instant, java.time.Instant.now()).seconds
         when {
-            seconds < 60 -> "just now"
-            seconds < 3600 -> "${seconds / 60}m ago"
-            seconds < 86400 -> "${seconds / 3600}h ago"
-            else -> "${seconds / 86400}d ago"
+            seconds < 60 -> context.getString(R.string.browse_time_just_now)
+            seconds < 3600 -> context.getString(R.string.browse_time_minutes_ago, seconds / 60)
+            seconds < 86400 -> context.getString(R.string.browse_time_hours_ago, seconds / 3600)
+            else -> context.getString(R.string.browse_time_days_ago, seconds / 86400)
         }
     } catch (_: Exception) {
         ""
@@ -1247,6 +1248,7 @@ fun GameCardEdits(gameId: String) {
     var loading by remember { mutableStateOf(false) }
     var fetched by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     fun load() {
         if (loading) return
@@ -1301,7 +1303,7 @@ fun GameCardEdits(gameId: String) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("✨ Edits", fontSize = 13.sp, color = RvGrape, fontWeight = FontWeight.SemiBold)
+                Text("✨ ${stringResource(R.string.browse_edits)}", fontSize = 13.sp, color = RvGrape, fontWeight = FontWeight.SemiBold)
                 if (fetched && versions.isNotEmpty()) {
                     Spacer(Modifier.width(6.dp))
                     Text(
@@ -1329,7 +1331,7 @@ fun GameCardEdits(gameId: String) {
                     strokeWidth = 2.dp
                 )
                 versions.isEmpty() -> Text(
-                    "No edits yet",
+                    stringResource(R.string.browse_no_edits_yet),
                     fontSize = 12.sp,
                     color = RvInkSoft
                 )
@@ -1368,7 +1370,7 @@ fun GameCardEdits(gameId: String) {
                                         fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace
                                     )
                                 }
-                                val ago = relativeTimeFromIso(v.date)
+                                val ago = relativeTimeFromIso(v.date, context)
                                 if (ago.isNotEmpty()) {
                                     Spacer(Modifier.width(8.dp))
                                     Text(ago, fontSize = 10.sp, color = RvInkSoft)
@@ -1380,7 +1382,7 @@ fun GameCardEdits(gameId: String) {
                                         color = RvSuccessEdge.copy(alpha = 0.15f)
                                     ) {
                                         Text(
-                                            "Original",
+                                            stringResource(R.string.original),
                                             fontSize = 9.sp,
                                             color = RvSuccessEdge,
                                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
@@ -1527,7 +1529,7 @@ fun BrowseGamePlayScreen(
                                 parsed.add(
                                     LeaderboardPlayerData(
                                         rank = p.optInt("rank", i + 1),
-                                        playerName = p.optString("playerName", "Unknown"),
+                                        playerName = p.optString("playerName", context.getString(R.string.home_creator_unknown)),
                                         score = p.optInt("score", 0),
                                         userId = p.optString("userId", ""),
                                         isCurrentUser = p.optString("userId", "") == userId
@@ -1618,7 +1620,7 @@ fun BrowseGamePlayScreen(
     }
 
     fun spendAndPlay(bundle: String, level: Int) {
-        generationPhase = "Spending ${CoinManager.difficultyCost(level)} coins..."
+        generationPhase = context.resources.getQuantityString(R.plurals.browse_spending_coins, CoinManager.difficultyCost(level), CoinManager.difficultyCost(level))
         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
         val creatorId = if (game.creatorId != currentUserId) game.creatorId else null
         coinManager.spendForHarderChallenge(
@@ -1631,14 +1633,14 @@ fun BrowseGamePlayScreen(
             } else {
                 isGeneratingHarder = false
                 gameOver = true
-                errorMessage = "Payment failed. Please try again."
+                errorMessage = context.getString(R.string.browse_payment_failed)
             }
         }
     }
 
     fun generateHarderVariant(level: Int) {
         isGeneratingHarder = true
-        generationPhase = "Starting generation..."
+        generationPhase = context.getString(R.string.browse_starting_generation)
         generationProgress = 0.0
 
         coroutineScope.launch {
@@ -1666,7 +1668,7 @@ fun BrowseGamePlayScreen(
                         withContext(Dispatchers.Main) {
                             isGeneratingHarder = false
                             gameOver = true
-                            errorMessage = "No response from build server"
+                            errorMessage = context.getString(R.string.browse_no_build_response)
                         }
                         return@withContext
                     }
@@ -1691,7 +1693,7 @@ fun BrowseGamePlayScreen(
                                 val bundle = event.optString("bundle", "")
                                 if (bundle.isNotEmpty()) bundleResult = bundle
                             } else if (type == "error") {
-                                val errorMsg = event.optString("error", "Generation failed")
+                                val errorMsg = event.optString("error", context.getString(R.string.browse_generation_failed))
                                 withContext(Dispatchers.Main) {
                                     isGeneratingHarder = false
                                     gameOver = true
@@ -1720,7 +1722,7 @@ fun BrowseGamePlayScreen(
                         withContext(Dispatchers.Main) {
                             isGeneratingHarder = false
                             gameOver = true
-                            errorMessage = "Generation completed but no game bundle received"
+                            errorMessage = context.getString(R.string.browse_generation_no_bundle)
                         }
                     }
                 } catch (e: Exception) {
@@ -1728,7 +1730,7 @@ fun BrowseGamePlayScreen(
                     withContext(Dispatchers.Main) {
                         isGeneratingHarder = false
                         gameOver = true
-                        errorMessage = "Failed to generate: ${e.message}"
+                        errorMessage = context.getString(R.string.browse_failed_generate, e.message)
                     }
                 }
             }
@@ -1768,7 +1770,7 @@ fun BrowseGamePlayScreen(
                 withContext(Dispatchers.Main) {
                     isGeneratingHarder = false
                     gameOver = true
-                    errorMessage = "Generation timed out. Please try again."
+                    errorMessage = context.getString(R.string.browse_generation_timed_out)
                 }
             }
         }
@@ -1803,7 +1805,7 @@ fun BrowseGamePlayScreen(
                         } else if (generating) {
                             // Another user is generating — poll
                             withContext(Dispatchers.Main) {
-                                generationPhase = "Another player is generating this level..."
+                                generationPhase = context.getString(R.string.browse_another_player_generating)
                                 generationProgress = 0.5
                             }
                             pollForVariant(level)
@@ -1816,14 +1818,14 @@ fun BrowseGamePlayScreen(
                             withContext(Dispatchers.Main) {
                                 isGeneratingHarder = false
                                 gameOver = true
-                                errorMessage = "Could not load harder version"
+                                errorMessage = context.getString(R.string.browse_could_not_load_harder)
                             }
                         }
                     } else {
                         withContext(Dispatchers.Main) {
                             isGeneratingHarder = false
                             gameOver = true
-                            errorMessage = "Failed to check variant availability"
+                            errorMessage = context.getString(R.string.browse_failed_check_variant)
                         }
                     }
                 } catch (e: Exception) {
@@ -1831,7 +1833,7 @@ fun BrowseGamePlayScreen(
                     withContext(Dispatchers.Main) {
                         isGeneratingHarder = false
                         gameOver = true
-                        errorMessage = "Connection error: ${e.message}"
+                        errorMessage = context.getString(R.string.browse_connection_error, e.message)
                     }
                 }
             }
@@ -1848,7 +1850,7 @@ fun BrowseGamePlayScreen(
         }
 
         isGeneratingHarder = true
-        generationPhase = "Checking availability..."
+        generationPhase = context.getString(R.string.browse_checking_availability)
         generationProgress = 0.0
         errorMessage = null
 
@@ -1866,7 +1868,7 @@ fun BrowseGamePlayScreen(
 
         showCustomizeDialog = false
         isCustomizing = true
-        customizePhase = "Preparing customization..."
+        customizePhase = context.getString(R.string.browse_preparing_customization)
         customizeProgress = 0.0
         errorMessage = null
 
@@ -1876,7 +1878,7 @@ fun BrowseGamePlayScreen(
                 val jsonBody = JSONObject().apply {
                     put("userId", userId)
                     put("customizeDescription", description)
-                    put("newTitle", newTitle.ifBlank { "My ${game.title}" })
+                    put("newTitle", newTitle.ifBlank { context.getString(R.string.browse_my_game_title, game.title) })
                 }
 
                 val requestBody = jsonBody.toString().toRequestBody("application/json".toMediaTypeOrNull())
@@ -1899,7 +1901,7 @@ fun BrowseGamePlayScreen(
                         withContext(Dispatchers.Main) {
                             isCustomizing = false
                             gameOver = true
-                            errorMessage = "Connection failed"
+                            errorMessage = context.getString(R.string.browse_connection_failed)
                         }
                         return@withContext
                     }
@@ -1934,7 +1936,7 @@ fun BrowseGamePlayScreen(
                                         resultBundle = json.optString("bundle", "")
                                     }
                                     "error" -> {
-                                        val errorMsg = json.optString("error", "Customization failed")
+                                        val errorMsg = json.optString("error", context.getString(R.string.browse_customization_failed))
                                         withContext(Dispatchers.Main) {
                                             isCustomizing = false
                                             gameOver = true
@@ -1953,7 +1955,7 @@ fun BrowseGamePlayScreen(
                     if (gotResult && !resultBundle.isNullOrEmpty()) {
                         // Spend coins after success
                         withContext(Dispatchers.Main) {
-                            customizePhase = "Spending ${CoinManager.CUSTOMIZE_COST} coins..."
+                            customizePhase = context.resources.getQuantityString(R.plurals.browse_spending_coins, CoinManager.CUSTOMIZE_COST, CoinManager.CUSTOMIZE_COST)
                         }
 
                         val currentUserId = FirebaseAuth.getInstance().currentUser?.uid
@@ -1998,21 +2000,21 @@ fun BrowseGamePlayScreen(
                                         withContext(Dispatchers.Main) {
                                             isCustomizing = false
                                             gameOver = true
-                                            errorMessage = "Failed to load customized game"
+                                            errorMessage = context.getString(R.string.browse_failed_load_customized)
                                         }
                                     }
                                 }
                             } else {
                                 isCustomizing = false
                                 gameOver = true
-                                errorMessage = "Payment failed. Please try again."
+                                errorMessage = context.getString(R.string.browse_payment_failed)
                             }
                         }
                     } else if (!gotResult) {
                         withContext(Dispatchers.Main) {
                             isCustomizing = false
                             gameOver = true
-                            errorMessage = "Customization failed — no result received"
+                            errorMessage = context.getString(R.string.browse_customization_no_result)
                         }
                     }
                 }
@@ -2020,7 +2022,7 @@ fun BrowseGamePlayScreen(
                 withContext(Dispatchers.Main) {
                     isCustomizing = false
                     gameOver = true
-                    errorMessage = "Customization error: ${e.localizedMessage}"
+                    errorMessage = context.getString(R.string.browse_customization_error, e.localizedMessage)
                 }
             }
         }
@@ -2111,11 +2113,11 @@ fun BrowseGamePlayScreen(
         if (showHowToPlay) {
             AlertDialog(
                 onDismissRequest = { showHowToPlay = false },
-                title = { Text("How to Play", color = RvInk, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.how_to_play), color = RvInk, fontWeight = FontWeight.Bold) },
                 text = { Text(game.initialPrompt, color = RvInk, fontSize = 14.sp) },
                 confirmButton = {
                     TextButton(onClick = { showHowToPlay = false }) {
-                        Text("Got it!", color = RvViolet, fontWeight = FontWeight.SemiBold)
+                        Text(stringResource(R.string.got_it), color = RvViolet, fontWeight = FontWeight.SemiBold)
                     }
                 },
                 containerColor = RvCanvas,
@@ -2148,7 +2150,7 @@ fun BrowseGamePlayScreen(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "Lv.${currentDifficultyLevel + 1}",
+                        text = stringResource(R.string.browse_level_short, currentDifficultyLevel + 1),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = RvError
@@ -2239,10 +2241,10 @@ fun BrowseGamePlayScreen(
                 ) {
                     Text("🎮", fontSize = 48.sp)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text("Play Again?", fontSize = 28.sp, fontWeight = FontWeight.Bold, color = RvInk)
+                    Text(stringResource(R.string.browse_play_again_question), fontSize = 28.sp, fontWeight = FontWeight.Bold, color = RvInk)
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        "You've already played this game.\nSpend ${CoinManager.CONTINUE_COST} coins to play again.",
+                        context.resources.getQuantityString(R.plurals.browse_replay_body, CoinManager.CONTINUE_COST, CoinManager.CONTINUE_COST),
                         fontSize = 15.sp, color = RvInkSoft,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )
@@ -2255,7 +2257,7 @@ fun BrowseGamePlayScreen(
                     ) {
                         Icon(Icons.Default.PlayCircle, contentDescription = null, tint = RvOnTone)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Play Again", color = RvOnTone, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.play_again), color = RvOnTone, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.weight(1f))
                         Surface(shape = RoundedCornerShape(16.dp), color = RvOnTone.copy(alpha = 0.2f)) {
                             Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -2267,7 +2269,7 @@ fun BrowseGamePlayScreen(
                     }
                     Spacer(modifier = Modifier.height(12.dp))
                     TextButton(onClick = { onClose() }) {
-                        Text("Back", color = RvInkSoft)
+                        Text(stringResource(R.string.back), color = RvInkSoft)
                     }
                 }
             }
@@ -2624,7 +2626,7 @@ fun BrowseGamePlayScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     CircularProgressIndicator(color = RvInk)
-                    Text("Fixing game...", color = RvInk, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.browse_fixing_game), color = RvInk, fontWeight = FontWeight.Bold)
                     if (fixPhase.isNotEmpty()) {
                         Text(fixPhase, color = RvInkSoft, fontSize = 12.sp)
                     }
@@ -2676,12 +2678,12 @@ fun BrowseGamePlayScreen(
             title = { Text(stringResource(R.string.whats_wrong)) },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Brief description — even a couple words helps", fontSize = 13.sp, color = RvInkSoft)
+                    Text(stringResource(R.string.browse_brief_description_hint), fontSize = 13.sp, color = RvInkSoft)
                     OutlinedTextField(
                         value = feedbackText,
                         onValueChange = { feedbackText = it },
                         modifier = Modifier.fillMaxWidth(),
-                        placeholder = { Text("e.g. buttons don't work, blank screen") },
+                        placeholder = { Text(stringResource(R.string.browse_feedback_placeholder)) },
                         singleLine = false,
                         maxLines = 3
                     )
@@ -2891,7 +2893,7 @@ private fun CoinStoreBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Coin Store",
+                text = stringResource(R.string.coin_store),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk,
@@ -2918,7 +2920,7 @@ private fun CoinStoreBottomSheet(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "coins",
+                    text = stringResource(R.string.coins_label),
                     fontSize = 14.sp,
                     color = RvInkSoft
                 )
@@ -2955,7 +2957,7 @@ private fun CoinStoreBottomSheet(
                             )
                             if (pack.coins == 1200) {
                                 Text(
-                                    text = "Best Value",
+                                    text = stringResource(R.string.best_value),
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = RvSuccessEdge
@@ -2991,13 +2993,13 @@ private fun CoinStoreBottomSheet(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.CheckCircle, contentDescription = null, tint = RvSuccessEdge, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(coinManager.purchaseMessage!!, fontSize = 13.sp, color = RvSuccessEdge)
+                    Text(coinManager.purchaseMessage!!.asString(), fontSize = 13.sp, color = RvSuccessEdge)
                 }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Coins are used to continue games and support creators.",
+                text = stringResource(R.string.coins_used_description),
                 fontSize = 12.sp,
                 color = RvInkSoft
             )
@@ -3087,7 +3089,7 @@ private fun LeaderboardBottomSheet(
                         ) {
                             Icon(Icons.Default.Person, contentDescription = null, tint = RvViolet, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text("Your rank: #$userRank", fontSize = 14.sp, fontWeight = FontWeight.Medium, color = RvViolet)
+                            Text(stringResource(R.string.browse_your_rank, userRank), fontSize = 14.sp, fontWeight = FontWeight.Medium, color = RvViolet)
                         }
                     }
                 }
@@ -3227,14 +3229,14 @@ fun GameTweakScreen(
                         }
                     } else {
                         withContext(Dispatchers.Main) {
-                            errorMessage = "Empty response"
+                            errorMessage = context.getString(R.string.browse_empty_response_short)
                             isLoadingVersions = false
                         }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Fetch versions error", e)
                     withContext(Dispatchers.Main) {
-                        errorMessage = "Failed to load version history"
+                        errorMessage = context.getString(R.string.browse_failed_load_versions)
                         isLoadingVersions = false
                     }
                 }
@@ -3255,7 +3257,7 @@ fun GameTweakScreen(
         Log.d(TAG, "Submitting tweak: \"$description\"")
 
         isTweaking = true
-        tweakPhase = "Preparing..."
+        tweakPhase = context.getString(R.string.browse_preparing)
         tweakProgress = 0f
         errorMessage = null
         successMessage = null
@@ -3283,7 +3285,7 @@ fun GameTweakScreen(
                     val source = response.body?.source() ?: run {
                         withContext(Dispatchers.Main) {
                             isTweaking = false
-                            errorMessage = "Connection failed"
+                            errorMessage = context.getString(R.string.browse_connection_failed)
                         }
                         return@withContext
                     }
@@ -3319,13 +3321,13 @@ fun GameTweakScreen(
                                         tweakText = ""
                                         freeTweaksRemaining = remaining
                                         if (coinsSpent > 0) coinManager.fetchBalance()
-                                        successMessage = "Tweak applied! Your game has been updated."
+                                        successMessage = context.getString(R.string.browse_tweak_applied)
                                         fetchVersions()
                                     }
                                     break
                                 }
                                 "error" -> {
-                                    val errorMsg = event.optString("error", "Unknown error")
+                                    val errorMsg = event.optString("error", context.getString(R.string.browse_webview_unknown_error))
                                     Log.e(TAG, "Tweak error: $errorMsg")
                                     withContext(Dispatchers.Main) {
                                         isTweaking = false
@@ -3342,14 +3344,14 @@ fun GameTweakScreen(
                     if (!gotResult) {
                         withContext(Dispatchers.Main) {
                             isTweaking = false
-                            if (errorMessage == null) errorMessage = "Tweak failed - no result received"
+                            if (errorMessage == null) errorMessage = context.getString(R.string.browse_tweak_no_result)
                         }
                     }
                 } catch (e: Exception) {
                     Log.e(TAG, "Tweak error", e)
                     withContext(Dispatchers.Main) {
                         isTweaking = false
-                        errorMessage = "Failed: ${e.message}"
+                        errorMessage = context.getString(R.string.browse_failed_detail, e.message)
                     }
                 }
             }
@@ -3390,7 +3392,7 @@ fun GameTweakScreen(
 
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Edit: ${game.title}",
+                        text = stringResource(R.string.browse_edit_title, game.title),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = RvInk,
@@ -3399,7 +3401,7 @@ fun GameTweakScreen(
                     )
                     if (freeTweaksRemaining > 0) {
                         Text(
-                            text = "$freeTweaksRemaining free edit${if (freeTweaksRemaining == 1) "" else "s"} left",
+                            text = context.resources.getQuantityString(R.plurals.browse_free_edits_left, freeTweaksRemaining, freeTweaksRemaining),
                             fontSize = 11.sp,
                             color = RvSuccessEdge
                         )
@@ -3407,7 +3409,7 @@ fun GameTweakScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.Circle, contentDescription = null, tint = RvSunEdge, modifier = Modifier.size(8.dp))
                             Spacer(modifier = Modifier.width(3.dp))
-                            Text("$tweakCost coins per edit", fontSize = 11.sp, color = RvSunEdge)
+                            Text(context.resources.getQuantityString(R.plurals.browse_coins_per_edit, tweakCost, tweakCost), fontSize = 11.sp, color = RvSunEdge)
                         }
                     }
                 }
@@ -3436,7 +3438,7 @@ fun GameTweakScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         CircularProgressIndicator(color = RvInk)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Loading version history...", fontSize = 13.sp, color = RvInkSoft)
+                        Text(stringResource(R.string.browse_loading_versions), fontSize = 13.sp, color = RvInkSoft)
                     }
                 }
             } else if (versions.isEmpty()) {
@@ -3444,9 +3446,9 @@ fun GameTweakScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(40.dp)) {
                         Icon(Icons.Default.Search, contentDescription = null, tint = RvInkSoft, modifier = Modifier.size(40.dp))
                         Spacer(modifier = Modifier.height(12.dp))
-                        Text("No version history yet", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvInkSoft)
+                        Text(stringResource(R.string.browse_no_versions), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = RvInkSoft)
                         Spacer(modifier = Modifier.height(4.dp))
-                        Text("Describe your change below to start editing", fontSize = 13.sp, color = RvInkSoft)
+                        Text(stringResource(R.string.browse_describe_change_below), fontSize = 13.sp, color = RvInkSoft)
                     }
                 }
             } else {
@@ -3504,7 +3506,7 @@ fun GameTweakScreen(
                 OutlinedTextField(
                     value = tweakText,
                     onValueChange = { tweakText = it },
-                    placeholder = { Text("Describe your change...", color = RvInkSoft) },
+                    placeholder = { Text(stringResource(R.string.browse_describe_change), color = RvInkSoft) },
                     modifier = Modifier.weight(1f),
                     enabled = !isTweaking,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -3536,7 +3538,7 @@ fun GameTweakScreen(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "Send",
+                        contentDescription = stringResource(R.string.browse_send),
                         tint = if (canSend) RvViolet else RvDisabled
                     )
                 }
@@ -3557,7 +3559,7 @@ fun GameTweakScreen(
                 ) {
                     Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = RvViolet, modifier = Modifier.size(48.dp))
                     Spacer(modifier = Modifier.height(20.dp))
-                    Text("Applying Edit", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvInk)
+                    Text(stringResource(R.string.browse_applying_edit), fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RvInk)
                     Spacer(modifier = Modifier.height(24.dp))
                     LinearProgressIndicator(
                         progress = { tweakProgress.coerceIn(0f, 1f) },
@@ -3568,7 +3570,7 @@ fun GameTweakScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(tweakPhase, fontSize = 13.sp, color = RvInkSoft)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("This may take a minute...", fontSize = 12.sp, color = RvInkSoft)
+                    Text(stringResource(R.string.browse_may_take_minute), fontSize = 12.sp, color = RvInkSoft)
                 }
             }
         }
@@ -3634,7 +3636,7 @@ private fun VersionCard(version: GameVersionData) {
                     color = RvSuccessEdge.copy(alpha = 0.15f)
                 ) {
                     Text(
-                        text = "Original",
+                        text = stringResource(R.string.original),
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                         color = RvSuccessEdge,
@@ -3657,7 +3659,8 @@ private fun CustomizeGameDialog(
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var description by remember { mutableStateOf("") }
-    var newTitle by remember { mutableStateOf("My $gameTitle") }
+    val defaultNewTitle = stringResource(R.string.browse_my_game_title, gameTitle)
+    var newTitle by remember { mutableStateOf(defaultNewTitle) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -3672,7 +3675,7 @@ private fun CustomizeGameDialog(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                text = "Customize This Game",
+                text = stringResource(R.string.customize_this_game),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = RvInk
@@ -3681,7 +3684,7 @@ private fun CustomizeGameDialog(
             Spacer(modifier = Modifier.height(4.dp))
 
             Text(
-                text = "Describe what you'd like to change. A new game will be created under your name.",
+                text = stringResource(R.string.browse_customize_description),
                 fontSize = 13.sp,
                 color = RvInkSoft
             )
@@ -3689,7 +3692,7 @@ private fun CustomizeGameDialog(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Game name field
-            Text("Game Name", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
+            Text(stringResource(R.string.game_name), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = newTitle,
@@ -3711,7 +3714,7 @@ private fun CustomizeGameDialog(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Description field
-            Text("What would you like to change?", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
+            Text(stringResource(R.string.what_would_you_change), fontSize = 13.sp, fontWeight = FontWeight.Medium, color = RvInkSoft)
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = description,
@@ -3719,7 +3722,7 @@ private fun CustomizeGameDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(120.dp),
-                placeholder = { Text("e.g., Make it space-themed with asteroids instead of blocks...", color = RvInkSoft) },
+                placeholder = { Text(stringResource(R.string.browse_customize_placeholder), color = RvInkSoft) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = RvGrape,
                     unfocusedBorderColor = RvOutline,
@@ -3771,7 +3774,7 @@ private fun CustomizeGameDialog(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "\u2728", fontSize = 16.sp)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("Create Customized Game", fontWeight = FontWeight.Bold, color = RvOnTone)
+                        Text(stringResource(R.string.create_customized_game), fontWeight = FontWeight.Bold, color = RvOnTone)
                         Spacer(modifier = Modifier.width(8.dp))
                         Surface(
                             shape = RoundedCornerShape(16.dp),

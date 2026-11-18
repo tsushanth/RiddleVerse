@@ -1041,7 +1041,7 @@ fun EnhancedWordSearchCompletionDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Final Score: $finalScore",
+                    text = "${stringResource(R.string.final_score)}: $finalScore",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk,
@@ -1113,7 +1113,7 @@ fun EnhancedWordSearchCompletionDialog(
 
                 val timeUsed = totalTime - timeRemaining
                 Text(
-                    text = "Time: ${timeUsed/60}:${String.format("%02d", timeUsed%60)}",
+                    text = "${stringResource(R.string.time_label)}: ${timeUsed/60}:${String.format("%02d", timeUsed%60)}",
                     fontSize = 16.sp,
                     color = RvInkSoft.copy(alpha = 0.9f),
                     textAlign = TextAlign.Center

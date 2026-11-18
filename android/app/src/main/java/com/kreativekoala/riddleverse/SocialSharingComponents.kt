@@ -66,7 +66,7 @@ fun SocialShareDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                "Share Your Success!",
+                stringResource(R.string.done_share_your_success),
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center
             )
@@ -203,7 +203,7 @@ fun ShareOptionRow(
 
         Icon(
             imageVector = Icons.Default.ChevronRight,
-            contentDescription = "Share",
+            contentDescription = stringResource(R.string.share),
             tint = RvInkSoft,
             modifier = Modifier.size(20.dp)
         )
@@ -255,22 +255,23 @@ fun CustomPuzzleShareDialog(
 }
 
 // MARK: - Share Options Configuration
+@Composable
 fun getShareOptions(): List<ShareOption> {
     return listOf(
         ShareOption(
-            title = "Share to Social Media",
+            title = stringResource(R.string.done_share_to_social),
             icon = Icons.Default.Share,
             color = Color(0xFF1DA1F2),
             action = { context, content -> shareToSocialMedia(context, content) }
         ),
         ShareOption(
-            title = "Copy to Clipboard",
+            title = stringResource(R.string.copy_to_clipboard),
             icon = Icons.Default.ContentCopy,
             color = Color(0xFF34A853),
             action = { context, content -> copyToClipboard(context, content) }
         ),
         ShareOption(
-            title = "Send via Messages",
+            title = stringResource(R.string.done_send_via_messages),
             icon = Icons.Default.Message,
             color = Color(0xFF0F9D58),
             action = { context, content -> shareViaMessages(context, content) }
@@ -288,7 +289,7 @@ fun shareToSocialMedia(context: Context, content: ShareableContent) {
         putExtra(Intent.EXTRA_SUBJECT, content.title)
     }
 
-    context.startActivity(Intent.createChooser(shareIntent, "Share your achievement"))
+    context.startActivity(Intent.createChooser(shareIntent, context.getString(R.string.done_share_chooser_title)))
 }
 
 fun copyToClipboard(context: Context, content: ShareableContent) {
@@ -350,56 +351,56 @@ fun buildShareText(content: ShareableContent): String {
 }
 
 // MARK: - Helper Functions for Creating Shareable Content
-fun createPuzzleResultShare(puzzleType: String, score: Int, streak: Int): ShareableContent {
+fun createPuzzleResultShare(context: Context, puzzleType: String, score: Int, streak: Int): ShareableContent {
     return ShareableContent(
         type = ShareType.PUZZLE_RESULT,
-        title = "Puzzle Completed!",
-        message = "🧠 Just solved a $puzzleType puzzle and scored $score points! 🔥 Current streak: $streak days. Can you beat my score?",
+        title = context.getString(R.string.puzzle_completed),
+        message = context.getString(R.string.done_share_puzzle_result, puzzleType, score, streak),
         hashtags = listOf("PuzzleVerse", "BrainTraining", puzzleType.capitalize())
     )
 }
 
-fun createAchievementShare(achievement: Achievement): ShareableContent {
+fun createAchievementShare(context: Context, achievement: Achievement): ShareableContent {
     return ShareableContent(
         type = ShareType.ACHIEVEMENT,
-        title = "Achievement Unlocked!",
-        message = "Just unlocked '${achievement.title}' badge! ${achievement.description} 🎯",
+        title = context.getString(R.string.achievement_unlocked),
+        message = context.getString(R.string.done_share_achievement, context.getString(achievement.titleRes), context.getString(achievement.descriptionRes)),
         hashtags = listOf("PuzzleVerse", "Achievement", "BrainTraining")
     )
 }
 
-fun createLevelUpShare(oldLevel: Int, newLevel: Int): ShareableContent {
+fun createLevelUpShare(context: Context, oldLevel: Int, newLevel: Int): ShareableContent {
     return ShareableContent(
         type = ShareType.LEVEL_UP,
-        title = "Level Up!",
-        message = "🚀 Just reached Level $newLevel in PuzzleVerse! My brain training is paying off! 💪",
+        title = context.getString(R.string.level_up),
+        message = context.getString(R.string.done_share_level_up, newLevel),
         hashtags = listOf("PuzzleVerse", "LevelUp", "BrainTraining")
     )
 }
 
-fun createStreakShare(streakDays: Int): ShareableContent {
+fun createStreakShare(context: Context, streakDays: Int): ShareableContent {
     return ShareableContent(
         type = ShareType.STREAK,
-        title = "Streak Achievement!",
-        message = "🔥 $streakDays days of consistent brain training! Join me in daily puzzle solving! 🧠",
+        title = context.getString(R.string.done_share_streak_title),
+        message = context.getString(R.string.done_share_streak, streakDays),
         hashtags = listOf("PuzzleVerse", "Streak", "DailyChallenge")
     )
 }
 
-fun createWeeklyRankShare(rank: Int, score: Int): ShareableContent {
+fun createWeeklyRankShare(context: Context, rank: Int, score: Int): ShareableContent {
     return ShareableContent(
         type = ShareType.WEEKLY_RANK,
-        title = "Weekly Leaderboard!",
-        message = "📊 This week I'm ranked #$rank on PuzzleVerse with $score points! 🧠 Join me in daily brain training!",
+        title = context.getString(R.string.done_share_weekly_title),
+        message = context.getString(R.string.done_share_weekly_rank, rank, score),
         hashtags = listOf("PuzzleVerse", "Leaderboard", "Competition")
     )
 }
 
-fun createCustomPuzzleShare(puzzleId: String, puzzleName: String): ShareableContent {
+fun createCustomPuzzleShare(context: Context, puzzleId: String, puzzleName: String): ShareableContent {
     return ShareableContent(
         type = ShareType.CUSTOM_PUZZLE,
-        title = "Custom Puzzle Created!",
-        message = "🧩 I just created a custom puzzle '$puzzleName' on PuzzleVerse! Think you can solve it?",
+        title = context.getString(R.string.done_share_custom_created_title),
+        message = context.getString(R.string.done_share_custom_created, puzzleName),
         hashtags = listOf("PuzzleVerse", "CustomPuzzle", "Challenge"),
         customData = mapOf("puzzleId" to puzzleId)
     )

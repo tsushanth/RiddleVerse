@@ -4,6 +4,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.verticalScroll
 import com.kreativekoala.riddleverse.ui.RvActivityTheme
 import android.annotation.TargetApi
+import androidx.annotation.StringRes
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -104,18 +105,18 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
 
-enum class PuzzleSort(val displayName: String) {
-    NEWEST("Newest"),
-    OLDEST("Oldest"),
-    MOST_PLAYED("Most Played"),
-    HIGHEST_RATED("Highest Rated"),
-    ALPHABETICAL("A-Z")
+enum class PuzzleSort(@StringRes val labelRes: Int) {
+    NEWEST(R.string.newest),
+    OLDEST(R.string.home_sort_oldest),
+    MOST_PLAYED(R.string.most_played),
+    HIGHEST_RATED(R.string.home_sort_highest_rated),
+    ALPHABETICAL(R.string.home_sort_alphabetical)
 }
 
-enum class CustomPuzzleTab(val displayName: String) {
-    BROWSE("Browse"),
-    YOUR_PUZZLES("Your Puzzles"),
-    FEATURED("Featured")
+enum class CustomPuzzleTab(@StringRes val labelRes: Int) {
+    BROWSE(R.string.subtab_browse),
+    YOUR_PUZZLES(R.string.subtab_your_puzzles),
+    FEATURED(R.string.subtab_featured)
 }
 
 val dailyTopicColors = listOf(
@@ -127,15 +128,15 @@ val dailyTopicColors = listOf(
 
 // Tab Selection Enum
 enum class TabSelection(
-    val title: String,
+    @StringRes val labelRes: Int,
     val icon: ImageVector,
     val hasNewFeatures: Boolean = false
 ) {
-    FOR_YOU("For You", Icons.Default.Star),
-    CATEGORIES("Categories", Icons.Default.GridView),
-    CREATE_GAME("Games", Icons.Default.SportsEsports),
-    CUSTOM_PUZZLES("Puzzles", Icons.Default.Extension),
-    SETTINGS("Settings", Icons.Default.Settings)
+    FOR_YOU(R.string.tab_for_you, Icons.Default.Star),
+    CATEGORIES(R.string.tab_categories, Icons.Default.GridView),
+    CREATE_GAME(R.string.tab_games, Icons.Default.SportsEsports),
+    CUSTOM_PUZZLES(R.string.tab_puzzles, Icons.Default.Extension),
+    SETTINGS(R.string.tab_settings, Icons.Default.Settings)
 }
 
 object RecentPuzzlesManager {
@@ -247,7 +248,7 @@ fun HomeScreen(navController: NavHostController,
         // Navigate to puzzle
         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
             putExtra("puzzleType", puzzleType)
-            putExtra("title", PuzzleTypeNames.display(puzzleType))
+            putExtra("title", PuzzleTypeNames.display(context, puzzleType))
         }
         context.startActivity(intent)
     }
@@ -375,7 +376,7 @@ fun HomeScreen(navController: NavHostController,
                     onCategorySelected = { category ->
                         val intent = Intent(context, StartPuzzleActivity::class.java).apply {
                             putExtra("puzzleType", category)
-                            putExtra("title", PuzzleTypeNames.display(category))
+                            putExtra("title", PuzzleTypeNames.display(context, category))
                         }
                         context.startActivity(intent)
                     }
@@ -397,7 +398,7 @@ fun HomeScreen(navController: NavHostController,
                     onCreatePuzzle = {
                         // Server-side AI generation is per account: guests get a "sign in to create" prompt.
                         val act = context as? android.app.Activity
-                        if (act == null || GuestGate.requireAccount(act, "create puzzles")) {
+                        if (act == null || GuestGate.requireAccount(act, GuestFeature.CREATE_PUZZLES)) {
                             context.startActivity(Intent(context, CreatePuzzleActivity::class.java))
                         }
                     },
@@ -486,8 +487,8 @@ fun HomeScreen(navController: NavHostController,
                                 if (leaderboard != null) {
                                     val intent = Intent(context, PuzzleLeaderboardActivity::class.java).apply {
                                         putExtra("puzzleId", puzzleId)
-                                        putExtra("puzzleName", leaderboard.puzzleName ?: "Custom Puzzle")
-                                        putExtra("puzzleCreator", leaderboard.puzzleCreator ?: "Unknown")
+                                        putExtra("puzzleName", leaderboard.puzzleName ?: context.getString(R.string.cat_extra_custom))
+                                        putExtra("puzzleCreator", leaderboard.puzzleCreator ?: context.getString(R.string.home_creator_unknown))
                                         putExtra("totalPlayers", leaderboard.totalPlayers)
                                         putExtra("userRank", leaderboard.userRank ?: 0)
                                         putExtra("userScore", leaderboard.userScore ?: 0)
@@ -508,7 +509,7 @@ fun HomeScreen(navController: NavHostController,
                                 } else {
                                     Toast.makeText(
                                         context,
-                                        "Could not load leaderboard for this puzzle",
+                                        context.getString(R.string.home_toast_leaderboard_failed),
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -584,8 +585,9 @@ fun HomeScreen(navController: NavHostController,
 
     // Show error message
     errorMessage?.let { message ->
+        val errorToast = stringResource(R.string.home_toast_error, message)
         LaunchedEffect(message) {
-            Toast.makeText(context, "Error: $message", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, errorToast, Toast.LENGTH_LONG).show()
         }
     }
 }
@@ -673,7 +675,7 @@ fun HeaderSection() {
         Column(modifier = Modifier.weight(1f)) {
             GreetingBasedOnTime()
             Text(
-                text = FirebaseAuth.getInstance().currentUser?.displayName ?: "Guest",
+                text = FirebaseAuth.getInstance().currentUser?.displayName ?: stringResource(R.string.home_guest),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp
             )
@@ -697,12 +699,28 @@ fun HeaderSection() {
         }) {
             Icon(
                 imageVector = Icons.Default.Leaderboard,
-                contentDescription = "Leaderboard",
+                contentDescription = stringResource(R.string.leaderboard),
                 tint = RvFlame,
                 modifier = androidx.compose.ui.Modifier.size(26.dp)
             )
         }
     }
+}
+
+/** Display label for a stored Categories-tab filter value (the stored value itself is never changed). */
+@StringRes
+private fun homeFilterLabelRes(filter: String): Int = when (filter) {
+    "All" -> R.string.home_filter_all
+    "Ready" -> R.string.home_filter_ready
+    "On Demand" -> R.string.home_filter_on_demand
+    "Offline" -> R.string.home_filter_offline
+    "Math" -> R.string.cat_math_title
+    "English" -> R.string.language_english
+    "Memory" -> R.string.cat_filter_memory
+    "Visual" -> R.string.cat_filter_visual
+    "Logic" -> R.string.cat_filter_logic
+    "General" -> R.string.cat_label_general
+    else -> R.string.home_filter_all
 }
 
 // Reactive CategoriesTab that shows puzzles immediately as data becomes available
@@ -801,7 +819,7 @@ fun CategoriesTab(
                     }
 
                     Text(
-                        text = "$readyCount/${allCategories.size} ready to play",
+                        text = stringResource(R.string.home_categories_ready_count, readyCount, allCategories.size),
                         fontSize = 14.sp,
                         color = if (readyCount > 0) RvSuccessEdge else RvSunEdge
                     )
@@ -817,7 +835,7 @@ fun CategoriesTab(
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
                     Text(
-                        text = "ALL SHOWN",
+                        text = stringResource(R.string.home_all_shown_badge),
                         maxLines = 1,
                         softWrap = false,
                         color = RvOnTone,
@@ -852,22 +870,22 @@ fun CategoriesTab(
                                 when (filter) {
                                     "Ready" -> Icon(
                                         imageVector = Icons.Default.PlayArrow,
-                                        contentDescription = "Ready",
+                                        contentDescription = stringResource(R.string.home_filter_ready),
                                         modifier = Modifier.size(14.dp)
                                     )
                                     "On Demand" -> Icon(
                                         imageVector = Icons.Default.CloudDownload,
-                                        contentDescription = "On Demand",
+                                        contentDescription = stringResource(R.string.home_filter_on_demand),
                                         modifier = Modifier.size(14.dp)
                                     )
                                     "Offline" -> Icon(
                                         imageVector = Icons.Default.CloudOff,
-                                        contentDescription = "Offline",
+                                        contentDescription = stringResource(R.string.home_filter_offline),
                                         modifier = Modifier.size(14.dp)
                                     )
                                 }
 
-                                Text("$filter ($count)")
+                                Text(stringResource(R.string.home_filter_chip_count, stringResource(homeFilterLabelRes(filter)), count))
                             }
                         },
                         colors = FilterChipDefaults.filterChipColors(
@@ -889,11 +907,11 @@ fun CategoriesTab(
         item {
             Text(
                 text = when (selectedFilter) {
-                    "All" -> "All Categories"
-                    "Ready" -> "Ready to Play"
-                    "On Demand" -> "On Demand (Server-based)"
-                    "Offline" -> "Offline Categories"
-                    else -> "$selectedFilter Categories"
+                    "All" -> stringResource(R.string.home_section_all_categories)
+                    "Ready" -> stringResource(R.string.home_section_ready_to_play)
+                    "On Demand" -> stringResource(R.string.home_section_on_demand)
+                    "Offline" -> stringResource(R.string.home_section_offline_categories)
+                    else -> stringResource(R.string.home_section_filter_categories, stringResource(homeFilterLabelRes(selectedFilter)))
                 },
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
@@ -921,7 +939,7 @@ fun CategoriesTab(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "No $selectedFilter categories",
+                        text = stringResource(R.string.home_no_filter_categories, stringResource(homeFilterLabelRes(selectedFilter))),
                         fontSize = 16.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center
@@ -1006,7 +1024,7 @@ fun CategoryCard(
                     if (imageResource != null) {
                         Image(
                             painter = painterResource(id = imageResource),
-                            contentDescription = "${category.title} game preview",
+                            contentDescription = stringResource(R.string.home_category_game_preview_cd, category.titleText()),
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clip(RoundedCornerShape(topStart = 22.dp, topEnd = 22.dp)),
@@ -1078,10 +1096,10 @@ fun CategoryCard(
                         ) {
                             Text(
                                 text = when {
-                                    isReady -> if (isOffline) "OFFLINE" else "READY"
-                                    isOffline -> "OFFLINE"
-                                    else -> "ON DEMAND"
-                                },
+                                    isReady -> if (isOffline) stringResource(R.string.home_filter_offline) else stringResource(R.string.home_filter_ready)
+                                    isOffline -> stringResource(R.string.home_filter_offline)
+                                    else -> stringResource(R.string.home_filter_on_demand)
+                                }.uppercase(),
                                 fontSize = 9.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = when {
@@ -1103,7 +1121,7 @@ fun CategoryCard(
                                     .padding(horizontal = 8.dp, vertical = 4.dp)
                             ) {
                                 Text(
-                                    text = "NEW!",
+                                    text = stringResource(R.string.home_badge_new_bang),
                                     color = RvOnTone,
                                     fontSize = 10.sp,
                                     fontWeight = FontWeight.Bold
@@ -1123,7 +1141,7 @@ fun CategoryCard(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
-                    text = category.title,
+                    text = category.titleText(),
                     fontSize = 15.sp,
                     fontWeight = FontWeight.ExtraBold,
                     color = RvInk,
@@ -1133,10 +1151,10 @@ fun CategoryCard(
 
                 Text(
                     text = when {
-                        isReady && isOffline -> "Works offline"
-                        isReady -> "Ready to play"
-                        isOffline -> "No internet needed"
-                        else -> "Loads on demand"
+                        isReady && isOffline -> stringResource(R.string.home_card_works_offline)
+                        isReady -> stringResource(R.string.home_card_ready_to_play)
+                        isOffline -> stringResource(R.string.home_card_no_internet_needed)
+                        else -> stringResource(R.string.home_card_loads_on_demand)
                     },
                     fontSize = 11.sp,
                     color = RvInkSoft,
@@ -1481,7 +1499,13 @@ fun SubscriptionSection() {
                         )
 
                         Text(
-                            text = subscriptionManager.currentTier.displayName,
+                            text = stringResource(
+                                when (subscriptionManager.currentTier) {
+                                    SubscriptionTier.FREE -> R.string.home_tier_free
+                                    SubscriptionTier.PREMIUM -> R.string.home_tier_premium_monthly
+                                    SubscriptionTier.PREMIUM_YEARLY -> R.string.home_tier_premium_yearly
+                                }
+                            ),
                             fontSize = 14.sp,
                             color = if (subscriptionManager.hasActiveSubscription()) {
                                 RvSunEdge
@@ -1539,7 +1563,7 @@ fun SubscriptionSection() {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = when (subscriptionManager.currentTier) {
-                            SubscriptionTier.PREMIUM, SubscriptionTier.PREMIUM_YEARLY -> "Unlimited generations • No ads • Priority support"
+                            SubscriptionTier.PREMIUM, SubscriptionTier.PREMIUM_YEARLY -> stringResource(R.string.home_premium_benefits)
                             else -> ""
                         },
                         fontSize = 12.sp,
@@ -1561,7 +1585,7 @@ fun SubscriptionSection() {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "10 daily generations • 100 monthly generations",
+                        text = stringResource(R.string.home_free_limits),
                         fontSize = 12.sp,
                         color = RvInkSoft
                     )
@@ -1675,16 +1699,18 @@ fun SettingsTab(
 fun RatingSection() {
     val context = LocalContext.current
     var showFeedbackDialog by remember { mutableStateOf(false) }
+    val couldNotOpenPlayText = stringResource(R.string.home_toast_cannot_open_play)
+    val feedbackThanksText = stringResource(R.string.home_toast_feedback_thanks)
 
-    SettingsSection(title = "Support & Feedback") {
+    SettingsSection(title = stringResource(R.string.home_support_feedback_title)) {
         Column {
             SettingsRow(
                 icon = Icons.Default.Star,
-                title = "Rate RiddleVerse",
-                subtitle = "Open RiddleVerse on Google Play",
+                title = stringResource(R.string.home_rate_app_title),
+                subtitle = stringResource(R.string.home_rate_app_subtitle),
                 onClick = {
                     if (!PlayListing.open(context)) {
-                        Toast.makeText(context, "Couldn't open Google Play", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, couldNotOpenPlayText, Toast.LENGTH_SHORT).show()
                     }
                 }
             )
@@ -1693,8 +1719,8 @@ fun RatingSection() {
 
             SettingsRow(
                 icon = Icons.Default.BugReport,
-                title = "Send Feedback",
-                subtitle = "Tell us what to improve or what isn't working",
+                title = stringResource(R.string.home_send_feedback_title),
+                subtitle = stringResource(R.string.home_send_feedback_subtitle),
                 onClick = {
                     showFeedbackDialog = true
                 }
@@ -1705,8 +1731,8 @@ fun RatingSection() {
 
             SettingsRow(
                 icon = Icons.Default.ContactSupport,
-                title = "Contact Support",
-                subtitle = "Get help with account or technical issues",
+                title = stringResource(R.string.home_contact_support_title),
+                subtitle = stringResource(R.string.home_contact_support_subtitle),
                 onClick = {
                     openFeedbackEmail(context)
                 }
@@ -1723,7 +1749,7 @@ fun RatingSection() {
             },
             onSubmitted = {
                 showFeedbackDialog = false
-                Toast.makeText(context, "Thank you for your feedback!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, feedbackThanksText, Toast.LENGTH_SHORT).show()
             }
         )
     }
@@ -1752,7 +1778,7 @@ fun ProgressStatsSection() {
         }
     }
 
-    SettingsSection(title = "Progress & Stats") {
+    SettingsSection(title = stringResource(R.string.home_progress_stats_title)) {
         if (isLoading) {
             Box(
                 modifier = Modifier
@@ -1776,12 +1802,12 @@ fun ProgressStatsSection() {
                     ) {
                         Column {
                             Text(
-                                text = "Level ${data.levelInfo.level}",
+                                text = stringResource(R.string.home_level_number, data.levelInfo.level),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
                             Text(
-                                text = "${data.globalStats.totalXP} XP",
+                                text = stringResource(R.string.home_xp_amount, data.globalStats.totalXP),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -1807,7 +1833,7 @@ fun ProgressStatsSection() {
                             fontWeight = FontWeight.Medium
                         )
                         Text(
-                            text = data.tierInfo.currentTier,
+                            text = stringResource(data.tierInfo.currentTierRes),
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
@@ -1856,7 +1882,7 @@ fun ProgressStatsSection() {
 
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text(
-                                text = "${data.globalStats.totalTimeHours.toInt()}h",
+                                text = stringResource(R.string.home_hours_short, data.globalStats.totalTimeHours.toInt()),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp
                             )
@@ -1889,7 +1915,7 @@ fun ProgressStatsSection() {
                 ) {
                     Icon(
                         imageVector = Icons.Default.Error,
-                        contentDescription = "Error",
+                        contentDescription = stringResource(R.string.common_error),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(32.dp)
                     )
@@ -1909,17 +1935,17 @@ fun ProgressStatsSection() {
 fun ProfileSection(onSignIn: () -> Unit = {}) {
     val user = FirebaseAuth.getInstance().currentUser
     val guest = isGuestProfile(user)
-    SettingsSection(title = "Profile") {
+    SettingsSection(title = stringResource(R.string.home_profile_title)) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .then(if (guest) Modifier.clickable(onClickLabel = "Sign in or create account") { onSignIn() } else Modifier)
+                .then(if (guest) Modifier.clickable(onClickLabel = stringResource(R.string.common_sign_in_or_create)) { onSignIn() } else Modifier)
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Profile",
+                contentDescription = stringResource(R.string.home_profile_title),
                 modifier = Modifier.size(40.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -1930,7 +1956,7 @@ fun ProfileSection(onSignIn: () -> Unit = {}) {
                 if (guest || user == null) {
                     // Guest: say so, and give a visible way into email sign-in / sign-up (AuthActivity)
                     Text(
-                        text = "Guest",
+                        text = stringResource(R.string.home_guest),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 16.sp
                     )
@@ -1939,7 +1965,7 @@ fun ProfileSection(onSignIn: () -> Unit = {}) {
                         contentPadding = PaddingValues(horizontal = 0.dp, vertical = 4.dp),
                         modifier = Modifier.heightIn(min = 48.dp)
                     ) {
-                        Text("Sign in or create account", fontSize = 14.sp)
+                        Text(stringResource(R.string.common_sign_in_or_create), fontSize = 14.sp)
                     }
                 } else {
                     user.displayName?.let {
@@ -1976,7 +2002,7 @@ fun CreatorEarningsSection() {
     }
 
     if (coinManager.isLoadingEarnings) {
-        SettingsSection(title = "Creator Earnings") {
+        SettingsSection(title = stringResource(R.string.home_creator_earnings_title)) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -1991,7 +2017,7 @@ fun CreatorEarningsSection() {
 
     val earnings = coinManager.creatorEarnings ?: return
 
-    SettingsSection(title = "Creator Earnings") {
+    SettingsSection(title = stringResource(R.string.home_creator_earnings_title)) {
         Column(modifier = Modifier.padding(16.dp)) {
             if (earnings.totalCoinsEarned == 0) {
                 // Teaser card
@@ -2076,7 +2102,7 @@ fun CreatorEarningsSection() {
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
-                                text = "${game.totalCoinsEarned} coins",
+                                text = stringResource(R.string.home_coins_amount, game.totalCoinsEarned),
                                 fontSize = 13.sp,
                                 color = RvSuccessEdge,
                                 fontWeight = FontWeight.Medium
@@ -2173,7 +2199,7 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Set up your Stripe account to cash out your earned coins as real money.",
+                        text = stringResource(R.string.home_payout_setup_stripe_body),
                         fontSize = 13.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center
@@ -2208,7 +2234,7 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Your Stripe account setup is incomplete. Tap below to finish.",
+                        text = stringResource(R.string.home_payout_setup_incomplete_body),
                         fontSize = 13.sp,
                         color = RvInkSoft,
                         textAlign = TextAlign.Center
@@ -2237,13 +2263,13 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                         color = RvSuccessEdge
                     )
                     Text(
-                        text = "coins available",
+                        text = stringResource(R.string.home_payout_coins_available),
                         fontSize = 13.sp,
                         color = RvInkSoft
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
-                        text = "You need $needed more coins to reach the minimum payout of ${eligibility.minThreshold} coins.",
+                        text = stringResource(R.string.home_payout_need_more, needed, eligibility.minThreshold),
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         color = RvInkSoft
@@ -2260,18 +2286,18 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                         color = RvSuccessEdge
                     )
                     Text(
-                        text = "coins available",
+                        text = stringResource(R.string.home_payout_coins_available),
                         fontSize = 13.sp,
                         color = RvInkSoft
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "$$usdAmount USD",
+                        text = stringResource(R.string.home_payout_usd_total, usdAmount),
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp
                     )
                     Text(
-                        text = "at ${eligibility.conversionRate}/coin",
+                        text = stringResource(R.string.home_payout_rate_per_coin, eligibility.conversionRate.toString()),
                         fontSize = 12.sp,
                         color = RvInkSoft
                     )
@@ -2306,9 +2332,9 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                 coinManager.payoutMessage?.let { msg ->
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = msg,
+                        text = msg.asString(),
                         fontSize = 13.sp,
-                        color = if (msg.contains("failed") || msg.contains("error", ignoreCase = true))
+                        color = if (coinManager.payoutMessageIsError)
                             RvError else RvSuccessEdge,
                         textAlign = TextAlign.Center
                     )
@@ -2338,12 +2364,12 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                         ) {
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "${payout.coinsAmount} coins",
+                                    text = stringResource(R.string.home_coins_amount, payout.coinsAmount),
                                     fontSize = 13.sp,
                                     fontWeight = FontWeight.Medium
                                 )
                                 Text(
-                                    text = "$${String.format("%.2f", payout.usdAmount)}",
+                                    text = stringResource(R.string.home_usd_amount, String.format("%.2f", payout.usdAmount)),
                                     fontSize = 12.sp,
                                     color = RvInkSoft
                                 )
@@ -2355,7 +2381,13 @@ fun PayoutDialog(onDismiss: () -> Unit) {
                                 else -> RvInkSoft
                             }
                             Text(
-                                text = payout.status.replaceFirstChar { it.uppercase() },
+                                text = when (payout.status) {
+                                    "completed" -> stringResource(R.string.completed)
+                                    "pending" -> stringResource(R.string.home_payout_status_pending)
+                                    "processing" -> stringResource(R.string.home_payout_status_processing)
+                                    "failed" -> stringResource(R.string.home_payout_status_failed)
+                                    else -> payout.status.replaceFirstChar { it.uppercase() }
+                                },
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 color = statusColor
@@ -2374,12 +2406,12 @@ fun AppFeaturesSection(
     onNavigateToTopics: () -> Unit,
     onNavigateToAchievements: () -> Unit
 ) {
-    SettingsSection(title = "App Features") {
+    SettingsSection(title = stringResource(R.string.home_app_features_title)) {
         Column {
             SettingsRow(
                 icon = Icons.Default.Iron,
                 title = stringResource(R.string.leaderboard),
-                subtitle = "View rankings and scores",
+                subtitle = stringResource(R.string.home_leaderboard_row_subtitle),
                 onClick = onNavigateToLeaderboard
             )
 
@@ -2388,7 +2420,7 @@ fun AppFeaturesSection(
             SettingsRow(
                 icon = Icons.Default.Tag,
                 title = stringResource(R.string.preferred_topics),
-                subtitle = "Customize your puzzle preferences",
+                subtitle = stringResource(R.string.home_topics_row_subtitle),
                 onClick = onNavigateToTopics
             )
 
@@ -2396,8 +2428,8 @@ fun AppFeaturesSection(
 
             SettingsRow(
                 icon = Icons.Default.EmojiEvents,
-                title = "Achievements & Progress",
-                subtitle = "View achievements, badges, tier progress, and rewards",
+                title = stringResource(R.string.home_achievements_row_title),
+                subtitle = stringResource(R.string.home_achievements_row_subtitle),
                 onClick = onNavigateToAchievements
             )
         }
@@ -2411,11 +2443,11 @@ fun AccountSection(
     onSignIn: () -> Unit,
     onSignUp: () -> Unit
 ) {
-    SettingsSection(title = "Account") {
+    SettingsSection(title = stringResource(R.string.home_account_title)) {
         if (isSignedIn) {
             SettingsRow(
                 icon = Icons.AutoMirrored.Filled.Logout,
-                title = "Sign Out",
+                title = stringResource(R.string.home_sign_out),
                 iconTint = RvError,
                 titleColor = RvError,
                 onClick = onSignOut
@@ -2424,7 +2456,7 @@ fun AccountSection(
             Column {
                 SettingsRow(
                     icon = Icons.AutoMirrored.Filled.Login,
-                    title = "Sign In",
+                    title = stringResource(R.string.home_sign_in),
                     onClick = onSignIn
                 )
 
@@ -2432,7 +2464,7 @@ fun AccountSection(
 
                 SettingsRow(
                     icon = Icons.Default.PersonAdd,
-                    title = "Create Account",
+                    title = stringResource(R.string.home_create_account),
                     onClick = onSignUp
                 )
             }
@@ -2511,7 +2543,7 @@ fun SettingsRow(
 
         Icon(
             imageVector = Icons.Default.ChevronRight,
-            contentDescription = "Navigate",
+            contentDescription = stringResource(R.string.home_navigate_cd),
             tint = RvInkSoft
         )
     }
@@ -2551,7 +2583,7 @@ fun GameCompletionBanner(
                     fontSize = 14.sp
                 )
                 Text(
-                    text = "Tap to preview — also in Explore > Custom Games",
+                    text = stringResource(R.string.home_game_ready_banner_hint),
                     color = RvInkSoft,
                     fontSize = 12.sp
                 )
@@ -2598,7 +2630,7 @@ fun BottomTabBar(
                     Box {
                         Icon(
                             imageVector = tab.icon,
-                            contentDescription = tab.title,
+                            contentDescription = stringResource(tab.labelRes),
                             modifier = Modifier.size(24.dp),
                             tint = if (selectedTab == tab) {
                                 RvViolet
@@ -2640,13 +2672,7 @@ fun BottomTabBar(
                     Spacer(modifier = Modifier.height(4.dp))
 
                     com.kreativekoala.riddleverse.ui.AutoShrinkText(
-                        text = when (tab) {
-                            TabSelection.FOR_YOU -> stringResource(R.string.tab_for_you)
-                            TabSelection.CATEGORIES -> stringResource(R.string.tab_categories)
-                            TabSelection.CREATE_GAME -> stringResource(R.string.tab_games)
-                            TabSelection.CUSTOM_PUZZLES -> stringResource(R.string.tab_puzzles)
-                            TabSelection.SETTINGS -> stringResource(R.string.tab_settings)
-                        },
+                        text = stringResource(tab.labelRes),
                         maxSize = 11.sp,
                         minSize = 8.sp,
                         maxLines = 1,
@@ -2741,11 +2767,11 @@ class HomeActivity : AppCompatActivity() {
                 putExtra("dailyTopic", topic)
                 putExtra("userEmail", currentUser.email)
                 putExtra("puzzleType", "daily")
-                putExtra("title", "$topic Quiz")
+                putExtra("title", getString(R.string.home_daily_quiz_title, topic))
             }
             startActivity(intent)
         } else {
-            GuestGate.requireAccount(this, "play daily quizzes")
+            GuestGate.requireAccount(this, GuestFeature.PLAY_DAILY_QUIZZES)
         }
     }
 
@@ -2823,7 +2849,7 @@ fun UserScoreView() {
 
     if (backendScore != null || localScoreIncrement > 0) {
         Text(
-            text = "🏅 Score: $displayScore" + if (localScoreIncrement > 0) " (+$localScoreIncrement)" else "",
+            text = "🏅 " + stringResource(R.string.home_score_line, displayScore) + if (localScoreIncrement > 0) " (+$localScoreIncrement)" else "",
             color = RvViolet,
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
@@ -2835,7 +2861,7 @@ fun UserScoreView() {
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    placeholder: String = "Search puzzles..."
+    placeholder: String = stringResource(R.string.home_search_puzzles_placeholder)
 ) {
     OutlinedTextField(
         value = query,
@@ -2850,7 +2876,7 @@ fun SearchBar(
         leadingIcon = {
             Icon(
                 Icons.Default.Search,
-                contentDescription = "Search",
+                contentDescription = stringResource(R.string.common_search),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         },
@@ -2859,7 +2885,7 @@ fun SearchBar(
                 IconButton(onClick = { onQueryChange("") }) {
                     Icon(
                         Icons.Default.Clear,
-                        contentDescription = "Clear",
+                        contentDescription = stringResource(R.string.clear),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -2891,7 +2917,7 @@ fun CustomPuzzleTabRow(
             Tab(
                 selected = selectedTab == tab,
                 onClick = { onTabSelected(tab) },
-                text = { Text(tab.displayName) }
+                text = { Text(stringResource(tab.labelRes)) }
             )
         }
     }
@@ -2951,7 +2977,7 @@ fun CustomPuzzlesHeader(
             ) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
-                    contentDescription = "Refresh",
+                    contentDescription = stringResource(R.string.refresh),
                     tint = RvOnTone
                 )
             }

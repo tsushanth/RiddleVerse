@@ -549,7 +549,7 @@ fun WordPrefixPuzzleScreen(
                 CircularProgressIndicator(color = Color.White)
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    text = "Loading dictionary...",
+                    text = stringResource(R.string.xb_loading_dictionary),
                     color = RvInk,
                     fontSize = 16.sp
                 )
@@ -697,18 +697,18 @@ fun WordPrefixPuzzleScreen(
                             showCompletionDialog = false
                         }
                     ) {
-                        Text("Finish Now", color = RvInk, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.finish_now), color = RvInk, fontWeight = FontWeight.Bold)
                     }
                 },
                 dismissButton = {
                     TextButton(
                         onClick = { showCompletionDialog = false }
                     ) {
-                        Text("Keep Playing", color = RvInk)
+                        Text(stringResource(R.string.keep_playing), color = RvInk)
                     }
                 },
                 title = {
-                    Text("Gold Level Reached!", color = RvInk, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.gold_level_reached), color = RvInk, fontWeight = FontWeight.Bold)
                 },
                 text = {
                     Column {
@@ -718,7 +718,7 @@ fun WordPrefixPuzzleScreen(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            "Current Score: $totalScore",
+                            stringResource(R.string.xb_current_score, totalScore),
                             color = RvSunEdge,
                             fontWeight = FontWeight.Bold
                         )
@@ -763,11 +763,11 @@ fun WordPrefixPuzzleScreen(
                 onDismissRequest = { showHint = false },
                 confirmButton = {
                     TextButton(onClick = { showHint = false }) {
-                        Text("Got it!", color = RvInk)
+                        Text(stringResource(R.string.got_it), color = RvInk)
                     }
                 },
                 title = {
-                    Text("How to Play", color = RvInk, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.how_to_play), color = RvInk, fontWeight = FontWeight.Bold)
                 },
                 text = {
                     Column {
@@ -831,7 +831,7 @@ fun EnhancedStatsRow(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Score: $totalScore",
+                    text = "${stringResource(R.string.score_label)}: $totalScore",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvSunEdge
@@ -1083,7 +1083,7 @@ fun EnhancedFoundWordsSection(
 
             if (streakCount > 0) {
                 Text(
-                    text = "Streak: $streakCount",
+                    text = stringResource(R.string.riddle_streak, streakCount),
                     fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                     color = RvWarning
@@ -1170,13 +1170,13 @@ fun EnhancedStatsSection(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             StatItem(
-                label = "Found",
+                label = stringResource(R.string.found),
                 value = "$foundWords/$totalWords",
                 color = RvInk
             )
 
             StatItem(
-                label = "Score",
+                label = stringResource(R.string.score_label),
                 value = score.toString(),
                 color = RvSunEdge
             )
@@ -1191,7 +1191,7 @@ fun EnhancedStatsSection(
 
             if (streak > 0) {
                 StatItem(
-                    label = "Streak",
+                    label = stringResource(R.string.streak_label),
                     value = "$streak",
                     color = RvWarning
                 )
@@ -1372,7 +1372,7 @@ fun WordPrefixTopBar(
 
             Column {
                 Text(
-                    text = "Level ${level.level}",
+                    text = "${stringResource(R.string.level_label)} ${level.level}",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     color = RvInk
@@ -1393,7 +1393,7 @@ fun WordPrefixTopBar(
                 repeat(5) { index ->
                     Icon(
                         imageVector = Icons.Default.Favorite,
-                        contentDescription = "Heart",
+                        contentDescription = stringResource(R.string.xa_heart),
                         tint = if (index < hearts) Color.Red else RvOutline,
                         modifier = Modifier.size(18.dp)
                     )

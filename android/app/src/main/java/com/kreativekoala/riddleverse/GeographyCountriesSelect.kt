@@ -675,7 +675,7 @@ fun GeographyCountryDragDropPuzzleScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "TIME ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
+                                text = "${stringResource(R.string.time_label).uppercase()} ${String.format("%d:%02d", timeRemaining / 60, timeRemaining % 60)}",
                                 color = RvInk,
                                 fontSize = 14.sp,
                                 maxLines = 1,
@@ -690,7 +690,7 @@ fun GeographyCountryDragDropPuzzleScreen(
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                text = "SCORE $totalScore",
+                                text = "${stringResource(R.string.score_label).uppercase()} $totalScore",
                                 color = RvInk,
                                 fontSize = 14.sp,
                                 maxLines = 1,
@@ -1150,7 +1150,7 @@ private fun CountryPrecisePlacementScreen(
                             modifier = Modifier.heightIn(min = 48.dp),
                             border = BorderStroke(if (showHints) 2.dp else 1.dp, if (showHints) RvSunEdge else RvOutline)
                         ) {
-                            Text(if (showHints) "Hide Hints" else "Show Hints", fontSize = 14.sp, color = RvInk, maxLines = 1)
+                            Text(if (showHints) stringResource(R.string.xa_hide_hints) else stringResource(R.string.xa_show_hints), fontSize = 14.sp, color = RvInk, maxLines = 1)
                         }
                     }
                 }
@@ -1602,7 +1602,7 @@ fun CountryGridTestingScreen(
                 onClick = onBack,
                 colors = ButtonDefaults.buttonColors(containerColor = RvSky)
             ) {
-                Text("← Back", color = RvOnTone)
+                Text("← ${stringResource(R.string.back)}", color = RvOnTone)
             }
 
             Text(

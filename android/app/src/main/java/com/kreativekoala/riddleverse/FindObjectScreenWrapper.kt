@@ -47,6 +47,7 @@ import java.lang.Math.pow
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.math.abs
+import com.kreativekoala.riddleverse.ui.rvDifficultyLabel
 
 // Enhanced data classes for Natural Discovery approach
 data class FindObjectPuzzleData(
@@ -154,7 +155,7 @@ fun FindObjectScreenWrapper(
     LaunchedEffect(currentPuzzle.puzzleId, loadAttempt) {
         kotlinx.coroutines.delay(20_000)
         if (isLoading && puzzleData == null) {
-            errorMessage = "This puzzle is taking too long to load. Please try again."
+            errorMessage = context.getString(R.string.common_puzzle_load_timeout)
             hasError = true
             isLoading = false
         }
@@ -187,7 +188,7 @@ fun FindObjectScreenWrapper(
             // Validate image readiness
             if (imageUrl.isEmpty() || imageUrl == "null" || imageUrl.contains("PLACEHOLDER")) {
                 Log.e(TAG, "❌ Image not ready yet: '$imageUrl'")
-                errorMessage = "Image is still being generated. Please try again in a moment."
+                errorMessage = context.getString(R.string.common_image_still_generating)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -195,7 +196,7 @@ fun FindObjectScreenWrapper(
 
             if (!imageUrl.startsWith("http")) {
                 Log.e(TAG, "❌ Invalid image URL format: '$imageUrl'")
-                errorMessage = "Invalid image URL. Please try again."
+                errorMessage = context.getString(R.string.common_invalid_image_url)
                 hasError = true
                 isLoading = false
                 return@LaunchedEffect
@@ -373,7 +374,7 @@ fun FindObjectScreenWrapper(
         } catch (e: Exception) {
             Log.e(TAG, "❌ Error parsing puzzle data: ${e.message}", e)
             Log.e(TAG, "📄 Raw question data: ${currentPuzzle.question}")
-            errorMessage = "Failed to load puzzle: ${e.message}"
+            errorMessage = context.getString(R.string.common_failed_to_load_puzzle, e.message)
             hasError = true
             isLoading = false
         }
@@ -381,7 +382,7 @@ fun FindObjectScreenWrapper(
 
     when {
         isLoading -> {
-            LoadingScreen(message = "Loading natural discovery puzzle...")
+            LoadingScreen(message = stringResource(R.string.xa_loading_discovery_puzzle))
         }
 
         hasError -> {
@@ -419,7 +420,7 @@ fun FindObjectScreenWrapper(
         else -> {
             // Not loading, no error, no data: previously rendered nothing (blank white screen).
             FoErrorScreen(
-                message = "The puzzle could not be loaded. Please try again.",
+                message = stringResource(R.string.common_puzzle_load_failed),
                 onRetry = {
                     isLoading = true
                     hasError = false
@@ -653,7 +654,7 @@ fun FindObjectPuzzleScreen(
                 trackColor = RvOutline
             )
             Text(
-                text = "Wrong: $wrongClicks/${puzzleData.gameSettings.maxWrongClicks}",
+                text = stringResource(R.string.xa_wrong_ratio, wrongClicks, puzzleData.gameSettings.maxWrongClicks),
                 color = if (wrongClicks >= puzzleData.gameSettings.maxWrongClicks * 0.8) RvCoralEdge else RvInk,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
@@ -735,7 +736,7 @@ fun NaturalFindObjectHeader(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = difficulty.uppercase(),
+                        text = rvDifficultyLabel(difficulty).uppercase(),
                         color = RvInk,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
@@ -1165,7 +1166,7 @@ fun NaturalObjectLandscapeView(
                 ) {
                     Icon(
                         Icons.Default.Lightbulb,
-                        "Hint",
+                        stringResource(R.string.hint),
                         tint = RvInk,
                         modifier = Modifier.size(24.dp)
                     )
@@ -1361,11 +1362,11 @@ fun NaturalObjectCard(
                     ) {
                         Icon(
                             Icons.Default.Lightbulb,
-                            "Hint",
+                            stringResource(R.string.hint),
                             tint = RvInk
                         )
                         Text(
-                            "Show Hint",
+                            stringResource(R.string.xa_show_hint),
                             color = RvInk
                         )
                     }
@@ -1392,7 +1393,7 @@ fun FoErrorScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "⚠️ Error",
+                text = "⚠️ ${stringResource(R.string.common_error)}",
                 color = Color.Red,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -1409,14 +1410,14 @@ fun FoErrorScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Button(onClick = onRetry) {
-                    Text("Retry")
+                    Text(stringResource(R.string.retry))
                 }
 
                 Button(
                     onClick = onSkip,
                     colors = ButtonDefaults.buttonColors(containerColor = RvInkSoft)
                 ) {
-                    Text("Skip")
+                    Text(stringResource(R.string.skip))
                 }
             }
         }

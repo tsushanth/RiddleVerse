@@ -340,14 +340,14 @@ private fun TriangleDotCompletionScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Correct Answers: $correctCount / $totalQuestions",
+                        text = "${stringResource(R.string.correct_answers)}: $correctCount / $totalQuestions",
                         fontSize = 16.sp,
                         color = RvInk
                     )
 
                     val percentage = (correctCount.toDouble() / totalQuestions.toDouble() * 100).toInt()
                     Text(
-                        text = "Accuracy: $percentage%",
+                        text = "${stringResource(R.string.accuracy)}: $percentage%",
                         fontSize = 16.sp,
                         color = RvInk
                     )

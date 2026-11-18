@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +53,7 @@ fun WebPromoBanner() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "Also available on the web \u2192 puzzleverseai.com",
+                text = stringResource(R.string.home_web_promo),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = RvGrape,
@@ -68,7 +69,7 @@ fun WebPromoBanner() {
             ) {
                 Icon(
                     imageVector = Icons.Default.Close,
-                    contentDescription = "Dismiss",
+                    contentDescription = stringResource(R.string.welcome_back_dismiss),
                     tint = RvInkSoft,
                     modifier = Modifier.size(16.dp)
                 )

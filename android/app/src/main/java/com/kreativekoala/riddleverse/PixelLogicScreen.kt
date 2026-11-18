@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.compose.ui.res.stringResource
 import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.foundation.Canvas
@@ -107,23 +108,23 @@ private fun PixelLogicBoard(args: SpatialArgs, puzzle: NonogramPuzzle) {
         args = args,
         status = "$filled/$target",
         controls = {
-            SpatialAction(Icons.AutoMirrored.Filled.Undo, "Undo", enabled = game.canUndo()) {
+            SpatialAction(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.xa_undo), enabled = game.canUndo()) {
                 game.undo(); mistakes = null; commit()
             }
-            SpatialAction(Icons.Default.Lightbulb, "Hint") {
+            SpatialAction(Icons.Default.Lightbulb, stringResource(R.string.hint)) {
                 val i = game.hint()
                 toast = if (i >= 0) "Revealed row ${i / n + 1}, column ${i % n + 1}" else "Nothing left to reveal"
                 mistakes = null; commit()
             }
-            SpatialAction(Icons.Default.FactCheck, "Check") {
+            SpatialAction(Icons.Default.FactCheck, stringResource(R.string.check)) {
                 val m = game.mistakes()
                 mistakes = m
                 toast = if (m.isEmpty()) "No mistakes so far" else "${m.size} wrong cell(s) outlined"
             }
-            SpatialAction(Icons.Default.Delete, "Clear", enabled = game.cells.any { it != 0 }) {
+            SpatialAction(Icons.Default.Delete, stringResource(R.string.clear), enabled = game.cells.any { it != 0 }) {
                 game.clear(); mistakes = null; commit()
             }
-            SpatialAction(Icons.Default.SkipNext, "Skip") { args.onFinished(false, 0) }
+            SpatialAction(Icons.Default.SkipNext, stringResource(R.string.skip)) { args.onFinished(false, 0) }
         }
     ) {
         // mode row
@@ -362,7 +363,7 @@ private fun PixelLogicBoard(args: SpatialArgs, puzzle: NonogramPuzzle) {
             success = true, title = "Picture complete!",
             detail = "Hints used: ${game.hintsUsed}.  Score $s",
             stars = when { game.hintsUsed == 0 -> 3; game.hintsUsed <= 2 -> 2; else -> 1 },
-            primaryLabel = "Continue", onPrimary = { args.onFinished(true, s) }
+            primaryLabel = stringResource(R.string.continue_label), onPrimary = { args.onFinished(true, s) }
         )
     }
 }
