@@ -867,7 +867,7 @@ private fun CountryInstructionsScreen(
                     Spacer(modifier = Modifier.height(12.dp))
 
                     val features = listOf(
-                        "✅ GPT-4 Vision powered grid mappings",
+                        "✅ AI-assisted grid mappings",
                         "🎯 Mobile-optimized grid sizes per continent",
                         "🏆 Intelligent difficulty scaling",
                         "📱 Touch-friendly country selection",
