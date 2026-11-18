@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Stehen zwei Einsen nebeneinander, müssen die Felder an beiden Enden 0 sein.</string>
     <string name="tut_grid_cagemath_tip">Beginne mit Käfigen aus einem Feld und großen Produkten, dann grenze den Rest über Zeilen und Spalten ein.</string>
     <string name="tut_grid_signgrid_tip">Die größte Ziffer kann nie am spitzen Ende eines Zeichens stehen.</string>
+    <string name="tut_purchasing_instruction">Jedes Rätsel zeigt ein Abo: was du zahlst und wie oft. Rechne aus, was es in einem Jahr kostet, und tippe auf die passende Summe. Beispiel: 10 im Monat sind 10 × 12 = 120 im Jahr.</string>
+    <string name="tut_purchasing_tip">Täglich × 365, wöchentlich × 52, monatlich × 12, vierteljährlich × 4. Hinweise helfen, senken aber deine Punktzahl.</string>
 </resources>

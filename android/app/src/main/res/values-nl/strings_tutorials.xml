@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Staan er twee enen naast elkaar, dan moeten de vakjes aan beide kanten 0 zijn.</string>
     <string name="tut_grid_cagemath_tip">Begin met kooien van één vakje en grote producten, en beperk de rest daarna met rijen en kolommen.</string>
     <string name="tut_grid_signgrid_tip">Het grootste cijfer kan nooit aan de smalle kant van een teken staan.</string>
+    <string name="tut_purchasing_instruction">Elke puzzel toont een abonnement: wat je betaalt en hoe vaak. Reken uit wat het in een jaar kost en tik op het juiste totaal. Voorbeeld: 10 per maand is 10 × 12 = 120 per jaar.</string>
+    <string name="tut_purchasing_tip">Dagelijks × 365, wekelijks × 52, maandelijks × 12, per kwartaal × 4. Hints helpen, maar verlagen je score.</string>
 </resources>

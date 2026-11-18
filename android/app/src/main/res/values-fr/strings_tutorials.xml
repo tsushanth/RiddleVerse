@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Si deux 1 sont côte à côte, les cases aux deux extrémités doivent être 0.</string>
     <string name="tut_grid_cagemath_tip">Commencez par les cages d\'une case et les grands produits, puis utilisez les lignes et colonnes pour restreindre le reste.</string>
     <string name="tut_grid_signgrid_tip">Le plus grand chiffre ne peut jamais se trouver du côté étroit d\'un signe.</string>
+    <string name="tut_purchasing_instruction">Chaque énigme montre un abonnement : ce que vous payez et à quelle fréquence. Calculez son coût sur un an et touchez le bon total. Exemple : 10 par mois, c\'est 10 × 12 = 120 par an.</string>
+    <string name="tut_purchasing_tip">Par jour × 365, par semaine × 52, par mois × 12, par trimestre × 4. Les indices aident, mais baissent votre score.</string>
 </resources>

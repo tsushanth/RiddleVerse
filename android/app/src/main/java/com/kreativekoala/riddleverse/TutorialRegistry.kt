@@ -40,7 +40,7 @@ object TutorialRegistry {
         "mathestimation", "discounts", "conversion", "crossword",
         "pinballdeflector", "imagepuzzle",
         // Single-screen cards: math
-        "numbersum", "averages", "percentage", "mathcomparison", "mathexpression", "mathcrossword", "tipbubble",
+        "numbersum", "averages", "percentage", "mathcomparison", "mathexpression", "mathcrossword", "tipbubble", "purchasing",
         // memory
         "memorystory", "memorysequencing", "memoryretention",
         "memoryprevioussingle", "memorypreviouspair", "triangledotmemory",

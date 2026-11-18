@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Pokud vedle sebe leží dvě jedničky, políčka na obou koncích musí být 0.</string>
     <string name="tut_grid_cagemath_tip">Začněte klecemi o jednom políčku a velkými součiny, pak zbytek zúžte pomocí řádků a sloupců.</string>
     <string name="tut_grid_signgrid_tip">Největší číslice nikdy nemůže stát na úzkém konci znaménka.</string>
+    <string name="tut_purchasing_instruction">Každá hádanka ukazuje předplatné: kolik platíte a jak často. Spočítejte, kolik stojí za rok, a klepněte na odpovídající součet. Příklad: 10 měsíčně je 10 × 12 = 120 ročně.</string>
+    <string name="tut_purchasing_tip">Denně × 365, týdně × 52, měsíčně × 12, čtvrtletně × 4. Nápovědy pomáhají, ale snižují skóre.</string>
 </resources>

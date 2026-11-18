@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Se dois 1 estiverem lado a lado, as casas nas duas pontas precisam ser 0.</string>
     <string name="tut_grid_cagemath_tip">Comece pelas gaiolas de uma casa e pelos produtos grandes, depois use linhas e colunas para reduzir o resto.</string>
     <string name="tut_grid_signgrid_tip">O maior dígito nunca pode ficar na ponta estreita de um sinal.</string>
+    <string name="tut_purchasing_instruction">Cada quebra-cabeça mostra uma assinatura: quanto você paga e com que frequência. Calcule quanto custa em um ano e toque no total certo. Exemplo: 10 por mês são 10 × 12 = 120 por ano.</string>
+    <string name="tut_purchasing_tip">Diário × 365, semanal × 52, mensal × 12, trimestral × 4. As dicas ajudam, mas reduzem sua pontuação.</string>
 </resources>

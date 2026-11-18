@@ -1007,3 +1007,24 @@ fun MultipleChoiceTutorialScreen(
         onSkip = onTutorialSkipped
     )
 }
+
+
+// Purchasing (subscription yearly total). Text lives in strings.xml, unlike the older cards above.
+@Composable
+fun PurchasingTutorialScreen(
+    onTutorialComplete: () -> Unit,
+    onTutorialSkipped: () -> Unit,
+    onBack: () -> Unit
+) {
+    SimpleTutorialScreen(
+        content = SimpleTutorialContent(
+            title = stringResource(R.string.cat_purchasing_title),
+            emoji = "💳",
+            instruction = stringResource(R.string.tut_purchasing_instruction),
+            tip = stringResource(R.string.tut_purchasing_tip),
+            backgroundColor = listOf(Color(0xFF1D976C), Color(0xFF93F9B9))
+        ),
+        onComplete = onTutorialComplete,
+        onSkip = onTutorialSkipped
+    )
+}

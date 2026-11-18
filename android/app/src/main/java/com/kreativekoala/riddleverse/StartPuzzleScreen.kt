@@ -1096,6 +1096,13 @@ fun StartPuzzleScreen(
             }
 
             // Wave 3: Math puzzles
+            "purchasing" -> {
+                PurchasingTutorialScreen(
+                    onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
+                    onTutorialSkipped = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },
+                    onBack = { showTutorial = false }
+                )
+            }
             "subtraction" -> {
                 SubtractionTutorialScreen(
                     onTutorialComplete = { showTutorial = false; tutorialPrefs.markTutorialSeen(type) },

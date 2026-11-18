@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Jos kaksi ykköstä on vierekkäin, molempien päiden ruutujen on oltava 0.</string>
     <string name="tut_grid_cagemath_tip">Aloita yhden ruudun häkeistä ja suurista tuloista, ja rajaa loput riveillä ja sarakkeilla.</string>
     <string name="tut_grid_signgrid_tip">Suurin numero ei voi koskaan olla merkin kapeassa päässä.</string>
+    <string name="tut_purchasing_instruction">Jokainen tehtävä näyttää tilauksen: mitä maksat ja kuinka usein. Laske, paljonko se maksaa vuodessa, ja napauta oikeaa summaa. Esimerkki: 10 kuukaudessa on 10 × 12 = 120 vuodessa.</string>
+    <string name="tut_purchasing_tip">Päivittäin × 365, viikoittain × 52, kuukausittain × 12, neljännesvuosittain × 4. Vihjeet auttavat, mutta laskevat pisteitäsi.</string>
 </resources>
