@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Dacă două de 1 stau alături, căsuțele de la ambele capete trebuie să fie 0.</string>
     <string name="tut_grid_cagemath_tip">Începe cu cuștile de o căsuță și produsele mari, apoi folosește rândurile și coloanele pentru a restrânge restul.</string>
     <string name="tut_grid_signgrid_tip">Cea mai mare cifră nu poate sta niciodată la capătul îngust al unui semn.</string>
+    <string name="tut_purchasing_instruction">Fiecare puzzle arată un abonament: cât plătești și cât de des. Calculează cât costă într-un an și atinge totalul potrivit. Exemplu: 10 pe lună înseamnă 10 × 12 = 120 pe an.</string>
+    <string name="tut_purchasing_tip">Zilnic × 365, săptămânal × 52, lunar × 12, trimestrial × 4. Indiciile ajută, dar îți scad scorul.</string>
 </resources>

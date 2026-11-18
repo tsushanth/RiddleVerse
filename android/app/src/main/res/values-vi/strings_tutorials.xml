@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Nếu hai số 1 nằm cạnh nhau, các ô ở hai đầu phải là 0.</string>
     <string name="tut_grid_cagemath_tip">Bắt đầu từ các lồng một ô và các tích lớn, rồi dùng hàng và cột để thu hẹp phần còn lại.</string>
     <string name="tut_grid_signgrid_tip">Chữ số lớn nhất không bao giờ nằm ở đầu hẹp của một dấu.</string>
+    <string name="tut_purchasing_instruction">Mỗi câu đố hiển thị một gói đăng ký: bạn trả bao nhiêu và bao lâu một lần. Hãy tính chi phí trong một năm và chạm vào tổng đúng. Ví dụ: 10 mỗi tháng là 10 × 12 = 120 mỗi năm.</string>
+    <string name="tut_purchasing_tip">Hằng ngày × 365, hằng tuần × 52, hằng tháng × 12, hằng quý × 4. Gợi ý có ích nhưng làm giảm điểm của bạn.</string>
 </resources>

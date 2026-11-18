@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Kung magkatabi ang dalawang 1, ang mga kahon sa magkabilang dulo ay dapat 0.</string>
     <string name="tut_grid_cagemath_tip">Magsimula sa mga kulungang isang kahon at malalaking produkto, saka gamitin ang mga hilera at hanay para paliitin ang natitira.</string>
     <string name="tut_grid_signgrid_tip">Ang pinakamalaking digit ay hindi kailanman puwede sa makitid na dulo ng simbolo.</string>
+    <string name="tut_purchasing_instruction">Ipinapakita ng bawat puzzle ang isang subscription: magkano ang binabayad mo at gaano kadalas. Kalkulahin kung magkano ito sa isang taon at i-tap ang tamang kabuuan. Halimbawa: 10 kada buwan ay 10 × 12 = 120 kada taon.</string>
+    <string name="tut_purchasing_tip">Araw-araw × 365, lingguhan × 52, buwanan × 12, kada quarter × 4. Nakakatulong ang mga pahiwatig, pero binabawasan nito ang iyong iskor.</string>
 </resources>

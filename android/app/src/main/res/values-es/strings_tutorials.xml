@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Si dos unos están juntos, las casillas de ambos extremos deben ser 0.</string>
     <string name="tut_grid_cagemath_tip">Empieza por las jaulas de una casilla y los productos grandes, y luego usa filas y columnas para acotar el resto.</string>
     <string name="tut_grid_signgrid_tip">El dígito más grande nunca puede ir en el extremo estrecho de un signo.</string>
+    <string name="tut_purchasing_instruction">Cada puzle muestra una suscripción: cuánto pagas y con qué frecuencia. Calcula cuánto cuesta en un año y toca el total correcto. Ejemplo: 10 al mes son 10 × 12 = 120 al año.</string>
+    <string name="tut_purchasing_tip">Diario × 365, semanal × 52, mensual × 12, trimestral × 4. Las pistas ayudan, pero bajan tu puntuación.</string>
 </resources>

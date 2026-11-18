@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Ha két 1-es egymás mellett áll, a két végén lévő mezőnek 0-nak kell lennie.</string>
     <string name="tut_grid_cagemath_tip">Kezdd az egymezős ketrecekkel és a nagy szorzatokkal, majd a sorokkal és oszlopokkal szűkítsd a többit.</string>
     <string name="tut_grid_signgrid_tip">A legnagyobb számjegy soha nem állhat a jel keskeny végén.</string>
+    <string name="tut_purchasing_instruction">Minden feladvány egy előfizetést mutat: mennyit fizetsz és milyen gyakran. Számold ki, mennyibe kerül egy évre, és koppints a megfelelő összegre. Példa: havi 10 az 10 × 12 = évi 120.</string>
+    <string name="tut_purchasing_tip">Naponta × 365, hetente × 52, havonta × 12, negyedévente × 4. A tippek segítenek, de csökkentik a pontszámod.</string>
 </resources>

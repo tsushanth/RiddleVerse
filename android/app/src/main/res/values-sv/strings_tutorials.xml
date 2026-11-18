@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Om två ettor ligger bredvid varandra måste rutorna i båda ändar vara 0.</string>
     <string name="tut_grid_cagemath_tip">Börja med burar med en ruta och stora produkter, och snäva sedan in resten med rader och kolumner.</string>
     <string name="tut_grid_signgrid_tip">Den största siffran kan aldrig stå vid den smala änden av ett tecken.</string>
+    <string name="tut_purchasing_instruction">Varje pussel visar en prenumeration: vad du betalar och hur ofta. Räkna ut vad den kostar på ett år och tryck på rätt summa. Exempel: 10 i månaden är 10 × 12 = 120 per år.</string>
+    <string name="tut_purchasing_tip">Dagligen × 365, veckovis × 52, månadsvis × 12, kvartalsvis × 4. Ledtrådar hjälper, men sänker din poäng.</string>
 </resources>

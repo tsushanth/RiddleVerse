@@ -14,9 +14,7 @@ import java.io.File
 class TutorialRegistryTest {
 
     /** Catalog games that deliberately have no tutorial, with the reason. Keep empty unless a game truly needs none. */
-    private val notApplicable: Map<String, String> = mapOf(
-        "purchasing" to "tutorial card arrives in the next change; remove this entry then",
-    )
+    private val notApplicable: Map<String, String> = emptyMap()
 
     private val catalogKeys: List<String> by lazy { QuizCategories.allCategories.map { it.category }.distinct() }
 

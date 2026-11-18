@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Jeśli dwie jedynki leżą obok siebie, pola na obu końcach muszą być zerami.</string>
     <string name="tut_grid_cagemath_tip">Zacznij od klatek jednopolowych i dużych iloczynów, a resztę zawęź wierszami i kolumnami.</string>
     <string name="tut_grid_signgrid_tip">Największa cyfra nigdy nie może stać przy wąskim końcu znaku.</string>
+    <string name="tut_purchasing_instruction">Każda łamigłówka pokazuje subskrypcję: ile płacisz i jak często. Policz, ile kosztuje przez rok, i stuknij pasującą sumę. Przykład: 10 miesięcznie to 10 × 12 = 120 rocznie.</string>
+    <string name="tut_purchasing_tip">Codziennie × 365, tygodniowo × 52, miesięcznie × 12, kwartalnie × 4. Podpowiedzi pomagają, ale obniżają wynik.</string>
 </resources>

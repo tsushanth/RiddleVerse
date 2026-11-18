@@ -8,4 +8,6 @@
     <string name="tut_grid_binary_tip">Jika dua angka 1 berdampingan, kotak di kedua ujungnya harus 0.</string>
     <string name="tut_grid_cagemath_tip">Mulai dari sangkar satu kotak dan hasil kali besar, lalu gunakan baris dan kolom untuk mempersempit sisanya.</string>
     <string name="tut_grid_signgrid_tip">Angka terbesar tidak pernah bisa berada di ujung sempit sebuah tanda.</string>
+    <string name="tut_purchasing_instruction">Setiap teka-teki menampilkan langganan: berapa yang Anda bayar dan seberapa sering. Hitung biayanya selama satu tahun dan ketuk total yang cocok. Contoh: 10 per bulan adalah 10 × 12 = 120 per tahun.</string>
+    <string name="tut_purchasing_tip">Harian × 365, mingguan × 52, bulanan × 12, per kuartal × 4. Petunjuk membantu, tetapi menurunkan skor Anda.</string>
 </resources>
