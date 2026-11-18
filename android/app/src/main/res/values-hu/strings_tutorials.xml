@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Töltsd ki az összes üres mezőt úgy, hogy minden sorban, oszlopban és blokkban minden számjegy pontosan egyszer szerepeljen. A ceruzával jegyezheted fel a lehetséges számjegyeket. Minden feladványnak pontosan egy megoldása van.</string>
+    <string name="tut_grid_binary_rules">Töltsd ki minden mezőt 0-val vagy 1-gyel. Egy sorban vagy oszlopban legfeljebb két egyforma számjegy állhat egymás mellett, minden sorban és oszlopban ugyanannyi 0 és 1 van, és nincs két egyforma sor (vagy oszlop).</string>
+    <string name="tut_grid_cagemath_rules">Töltsd ki a rácsot számjegyekkel úgy, hogy egyik se ismétlődjön sorban vagy oszlopban. A ketrec sarkában lévő szám és jel adja a célt: a ketrec számjegyeinek összeadva, kivonva, szorozva vagy osztva ezt kell kiadniuk. A csak számot tartalmazó ketrec egyetlen mező. A számjegyek ismétlődhetnek a ketrecen belül, ha különböző sorban és oszlopban vannak.</string>
+    <string name="tut_grid_signgrid_rules">Töltsd ki a rácsot úgy, hogy egyik számjegy se ismétlődjön sorban vagy oszlopban. A két mező közötti jel a kisebbre mutat: a keskeny végén lévő mezőben a kisebb számjegy áll.</string>
+    <string name="tut_grid_sudoku_tip">Koppints egy mezőre, majd egy számjegyre. Kapcsold be a ceruzát a jelöltek felírásához; 3 hiba véget vet a feladványnak.</string>
+    <string name="tut_grid_binary_tip">Ha két 1-es egymás mellett áll, a két végén lévő mezőnek 0-nak kell lennie.</string>
+    <string name="tut_grid_cagemath_tip">Kezdd az egymezős ketrecekkel és a nagy szorzatokkal, majd a sorokkal és oszlopokkal szűkítsd a többit.</string>
+    <string name="tut_grid_signgrid_tip">A legnagyobb számjegy soha nem állhat a jel keskeny végén.</string>
+</resources>

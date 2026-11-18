@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Fill every empty cell so each row, each column and each box contains every digit exactly once. Use the pencil tool to jot candidate digits. Every puzzle has exactly one solution.</string>
+    <string name="tut_grid_binary_rules">Fill every cell with 0 or 1. No more than two equal digits may touch in a row or column, each row and column has as many 0s as 1s, and no two rows (or two columns) are identical.</string>
+    <string name="tut_grid_cagemath_rules">Fill the grid with digits so none repeats in any row or column. The number and sign in a cage corner give the target: the cage\'s digits must add, subtract, multiply or divide to it. A cage with only a number is a single cell. Digits may repeat inside a cage if they are in different rows and columns.</string>
+    <string name="tut_grid_signgrid_rules">Fill the grid so no digit repeats in any row or column. A sign between two cells points to the smaller one: the cell at the narrow end holds the smaller digit.</string>
+    <string name="tut_grid_sudoku_tip">Tap a cell, then a digit. Turn on the pencil to note candidates; 3 mistakes ends the puzzle.</string>
+    <string name="tut_grid_binary_tip">If two 1s sit side by side, the cells on both ends must be 0.</string>
+    <string name="tut_grid_cagemath_tip">Start with single-cell cages and big products, then use rows and columns to narrow the rest.</string>
+    <string name="tut_grid_signgrid_tip">The biggest digit can never sit at the narrow end of a sign.</string>
+</resources>

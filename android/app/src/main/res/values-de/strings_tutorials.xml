@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Fülle jedes leere Feld so, dass jede Zeile, jede Spalte und jeder Block jede Ziffer genau einmal enthält. Mit dem Stift kannst du mögliche Ziffern notieren. Jedes Rätsel hat genau eine Lösung.</string>
+    <string name="tut_grid_binary_rules">Fülle jedes Feld mit 0 oder 1. In einer Zeile oder Spalte dürfen nicht mehr als zwei gleiche Ziffern nebeneinander stehen, jede Zeile und Spalte hat gleich viele 0en wie 1en, und keine zwei Zeilen (oder Spalten) sind identisch.</string>
+    <string name="tut_grid_cagemath_rules">Fülle das Gitter mit Ziffern, sodass sich keine in einer Zeile oder Spalte wiederholt. Zahl und Zeichen in der Ecke eines Käfigs nennen das Ziel: Die Ziffern des Käfigs müssen sich zu diesem Wert addieren, subtrahieren, multiplizieren oder dividieren. Ein Käfig mit nur einer Zahl ist ein einzelnes Feld. Ziffern dürfen sich in einem Käfig wiederholen, wenn sie in verschiedenen Zeilen und Spalten stehen.</string>
+    <string name="tut_grid_signgrid_rules">Fülle das Gitter so, dass sich keine Ziffer in einer Zeile oder Spalte wiederholt. Ein Zeichen zwischen zwei Feldern zeigt auf das kleinere: Das Feld am spitzen Ende enthält die kleinere Ziffer.</string>
+    <string name="tut_grid_sudoku_tip">Tippe auf ein Feld und dann auf eine Ziffer. Schalte den Stift ein, um Kandidaten zu notieren; bei 3 Fehlern ist das Rätsel vorbei.</string>
+    <string name="tut_grid_binary_tip">Stehen zwei Einsen nebeneinander, müssen die Felder an beiden Enden 0 sein.</string>
+    <string name="tut_grid_cagemath_tip">Beginne mit Käfigen aus einem Feld und großen Produkten, dann grenze den Rest über Zeilen und Spalten ein.</string>
+    <string name="tut_grid_signgrid_tip">Die größte Ziffer kann nie am spitzen Ende eines Zeichens stehen.</string>
+</resources>

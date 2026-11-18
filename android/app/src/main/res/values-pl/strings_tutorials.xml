@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Wypełnij każde puste pole tak, aby w każdym wierszu, każdej kolumnie i każdym bloku każda cyfra występowała dokładnie raz. Ołówkiem możesz zapisywać kandydatów. Każda łamigłówka ma dokładnie jedno rozwiązanie.</string>
+    <string name="tut_grid_binary_rules">Wpisz w każde pole 0 lub 1. W wierszu ani kolumnie nie mogą sąsiadować więcej niż dwie takie same cyfry, każdy wiersz i każda kolumna ma tyle samo zer co jedynek, a żadne dwa wiersze (ani dwie kolumny) nie są identyczne.</string>
+    <string name="tut_grid_cagemath_rules">Wypełnij siatkę cyframi tak, aby żadna nie powtarzała się w wierszu ani kolumnie. Liczba i znak w rogu klatki podają cel: cyfry w klatce muszą po dodaniu, odjęciu, pomnożeniu lub podzieleniu dać ten wynik. Klatka z samą liczbą to jedno pole. Cyfry mogą się powtarzać w klatce, jeśli leżą w różnych wierszach i kolumnach.</string>
+    <string name="tut_grid_signgrid_rules">Wypełnij siatkę tak, aby żadna cyfra nie powtarzała się w wierszu ani kolumnie. Znak między dwoma polami wskazuje mniejsze: pole przy wąskim końcu zawiera mniejszą cyfrę.</string>
+    <string name="tut_grid_sudoku_tip">Stuknij pole, potem cyfrę. Włącz ołówek, aby zapisywać kandydatów; trzy błędy kończą łamigłówkę.</string>
+    <string name="tut_grid_binary_tip">Jeśli dwie jedynki leżą obok siebie, pola na obu końcach muszą być zerami.</string>
+    <string name="tut_grid_cagemath_tip">Zacznij od klatek jednopolowych i dużych iloczynów, a resztę zawęź wierszami i kolumnami.</string>
+    <string name="tut_grid_signgrid_tip">Największa cyfra nigdy nie może stać przy wąskim końcu znaku.</string>
+</resources>

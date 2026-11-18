@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Punan ang bawat walang laman na kahon para ang bawat hilera, hanay at bloke ay may bawat digit nang eksaktong isang beses. Gamitin ang lapis para itala ang mga posibleng digit. Isa lang ang sagot ng bawat puzzle.</string>
+    <string name="tut_grid_binary_rules">Punan ang bawat kahon ng 0 o 1. Hindi puwedeng magkatabi ang higit sa dalawang magkaparehong digit sa isang hilera o hanay, pantay ang bilang ng 0 at 1 sa bawat hilera at hanay, at walang dalawang hilera (o dalawang hanay) na magkapareho.</string>
+    <string name="tut_grid_cagemath_rules">Punan ang grid ng mga digit nang walang umuulit sa hilera o hanay. Ang numero at simbolo sa sulok ng kulungan ang target: ang mga digit ng kulungan ay dapat idagdag, ibawas, i-multiply o hatiin para makuha ito. Ang kulungang numero lang ang laman ay isang kahon. Puwedeng umulit ang digit sa loob ng kulungan kung nasa magkaibang hilera at hanay.</string>
+    <string name="tut_grid_signgrid_rules">Punan ang grid nang walang digit na umuulit sa hilera o hanay. Ang simbolo sa pagitan ng dalawang kahon ay nakaturo sa mas maliit: ang kahon sa makitid na dulo ang may mas maliit na digit.</string>
+    <string name="tut_grid_sudoku_tip">I-tap ang isang kahon, saka ang isang digit. I-on ang lapis para itala ang mga posibilidad; ang 3 pagkakamali ay tatapos sa puzzle.</string>
+    <string name="tut_grid_binary_tip">Kung magkatabi ang dalawang 1, ang mga kahon sa magkabilang dulo ay dapat 0.</string>
+    <string name="tut_grid_cagemath_tip">Magsimula sa mga kulungang isang kahon at malalaking produkto, saka gamitin ang mga hilera at hanay para paliitin ang natitira.</string>
+    <string name="tut_grid_signgrid_tip">Ang pinakamalaking digit ay hindi kailanman puwede sa makitid na dulo ng simbolo.</string>
+</resources>

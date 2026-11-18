@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">空いているマスを埋めて、各行・各列・各ブロックにすべての数字がちょうど1回ずつ入るようにします。鉛筆ツールで候補の数字をメモできます。どのパズルも答えは1つだけです。</string>
+    <string name="tut_grid_binary_rules">すべてのマスに0か1を入れます。同じ数字は行や列で3つ以上続けて並べられず、各行と各列の0と1の数は同じで、同じ行(または同じ列)が2つあってはいけません。</string>
+    <string name="tut_grid_cagemath_rules">各行・各列で数字が重ならないようにマスを埋めます。ケージの角の数字と記号が目標です。ケージ内の数字を足す、引く、掛ける、割るのいずれかで目標になる必要があります。数字だけのケージは1マスです。ケージ内の数字は、別の行と列にあれば重なってもかまいません。</string>
+    <string name="tut_grid_signgrid_rules">各行・各列で数字が重ならないようにマスを埋めます。2つのマスの間の記号は小さいほうを指します。細い側のマスに小さい数字が入ります。</string>
+    <string name="tut_grid_sudoku_tip">マスをタップして、数字をタップします。鉛筆をオンにして候補をメモできます。3回間違えるとパズルは終了です。</string>
+    <string name="tut_grid_binary_tip">1が2つ並んだら、その両端のマスは必ず0になります。</string>
+    <string name="tut_grid_cagemath_tip">1マスのケージと大きな積から始めて、行と列で残りを絞り込みます。</string>
+    <string name="tut_grid_signgrid_tip">最大の数字が記号の細い側に入ることはありません。</string>
+</resources>

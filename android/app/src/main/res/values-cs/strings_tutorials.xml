@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Vyplňte každé prázdné políčko tak, aby každý řádek, každý sloupec i každý box obsahoval každou číslici právě jednou. Kandidáty si můžete poznačit tužkou. Každá hádanka má právě jedno řešení.</string>
+    <string name="tut_grid_binary_rules">Do každého políčka vložte 0 nebo 1. V řádku ani sloupci se nesmí dotýkat více než dvě stejné číslice, každý řádek i sloupec má stejně nul jako jedniček a žádné dva řádky (ani dva sloupce) nejsou stejné.</string>
+    <string name="tut_grid_cagemath_rules">Vyplňte mřížku číslicemi tak, aby se žádná neopakovala v řádku ani ve sloupci. Číslo a znaménko v rohu klece určují cíl: číslice v kleci se musí sečíst, odečíst, vynásobit nebo vydělit na tento cíl. Klec jen s číslem je jedno políčko. Číslice se v kleci smí opakovat, pokud jsou v různých řádcích a sloupcích.</string>
+    <string name="tut_grid_signgrid_rules">Vyplňte mřížku tak, aby se žádná číslice neopakovala v řádku ani ve sloupci. Znaménko mezi dvěma políčky míří k menšímu: políčko na úzkém konci má menší číslici.</string>
+    <string name="tut_grid_sudoku_tip">Klepněte na políčko a pak na číslici. Zapněte tužku a poznačte si kandidáty; tři chyby ukončí hru.</string>
+    <string name="tut_grid_binary_tip">Pokud vedle sebe leží dvě jedničky, políčka na obou koncích musí být 0.</string>
+    <string name="tut_grid_cagemath_tip">Začněte klecemi o jednom políčku a velkými součiny, pak zbytek zúžte pomocí řádků a sloupců.</string>
+    <string name="tut_grid_signgrid_tip">Největší číslice nikdy nemůže stát na úzkém konci znaménka.</string>
+</resources>

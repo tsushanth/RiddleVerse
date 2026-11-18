@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Remplissez chaque case vide pour que chaque ligne, chaque colonne et chaque bloc contienne chaque chiffre exactement une fois. Utilisez le crayon pour noter des candidats. Chaque grille n\'a qu\'une seule solution.</string>
+    <string name="tut_grid_binary_rules">Remplissez chaque case avec 0 ou 1. Pas plus de deux chiffres identiques ne peuvent se toucher dans une ligne ou une colonne, chaque ligne et colonne contient autant de 0 que de 1, et deux lignes (ou deux colonnes) ne sont jamais identiques.</string>
+    <string name="tut_grid_cagemath_rules">Remplissez la grille de chiffres sans répétition dans une ligne ou une colonne. Le nombre et le signe dans le coin d\'une cage donnent l\'objectif : les chiffres de la cage doivent s\'additionner, se soustraire, se multiplier ou se diviser pour l\'atteindre. Une cage avec seulement un nombre est une seule case. Les chiffres peuvent se répéter dans une cage s\'ils sont dans des lignes et colonnes différentes.</string>
+    <string name="tut_grid_signgrid_rules">Remplissez la grille sans répéter de chiffre dans une ligne ou une colonne. Un signe entre deux cases pointe vers la plus petite : la case du côté étroit contient le plus petit chiffre.</string>
+    <string name="tut_grid_sudoku_tip">Touchez une case, puis un chiffre. Activez le crayon pour noter des candidats ; 3 erreurs terminent la partie.</string>
+    <string name="tut_grid_binary_tip">Si deux 1 sont côte à côte, les cases aux deux extrémités doivent être 0.</string>
+    <string name="tut_grid_cagemath_tip">Commencez par les cages d\'une case et les grands produits, puis utilisez les lignes et colonnes pour restreindre le reste.</string>
+    <string name="tut_grid_signgrid_tip">Le plus grand chiffre ne peut jamais se trouver du côté étroit d\'un signe.</string>
+</resources>

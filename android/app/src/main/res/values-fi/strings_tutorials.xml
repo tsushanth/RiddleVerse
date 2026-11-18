@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Täytä jokainen tyhjä ruutu niin, että jokaisella rivillä, sarakkeella ja laatikossa on jokainen numero täsmälleen kerran. Käytä kynää merkitäksesi mahdolliset numerot. Jokaisella tehtävällä on täsmälleen yksi ratkaisu.</string>
+    <string name="tut_grid_binary_rules">Täytä jokainen ruutu 0:lla tai 1:llä. Rivillä tai sarakkeella ei saa olla yli kahta samaa numeroa vierekkäin, jokaisella rivillä ja sarakkeella on yhtä monta 0:aa ja 1:tä, eikä kahta riviä (tai saraketta) ole samoja.</string>
+    <string name="tut_grid_cagemath_rules">Täytä ruudukko numeroilla niin, ettei mikään toistu rivillä tai sarakkeella. Häkin kulman luku ja merkki kertovat tavoitteen: häkin numeroiden pitää summautua, vähentyä, kertoutua tai jakautua tähän. Pelkän luvun häkki on yksi ruutu. Numerot voivat toistua häkin sisällä, jos ne ovat eri riveillä ja sarakkeilla.</string>
+    <string name="tut_grid_signgrid_rules">Täytä ruudukko niin, ettei mikään numero toistu rivillä tai sarakkeella. Kahden ruudun välinen merkki osoittaa pienempään: kapean pään ruudussa on pienempi numero.</string>
+    <string name="tut_grid_sudoku_tip">Napauta ruutua ja sitten numeroa. Ota kynä käyttöön merkitäksesi vaihtoehdot; kolme virhettä päättää tehtävän.</string>
+    <string name="tut_grid_binary_tip">Jos kaksi ykköstä on vierekkäin, molempien päiden ruutujen on oltava 0.</string>
+    <string name="tut_grid_cagemath_tip">Aloita yhden ruudun häkeistä ja suurista tuloista, ja rajaa loput riveillä ja sarakkeilla.</string>
+    <string name="tut_grid_signgrid_tip">Suurin numero ei voi koskaan olla merkin kapeassa päässä.</string>
+</resources>

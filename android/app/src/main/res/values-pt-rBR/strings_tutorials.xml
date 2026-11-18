@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Preencha cada casa vazia para que cada linha, cada coluna e cada bloco tenha cada dígito exatamente uma vez. Use o lápis para anotar candidatos. Cada quebra-cabeça tem uma única solução.</string>
+    <string name="tut_grid_binary_rules">Preencha cada casa com 0 ou 1. Não pode haver mais de dois dígitos iguais lado a lado em uma linha ou coluna, cada linha e coluna tem tantos 0 quanto 1, e não existem duas linhas (ou duas colunas) idênticas.</string>
+    <string name="tut_grid_cagemath_rules">Preencha a grade com dígitos sem repetir nenhum em linha ou coluna. O número e o sinal no canto de uma gaiola dão o objetivo: os dígitos da gaiola devem somar, subtrair, multiplicar ou dividir até ele. Uma gaiola só com um número é uma única casa. Os dígitos podem se repetir dentro de uma gaiola se estiverem em linhas e colunas diferentes.</string>
+    <string name="tut_grid_signgrid_rules">Preencha a grade sem repetir nenhum dígito em linha ou coluna. Um sinal entre duas casas aponta para a menor: a casa na ponta estreita tem o dígito menor.</string>
+    <string name="tut_grid_sudoku_tip">Toque em uma casa e depois em um dígito. Ative o lápis para anotar candidatos; 3 erros encerram o jogo.</string>
+    <string name="tut_grid_binary_tip">Se dois 1 estiverem lado a lado, as casas nas duas pontas precisam ser 0.</string>
+    <string name="tut_grid_cagemath_tip">Comece pelas gaiolas de uma casa e pelos produtos grandes, depois use linhas e colunas para reduzir o resto.</string>
+    <string name="tut_grid_signgrid_tip">O maior dígito nunca pode ficar na ponta estreita de um sinal.</string>
+</resources>

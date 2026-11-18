@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Vul elk lege vakje zo in dat elke rij, elke kolom en elk blok elk cijfer precies één keer bevat. Gebruik het potlood om kandidaten te noteren. Elke puzzel heeft precies één oplossing.</string>
+    <string name="tut_grid_binary_rules">Vul elk vakje met 0 of 1. Er mogen niet meer dan twee gelijke cijfers naast elkaar staan in een rij of kolom, elke rij en kolom heeft evenveel nullen als enen, en geen twee rijen (of kolommen) zijn gelijk.</string>
+    <string name="tut_grid_cagemath_rules">Vul het raster met cijfers zodat er geen herhaald wordt in een rij of kolom. Het getal en teken in de hoek van een kooi geven het doel: de cijfers in de kooi moeten opgeteld, afgetrokken, vermenigvuldigd of gedeeld dat doel opleveren. Een kooi met alleen een getal is één vakje. Cijfers mogen binnen een kooi herhaald worden als ze in verschillende rijen en kolommen staan.</string>
+    <string name="tut_grid_signgrid_rules">Vul het raster zo in dat geen cijfer herhaald wordt in een rij of kolom. Een teken tussen twee vakjes wijst naar het kleinste: het vakje aan de smalle kant bevat het kleinere cijfer.</string>
+    <string name="tut_grid_sudoku_tip">Tik op een vakje en dan op een cijfer. Zet het potlood aan om kandidaten te noteren; bij 3 fouten is de puzzel voorbij.</string>
+    <string name="tut_grid_binary_tip">Staan er twee enen naast elkaar, dan moeten de vakjes aan beide kanten 0 zijn.</string>
+    <string name="tut_grid_cagemath_tip">Begin met kooien van één vakje en grote producten, en beperk de rest daarna met rijen en kolommen.</string>
+    <string name="tut_grid_signgrid_tip">Het grootste cijfer kan nooit aan de smalle kant van een teken staan.</string>
+</resources>

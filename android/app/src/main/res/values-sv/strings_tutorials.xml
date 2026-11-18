@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">Fyll i varje tom ruta så att varje rad, kolumn och block innehåller varje siffra exakt en gång. Använd pennan för att anteckna kandidater. Varje pussel har exakt en lösning.</string>
+    <string name="tut_grid_binary_rules">Fyll varje ruta med 0 eller 1. Högst två lika siffror får ligga bredvid varandra i en rad eller kolumn, varje rad och kolumn har lika många nollor som ettor, och inga två rader (eller kolumner) är identiska.</string>
+    <string name="tut_grid_cagemath_rules">Fyll rutnätet med siffror så att ingen upprepas i en rad eller kolumn. Talet och tecknet i burens hörn anger målet: burens siffror ska ge det när de adderas, subtraheras, multipliceras eller divideras. En bur med bara ett tal är en enda ruta. Siffror får upprepas i en bur om de står i olika rader och kolumner.</string>
+    <string name="tut_grid_signgrid_rules">Fyll rutnätet så att ingen siffra upprepas i en rad eller kolumn. Ett tecken mellan två rutor pekar mot den mindre: rutan vid den smala änden har den mindre siffran.</string>
+    <string name="tut_grid_sudoku_tip">Tryck på en ruta och sedan på en siffra. Slå på pennan för att anteckna kandidater; tre fel avslutar pusslet.</string>
+    <string name="tut_grid_binary_tip">Om två ettor ligger bredvid varandra måste rutorna i båda ändar vara 0.</string>
+    <string name="tut_grid_cagemath_tip">Börja med burar med en ruta och stora produkter, och snäva sedan in resten med rader och kolumner.</string>
+    <string name="tut_grid_signgrid_tip">Den största siffran kan aldrig stå vid den smala änden av ett tecken.</string>
+</resources>
