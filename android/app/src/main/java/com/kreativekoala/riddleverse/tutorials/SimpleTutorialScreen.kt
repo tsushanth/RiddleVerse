@@ -2,7 +2,9 @@ package com.kreativekoala.riddleverse
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
@@ -45,26 +47,15 @@ fun SimpleTutorialScreen(
                 brush = Brush.verticalGradient(colors = content.backgroundColor)
             )
     ) {
-        // Close button
-        IconButton(
-            onClick = onSkip,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(16.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Close,
-                contentDescription = stringResource(R.string.skip),
-                tint = Color.White.copy(alpha = 0.8f)
-            )
-        }
-
+        // Centered when it fits, scrolls when it does not (long translations, large fonts, small phones),
+        // so the start button is always reachable.
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .align(Alignment.Center)
+                .fillMaxWidth()
                 .statusBarsPadding()
                 .navigationBarsPadding()
+                .verticalScroll(rememberScrollState())
                 .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
@@ -175,6 +166,21 @@ fun SimpleTutorialScreen(
                     fontSize = 14.sp
                 )
             }
+        }
+
+        // Close button (drawn last so it stays tappable above scrolling content)
+        IconButton(
+            onClick = onSkip,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = stringResource(R.string.skip),
+                tint = Color.White.copy(alpha = 0.8f)
+            )
         }
     }
 }
