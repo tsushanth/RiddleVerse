@@ -2112,7 +2112,7 @@ fun StartPuzzleScreen(
                         )
                     } } } catch (e: Exception) {
                         Log.e("RedesignedStartPuzzle", "Local puzzle generation failed for $type", e)
-                        errorMessage = "Could not build this puzzle. Please try again."
+                        errorMessage = context.getString(R.string.common_puzzle_load_failed)
                         isLoading = false
                         return@launch
                     }
@@ -2372,7 +2372,7 @@ fun StartPuzzleScreen(
                                         )
                                     } } } catch (e: Exception) {
                                         Log.e("RedesignedStartPuzzle", "Local puzzle generation failed for $type", e)
-                                        errorMessage = "Could not build this puzzle. Please try again."
+                                        errorMessage = context.getString(R.string.common_puzzle_load_failed)
                                         isLoading = false
                                         return@launch
                                     }

@@ -1830,7 +1830,7 @@
     <string name="xa_best_streak_value">أفضل سلسلة: %1$s</string>
     <string name="xa_completed_exclaim">اكتمل!</string>
     <string name="xa_congratulations">تهانينا!</string>
-    <string name="xa_correct_points">صحيح! +%1$s</string>
+    <string name="xa_correct_points">صحيح! +%1$d</string>
     <string name="xa_correct_ratio">الصحيحة: %1$s/%2$s</string>
     <string name="xa_correct_value">الصحيحة: %1$s</string>
     <string name="xa_difficulty_adapted">تم تكييف الصعوبة</string>
@@ -1839,12 +1839,12 @@
     <string name="xa_difficulty_grandmaster">أستاذ كبير</string>
     <string name="xa_difficulty_master">محترف</string>
     <string name="xa_equations_all_correct">ممتاز! كل المعادلات صحيحة!</string>
-    <string name="xa_equations_correct_points">ممتاز! كل المعادلات صحيحة! +%1$s نقطة</string>
+    <string name="xa_equations_correct_points">ممتاز! كل المعادلات صحيحة! +%1$d نقطة</string>
     <string name="xa_excellent">ممتاز!</string>
     <string name="xa_failed_to_load_dictionary">تعذر تحميل القاموس: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">تعذرت قراءة بيانات لغز مجموعة الحروف</string>
     <string name="xa_final_score_value">النتيجة النهائية: %1$s</string>
-    <string name="xa_game_over_final_score">انتهت اللعبة! النتيجة النهائية: %1$s</string>
+    <string name="xa_game_over_final_score">انتهت اللعبة! النتيجة النهائية: %1$d</string>
     <string name="xa_grid_result_summary">الوقت %1$s  |  الأخطاء %2$s  |  التلميحات %3$s\n+%4$s نقطة</string>
     <string name="xa_grid_three_mistakes">ثلاثة أخطاء تنهي اللغز. جرّب اللغز التالي!</string>
     <string name="xa_heart">قلب</string>
@@ -1877,7 +1877,7 @@
     <string name="xa_oops">عذرًا!</string>
     <string name="xa_out_of_lives">نفدت الأرواح</string>
     <string name="xa_perfect">ممتاز!</string>
-    <string name="xa_perfect_points_multiplier">ممتاز! +%1$s (×%2$s)</string>
+    <string name="xa_perfect_points_multiplier">ممتاز! +%1$d (×%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s نقطة</string>
     <string name="xa_preparing_image">جارٍ تجهيز الصورة...</string>
     <string name="xa_pts_value">%1$s نقطة</string>
@@ -1907,7 +1907,7 @@
     <string name="xa_vortex_perfect_all_new">ممتاز! وجدت كل الصور الجديدة!</string>
     <string name="xa_vortex_times_up_faster">انتهى الوقت! حاول أن تكون أسرع في المرة القادمة.</string>
     <string name="xa_wrong_answer_lives">إجابة خاطئة. الأرواح: %1$s</string>
-    <string name="xa_wrong_direction_lives">اتجاه خاطئ! الأرواح: %1$s</string>
+    <string name="xa_wrong_direction_lives">اتجاه خاطئ! الأرواح: %1$d</string>
     <string name="xa_wrong_ratio">الخاطئة: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">تعذر تحميل لغز الكشف التدريجي: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">جارٍ تحميل لغز ثعبان الكلمات…</string>

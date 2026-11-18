@@ -1555,7 +1555,7 @@
     <string name="xa_best_streak_value">Siri terbaik: %1$s</string>
     <string name="xa_completed_exclaim">Selesai!</string>
     <string name="xa_congratulations">Tahniah!</string>
-    <string name="xa_correct_points">Betul! +%1$s</string>
+    <string name="xa_correct_points">Betul! +%1$d</string>
     <string name="xa_correct_ratio">Betul: %1$s/%2$s</string>
     <string name="xa_correct_value">Betul: %1$s</string>
     <string name="xa_difficulty_adapted">Kesukaran Disesuaikan</string>
@@ -1564,12 +1564,12 @@
     <string name="xa_difficulty_grandmaster">Grandmaster</string>
     <string name="xa_difficulty_master">Mahir</string>
     <string name="xa_equations_all_correct">Sempurna! Semua persamaan betul!</string>
-    <string name="xa_equations_correct_points">Sempurna! Semua persamaan betul! +%1$s mata</string>
+    <string name="xa_equations_correct_points">Sempurna! Semua persamaan betul! +%1$d mata</string>
     <string name="xa_excellent">Cemerlang!</string>
     <string name="xa_failed_to_load_dictionary">Gagal memuatkan kamus: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Gagal menghuraikan data teka-teki set huruf</string>
     <string name="xa_final_score_value">Skor Akhir: %1$s</string>
-    <string name="xa_game_over_final_score">Permainan Tamat! Skor Akhir: %1$s</string>
+    <string name="xa_game_over_final_score">Permainan Tamat! Skor Akhir: %1$d</string>
     <string name="xa_grid_result_summary">Masa %1$s  |  Kesilapan %2$s  |  Petunjuk %3$s\n+%4$s mata</string>
     <string name="xa_grid_three_mistakes">Tiga kesilapan menamatkan teka-teki. Cuba yang seterusnya!</string>
     <string name="xa_heart">Hati</string>
@@ -1602,7 +1602,7 @@
     <string name="xa_oops">Alamak!</string>
     <string name="xa_out_of_lives">Nyawa habis</string>
     <string name="xa_perfect">Sempurna!</string>
-    <string name="xa_perfect_points_multiplier">Sempurna! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Sempurna! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s mata</string>
     <string name="xa_preparing_image">Menyediakan imej...</string>
     <string name="xa_pts_value">%1$s mata</string>
@@ -1632,7 +1632,7 @@
     <string name="xa_vortex_perfect_all_new">Sempurna! Semua imej baharu ditemui!</string>
     <string name="xa_vortex_times_up_faster">Masa tamat! Cuba lebih pantas pada masa akan datang.</string>
     <string name="xa_wrong_answer_lives">Jawapan salah. Nyawa: %1$s</string>
-    <string name="xa_wrong_direction_lives">Arah salah! Nyawa: %1$s</string>
+    <string name="xa_wrong_direction_lives">Arah salah! Nyawa: %1$d</string>
     <string name="xa_wrong_ratio">Salah: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Gagal memuatkan teka-teki dedah berperingkat: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Memuatkan teka-teki Ular Perkataan…</string>

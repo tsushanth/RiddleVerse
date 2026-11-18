@@ -1610,7 +1610,7 @@
     <string name="xa_best_streak_value">En iyi seri: %1$s</string>
     <string name="xa_completed_exclaim">Tamamlandı!</string>
     <string name="xa_congratulations">Tebrikler!</string>
-    <string name="xa_correct_points">Doğru! +%1$s</string>
+    <string name="xa_correct_points">Doğru! +%1$d</string>
     <string name="xa_correct_ratio">Doğru: %1$s/%2$s</string>
     <string name="xa_correct_value">Doğru: %1$s</string>
     <string name="xa_difficulty_adapted">Zorluk Uyarlandı</string>
@@ -1619,12 +1619,12 @@
     <string name="xa_difficulty_grandmaster">Büyük Usta</string>
     <string name="xa_difficulty_master">Usta</string>
     <string name="xa_equations_all_correct">Mükemmel! Tüm denklemler doğru!</string>
-    <string name="xa_equations_correct_points">Mükemmel! Tüm denklemler doğru! +%1$s puan</string>
+    <string name="xa_equations_correct_points">Mükemmel! Tüm denklemler doğru! +%1$d puan</string>
     <string name="xa_excellent">Mükemmel!</string>
     <string name="xa_failed_to_load_dictionary">Sözlük yüklenemedi: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Harf kümesi bulmacası verileri ayrıştırılamadı</string>
     <string name="xa_final_score_value">Final Skoru: %1$s</string>
-    <string name="xa_game_over_final_score">Oyun Bitti! Final Skoru: %1$s</string>
+    <string name="xa_game_over_final_score">Oyun Bitti! Final Skoru: %1$d</string>
     <string name="xa_grid_result_summary">Süre %1$s  |  Hata %2$s  |  İpucu %3$s\n+%4$s puan</string>
     <string name="xa_grid_three_mistakes">Üç hata bulmacayı bitirir. Sonrakini deneyin!</string>
     <string name="xa_heart">Kalp</string>
@@ -1657,7 +1657,7 @@
     <string name="xa_oops">Hay aksi!</string>
     <string name="xa_out_of_lives">Can kalmadı</string>
     <string name="xa_perfect">Mükemmel!</string>
-    <string name="xa_perfect_points_multiplier">Mükemmel! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Mükemmel! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s puan</string>
     <string name="xa_preparing_image">Görsel hazırlanıyor...</string>
     <string name="xa_pts_value">%1$s puan</string>
@@ -1687,7 +1687,7 @@
     <string name="xa_vortex_perfect_all_new">Mükemmel! Tüm yeni görselleri buldunuz!</string>
     <string name="xa_vortex_times_up_faster">Süre doldu! Bir dahaki sefere daha hızlı olmaya çalışın.</string>
     <string name="xa_wrong_answer_lives">Yanlış cevap. Can: %1$s</string>
-    <string name="xa_wrong_direction_lives">Yanlış yön! Can: %1$s</string>
+    <string name="xa_wrong_direction_lives">Yanlış yön! Can: %1$d</string>
     <string name="xa_wrong_ratio">Yanlış: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Kademeli bulmaca yüklenemedi: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Kelime Yılanı bulmacası yükleniyor…</string>

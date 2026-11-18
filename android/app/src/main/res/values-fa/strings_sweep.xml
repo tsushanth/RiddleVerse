@@ -1610,7 +1610,7 @@
     <string name="xa_best_streak_value">بهترین رشته: %1$s</string>
     <string name="xa_completed_exclaim">کامل شد!</string>
     <string name="xa_congratulations">تبریک!</string>
-    <string name="xa_correct_points">درست! +%1$s</string>
+    <string name="xa_correct_points">درست! +%1$d</string>
     <string name="xa_correct_ratio">درست: %1$s/%2$s</string>
     <string name="xa_correct_value">درست: %1$s</string>
     <string name="xa_difficulty_adapted">دشواری تطبیق داده شد</string>
@@ -1619,12 +1619,12 @@
     <string name="xa_difficulty_grandmaster">استاد بزرگ</string>
     <string name="xa_difficulty_master">استاد</string>
     <string name="xa_equations_all_correct">بی‌نقص! همهٔ معادله‌ها درست‌اند!</string>
-    <string name="xa_equations_correct_points">بی‌نقص! همهٔ معادله‌ها درست‌اند! +%1$s امتیاز</string>
+    <string name="xa_equations_correct_points">بی‌نقص! همهٔ معادله‌ها درست‌اند! +%1$d امتیاز</string>
     <string name="xa_excellent">عالی!</string>
     <string name="xa_failed_to_load_dictionary">بارگذاری فرهنگ لغت ناموفق بود: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">خواندن داده‌های معمای مجموعهٔ حروف ناموفق بود</string>
     <string name="xa_final_score_value">امتیاز نهایی: %1$s</string>
-    <string name="xa_game_over_final_score">بازی تمام شد! امتیاز نهایی: %1$s</string>
+    <string name="xa_game_over_final_score">بازی تمام شد! امتیاز نهایی: %1$d</string>
     <string name="xa_grid_result_summary">زمان %1$s  |  اشتباه‌ها %2$s  |  راهنمایی‌ها %3$s\n+%4$s امتیاز</string>
     <string name="xa_grid_three_mistakes">سه اشتباه معما را تمام می‌کند. معمای بعدی را امتحان کنید!</string>
     <string name="xa_heart">قلب</string>
@@ -1657,7 +1657,7 @@
     <string name="xa_oops">اوه!</string>
     <string name="xa_out_of_lives">جان‌ها تمام شد</string>
     <string name="xa_perfect">بی‌نقص!</string>
-    <string name="xa_perfect_points_multiplier">بی‌نقص! +%1$s (×%2$s)</string>
+    <string name="xa_perfect_points_multiplier">بی‌نقص! +%1$d (×%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s امتیاز</string>
     <string name="xa_preparing_image">در حال آماده‌سازی تصویر...</string>
     <string name="xa_pts_value">%1$s امتیاز</string>
@@ -1687,7 +1687,7 @@
     <string name="xa_vortex_perfect_all_new">بی‌نقص! همهٔ تصویرهای جدید را پیدا کردید!</string>
     <string name="xa_vortex_times_up_faster">زمان تمام شد! دفعهٔ بعد سریع‌تر باشید.</string>
     <string name="xa_wrong_answer_lives">پاسخ نادرست. جان‌ها: %1$s</string>
-    <string name="xa_wrong_direction_lives">جهت نادرست! جان‌ها: %1$s</string>
+    <string name="xa_wrong_direction_lives">جهت نادرست! جان‌ها: %1$d</string>
     <string name="xa_wrong_ratio">نادرست: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">بارگذاری معمای آشکارسازی تدریجی ناموفق بود: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">در حال بارگذاری معمای مار کلمه…</string>

@@ -1720,7 +1720,7 @@
     <string name="xa_best_streak_value">Najlepsza seria: %1$s</string>
     <string name="xa_completed_exclaim">Ukończono!</string>
     <string name="xa_congratulations">Gratulacje!</string>
-    <string name="xa_correct_points">Poprawnie! +%1$s</string>
+    <string name="xa_correct_points">Poprawnie! +%1$d</string>
     <string name="xa_correct_ratio">Poprawne: %1$s/%2$s</string>
     <string name="xa_correct_value">Poprawne: %1$s</string>
     <string name="xa_difficulty_adapted">Dostosowano trudność</string>
@@ -1729,12 +1729,12 @@
     <string name="xa_difficulty_grandmaster">Arcymistrz</string>
     <string name="xa_difficulty_master">Mistrz</string>
     <string name="xa_equations_all_correct">Idealnie! Wszystkie równania są poprawne!</string>
-    <string name="xa_equations_correct_points">Idealnie! Wszystkie równania są poprawne! +%1$s pkt</string>
+    <string name="xa_equations_correct_points">Idealnie! Wszystkie równania są poprawne! +%1$d pkt</string>
     <string name="xa_excellent">Doskonale!</string>
     <string name="xa_failed_to_load_dictionary">Nie udało się załadować słownika: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Nie udało się przetworzyć danych łamigłówki z zestawem liter</string>
     <string name="xa_final_score_value">Wynik końcowy: %1$s</string>
-    <string name="xa_game_over_final_score">Koniec gry! Wynik końcowy: %1$s</string>
+    <string name="xa_game_over_final_score">Koniec gry! Wynik końcowy: %1$d</string>
     <string name="xa_grid_result_summary">Czas %1$s  |  Błędy %2$s  |  Podpowiedzi %3$s\n+%4$s pkt</string>
     <string name="xa_grid_three_mistakes">Trzy błędy kończą łamigłówkę. Spróbuj następnej!</string>
     <string name="xa_heart">Serce</string>
@@ -1767,7 +1767,7 @@
     <string name="xa_oops">Ups!</string>
     <string name="xa_out_of_lives">Brak żyć</string>
     <string name="xa_perfect">Idealnie!</string>
-    <string name="xa_perfect_points_multiplier">Idealnie! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Idealnie! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s pkt</string>
     <string name="xa_preparing_image">Przygotowywanie obrazu…</string>
     <string name="xa_pts_value">%1$s pkt</string>
@@ -1797,7 +1797,7 @@
     <string name="xa_vortex_perfect_all_new">Idealnie! Znalazłeś wszystkie nowe obrazy!</string>
     <string name="xa_vortex_times_up_faster">Czas minął! Następnym razem bądź szybszy.</string>
     <string name="xa_wrong_answer_lives">Zła odpowiedź. Życia: %1$s</string>
-    <string name="xa_wrong_direction_lives">Zły kierunek! Życia: %1$s</string>
+    <string name="xa_wrong_direction_lives">Zły kierunek! Życia: %1$d</string>
     <string name="xa_wrong_ratio">Błędne: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Nie udało się załadować łamigłówki ze stopniowym odsłanianiem: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Ładowanie łamigłówki Wąż ze słów…</string>

@@ -1555,7 +1555,7 @@
     <string name="xa_best_streak_value">최고 연속: %1$s</string>
     <string name="xa_completed_exclaim">완료!</string>
     <string name="xa_congratulations">축하합니다!</string>
-    <string name="xa_correct_points">정답! +%1$s</string>
+    <string name="xa_correct_points">정답! +%1$d</string>
     <string name="xa_correct_ratio">정답: %1$s/%2$s</string>
     <string name="xa_correct_value">정답: %1$s</string>
     <string name="xa_difficulty_adapted">난이도가 조정되었어요</string>
@@ -1564,12 +1564,12 @@
     <string name="xa_difficulty_grandmaster">그랜드마스터</string>
     <string name="xa_difficulty_master">마스터</string>
     <string name="xa_equations_all_correct">완벽해요! 모든 수식이 정답이에요!</string>
-    <string name="xa_equations_correct_points">완벽해요! 모든 수식이 정답이에요! +%1$s점</string>
+    <string name="xa_equations_correct_points">완벽해요! 모든 수식이 정답이에요! +%1$d점</string>
     <string name="xa_excellent">훌륭해요!</string>
     <string name="xa_failed_to_load_dictionary">사전을 불러오지 못했습니다: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">글자 찾기 퍼즐 데이터를 읽지 못했습니다</string>
     <string name="xa_final_score_value">최종 점수: %1$s</string>
-    <string name="xa_game_over_final_score">게임 오버! 최종 점수: %1$s</string>
+    <string name="xa_game_over_final_score">게임 오버! 최종 점수: %1$d</string>
     <string name="xa_grid_result_summary">시간 %1$s  |  실수 %2$s  |  힌트 %3$s\n+%4$s점</string>
     <string name="xa_grid_three_mistakes">세 번 실수하면 퍼즐이 끝나요. 다음 퍼즐에 도전해 보세요!</string>
     <string name="xa_heart">하트</string>
@@ -1602,7 +1602,7 @@
     <string name="xa_oops">앗!</string>
     <string name="xa_out_of_lives">목숨을 모두 잃었어요</string>
     <string name="xa_perfect">완벽해요!</string>
-    <string name="xa_perfect_points_multiplier">완벽해요! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">완벽해요! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s점</string>
     <string name="xa_preparing_image">이미지 준비 중...</string>
     <string name="xa_pts_value">%1$s점</string>
@@ -1632,7 +1632,7 @@
     <string name="xa_vortex_perfect_all_new">완벽해요! 새로운 이미지를 모두 찾았어요!</string>
     <string name="xa_vortex_times_up_faster">시간 초과! 다음에는 더 빨리 해 보세요.</string>
     <string name="xa_wrong_answer_lives">오답입니다. 목숨: %1$s</string>
-    <string name="xa_wrong_direction_lives">방향이 틀렸어요! 목숨: %1$s</string>
+    <string name="xa_wrong_direction_lives">방향이 틀렸어요! 목숨: %1$d</string>
     <string name="xa_wrong_ratio">오답: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">점점 선명해지는 퍼즐을 불러오지 못했습니다: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">워드 스네이크 퍼즐 로딩 중…</string>

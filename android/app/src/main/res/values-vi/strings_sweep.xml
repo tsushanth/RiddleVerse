@@ -1555,7 +1555,7 @@
     <string name="xa_best_streak_value">Chuỗi tốt nhất: %1$s</string>
     <string name="xa_completed_exclaim">Đã hoàn thành!</string>
     <string name="xa_congratulations">Chúc mừng!</string>
-    <string name="xa_correct_points">Đúng! +%1$s</string>
+    <string name="xa_correct_points">Đúng! +%1$d</string>
     <string name="xa_correct_ratio">Đúng: %1$s/%2$s</string>
     <string name="xa_correct_value">Đúng: %1$s</string>
     <string name="xa_difficulty_adapted">Đã điều chỉnh độ khó</string>
@@ -1564,12 +1564,12 @@
     <string name="xa_difficulty_grandmaster">Đại kiện tướng</string>
     <string name="xa_difficulty_master">Bậc thầy</string>
     <string name="xa_equations_all_correct">Hoàn hảo! Tất cả phương trình đều đúng!</string>
-    <string name="xa_equations_correct_points">Hoàn hảo! Tất cả phương trình đều đúng! +%1$s điểm</string>
+    <string name="xa_equations_correct_points">Hoàn hảo! Tất cả phương trình đều đúng! +%1$d điểm</string>
     <string name="xa_excellent">Xuất sắc!</string>
     <string name="xa_failed_to_load_dictionary">Không tải được từ điển: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Không đọc được dữ liệu câu đố bộ chữ cái</string>
     <string name="xa_final_score_value">Điểm cuối: %1$s</string>
-    <string name="xa_game_over_final_score">Hết trò chơi! Điểm cuối: %1$s</string>
+    <string name="xa_game_over_final_score">Hết trò chơi! Điểm cuối: %1$d</string>
     <string name="xa_grid_result_summary">Thời gian %1$s  |  Lỗi %2$s  |  Gợi ý %3$s\n+%4$s điểm</string>
     <string name="xa_grid_three_mistakes">Sai ba lần sẽ kết thúc câu đố. Hãy thử câu tiếp theo!</string>
     <string name="xa_heart">Tim</string>
@@ -1602,7 +1602,7 @@
     <string name="xa_oops">Rất tiếc!</string>
     <string name="xa_out_of_lives">Hết mạng</string>
     <string name="xa_perfect">Hoàn hảo!</string>
-    <string name="xa_perfect_points_multiplier">Hoàn hảo! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Hoàn hảo! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s điểm</string>
     <string name="xa_preparing_image">Đang chuẩn bị hình ảnh...</string>
     <string name="xa_pts_value">%1$s điểm</string>
@@ -1632,7 +1632,7 @@
     <string name="xa_vortex_perfect_all_new">Hoàn hảo! Đã tìm thấy tất cả hình ảnh mới!</string>
     <string name="xa_vortex_times_up_faster">Hết giờ! Lần sau hãy thử nhanh hơn nhé.</string>
     <string name="xa_wrong_answer_lives">Sai rồi. Mạng: %1$s</string>
-    <string name="xa_wrong_direction_lives">Sai hướng! Mạng: %1$s</string>
+    <string name="xa_wrong_direction_lives">Sai hướng! Mạng: %1$d</string>
     <string name="xa_wrong_ratio">Sai: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Không tải được câu đố hé lộ dần: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Đang tải câu đố Rắn từ…</string>

@@ -1720,7 +1720,7 @@
     <string name="xa_best_streak_value">Nejlepší série: %1$s</string>
     <string name="xa_completed_exclaim">Dokončeno!</string>
     <string name="xa_congratulations">Gratulujeme!</string>
-    <string name="xa_correct_points">Správně! +%1$s</string>
+    <string name="xa_correct_points">Správně! +%1$d</string>
     <string name="xa_correct_ratio">Správně: %1$s/%2$s</string>
     <string name="xa_correct_value">Správně: %1$s</string>
     <string name="xa_difficulty_adapted">Obtížnost přizpůsobena</string>
@@ -1729,12 +1729,12 @@
     <string name="xa_difficulty_grandmaster">Velmistr</string>
     <string name="xa_difficulty_master">Mistr</string>
     <string name="xa_equations_all_correct">Skvěle! Všechny rovnice jsou správně!</string>
-    <string name="xa_equations_correct_points">Skvěle! Všechny rovnice jsou správně! +%1$s bodů</string>
+    <string name="xa_equations_correct_points">Skvěle! Všechny rovnice jsou správně! +%1$d bodů</string>
     <string name="xa_excellent">Výborně!</string>
     <string name="xa_failed_to_load_dictionary">Slovník se nepodařilo načíst: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Data hádanky se sadou písmen se nepodařilo zpracovat</string>
     <string name="xa_final_score_value">Konečné skóre: %1$s</string>
-    <string name="xa_game_over_final_score">Konec hry! Konečné skóre: %1$s</string>
+    <string name="xa_game_over_final_score">Konec hry! Konečné skóre: %1$d</string>
     <string name="xa_grid_result_summary">Čas %1$s  |  Chyby %2$s  |  Nápovědy %3$s\n+%4$s bodů</string>
     <string name="xa_grid_three_mistakes">Tři chyby ukončí hádanku. Zkuste další!</string>
     <string name="xa_heart">Srdce</string>
@@ -1767,7 +1767,7 @@
     <string name="xa_oops">Ouha!</string>
     <string name="xa_out_of_lives">Došly životy</string>
     <string name="xa_perfect">Perfektní!</string>
-    <string name="xa_perfect_points_multiplier">Perfektní! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Perfektní! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s b.</string>
     <string name="xa_preparing_image">Příprava obrázku…</string>
     <string name="xa_pts_value">%1$s b.</string>
@@ -1797,7 +1797,7 @@
     <string name="xa_vortex_perfect_all_new">Perfektní! Našli jste všechny nové obrázky!</string>
     <string name="xa_vortex_times_up_faster">Čas vypršel! Příště buďte rychlejší.</string>
     <string name="xa_wrong_answer_lives">Špatná odpověď. Životy: %1$s</string>
-    <string name="xa_wrong_direction_lives">Špatný směr! Životy: %1$s</string>
+    <string name="xa_wrong_direction_lives">Špatný směr! Životy: %1$d</string>
     <string name="xa_wrong_ratio">Špatně: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Hádanku s postupným odhalením se nepodařilo načíst: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Načítání hádanky Slovní had…</string>

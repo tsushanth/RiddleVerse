@@ -1610,7 +1610,7 @@
     <string name="xa_best_streak_value">Legjobb sorozat: %1$s</string>
     <string name="xa_completed_exclaim">Teljesítve!</string>
     <string name="xa_congratulations">Gratulálunk!</string>
-    <string name="xa_correct_points">Helyes! +%1$s</string>
+    <string name="xa_correct_points">Helyes! +%1$d</string>
     <string name="xa_correct_ratio">Helyes: %1$s/%2$s</string>
     <string name="xa_correct_value">Helyes: %1$s</string>
     <string name="xa_difficulty_adapted">Nehézség módosítva</string>
@@ -1619,12 +1619,12 @@
     <string name="xa_difficulty_grandmaster">Nagymester</string>
     <string name="xa_difficulty_master">Mester</string>
     <string name="xa_equations_all_correct">Tökéletes! Minden egyenlet helyes!</string>
-    <string name="xa_equations_correct_points">Tökéletes! Minden egyenlet helyes! +%1$s pont</string>
+    <string name="xa_equations_correct_points">Tökéletes! Minden egyenlet helyes! +%1$d pont</string>
     <string name="xa_excellent">Kiváló!</string>
     <string name="xa_failed_to_load_dictionary">A szótár betöltése nem sikerült: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">A betűkészlet-fejtörő adatainak feldolgozása nem sikerült</string>
     <string name="xa_final_score_value">Végső pontszám: %1$s</string>
-    <string name="xa_game_over_final_score">Vége a játéknak! Végső pontszám: %1$s</string>
+    <string name="xa_game_over_final_score">Vége a játéknak! Végső pontszám: %1$d</string>
     <string name="xa_grid_result_summary">Idő %1$s  |  Hibák %2$s  |  Tippek %3$s\n+%4$s pont</string>
     <string name="xa_grid_three_mistakes">Három hiba véget vet a fejtörőnek. Próbáld a következőt!</string>
     <string name="xa_heart">Szív</string>
@@ -1657,7 +1657,7 @@
     <string name="xa_oops">Hoppá!</string>
     <string name="xa_out_of_lives">Elfogytak az életek</string>
     <string name="xa_perfect">Tökéletes!</string>
-    <string name="xa_perfect_points_multiplier">Tökéletes! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Tökéletes! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s pont</string>
     <string name="xa_preparing_image">Kép előkészítése...</string>
     <string name="xa_pts_value">%1$s pont</string>
@@ -1687,7 +1687,7 @@
     <string name="xa_vortex_perfect_all_new">Tökéletes! Megtaláltad az összes új képet!</string>
     <string name="xa_vortex_times_up_faster">Lejárt az idő! Legközelebb légy gyorsabb.</string>
     <string name="xa_wrong_answer_lives">Hibás válasz. Életek: %1$s</string>
-    <string name="xa_wrong_direction_lives">Rossz irány! Életek: %1$s</string>
+    <string name="xa_wrong_direction_lives">Rossz irány! Életek: %1$d</string>
     <string name="xa_wrong_ratio">Hibás: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">A fokozatos felfedéses fejtörő betöltése nem sikerült: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Szókígyó fejtörő betöltése…</string>

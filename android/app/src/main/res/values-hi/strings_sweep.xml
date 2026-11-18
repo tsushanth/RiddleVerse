@@ -1610,7 +1610,7 @@
     <string name="xa_best_streak_value">सर्वश्रेष्ठ स्ट्रीक: %1$s</string>
     <string name="xa_completed_exclaim">पूरा हुआ!</string>
     <string name="xa_congratulations">बधाई हो!</string>
-    <string name="xa_correct_points">सही! +%1$s</string>
+    <string name="xa_correct_points">सही! +%1$d</string>
     <string name="xa_correct_ratio">सही: %1$s/%2$s</string>
     <string name="xa_correct_value">सही: %1$s</string>
     <string name="xa_difficulty_adapted">कठिनाई समायोजित</string>
@@ -1619,12 +1619,12 @@
     <string name="xa_difficulty_grandmaster">ग्रैंडमास्टर</string>
     <string name="xa_difficulty_master">मास्टर</string>
     <string name="xa_equations_all_correct">बिल्कुल सही! सभी समीकरण सही हैं!</string>
-    <string name="xa_equations_correct_points">बिल्कुल सही! सभी समीकरण सही हैं! +%1$s अंक</string>
+    <string name="xa_equations_correct_points">बिल्कुल सही! सभी समीकरण सही हैं! +%1$d अंक</string>
     <string name="xa_excellent">बेहतरीन!</string>
     <string name="xa_failed_to_load_dictionary">शब्दकोश लोड नहीं हो सका: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">अक्षर समूह पहेली का डेटा पढ़ा नहीं जा सका</string>
     <string name="xa_final_score_value">अंतिम स्कोर: %1$s</string>
-    <string name="xa_game_over_final_score">खेल समाप्त! अंतिम स्कोर: %1$s</string>
+    <string name="xa_game_over_final_score">खेल समाप्त! अंतिम स्कोर: %1$d</string>
     <string name="xa_grid_result_summary">समय %1$s  |  ग़लतियाँ %2$s  |  संकेत %3$s\n+%4$s अंक</string>
     <string name="xa_grid_three_mistakes">तीन ग़लतियों पर पहेली खत्म हो जाती है। अगली आज़माएँ!</string>
     <string name="xa_heart">हार्ट</string>
@@ -1657,7 +1657,7 @@
     <string name="xa_oops">अरे!</string>
     <string name="xa_out_of_lives">जीवन खत्म</string>
     <string name="xa_perfect">बिल्कुल सही!</string>
-    <string name="xa_perfect_points_multiplier">बिल्कुल सही! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">बिल्कुल सही! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s अंक</string>
     <string name="xa_preparing_image">छवि तैयार हो रही है...</string>
     <string name="xa_pts_value">%1$s अंक</string>
@@ -1687,7 +1687,7 @@
     <string name="xa_vortex_perfect_all_new">बिल्कुल सही! सारी नई छवियाँ मिल गईं!</string>
     <string name="xa_vortex_times_up_faster">समय समाप्त! अगली बार और तेज़ी से कोशिश करें।</string>
     <string name="xa_wrong_answer_lives">ग़लत उत्तर। जीवन: %1$s</string>
-    <string name="xa_wrong_direction_lives">ग़लत दिशा! जीवन: %1$s</string>
+    <string name="xa_wrong_direction_lives">ग़लत दिशा! जीवन: %1$d</string>
     <string name="xa_wrong_ratio">ग़लत: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">क्रमिक प्रकटीकरण पहेली लोड नहीं हो सकी: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">शब्द साँप पहेली लोड हो रही है…</string>

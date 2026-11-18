@@ -1610,7 +1610,7 @@
     <string name="xa_best_streak_value">সেরা স্ট্রিক: %1$s</string>
     <string name="xa_completed_exclaim">সম্পন্ন!</string>
     <string name="xa_congratulations">অভিনন্দন!</string>
-    <string name="xa_correct_points">সঠিক! +%1$s</string>
+    <string name="xa_correct_points">সঠিক! +%1$d</string>
     <string name="xa_correct_ratio">সঠিক: %1$s/%2$s</string>
     <string name="xa_correct_value">সঠিক: %1$s</string>
     <string name="xa_difficulty_adapted">কঠিনতা সমন্বিত</string>
@@ -1619,12 +1619,12 @@
     <string name="xa_difficulty_grandmaster">গ্র্যান্ডমাস্টার</string>
     <string name="xa_difficulty_master">মাস্টার</string>
     <string name="xa_equations_all_correct">নিখুঁত! সব সমীকরণ সঠিক!</string>
-    <string name="xa_equations_correct_points">নিখুঁত! সব সমীকরণ সঠিক! +%1$s পয়েন্ট</string>
+    <string name="xa_equations_correct_points">নিখুঁত! সব সমীকরণ সঠিক! +%1$d পয়েন্ট</string>
     <string name="xa_excellent">চমৎকার!</string>
     <string name="xa_failed_to_load_dictionary">অভিধান লোড করা যায়নি: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">অক্ষরগুচ্ছের পাজলের তথ্য পড়া যায়নি</string>
     <string name="xa_final_score_value">চূড়ান্ত স্কোর: %1$s</string>
-    <string name="xa_game_over_final_score">খেলা শেষ! চূড়ান্ত স্কোর: %1$s</string>
+    <string name="xa_game_over_final_score">খেলা শেষ! চূড়ান্ত স্কোর: %1$d</string>
     <string name="xa_grid_result_summary">সময় %1$s  |  ভুল %2$s  |  ইঙ্গিত %3$s\n+%4$s পয়েন্ট</string>
     <string name="xa_grid_three_mistakes">তিনটি ভুলে পাজল শেষ। পরেরটি চেষ্টা করুন!</string>
     <string name="xa_heart">হার্ট</string>
@@ -1657,7 +1657,7 @@
     <string name="xa_oops">ইশ!</string>
     <string name="xa_out_of_lives">জীবন শেষ</string>
     <string name="xa_perfect">নিখুঁত!</string>
-    <string name="xa_perfect_points_multiplier">নিখুঁত! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">নিখুঁত! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s পয়েন্ট</string>
     <string name="xa_preparing_image">ছবি প্রস্তুত হচ্ছে...</string>
     <string name="xa_pts_value">%1$s পয়েন্ট</string>
@@ -1687,7 +1687,7 @@
     <string name="xa_vortex_perfect_all_new">নিখুঁত! সব নতুন ছবি পেয়েছেন!</string>
     <string name="xa_vortex_times_up_faster">সময় শেষ! পরের বার আরও দ্রুত চেষ্টা করুন।</string>
     <string name="xa_wrong_answer_lives">ভুল উত্তর। জীবন: %1$s</string>
-    <string name="xa_wrong_direction_lives">ভুল দিক! জীবন: %1$s</string>
+    <string name="xa_wrong_direction_lives">ভুল দিক! জীবন: %1$d</string>
     <string name="xa_wrong_ratio">ভুল: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">ধাপে ধাপে প্রকাশের পাজল লোড করা যায়নি: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">শব্দ সাপের পাজল লোড হচ্ছে…</string>

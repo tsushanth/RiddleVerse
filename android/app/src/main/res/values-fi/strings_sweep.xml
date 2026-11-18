@@ -1610,7 +1610,7 @@
     <string name="xa_best_streak_value">Paras putki: %1$s</string>
     <string name="xa_completed_exclaim">Suoritettu!</string>
     <string name="xa_congratulations">Onnittelut!</string>
-    <string name="xa_correct_points">Oikein! +%1$s</string>
+    <string name="xa_correct_points">Oikein! +%1$d</string>
     <string name="xa_correct_ratio">Oikein: %1$s/%2$s</string>
     <string name="xa_correct_value">Oikein: %1$s</string>
     <string name="xa_difficulty_adapted">Vaikeustaso mukautettu</string>
@@ -1619,12 +1619,12 @@
     <string name="xa_difficulty_grandmaster">Suurmestari</string>
     <string name="xa_difficulty_master">Mestari</string>
     <string name="xa_equations_all_correct">Täydellistä! Kaikki yhtälöt ovat oikein!</string>
-    <string name="xa_equations_correct_points">Täydellistä! Kaikki yhtälöt ovat oikein! +%1$s pistettä</string>
+    <string name="xa_equations_correct_points">Täydellistä! Kaikki yhtälöt ovat oikein! +%1$d pistettä</string>
     <string name="xa_excellent">Erinomaista!</string>
     <string name="xa_failed_to_load_dictionary">Sanakirjan lataus epäonnistui: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Kirjaimistopulman tietojen jäsennys epäonnistui</string>
     <string name="xa_final_score_value">Loppupisteet: %1$s</string>
-    <string name="xa_game_over_final_score">Peli ohi! Loppupisteet: %1$s</string>
+    <string name="xa_game_over_final_score">Peli ohi! Loppupisteet: %1$d</string>
     <string name="xa_grid_result_summary">Aika %1$s  |  Virheet %2$s  |  Vihjeet %3$s\n+%4$s pistettä</string>
     <string name="xa_grid_three_mistakes">Kolme virhettä päättää pulman. Kokeile seuraavaa!</string>
     <string name="xa_heart">Sydän</string>
@@ -1657,7 +1657,7 @@
     <string name="xa_oops">Hups!</string>
     <string name="xa_out_of_lives">Elämät loppuivat</string>
     <string name="xa_perfect">Täydellistä!</string>
-    <string name="xa_perfect_points_multiplier">Täydellistä! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Täydellistä! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s p</string>
     <string name="xa_preparing_image">Valmistellaan kuvaa...</string>
     <string name="xa_pts_value">%1$s p</string>
@@ -1687,7 +1687,7 @@
     <string name="xa_vortex_perfect_all_new">Täydellistä! Löysit kaikki uudet kuvat!</string>
     <string name="xa_vortex_times_up_faster">Aika loppui! Yritä olla nopeampi ensi kerralla.</string>
     <string name="xa_wrong_answer_lives">Väärä vastaus. Elämät: %1$s</string>
-    <string name="xa_wrong_direction_lives">Väärä suunta! Elämät: %1$s</string>
+    <string name="xa_wrong_direction_lives">Väärä suunta! Elämät: %1$d</string>
     <string name="xa_wrong_ratio">Väärin: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Vähitellen paljastuvan pulman lataus epäonnistui: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Ladataan Sanakäärme-pulmaa…</string>

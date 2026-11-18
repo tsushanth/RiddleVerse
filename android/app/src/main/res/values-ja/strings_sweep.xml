@@ -1555,7 +1555,7 @@
     <string name="xa_best_streak_value">最高連続：%1$s</string>
     <string name="xa_completed_exclaim">クリア！</string>
     <string name="xa_congratulations">おめでとうございます！</string>
-    <string name="xa_correct_points">正解！+%1$s</string>
+    <string name="xa_correct_points">正解！+%1$d</string>
     <string name="xa_correct_ratio">正解：%1$s/%2$s</string>
     <string name="xa_correct_value">正解：%1$s</string>
     <string name="xa_difficulty_adapted">難易度を調整しました</string>
@@ -1564,12 +1564,12 @@
     <string name="xa_difficulty_grandmaster">グランドマスター</string>
     <string name="xa_difficulty_master">マスター</string>
     <string name="xa_equations_all_correct">完璧！すべての式が正解です！</string>
-    <string name="xa_equations_correct_points">完璧！すべての式が正解です！+%1$sポイント</string>
+    <string name="xa_equations_correct_points">完璧！すべての式が正解です！+%1$dポイント</string>
     <string name="xa_excellent">すばらしい！</string>
     <string name="xa_failed_to_load_dictionary">辞書を読み込めませんでした：%1$s</string>
     <string name="xa_failed_to_parse_letter_set">文字探しパズルのデータを解析できませんでした</string>
     <string name="xa_final_score_value">最終スコア：%1$s</string>
-    <string name="xa_game_over_final_score">ゲームオーバー！最終スコア：%1$s</string>
+    <string name="xa_game_over_final_score">ゲームオーバー！最終スコア：%1$d</string>
     <string name="xa_grid_result_summary">タイム %1$s  |  ミス %2$s  |  ヒント %3$s\n+%4$sポイント</string>
     <string name="xa_grid_three_mistakes">3回ミスするとパズルは終了です。次のパズルに挑戦しよう！</string>
     <string name="xa_heart">ハート</string>
@@ -1602,7 +1602,7 @@
     <string name="xa_oops">おっと！</string>
     <string name="xa_out_of_lives">ライフがなくなりました</string>
     <string name="xa_perfect">完璧！</string>
-    <string name="xa_perfect_points_multiplier">完璧！+%1$s（×%2$s）</string>
+    <string name="xa_perfect_points_multiplier">完璧！+%1$d（×%2$d）</string>
     <string name="xa_plus_pts_value">+%1$sポイント</string>
     <string name="xa_preparing_image">画像を準備中...</string>
     <string name="xa_pts_value">%1$sポイント</string>
@@ -1632,7 +1632,7 @@
     <string name="xa_vortex_perfect_all_new">完璧！新しい画像をすべて見つけました！</string>
     <string name="xa_vortex_times_up_faster">時間切れ！次はもっと速く答えよう。</string>
     <string name="xa_wrong_answer_lives">不正解。ライフ：%1$s</string>
-    <string name="xa_wrong_direction_lives">方向が違います！ライフ：%1$s</string>
+    <string name="xa_wrong_direction_lives">方向が違います！ライフ：%1$d</string>
     <string name="xa_wrong_ratio">ミス：%1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">だんだん見えるパズルを読み込めませんでした：%1$s</string>
     <string name="xb_loading_word_snake_puzzle">ワードスネークのパズルを読み込み中…</string>

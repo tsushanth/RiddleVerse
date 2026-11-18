@@ -1720,7 +1720,7 @@
     <string name="xa_best_streak_value">Лучшая серия: %1$s</string>
     <string name="xa_completed_exclaim">Пройдено!</string>
     <string name="xa_congratulations">Поздравляем!</string>
-    <string name="xa_correct_points">Правильно! +%1$s</string>
+    <string name="xa_correct_points">Правильно! +%1$d</string>
     <string name="xa_correct_ratio">Верно: %1$s/%2$s</string>
     <string name="xa_correct_value">Верно: %1$s</string>
     <string name="xa_difficulty_adapted">Сложность адаптирована</string>
@@ -1729,12 +1729,12 @@
     <string name="xa_difficulty_grandmaster">Гроссмейстер</string>
     <string name="xa_difficulty_master">Мастер</string>
     <string name="xa_equations_all_correct">Идеально! Все уравнения верны!</string>
-    <string name="xa_equations_correct_points">Идеально! Все уравнения верны! +%1$s очков</string>
+    <string name="xa_equations_correct_points">Идеально! Все уравнения верны! +%1$d очков</string>
     <string name="xa_excellent">Отлично!</string>
     <string name="xa_failed_to_load_dictionary">Не удалось загрузить словарь: %1$s</string>
     <string name="xa_failed_to_parse_letter_set">Не удалось обработать данные головоломки с набором букв</string>
     <string name="xa_final_score_value">Итоговый счёт: %1$s</string>
-    <string name="xa_game_over_final_score">Игра окончена! Итоговый счёт: %1$s</string>
+    <string name="xa_game_over_final_score">Игра окончена! Итоговый счёт: %1$d</string>
     <string name="xa_grid_result_summary">Время %1$s  |  Ошибки %2$s  |  Подсказки %3$s\n+%4$s очков</string>
     <string name="xa_grid_three_mistakes">Три ошибки завершают головоломку. Попробуйте следующую!</string>
     <string name="xa_heart">Сердце</string>
@@ -1767,7 +1767,7 @@
     <string name="xa_oops">Ой!</string>
     <string name="xa_out_of_lives">Жизни закончились</string>
     <string name="xa_perfect">Идеально!</string>
-    <string name="xa_perfect_points_multiplier">Идеально! +%1$s (x%2$s)</string>
+    <string name="xa_perfect_points_multiplier">Идеально! +%1$d (x%2$d)</string>
     <string name="xa_plus_pts_value">+%1$s очк.</string>
     <string name="xa_preparing_image">Подготовка изображения...</string>
     <string name="xa_pts_value">%1$s очк.</string>
@@ -1797,7 +1797,7 @@
     <string name="xa_vortex_perfect_all_new">Идеально! Найдены все новые изображения!</string>
     <string name="xa_vortex_times_up_faster">Время вышло! В следующий раз постарайтесь быстрее.</string>
     <string name="xa_wrong_answer_lives">Неправильный ответ. Жизни: %1$s</string>
-    <string name="xa_wrong_direction_lives">Неправильное направление! Жизни: %1$s</string>
+    <string name="xa_wrong_direction_lives">Неправильное направление! Жизни: %1$d</string>
     <string name="xa_wrong_ratio">Ошибки: %1$d/%2$d</string>
     <string name="xb_failed_to_load_progressive_puzzle">Не удалось загрузить головоломку с постепенным раскрытием: %1$s</string>
     <string name="xb_loading_word_snake_puzzle">Загрузка головоломки «Словесная змейка»…</string>
