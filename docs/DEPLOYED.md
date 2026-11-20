@@ -1,11 +1,12 @@
 # Deployed releases (Play)
 
-## 184.0 (versionCode 184): production, 20% staged rollout, 2026-11-17
+## 184.0 (versionCode 184): production, 100% since 2026-11-19 (20% staged rollout from 2026-11-17)
 - Built from main `39f46ec` (merge of #54 on top of #51 i18n sweep, #52 model-name neutralisation, #53 hard-coded-string guard); tag `play/RiddleVerse-184.0-184`. The built `android/` tree equals `origin/main` (later commits touch docs only).
 - Gradle: `:app:testDebugUnitTest` and `:app:bundleRelease` on the built tree; `:app:lintDebug` on the previous tree 8a5e365 (identical app code, version bump only), all exit 0.
 - Device check (Pixel 9 Pro, in-place update over 183, upload-key signature, 10 locales en ar ja ru de hi uk es tr th, 5 screens each): PASS, 0 crash/ANR/died, no raw tokens, Arabic mirrors. Checked on 8a5e365 (same code, versionCode 183).
 - AAB sha256: 7232d1d3277293966876558f7c7c7f69d5bfa4d32fd039a13e78927bd1052e18
 - Play production track read back after commit: 184.0 (184) inProgress userFraction 0.2; 183.0 (183) completed. Not raised above 20%.
+- Raised to 100% on 2026-11-19 on the owner's instruction (Play Developer API edit: 184.0 (184) set to completed with no userFraction, validated, committed). Play production track read back afterwards: 184.0 (184) completed, no other release listed. Not done at promotion: a device check of the Play-signed build (the Pixel copy carries the upload-key signature, so the check above is the only device evidence) and a crash or ANR rate review (the Play vitals query returned an error). A completed release cannot be halted: roll back by shipping a fix as a new version code or re-uploading 183.0 (183) as the completed release.
 - Contents: UI text moved from code into string resources (1627 strings, 29 locales, machine translations needing native review), a GPT-vendor mention removed from the Geography feature list. Changelog: "More of the app is now translated into your language."
 - Rollback: halt the rollout in Play Console, or re-upload 183.0 (183) as the completed production release.
 
