@@ -1,5 +1,13 @@
 # Deployed releases (Play)
 
+## 185.0 (versionCode 185): production, 20% staged rollout, 2026-11-22
+- Built from main `6c94781` (squash merge of #60; the tree built for the AAB, `android/` `153f1cc`, equals `origin/main`); tag `play/RiddleVerse-185.0-185`. Signed with the upload key (cert SHA-256 `edd13783...52f7`, same as the Pixel copy).
+- Fix: `Purchases.configure` moved off the main thread (`RevenueCatBootstrap.kt`); it was the top ANR cluster in Play vitals (7 issues, 25 reports, builds 168-184; stacks blocked in `MyApplication.onCreate` at the RevenueCat configure call). `FailureReporter` pending-crash read moved to its worker thread. Not changed: PuzzleEvents, Funnel, TikTok init, Firebase init provider samples.
+- Verified: `:app:compileDebugKotlin`, `:app:compileDebugUnitTestKotlin`, `:app:assembleRelease` and `:app:bundleRelease` succeed. NOT run: the unit tests themselves, and the device smoke test (the Pixel was unplugged before it could run; the 185 release APK was installed in place over 183 on the Pixel, not exercised). No ANR change measured yet: Play vitals volume is about 60 users a day, so judge over a week.
+- AAB sha256: 307c08fad97de29e561708cb1c5e0aa95ca979a944100386384bdf608a9d7a9d
+- Play production track read back after commit: 185.0 (185) inProgress userFraction 0.2; 184.0 (184) completed. Changelog: "Faster, smoother app start."
+- Rollback: halt the rollout in Play Console (184 stays completed for everyone else), or re-upload 184 content as a new versionCode.
+
 ## 184.0 (versionCode 184): production, 100% since 2026-11-19 (20% staged rollout from 2026-11-17)
 - Built from main `39f46ec` (merge of #54 on top of #51 i18n sweep, #52 model-name neutralisation, #53 hard-coded-string guard); tag `play/RiddleVerse-184.0-184`. The built `android/` tree equals `origin/main` (later commits touch docs only).
 - Gradle: `:app:testDebugUnitTest` and `:app:bundleRelease` on the built tree; `:app:lintDebug` on the previous tree 8a5e365 (identical app code, version bump only), all exit 0.
