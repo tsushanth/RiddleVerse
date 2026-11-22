@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity() {
                 if (success) {
                     val user = FirebaseAuth.getInstance().currentUser
                     if (user != null) {
-                        Purchases.sharedInstance.logIn(
+                        RevenueCatBootstrap.instance.logIn(
                             user.uid,
                             object : com.revenuecat.purchases.interfaces.LogInCallback {
                                 override fun onReceived(customerInfo: com.revenuecat.purchases.CustomerInfo, created: Boolean) {
@@ -200,7 +200,7 @@ class MainActivity : AppCompatActivity() {
 
         if (currentUser != null) {
             Log.d("MainActivity", "User logged in: ${currentUser.email}, navigating to Home")
-            Purchases.sharedInstance.logIn(
+            RevenueCatBootstrap.whenReady { it.logIn(
                 currentUser.uid,
                 object : com.revenuecat.purchases.interfaces.LogInCallback {
                     override fun onReceived(customerInfo: com.revenuecat.purchases.CustomerInfo, created: Boolean) {
@@ -212,7 +212,7 @@ class MainActivity : AppCompatActivity() {
                         Log.e("MainActivity", "RevenueCat logIn error: ${error.message}")
                     }
                 }
-            )
+            ) }
             startActivity(Intent(this, HomeActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             })
@@ -246,7 +246,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setRevenueCatAttributes(user: com.google.firebase.auth.FirebaseUser) {
         try {
-            val purchases = Purchases.sharedInstance
+            val purchases = RevenueCatBootstrap.instance
             user.email?.let { purchases.setEmail(it) }
             user.displayName?.let { purchases.setDisplayName(it) }
 

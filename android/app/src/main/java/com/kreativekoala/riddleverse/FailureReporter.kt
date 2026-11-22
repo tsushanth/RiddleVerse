@@ -95,7 +95,13 @@ object FailureReporter {
     private fun prefs() = appCtx?.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
 
     private fun flushPendingCrash() {
-        val pending = prefs()?.getString(PENDING, null) ?: return
-        io.execute { try { if (post(pending, 8000)) prefs()?.edit()?.remove(PENDING)?.apply() } catch (_: Throwable) {} }
+        // Read the pending report on the worker thread: the SharedPreferences load is disk I/O and this runs
+        // from Application.onCreate (a cold-start ANR sample was blocked here).
+        io.execute {
+            try {
+                val pending = prefs()?.getString(PENDING, null) ?: return@execute
+                if (post(pending, 8000)) prefs()?.edit()?.remove(PENDING)?.apply()
+            } catch (_: Throwable) {}
+        }
     }
 }

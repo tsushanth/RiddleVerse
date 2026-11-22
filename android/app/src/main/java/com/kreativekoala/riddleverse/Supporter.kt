@@ -111,7 +111,7 @@ object Supporter {
                 if (body != null) p.edit().putBoolean(K_FLAG, SupporterRules.parseFlag(body)).apply()
                 p.edit().putLong(K_FLAG_AT, System.currentTimeMillis()).apply()
             }
-            Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
+            RevenueCatBootstrap.instance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
                 override fun onReceived(customerInfo: CustomerInfo) { apply(c, customerInfo) }
                 override fun onError(error: PurchasesError) {}
             })
@@ -145,7 +145,7 @@ object Supporter {
     /** Loads the supporter package; `null` when the offering/product does not exist (card then stays hidden). */
     fun loadPackage(onResult: (Package?) -> Unit) {
         try {
-            Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
+            RevenueCatBootstrap.instance.getOfferings(object : ReceiveOfferingsCallback {
                 override fun onReceived(offerings: Offerings) { onResult(offerings.getOffering(OFFERING)?.availablePackages?.firstOrNull()) }
                 override fun onError(error: PurchasesError) { onResult(null) }
             })
@@ -154,7 +154,7 @@ object Supporter {
 
     fun purchase(activity: Activity, pkg: Package, onDone: (Boolean) -> Unit) {
         try {
-            Purchases.sharedInstance.purchase(PurchaseParams.Builder(activity, pkg).build(), object : PurchaseCallback {
+            RevenueCatBootstrap.instance.purchase(PurchaseParams.Builder(activity, pkg).build(), object : PurchaseCallback {
                 override fun onCompleted(storeTransaction: StoreTransaction, customerInfo: CustomerInfo) {
                     apply(activity, customerInfo); onDone(isSupporter(activity))
                 }

@@ -697,7 +697,7 @@ class CoinManager private constructor() {
 
     fun loadCoinProducts() {
         val productIds = COIN_PACKS.map { it.productId }
-        Purchases.sharedInstance.getProducts(
+        RevenueCatBootstrap.whenReady { it.getProducts(
             productIds,
             ProductType.INAPP,
             object : GetStoreProductsCallback {
@@ -710,7 +710,7 @@ class CoinManager private constructor() {
                     Log.e(TAG, "Failed to load coin products: ${error.message}")
                 }
             }
-        )
+        ) }
     }
 
     fun getProductPrice(productId: String): String? {
@@ -730,7 +730,7 @@ class CoinManager private constructor() {
         }
 
         isPurchasing = true
-        Purchases.sharedInstance.purchase(
+        RevenueCatBootstrap.instance.purchase(
             PurchaseParams.Builder(activity, product).build(),
             object : PurchaseCallback {
                 override fun onCompleted(storeTransaction: StoreTransaction, customerInfo: CustomerInfo) {

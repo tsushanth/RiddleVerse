@@ -289,7 +289,7 @@ class AuthActivity : AppCompatActivity() {
 
                     // Set RevenueCat subscriber attributes for segmentation
                     user?.uid?.let { uid ->
-                        Purchases.sharedInstance.logIn(
+                        RevenueCatBootstrap.instance.logIn(
                             uid,
                             object : com.revenuecat.purchases.interfaces.LogInCallback {
                                 override fun onReceived(customerInfo: com.revenuecat.purchases.CustomerInfo, created: Boolean) {
@@ -385,7 +385,7 @@ class AuthActivity : AppCompatActivity() {
      */
     private fun setRevenueCatAttributes(isNewUser: Boolean, method: String = "google") {
         try {
-            val purchases = Purchases.sharedInstance
+            val purchases = RevenueCatBootstrap.instance
             val user = auth.currentUser
 
             // Standard RevenueCat reserved attributes

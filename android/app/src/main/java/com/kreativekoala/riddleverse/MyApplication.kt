@@ -17,8 +17,6 @@ import com.google.android.gms.security.ProviderInstaller
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.messaging.FirebaseMessaging
-import com.revenuecat.purchases.Purchases
-import com.revenuecat.purchases.PurchasesConfiguration
 import com.kreativekoala.paywallkit.manager.ExperimentManager
 import com.kreativekoala.ratingkit.RatingKit
 import kotlinx.coroutines.CoroutineScope
@@ -42,8 +40,9 @@ class MyApplication : Application() {
         // Initialize Firebase first (required early)
         FirebaseApp.initializeApp(this)
 
-        // Initialize RevenueCat (must be on main thread, before any activity accesses it)
-        Purchases.configure(PurchasesConfiguration.Builder(this, "goog_ITYXDzvdjnVZQUeqwrwkmNvRIvL").build())
+        // Configure RevenueCat on a background thread (it was the top ANR cause on the main thread here).
+        // Every SDK call goes through RevenueCatBootstrap, which waits for configure to finish.
+        RevenueCatBootstrap.start(this)
 
         // Initialize PaywallKit experiment manager
         ExperimentManager.init(this)
