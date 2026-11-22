@@ -56,7 +56,7 @@ fun SubscriptionUpgradeDialog(
 
     LaunchedEffect(Unit) {
         // Tag subscriber with paywall context for RC targeting/analytics
-        Purchases.sharedInstance.setAttributes(
+        RevenueCatBootstrap.whenReady { it.setAttributes(
             mapOf(
                 "last_paywall_source" to paywallContext,
                 "last_paywall_date" to java.text.SimpleDateFormat(
@@ -64,7 +64,7 @@ fun SubscriptionUpgradeDialog(
                 ).apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }
                     .format(java.util.Date())
             )
-        )
+        ) }
         analyticsManager?.track(
             AnalyticsEvent.subscriptionDialogOpen(
                 targetTier = targetTier.value,
@@ -264,7 +264,7 @@ fun CoinStoreDialog(onDismiss: () -> Unit) {
     val mainHandler = remember { Handler(Looper.getMainLooper()) }
 
     LaunchedEffect(Unit) {
-        Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
+        RevenueCatBootstrap.instance.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: com.revenuecat.purchases.Offerings) {
                 mainHandler.post {
                     coinsOffering = offerings.all["coins"]

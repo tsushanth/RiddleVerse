@@ -184,7 +184,7 @@ class SubscriptionManager private constructor(
     // MARK: - Public Methods
 
     fun loadProducts() {
-        Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
+        RevenueCatBootstrap.whenReady { it.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: Offerings) {
                 val current = offerings.current
                 if (current != null) {
@@ -201,7 +201,7 @@ class SubscriptionManager private constructor(
             override fun onError(error: PurchasesError) {
                 Log.e(TAG, "Failed to load offerings: ${error.message}")
             }
-        })
+        }) }
     }
 
     fun purchasePackage(activity: Activity, pkg: Package) {
@@ -210,7 +210,7 @@ class SubscriptionManager private constructor(
         if (!GuestGate.requireAccount(activity, GuestFeature.SUBSCRIBE)) return
         purchaseState = PurchaseState.Purchasing
 
-        Purchases.sharedInstance.purchase(
+        RevenueCatBootstrap.instance.purchase(
             PurchaseParams.Builder(activity, pkg).build(),
             object : PurchaseCallback {
                 override fun onCompleted(storeTransaction: StoreTransaction, customerInfo: CustomerInfo) {
@@ -241,7 +241,7 @@ class SubscriptionManager private constructor(
     }
 
     fun restorePurchases() {
-        Purchases.sharedInstance.restorePurchases(object : ReceiveCustomerInfoCallback {
+        RevenueCatBootstrap.instance.restorePurchases(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
                 updateTierFromCustomerInfo(customerInfo)
                 Log.d(TAG, "Purchases restored successfully")
@@ -266,7 +266,7 @@ class SubscriptionManager private constructor(
 
     /** Fetch packages for a specific offering by identifier (for manual offering selection). */
     fun getOfferingPackages(identifier: String, callback: (List<Package>) -> Unit) {
-        Purchases.sharedInstance.getOfferings(object : ReceiveOfferingsCallback {
+        RevenueCatBootstrap.instance.getOfferings(object : ReceiveOfferingsCallback {
             override fun onReceived(offerings: Offerings) {
                 val packages = offerings.getOffering(identifier)?.availablePackages ?: emptyList()
                 callback(packages)
@@ -313,7 +313,7 @@ class SubscriptionManager private constructor(
     // MARK: - Private Methods
 
     private fun refreshCustomerInfo() {
-        Purchases.sharedInstance.getCustomerInfo(object : ReceiveCustomerInfoCallback {
+        RevenueCatBootstrap.whenReady { it.getCustomerInfo(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
                 updateTierFromCustomerInfo(customerInfo)
             }
@@ -321,7 +321,7 @@ class SubscriptionManager private constructor(
             override fun onError(error: PurchasesError) {
                 Log.e(TAG, "Failed to get customer info: ${error.message}")
             }
-        })
+        }) }
     }
 
     internal fun updateTierFromCustomerInfo(customerInfo: CustomerInfo) {
