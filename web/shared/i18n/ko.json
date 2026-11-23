@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "트레일",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "연속 기록을 끊지 마세요!",
+    "streak_risk_body": "{days}일 연속 기록이 위험해요. 오늘 플레이해서 이어가세요!",
+    "comeback_title": "다시 시작할 준비 되셨나요?",
+    "comeback_record": "최고 기록은 {days}일이었어요. 이 기록을 깰 시간이에요!",
+    "comeback_new": "모든 전문가도 처음엔 초보였어요. 오늘 새 연속 기록을 시작하세요!",
+    "celebrate_title": "{days}일 연속!",
+    "celebrate_body": "대단해요! {days}일 연속으로 퍼즐을 풀었어요.",
+    "puzzles_ready_title": "맞춤 퍼즐이 준비되었어요!",
+    "puzzles_ready_body": "\"{topic}\" 퍼즐 세트를 플레이할 수 있어요! 퍼즐 {count}개가 생성되었어요."
   }
 }

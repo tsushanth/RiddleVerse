@@ -2,6 +2,7 @@
 import { admin, db } from '../config/firebaseAdmin.js';
 import { supabase } from '../config/database.js';
 import { createHash } from 'node:crypto';
+import { pushLanguage, localizedStreakPush } from './pushText.js';
 
 /**
  * Operating limits. All come from env vars so they can be changed with
@@ -565,14 +566,23 @@ export class FirebaseStreakNotificationService {
     /**
      * Send notification using FCM directly (FIXED)
      */
-    async sendNotificationToUser(userEmail, title, message, notificationType, streakValue) {
+    async sendNotificationToUser(userEmail, title, message, notificationType, streakValue, localize = null) {
         try {
-            // Get user's FCM tokens from Supabase
-            const { data: tokens, error } = await this.supabase
+            // Get user's FCM tokens (and the language each device registered with) from Supabase
+            let { data: tokens, error } = await this.supabase
                 .from('user_notification_tokens')
-                .select('fcm_token')
+                .select('fcm_token, language')
                 .eq('user_email', userEmail)
                 .eq('is_active', true);
+
+            if (error && /language/i.test(error.message || '')) {
+                // migrations/user_notification_tokens_language.sql not applied yet: every device is English.
+                ({ data: tokens, error } = await this.supabase
+                    .from('user_notification_tokens')
+                    .select('fcm_token')
+                    .eq('user_email', userEmail)
+                    .eq('is_active', true));
+            }
 
             if (error || !tokens || tokens.length === 0) {
                 console.log(`⚠️ No active FCM tokens for user ${hashUser(userEmail)}`);
@@ -586,13 +596,25 @@ export class FirebaseStreakNotificationService {
                 return false;
             }
 
-            // Send via Firebase Cloud Messaging
-            const fcmMessage = {
-                notification: { title, body: message },
-                tokens: fcmTokens
-            };
-
-            const response = await this.admin.messaging().sendMulticast(fcmMessage);
+            // One multicast per language: each device gets the text in the language it registered with
+            // (English, the original wording, when it registered none or localize() has nothing for it).
+            const byLang = new Map();
+            for (const t of tokens) {
+                if (!t.fcm_token) continue;
+                const lang = pushLanguage(t.language);
+                if (!byLang.has(lang)) byLang.set(lang, []);
+                byLang.get(lang).push(t.fcm_token);
+            }
+            let successCount = 0;
+            for (const [lang, langTokens] of byLang) {
+                const text = (localize && lang !== 'en' ? localize(lang) : null) || { title, message };
+                const response = await this.admin.messaging().sendMulticast({
+                    notification: { title: text.title, body: text.message },
+                    tokens: langTokens
+                });
+                successCount += response.successCount;
+            }
+            const response = { successCount };
             
             if (response.successCount > 0) {
                 await this.logNotificationSent(userEmail, notificationType, streakValue);
@@ -623,7 +645,8 @@ export class FirebaseStreakNotificationService {
         const title = "🔥 Don't Break Your Streak!";
         const message = messages[streakDays] || messages.default;
 
-        return await this.sendNotificationToUser(userEmail, title, message, 'streak_at_risk', streakDays);
+        return await this.sendNotificationToUser(userEmail, title, message, 'streak_at_risk', streakDays,
+            (lang) => localizedStreakPush('streak_at_risk', lang, streakDays));
     }
 
     /**
@@ -635,7 +658,8 @@ export class FirebaseStreakNotificationService {
             ? `Your best streak was ${bestStreak} days. Time to beat that record!`
             : "Every expert was once a beginner. Start a new streak today!";
 
-        return await this.sendNotificationToUser(userEmail, title, message, 'comeback', bestStreak);
+        return await this.sendNotificationToUser(userEmail, title, message, 'comeback', bestStreak,
+            (lang) => localizedStreakPush('comeback', lang, bestStreak));
     }
 
     /**
@@ -656,7 +680,8 @@ export class FirebaseStreakNotificationService {
             message: `Incredible! ${streakDays} days of consistent puzzle solving.`
         };
 
-        const success = await this.sendNotificationToUser(userEmail, celebration.title, celebration.message, 'celebration', streakDays);
+        const success = await this.sendNotificationToUser(userEmail, celebration.title, celebration.message, 'celebration', streakDays,
+            (lang) => localizedStreakPush('celebration', lang, streakDays));
         
         if (success) {
             await this.updateLastCelebrationStreak(userEmail, streakDays);

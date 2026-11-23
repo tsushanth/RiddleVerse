@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Sendero",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "¡No rompas tu racha!",
+    "streak_risk_body": "Tu racha de {days} días está en juego. ¡Juega hoy para mantenerla!",
+    "comeback_title": "¿Listo para volver?",
+    "comeback_record": "Tu mejor racha fue de {days} días. ¡Es hora de superar ese récord!",
+    "comeback_new": "Todo experto fue principiante alguna vez. ¡Empieza una nueva racha hoy!",
+    "celebrate_title": "¡Racha de {days} días!",
+    "celebrate_body": "¡Increíble! {days} días resolviendo acertijos sin parar.",
+    "puzzles_ready_title": "¡Acertijos personalizados listos!",
+    "puzzles_ready_body": "Tu conjunto «{topic}» está listo para jugar. Se generaron {count} acertijos."
   }
 }

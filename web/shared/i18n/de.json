@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Pfad",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Brich deine Serie nicht ab!",
+    "streak_risk_body": "Deine {days}-Tage-Serie steht auf dem Spiel. Spiele heute, um sie zu halten!",
+    "comeback_title": "Bereit für ein Comeback?",
+    "comeback_record": "Deine beste Serie waren {days} Tage. Zeit, diesen Rekord zu knacken!",
+    "comeback_new": "Jeder Profi war einmal Anfänger. Starte heute eine neue Serie!",
+    "celebrate_title": "{days}-Tage-Serie!",
+    "celebrate_body": "Großartig! {days} Tage in Folge Rätsel gelöst.",
+    "puzzles_ready_title": "Eigene Rätsel sind fertig!",
+    "puzzles_ready_body": "Dein Rätselset „{topic}“ ist bereit zum Spielen! {count} Rätsel wurden erstellt."
   }
 }

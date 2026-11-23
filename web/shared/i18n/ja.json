@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "トレイル",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "連続記録を途切れさせないで!",
+    "streak_risk_body": "{days}日連続の記録が途切れそうです。今日プレイして続けましょう!",
+    "comeback_title": "カムバックしませんか?",
+    "comeback_record": "最高記録は{days}日でした。記録を更新しましょう!",
+    "comeback_new": "どんな達人も最初は初心者でした。今日から新しい連続記録を始めましょう!",
+    "celebrate_title": "{days}日連続!",
+    "celebrate_body": "すごい!{days}日連続でパズルを解きました。",
+    "puzzles_ready_title": "カスタムパズルの準備ができました!",
+    "puzzles_ready_body": "「{topic}」のパズルセットが遊べます!{count}問を作成しました。"
   }
 }

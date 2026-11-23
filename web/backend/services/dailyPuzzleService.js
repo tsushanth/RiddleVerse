@@ -805,22 +805,31 @@ async function logValidationFailure(userEmail, topic, puzzle, validationResult, 
 }
 
 
-export async function storeFCMToken(userEmail, userId, fcmToken, platform) {
+export async function storeFCMToken(userEmail, userId, fcmToken, platform, language = null) {
     try {
-        const { data, error } = await supabase
+        const row = {
+            user_email: userEmail,
+            user_id: userId,
+            fcm_token: fcmToken,
+            platform: platform,
+            is_active: true,
+            last_used: new Date().toISOString(),
+            created_at: new Date().toISOString()
+        };
+        const options = {
+            onConflict: 'user_email,platform,fcm_token',
+            ignoreDuplicates: false // This will update existing records
+        };
+        // The app language the device registered with, so push text can be localized. Only written when the app sent
+        // one; a row registered by an older app keeps whatever language it had.
+        let { data, error } = await supabase
             .from('user_notification_tokens')
-            .upsert({
-                user_email: userEmail,
-                user_id: userId,
-                fcm_token: fcmToken,
-                platform: platform,
-                is_active: true,
-                last_used: new Date().toISOString(),
-                created_at: new Date().toISOString()
-            }, {
-                onConflict: 'user_email,platform,fcm_token',
-                ignoreDuplicates: false // This will update existing records
-            });
+            .upsert(language ? { ...row, language } : row, options);
+
+        if (error && language && /language/i.test(error.message || '')) {
+            // migrations/user_notification_tokens_language.sql not applied yet: register the token without it.
+            ({ data, error } = await supabase.from('user_notification_tokens').upsert(row, options));
+        }
 
         if (error) {
             throw new Error(`Failed to store FCM token: ${error.message}`);

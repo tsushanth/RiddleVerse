@@ -6,6 +6,7 @@
 import { supabase } from '../config/database.js';
 import { PuzzleGenerator } from './puzzleGeneration.js';
 import { PUZZLE_TYPES } from '../config/puzzleConfig.js';
+import { DEFAULT_LANGUAGE, langCacheSuffix } from '../utils/contentLanguage.js';
 
 // ---------------------------------------------------------------------------
 // Configuration: how many puzzles per type per day
@@ -83,7 +84,9 @@ const DB_BACKED_TYPES = [
 
 // ---------------------------------------------------------------------------
 // In-memory cache: Map<string, { puzzles: Array, generatedAt: Date }>
-// Key format: `${type}_${difficulty}_${YYYY-MM-DD}`
+// Key format: `${type}_${difficulty}_${YYYY-MM-DD}` for English, `${type}_${difficulty}_${lang}_${YYYY-MM-DD}` for
+// another language, so languages never share an entry. Only English pools are filled today (the puzzles table has no
+// language); a request for another language falls back to the English entry and says so (see resolveLocalized).
 // ---------------------------------------------------------------------------
 
 const cache = new Map();
@@ -100,8 +103,33 @@ function todayUTC() {
   return new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 }
 
-function cacheKey(type, difficulty, date) {
-  return `${type}_${difficulty}_${date}`;
+function cacheKey(type, difficulty, date, lang = DEFAULT_LANGUAGE) {
+  return `${type}_${difficulty}${langCacheSuffix(lang)}_${date}`;
+}
+
+/**
+ * Cache entry for the requested language, else the English one. Returns { key, cached, contentLanguage } so callers can
+ * tell the client which language the text really is in (never silently label English text as another language).
+ */
+function resolveLocalized(type, difficulty, date, lang) {
+  if (lang && lang !== DEFAULT_LANGUAGE) {
+    const key = cacheKey(type, difficulty, date, lang);
+    const cached = cache.get(key);
+    if (cached && cached.puzzles.length > 0) return { key, cached, contentLanguage: lang };
+  }
+  const key = cacheKey(type, difficulty, date);
+  return { key, cached: cache.get(key), contentLanguage: DEFAULT_LANGUAGE };
+}
+
+/** Test hook / future per-language pool loader: store a localized pool next to the English one. */
+export function setLocalizedPool(type, difficulty, lang, puzzles, date = todayUTC()) {
+  cache.set(cacheKey(type.toLowerCase(), (difficulty || 'easy').toLowerCase(), date, lang), { puzzles, generatedAt: new Date() });
+}
+
+/** Test hook: drop everything (module state). */
+export function _resetDailyCacheForTests() {
+  cache.clear();
+  serveIndex.clear();
 }
 
 function getCountForType(type) {
@@ -297,18 +325,19 @@ export async function refreshDailyPuzzles() {
  * @param {string}   [date]  - YYYY-MM-DD, defaults to today UTC
  * @returns {{ date: string, puzzles: Record<string, Array> }}
  */
-export function getDailyPuzzles(types, difficulty, date) {
+export function getDailyPuzzles(types, difficulty, date, lang = DEFAULT_LANGUAGE) {
   const d = date || todayUTC();
   const normalizedDiff = difficulty ? difficulty.toLowerCase() : 'easy';
   const result = {};
+  const contentLanguage = {};
 
   for (const type of types) {
-    const key = cacheKey(type.toLowerCase(), normalizedDiff, d);
-    const cached = cache.get(key);
+    const { cached, contentLanguage: cl } = resolveLocalized(type.toLowerCase(), normalizedDiff, d, lang);
     result[type] = cached ? cached.puzzles : [];
+    contentLanguage[type] = cl;
   }
 
-  return { date: d, puzzles: result };
+  return { date: d, language: lang || DEFAULT_LANGUAGE, puzzles: result, contentLanguage };
 }
 
 /**
@@ -319,11 +348,10 @@ export function getDailyPuzzles(types, difficulty, date) {
  * @param {string} difficulty
  * @returns {object|null} Formatted puzzle or null if none available
  */
-export function getNextDailyPuzzle(type, difficulty) {
+export function getNextDailyPuzzle(type, difficulty, lang = DEFAULT_LANGUAGE) {
   const d = todayUTC();
   const normalizedDiff = difficulty ? difficulty.toLowerCase() : 'easy';
-  const key = cacheKey(type.toLowerCase(), normalizedDiff, d);
-  const cached = cache.get(key);
+  const { key, cached } = resolveLocalized(type.toLowerCase(), normalizedDiff, d, lang);
 
   if (!cached || cached.puzzles.length === 0) {
     return null;
@@ -342,10 +370,14 @@ export function getNextDailyPuzzle(type, difficulty) {
 /**
  * Check whether the cache has puzzles for a given type+difficulty today.
  */
-export function hasDailyPuzzles(type, difficulty) {
-  const key = cacheKey(type.toLowerCase(), (difficulty || 'easy').toLowerCase(), todayUTC());
-  const cached = cache.get(key);
-  return cached && cached.puzzles.length > 0;
+export function hasDailyPuzzles(type, difficulty, lang = DEFAULT_LANGUAGE) {
+  const { cached } = resolveLocalized(type.toLowerCase(), (difficulty || 'easy').toLowerCase(), todayUTC(), lang);
+  return !!(cached && cached.puzzles.length > 0);
+}
+
+/** Language the next daily puzzle of this type is really in ('en' when only the English pool exists). */
+export function dailyContentLanguage(type, difficulty, lang = DEFAULT_LANGUAGE) {
+  return resolveLocalized(type.toLowerCase(), (difficulty || 'easy').toLowerCase(), todayUTC(), lang).contentLanguage;
 }
 
 /**
@@ -363,6 +395,7 @@ export function getDailyCacheStats() {
   for (const [key, value] of cache) {
     if (key.endsWith(`_${date}`)) {
       stats.todayEntries++;
+      if (/_(?:easy|medium|hard)_[a-z]{2}_\d{4}-\d{2}-\d{2}$/.test(key)) continue; // localized pool: counted above, not per type
       const parts = key.replace(`_${date}`, '').split('_');
       const type = parts.slice(0, -1).join('_');
       const diff = parts[parts.length - 1];

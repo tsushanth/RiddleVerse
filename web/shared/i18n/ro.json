@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Traseu",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Nu-ți întrerupe seria!",
+    "streak_risk_body": "Seria ta de {days} zile este în pericol. Joacă astăzi ca s-o păstrezi!",
+    "comeback_title": "Gata de revenire?",
+    "comeback_record": "Cea mai bună serie a ta a fost de {days} zile. E timpul să bați recordul!",
+    "comeback_new": "Fiecare expert a fost cândva începător. Începe o serie nouă astăzi!",
+    "celebrate_title": "Serie de {days} zile!",
+    "celebrate_body": "Minunat! {days} zile la rând de rezolvat enigme.",
+    "puzzles_ready_title": "Enigmele personalizate sunt gata!",
+    "puzzles_ready_body": "Setul tău „{topic}” este gata de joc! Au fost generate {count} enigme."
   }
 }

@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Pad",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Verbreek je reeks niet!",
+    "streak_risk_body": "Je reeks van {days} dagen staat op het spel. Speel vandaag om hem te behouden!",
+    "comeback_title": "Klaar voor een comeback?",
+    "comeback_record": "Je beste reeks was {days} dagen. Tijd om dat record te verbreken!",
+    "comeback_new": "Elke expert was ooit beginner. Start vandaag een nieuwe reeks!",
+    "celebrate_title": "Reeks van {days} dagen!",
+    "celebrate_body": "Geweldig! {days} dagen achter elkaar puzzels opgelost.",
+    "puzzles_ready_title": "Eigen puzzels staan klaar!",
+    "puzzles_ready_body": "Je puzzelset \"{topic}\" is klaar om te spelen! {count} puzzels gemaakt."
   }
 }

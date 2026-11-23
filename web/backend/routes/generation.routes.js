@@ -10,9 +10,9 @@ const generateRiddleGuard = createGenerateRiddleGuard();
 /**
  * Helper function to generate puzzles with notification
  */
-async function generateCustomPuzzlesWithNotification(topic, format, numPuzzles, userId, puzzleId) {
+async function generateCustomPuzzlesWithNotification(topic, format, numPuzzles, userId, puzzleId, lang = 'en') {
     try {
-        const result = await generateCustomPuzzles(topic, format, numPuzzles, userId, puzzleId, false);
+        const result = await generateCustomPuzzles(topic, format, numPuzzles, userId, puzzleId, false, lang);
 
         if (result && result.puzzleId) {
             await regenerationService.sendCompletionNotification(userId, topic, numPuzzles);
@@ -63,7 +63,7 @@ router.post('/generate-riddle', generateRiddleGuard, async (req, res) => {
         const puzzleId = `riddle-${Date.now()}`;
 
         // Fire off puzzle generation with notification (async)
-        generateCustomPuzzlesWithNotification(topic, format, numPuzzles, userId, puzzleId)
+        generateCustomPuzzlesWithNotification(topic, format, numPuzzles, userId, puzzleId, req.contentLang)
             .catch(() => { /* already logged inside; a rejection here must not become an unhandledRejection */ });
 
         return res.json({

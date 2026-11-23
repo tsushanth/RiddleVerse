@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Szlak",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Nie przerywaj serii!",
+    "streak_risk_body": "Twoja seria {days} dni jest zagrożona. Zagraj dziś, aby ją utrzymać!",
+    "comeback_title": "Gotowy na powrót?",
+    "comeback_record": "Twoja najlepsza seria trwała {days} dni. Czas pobić ten rekord!",
+    "comeback_new": "Każdy ekspert był kiedyś początkujący. Zacznij nową serię już dziś!",
+    "celebrate_title": "Seria {days} dni!",
+    "celebrate_body": "Świetnie! {days} dni rozwiązywania zagadek z rzędu.",
+    "puzzles_ready_title": "Własne zagadki gotowe!",
+    "puzzles_ready_body": "Twój zestaw „{topic}” jest gotowy do gry! Wygenerowano zagadek: {count}."
   }
 }

@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Ösvény",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Ne szakítsd meg a sorozatodat!",
+    "streak_risk_body": "A {days} napos sorozatod veszélyben van. Játssz ma, hogy megtartsd!",
+    "comeback_title": "Készen állsz a visszatérésre?",
+    "comeback_record": "A legjobb sorozatod {days} nap volt. Ideje megdönteni ezt a rekordot!",
+    "comeback_new": "Minden szakértő volt egyszer kezdő. Kezdj ma új sorozatot!",
+    "celebrate_title": "{days} napos sorozat!",
+    "celebrate_body": "Fantasztikus! {days} napja megszakítás nélkül fejted a rejtvényeket.",
+    "puzzles_ready_title": "Az egyéni rejtvények elkészültek!",
+    "puzzles_ready_body": "A(z) „{topic}” rejtvénykészleted készen áll a játékra! {count} rejtvény készült."
   }
 }

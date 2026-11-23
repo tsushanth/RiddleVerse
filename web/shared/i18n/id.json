@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Jejak",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Jangan putuskan rentetan Anda!",
+    "streak_risk_body": "Rentetan {days} hari Anda terancam. Main hari ini untuk mempertahankannya!",
+    "comeback_title": "Siap untuk kembali?",
+    "comeback_record": "Rentetan terbaik Anda adalah {days} hari. Saatnya memecahkan rekor itu!",
+    "comeback_new": "Setiap ahli pernah menjadi pemula. Mulai rentetan baru hari ini!",
+    "celebrate_title": "Rentetan {days} hari!",
+    "celebrate_body": "Luar biasa! {days} hari berturut-turut memecahkan teka-teki.",
+    "puzzles_ready_title": "Teka-teki kustom sudah siap!",
+    "puzzles_ready_body": "Set teka-teki \"{topic}\" Anda siap dimainkan! {count} teka-teki dibuat."
   }
 }

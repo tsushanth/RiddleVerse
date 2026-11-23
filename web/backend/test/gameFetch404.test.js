@@ -42,14 +42,14 @@ test('GET /:gameId -> 404 when no row matches (PGRST116)', async () => {
     reply = { status: 406, body: { code: 'PGRST116', details: 'The result contains 0 rows', message: 'Cannot coerce the result to a single JSON object' } };
     const r = await get('00000000-0000-0000-0000-000000000000');
     assert.equal(r.status, 404);
-    assert.deepEqual(r.body, { error: 'Game not found' });
+    assert.deepEqual(r.body, { error: 'Game not found', code: 'game_not_found' });
 });
 
 test('GET /:gameId -> 404 for a malformed uuid (22P02)', async () => {
     reply = { status: 400, body: { code: '22P02', message: 'invalid input syntax for type uuid: "nope"' } };
     const r = await get('nope');
     assert.equal(r.status, 404);
-    assert.deepEqual(r.body, { error: 'Game not found' });
+    assert.deepEqual(r.body, { error: 'Game not found', code: 'game_not_found' });
 });
 
 test('GET /:gameId -> other database errors stay 500', async () => {
@@ -59,6 +59,6 @@ test('GET /:gameId -> other database errors stay 500', async () => {
         reply = { status: 500, body: { code: 'XX000', message: 'internal error' } };
         const r = await get('00000000-0000-0000-0000-000000000000');
         assert.equal(r.status, 500);
-        assert.deepEqual(r.body, { error: 'Failed to fetch game' });
+        assert.deepEqual(r.body, { error: 'Failed to fetch game', code: 'fetch_failed' });
     } finally { console.error = orig; }
 });

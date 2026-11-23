@@ -17,6 +17,7 @@ import { supabase } from '../config/database.js';
 import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware/notificationAuth.js';
 import { verifiedCaller } from '../middleware/callerIdentity.js';
 import { fcmTokenRegisterLimiter } from '../config/middleware.js';
+import { matchLanguage } from '../utils/contentLanguage.js';
 
 const router = express.Router();
 
@@ -494,7 +495,10 @@ export async function registerFcmTokenHandler(req, res) {
             }
         }
 
-        const result = await storeFCMToken(userEmail, userId, fcmToken, platform);
+        // The app language the device registered with (body.language; unsupported -> 'en'), so push text can be localized.
+        // Apps that send none leave a stored language untouched.
+        const language = req.body?.language ? (matchLanguage(req.body.language) || 'en') : null;
+        const result = await storeFCMToken(userEmail, userId, fcmToken, platform, language);
         
         if (result.success) {
             res.json({

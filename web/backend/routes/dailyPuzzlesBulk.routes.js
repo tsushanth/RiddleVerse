@@ -57,7 +57,7 @@ router.get('/daily', async (req, res) => {
     const diff = difficulty || 'easy';
 
     // Check if cache has data for these types
-    let result = getDailyPuzzles(typeList, diff, date || undefined);
+    let result = getDailyPuzzles(typeList, diff, date || undefined, req.contentLang);
     const hasData = Object.values(result.puzzles).some(arr => arr.length > 0);
 
     if (!hasData) {
@@ -69,7 +69,7 @@ router.get('/daily', async (req, res) => {
           .finally(() => { refreshPromise = null; });
       }
       await refreshPromise;
-      result = getDailyPuzzles(typeList, diff, date || undefined);
+      result = getDailyPuzzles(typeList, diff, date || undefined, req.contentLang);
     }
 
     return res.json({

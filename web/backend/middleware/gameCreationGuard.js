@@ -110,11 +110,11 @@ export function createGameCreationGuard({ env = process.env, now = Date.now, ver
         let uid = null;
         if (token) {
             try { const id = await verify(token); uid = id && id.uid ? String(id.uid) : null; } catch { uid = null; }
-            if (!uid) return reject(401, 'Invalid or expired credentials.');
+            if (!uid) return reject(401, 'Invalid or expired credentials.', { code: 'auth_required' });
             const bodyUser = req.body && typeof req.body === 'object' ? req.body.userId : undefined;
-            if (typeof bodyUser === 'string' && bodyUser && bodyUser !== uid) return reject(403, 'Credentials do not match userId.');
+            if (typeof bodyUser === 'string' && bodyUser && bodyUser !== uid) return reject(403, 'Credentials do not match userId.', { code: 'auth_required' });
         } else if (cfg.requireAuth && kind) {
-            return reject(401, 'Authentication required.');
+            return reject(401, 'Authentication required.', { code: 'auth_required' });
         }
 
         if (!kind) return next(); // reads and unknown routes: nothing to meter here
@@ -122,7 +122,7 @@ export function createGameCreationGuard({ env = process.env, now = Date.now, ver
         const metered = (Number(cfg.costs[kind]) || 0) > 0;
 
         const body = req.body && typeof req.body === 'object' ? req.body : {};
-        if (body.userId !== undefined && (typeof body.userId !== 'string' || body.userId.length > 128)) return reject(400, 'Invalid userId.');
+        if (body.userId !== undefined && (typeof body.userId !== 'string' || body.userId.length > 128)) return reject(400, 'Invalid userId.', { code: 'missing_fields' });
         const installId = typeof req.headers?.['x-install-id'] === 'string' ? req.headers['x-install-id'].slice(0, 64) : '';
         const key = uid ? `uid:${uid}` : installId ? `install:${installId}` : body.userId ? `body:${String(body.userId).toLowerCase()}` : null;
         const ip = clientIp(req);
@@ -134,18 +134,18 @@ export function createGameCreationGuard({ env = process.env, now = Date.now, ver
         if (cost > 0 && spentUsd + cost > cfg.dailyBudgetUsd) {
             log(`[GameGuard] daily budget reached (${spentUsd.toFixed(2)} of ${cfg.dailyBudgetUsd} USD estimated) kind=${kind}`);
             const secs = Math.max(1, Math.ceil((Date.parse(`${day}T00:00:00Z`) + 24 * HOUR_MS - now()) / 1000));
-            return reject(429, 'Game creation is very busy today. Please try again tomorrow.', {}, { 'Retry-After': String(secs) });
+            return reject(429, 'Game creation is very busy today. Please try again tomorrow.', { code: 'creation_busy' }, { 'Retry-After': String(secs) });
         }
         const ipWait = metered ? ipCounter.retryAfter(ip, cfg.ipPerHour) : 0;
         if (ipWait) {
             log(`[GameGuard] ip limit kind=${kind}`);
-            return reject(429, 'Too many requests from your network. Please try again later.', {}, { 'Retry-After': String(ipWait) });
+            return reject(429, 'Too many requests from your network. Please try again later.', { code: 'rate_limited' }, { 'Retry-After': String(ipWait) });
         }
         if (key && metered) {
             const keyWait = keyCounter.retryAfter(key, cfg.keyPerHour);
             if (keyWait) {
                 log(`[GameGuard] key limit kind=${kind} keyType=${key.split(':')[0]}`);
-                return reject(429, 'You have made several requests recently. Please try again in a while.', {}, { 'Retry-After': String(keyWait) });
+                return reject(429, 'You have made several requests recently. Please try again in a while.', { code: 'rate_limited' }, { 'Retry-After': String(keyWait) });
             }
         }
 
@@ -170,7 +170,7 @@ export function createWriteRateLimit({ env = process.env, now = Date.now, log = 
         if (wait) {
             log('[WriteLimit] ip over limit');
             res.setHeader('Retry-After', String(wait));
-            return res.status(429).json({ error: 'Too many requests. Please slow down.' });
+            return res.status(429).json({ error: 'Too many requests. Please slow down.', code: 'rate_limited' });
         }
         counter.record(ip);
         return next();

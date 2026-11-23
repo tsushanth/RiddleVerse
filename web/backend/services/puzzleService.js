@@ -23,6 +23,8 @@ import { enhancedWordSnakeGenerator } from './snakeWordSearch.js';
 import { ProgressivePuzzleSystem } from './progressivePuzzleSystem.js';
 import { notificationService } from './notificationService.js';
 import { maskEmail } from './puzzleLeaderboard.js';
+import { DEFAULT_LANGUAGE, languageDirective } from '../utils/contentLanguage.js';
+import { pushLanguage, localizedPuzzlesReadyPush } from './pushText.js';
 
 
 
@@ -1531,11 +1533,20 @@ async function sendCustomPuzzleCompletionNotification(userEmail, topic, format, 
         // Step 2: Get user's FCM tokens with detailed logging
         console.log(`🔍 Fetching FCM tokens for user: ${userEmail}`);
         
-        const { data: tokens, error: tokenError } = await supabase
+        let { data: tokens, error: tokenError } = await supabase
             .from('user_notification_tokens')
-            .select('fcm_token, platform, is_active, created_at')
+            .select('fcm_token, platform, is_active, created_at, language')
             .eq('user_email', userEmail)
             .eq('is_active', true);
+
+        if (tokenError && /language/i.test(tokenError.message || '')) {
+            // migrations/user_notification_tokens_language.sql not applied yet: every device is English.
+            ({ data: tokens, error: tokenError } = await supabase
+                .from('user_notification_tokens')
+                .select('fcm_token, platform, is_active, created_at')
+                .eq('user_email', userEmail)
+                .eq('is_active', true));
+        }
 
         if (tokenError) {
             console.error(`❌ Database error fetching tokens:`, tokenError);
@@ -1620,7 +1631,25 @@ async function sendCustomPuzzleCompletionNotification(userEmail, topic, format, 
         console.log(`🚀 Sending to ${fcmTokens.length} valid FCM tokens using NotificationService...`);
         
         // 🔥 THIS IS THE KEY FIX - use your existing service
-        const result = await notificationService.sendMulticastNotification(fcmTokens, notificationData);
+        // One send per device language: the success text is localized for devices that registered a non-English
+        // language (the failure text carries a server error string and stays English).
+        const tokensByLang = new Map();
+        for (const t of tokens) {
+            if (!t.fcm_token) continue;
+            const lang = pushLanguage(t.language);
+            if (!tokensByLang.has(lang)) tokensByLang.set(lang, []);
+            tokensByLang.get(lang).push(t.fcm_token);
+        }
+        const result = { success: false, successCount: 0, failureCount: 0, error: undefined };
+        for (const [lang, langTokens] of tokensByLang) {
+            const localized = success ? localizedPuzzlesReadyPush(lang, topic, numPuzzles) : null;
+            const data = localized ? { ...notificationData, title: localized.title, body: localized.body } : notificationData;
+            const r = await notificationService.sendMulticastNotification(langTokens, data);
+            result.success = result.success || !!r.success;
+            result.successCount += r.successCount || 0;
+            result.failureCount += r.failureCount || 0;
+            if (r.error) result.error = r.error;
+        }
         
         console.log(`📊 NotificationService results:`, {
             success: result.success,
@@ -4033,7 +4062,8 @@ export async function deletePuzzleLeaderboardEntry(puzzleId, userId) {
 }
 
 
-async function createPuzzles(topic, batchSize, format) {
+export function buildRiddlePrompt(topic, batchSize, format, lang = DEFAULT_LANGUAGE) {
+    const langLine = languageDirective(lang, 'riddle text (question, answer, options and hint)');
     const prompt = `
 You are a riddle generator API. Given a topic and format, generate ${batchSize} unique riddles.
 
@@ -4056,7 +4086,12 @@ For difficulty, assign one of: "Easy", "Medium", "Hard", "Expert" based on the c
 
 Topic: "${topic}"
 Format: "${format}"
-Respond ONLY with valid JSON.`.trim();
+${langLine ? langLine + '\n' : ''}Respond ONLY with valid JSON.`.trim();
+    return prompt;
+}
+
+async function createPuzzles(topic, batchSize, format, lang = DEFAULT_LANGUAGE) {
+    const prompt = buildRiddlePrompt(topic, batchSize, format, lang);
 
     try {
         const riddleData = await retryWithBackoff(() => callAI(prompt, null, 2, {
@@ -4099,7 +4134,7 @@ async function retryWithBackoff(fn, retries = 5, delay = 500) {
     }
 }
 
-export async function generateCustomPuzzles(topic, format, numPuzzles, userId, puzzleId, skipLLMValidation = false) {
+export async function generateCustomPuzzles(topic, format, numPuzzles, userId, puzzleId, skipLLMValidation = false, lang = DEFAULT_LANGUAGE) {
     topic = toCamelCase(topic);
     console.log(`🚀 Starting generateCustomPuzzles for topic="${topic}", format="${format}", numPuzzles=${numPuzzles}, userId=${userId}, puzzleId=${puzzleId}, skipLLMValidation=${skipLLMValidation}`);
 
@@ -4135,6 +4170,7 @@ export async function generateCustomPuzzles(topic, format, numPuzzles, userId, p
         
         Topic: "${topic}"
         Format: "${format}"
+        Keep "correctedTopic" in the same language as the topic above (do not translate it).
         
         Respond ONLY with valid JSON:
         - If safe and appropriate: { "valid": true, "correctedTopic": "corrected version or original if no correction needed" }
@@ -4279,7 +4315,7 @@ export async function generateCustomPuzzles(topic, format, numPuzzles, userId, p
 
             console.log(`🧩 Requesting ${batchSize} new puzzles (remaining: ${remaining})...`);
 
-            let newPuzzles = await createPuzzles(topic, batchSize, format);
+            let newPuzzles = await createPuzzles(topic, batchSize, format, lang);
 
             if (newPuzzles.error) {
                 console.warn(`❌ Puzzle generation failed: ${newPuzzles.error}`);
