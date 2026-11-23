@@ -83,19 +83,27 @@ object AppStartup {
         tikTok = OnceInit("TikTok") { TikTokHelper.initialize(application) }
 
         executor.execute {
+            // The first screen reads this on the main thread (MainActivity.navigateToDefaultScreen).
+            safely("prefs guest_state") { application.getSharedPreferences("guest_state", 0).all }
             // Main will touch FirebaseAuth in the first screen (signed-in check): build it here, in parallel with the
             // activity start, instead of on the main thread.
             safely("FirebaseAuth warm-up") { com.google.firebase.auth.FirebaseAuth.getInstance() }
             ratingKit.ensure()
             experimentManager.ensure()
-            // First-screen SharedPreferences files: load them here so the main-thread reads that follow are in memory.
+            // Home's SharedPreferences files and the puzzle queue (a JSON parse in its constructor): load them here so the
+            // main-thread reads during the first Home composition find them in memory (StrictMode showed 170-190 ms each).
             for (name in WARM_PREFS) safely("prefs $name") { application.getSharedPreferences(name, 0).all }
+            safely("PuzzleQueueManager") { PuzzleQueueManager.getInstance(application) }
             tikTok.ensure()
         }
     }
 
     /** SharedPreferences that the first screens read on the main thread (found with StrictMode in debug builds). */
-    private val WARM_PREFS = listOf("retention_v1", "daily_reminder_v1", "funnel_state", "puzzle_events")
+    private val WARM_PREFS = listOf(
+        "retention_v1", "daily_reminder_v1", "funnel_state", "puzzle_events",
+        "app_prefs", "tutorial_prefs", "web_promo_banner", "puzzle_group_completion", "recent_puzzles",
+        "daily_streak_data", "daily_puzzle_v1",
+    )
 
     fun ensureExperimentManager(): Boolean = experimentManager.ensure()
     fun ensureRatingKit(): Boolean = ratingKit.ensure()
