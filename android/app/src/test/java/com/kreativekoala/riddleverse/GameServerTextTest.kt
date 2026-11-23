@@ -98,16 +98,24 @@ class GameServerTextTest {
             }
             .build()
         Locale.setDefault(Locale.forLanguageTag("de-AT"))
-        client.newCall(Request.Builder().url("https://example.test/x").build()).execute().close()
+        client.newCall(Request.Builder().url("https://puzzleverseai.com/x").build()).execute().close()
         assertEquals("de", seen[0].header("Accept-Language"))
         assertEquals("de", seen[0].header(ContentLanguage.HEADER))
 
         Locale.setDefault(Locale("in", "ID"))
-        client.newCall(Request.Builder().url("https://example.test/x").build()).execute().close()
+        client.newCall(Request.Builder().url("https://puzzleverseai.com/x").build()).execute().close()
         assertEquals("id", seen[1].header(ContentLanguage.HEADER))
 
-        client.newCall(Request.Builder().url("https://example.test/x").header("Accept-Language", "fr").build()).execute().close()
+        client.newCall(Request.Builder().url("https://puzzleverseai.com/x").header("Accept-Language", "fr").build()).execute().close()
         assertEquals("fr", seen[2].header("Accept-Language"))
         assertNotNull(seen[2].header(ContentLanguage.HEADER))
+
+        // Third-party hosts (and look-alikes) get no language headers at all.
+        for (other in listOf("https://picsum.photos/x", "https://evilpuzzleverseai.com/x", "https://puzzleverseai.com.evil.test/x")) {
+            client.newCall(Request.Builder().url(other).build()).execute().close()
+            val sent = seen.last()
+            assertEquals(other, null, sent.header(ContentLanguage.HEADER))
+            assertEquals(other, null, sent.header("Accept-Language"))
+        }
     }
 }

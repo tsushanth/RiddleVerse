@@ -128,3 +128,17 @@ test('wiring: the language reaches generate-riddle, fetch-next-puzzle, the daily
     assert.match(gc, /buildGamePrompt\(prompt, req\.contentLang\)/);
     assert.match(gc, /buildGamePrompt\(remixDescription, req\.contentLang\)/);
 });
+
+test('inherited Object.prototype names in a header never resolve to a language (no prototype lookups)', () => {
+    for (const t of ['constructor', '__proto__', 'toString', 'hasOwnProperty', 'valueOf', 'CONSTRUCTOR']) {
+        assert.equal(matchLanguage(t), null, t);
+        const lang = resolveRequestLanguage({ headers: { 'x-app-language': t, 'accept-language': t }, query: { lang: t } });
+        assert.equal(lang, 'en', t);
+        assert.equal(langCacheSuffix(t), '', t);
+        assert.equal(languageDirective(t), '', t);
+    }
+    assert.equal(fromAcceptLanguage('constructor, __proto__;q=0.9, es;q=0.5'), 'es');
+    // odd shapes: arrays / objects / huge values never throw
+    assert.equal(resolveRequestLanguage({ headers: { 'x-app-language': ['de'] }, query: { lang: { a: 1 } } }), 'en');
+    assert.equal(resolveRequestLanguage({ headers: { 'accept-language': 'x'.repeat(100000) } }), 'en');
+});

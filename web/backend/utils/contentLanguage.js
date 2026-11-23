@@ -12,22 +12,23 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 export const DEFAULT_LANGUAGE = 'en';
 
 // Code -> English name of the language, used inside LLM prompts ("Write ... in German").
-export const LANGUAGE_NAMES = Object.freeze({
+// Null-prototype on purpose: a header value like 'constructor' or '__proto__' must never resolve to an inherited member.
+export const LANGUAGE_NAMES = Object.freeze(Object.assign(Object.create(null), {
     en: 'English', ar: 'Arabic', bn: 'Bengali', cs: 'Czech', de: 'German', el: 'Greek', es: 'Spanish', fa: 'Persian',
     fi: 'Finnish', fr: 'French', hi: 'Hindi', hu: 'Hungarian', id: 'Indonesian', it: 'Italian', ja: 'Japanese',
     ko: 'Korean', ms: 'Malay', nl: 'Dutch', pl: 'Polish', pt: 'Brazilian Portuguese', ro: 'Romanian', ru: 'Russian',
     sv: 'Swedish', th: 'Thai', tl: 'Filipino (Tagalog)', tr: 'Turkish', uk: 'Ukrainian', ur: 'Urdu', vi: 'Vietnamese',
     zh: 'Simplified Chinese',
-});
+}));
 
 export const SUPPORTED_LANGUAGES = Object.freeze(Object.keys(LANGUAGE_NAMES));
 
 // Android / legacy codes that differ from the codes of web/shared/i18n.
-const ALIASES = Object.freeze({
+const ALIASES = Object.freeze(Object.assign(Object.create(null), {
     in: 'id', fil: 'tl', 'pt-br': 'pt', 'pt-pt': 'pt', 'zh-cn': 'zh', 'zh-hans': 'zh', 'zh-sg': 'zh',
     // Traditional Chinese is not a shipped locale: do not pretend it is Simplified.
     nb: null, no: null,
-});
+}));
 
 /** Best supported language for one tag ('de', 'de-AT', 'pt_BR', 'in'). Returns null when unsupported. */
 export function matchLanguage(tag) {

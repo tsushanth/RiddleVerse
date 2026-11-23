@@ -35,9 +35,16 @@ object ContentLanguage {
     /** The current app language (the per-app locale on Android 13+, else the device locale). */
     fun current(): String = codeFor(Locale.getDefault().language)
 
-    /** Adds Accept-Language and x-app-language to every request that does not set them itself. */
+    /** Our own API host (and its subdomains): the only place the language headers are sent. */
+    internal fun isOwnHost(host: String): Boolean = host == "puzzleverseai.com" || host.endsWith(".puzzleverseai.com")
+
+    /**
+     * Adds Accept-Language and x-app-language to requests to our own backend that do not set them itself. Third-party
+     * requests (media, signed URLs, analytics) are passed through untouched.
+     */
     val interceptor: Interceptor = Interceptor { chain ->
         val request = chain.request()
+        if (!isOwnHost(request.url.host)) return@Interceptor chain.proceed(request)
         val code = current()
         val builder = request.newBuilder()
         if (request.header("Accept-Language") == null) builder.header("Accept-Language", code)
