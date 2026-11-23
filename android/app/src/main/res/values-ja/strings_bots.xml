@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Telegramで友達と遊ぼう</string>
+    <string name="tg_result_body">チャットに挑戦して、ライブのリーダーボードでスコアを比べましょう。友達は何もインストールする必要がありません。</string>
+    <string name="tg_result_cta">ボットを開く</string>
+    <string name="tg_daily_title">Telegramでデイリーパズルを受け取る</string>
+    <string name="tg_daily_body">ボットが今日のパズルを投稿し、毎日リマインドもできます。</string>
+    <string name="tg_daily_cta">設定する</string>
+    <string name="tg_settings_title">Telegramボット</string>
+    <string name="tg_settings_subtitle">友達と対戦、デイリーパズル、グループのリーダーボード</string>
+    <string name="tg_connect_title">Telegramを連携</string>
+    <string name="tg_connect_subtitle">アプリとボットで1つのアカウントを使う</string>
+    <string name="tg_link_confirm_title">Telegramを連携しますか?</string>
+    <string name="tg_link_confirm_body">このリンクを送信したTelegramアカウントをRiddleVerseアカウントと連携しますか?</string>
+    <string name="tg_link_confirm_yes">連携する</string>
+    <string name="tg_link_confirm_no">キャンセル</string>
+    <string name="tg_link_success">Telegramを連携しました</string>
+    <string name="tg_link_failed">このリンクは期限切れか、すでに使用されています。ボットに/linkを送信して新しいリンクを取得してください。</string>
+    <string name="share_play_link_message">RiddleVerseで%1$sを遊んで、私のスコアを超えよう: %2$s</string>
+</resources>

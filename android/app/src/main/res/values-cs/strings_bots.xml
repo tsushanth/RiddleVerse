@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Hrajte s přáteli v Telegramu</string>
+    <string name="tg_result_body">Vyzvěte chat a porovnejte skóre v živém žebříčku. Vaši přátelé nemusejí nic instalovat.</string>
+    <string name="tg_result_cta">Otevřít bota</string>
+    <string name="tg_daily_title">Získejte denní hádanku v Telegramu</string>
+    <string name="tg_daily_body">Bot zveřejní dnešní hádanku a může vám ji každý den připomenout.</string>
+    <string name="tg_daily_cta">Nastavit</string>
+    <string name="tg_settings_title">Telegram bot</string>
+    <string name="tg_settings_subtitle">Hra s přáteli, denní hádanka, skupinové žebříčky</string>
+    <string name="tg_connect_title">Propojit Telegram</string>
+    <string name="tg_connect_subtitle">Jeden účet v aplikaci i v botovi</string>
+    <string name="tg_link_confirm_title">Propojit Telegram?</string>
+    <string name="tg_link_confirm_body">Chcete propojit účet Telegram, který vám poslal tento odkaz, se svým účtem RiddleVerse?</string>
+    <string name="tg_link_confirm_yes">Propojit</string>
+    <string name="tg_link_confirm_no">Zrušit</string>
+    <string name="tg_link_success">Telegram propojen</string>
+    <string name="tg_link_failed">Tento odkaz vypršel nebo už byl použit. Pošlete botovi /link pro nový.</string>
+    <string name="share_play_link_message">Zahrajte si %1$s v RiddleVerse a překonejte moje skóre: %2$s</string>
+</resources>

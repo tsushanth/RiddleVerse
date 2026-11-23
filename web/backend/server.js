@@ -45,6 +45,7 @@ import notificationConfigRoutes from './routes/notificationConfig.routes.js';
 import generationRoutes from './routes/generation.routes.js';
 import gameCreationRoutes from './routes/gameCreation.routes.js';
 import chatScoresRoutes from './routes/chatScores.routes.js';
+import telegramRoutes from './routes/telegram.routes.js';
 import leaderboardRoutes from './routes/leaderboard.routes.js';
 import coinsRoutes from './routes/coins.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
@@ -72,6 +73,8 @@ import { createGameCreationGuard, createWriteRateLimit } from './middleware/game
 import { registerFcmTokenHandler } from './routes/dailyPuzzles.routes.js';
 import { fcmTokenRegisterLimiter } from './config/middleware.js';
 import { createPlayPagesRouter } from './services/playPages.js';
+import { createPageHitRecorder } from './services/pageHits.js';
+import { createLimiter as createHitLimiter } from './services/puzzleMonitoring.js';
 
 const __dirname = path.resolve();
 
@@ -255,6 +258,7 @@ app.use('/api/dash', puzzleAdminRouter);
 app.use('/api/games', writeRateLimit, gamesRoutes);
 app.use('/api/game-creation', gameCreationGuard, gameCreationRoutes);
 app.use('/api/chat-scores', writeRateLimit, chatScoresRoutes);
+app.use('/', telegramRoutes); // Telegram bot webhook, Mini App score, app link redeem (see routes/telegram.routes.js)
 app.use('/api/coins', coinsRoutes);
 app.use('/api/payouts', payoutRoutes);
 app.use('/api/leaderboard', writeRateLimit, leaderboardRoutes);
@@ -305,7 +309,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
 
 // Public no-login play pages: /play, /play/<puzzle-type>, robots.txt, sitemap.xml (per-route meta injected into index.html).
 // Anything it does not own falls through to the custom-game /play/:gameId routes and the SPA.
-app.use(createPlayPagesRouter());
+app.use(createPlayPagesRouter({ onHit: createPageHitRecorder({ getClient: () => supabase, limiter: createHitLimiter() }) }));
 
 // Static files
 app.use(express.static(path.join(__dirname, "public")));

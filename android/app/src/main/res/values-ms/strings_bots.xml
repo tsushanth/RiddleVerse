@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Main bersama rakan di Telegram</string>
+    <string name="tg_result_body">Cabar sebuah sembang dan bandingkan markah pada papan pendahulu langsung. Rakan anda tidak perlu memasang apa-apa.</string>
+    <string name="tg_result_cta">Buka bot</string>
+    <string name="tg_daily_title">Dapatkan teka-teki harian di Telegram</string>
+    <string name="tg_daily_body">Bot menyiarkan teka-teki hari ini dan boleh mengingatkan anda setiap hari.</string>
+    <string name="tg_daily_cta">Sediakan</string>
+    <string name="tg_settings_title">Bot Telegram</string>
+    <string name="tg_settings_subtitle">Main bersama rakan, teka-teki harian, papan pendahulu kumpulan</string>
+    <string name="tg_connect_title">Sambung Telegram</string>
+    <string name="tg_connect_subtitle">Guna satu akaun dalam apl dan bot</string>
+    <string name="tg_link_confirm_title">Sambung Telegram?</string>
+    <string name="tg_link_confirm_body">Sambungkan akaun Telegram yang menghantar pautan ini kepada anda ke akaun RiddleVerse anda?</string>
+    <string name="tg_link_confirm_yes">Sambung</string>
+    <string name="tg_link_confirm_no">Batal</string>
+    <string name="tg_link_success">Telegram disambung</string>
+    <string name="tg_link_failed">Pautan ini telah tamat tempoh atau sudah digunakan. Hantar /link kepada bot untuk mendapatkan yang baharu.</string>
+    <string name="share_play_link_message">Main %1$s di RiddleVerse dan kalahkan markah saya: %2$s</string>
+</resources>

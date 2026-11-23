@@ -1,10 +1,12 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import PlayShell, { PlayStoreButton } from '../components/play/PlayShell'
+import PlayShell, { PlayStoreButton, TelegramButton } from '../components/play/PlayShell'
+import usePlayLang from '../hooks/usePlayLang'
 import { PLAY_CATEGORIES, PLAY_GAMES, PLAY_INDEX_TITLE, playIndexDescription } from '../utils/playCatalog'
 import { applyPageMeta } from '../utils/pageMeta'
 
 export default function PlayIndexPage() {
+  const { t } = usePlayLang()
   useEffect(() => {
     applyPageMeta({ title: PLAY_INDEX_TITLE, description: playIndexDescription(), path: '/play' })
   }, [])
@@ -43,7 +45,11 @@ export default function PlayIndexPage() {
 
       <section className="glass rounded-2xl p-5 text-center space-y-3">
         <p className="font-semibold">Want these on your phone?</p>
-        <PlayStoreButton campaign="index" />
+        <div className="flex flex-wrap justify-center gap-3">
+          <PlayStoreButton campaign="index" />
+          <TelegramButton campaign="index" />
+        </div>
+        <p className="text-sm text-white/80">{t('telegram_blurb')}</p>
       </section>
     </PlayShell>
   )

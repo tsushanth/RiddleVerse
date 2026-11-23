@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Παίξτε με φίλους στο Telegram</string>
+    <string name="tg_result_body">Προκαλέστε μια συνομιλία και συγκρίνετε σκορ σε ζωντανή βαθμολογία. Οι φίλοι σας δεν χρειάζεται να εγκαταστήσουν τίποτα.</string>
+    <string name="tg_result_cta">Άνοιγμα του bot</string>
+    <string name="tg_daily_title">Λάβετε το ημερήσιο παζλ στο Telegram</string>
+    <string name="tg_daily_body">Το bot δημοσιεύει το σημερινό παζλ και μπορεί να σας το υπενθυμίζει κάθε μέρα.</string>
+    <string name="tg_daily_cta">Ρύθμιση</string>
+    <string name="tg_settings_title">Bot Telegram</string>
+    <string name="tg_settings_subtitle">Παιχνίδι με φίλους, ημερήσιο παζλ, ομαδικές βαθμολογίες</string>
+    <string name="tg_connect_title">Σύνδεση Telegram</string>
+    <string name="tg_connect_subtitle">Ένας λογαριασμός στην εφαρμογή και στο bot</string>
+    <string name="tg_link_confirm_title">Σύνδεση Telegram;</string>
+    <string name="tg_link_confirm_body">Να συνδεθεί ο λογαριασμός Telegram που σας έστειλε αυτόν τον σύνδεσμο με τον λογαριασμό σας στο RiddleVerse;</string>
+    <string name="tg_link_confirm_yes">Σύνδεση</string>
+    <string name="tg_link_confirm_no">Άκυρο</string>
+    <string name="tg_link_success">Το Telegram συνδέθηκε</string>
+    <string name="tg_link_failed">Αυτός ο σύνδεσμος έληξε ή έχει ήδη χρησιμοποιηθεί. Στείλτε /link στο bot για νέο.</string>
+    <string name="share_play_link_message">Παίξτε %1$s στο RiddleVerse και ξεπεράστε το σκορ μου: %2$s</string>
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Játssz barátokkal Telegramon</string>
+    <string name="tg_result_body">Hívj ki egy csevegést, és hasonlítsd össze az eredményeket az élő ranglistán. A barátaidnak nem kell semmit telepíteniük.</string>
+    <string name="tg_result_cta">Bot megnyitása</string>
+    <string name="tg_daily_title">Kapd meg a napi fejtörőt Telegramon</string>
+    <string name="tg_daily_body">A bot kiposztolja a mai fejtörőt, és minden nap emlékeztethet is.</string>
+    <string name="tg_daily_cta">Beállítás</string>
+    <string name="tg_settings_title">Telegram bot</string>
+    <string name="tg_settings_subtitle">Játék barátokkal, napi fejtörő, csoportos ranglisták</string>
+    <string name="tg_connect_title">Telegram összekapcsolása</string>
+    <string name="tg_connect_subtitle">Egy fiók az appban és a botban</string>
+    <string name="tg_link_confirm_title">Összekapcsolod a Telegramot?</string>
+    <string name="tg_link_confirm_body">Összekapcsolod a linket küldő Telegram-fiókot a RiddleVerse-fiókoddal?</string>
+    <string name="tg_link_confirm_yes">Összekapcsolás</string>
+    <string name="tg_link_confirm_no">Mégse</string>
+    <string name="tg_link_success">Telegram összekapcsolva</string>
+    <string name="tg_link_failed">Ez a link lejárt vagy már felhasználták. Küldd el a /link parancsot a botnak egy újért.</string>
+    <string name="share_play_link_message">Játssz ezzel: %1$s a RiddleVerse-ben, és döntsd meg az eredményem: %2$s</string>
+</resources>

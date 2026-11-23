@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Gioca con gli amici su Telegram</string>
+    <string name="tg_result_body">Sfida una chat e confronta i punteggi in una classifica in tempo reale. I tuoi amici non devono installare nulla.</string>
+    <string name="tg_result_cta">Apri il bot</string>
+    <string name="tg_daily_title">Ricevi l\'enigma del giorno su Telegram</string>
+    <string name="tg_daily_body">Il bot pubblica l\'enigma di oggi e può ricordartelo ogni giorno.</string>
+    <string name="tg_daily_cta">Configura</string>
+    <string name="tg_settings_title">Bot Telegram</string>
+    <string name="tg_settings_subtitle">Gioca con gli amici, enigma del giorno, classifiche di gruppo</string>
+    <string name="tg_connect_title">Collega Telegram</string>
+    <string name="tg_connect_subtitle">Un solo account nell\'app e nel bot</string>
+    <string name="tg_link_confirm_title">Collegare Telegram?</string>
+    <string name="tg_link_confirm_body">Collegare l\'account Telegram che ti ha inviato questo link al tuo account RiddleVerse?</string>
+    <string name="tg_link_confirm_yes">Collega</string>
+    <string name="tg_link_confirm_no">Annulla</string>
+    <string name="tg_link_success">Telegram collegato</string>
+    <string name="tg_link_failed">Questo link è scaduto o è già stato usato. Invia /link al bot per averne uno nuovo.</string>
+    <string name="share_play_link_message">Gioca a %1$s su RiddleVerse e batti il mio punteggio: %2$s</string>
+</resources>

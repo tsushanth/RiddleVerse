@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Telegram에서 친구와 플레이</string>
+    <string name="tg_result_body">채팅에 도전하고 실시간 리더보드에서 점수를 비교해 보세요. 친구들은 아무것도 설치할 필요가 없어요.</string>
+    <string name="tg_result_cta">봇 열기</string>
+    <string name="tg_daily_title">Telegram에서 오늘의 퍼즐 받기</string>
+    <string name="tg_daily_body">봇이 오늘의 퍼즐을 올려 주고 매일 알림도 보내 줄 수 있어요.</string>
+    <string name="tg_daily_cta">설정하기</string>
+    <string name="tg_settings_title">Telegram 봇</string>
+    <string name="tg_settings_subtitle">친구와 플레이, 오늘의 퍼즐, 그룹 리더보드</string>
+    <string name="tg_connect_title">Telegram 연결</string>
+    <string name="tg_connect_subtitle">앱과 봇에서 하나의 계정 사용</string>
+    <string name="tg_link_confirm_title">Telegram을 연결할까요?</string>
+    <string name="tg_link_confirm_body">이 링크를 보낸 Telegram 계정을 RiddleVerse 계정에 연결할까요?</string>
+    <string name="tg_link_confirm_yes">연결</string>
+    <string name="tg_link_confirm_no">취소</string>
+    <string name="tg_link_success">Telegram이 연결되었어요</string>
+    <string name="tg_link_failed">이 링크는 만료되었거나 이미 사용되었어요. 봇에 /link를 보내 새 링크를 받으세요.</string>
+    <string name="share_play_link_message">RiddleVerse에서 %1$s을(를) 플레이하고 제 점수를 넘어보세요: %2$s</string>
+</resources>

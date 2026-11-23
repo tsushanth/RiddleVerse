@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">在 Telegram 上和好友一起玩</string>
+    <string name="tg_result_body">向聊天发起挑战，在实时排行榜上比拼分数。你的好友无需安装任何东西。</string>
+    <string name="tg_result_cta">打开机器人</string>
+    <string name="tg_daily_title">在 Telegram 上获取每日谜题</string>
+    <string name="tg_daily_body">机器人会发布今天的谜题，还能每天提醒你。</string>
+    <string name="tg_daily_cta">去设置</string>
+    <string name="tg_settings_title">Telegram 机器人</string>
+    <string name="tg_settings_subtitle">和好友一起玩、每日谜题、群排行榜</string>
+    <string name="tg_connect_title">连接 Telegram</string>
+    <string name="tg_connect_subtitle">在应用和机器人中使用同一个账号</string>
+    <string name="tg_link_confirm_title">连接 Telegram？</string>
+    <string name="tg_link_confirm_body">要把发给你此链接的 Telegram 账号连接到你的 RiddleVerse 账号吗？</string>
+    <string name="tg_link_confirm_yes">连接</string>
+    <string name="tg_link_confirm_no">取消</string>
+    <string name="tg_link_success">Telegram 已连接</string>
+    <string name="tg_link_failed">此链接已过期或已被使用。请向机器人发送 /link 获取新链接。</string>
+    <string name="share_play_link_message">在 RiddleVerse 玩 %1$s，来超越我的分数：%2$s</string>
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Joacă cu prietenii în Telegram</string>
+    <string name="tg_result_body">Provoacă un chat și compară scorurile într-un clasament live. Prietenii tăi nu trebuie să instaleze nimic.</string>
+    <string name="tg_result_cta">Deschide botul</string>
+    <string name="tg_daily_title">Primește puzzle-ul zilei în Telegram</string>
+    <string name="tg_daily_body">Botul postează puzzle-ul de azi și îți poate trimite un memento în fiecare zi.</string>
+    <string name="tg_daily_cta">Configurează</string>
+    <string name="tg_settings_title">Bot Telegram</string>
+    <string name="tg_settings_subtitle">Joacă cu prietenii, puzzle zilnic, clasamente de grup</string>
+    <string name="tg_connect_title">Conectează Telegram</string>
+    <string name="tg_connect_subtitle">Un singur cont în aplicație și în bot</string>
+    <string name="tg_link_confirm_title">Conectezi Telegram?</string>
+    <string name="tg_link_confirm_body">Conectezi contul Telegram care ți-a trimis acest link la contul tău RiddleVerse?</string>
+    <string name="tg_link_confirm_yes">Conectează</string>
+    <string name="tg_link_confirm_no">Anulează</string>
+    <string name="tg_link_success">Telegram conectat</string>
+    <string name="tg_link_failed">Acest link a expirat sau a fost deja folosit. Trimite /link botului pentru unul nou.</string>
+    <string name="share_play_link_message">Joacă %1$s în RiddleVerse și bate-mi scorul: %2$s</string>
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Pelaa kavereiden kanssa Telegramissa</string>
+    <string name="tg_result_body">Haasta keskustelu ja vertaile pisteitä live-tulostaululla. Kaverien ei tarvitse asentaa mitään.</string>
+    <string name="tg_result_cta">Avaa botti</string>
+    <string name="tg_daily_title">Hanki päivän pulma Telegramissa</string>
+    <string name="tg_daily_body">Botti julkaisee päivän pulman ja voi muistuttaa sinua joka päivä.</string>
+    <string name="tg_daily_cta">Ota käyttöön</string>
+    <string name="tg_settings_title">Telegram-botti</string>
+    <string name="tg_settings_subtitle">Pelaa kavereiden kanssa, päivän pulma, ryhmien tulostaulut</string>
+    <string name="tg_connect_title">Yhdistä Telegram</string>
+    <string name="tg_connect_subtitle">Käytä samaa tiliä sovelluksessa ja botissa</string>
+    <string name="tg_link_confirm_title">Yhdistetäänkö Telegram?</string>
+    <string name="tg_link_confirm_body">Yhdistetäänkö tämän linkin sinulle lähettänyt Telegram-tili RiddleVerse-tiliisi?</string>
+    <string name="tg_link_confirm_yes">Yhdistä</string>
+    <string name="tg_link_confirm_no">Peruuta</string>
+    <string name="tg_link_success">Telegram yhdistetty</string>
+    <string name="tg_link_failed">Tämä linkki on vanhentunut tai se on jo käytetty. Lähetä botille /link saadaksesi uuden.</string>
+    <string name="share_play_link_message">Pelaa %1$s RiddleVersessä ja voita tulokseni: %2$s</string>
+</resources>

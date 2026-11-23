@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
-import PlayShell, { PlayStoreButton } from '../components/play/PlayShell'
+import PlayShell, { PlayStoreButton, TelegramButton } from '../components/play/PlayShell'
 import PuzzleRenderer from '../components/puzzles/PuzzleRenderer'
 import { PLAY_GAMES, getPlayGame, playGameDescription, playGameTitle } from '../utils/playCatalog'
 import { applyPageMeta } from '../utils/pageMeta'
 import { webPlay, createRoundTracker } from '../utils/webPlayAnalytics'
+import usePlayLang from '../hooks/usePlayLang'
+import { parseTelegramContext, submitScore, telegramShareUrl } from '../utils/telegramPlay'
+import { loadTelegramWebApp } from '../utils/telegramScript'
 
 const DIFFICULTY_LABEL = { 1: 'easy', 2: 'medium', 3: 'hard' }
 
@@ -60,10 +63,24 @@ function PlayGame({ game }) {
   useEffect(() => { tracker.reset() }, [tracker, puzzle.puzzleId])
   const onInteract = useCallback(() => tracker.interact(diffRef.current), [tracker])
 
+  // Opened from the Telegram bot (Mini App): report the finished round with Telegram's signed initData; the server scores it.
+  const { t } = usePlayLang()
+  const tg = useMemo(() => parseTelegramContext(window.location.search, window.location.hash), [])
+  const tgApp = useRef(null)
+  const [tgResult, setTgResult] = useState(null)
+  useEffect(() => {
+    if (!tg.fromTelegram) return
+    loadTelegramWebApp().then((app) => { tgApp.current = app; try { app && app.ready(); app && app.expand() } catch { /* ignore */ } })
+  }, [tg.fromTelegram])
+
   const onAnswer = useCallback((isCorrect) => {
     setFinishedOnce(true)
-    tracker.answered(isCorrect, diffRef.current)
-  }, [tracker])
+    const round = tracker.answered(isCorrect, diffRef.current)
+    if (round && tg.fromTelegram && tgApp.current && tgApp.current.initData) {
+      submitScore({ initData: tgApp.current.initData, fetch: (...a) => fetch(...a) }, { slug: game.slug, difficulty: round.difficulty, durationMs: round.durationMs, ctx: tg.ctx })
+        .then((r) => { if (r) setTgResult(r) })
+    }
+  }, [tracker, tg, game.slug])
   const others = PLAY_GAMES.filter((g) => g.slug !== game.slug && g.category === game.category)
   const more = others.length ? others : PLAY_GAMES.filter((g) => g.slug !== game.slug).slice(0, 4)
 
@@ -111,7 +128,26 @@ function PlayGame({ game }) {
         <span className="contents" onClickCapture={() => webPlay.cta(game.slug)}>
           <PlayStoreButton campaign={game.slug} />
         </span>
+        {!tg.fromTelegram && <TelegramButton slug={game.slug} />}
       </div>
+
+      {!tg.fromTelegram && <p className="text-sm text-white/80">{t('telegram_blurb')}</p>}
+
+      {tgResult && (
+        <p role="status" className="glass rounded-xl p-4 text-sm font-semibold">
+          {t('score_result', { score: tgResult.score, best: tgResult.best })}
+        </p>
+      )}
+      {finishedOnce && (
+        <a
+          href={telegramShareUrl(game.slug, t('share_message', { game: game.name }))}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center gap-2 glass rounded-xl px-4 min-h-[44px] font-semibold focus:outline-none focus-visible:ring-4 focus-visible:ring-white"
+        >
+          <span aria-hidden="true">{'\u2708'}</span> {t('cta_share')}
+        </a>
+      )}
 
       {finishedOnce && (
         <p role="status" className="glass rounded-xl p-4 text-sm">

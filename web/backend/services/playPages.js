@@ -5,21 +5,14 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { loadCatalog } from './playCatalog.js';
 
 export const SITE_ORIGIN = 'https://puzzleverseai.com';
 export const PLAY_STORE_BASE = 'https://play.google.com/store/apps/details?id=com.kreativekoala.riddleverse';
 export const OG_IMAGE_PATH = '/og/riddleverse-feature.jpg';
 const SITE_NAME = 'RiddleVerse';
 
-const here = path.dirname(fileURLToPath(import.meta.url));
-// Local: web/backend/services -> web/shared. Docker: /backend/services -> /shared. Same relative path.
-const CATALOG_PATH = path.resolve(here, '..', '..', 'shared', 'playCatalog.json');
-
-export function loadCatalog(file = CATALOG_PATH) {
-    const raw = JSON.parse(fs.readFileSync(file, 'utf8'));
-    return { categories: raw.categories, games: raw.games };
-}
+export { loadCatalog };
 
 export function escapeHtml(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -264,6 +257,7 @@ export function createPlayPagesRouter(deps = {}) {
             }
             const meta = resolvePlayPage(req.path, catalog);
             if (!meta) return next();
+            if (deps.onHit) deps.onHit(req, meta); // server-side page-open counting (services/pageHits.js); never throws
 
             const html = injectMeta(await getTemplate(), meta);
             res.set('Content-Type', 'text/html; charset=utf-8');

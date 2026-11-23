@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Main bareng teman di Telegram</string>
+    <string name="tg_result_body">Tantang sebuah obrolan dan bandingkan skor di papan peringkat langsung. Teman-temanmu tidak perlu menginstal apa pun.</string>
+    <string name="tg_result_cta">Buka bot</string>
+    <string name="tg_daily_title">Dapatkan teka-teki harian di Telegram</string>
+    <string name="tg_daily_body">Bot mengirim teka-teki hari ini dan bisa mengingatkanmu setiap hari.</string>
+    <string name="tg_daily_cta">Atur sekarang</string>
+    <string name="tg_settings_title">Bot Telegram</string>
+    <string name="tg_settings_subtitle">Main bareng teman, teka-teki harian, papan peringkat grup</string>
+    <string name="tg_connect_title">Hubungkan Telegram</string>
+    <string name="tg_connect_subtitle">Satu akun di aplikasi dan bot</string>
+    <string name="tg_link_confirm_title">Hubungkan Telegram?</string>
+    <string name="tg_link_confirm_body">Hubungkan akun Telegram yang mengirimkan tautan ini ke akun RiddleVerse-mu?</string>
+    <string name="tg_link_confirm_yes">Hubungkan</string>
+    <string name="tg_link_confirm_no">Batal</string>
+    <string name="tg_link_success">Telegram terhubung</string>
+    <string name="tg_link_failed">Tautan ini sudah kedaluwarsa atau sudah dipakai. Kirim /link ke bot untuk mendapatkan yang baru.</string>
+    <string name="share_play_link_message">Main %1$s di RiddleVerse dan kalahkan skorku: %2$s</string>
+</resources>
