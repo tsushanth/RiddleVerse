@@ -1,6 +1,6 @@
 // Persistence for the Telegram bot. Two implementations of one interface: Supabase (production) and in-memory (tests).
-// Tables (see supabase/migrations/20261122120000_telegram_bot.sql): rv_telegram_users, rv_telegram_link_codes,
-// rv_telegram_updates, plus the existing chat_scores and game_sessions (source = 'telegram'). The Supabase project is
+// Tables (see supabase/migrations/20261122120000_telegram_bot.sql and 20261123120000_rv_channel_events.sql): rv_telegram_users,
+// rv_telegram_link_codes, rv_telegram_updates, rv_channel_events, plus the existing chat_scores and game_sessions (source = 'telegram'). The Supabase project is
 // shared with other apps: every table here carries the rv_ prefix or is already RiddleVerse-only.
 
 const PLATFORM = 'telegram';
@@ -97,6 +97,14 @@ export function createSupabaseStore(sb) {
         async insertSession(row) {
             must(await sb.from('game_sessions').insert(row));
         },
+        /** Usage event for a non-app channel (public.rv_channel_events). Throws on failure: channelEvents.js handles the back-off. */
+        async insertChannelEvent(row) {
+            must(await sb.from('rv_channel_events').insert(row));
+        },
+        /** One jsonb document with every number of docs/channels-metrics.md (SQL function rv_channel_stats). */
+        async channelStats(days) {
+            return must(await sb.rpc('rv_channel_stats', { p_days: days }));
+        },
     };
 }
 
@@ -107,6 +115,7 @@ export function createMemoryStore({ now = () => Date.now() } = {}) {
     const codes = new Map();
     const scores = new Map(); // `${gameId}|${chatId}|${userId}` -> row
     const sessions = [];
+    const events = [];
     return {
         _users: users, _codes: codes, _scores: scores, _sessions: sessions, _updates: updates,
         async claimUpdate(id) { if (updates.has(id)) return false; updates.add(id); return true; },
@@ -155,5 +164,8 @@ export function createMemoryStore({ now = () => Date.now() } = {}) {
                 .sort((a, b) => b.score - a.score).slice(0, limit).map((s) => ({ userId: s.userId, username: s.username, score: s.score }));
         },
         async insertSession(row) { sessions.push(row); },
+        _events: events,
+        async insertChannelEvent(row) { events.push(row); },
+        async channelStats(days) { return { days, memory: true, events: events.length }; },
     };
 }

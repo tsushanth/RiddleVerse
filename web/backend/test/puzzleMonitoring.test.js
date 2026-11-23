@@ -267,11 +267,11 @@ test('funnel: admin puzzle summary hides the placeholder "app" puzzle', () => {
 });
 
 // ---- public /play page measurement (web_play_*) ----
-const WP = ['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta'];
+const WP = ['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta', 'web_play_telegram'];
 const wev = (type, over = {}) => ({ type, puzzleType: 'sudoku', sessionId: 's1', ts: NOW, ...over });
 const wpay = (...events) => ({ installId: 'abc', platform: 'web', appVersion: 'web-play', events });
 
-test('web_play: the four event names validate and map to puzzle_type = slug', () => {
+test('web_play: the five event names validate and map to puzzle_type = slug', () => {
     assert.deepEqual([...WEB_PLAY_EVENT_TYPES].sort(), [...WP].sort());
     for (const t of WP) {
         const v = validatePayload(wpay(wev(t)), NOW);

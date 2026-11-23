@@ -6,6 +6,7 @@ import { createLinkService } from '../services/telegram/linkService.js';
 import { createBot } from '../services/telegram/bot.js';
 import { createTelegramHandlers } from '../services/telegram/handlers.js';
 import { createLimiter } from '../services/puzzleMonitoring.js';
+import { createChannelEvents } from '../services/telegram/channelEvents.js';
 
 export const TOKEN = '111111:TEST-TOKEN-not-real';
 export const CONFIG = {
@@ -46,9 +47,10 @@ export function build({ now = () => Date.UTC(2026, 10, 22, 12, 0, 0), auth = fak
     const limiter = createLimiter({ now });
     const linkService = createLinkService({ store, getFirebaseAuth: async () => auth, now });
     const quiet = { warn() {}, error() {}, log() {} };
-    const bot = createBot({ api, store, i18n, linkService, catalog, config: CONFIG, now, limiter, log: quiet });
-    const handlers = createTelegramHandlers({ bot, api, store, i18n, linkService, catalog, config: CONFIG, now, limiter, log: quiet, sleepFn: async () => {} });
-    return { i18n, catalog, store, api, limiter, linkService, bot, handlers, auth, now, config: CONFIG };
+    const events = createChannelEvents({ store, refKey: 'test-ref-key', now, log: quiet });
+    const bot = createBot({ api, store, i18n, linkService, catalog, config: CONFIG, now, limiter, log: quiet, events });
+    const handlers = createTelegramHandlers({ bot, api, store, i18n, linkService, catalog, config: CONFIG, now, limiter, log: quiet, sleepFn: async () => {}, events });
+    return { i18n, catalog, store, api, limiter, linkService, bot, handlers, auth, now, config: CONFIG, events };
 }
 
 let uid = 1000;
@@ -70,3 +72,6 @@ export function fakeRes() {
     res.set = (k, v) => { res.headers[k] = v; return res; };
     return res;
 }
+
+/** Channel events written so far (after the background writes settled). */
+export async function eventsOf(t) { await t.events.flush(); return t.store._events; }

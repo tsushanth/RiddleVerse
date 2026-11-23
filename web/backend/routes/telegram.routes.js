@@ -3,6 +3,7 @@
 //   POST /api/telegram/score        Mini App / play page -> us (initData verified)
 //   POST /api/telegram/link/redeem  the Android app -> us (one-time code, optional Firebase bearer)
 //   POST /api/telegram/daily-push   external scheduler -> us (shared secret header)
+//   GET  /api/telegram/stats?days=7 usage numbers as JSON (same x-cron-secret header)
 //   GET  /app/link?code=...         https link the bot sends; opens the app or Google Play
 import express from 'express';
 import { createTelegramIntegration } from '../services/telegram/index.js';
@@ -38,6 +39,7 @@ export function createTelegramRouter({ getIntegration } = {}) {
     router.post('/api/telegram/score', express.json({ limit: '8kb' }), wrap('score'));
     router.post('/api/telegram/link/redeem', express.json({ limit: '2kb' }), wrap('redeem'));
     router.post('/api/telegram/daily-push', wrap('dailyPush'));
+    router.get('/api/telegram/stats', wrap('stats'));
     router.get('/app/link', wrap('linkPage'));
     return router;
 }

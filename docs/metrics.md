@@ -26,6 +26,8 @@ what the `retention_by_cohort` view in the funnel migration computes. One-time s
 Read-only queries: `docs/funnel-queries.sql` (D1/D7 by cohort, funnel conversion, DAU) and `docs/retention-queries.sql`
 (daily completion rate, streak distribution, return after first solve, reminder funnel, win-back, supporter offer).
 
+Telegram bot, linking, sharing and web `/play` usage is a separate table with its own queries: `docs/channels-metrics.md`.
+
 ## Deploy order (important)
 
 1. Owner applies `web/backend/supabase/migrations/20261101120000_funnel_events.sql` (not applied by this work; check with `\d public.puzzle_events`).

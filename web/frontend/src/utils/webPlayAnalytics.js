@@ -4,6 +4,8 @@
 //   web_play_start     first interaction with the game (once per round)
 //   web_play_complete  puzzle solved (correct answer only)
 //   web_play_cta       click on "Get it on Google Play" (its link carries utm_campaign = the same slug)
+//   web_play_telegram  click on a "Play in Telegram" button (puzzleType = slug, or 'index' / 'welcome'; channel = surface label,
+//                      the same label the bot records from the /start payload: web_game, web_share, web_index, web_home)
 //
 // Privacy: sends nothing at all when Global Privacy Control or Do Not Track is on (re-read on every call).
 // The only identifier is a random id kept in localStorage under its own key (not the signed-in app's id, not a
@@ -16,12 +18,14 @@ export const WEB_PLAY_EVENTS = {
   start: 'web_play_start',
   complete: 'web_play_complete',
   cta: 'web_play_cta',
+  telegram: 'web_play_telegram',
 }
 export const INSTALL_KEY = 'rv_play_vid'
 const VIEW_KEY_PREFIX = 'rv_play_viewed_'
 const APP_VERSION = 'web-play'
 const SLUG_RE = /^[a-z0-9_]{1,40}$/
 const DIFFICULTIES = ['easy', 'medium', 'hard']
+const CHANNEL_RE = /^[a-z0-9_]{1,24}$/
 const MAX_DURATION_MS = 24 * 3600 * 1000
 
 /** True when the visitor asked not to be tracked (GPC, or DNT in any of its spellings). */
@@ -125,6 +129,7 @@ export function createWebPlayAnalytics(env = {}) {
           ev.durationMs = Math.trunc(extra.durationMs)
         }
       }
+      if (type === WEB_PLAY_EVENTS.telegram && extra && typeof extra.channel === 'string' && CHANNEL_RE.test(extra.channel)) ev.channel = extra.channel
       post(ev)
       return true
     } catch {
@@ -156,6 +161,7 @@ export function createWebPlayAnalytics(env = {}) {
     start: (slug, difficulty) => { emit(WEB_PLAY_EVENTS.start, slug, { difficulty }) },
     complete: (slug, extra) => { emit(WEB_PLAY_EVENTS.complete, slug, extra || {}) },
     cta: (slug) => { emit(WEB_PLAY_EVENTS.cta, slug) },
+    telegram: (slug, channel) => { emit(WEB_PLAY_EVENTS.telegram, slug, { channel }) },
   }
 }
 

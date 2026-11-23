@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { playStoreUrl } from '../utils/playLinks'
 import { telegramBotUrl } from '../utils/telegramPlay'
+import { webPlay } from '../utils/webPlayAnalytics'
 
 export default function WelcomePage() {
   const { loginWithGoogle, loginWithEmail, registerWithEmail, error } = useAuth()
@@ -222,7 +223,8 @@ export default function WelcomePage() {
               Play Store
             </a>
             <a
-              href={telegramBotUrl()}
+              href={telegramBotUrl(null, 'web_home')}
+              onClick={() => webPlay.telegram('welcome', 'web_home')}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-sky-600/80 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm transition-colors"

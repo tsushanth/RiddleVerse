@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { validatePayload, toRows } from '../services/puzzleMonitoring.js';
+import { validatePayload, toRows, buildAdminPuzzles } from '../services/puzzleMonitoring.js';
 import { pageHitRow, createPageHitRecorder } from '../services/pageHits.js';
 import { createLimiter } from '../services/puzzleMonitoring.js';
 
@@ -81,4 +81,34 @@ test('recorder inserts once, retries without channel when the column does not ex
 test('recorder never throws when the database is missing', () => {
     const record = createPageHitRecorder({ getClient: () => null, limiter: createLimiter() });
     assert.doesNotThrow(() => record(req(), game));
+});
+
+test('web_play_telegram: web only, anonymous, puzzle_type is a slug or a page, channel is a whitelisted surface label', () => {
+    const v = validatePayload(body([
+        { type: 'web_play_telegram', puzzleType: 'sudoku', channel: 'web_game' },
+        { type: 'web_play_telegram', puzzleType: 'index', channel: 'web_share' },
+        { type: 'web_play_telegram', puzzleType: 'welcome', channel: 'Bad Label' },
+    ], 'web'), NOW);
+    assert.ok(v);
+    assert.deepEqual(v.events.map((e) => [e.event_type, e.puzzle_type, e.channel]), [['web_play_telegram', 'sudoku', 'web_game'], ['web_play_telegram', 'index', 'web_share'], ['web_play_telegram', 'welcome', null]]);
+    assert.ok(toRows(v, 'firebase-uid').every((r) => r.user_id === null)); // never the signed-in uid
+    assert.equal(validatePayload(body([{ type: 'web_play_telegram', puzzleType: 'sudoku' }], 'android'), NOW), null);
+    assert.equal(validatePayload(body([{ type: 'web_play_telegram', puzzleType: 'app' }], 'web'), NOW), null);
+    // other web-play rows still never carry a channel key
+    const other = validatePayload(body([{ type: 'web_play_cta', puzzleType: 'sudoku', channel: 'x' }], 'web'), NOW);
+    assert.ok(!('channel' in toRows(other, null)[0]));
+});
+
+test('the admin puzzle table hides page surfaces (index, daily, welcome) that web events use as puzzle_type', () => {
+    const out = buildAdminPuzzles({ puzzles: [{ puzzleType: 'index', web: 5 }, { puzzleType: 'welcome', web: 2 }, { puzzleType: 'daily', web: 1 }, { puzzleType: 'sudoku', starts: 3, web: 3 }] }, { days: 7, platform: 'all' });
+    const types = out.byPuzzle.map((p) => p.puzzleType);
+    for (const hidden of ['index', 'welcome', 'daily', 'app']) assert.ok(!types.includes(hidden), hidden);
+    assert.ok(types.includes('sudoku'));
+});
+
+test('page hits: the Telegram Mini App WebView is counted, the TelegramBot link-preview fetcher is not', () => {
+    const q = { src: 'telegram', tgctx: 'p_sudoku_m1_abc' };
+    const webview = req({ headers: { 'user-agent': 'Mozilla/5.0 (Linux; Android 15; Pixel 9) AppleWebKit/537.36 Chrome/130 Mobile Safari/537.36 Telegram-Android/11.2.0' }, query: q });
+    assert.equal(pageHitRow(webview, game).channel, 'telegram');
+    assert.equal(pageHitRow(req({ headers: { 'user-agent': 'TelegramBot (like TwitterBot)' }, query: q }), game), null);
 });

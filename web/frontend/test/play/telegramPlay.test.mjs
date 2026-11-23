@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  telegramBotUrl, telegramShareUrl, parseTelegramContext, slugFromContext, kindFromContext, buildScorePayload, submitScore, BOT_USERNAME,
+  telegramBotUrl, telegramSrc, telegramShareUrl, parseTelegramContext, slugFromContext, kindFromContext, buildScorePayload, submitScore, BOT_USERNAME,
 } from '../../src/utils/telegramPlay.js'
 import { pickLang, format, isRtl } from '../../src/utils/playI18n.js'
 import { createRoundTracker, createWebPlayAnalytics } from '../../src/utils/webPlayAnalytics.js'
@@ -90,4 +90,18 @@ test('round tracker returns the finished round (for the Telegram score) only for
   assert.equal(tr.answered(false, 'easy'), undefined, 'wrong answer')
   assert.deepEqual(tr.answered(true, 'easy'), { durationMs: 30000, difficulty: 'easy' })
   assert.equal(tr.answered(true, 'easy'), undefined, 'one solve counts once')
+})
+
+test('bot link carries the surface label in the /start payload: g_<slug>-<src>, <src>, or neither', () => {
+  assert.equal(telegramBotUrl('sudoku', 'web_game'), 'https://t.me/Riddleverse_bot?start=g_sudoku-web_game')
+  assert.equal(telegramBotUrl(null, 'web_home'), 'https://t.me/Riddleverse_bot?start=web_home')
+  assert.equal(telegramBotUrl(undefined, undefined), 'https://t.me/Riddleverse_bot')
+  assert.equal(telegramBotUrl('sudoku', 'Bad Label'), 'https://t.me/Riddleverse_bot?start=g_sudoku')
+  assert.equal(telegramBotUrl(null, 'x'.repeat(17)), 'https://t.me/Riddleverse_bot')
+})
+
+test('a page opened from a shared link reports web_share, anything else the base label', () => {
+  assert.equal(telegramSrc('web_game', '?src=share&utm_source=telegram'), 'web_share')
+  assert.equal(telegramSrc('web_game', '?src=telegram'), 'web_game')
+  assert.equal(telegramSrc('web_index', ''), 'web_index')
 })

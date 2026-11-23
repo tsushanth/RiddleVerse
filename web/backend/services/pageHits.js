@@ -2,9 +2,10 @@
 // all?" when the client telemetry shows nothing, and it is the only way to see opens of shared links (src=share).
 //
 // Privacy: honours Global Privacy Control (Sec-GPC: 1) and Do Not Track (DNT: 1) request headers (nothing is written),
-// ignores crawlers and link-preview fetchers, stores no IP, no user agent, no referrer and no query string beyond a short
+// ignores crawlers and link-preview fetchers (the Telegram preview fetcher is "TelegramBot"; the Mini App WebView is a real
+// browser whose user agent may carry "Telegram", so only "TelegramBot" is filtered), stores no IP, no user agent, no referrer and no query string beyond a short
 // whitelisted channel label, and uses the fixed install id 'server' (not a person).
-const BOT_UA = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|telegram|whatsapp|discord|slack|curl|wget|python|go-http|headless|lighthouse|monitor|uptime/i;
+const BOT_UA = /bot|crawl|spider|slurp|preview|facebookexternalhit|embedly|telegrambot|whatsapp|discord|slack|curl|wget|python|go-http|headless|lighthouse|monitor|uptime/i;
 const CHANNEL_RE = /^[a-z0-9_]{1,24}$/;
 
 export function pageHitRow(req, meta) {
