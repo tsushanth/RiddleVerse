@@ -38,20 +38,15 @@ object PuzzleEvents {
     private var pending: ScheduledFuture<*>? = null
     private var startedActivities = 0
 
+    /**
+     * Main thread: only stores the context and registers the lifecycle hook (no I/O). The SharedPreferences read/write and the
+     * client construction run on [io] (a cold-start ANR sample was blocked here); everything that uses [client] is also
+     * posted to [io], so it always runs after this and no early event is lost.
+     */
     fun init(app: Application) {
         try {
-            if (client != null) return
+            if (appCtx != null) return
             appCtx = app.applicationContext
-            val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            enabledFlag = prefs.getBoolean("enabled", true)
-            var id = prefs.getString("install_id", null)
-            if (id.isNullOrEmpty()) { id = UUID.randomUUID().toString(); prefs.edit().putString("install_id", id).apply() }
-            client = PuzzleEventsClient(
-                installId = id, appVersion = BuildConfig.VERSION_NAME,
-                send = { body, token -> post(body, token) },
-                tokenProvider = { null }, // events are anonymous: no account id is attached (privacy)
-                enabled = { enabledFlag }
-            )
             app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
                 override fun onActivityCreated(a: Activity, b: Bundle?) {}
                 override fun onActivityStarted(a: Activity) { synchronized(this@PuzzleEvents) { startedActivities++ } }
@@ -59,12 +54,28 @@ object PuzzleEvents {
                 override fun onActivityPaused(a: Activity) {}
                 override fun onActivityStopped(a: Activity) {
                     val none = synchronized(this@PuzzleEvents) { startedActivities = (startedActivities - 1).coerceAtLeast(0); startedActivities == 0 }
-                    if (none) flushSoon(0)
+                    if (none) { if (client != null) flushSoon(0) else try { io.execute { flushSoon(0) } } catch (_: Throwable) { } }
                 }
                 override fun onActivitySaveInstanceState(a: Activity, b: Bundle) {}
                 override fun onActivityDestroyed(a: Activity) {}
             })
+            io.execute { try { initClient(app) } catch (_: Throwable) { } }
         } catch (_: Throwable) { }
+    }
+
+    /** Runs on [io]. */
+    private fun initClient(app: Application) {
+        if (client != null) return
+        val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        enabledFlag = prefs.getBoolean("enabled", true)
+        var id = prefs.getString("install_id", null)
+        if (id.isNullOrEmpty()) { id = UUID.randomUUID().toString(); prefs.edit().putString("install_id", id).apply() }
+        client = PuzzleEventsClient(
+            installId = id, appVersion = BuildConfig.VERSION_NAME,
+            send = { body, token -> post(body, token) },
+            tokenProvider = { null }, // events are anonymous: no account id is attached (privacy)
+            enabled = { enabledFlag }
+        )
     }
 
     fun setEnabled(enabled: Boolean) {
@@ -122,10 +133,17 @@ object PuzzleEvents {
     /** Used by [Funnel]: same queue, endpoint and install id as puzzle events. */
     internal fun emitFunnel(e: PuzzleEvent) = guarded { emit(e) }
 
+    /** Queued on [io], behind [initClient], so an event raised during startup is kept instead of dropped. */
     private fun emit(e: PuzzleEvent) {
-        val c = client ?: return
-        val full = c.enqueue(e)
-        flushSoon(if (full) 0 else FLUSH_INTERVAL_MS)
+        try {
+            io.execute {
+                try {
+                    val c = client ?: return@execute
+                    val full = c.enqueue(e)
+                    flushSoon(if (full) 0 else FLUSH_INTERVAL_MS)
+                } catch (_: Throwable) { }
+            }
+        } catch (_: Throwable) { }
     }
 
     @Synchronized

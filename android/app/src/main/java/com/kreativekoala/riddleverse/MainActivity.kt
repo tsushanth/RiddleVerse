@@ -86,7 +86,8 @@ class MainActivity : AppCompatActivity() {
             navigationBarStyle = SystemBarStyle.light(android.graphics.Color.TRANSPARENT, android.graphics.Color.TRANSPARENT)
         )
 
-        RatingKit.trackAppOpen(this)
+        // Counts the session; needs no Activity, so it is queued behind RatingKit.init on the startup thread (no main-thread disk).
+        AppStartup.post { AppStartup.ensureRatingKit(); RatingKit.trackAppOpen(null) }
 
         // Defer FCM setup to background thread - not critical for startup
         CoroutineScope(Dispatchers.IO).launch {

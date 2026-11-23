@@ -304,6 +304,7 @@ class PuzzleActivity : AppCompatActivity() {
                             val currentPuzzleNumber = getIntent().getIntExtra("currentPuzzleNumber", 0)
                             Log.d("PuzzleActivity", "🎉 Puzzle completed, showing completion screen, source group id: $sourceGroupId puzzle count $currentPuzzleNumber")
 
+                            AppStartup.ensureRatingKit()
                             RatingKit.trackAction(this@PuzzleActivity)
 
                             if (sourceGroupId != null && currentPuzzleNumber >= 5) {

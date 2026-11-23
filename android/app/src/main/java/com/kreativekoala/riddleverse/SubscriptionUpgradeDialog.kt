@@ -116,6 +116,8 @@ fun SubscriptionUpgradeDialog(
         )
     }
 
+    // PaywallView reads ExperimentManager (initialised on the startup thread): make sure it is, whatever the timing.
+    AppStartup.ensureExperimentManager()
     PaywallView(
         appId = "riddleverse",
         appName = "RiddleVerse",
@@ -471,6 +473,8 @@ fun HardPaywallGate(
         )
     }
 
+    // PaywallView reads ExperimentManager (initialised on the startup thread): make sure it is, whatever the timing.
+    AppStartup.ensureExperimentManager()
     PaywallView(
         appId = "riddleverse",
         appName = "RiddleVerse",

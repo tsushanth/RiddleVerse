@@ -6,19 +6,20 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.ContentValues.TAG
 import android.util.Log
-import com.google.firebase.BuildConfig
 import com.google.firebase.FirebaseApp
 import timber.log.Timber
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.HandlerThread
+import android.os.StrictMode
+import java.util.concurrent.atomic.AtomicBoolean
 import com.google.android.gms.security.ProviderInstaller
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreSettings
 import com.google.firebase.messaging.FirebaseMessaging
-import com.kreativekoala.paywallkit.manager.ExperimentManager
-import com.kreativekoala.ratingkit.RatingKit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,30 +32,38 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        FailureReporter.init(this, "riddleverse", "afr_2380403b6807a34c833fa412468daee3", BuildConfig.VERSION_NAME)
+        // Debug builds only: log every disk read/write on the main thread so cold-start regressions show up in logcat
+        // (tag StrictMode). The app's own BuildConfig, not Firebase's (the Firebase one is always false here).
+        if (com.kreativekoala.riddleverse.BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder().detectDiskReads().detectDiskWrites().penaltyLog().build()
+            )
+        }
 
+        // Plant Timber early for logging (the background inits below log through it)
+        Timber.plant(Timber.DebugTree())
+
+        // Only cheap, non-I/O work stays on the main thread: the crash handler must be installed before anything can crash
+        // (its pending-report read already runs on its own worker thread).
+        FailureReporter.init(this, "riddleverse", "afr_2380403b6807a34c833fa412468daee3", com.kreativekoala.riddleverse.BuildConfig.VERSION_NAME)
+
+        // These register their lifecycle hooks here (so the first activity start is seen) but do their SharedPreferences /
+        // package-manager work on their own worker threads, queued in order.
         PuzzleEvents.init(this)
         Funnel.init(this)
         Retention.init(this)
 
-        // Initialize Firebase first (required early)
+        // FirebaseInitProvider has already initialised the default app before Application.onCreate, so this is a no-op
+        // safety net, not the real init.
         FirebaseApp.initializeApp(this)
 
         // Configure RevenueCat on a background thread (it was the top ANR cause on the main thread here).
         // Every SDK call goes through RevenueCatBootstrap, which waits for configure to finish.
         RevenueCatBootstrap.start(this)
 
-        // Initialize PaywallKit experiment manager
-        ExperimentManager.init(this)
-
-        // Initialize RatingKit
-        RatingKit.init(this, appId = "riddleverse")
-
-        // Initialize TikTok Events SDK
-        TikTokHelper.initialize(this)
-
-        // Plant Timber early for logging
-        Timber.plant(Timber.DebugTree())
+        // ExperimentManager (PaywallKit), RatingKit and the TikTok SDK are initialised on the "rv-startup" thread.
+        // Consumers go through AppStartup.ensure*() / AppStartup.post {} so first use can never see an uninitialised SDK.
+        AppStartup.start(this)
 
         // Register activity lifecycle callbacks for cleanup
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
@@ -123,7 +132,6 @@ class MyApplication : Application() {
                 Timber.d("Application initialized successfully")
             } catch (e: Exception) {
                 Timber.e(e, "Application initialization failed")
-                if (BuildConfig.DEBUG) throw e
             }
         }
     }
@@ -160,22 +168,48 @@ class MyApplication : Application() {
         }
     }
 
+    private val cleanupRunning = AtomicBoolean(false)
+    private val cleanupThread: Handler by lazy {
+        Handler(HandlerThread("binder-cleanup", android.os.Process.THREAD_PRIORITY_BACKGROUND).also { it.start() }.looper)
+    }
+
+    /**
+     * Same work as before, never on the caller's (main) thread: the activity-destroy and low-memory callbacks used to
+     * stall the UI with a process-list IPC, two forced GCs, finalizers and a 100 ms sleep.
+     *
+     * Notes for reviewers:
+     *  - `clearPersistence()` returns a failed Task (IllegalStateException) while Firestore is running, and nothing in this
+     *    app terminates Firestore, so today it is a no-op that only produces a logged failure. If Firestore were ever
+     *    terminated it WOULD wipe the offline cache on every activity destroy. It is kept (behaviour preserved) but its
+     *    failure is observed so it cannot surface as an unhandled task exception.
+     *  - The forced GC itself is of doubtful value (the runtime collects on its own); it is kept, off-main, and coalesced:
+     *    a destroy burst triggers one cleanup, not one per activity.
+     */
     private fun forceBinderCleanup() {
+        if (!cleanupRunning.compareAndSet(false, true)) return
         try {
-            // Only clear Firestore cache in main process
-            if (isMainProcess()) {
-                FirebaseFirestore.getInstance().clearPersistence()
+            cleanupThread.post {
+                try {
+                    // Only clear Firestore cache in main process
+                    if (isMainProcess()) {
+                        FirebaseFirestore.getInstance().clearPersistence()
+                            .addOnFailureListener { Log.d("BinderCleanup", "clearPersistence skipped: ${it.message}") }
+                    }
+
+                    // Force garbage collection (the 100 ms sleep between the two passes is gone: it only delayed the thread)
+                    System.gc()
+                    System.runFinalization()
+                    System.gc()
+
+                    Log.d("BinderCleanup", "Forced comprehensive binder cleanup")
+                } catch (e: Throwable) {
+                    Log.e("BinderCleanup", "Error during forced cleanup", e)
+                } finally {
+                    cleanupRunning.set(false)
+                }
             }
-
-            // Force garbage collection multiple times
-            System.gc()
-            System.runFinalization()
-            Thread.sleep(100)
-            System.gc()
-
-            Log.d("BinderCleanup", "Forced comprehensive binder cleanup")
-        } catch (e: Exception) {
-            Log.e("BinderCleanup", "Error during forced cleanup", e)
+        } catch (e: Throwable) {
+            cleanupRunning.set(false)
         }
     }
 
