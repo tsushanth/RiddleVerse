@@ -83,6 +83,10 @@ object AppStartup {
         tikTok = OnceInit("TikTok") { TikTokHelper.initialize(application) }
 
         executor.execute {
+            // First: the TikTok SDK registers its ActivityLifecycleCallbacks inside initializeSdk, and MainActivity starts
+            // a few milliseconds after Application.onCreate. Initialising it last could miss the first activity's
+            // started/resumed callbacks (launch/install attribution), and nothing on the main thread depends on it.
+            tikTok.ensure()
             // The first screen reads this on the main thread (MainActivity.navigateToDefaultScreen).
             safely("prefs guest_state") { application.getSharedPreferences("guest_state", 0).all }
             // Main will touch FirebaseAuth in the first screen (signed-in check): build it here, in parallel with the
@@ -94,7 +98,6 @@ object AppStartup {
             // main-thread reads during the first Home composition find them in memory (StrictMode showed 170-190 ms each).
             for (name in WARM_PREFS) safely("prefs $name") { application.getSharedPreferences(name, 0).all }
             safely("PuzzleQueueManager") { PuzzleQueueManager.getInstance(application) }
-            tikTok.ensure()
         }
     }
 

@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kreativekoala.riddleverse.ui.theme.*
 import java.util.TimeZone
+import java.util.concurrent.CountDownLatch
 import java.util.concurrent.Executors
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -71,6 +72,9 @@ object Retention {
     // [pendingWelcomeBackDays] waits (bounded) for it so the card never reads the previous open's state.
     private val io = Executors.newSingleThreadExecutor { r -> Thread(r, "retention").apply { isDaemon = true } }
     @Volatile private var foregroundTask: Future<*>? = null
+    // Released as soon as the "away days" value is written, so the card waits only for that write and not for the
+    // alarm scheduling and supporter refresh that follow it in onForeground.
+    @Volatile private var awayWritten: CountDownLatch? = null
 
     private fun prefs(c: Context): SharedPreferences = c.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private fun localDay(ms: Long): Long = Math.floorDiv(ms + TimeZone.getDefault().getOffset(ms), 24 * 3600 * 1000L)
@@ -84,7 +88,9 @@ object Retention {
                     val first = synchronized(Retention) { started++ == 0 }
                     if (first) {
                         val ctx = a.applicationContext
-                        foregroundTask = try { io.submit { onForeground(ctx) } } catch (_: Throwable) { null }
+                        val latch = CountDownLatch(1)
+                        awayWritten = latch
+                        foregroundTask = try { io.submit { onForeground(ctx, latch) } } catch (_: Throwable) { latch.countDown(); null }
                     }
                 }
                 override fun onActivityResumed(a: Activity) {}
@@ -96,7 +102,7 @@ object Retention {
         } catch (_: Throwable) { }
     }
 
-    internal fun onForeground(c: Context) {
+    internal fun onForeground(c: Context, awayWritten: CountDownLatch? = null) {
         try {
             val p = prefs(c)
             val today = localDay(System.currentTimeMillis())
@@ -106,15 +112,19 @@ object Retention {
             // Keep an unseen card across several opens on the same day; a new away gap replaces it.
             if (away > 0) e.putInt(K_AWAY, away) else if (last != today) e.putInt(K_AWAY, 0)
             e.apply()
+            awayWritten?.countDown()
             DailyReminder.onAppOpened(c)
             DailyReminder.schedule(c) // idempotent; keeps the alarm alive on devices that dropped it
             Thread { Supporter.refresh(c) }.start() // flag file + entitlement, off the main thread
-        } catch (_: Throwable) { }
+        } catch (_: Throwable) {
+        } finally {
+            awayWritten?.countDown() // never leave the card waiting if anything above threw
+        }
     }
 
     /** Days the player was away, or 0 when there is nothing to welcome back (already dismissed, solved today, or not away). */
     fun pendingWelcomeBackDays(c: Context): Int {
-        try { foregroundTask?.get(1, TimeUnit.SECONDS) } catch (_: Throwable) { }
+        try { awayWritten?.await(1, TimeUnit.SECONDS) } catch (_: Throwable) { }
         val away = prefs(c).getInt(K_AWAY, 0)
         if (away <= 0) return 0
         return if (DailyPuzzleStore.resultFor(c, DailyPuzzleStore.today()) != null) 0 else away
