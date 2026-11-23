@@ -530,6 +530,7 @@ fun HomeScreen(navController: NavHostController,
                     onSignOut = {
                         FirebaseAuth.getInstance().signOut()
                         com.kreativekoala.riddleverse.auth.SupabaseAuth.clearSession(context)
+                        MagicLinkAuthManager.clearSession(context) // the bot-login premium flag must not outlive the account
                         GuestPrefs.clear(context) // signing out returns to the first-run screen, not a half-guest state
                         val intent = Intent(context, WelcomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

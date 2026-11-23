@@ -852,7 +852,8 @@ fun GameBrowseContent(context: android.content.Context) {
 
 // Share game to Telegram (or fallback to share sheet)
 private fun shareGameToTelegram(context: android.content.Context, game: BrowseGameData) {
-    val gameUrl = "${BuildConfig.API_BASE_URL}/api/game-creation/${game.id}"
+    // platform=session serves the playable page; without it the route returns the raw game JSON, which is useless to a recipient.
+    val gameUrl = "${BuildConfig.API_BASE_URL}/api/game-creation/${game.id}?platform=session"
     val shareText = context.getString(R.string.browse_share_text, game.title, gameUrl)
     val encodedText = Uri.encode(shareText)
 
