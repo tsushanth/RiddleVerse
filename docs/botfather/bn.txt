@@ -1,0 +1,17 @@
+Language: বাংলা (bn)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=bn:
+daily - আজকের পাজল
+play - একটি গেম বেছে নিন
+leaderboard - এই চ্যাটের স্কোর
+link - RiddleVerse অ্যাপ যুক্ত করুন
+remind - দৈনিক রিমাইন্ডার চালু বা বন্ধ
+language - ভাষা পরিবর্তন করুন
+app - Android অ্যাপ নিন
+help - সাহায্য দেখুন
+
+BotFather > /setabouttext (short description, max 120):
+Telegram-এ বিনামূল্যে পাজল গেম: দৈনিক পাজল, গ্রুপ লিডারবোর্ড, বন্ধুদের সাথে খেলা।
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse Telegram-এ ২৩টি বিনামূল্যের পাজল গেম নিয়ে আসে। দৈনিক পাজল খেলুন, চ্যাটে বন্ধুদের চ্যালেঞ্জ করুন এবং গ্রুপ লিডারবোর্ডে উপরে উঠুন। সবখানে একটি অ্যাকাউন্ট ব্যবহার করতে বিনামূল্যের Android অ্যাপ যুক্ত করুন।

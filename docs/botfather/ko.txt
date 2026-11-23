@@ -1,0 +1,17 @@
+Language: 한국어 (ko)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ko:
+daily - 오늘의 퍼즐
+play - 게임 선택
+leaderboard - 이 채팅의 점수
+link - RiddleVerse 앱 연결
+remind - 매일 알림 켜기/끄기
+language - 언어 변경
+app - Android 앱 받기
+help - 도움말 보기
+
+BotFather > /setabouttext (short description, max 120):
+Telegram에서 즐기는 무료 퍼즐 게임: 오늘의 퍼즐, 그룹 리더보드, 친구와 함께 플레이.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse는 무료 퍼즐 게임 23종을 Telegram으로 가져왔어요. 오늘의 퍼즐을 즐기고, 채팅에서 친구에게 도전하고, 그룹 리더보드를 올라가 보세요. 무료 Android 앱을 연결하면 어디서든 하나의 계정을 쓸 수 있어요.

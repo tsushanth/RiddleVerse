@@ -177,5 +177,6 @@ object DailyPuzzleStore {
         seconds = r.seconds,
         attempts = r.attempts,
         streak = r.streak,
+        slug = r.type,
     )
 }

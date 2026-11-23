@@ -33,7 +33,12 @@ export function createPuzzleMonitoringRouters(deps = {}) {
             try { userId = (await d.verifyBearerToken(req.headers.authorization))?.uid || null; } catch { userId = null; }
         }
         try {
-            const { error } = await d.getClient().from('puzzle_events').insert(toRows(v, userId));
+            const rows = toRows(v, userId);
+            let { error } = await d.getClient().from('puzzle_events').insert(rows);
+            // The channel column ships in migration 20261122120000. Until it is applied, drop it instead of losing the batch.
+            if (error && /channel/i.test(error.message || '') && rows.some((r) => 'channel' in r)) {
+                ({ error } = await d.getClient().from('puzzle_events').insert(rows.map(({ channel, ...rest }) => rest)));
+            }
             if (error) throw error;
         } catch (e) {
             console.error('puzzle-events insert failed:', e?.message || e);

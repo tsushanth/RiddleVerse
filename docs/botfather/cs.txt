@@ -1,0 +1,17 @@
+Language: Čeština (cs)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=cs:
+daily - Dnešní hádanka
+play - Vyberte hru
+leaderboard - Skóre v tomto chatu
+link - Propojit aplikaci RiddleVerse
+remind - Denní připomínka zap./vyp.
+language - Změnit jazyk
+app - Získat aplikaci pro Android
+help - Zobrazit nápovědu
+
+BotFather > /setabouttext (short description, max 120):
+Hádanky zdarma v Telegramu: denní hádanka, skupinové žebříčky, hra s přáteli.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse přináší do Telegramu 23 hádankových her zdarma. Hrajte denní hádanku, vyzývejte přátele v chatu a šplhejte skupinovým žebříčkem. Propojte bezplatnou aplikaci pro Android a používejte jeden účet všude.

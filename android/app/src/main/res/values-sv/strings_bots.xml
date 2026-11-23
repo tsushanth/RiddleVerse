@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Spela med vänner på Telegram</string>
+    <string name="tg_result_body">Utmana en chatt och jämför resultat på en live-topplista. Dina vänner behöver inte installera något.</string>
+    <string name="tg_result_cta">Öppna boten</string>
+    <string name="tg_daily_title">Få dagens pussel på Telegram</string>
+    <string name="tg_daily_body">Boten skickar dagens pussel och kan påminna dig varje dag.</string>
+    <string name="tg_daily_cta">Ställ in</string>
+    <string name="tg_settings_title">Telegram-bot</string>
+    <string name="tg_settings_subtitle">Spela med vänner, dagligt pussel, gruppens topplistor</string>
+    <string name="tg_connect_title">Anslut Telegram</string>
+    <string name="tg_connect_subtitle">Använd ett konto i appen och i boten</string>
+    <string name="tg_link_confirm_title">Ansluta Telegram?</string>
+    <string name="tg_link_confirm_body">Vill du ansluta Telegram-kontot som skickade den här länken till ditt RiddleVerse-konto?</string>
+    <string name="tg_link_confirm_yes">Anslut</string>
+    <string name="tg_link_confirm_no">Avbryt</string>
+    <string name="tg_link_success">Telegram anslutet</string>
+    <string name="tg_link_failed">Länken har gått ut eller har redan använts. Skicka /link till boten för en ny.</string>
+    <string name="share_play_link_message">Spela %1$s på RiddleVerse och slå mitt resultat: %2$s</string>
+</resources>

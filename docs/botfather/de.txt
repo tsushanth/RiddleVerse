@@ -1,0 +1,17 @@
+Language: Deutsch (de)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=de:
+daily - Das heutige Rätsel
+play - Spiel auswählen
+leaderboard - Punkte in diesem Chat
+link - RiddleVerse-App verbinden
+remind - Tägliche Erinnerung an oder aus
+language - Sprache ändern
+app - Android-App holen
+help - Hilfe anzeigen
+
+BotFather > /setabouttext (short description, max 120):
+Kostenlose Rätselspiele in Telegram: tägliches Rätsel, Gruppen-Bestenlisten, Spielen mit Freunden.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse bringt 23 kostenlose Rätselspiele zu Telegram. Spiele das tägliche Rätsel, fordere Freunde in einem Chat heraus und klettere in der Gruppen-Bestenliste nach oben. Verbinde die kostenlose Android-App, um überall ein Konto zu nutzen.

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Speel met vrienden op Telegram</string>
+    <string name="tg_result_body">Daag een chat uit en vergelijk scores op een live scorebord. Je vrienden hoeven niets te installeren.</string>
+    <string name="tg_result_cta">Open de bot</string>
+    <string name="tg_daily_title">Ontvang de dagelijkse puzzel op Telegram</string>
+    <string name="tg_daily_body">De bot plaatst de puzzel van vandaag en kan je elke dag herinneren.</string>
+    <string name="tg_daily_cta">Instellen</string>
+    <string name="tg_settings_title">Telegram-bot</string>
+    <string name="tg_settings_subtitle">Speel met vrienden, dagelijkse puzzel, groepsscoreborden</string>
+    <string name="tg_connect_title">Telegram koppelen</string>
+    <string name="tg_connect_subtitle">Eén account in de app en de bot</string>
+    <string name="tg_link_confirm_title">Telegram koppelen?</string>
+    <string name="tg_link_confirm_body">Wil je het Telegram-account dat je deze link stuurde koppelen aan je RiddleVerse-account?</string>
+    <string name="tg_link_confirm_yes">Koppelen</string>
+    <string name="tg_link_confirm_no">Annuleren</string>
+    <string name="tg_link_success">Telegram gekoppeld</string>
+    <string name="tg_link_failed">Deze link is verlopen of is al gebruikt. Stuur /link naar de bot voor een nieuwe.</string>
+    <string name="share_play_link_message">Speel %1$s op RiddleVerse en versla mijn score: %2$s</string>
+</resources>

@@ -40,14 +40,19 @@ class DailyShareTextTest {
         assertEquals(3, lines.size)
         assertEquals(DailyShareText.headline(r(tries = 2)), lines[0])
         assertEquals("Sudoku 🟥🟩", lines[1])
-        assertEquals(DailyShareText.PLAY_URL, lines[2])
+        assertEquals(DailyShareText.playUrl(null), lines[2])
     }
 
-    @Test fun playLink_isExactlyTheCampaignUrl() {
+    @Test fun playLink_isThePlayablePageWithShareTags() {
         assertEquals(
-            "https://play.google.com/store/apps/details?id=com.kreativekoala.riddleverse&utm_source=share&utm_medium=daily&utm_campaign=card",
-            DailyShareText.PLAY_URL,
+            "https://puzzleverseai.com/play/sudoku?src=share&utm_source=other&utm_medium=daily&utm_campaign=sudoku",
+            DailyShareText.playUrl("sudoku"),
         )
+        assertEquals(
+            "https://puzzleverseai.com/play?src=share&utm_source=other&utm_medium=daily&utm_campaign=index",
+            DailyShareText.playUrl(null),
+        )
+        assertEquals(DailyShareText.playUrl("sudoku"), DailyShareText.build(r().copy(slug = "sudoku")).split("\n").last())
     }
 
     @Test fun text_neverContainsSeedOrAnswerFields() {

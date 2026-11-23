@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Играйте с друзьями в Telegram</string>
+    <string name="tg_result_body">Бросьте вызов чату и сравнивайте результаты в живой таблице лидеров. Друзьям ничего не нужно устанавливать.</string>
+    <string name="tg_result_cta">Открыть бота</string>
+    <string name="tg_daily_title">Загадка дня в Telegram</string>
+    <string name="tg_daily_body">Бот присылает сегодняшнюю загадку и может напоминать о ней каждый день.</string>
+    <string name="tg_daily_cta">Настроить</string>
+    <string name="tg_settings_title">Бот в Telegram</string>
+    <string name="tg_settings_subtitle">Игры с друзьями, загадка дня, таблицы лидеров групп</string>
+    <string name="tg_connect_title">Подключить Telegram</string>
+    <string name="tg_connect_subtitle">Один аккаунт в приложении и в боте</string>
+    <string name="tg_link_confirm_title">Подключить Telegram?</string>
+    <string name="tg_link_confirm_body">Подключить аккаунт Telegram, приславший вам эту ссылку, к вашему аккаунту RiddleVerse?</string>
+    <string name="tg_link_confirm_yes">Подключить</string>
+    <string name="tg_link_confirm_no">Отмена</string>
+    <string name="tg_link_success">Telegram подключён</string>
+    <string name="tg_link_failed">Ссылка устарела или уже использована. Отправьте боту /link, чтобы получить новую.</string>
+    <string name="share_play_link_message">Сыграй в %1$s в RiddleVerse и побей мой результат: %2$s</string>
+</resources>

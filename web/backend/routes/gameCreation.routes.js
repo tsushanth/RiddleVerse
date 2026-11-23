@@ -123,6 +123,11 @@ function reportWorkerHttp(op, status) {
 const API_BASE_URL = process.env.API_BASE_URL || '';
 
 const GAME_WORKER_URL = process.env.GAME_WORKER_URL || 'http://localhost:3456';
+// The build worker is on a Hetzner box that has no TLS certificate yet, so these calls (they carry x-worker-secret and prompts)
+// travel unencrypted. Say so once at boot until the URL is https (see docs/telegram-and-sharing.md, "Forge hardening").
+if (/^http:\/\//i.test(GAME_WORKER_URL) && !/^http:\/\/(localhost|127\.0\.0\.1)/i.test(GAME_WORKER_URL)) {
+    console.warn('[forge] GAME_WORKER_URL is plain http: the worker secret and prompts are sent unencrypted. Put the worker behind TLS and set GAME_WORKER_URL to https.');
+}
 const GAME_WORKER_SECRET = process.env.GAME_WORKER_SECRET || 'game-worker-secret-2024';
 const GAME_BUNDLES_BUCKET = 'game-bundles';
 const SCREENSHOT_SERVICE_URL = process.env.SCREENSHOT_SERVICE_URL || 'http://178.156.231.255:3465';

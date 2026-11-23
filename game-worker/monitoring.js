@@ -92,3 +92,45 @@ export function evaluateHealth({ cliAvailable, quotaExhausted, activeGenerations
   if (freeBytes !== null && freeBytes !== undefined && freeBytes < LOW_DISK_BYTES) reasons.push('disk_low');
   return { ok: reasons.length === 0, reasons };
 }
+
+/**
+ * Token / cost figures from the Claude CLI `result` event (stream-json), or null when the CLI did not report any.
+ * Only numbers are kept: no prompt, no output text.
+ */
+export function summarizeCliResult(event) {
+  if (!event || event.type !== 'result') return null;
+  const num = (v) => (typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : null);
+  const u = event.usage && typeof event.usage === 'object' ? event.usage : {};
+  const out = {
+    costUsd: num(event.total_cost_usd) ?? num(event.cost_usd),
+    inputTokens: num(u.input_tokens),
+    outputTokens: num(u.output_tokens),
+    cacheReadTokens: num(u.cache_read_input_tokens),
+    cacheWriteTokens: num(u.cache_creation_input_tokens),
+    durationMs: num(event.duration_ms),
+    turns: num(event.num_turns),
+  };
+  return Object.values(out).every((v) => v === null) ? null : out;
+}
+
+/** Rolling per-day totals of what generations cost, served by GET /usage (same secret as the other routes). */
+export function createUsageTally(now = () => Date.now()) {
+  const days = new Map(); // 'YYYY-MM-DD' (UTC) -> totals
+  const add = (usage, ok) => {
+    const day = new Date(now()).toISOString().slice(0, 10);
+    const t = days.get(day) || { sessions: 0, failed: 0, withUsage: 0, costUsd: 0, inputTokens: 0, outputTokens: 0, cacheReadTokens: 0, durationMs: 0 };
+    t.sessions++;
+    if (!ok) t.failed++;
+    if (usage) {
+      t.withUsage++;
+      t.costUsd += usage.costUsd || 0;
+      t.inputTokens += usage.inputTokens || 0;
+      t.outputTokens += usage.outputTokens || 0;
+      t.cacheReadTokens += usage.cacheReadTokens || 0;
+      t.durationMs += usage.durationMs || 0;
+    }
+    days.set(day, t);
+    for (const k of [...days.keys()].sort().slice(0, -14)) days.delete(k); // keep two weeks
+  };
+  return { record: add, snapshot: () => Object.fromEntries([...days.entries()].sort()) };
+}

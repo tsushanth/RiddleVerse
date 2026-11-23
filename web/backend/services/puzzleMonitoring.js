@@ -11,7 +11,13 @@ const NEW_WAVE = new Set(NEW_WAVE_TYPES);
 // difficulty (enum, start/complete only), duration_ms only on complete, session_id is a random per-page-load id.
 export const WEB_PLAY_EVENT_TYPES = new Set(['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta']);
 export const WEB_PLAY_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
-export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open', 'daily_solved', ...WEB_PLAY_EVENT_TYPES]);
+// Sharing and channel events (Android and web): who shared what through which channel, how deep links and the Telegram promos
+// perform. `channel` is a short [a-z0-9_] label (telegram, whatsapp, other, banner, result, settings, ...). share_open, the
+// server-side "someone opened a shared link" event, is written by the server itself and is NOT accepted from clients.
+export const CHANNEL_EVENT_TYPES = new Set(['share_sent', 'deeplink_open', 'telegram_cta']);
+const APP_SCOPED_CHANNEL_TYPES = new Set(['deeplink_open', 'telegram_cta']); // may use the reserved puzzle_type 'app'
+export const EVENT_TYPES = new Set(['start', 'complete', 'fail', 'abandon', 'hint', 'undo', 'error', 'funnel', 'app_open', 'daily_solved', ...WEB_PLAY_EVENT_TYPES, ...CHANNEL_EVENT_TYPES]);
+const CHANNEL_RE = /^[a-z0-9_]{1,24}$/;
 // Install-funnel events (no puzzle): puzzle_type is the fixed placeholder 'app'; they carry funnelStep / daysSinceInstall only.
 // 'daily_solved' = one row per solved daily puzzle: days_since_install + score (= streak length after the solve).
 export const FUNNEL_EVENT_TYPES = new Set(['funnel', 'app_open', 'daily_solved']);
@@ -65,12 +71,22 @@ export function validatePayload(body, now = Date.now()) {
                 if (daysSinceInstall == null || daysSinceInstall > MAX_DAYS_SINCE_INSTALL) return null;
                 if (e.type === 'daily_solved') streakScore = Math.min(int(e.score) ?? 0, 100000);
             }
-        } else if (e.puzzleType === APP_PUZZLE_TYPE) {
+        } else if (e.puzzleType === APP_PUZZLE_TYPE && !APP_SCOPED_CHANNEL_TYPES.has(e.type)) {
             return null; // 'app' is reserved for funnel events; keep it out of puzzle stats
         }
+        const isChannel = CHANNEL_EVENT_TYPES.has(e.type);
+        if (isChannel && e.type === 'telegram_cta' && e.puzzleType !== APP_PUZZLE_TYPE) return null;
         let eventTs = null;
         if (typeof e.ts === 'number' && Number.isFinite(e.ts)) {
             eventTs = new Date(Math.min(Math.max(e.ts, now - DAY), now + DAY)).toISOString();
+        }
+        if (isChannel) {
+            events.push({
+                event_ts: eventTs, event_type: e.type, puzzle_type: e.puzzleType, difficulty: null,
+                session_id: str(e.sessionId, 64), duration_ms: null, score: null, moves: null, hints_used: null, mistakes: null, error_message: null,
+                channel: typeof e.channel === 'string' && CHANNEL_RE.test(e.channel) ? e.channel : null,
+            });
+            continue;
         }
         if (isWebPlay) {
             // Whitelist only: nothing else the client sends is copied into the row.

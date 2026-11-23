@@ -1,0 +1,17 @@
+Language: Polski (pl)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=pl:
+daily - Dzisiejsza zagadka
+play - Wybierz grę
+leaderboard - Wyniki na tym czacie
+link - Połącz aplikację RiddleVerse
+remind - Codzienne przypomnienie wł. lub wył.
+language - Zmień język
+app - Pobierz aplikację na Androida
+help - Pokaż pomoc
+
+BotFather > /setabouttext (short description, max 120):
+Darmowe gry logiczne w Telegramie: zagadka dnia, rankingi grup, gra ze znajomymi.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse przynosi do Telegramu 23 darmowe gry logiczne. Rozwiązuj zagadkę dnia, rzucaj wyzwania znajomym na czacie i pnij się w rankingu grupy. Połącz darmową aplikację na Androida, aby korzystać z jednego konta wszędzie.

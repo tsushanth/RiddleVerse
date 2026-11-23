@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { playStoreUrl } from '../utils/playLinks'
+import { telegramBotUrl } from '../utils/telegramPlay'
 
 export default function WelcomePage() {
   const { loginWithGoogle, loginWithEmail, registerWithEmail, error } = useAuth()
@@ -212,12 +214,20 @@ export default function WelcomePage() {
               App Store
             </a>
             <a
-              href="https://play.google.com/store/apps/details?id=com.kreativekoala.riddlebot"
+              href={playStoreUrl('welcome')}
               target="_blank"
               rel="noopener noreferrer"
               className="bg-black/50 hover:bg-black/70 text-white px-4 py-2 rounded-lg text-sm transition-colors"
             >
               Play Store
+            </a>
+            <a
+              href={telegramBotUrl()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-sky-600/80 hover:bg-sky-500 text-white px-4 py-2 rounded-lg text-sm transition-colors"
+            >
+              Telegram
             </a>
           </div>
         </div>

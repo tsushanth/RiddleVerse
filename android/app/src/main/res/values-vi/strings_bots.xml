@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Chơi cùng bạn bè trên Telegram</string>
+    <string name="tg_result_body">Thách đấu cả cuộc trò chuyện và so điểm trên bảng xếp hạng trực tiếp. Bạn bè không cần cài đặt gì cả.</string>
+    <string name="tg_result_cta">Mở bot</string>
+    <string name="tg_daily_title">Nhận câu đố hằng ngày trên Telegram</string>
+    <string name="tg_daily_body">Bot đăng câu đố hôm nay và có thể nhắc bạn mỗi ngày.</string>
+    <string name="tg_daily_cta">Thiết lập</string>
+    <string name="tg_settings_title">Bot Telegram</string>
+    <string name="tg_settings_subtitle">Chơi cùng bạn bè, câu đố hằng ngày, bảng xếp hạng nhóm</string>
+    <string name="tg_connect_title">Kết nối Telegram</string>
+    <string name="tg_connect_subtitle">Dùng một tài khoản trong ứng dụng và bot</string>
+    <string name="tg_link_confirm_title">Kết nối Telegram?</string>
+    <string name="tg_link_confirm_body">Kết nối tài khoản Telegram đã gửi cho bạn liên kết này với tài khoản RiddleVerse của bạn?</string>
+    <string name="tg_link_confirm_yes">Kết nối</string>
+    <string name="tg_link_confirm_no">Hủy</string>
+    <string name="tg_link_success">Đã kết nối Telegram</string>
+    <string name="tg_link_failed">Liên kết này đã hết hạn hoặc đã được dùng. Gửi /link cho bot để nhận liên kết mới.</string>
+    <string name="share_play_link_message">Chơi %1$s trên RiddleVerse và vượt điểm của tôi: %2$s</string>
+</resources>

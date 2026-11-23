@@ -18,7 +18,9 @@ data class PuzzleEvent(
     /** Only for type "funnel": one of [PuzzleEventsClient.FUNNEL_STEPS]. */
     val funnelStep: String? = null,
     /** Only for type "app_open": whole local days since install. */
-    val daysSinceInstall: Int? = null
+    val daysSinceInstall: Int? = null,
+    /** Only for [PuzzleEventsClient.CHANNEL_TYPES]: a short label such as telegram, whatsapp, other, banner, result. */
+    val channel: String? = null
 )
 
 /**
@@ -42,7 +44,11 @@ class PuzzleEventsClient(
         const val BASE_BACKOFF_MS = 15_000L
         const val MAX_BACKOFF_MS = 15 * 60_000L
         const val MAX_ERROR_CHARS = 300
-        private val TYPES = setOf("start", "complete", "fail", "abandon", "hint", "undo", "error", "funnel", "app_open", "daily_solved")
+        /** Sharing and Telegram-promo events. share_sent needs a real puzzle type; deeplink_open may use "app"; telegram_cta is always "app". */
+        val CHANNEL_TYPES = setOf("share_sent", "deeplink_open", "telegram_cta")
+        private val TYPES = setOf("start", "complete", "fail", "abandon", "hint", "undo", "error", "funnel", "app_open", "daily_solved") + CHANNEL_TYPES
+        private val CHANNEL = Regex("^[a-z0-9_]{1,24}$")
+        fun sanitizeChannel(raw: String?): String? = raw?.trim()?.lowercase()?.takeIf { CHANNEL.matches(it) }
         /** Install-funnel event types. They carry the fixed puzzle type [APP_PUZZLE_TYPE] (puzzle_type is NOT NULL server side). */
         const val APP_PUZZLE_TYPE = "app"
         const val MAX_DAYS_SINCE_INSTALL = 3650
@@ -118,7 +124,13 @@ class PuzzleEventsClient(
         if (!enabled()) false else {
             val type = event.type
             val funnel = isFunnelType(type)
-            val pt = if (funnel) APP_PUZZLE_TYPE else sanitizePuzzleType(event.puzzleType)
+            val channelType = type in CHANNEL_TYPES
+            val pt = when {
+                funnel || type == "telegram_cta" -> APP_PUZZLE_TYPE
+                // share_sent must name a real puzzle: "app" is reserved for install-level events (the server rejects it too).
+                type == "share_sent" -> sanitizePuzzleType(event.puzzleType)?.takeIf { it != APP_PUZZLE_TYPE }
+                else -> sanitizePuzzleType(event.puzzleType)
+            }
             val step = if (type == "funnel") event.funnelStep?.takeIf { it in FUNNEL_STEPS } else null
             val days = if (carriesDays(type)) event.daysSinceInstall?.takeIf { it in 0..MAX_DAYS_SINCE_INSTALL } else null
             if (type !in TYPES || pt == null || (type == "funnel" && step == null) || (carriesDays(type) && days == null)) false else {
@@ -131,7 +143,8 @@ class PuzzleEventsClient(
                     moves = event.moves?.coerceAtLeast(0),
                     hintsUsed = event.hintsUsed?.coerceAtLeast(0),
                     mistakes = event.mistakes?.coerceAtLeast(0),
-                    errorMessage = if (type == "error") sanitizeError(event.errorMessage) else null
+                    errorMessage = if (type == "error") sanitizeError(event.errorMessage) else null,
+                    channel = if (channelType) sanitizeChannel(event.channel) else null
                 ).let {
                     if (funnel) it.copy(
                         difficulty = null, moves = null, hintsUsed = null, mistakes = null, durationMs = null,
@@ -165,6 +178,7 @@ class PuzzleEventsClient(
             e.errorMessage?.let { sb.append(",\"errorMessage\":\"").append(esc(it)).append('"') }
             e.funnelStep?.let { sb.append(",\"funnelStep\":\"").append(esc(it)).append('"') }
             e.daysSinceInstall?.let { sb.append(",\"daysSinceInstall\":").append(it) }
+            e.channel?.let { sb.append(",\"channel\":\"").append(esc(it)).append('"') }
             sb.append(",\"ts\":").append(e.ts).append('}')
         }
         return sb.append("]}").toString()

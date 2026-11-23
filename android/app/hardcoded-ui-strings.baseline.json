@@ -1,6 +1,6 @@
 {
   "_note": "Per-file count of hard-coded user-visible English literals in src/main. NoHardcodedUiStringsTest fails if a count rises or a new file adds any. Lower counts are fine. Regenerate deliberately with scripts/update-hardcoded-baseline.sh; see docs/hardcoded-ui-strings-guard.md.",
-  "total": 1722,
+  "total": 1721,
   "files": {
     "src/main/java/com/kreativekoala/riddleverse/AdManager.kt": {"count": 6, "h": ["5ac9bba2", "9c0ce279", "cb0adcfa", "d16c84df", "f5bfb53b", "f5bfb53b"]},
     "src/main/java/com/kreativekoala/riddleverse/AdaptiveAveragePuzzleScreen.kt": {"count": 3, "h": ["59174c67", "efea3b10", "f77c3547"]},
@@ -32,7 +32,7 @@
     "src/main/java/com/kreativekoala/riddleverse/AntonymBalloonPuzzleScreen.kt": {"count": 2, "h": ["04eb4268", "7332ab71"]},
     "src/main/java/com/kreativekoala/riddleverse/AverageCalculationPuzzleScreen.kt": {"count": 2, "h": ["f77c3547", "f77c3547"]},
     "src/main/java/com/kreativekoala/riddleverse/BadgedIcon.kt": {"count": 3, "h": ["00012d80", "cf786036", "cf786036"]},
-    "src/main/java/com/kreativekoala/riddleverse/BotUpsellSheet.kt": {"count": 2, "h": ["772c5592", "b2c34d21"]},
+    "src/main/java/com/kreativekoala/riddleverse/BotUpsellSheet.kt": {"count": 1, "h": ["b2c34d21"]},
     "src/main/java/com/kreativekoala/riddleverse/ClassicPuzzleCommon.kt": {"count": 6, "h": ["0d98b22e", "4ead2bd6", "7cd21da6", "911c95f3", "a2630755", "bf4c6e21"]},
     "src/main/java/com/kreativekoala/riddleverse/ClientSideConversionWrapper.kt": {"count": 1, "h": ["f70e1612"]},
     "src/main/java/com/kreativekoala/riddleverse/CodeCrackerScreen.kt": {"count": 7, "h": ["2836640f", "37dfc850", "532c6f7f", "63ee7bb5", "7a7c86a3", "7b330623", "e3bf9718"]},

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Maglaro kasama ang mga kaibigan sa Telegram</string>
+    <string name="tg_result_body">Hamunin ang isang chat at ihambing ang mga score sa live na leaderboard. Hindi kailangang mag-install ng kahit ano ang mga kaibigan mo.</string>
+    <string name="tg_result_cta">Buksan ang bot</string>
+    <string name="tg_daily_title">Kunin ang daily puzzle sa Telegram</string>
+    <string name="tg_daily_body">Ipo-post ng bot ang puzzle ngayong araw at puwede ka nitong paalalahanan araw-araw.</string>
+    <string name="tg_daily_cta">I-set up</string>
+    <string name="tg_settings_title">Telegram bot</string>
+    <string name="tg_settings_subtitle">Laro kasama ang mga kaibigan, daily puzzle, leaderboard ng group</string>
+    <string name="tg_connect_title">I-connect ang Telegram</string>
+    <string name="tg_connect_subtitle">Iisang account sa app at sa bot</string>
+    <string name="tg_link_confirm_title">I-connect ang Telegram?</string>
+    <string name="tg_link_confirm_body">I-connect ang Telegram account na nagpadala sa iyo ng link na ito sa RiddleVerse account mo?</string>
+    <string name="tg_link_confirm_yes">I-connect</string>
+    <string name="tg_link_confirm_no">Kanselahin</string>
+    <string name="tg_link_success">Naka-connect na ang Telegram</string>
+    <string name="tg_link_failed">Nag-expire na o nagamit na ang link na ito. Ipadala ang /link sa bot para sa bago.</string>
+    <string name="share_play_link_message">Laruin ang %1$s sa RiddleVerse at talunin ang score ko: %2$s</string>
+</resources>

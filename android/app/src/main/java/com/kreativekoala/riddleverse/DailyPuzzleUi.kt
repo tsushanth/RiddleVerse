@@ -154,6 +154,7 @@ fun DailyResultScreen(record: DailySolveRecord, onDone: () -> Unit) {
         ) { Text(stringResource(R.string.daily_result_share_text), color = RvOnTone, fontWeight = FontWeight.ExtraBold, fontSize = 16.sp, modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center) }
 
         ReminderOfferCard()
+        TelegramPlayCard(variant = TelegramCardVariant.DAILY)
         SupporterOfferCard()
 
         Text(stringResource(R.string.daily_card_next_in, countdown(DailyPuzzleSchedule.millisUntilNext(now))), fontSize = 14.sp, color = RvInkSoft)

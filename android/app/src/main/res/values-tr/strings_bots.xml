@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Telegram\'da arkadaşlarınla oyna</string>
+    <string name="tg_result_body">Bir sohbete meydan oku ve skorları canlı sıralamada karşılaştır. Arkadaşlarının hiçbir şey yüklemesi gerekmez.</string>
+    <string name="tg_result_cta">Botu aç</string>
+    <string name="tg_daily_title">Günlük bulmacayı Telegram\'da al</string>
+    <string name="tg_daily_body">Bot bugünün bulmacasını paylaşır ve seni her gün hatırlatabilir.</string>
+    <string name="tg_daily_cta">Kur</string>
+    <string name="tg_settings_title">Telegram botu</string>
+    <string name="tg_settings_subtitle">Arkadaşlarla oyun, günlük bulmaca, grup sıralamaları</string>
+    <string name="tg_connect_title">Telegram\'ı bağla</string>
+    <string name="tg_connect_subtitle">Uygulamada ve botta tek hesap kullan</string>
+    <string name="tg_link_confirm_title">Telegram bağlansın mı?</string>
+    <string name="tg_link_confirm_body">Bu bağlantıyı sana gönderen Telegram hesabı RiddleVerse hesabına bağlansın mı?</string>
+    <string name="tg_link_confirm_yes">Bağla</string>
+    <string name="tg_link_confirm_no">İptal</string>
+    <string name="tg_link_success">Telegram bağlandı</string>
+    <string name="tg_link_failed">Bu bağlantının süresi doldu veya daha önce kullanıldı. Yenisi için bota /link gönder.</string>
+    <string name="share_play_link_message">RiddleVerse\'te %1$s oyna ve skorumu geç: %2$s</string>
+</resources>

@@ -1,29 +1,28 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
+import { createTelegramApi, escapeHtml } from '../services/telegram/telegramApi.js';
+import { createLimiter } from '../services/puzzleMonitoring.js';
 
 const router = express.Router();
 
-const TELEGRAM_BOT_TOKEN = process.env.RIDDLEVERSE_BOT_TOKEN || '';
+const TELEGRAM_BOT_TOKEN = process.env.RIDDLEVERSE_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN || '';
 const MEDALS = ['🥇', '🥈', '🥉'];
+let tgApi = null;
+// This endpoint is unauthenticated (the generated games call it from the page), so cap what it can make the bot say per chat.
+const notifyLimiter = createLimiter();
 
+// Leaderboard post for AI-generated games played in a chat. HTML parse mode with every dynamic value escaped: the old
+// MarkdownV2 text left the game title unescaped, so any title with "." or "-" made Telegram reject the message.
 async function sendTelegramLeaderboard(chatId, gameName, leaderboard) {
     if (!TELEGRAM_BOT_TOKEN || !chatId) return;
+    if (!/^-?\d{1,20}$/.test(String(chatId)) || !notifyLimiter.take(`chat:${chatId}`, 1, 3, 60e3)) return;
     try {
-        const lines = [`🏆 *${gameName} — Leaderboard*\n`];
+        if (!tgApi) tgApi = createTelegramApi({ token: TELEGRAM_BOT_TOKEN });
+        const lines = [`🏆 <b>${escapeHtml(gameName)}</b>`, ''];
         leaderboard.forEach((s, i) => {
-            const medal = MEDALS[i] || `${i + 1}.`;
-            const name = (s.username || 'Player').replace(/[_*[\]()~`>#+=|{}.!-]/g, '\\$&');
-            lines.push(`${medal} ${name} — *${s.score}*`);
+            lines.push(`${MEDALS[i] || `${i + 1}.`} ${escapeHtml(s.username || 'Player')} - <b>${Number(s.score) | 0}</b>`);
         });
-        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: lines.join('\n'),
-                parse_mode: 'MarkdownV2'
-            })
-        });
+        await tgApi.sendMessage(chatId, lines.join('\n'));
     } catch (err) {
         console.warn('[chat-scores] Telegram notify failed:', err.message);
     }

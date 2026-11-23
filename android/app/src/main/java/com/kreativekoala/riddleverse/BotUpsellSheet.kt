@@ -25,13 +25,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 
-// TODO: Replace with actual bot username and phone number
-private const val TELEGRAM_BOT_USERNAME = "RiddleVerseBot" // TODO: actual bot username
-private const val WHATSAPP_BOT_NUMBER = "1234567890"       // TODO: actual WhatsApp number
+// The live bot is @Riddleverse_bot (same handle as TelegramBotBanner). There is no WhatsApp bot, so no WhatsApp button.
+private const val TELEGRAM_BOT_USERNAME = "Riddleverse_bot"
 
 /**
  * Bottom-sheet-style dialog shown when a free user hits their daily generation limit.
- * Offers Telegram and WhatsApp bot links as an alternative path to continue.
+ * Offers the Telegram bot as an alternative path to continue.
  */
 @Composable
 fun BotUpsellSheet(
@@ -101,23 +100,6 @@ fun BotUpsellSheet(
                     Text("Telegram", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // WhatsApp button
-                Button(
-                    onClick = {
-                        openWhatsAppBot(context)
-                        onDismiss()
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 48.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF25D366)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Text("WhatsApp", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
-                }
-
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
@@ -132,28 +114,5 @@ fun BotUpsellSheet(
 }
 
 private fun openTelegramBot(context: Context) {
-    try {
-        // Try native Telegram deep link first
-        val telegramIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=$TELEGRAM_BOT_USERNAME"))
-        telegramIntent.setPackage("org.telegram.messenger")
-        context.startActivity(telegramIntent)
-    } catch (e: Exception) {
-        try {
-            // Fallback to web URL
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$TELEGRAM_BOT_USERNAME"))
-            context.startActivity(webIntent)
-        } catch (e2: Exception) {
-            Toast.makeText(context, context.getString(R.string.browse_bot_telegram_open_failed, TELEGRAM_BOT_USERNAME), Toast.LENGTH_LONG).show()
-        }
-    }
-}
-
-private fun openWhatsAppBot(context: Context) {
-    try {
-        // TODO: Replace with actual WhatsApp bot number
-        val whatsappIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://wa.me/$WHATSAPP_BOT_NUMBER"))
-        context.startActivity(whatsappIntent)
-    } catch (e: Exception) {
-        Toast.makeText(context, context.getString(R.string.browse_bot_whatsapp_open_failed), Toast.LENGTH_LONG).show()
-    }
+    TelegramPromo.open(context, null, "upsell")
 }

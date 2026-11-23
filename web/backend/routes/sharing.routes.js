@@ -86,7 +86,9 @@ router.get('/open-riddle', (req, res) => {
     const isIOS = /iphone|ipad|ipod/i.test(userAgent);
 
     if (isAndroid) {
-        return res.redirect(`intent://puzzleverseai.com/open-riddle?puzzleId=${encodeURIComponent(puzzleId)}#Intent;scheme=https;package=com.kreativekoala.riddleverse;end`);
+        // Without the app installed the bare intent:// URL dead-ends in Chrome; the fallback sends the person to Google Play.
+        const fallback = encodeURIComponent('https://play.google.com/store/apps/details?id=com.kreativekoala.riddleverse&utm_source=email_share&utm_medium=open_riddle&utm_campaign=riddle');
+        return res.redirect(`intent://puzzleverseai.com/open-riddle?puzzleId=${encodeURIComponent(puzzleId)}#Intent;scheme=https;package=com.kreativekoala.riddleverse;S.browser_fallback_url=${fallback};end`);
     } else if (isIOS) {
         return res.send(`
             <html>

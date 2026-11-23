@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">เล่นกับเพื่อนบน Telegram</string>
+    <string name="tg_result_body">ท้าแชตทั้งกลุ่มและเทียบคะแนนบนกระดานผู้นำสด เพื่อนของคุณไม่ต้องติดตั้งอะไร</string>
+    <string name="tg_result_cta">เปิดบอต</string>
+    <string name="tg_daily_title">รับปริศนาประจำวันบน Telegram</string>
+    <string name="tg_daily_body">บอตจะโพสต์ปริศนาของวันนี้และเตือนคุณได้ทุกวัน</string>
+    <string name="tg_daily_cta">ตั้งค่า</string>
+    <string name="tg_settings_title">บอต Telegram</string>
+    <string name="tg_settings_subtitle">เล่นกับเพื่อน ปริศนาประจำวัน กระดานผู้นำกลุ่ม</string>
+    <string name="tg_connect_title">เชื่อมต่อ Telegram</string>
+    <string name="tg_connect_subtitle">ใช้บัญชีเดียวทั้งในแอปและบอต</string>
+    <string name="tg_link_confirm_title">เชื่อมต่อ Telegram?</string>
+    <string name="tg_link_confirm_body">เชื่อมต่อบัญชี Telegram ที่ส่งลิงก์นี้ให้คุณเข้ากับบัญชี RiddleVerse ของคุณไหม?</string>
+    <string name="tg_link_confirm_yes">เชื่อมต่อ</string>
+    <string name="tg_link_confirm_no">ยกเลิก</string>
+    <string name="tg_link_success">เชื่อมต่อ Telegram แล้ว</string>
+    <string name="tg_link_failed">ลิงก์นี้หมดอายุหรือถูกใช้ไปแล้ว ส่ง /link ให้บอตเพื่อรับลิงก์ใหม่</string>
+    <string name="share_play_link_message">เล่น %1$s บน RiddleVerse แล้วทำคะแนนให้เกินของฉัน: %2$s</string>
+</resources>

@@ -1,0 +1,17 @@
+Language: Bahasa Melayu (ms)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ms:
+daily - Teka-teki hari ini
+play - Pilih permainan
+leaderboard - Markah dalam sembang ini
+link - Sambung apl RiddleVerse
+remind - Peringatan harian hidup atau mati
+language - Tukar bahasa
+app - Dapatkan apl Android
+help - Tunjukkan bantuan
+
+BotFather > /setabouttext (short description, max 120):
+Permainan teka-teki percuma di Telegram: teka-teki harian, papan pendahulu kumpulan, main bersama rakan.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse membawa 23 permainan teka-teki percuma ke Telegram. Mainkan teka-teki harian, cabar rakan dalam sembang dan naik ke papan pendahulu kumpulan. Sambungkan apl Android percuma untuk menggunakan satu akaun di mana-mana sahaja.

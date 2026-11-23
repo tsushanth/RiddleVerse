@@ -95,15 +95,12 @@ object DailyShareCard {
 
     /** Share sheet with the text only. */
     fun shareText(context: Context, r: DailyShareResult) {
-        val send = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, DailyShareText.build(r, context.getString(R.string.done_share_headline)))
-        }
-        context.startActivity(Intent.createChooser(send, context.getString(R.string.done_share_daily_chooser)))
+        ShareLinks.shareText(context, DailyShareText.build(r, context.getString(R.string.done_share_headline)), r.slug, context.getString(R.string.done_share_daily_chooser))
     }
 
     /** Share sheet with the image card (plus the same text). Uses a FileProvider content URI: no storage permission. */
     fun shareImage(context: Context, r: DailyShareResult) {
+        PuzzleEvents.shareSent(ShareLinks.eventTarget(r.slug) ?: "custom", ShareLinks.CHANNEL_OTHER)
         val file = save(context, r)
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         val send = Intent(Intent.ACTION_SEND).apply {

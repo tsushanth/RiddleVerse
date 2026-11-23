@@ -171,11 +171,13 @@ export function createRoundTracker(analytics, slug, now = () => Date.now()) {
       t0 = now()
       analytics.start(slug, difficulty)
     },
+    /** Returns { durationMs, difficulty } for a counted solve (the Telegram score uses it), otherwise undefined. */
     answered(isCorrect, difficulty) {
-      if (isCorrect !== true || t0 === null) return
+      if (isCorrect !== true || t0 === null) return undefined
       const durationMs = Math.max(0, now() - t0)
       t0 = null
       analytics.complete(slug, { difficulty, durationMs })
+      return { durationMs, difficulty }
     },
     reset() { t0 = null },
   }

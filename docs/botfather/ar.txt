@@ -1,0 +1,17 @@
+Language: العربية (ar)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ar:
+daily - لغز اليوم
+play - اختر لعبة
+leaderboard - النتائج في هذه المحادثة
+link - اربط تطبيق RiddleVerse
+remind - تشغيل التذكير اليومي أو إيقافه
+language - تغيير اللغة
+app - احصل على تطبيق Android
+help - عرض المساعدة
+
+BotFather > /setabouttext (short description, max 120):
+ألعاب ألغاز مجانية على Telegram: لغز يومي ولوحات متصدرين للمجموعات واللعب مع الأصدقاء.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+يقدّم RiddleVerse 23 لعبة ألغاز مجانية على Telegram. العب اللغز اليومي، وتحدَّ أصدقاءك في محادثة، وتصدّر لوحة متصدري المجموعة. اربط تطبيق Android المجاني لاستخدام حساب واحد في كل مكان.

@@ -1,0 +1,17 @@
+Language: Türkçe (tr)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=tr:
+daily - Bugünün bulmacası
+play - Oyun seç
+leaderboard - Bu sohbetteki skorlar
+link - RiddleVerse uygulamasını bağla
+remind - Günlük hatırlatıcıyı aç/kapat
+language - Dili değiştir
+app - Android uygulamasını al
+help - Yardımı göster
+
+BotFather > /setabouttext (short description, max 120):
+Telegram'da ücretsiz bulmaca oyunları: günlük bulmaca, grup sıralamaları, arkadaşlarla oyun.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse, Telegram'a 23 ücretsiz bulmaca oyunu getiriyor. Günlük bulmacayı oyna, sohbette arkadaşlarına meydan oku ve grup sıralamasında yüksel. Her yerde tek hesap kullanmak için ücretsiz Android uygulamasını bağla.

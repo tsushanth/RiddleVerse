@@ -1,0 +1,17 @@
+Language: Русский (ru)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ru:
+daily - Загадка дня
+play - Выбрать игру
+leaderboard - Результаты в этом чате
+link - Подключить приложение RiddleVerse
+remind - Напоминание вкл/выкл
+language - Сменить язык
+app - Приложение для Android
+help - Показать справку
+
+BotFather > /setabouttext (short description, max 120):
+Бесплатные головоломки в Telegram: загадка дня, таблицы лидеров в группах, игры с друзьями.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse приносит в Telegram 23 бесплатные игры-головоломки. Решайте загадку дня, бросайте вызов друзьям в чате и поднимайтесь в таблице лидеров группы. Подключите бесплатное приложение для Android, чтобы пользоваться одним аккаунтом везде.

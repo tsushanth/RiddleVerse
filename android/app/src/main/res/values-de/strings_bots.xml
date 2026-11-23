@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Spiele mit Freunden auf Telegram</string>
+    <string name="tg_result_body">Fordere einen Chat heraus und vergleiche Ergebnisse in einer Live-Bestenliste. Deine Freunde müssen nichts installieren.</string>
+    <string name="tg_result_cta">Bot öffnen</string>
+    <string name="tg_daily_title">Hol dir das tägliche Rätsel auf Telegram</string>
+    <string name="tg_daily_body">Der Bot postet das heutige Rätsel und kann dich jeden Tag erinnern.</string>
+    <string name="tg_daily_cta">Einrichten</string>
+    <string name="tg_settings_title">Telegram-Bot</string>
+    <string name="tg_settings_subtitle">Mit Freunden spielen, tägliches Rätsel, Gruppen-Bestenlisten</string>
+    <string name="tg_connect_title">Telegram verbinden</string>
+    <string name="tg_connect_subtitle">Ein Konto in der App und im Bot nutzen</string>
+    <string name="tg_link_confirm_title">Telegram verbinden?</string>
+    <string name="tg_link_confirm_body">Das Telegram-Konto, das dir diesen Link geschickt hat, mit deinem RiddleVerse-Konto verbinden?</string>
+    <string name="tg_link_confirm_yes">Verbinden</string>
+    <string name="tg_link_confirm_no">Abbrechen</string>
+    <string name="tg_link_success">Telegram verbunden</string>
+    <string name="tg_link_failed">Dieser Link ist abgelaufen oder wurde schon verwendet. Sende /link an den Bot, um einen neuen zu erhalten.</string>
+    <string name="share_play_link_message">Spiele %1$s auf RiddleVerse und schlage meine Punktzahl: %2$s</string>
+</resources>

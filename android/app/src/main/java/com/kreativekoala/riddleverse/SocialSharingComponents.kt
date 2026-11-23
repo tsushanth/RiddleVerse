@@ -281,7 +281,9 @@ fun getShareOptions(): List<ShareOption> {
 
 // MARK: - Sharing Actions
 fun shareToSocialMedia(context: Context, content: ShareableContent) {
-    val shareText = buildShareText(content)
+    // The link goes on its own line so chat apps preview it: the playable web page (App Link opens the app when installed).
+    val shareText = buildShareText(content) + "\n" + ShareLinks.playUrl(null, ShareLinks.CHANNEL_OTHER)
+    PuzzleEvents.shareSent("custom", ShareLinks.CHANNEL_OTHER)
     val shareIntent = Intent().apply {
         action = Intent.ACTION_SEND
         type = "text/plain"

@@ -1,0 +1,17 @@
+Language: Español (es)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=es:
+daily - El puzzle de hoy
+play - Elige un juego
+leaderboard - Puntuaciones de este chat
+link - Conecta la app de RiddleVerse
+remind - Recordatorio diario sí o no
+language - Cambiar idioma
+app - Descarga la app de Android
+help - Mostrar ayuda
+
+BotFather > /setabouttext (short description, max 120):
+Juegos de puzzles gratis en Telegram: puzzle diario, clasificaciones de grupo y partidas con amigos.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse lleva 23 juegos de puzzles gratis a Telegram. Juega al puzzle diario, reta a tus amigos en un chat y sube en la clasificación del grupo. Conecta la app gratuita de Android para usar una sola cuenta en todas partes.

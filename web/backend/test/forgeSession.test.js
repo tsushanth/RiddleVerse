@@ -197,3 +197,37 @@ test('flag: off unless FORGE_SESSION_SWEEPER_ENABLED=true; start is a no-op when
     console.log = orig;
   }
 });
+
+import { createFailureStreak } from '../services/forgeSessionService.js';
+
+test('failure streak: one report when N in a row fail, re-armed by a success, ignores other statuses', () => {
+  const reports = [];
+  const streak = createFailureStreak({ threshold: 3, report: (flow, err, ctx) => reports.push({ flow, msg: err.message, ctx }) });
+  streak.record('failed', 'worker_unreachable');
+  streak.record('failed', 'timeout');
+  assert.equal(reports.length, 0);
+  streak.record('generating');
+  streak.record('failed', 'stream_lost');
+  assert.equal(reports.length, 1);
+  assert.equal(reports[0].flow, 'forge.consecutive_failures');
+  assert.deepEqual(reports[0].ctx, { count: 3, reason: 'stream_lost' });
+  streak.record('failed', 'timeout');
+  streak.record('failed', 'timeout');
+  assert.equal(reports.length, 1, 'one alert per streak');
+  streak.record('completed');
+  assert.equal(streak.count, 0);
+  for (let i = 0; i < 3; i++) streak.record('failed', 'nonsense_reason');
+  assert.equal(reports.length, 2);
+  assert.equal(reports[1].ctx.reason, 'server_error');
+});
+
+test('the session closer feeds the streak and a throwing streak cannot break a close', () => {
+  const seen = [];
+  const finishes = [];
+  const close = createForgeSessionCloser({ sessionId: 's1', finish: (...a) => finishes.push(a), recordEvent: () => {}, report: () => {}, streak: { record: (st, r) => seen.push([st, r]) } });
+  assert.equal(close('failed', 'timeout'), true);
+  assert.deepEqual(seen, [['failed', 'timeout']]);
+  const bad = createForgeSessionCloser({ sessionId: 's2', finish: (...a) => finishes.push(a), recordEvent: () => {}, report: () => {}, streak: { record: () => { throw new Error('x'); } } });
+  assert.equal(bad('completed', null, 'g1'), true);
+  assert.equal(finishes.length, 2);
+});

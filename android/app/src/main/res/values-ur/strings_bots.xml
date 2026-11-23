@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">Telegram پر دوستوں کے ساتھ کھیلیں</string>
+    <string name="tg_result_body">کسی چیٹ کو چیلنج کریں اور لائیو لیڈر بورڈ پر اسکور کا موازنہ کریں۔ آپ کے دوستوں کو کچھ انسٹال کرنے کی ضرورت نہیں۔</string>
+    <string name="tg_result_cta">بوٹ کھولیں</string>
+    <string name="tg_daily_title">Telegram پر روزانہ پہیلی حاصل کریں</string>
+    <string name="tg_daily_body">بوٹ آج کی پہیلی پوسٹ کرتا ہے اور روزانہ آپ کو یاد دہانی بھی کرا سکتا ہے۔</string>
+    <string name="tg_daily_cta">سیٹ اپ کریں</string>
+    <string name="tg_settings_title">Telegram بوٹ</string>
+    <string name="tg_settings_subtitle">دوستوں کے ساتھ کھیل، روزانہ پہیلی، گروپ لیڈر بورڈ</string>
+    <string name="tg_connect_title">Telegram جوڑیں</string>
+    <string name="tg_connect_subtitle">ایپ اور بوٹ میں ایک ہی اکاؤنٹ استعمال کریں</string>
+    <string name="tg_link_confirm_title">Telegram جوڑیں؟</string>
+    <string name="tg_link_confirm_body">جس Telegram اکاؤنٹ نے آپ کو یہ لنک بھیجا، اسے اپنے RiddleVerse اکاؤنٹ سے جوڑیں؟</string>
+    <string name="tg_link_confirm_yes">جوڑیں</string>
+    <string name="tg_link_confirm_no">منسوخ کریں</string>
+    <string name="tg_link_success">Telegram جُڑ گیا</string>
+    <string name="tg_link_failed">یہ لنک ختم ہو چکا ہے یا پہلے استعمال ہو چکا ہے۔ نیا لنک لینے کے لیے بوٹ کو /link بھیجیں۔</string>
+    <string name="share_play_link_message">RiddleVerse پر %1$s کھیلیں اور میرا اسکور توڑیں: %2$s</string>
+</resources>

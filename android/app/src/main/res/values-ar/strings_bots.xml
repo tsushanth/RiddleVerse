@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">العب مع أصدقائك على Telegram</string>
+    <string name="tg_result_body">تحدَّ محادثة وقارن النتائج على لوحة متصدرين مباشرة. لا يحتاج أصدقاؤك إلى تثبيت أي شيء.</string>
+    <string name="tg_result_cta">افتح البوت</string>
+    <string name="tg_daily_title">احصل على اللغز اليومي على Telegram</string>
+    <string name="tg_daily_body">ينشر البوت لغز اليوم ويمكنه تذكيرك كل يوم.</string>
+    <string name="tg_daily_cta">إعداد</string>
+    <string name="tg_settings_title">بوت Telegram</string>
+    <string name="tg_settings_subtitle">العب مع الأصدقاء، لغز يومي، لوحات متصدرين للمجموعات</string>
+    <string name="tg_connect_title">ربط Telegram</string>
+    <string name="tg_connect_subtitle">استخدم حسابًا واحدًا في التطبيق والبوت</string>
+    <string name="tg_link_confirm_title">ربط Telegram؟</string>
+    <string name="tg_link_confirm_body">هل تريد ربط حساب Telegram الذي أرسل إليك هذا الرابط بحساب RiddleVerse الخاص بك؟</string>
+    <string name="tg_link_confirm_yes">ربط</string>
+    <string name="tg_link_confirm_no">إلغاء</string>
+    <string name="tg_link_success">تم ربط Telegram</string>
+    <string name="tg_link_failed">انتهت صلاحية هذا الرابط أو استُخدم من قبل. أرسل /link إلى البوت للحصول على رابط جديد.</string>
+    <string name="share_play_link_message">العب %1$s على RiddleVerse وتغلّب على نتيجتي: %2$s</string>
+</resources>

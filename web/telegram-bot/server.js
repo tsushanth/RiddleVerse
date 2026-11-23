@@ -8,7 +8,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // Environment configuration
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-const RIDDLEVERSE_API_URL = process.env.RIDDLEVERSE_API_URL || 'https://api.riddleverse.com';
+const RIDDLEVERSE_API_URL = process.env.RIDDLEVERSE_API_URL || 'https://puzzleverseai.com';
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 const PORT = parseInt(process.env.PORT || '3463');

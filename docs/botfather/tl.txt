@@ -1,0 +1,17 @@
+Language: Filipino (tl)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=tl:
+daily - Puzzle ngayong araw
+play - Pumili ng laro
+leaderboard - Mga score sa chat na ito
+link - I-connect ang RiddleVerse app
+remind - I-on o i-off ang paalala
+language - Palitan ang wika
+app - Kunin ang Android app
+help - Ipakita ang tulong
+
+BotFather > /setabouttext (short description, max 120):
+Mga libreng puzzle game sa Telegram: daily puzzle, leaderboard ng group, laro kasama ang mga kaibigan.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+Dinadala ng RiddleVerse ang 23 libreng puzzle game sa Telegram. Laruin ang daily puzzle, hamunin ang mga kaibigan sa chat at umakyat sa leaderboard ng group. I-connect ang libreng Android app para iisang account ang gamit sa lahat.

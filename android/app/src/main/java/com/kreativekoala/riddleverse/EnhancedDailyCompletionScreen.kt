@@ -1063,6 +1063,11 @@ fun EnhancedSuccessContentWithRanking(
                 }
             }
 
+            // Play with friends on Telegram (hidden for a while once the player has opened the bot)
+            if (celebrationStage >= 3) {
+                TelegramPlayCard(variant = TelegramCardVariant.RESULT, puzzleType = puzzleType)
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
         }
 
@@ -1085,7 +1090,8 @@ fun EnhancedSuccessContentWithRanking(
                 streakDays = streakDays,
                 earnedPoints = earnedPoints,
                 sessionStats = sessionStats,
-                onReturnHome = onReturnHome
+                onReturnHome = onReturnHome,
+                sharePuzzleType = if (isCustomPuzzle) null else puzzleType
             )
         }
     }
@@ -2020,7 +2026,9 @@ fun FloatingActionButtonsRow(
     earnedPoints: Int,
     sessionStats: SessionStatistics?,
     onReturnHome: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    /** Built-in puzzle type just played, so the shared link opens that game on the web page; null shares the game list. */
+    sharePuzzleType: String? = null
 ) {
     val context = LocalContext.current
     val shareGroupText = stringResource(R.string.done_share_group, sourceGroupName.orEmpty())
@@ -2057,13 +2065,9 @@ fun FloatingActionButtonsRow(
                         else -> shareStandardText
                     }
 
-                    val fullShareText = shareSessionSuffix?.let { "$shareText $it" } ?: shareText
+                    val fullShareText = (shareSessionSuffix?.let { "$shareText $it" } ?: shareText) + "\n" + ShareLinks.playUrl(sharePuzzleType, ShareLinks.CHANNEL_OTHER)
 
-                    val intent = Intent(Intent.ACTION_SEND).apply {
-                        type = "text/plain"
-                        putExtra(Intent.EXTRA_TEXT, fullShareText)
-                    }
-                    context.startActivity(Intent.createChooser(intent, shareChooserTitle))
+                    ShareLinks.shareText(context, fullShareText, sharePuzzleType, shareChooserTitle)
                 },
                 modifier = Modifier.weight(1f),
                 containerColor = RvSuccess,

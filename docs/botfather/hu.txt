@@ -1,0 +1,17 @@
+Language: Magyar (hu)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=hu:
+daily - A mai fejtörő
+play - Játék választása
+leaderboard - Eredmények ebben a csevegésben
+link - A RiddleVerse app összekapcsolása
+remind - Napi emlékeztető be vagy ki
+language - Nyelv módosítása
+app - Az Android app letöltése
+help - Súgó megjelenítése
+
+BotFather > /setabouttext (short description, max 120):
+Ingyenes fejtörő játékok Telegramban: napi fejtörő, csoportos ranglisták, játék barátokkal.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+A RiddleVerse 23 ingyenes fejtörő játékot hoz a Telegramba. Játssz a napi fejtörővel, hívd ki a barátaidat egy csevegésben, és kapaszkodj fel a csoport ranglistáján. Kapcsold össze az ingyenes Android appot, hogy mindenhol egy fiókot használhass.

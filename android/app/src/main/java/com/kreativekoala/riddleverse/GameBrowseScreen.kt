@@ -852,16 +852,19 @@ fun GameBrowseContent(context: android.content.Context) {
 
 // Share game to Telegram (or fallback to share sheet)
 private fun shareGameToTelegram(context: android.content.Context, game: BrowseGameData) {
-    val gameUrl = "${BuildConfig.API_BASE_URL}/api/game-creation/${game.id}"
+    // /play/<game id> is the playable page (the bare /api/game-creation route returns raw game JSON); src=share lets the server count opens.
+    val gameUrl = ShareLinks.playUrl(game.id, ShareLinks.CHANNEL_TELEGRAM)
     val shareText = context.getString(R.string.browse_share_text, game.title, gameUrl)
     val encodedText = Uri.encode(shareText)
+    PuzzleEvents.shareSent("custom", ShareLinks.CHANNEL_TELEGRAM)
 
     // Try Telegram deep link first
     val tgIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tg://msg?text=$encodedText"))
     try {
         context.startActivity(tgIntent)
     } catch (e: Exception) {
-        // Fallback: standard Android share sheet
+        // Telegram is not installed: standard Android share sheet (the link is already tagged with the telegram channel; that
+        // share counted above, so go straight to the chooser without counting it twice)
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, shareText)

@@ -25,15 +25,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private const val TELEGRAM_PREFS = "telegram_bot_banner"
-private const val TELEGRAM_DISMISSED_KEY = "banner_dismissed"
-private const val TELEGRAM_BOT_URL = "https://t.me/Riddleverse_bot"
-
+/**
+ * Home banner for the Telegram bot. Dismissing hides it for [TelegramPromo.BANNER_RESHOW_DAYS] days (then it returns once more
+ * per cycle); opening the bot hides it for [TelegramPromo.QUIET_AFTER_OPEN_DAYS] days. Text is localized (home_telegram_*).
+ */
 @Composable
 fun TelegramBotBanner() {
     val context = LocalContext.current
-    val prefs = remember { context.getSharedPreferences(TELEGRAM_PREFS, Context.MODE_PRIVATE) }
-    var dismissed by remember { mutableStateOf(prefs.getBoolean(TELEGRAM_DISMISSED_KEY, false)) }
+    var dismissed by remember { mutableStateOf(!TelegramPromo.isBannerVisible(context)) }
 
     AnimatedVisibility(
         visible = !dismissed,
@@ -51,9 +50,8 @@ fun TelegramBotBanner() {
                     )
                 )
                 .clickable {
-                    context.startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse(TELEGRAM_BOT_URL))
-                    )
+                    TelegramPromo.open(context, null, "banner")
+                    dismissed = true
                 }
         ) {
             Row(
@@ -84,7 +82,7 @@ fun TelegramBotBanner() {
                 IconButton(
                     onClick = {
                         dismissed = true
-                        prefs.edit().putBoolean(TELEGRAM_DISMISSED_KEY, true).apply()
+                        TelegramPromo.dismissBanner(context)
                     },
                     modifier = Modifier.size(24.dp)
                 ) {

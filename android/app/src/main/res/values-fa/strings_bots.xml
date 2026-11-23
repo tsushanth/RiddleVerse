@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tg_result_title">با دوستان در Telegram بازی کنید</string>
+    <string name="tg_result_body">یک گفتگو را به چالش بکشید و امتیازها را در جدول رتبه‌بندی زنده مقایسه کنید. دوستانتان لازم نیست چیزی نصب کنند.</string>
+    <string name="tg_result_cta">باز کردن ربات</string>
+    <string name="tg_daily_title">معمای روزانه را در Telegram بگیرید</string>
+    <string name="tg_daily_body">ربات معمای امروز را ارسال می‌کند و می‌تواند هر روز به شما یادآوری کند.</string>
+    <string name="tg_daily_cta">راه‌اندازی</string>
+    <string name="tg_settings_title">ربات Telegram</string>
+    <string name="tg_settings_subtitle">بازی با دوستان، معمای روزانه، جدول رتبه‌بندی گروهی</string>
+    <string name="tg_connect_title">اتصال Telegram</string>
+    <string name="tg_connect_subtitle">یک حساب در برنامه و ربات</string>
+    <string name="tg_link_confirm_title">Telegram متصل شود؟</string>
+    <string name="tg_link_confirm_body">حساب Telegram که این پیوند را برایتان فرستاده به حساب RiddleVerse شما متصل شود؟</string>
+    <string name="tg_link_confirm_yes">اتصال</string>
+    <string name="tg_link_confirm_no">لغو</string>
+    <string name="tg_link_success">Telegram متصل شد</string>
+    <string name="tg_link_failed">این پیوند منقضی شده یا قبلاً استفاده شده است. برای پیوند جدید، /link را به ربات بفرستید.</string>
+    <string name="share_play_link_message">%1$s را در RiddleVerse بازی کنید و امتیاز مرا بشکنید: %2$s</string>
+</resources>

@@ -1,3 +1,4 @@
+import { parseTelegramContext, slugFromContext } from './utils/telegramPlay'
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from './context/AuthContext'
@@ -56,6 +57,9 @@ function PublicRoute({ children }) {
 // /play?session_id=<uuid> is the host-controlled AI game session wrapper; plain /play is the public game list.
 function PlayEntry() {
   const [params] = useSearchParams()
+  // Telegram direct-link Mini App (group play): the start param carries the game and the signed chat context.
+  const tgSlug = slugFromContext(parseTelegramContext(window.location.search, window.location.hash).ctx)
+  if (tgSlug) return <Navigate to={`/play/${tgSlug}${window.location.search}${window.location.hash}`} replace />
   return params.get('session_id') !== null ? <GameSessionPage /> : <Suspense fallback={<LoadingSpinner />}><PlayIndexPage /></Suspense>
 }
 
