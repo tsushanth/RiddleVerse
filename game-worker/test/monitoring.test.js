@@ -53,3 +53,33 @@ test('freeDiskBytes: computes from statfs, null on error', () => {
   assert.equal(freeDiskBytes('/x', () => ({ bavail: 10, bsize: 4096 })), 40960);
   assert.equal(freeDiskBytes('/x', () => { throw new Error('no'); }), null);
 });
+
+import { summarizeCliResult, createUsageTally } from '../monitoring.js';
+
+test('summarizeCliResult keeps only numbers from the CLI result event, null when there are none', () => {
+  const r = summarizeCliResult({ type: 'result', total_cost_usd: 0.42, duration_ms: 90000, num_turns: 7, result: 'SECRET OUTPUT TEXT',
+    usage: { input_tokens: 1200, output_tokens: 3400, cache_read_input_tokens: 5000, cache_creation_input_tokens: 800 } });
+  assert.deepEqual(r, { costUsd: 0.42, inputTokens: 1200, outputTokens: 3400, cacheReadTokens: 5000, cacheWriteTokens: 800, durationMs: 90000, turns: 7 });
+  assert.ok(!JSON.stringify(r).includes('SECRET'));
+  assert.equal(summarizeCliResult({ type: 'assistant' }), null);
+  assert.equal(summarizeCliResult({ type: 'result' }), null);
+  assert.equal(summarizeCliResult(null), null);
+  assert.equal(summarizeCliResult({ type: 'result', total_cost_usd: -1, usage: { input_tokens: 'x' } }), null);
+});
+
+test('usage tally sums per UTC day, counts failures and sessions without usage, keeps two weeks', () => {
+  let t = Date.UTC(2026, 10, 22, 12);
+  const tally = createUsageTally(() => t);
+  tally.record({ costUsd: 0.5, inputTokens: 10, outputTokens: 20 }, true);
+  tally.record(null, false);
+  t += 86400e3;
+  tally.record({ costUsd: 0.25 }, true);
+  const snap = tally.snapshot();
+  assert.equal(snap['2026-11-22'].sessions, 2);
+  assert.equal(snap['2026-11-22'].failed, 1);
+  assert.equal(snap['2026-11-22'].withUsage, 1);
+  assert.equal(snap['2026-11-22'].costUsd, 0.5);
+  assert.equal(snap['2026-11-23'].costUsd, 0.25);
+  for (let i = 0; i < 20; i++) { t += 86400e3; tally.record(null, true); }
+  assert.equal(Object.keys(tally.snapshot()).length, 14);
+});

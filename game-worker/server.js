@@ -21,7 +21,7 @@ import * as path from 'path';
 import * as os from 'os';
 import crypto from 'crypto';
 import zlib from 'zlib';
-import { reportWorkerFailure, reportWorkerCrash, classifyCliFailure, reportCliFailure, createSlotTracker, freeDiskBytes, evaluateHealth } from './monitoring.js';
+import { reportWorkerFailure, reportWorkerCrash, classifyCliFailure, reportCliFailure, createSlotTracker, freeDiskBytes, evaluateHealth, summarizeCliResult, createUsageTally } from './monitoring.js';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
@@ -818,6 +818,12 @@ function authMiddleware(req, res, next) {
     next();
 }
 
+// Tokens / cost per UTC day as reported by the Claude CLI (same secret as the generation routes).
+app.get('/usage', (req, res) => {
+    if (req.headers['x-worker-secret'] !== WORKER_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+    res.json({ days: usageTally.snapshot() });
+});
+
 app.get('/health', (req, res) => {
     let cliAvailable = false;
     let cliPath = '';
@@ -1213,6 +1219,8 @@ Fix the root cause of each error. The game must load without JavaScript errors a
 // Claude Code CLI Runner
 // ============================================
 
+const usageTally = createUsageTally();
+
 function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
     return new Promise((resolve) => {
         const args = [
@@ -1237,6 +1245,7 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
 
         let stderr = '';
         const assistantBlocks = [];
+        let cliUsage = null; // tokens / cost the CLI reported in its result event
 
         const timeout = setTimeout(() => {
             console.log(`[${requestId}] Timeout after 8 min`);
@@ -1252,6 +1261,8 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
                         assistantBlocks.push(event.delta.text || '');
                     } else if (event.type === 'result') {
                         console.log(`[${requestId}] Claude finished`);
+                        cliUsage = summarizeCliResult(event);
+                        if (cliUsage) console.log(`[${requestId}] usage ${JSON.stringify(cliUsage)}`);
                     }
                 } catch {}
             }
@@ -1273,6 +1284,7 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
         proc.on('close', (code) => {
             clearTimeout(timeout);
             const output = assistantBlocks.join('');
+            usageTally.record(cliUsage, code === 0);
             const isQuotaError = containsQuotaError(stderr) || containsQuotaError(output);
             const resetTime = isQuotaError ? (extractResetTime(stderr) || extractResetTime(output)) : null;
 
@@ -1288,7 +1300,7 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
                     quotaResetTime = null;
                     console.log(`[${requestId}] Quota cleared — successful generation`);
                 }
-                resolve({ success: true, output, quotaError: false });
+                resolve({ success: true, output, quotaError: false, usage: cliUsage });
             } else if (isQuotaError) {
                 resolve({ success: false, output, error: 'Quota exhausted', quotaError: true, resetTime });
             } else {

@@ -1,0 +1,17 @@
+Language: Italiano (it)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=it:
+daily - L'enigma di oggi
+play - Scegli un gioco
+leaderboard - Punteggi in questa chat
+link - Collega l'app RiddleVerse
+remind - Promemoria giornaliero on o off
+language - Cambia lingua
+app - Scarica l'app Android
+help - Mostra l'aiuto
+
+BotFather > /setabouttext (short description, max 120):
+Giochi di enigmi gratis su Telegram: enigma del giorno, classifiche di gruppo, gioca con gli amici.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse porta 23 giochi di enigmi gratuiti su Telegram. Gioca all'enigma del giorno, sfida gli amici in una chat e scala la classifica del gruppo. Collega l'app Android gratuita per usare un solo account ovunque.

@@ -1,0 +1,17 @@
+Language: Bahasa Indonesia (id)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=id:
+daily - Teka-teki hari ini
+play - Pilih game
+leaderboard - Skor di obrolan ini
+link - Hubungkan aplikasi RiddleVerse
+remind - Pengingat harian aktif atau mati
+language - Ganti bahasa
+app - Unduh aplikasi Android
+help - Tampilkan bantuan
+
+BotFather > /setabouttext (short description, max 120):
+Game teka-teki gratis di Telegram: teka-teki harian, papan peringkat grup, main bareng teman.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse menghadirkan 23 game teka-teki gratis ke Telegram. Mainkan teka-teki harian, tantang teman di obrolan, dan naiki papan peringkat grup. Hubungkan aplikasi Android gratis untuk memakai satu akun di mana saja.

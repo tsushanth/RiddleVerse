@@ -11,12 +11,13 @@ data class DailyShareResult(
     /** Total tries including the one that solved it (1 = first try). */
     val attempts: Int,
     val streak: Int,
+    /** Puzzle type key of the daily game (e.g. "sudoku"): the shared link opens that game's web page / the app. Null = game list. */
+    val slug: String? = null,
 )
 
 object DailyShareText {
-    const val PLAY_URL =
-        "https://play.google.com/store/apps/details?id=com.kreativekoala.riddleverse" +
-            "&utm_source=share&utm_medium=daily&utm_campaign=card"
+    /** Link for a daily result: the playable web page of that game (App Link opens the app when installed), tagged src=share. */
+    fun playUrl(slug: String?): String = ShareLinks.playUrl(slug, ShareLinks.CHANNEL_OTHER, medium = "daily")
 
     /** English template for [headline]; the app passes the localized string `done_share_headline` instead. %1$d = number, %2$s = time. */
     const val DEFAULT_HEADLINE_TEMPLATE = "RiddleVerse Daily #%1\$d ✅ %2\$s"
@@ -45,7 +46,7 @@ object DailyShareText {
         return String.format(template, r.number, formatTime(r.seconds)) + flame
     }
 
-    /** Full text for the share sheet: headline, game + tries grid, then the Play link. */
+    /** Full text for the share sheet: headline, game + tries grid, then the playable link. */
     fun build(r: DailyShareResult, headlineTemplate: String = DEFAULT_HEADLINE_TEMPLATE): String =
-        headline(r, headlineTemplate) + "\n" + r.gameName + " " + attemptGrid(r.attempts) + "\n" + PLAY_URL
+        headline(r, headlineTemplate) + "\n" + r.gameName + " " + attemptGrid(r.attempts) + "\n" + playUrl(r.slug)
 }

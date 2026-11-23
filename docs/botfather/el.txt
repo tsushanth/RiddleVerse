@@ -1,0 +1,17 @@
+Language: Ελληνικά (el)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=el:
+daily - Το σημερινό παζλ
+play - Επιλογή παιχνιδιού
+leaderboard - Σκορ σε αυτή τη συνομιλία
+link - Σύνδεση της εφαρμογής RiddleVerse
+remind - Ημερήσια υπενθύμιση ναι ή όχι
+language - Αλλαγή γλώσσας
+app - Λήψη εφαρμογής Android
+help - Εμφάνιση βοήθειας
+
+BotFather > /setabouttext (short description, max 120):
+Δωρεάν παιχνίδια παζλ στο Telegram: ημερήσιο παζλ, ομαδικές βαθμολογίες, παιχνίδι με φίλους.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+Το RiddleVerse φέρνει 23 δωρεάν παιχνίδια παζλ στο Telegram. Παίξτε το ημερήσιο παζλ, προκαλέστε φίλους σε μια συνομιλία και ανεβείτε στην ομαδική βαθμολογία. Συνδέστε τη δωρεάν εφαρμογή Android για έναν λογαριασμό παντού.

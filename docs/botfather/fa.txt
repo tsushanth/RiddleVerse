@@ -1,0 +1,17 @@
+Language: فارسی (fa)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=fa:
+daily - معمای امروز
+play - انتخاب بازی
+leaderboard - امتیازهای این گفتگو
+link - اتصال برنامه RiddleVerse
+remind - روشن یا خاموش کردن یادآور روزانه
+language - تغییر زبان
+app - دریافت برنامه Android
+help - نمایش راهنما
+
+BotFather > /setabouttext (short description, max 120):
+بازی‌های معمای رایگان در Telegram: معمای روزانه، جدول رتبه‌بندی گروهی، بازی با دوستان.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse ۲۳ بازی معمای رایگان را به Telegram می‌آورد. معمای روزانه را حل کنید، دوستانتان را در یک گفتگو به چالش بکشید و در جدول رتبه‌بندی گروه بالا بروید. برنامه رایگان Android را متصل کنید تا همه‌جا یک حساب داشته باشید.

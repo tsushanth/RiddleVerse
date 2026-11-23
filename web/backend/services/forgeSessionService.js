@@ -32,6 +32,28 @@ export const FORGE_FAILURE_REASONS = Object.freeze({
   server_error: 'Something went wrong on the server.',
 });
 
+// Consecutive failures: N generation sessions failing back to back (any reason) raise ONE report per streak; the next
+// success re-arms it. Complements the 3 h dead-man and 24 h rate rules, which are slower and need traffic to fire.
+export const FORGE_CONSECUTIVE_FAIL_THRESHOLD = 3;
+export function createFailureStreak({ threshold = FORGE_CONSECUTIVE_FAIL_THRESHOLD, report = defaultReportFailure } = {}) {
+  let n = 0;
+  let alerted = false;
+  return {
+    get count() { return n; },
+    record(status, reason = null) {
+      if (status === 'completed') { n = 0; alerted = false; return 0; }
+      if (status !== 'failed') return n;
+      n++;
+      if (n >= threshold && !alerted) {
+        alerted = true;
+        report('forge.consecutive_failures', new Error('Forge: several generations failed in a row'), { count: n, reason: FORGE_FAILURE_REASONS[reason] ? reason : 'server_error' });
+      }
+      return n;
+    },
+  };
+}
+const defaultStreak = createFailureStreak();
+
 export function isForgeSweeperEnabled(env = process.env) {
   return env.FORGE_SESSION_SWEEPER_ENABLED === 'true';
 }
@@ -45,12 +67,13 @@ export function reasonMessage(reason) {
  * no-ops. A failed close also fires the analytics event and the central failure report.
  * deps: finish(sessionId, status, savedGameId), recordEvent(name, params), report(flow, err, ctx)
  */
-export function createForgeSessionCloser({ sessionId, finish, recordEvent, report = defaultReportFailure }) {
+export function createForgeSessionCloser({ sessionId, finish, recordEvent, report = defaultReportFailure, streak = defaultStreak }) {
   let closed = false;
   return function close(status, reason = null, savedGameId = null) {
     if (closed || !sessionId) return false;
     closed = true;
     finish(sessionId, status, savedGameId);
+    try { streak.record(status, reason); } catch { /* alerting must never break a close */ }
     if (status === 'failed') {
       const known = FORGE_FAILURE_REASONS[reason] ? reason : 'server_error';
       recordEvent?.('forge_session_failed', { session_id: sessionId, reason: known });

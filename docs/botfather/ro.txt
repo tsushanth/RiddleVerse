@@ -1,0 +1,17 @@
+Language: Română (ro)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ro:
+daily - Puzzle-ul de azi
+play - Alege un joc
+leaderboard - Scorurile din acest chat
+link - Conectează aplicația RiddleVerse
+remind - Memento zilnic pornit sau oprit
+language - Schimbă limba
+app - Descarcă aplicația Android
+help - Arată ajutorul
+
+BotFather > /setabouttext (short description, max 120):
+Jocuri puzzle gratuite în Telegram: puzzle zilnic, clasamente de grup, joacă cu prietenii.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse aduce 23 de jocuri puzzle gratuite în Telegram. Joacă puzzle-ul zilnic, provoacă-ți prietenii într-un chat și urcă în clasamentul grupului. Conectează aplicația Android gratuită ca să folosești un singur cont peste tot.

@@ -93,6 +93,21 @@ object PuzzleEvents {
         tracker.abandon(key)?.let { emit(it) }
     }
 
+    /** A share sheet was opened for [puzzleType] (or a custom game, passed as "custom"). [channel] = telegram, whatsapp or other. */
+    fun shareSent(puzzleType: String?, channel: String) = guarded {
+        emit(PuzzleEvent("share_sent", puzzleType ?: "custom", null, PuzzleEventsClient.newId(), ts = System.currentTimeMillis(), channel = channel))
+    }
+
+    /** The app was opened from a link: [target] = a puzzle type, or "app"; [channel] = the link's src (share, telegram, auth, ...). */
+    fun deepLinkOpen(target: String?, channel: String) = guarded {
+        emit(PuzzleEvent("deeplink_open", target ?: "app", null, PuzzleEventsClient.newId(), ts = System.currentTimeMillis(), channel = channel))
+    }
+
+    /** A Telegram promo (banner, result card, daily card, settings row) was tapped. [surface] is the label of the place. */
+    fun telegramCta(surface: String) = guarded {
+        emit(PuzzleEvent("telegram_cta", "app", null, PuzzleEventsClient.newId(), ts = System.currentTimeMillis(), channel = surface))
+    }
+
     /** Handled exception around puzzle generation. Pass only a short message, never user content. */
     fun error(puzzleType: String?, difficulty: String?, message: String?) = guarded {
         val sid = PuzzleEventsClient.newId()

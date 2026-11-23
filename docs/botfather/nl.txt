@@ -1,0 +1,17 @@
+Language: Nederlands (nl)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=nl:
+daily - De puzzel van vandaag
+play - Kies een spel
+leaderboard - Scores in deze chat
+link - Koppel de RiddleVerse-app
+remind - Dagelijkse herinnering aan of uit
+language - Taal wijzigen
+app - Download de Android-app
+help - Toon hulp
+
+BotFather > /setabouttext (short description, max 120):
+Gratis puzzelspellen in Telegram: dagelijkse puzzel, groepsscoreborden, speel met vrienden.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse brengt 23 gratis puzzelspellen naar Telegram. Speel de dagelijkse puzzel, daag vrienden uit in een chat en klim omhoog op het groepsscorebord. Koppel de gratis Android-app om overal één account te gebruiken.

@@ -114,18 +114,5 @@ fun BotUpsellSheet(
 }
 
 private fun openTelegramBot(context: Context) {
-    try {
-        // Try native Telegram deep link first
-        val telegramIntent = Intent(Intent.ACTION_VIEW, Uri.parse("tg://resolve?domain=$TELEGRAM_BOT_USERNAME"))
-        telegramIntent.setPackage("org.telegram.messenger")
-        context.startActivity(telegramIntent)
-    } catch (e: Exception) {
-        try {
-            // Fallback to web URL
-            val webIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://t.me/$TELEGRAM_BOT_USERNAME"))
-            context.startActivity(webIntent)
-        } catch (e2: Exception) {
-            Toast.makeText(context, context.getString(R.string.browse_bot_telegram_open_failed, TELEGRAM_BOT_USERNAME), Toast.LENGTH_LONG).show()
-        }
-    }
+    TelegramPromo.open(context, null, "upsell")
 }

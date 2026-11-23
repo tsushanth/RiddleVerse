@@ -30,6 +30,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.ArrowLeft
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -530,7 +531,6 @@ fun HomeScreen(navController: NavHostController,
                     onSignOut = {
                         FirebaseAuth.getInstance().signOut()
                         com.kreativekoala.riddleverse.auth.SupabaseAuth.clearSession(context)
-                        MagicLinkAuthManager.clearSession(context) // the bot-login premium flag must not outlive the account
                         GuestPrefs.clear(context) // signing out returns to the first-run screen, not a half-guest state
                         val intent = Intent(context, WelcomeActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -2432,6 +2432,25 @@ fun AppFeaturesSection(
                 title = stringResource(R.string.home_achievements_row_title),
                 subtitle = stringResource(R.string.home_achievements_row_subtitle),
                 onClick = onNavigateToAchievements
+            )
+
+            val appContext = LocalContext.current
+            HorizontalDivider(modifier = Modifier.padding(start = 50.dp))
+
+            SettingsRow(
+                icon = Icons.AutoMirrored.Filled.Send,
+                title = stringResource(R.string.tg_settings_title),
+                subtitle = stringResource(R.string.tg_settings_subtitle),
+                onClick = { TelegramPromo.open(appContext, null, "settings") }
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(start = 50.dp))
+
+            SettingsRow(
+                icon = Icons.Default.Tag,
+                title = stringResource(R.string.tg_connect_title),
+                subtitle = stringResource(R.string.tg_connect_subtitle),
+                onClick = { TelegramPromo.open(appContext, "link", "settings_link") }
             )
         }
     }

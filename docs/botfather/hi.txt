@@ -1,0 +1,17 @@
+Language: हिन्दी (hi)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=hi:
+daily - आज की पहेली
+play - कोई गेम चुनें
+leaderboard - इस चैट के स्कोर
+link - RiddleVerse ऐप जोड़ें
+remind - दैनिक रिमाइंडर चालू या बंद
+language - भाषा बदलें
+app - Android ऐप पाएँ
+help - मदद दिखाएँ
+
+BotFather > /setabouttext (short description, max 120):
+Telegram में मुफ़्त पहेली गेम: दैनिक पहेली, ग्रुप लीडरबोर्ड, दोस्तों के साथ खेलें।
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse Telegram में 23 मुफ़्त पहेली गेम लाता है। दैनिक पहेली खेलें, चैट में दोस्तों को चुनौती दें और ग्रुप लीडरबोर्ड में ऊपर चढ़ें। हर जगह एक ही खाते के लिए मुफ़्त Android ऐप जोड़ें।

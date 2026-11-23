@@ -1,0 +1,17 @@
+Language: Português (Brasil) (pt)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=pt:
+daily - O desafio de hoje
+play - Escolher um jogo
+leaderboard - Pontuações neste chat
+link - Conectar o app RiddleVerse
+remind - Lembrete diário ligado ou desligado
+language - Mudar o idioma
+app - Baixar o app Android
+help - Mostrar ajuda
+
+BotFather > /setabouttext (short description, max 120):
+Jogos de quebra-cabeça grátis no Telegram: desafio diário, rankings de grupo, jogue com amigos.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+O RiddleVerse traz 23 jogos de quebra-cabeça grátis para o Telegram. Jogue o desafio diário, desafie amigos em um chat e suba no ranking do grupo. Conecte o app Android grátis para usar uma única conta em todo lugar.

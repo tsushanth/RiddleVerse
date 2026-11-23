@@ -1,0 +1,17 @@
+Language: 简体中文 (zh)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=zh:
+daily - 今日谜题
+play - 选择游戏
+leaderboard - 本聊天的分数
+link - 连接 RiddleVerse 应用
+remind - 开启或关闭每日提醒
+language - 更换语言
+app - 获取 Android 应用
+help - 显示帮助
+
+BotFather > /setabouttext (short description, max 120):
+Telegram 上的免费益智游戏：每日谜题、群排行榜、和好友一起玩。
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse 把 23 款免费益智游戏带到 Telegram。玩每日谜题，在聊天中挑战好友，冲上群排行榜。连接免费的 Android 应用，即可在各处使用同一个账号。

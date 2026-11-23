@@ -104,59 +104,25 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        // Handle deep link to open specific game (riddleverse://game/{gameId})
-        if (intent?.data?.scheme == "riddleverse" && intent?.data?.host == "game") {
-            val pathSegments = intent.data?.pathSegments
-            val gameId = pathSegments?.firstOrNull() ?: intent.data?.getQueryParameter("gameId")
-            if (!gameId.isNullOrBlank()) {
-                Log.d("MainActivity", "Deep link to game: $gameId")
-                val userId = FirebaseAuth.getInstance().currentUser?.uid
-                ChromeGameLauncher.launchGame(this, gameId, userId)
+        // Incoming links: a custom game, a built-in puzzle page (/play/<type>), or the Telegram bot's one-time /link code.
+        // Parsing lives in DeepLinkRouter (unit tested). Every recognised link is counted once as deeplink_open.
+        val deepLink = DeepLinkRouter.parse(intent?.data)
+        if (deepLink != null && deepLink !is DeepLink.Riddle) {
+            PuzzleEvents.deepLinkOpen(DeepLinkRouter.targetOf(deepLink), DeepLinkRouter.channelOf(deepLink))
+        }
+        when (deepLink) {
+            is DeepLink.Game -> {
+                Log.d("MainActivity", "Deep link to game: ${deepLink.gameId}")
+                ChromeGameLauncher.launchGame(this, deepLink.gameId, FirebaseAuth.getInstance().currentUser?.uid)
                 finish()
                 return
             }
-        }
-
-        // Handle magic link auth from Telegram/WhatsApp bot
-        val magicLinkToken = if (intent?.data?.scheme == "riddleverse" && intent?.data?.host == "auth") {
-            intent?.data?.getQueryParameter("token")
-        } else null
-
-        if (!magicLinkToken.isNullOrBlank()) {
-            Log.d("MainActivity", "Magic link auth token received")
-            setContent {
-                RvActivityTheme {
-                    DeepLinkLoadingScreen()
-                }
+            is DeepLink.PlaySlug -> if (openPuzzleLink(deepLink.slug)) return
+            is DeepLink.TelegramLink -> {
+                showTelegramLinkConfirm(deepLink.code)
+                return
             }
-            CoroutineScope(Dispatchers.Main).launch {
-                val success = MagicLinkAuthManager.signInWithToken(this@MainActivity, magicLinkToken)
-                if (success) {
-                    val user = FirebaseAuth.getInstance().currentUser
-                    if (user != null) {
-                        RevenueCatBootstrap.instance.logIn(
-                            user.uid,
-                            object : com.revenuecat.purchases.interfaces.LogInCallback {
-                                override fun onReceived(customerInfo: com.revenuecat.purchases.CustomerInfo, created: Boolean) {
-                                    setRevenueCatAttributes(user)
-                                }
-                                override fun onError(error: com.revenuecat.purchases.PurchasesError) {
-                                    Log.e("MainActivity", "RevenueCat logIn error after magic link: ${error.message}")
-                                }
-                            }
-                        )
-                    }
-                    Toast.makeText(this@MainActivity, R.string.onb_main_signed_in, Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this@MainActivity, HomeActivity::class.java).apply {
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    })
-                    finish()
-                } else {
-                    Toast.makeText(this@MainActivity, R.string.onb_main_sign_in_failed, Toast.LENGTH_LONG).show()
-                    navigateToDefaultScreen()
-                }
-            }
-            return
+            else -> Unit
         }
 
         val puzzleId = intent?.data?.getQueryParameter("puzzleId")
@@ -192,6 +158,69 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             navigateToDefaultScreen()
+        }
+    }
+
+    /** /play/<puzzle type> or /play/daily from a shared link: Home underneath, the puzzle on top. False = not handled (first run, unknown type). */
+    private fun openPuzzleLink(slug: String): Boolean {
+        val known = FirebaseAuth.getInstance().currentUser != null || GuestPrefs.isStarted(this)
+        if (!known) return false // a brand-new device sees the first-run screen first
+        val home = Intent(this, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        val next = when {
+            slug == "daily" -> Intent(this, DailyPuzzleActivity::class.java)
+            CatalogText.titleRes(slug) != 0 -> Intent(this, StartPuzzleActivity::class.java)
+                .putExtra("puzzleType", slug).putExtra("title", PuzzleTypeNames.display(this, slug))
+            else -> return false
+        }
+        startActivities(arrayOf(home, next))
+        finish()
+        return true
+    }
+
+    /** The one-time code in a link is only redeemed after the player confirms: a stranger's link must not silently switch accounts. */
+    private fun showTelegramLinkConfirm(code: String) {
+        setContent {
+            RvActivityTheme {
+                TelegramLinkConfirm(
+                    onConfirm = { redeemTelegramLink(code) },
+                    onCancel = { navigateToDefaultScreen() }
+                )
+            }
+        }
+    }
+
+    private fun redeemTelegramLink(code: String) {
+        setContent { RvActivityTheme { DeepLinkLoadingScreen() } }
+        CoroutineScope(Dispatchers.Main).launch {
+            when (val result = TelegramLinkManager.redeem(code)) {
+                is TelegramLinkManager.Result.SignedIn -> {
+                    FirebaseAuth.getInstance().currentUser?.let { user ->
+                        RevenueCatBootstrap.whenReady { it.logIn(
+                            user.uid,
+                            object : com.revenuecat.purchases.interfaces.LogInCallback {
+                                override fun onReceived(customerInfo: com.revenuecat.purchases.CustomerInfo, created: Boolean) { setRevenueCatAttributes(user) }
+                                override fun onError(error: com.revenuecat.purchases.PurchasesError) {
+                                    Log.e("MainActivity", "RevenueCat logIn error after Telegram link: ${error.message}")
+                                }
+                            }
+                        ) }
+                    }
+                    Toast.makeText(this@MainActivity, R.string.tg_link_success, Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this@MainActivity, HomeActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    })
+                    finish()
+                }
+                is TelegramLinkManager.Result.Linked -> {
+                    Toast.makeText(this@MainActivity, R.string.tg_link_success, Toast.LENGTH_SHORT).show()
+                    navigateToDefaultScreen()
+                }
+                is TelegramLinkManager.Result.Failed -> {
+                    Log.w("MainActivity", "Telegram link failed: ${result.reason}")
+                    Toast.makeText(this@MainActivity, R.string.tg_link_failed, Toast.LENGTH_LONG).show()
+                    navigateToDefaultScreen()
+                }
+            }
         }
     }
 

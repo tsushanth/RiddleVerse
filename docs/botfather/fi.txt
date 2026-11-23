@@ -1,0 +1,17 @@
+Language: Suomi (fi)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=fi:
+daily - Päivän pulma
+play - Valitse peli
+leaderboard - Tämän keskustelun pisteet
+link - Yhdistä RiddleVerse-sovellus
+remind - Päivittäinen muistutus päälle tai pois
+language - Vaihda kieli
+app - Hanki Android-sovellus
+help - Näytä ohje
+
+BotFather > /setabouttext (short description, max 120):
+Ilmaisia pulmapelejä Telegramissa: päivän pulma, ryhmien tulostaulut, pelaa kavereiden kanssa.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse tuo 23 ilmaista pulmapeliä Telegramiin. Pelaa päivän pulma, haasta kaverit keskustelussa ja kiipeä ryhmän tulostaulun kärkeen. Yhdistä ilmainen Android-sovellus, niin käytät samaa tiliä kaikkialla.

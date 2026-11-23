@@ -1,0 +1,17 @@
+Language: Tiếng Việt (vi)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=vi:
+daily - Câu đố hôm nay
+play - Chọn trò chơi
+leaderboard - Điểm số trong cuộc trò chuyện này
+link - Kết nối ứng dụng RiddleVerse
+remind - Bật hoặc tắt nhắc hằng ngày
+language - Đổi ngôn ngữ
+app - Tải ứng dụng Android
+help - Xem trợ giúp
+
+BotFather > /setabouttext (short description, max 120):
+Trò chơi giải đố miễn phí trên Telegram: câu đố hằng ngày, bảng xếp hạng nhóm, chơi cùng bạn bè.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse mang 23 trò chơi giải đố miễn phí đến Telegram. Chơi câu đố hằng ngày, thách đấu bạn bè trong cuộc trò chuyện và leo lên bảng xếp hạng nhóm. Kết nối ứng dụng Android miễn phí để dùng một tài khoản ở mọi nơi.

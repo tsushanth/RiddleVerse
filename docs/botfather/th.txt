@@ -1,0 +1,17 @@
+Language: ไทย (th)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=th:
+daily - ปริศนาวันนี้
+play - เลือกเกม
+leaderboard - คะแนนในแชตนี้
+link - เชื่อมต่อแอป RiddleVerse
+remind - เปิดหรือปิดการเตือนรายวัน
+language - เปลี่ยนภาษา
+app - รับแอป Android
+help - แสดงความช่วยเหลือ
+
+BotFather > /setabouttext (short description, max 120):
+เกมปริศนาฟรีบน Telegram: ปริศนาประจำวัน กระดานผู้นำกลุ่ม เล่นกับเพื่อน
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse นำเกมปริศนาฟรี 23 เกมมาสู่ Telegram เล่นปริศนาประจำวัน ท้าเพื่อนในแชต และไต่อันดับบนกระดานผู้นำของกลุ่ม เชื่อมต่อแอป Android ฟรีเพื่อใช้บัญชีเดียวได้ทุกที่

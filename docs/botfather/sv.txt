@@ -1,0 +1,17 @@
+Language: Svenska (sv)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=sv:
+daily - Dagens pussel
+play - Välj ett spel
+leaderboard - Resultat i den här chatten
+link - Anslut RiddleVerse-appen
+remind - Daglig påminnelse på eller av
+language - Byt språk
+app - Hämta Android-appen
+help - Visa hjälp
+
+BotFather > /setabouttext (short description, max 120):
+Gratis pusselspel i Telegram: dagligt pussel, gruppens topplistor och spel med vänner.
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse ger dig 23 gratis pusselspel i Telegram. Spela dagens pussel, utmana vänner i en chatt och klättra på gruppens topplista. Anslut den gratis Android-appen för att använda ett konto överallt.

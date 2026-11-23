@@ -1,0 +1,17 @@
+Language: 日本語 (ja)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ja:
+daily - 今日のパズル
+play - ゲームを選ぶ
+leaderboard - このチャットのスコア
+link - RiddleVerseアプリと連携
+remind - デイリーリマインダーのオン/オフ
+language - 言語を変更
+app - Androidアプリを入手
+help - ヘルプを表示
+
+BotFather > /setabouttext (short description, max 120):
+Telegramで遊べる無料パズルゲーム。デイリーパズル、グループのリーダーボード、友達と対戦。
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerseは23種類の無料パズルゲームをTelegramでお届けします。デイリーパズルを遊んだり、チャットで友達に挑戦したり、グループのリーダーボードを駆け上がったりできます。無料のAndroidアプリと連携すれば、どこでも1つのアカウントで使えます。

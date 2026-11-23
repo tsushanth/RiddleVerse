@@ -1,0 +1,17 @@
+Language: اردو (ur)  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=ur:
+daily - آج کی پہیلی
+play - گیم منتخب کریں
+leaderboard - اس چیٹ کے اسکور
+link - RiddleVerse ایپ جوڑیں
+remind - روزانہ یاد دہانی آن یا آف
+language - زبان تبدیل کریں
+app - Android ایپ حاصل کریں
+help - مدد دکھائیں
+
+BotFather > /setabouttext (short description, max 120):
+Telegram میں مفت پہیلی گیمز: روزانہ پہیلی، گروپ لیڈر بورڈ، دوستوں کے ساتھ کھیلیں۔
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse Telegram میں 23 مفت پہیلی گیمز لاتا ہے۔ روزانہ پہیلی کھیلیں، چیٹ میں دوستوں کو چیلنج کریں اور گروپ لیڈر بورڈ پر اوپر چڑھیں۔ ہر جگہ ایک ہی اکاؤنٹ استعمال کرنے کے لیے مفت Android ایپ جوڑیں۔
