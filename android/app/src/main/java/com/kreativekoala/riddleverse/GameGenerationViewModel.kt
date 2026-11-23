@@ -324,6 +324,7 @@ class GameGenerationViewModel : ViewModel() {
                 if (!response.isSuccessful) {
                     Log.e(TAG, "$logPrefix HTTP ${response.code}")
                     var serverError: String? = null
+                    var serverCode: String? = null
                     var canUseCoinsFlag = false
                     var coinCost = 10
                     try {
@@ -332,6 +333,7 @@ class GameGenerationViewModel : ViewModel() {
                         if (errBody != null) {
                             val errJson = JSONObject(errBody)
                             errJson.optString("error", "").let { if (it.isNotEmpty()) serverError = it }
+                            serverCode = errJson.optString("code", "").ifEmpty { null }
                             canUseCoinsFlag = errJson.optBoolean("canUseCoins", false)
                             coinCost = errJson.optInt("coinCost", 10)
                         }
@@ -360,7 +362,7 @@ class GameGenerationViewModel : ViewModel() {
                     }
 
                     withContext(Dispatchers.Main) {
-                        errorMessage = serverErrorText(serverError, response.code)
+                        errorMessage = serverErrorText(serverError, serverCode, response.code)
                     }
                     return@withContext null
                 }
@@ -390,13 +392,17 @@ class GameGenerationViewModel : ViewModel() {
                                     "status" -> {
                                         val message = eventJson.optString("message", "")
                                         val detail = eventJson.optString("detail", "")
+                                        val phase = eventJson.optString("phase", "").ifEmpty { null }
+                                        val messageCode = eventJson.optString("messageCode", "").ifEmpty { null }
+                                        val detailCode = eventJson.optString("detailCode", "").ifEmpty { null }
+                                        val detailArgs = GameServerText.detailArgs(eventJson)
                                         val pct = eventJson.optDouble("progressPercent", 0.0).toFloat()
                                         val endPct = eventJson.optDouble("progressEndPct", pct.toDouble()).toFloat()
                                         val phaseSecs = eventJson.optLong("phaseDurationSeconds", 0)
                                         val eta = eventJson.optInt("estimatedSecondsRemaining", 0)
                                         withContext(Dispatchers.Main) {
-                                            buildPhase = serverText(message)
-                                            buildDetail = serverText(detail)
+                                            buildPhase = GameServerText.statusMessage(messageCode, phase, message)
+                                            buildDetail = GameServerText.statusDetail(detailCode, detailArgs, phase, detail)
                                             progressPercent = pct
                                             estimatedSecondsRemaining = eta
                                             phaseStartPct = pct
@@ -413,8 +419,10 @@ class GameGenerationViewModel : ViewModel() {
                                         val errMsg = eventJson.optString("error", "Unknown error")
                                         Log.e(TAG, "$logPrefix SSE error: $errMsg")
                                         val hasServerError = eventJson.has("error")
+                                        val errCode = eventJson.optString("code", "").ifEmpty { null }
                                         withContext(Dispatchers.Main) {
-                                            errorMessage = if (hasServerError) UiText.Raw(errMsg) else UiText.Res(R.string.browse_webview_unknown_error)
+                                            errorMessage = GameServerText.errorText(errCode)
+                                                ?: if (hasServerError) UiText.Raw(errMsg) else UiText.Res(R.string.browse_webview_unknown_error)
                                         }
                                         return@withContext null
                                     }
@@ -568,13 +576,17 @@ class GameGenerationViewModel : ViewModel() {
                         val status = pollJson.optString("status", "unknown")
                         val message = pollJson.optString("message", "")
                         val detail = pollJson.optString("detail", "")
+                        val phase = pollJson.optString("phase", "").ifEmpty { null }
+                        val messageCode = pollJson.optString("messageCode", "").ifEmpty { null }
+                        val detailCode = pollJson.optString("detailCode", "").ifEmpty { null }
+                        val detailArgs = GameServerText.detailArgs(pollJson)
                         val pct = pollJson.optDouble("progressPercent", 0.0).toFloat()
                         val endPct = pollJson.optDouble("progressEndPct", pct.toDouble()).toFloat()
                         val eta = pollJson.optInt("estimatedSecondsRemaining", 0)
 
                         withContext(Dispatchers.Main) {
-                            buildPhase = serverText(message)
-                            buildDetail = serverText(detail)
+                            buildPhase = GameServerText.statusMessage(messageCode, phase, message)
+                            buildDetail = GameServerText.statusDetail(detailCode, detailArgs, phase, detail)
                             progressPercent = pct
                             estimatedSecondsRemaining = eta
                             phaseStartPct = pct
@@ -599,8 +611,10 @@ class GameGenerationViewModel : ViewModel() {
                             val reason = pollJson.optString("reason", "")
                             Log.e(TAG, "$logPrefix job failed reason=$reason: $errMsg")
                             val hasServerError = pollJson.has("error")
+                            val errCode = pollJson.optString("code", "").ifEmpty { null }
                             withContext(Dispatchers.Main) {
-                                errorMessage = if (hasServerError) UiText.Raw(errMsg) else UiText.Res(R.string.browse_generation_failed)
+                                errorMessage = GameServerText.errorText(errCode)
+                                    ?: if (hasServerError) UiText.Raw(errMsg) else UiText.Res(R.string.browse_generation_failed)
                             }
                             return@withContext null
                         }
@@ -658,11 +672,10 @@ class GameGenerationViewModel : ViewModel() {
         }
     }
 
-    /** Status text from the server is shown as received; an empty message shows nothing (the UI has its own default). */
-    private fun serverText(text: String): UiText? = if (text.isEmpty()) null else UiText.Raw(text)
-
-    private fun serverErrorText(serverError: String?, httpCode: Int): UiText =
-        if (serverError != null) UiText.Raw(serverError) else UiText.Res(R.string.create_server_error, listOf(httpCode))
+    /** A known server `code` is shown in the app language; unknown or missing codes (an older server) show the server text. */
+    private fun serverErrorText(serverError: String?, serverCode: String?, httpCode: Int): UiText =
+        GameServerText.errorText(serverCode)
+            ?: if (serverError != null) UiText.Raw(serverError) else UiText.Res(R.string.create_server_error, listOf(httpCode))
 
     private fun exceptionText(e: Exception): UiText =
         e.localizedMessage?.let { UiText.Raw(it) } ?: UiText.Res(R.string.browse_webview_unknown_error)
@@ -672,6 +685,7 @@ class GameGenerationViewModel : ViewModel() {
     // can early-return.
     private suspend fun handleSubmitError(response: Response): GenerationResult? {
         var serverError: String? = null
+        var serverCode: String? = null
         var canUseCoinsFlag = false
         var coinCost = 10
         try {
@@ -679,6 +693,7 @@ class GameGenerationViewModel : ViewModel() {
             if (errBody != null) {
                 val errJson = JSONObject(errBody)
                 errJson.optString("error", "").let { if (it.isNotEmpty()) serverError = it }
+                serverCode = errJson.optString("code", "").ifEmpty { null }
                 canUseCoinsFlag = errJson.optBoolean("canUseCoins", false)
                 coinCost = errJson.optInt("coinCost", 10)
                 if (response.code == 403 && errJson.optBoolean("requiresSubscription", false)) {
@@ -698,17 +713,19 @@ class GameGenerationViewModel : ViewModel() {
             }
             return null
         }
-        withContext(Dispatchers.Main) { errorMessage = serverErrorText(serverError, response.code) }
+        withContext(Dispatchers.Main) { errorMessage = serverErrorText(serverError, serverCode, response.code) }
         return null
     }
 
     private fun buildRequest(mode: GenerationMode, userId: String, userName: String): Triple<String, JSONObject, String> {
         return when (mode) {
             is GenerationMode.Custom -> {
+                // The server adds the How to Play note and the language instruction (backend buildGamePrompt), so the
+                // prompt is exactly what the user typed, in the user's language.
                 val basePrompt = mode.prompt.trim()
-                val fullPrompt = "$basePrompt\n\nInclude a brief 'How to Play' note in the game UI."
                 val json = JSONObject().apply {
-                    put("prompt", fullPrompt)
+                    put("prompt", basePrompt)
+                    put("lang", ContentLanguage.current())
                     put("userId", userId)
                     put("userName", userName)
                     put("title", basePrompt.take(100))
@@ -723,7 +740,8 @@ class GameGenerationViewModel : ViewModel() {
                     put("userName", userName)
                     put("puzzleType", mode.puzzleType)
                     put("difficulty", mode.difficulty)
-                    put("remixDescription", mode.remixDescription.trim() + "\n\nInclude a brief 'How to Play' note in the game UI.")
+                    put("remixDescription", mode.remixDescription.trim())
+                    put("lang", ContentLanguage.current())
                     put("title", mode.title)
                     if (mode.imageBase64 != null) put("referenceImage", mode.imageBase64)
                     if (mode.useCoins) put("useCoins", true)

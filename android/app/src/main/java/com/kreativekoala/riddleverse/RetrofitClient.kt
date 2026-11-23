@@ -22,6 +22,7 @@ object HttpClientProvider {
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
+            .addInterceptor(ContentLanguage.interceptor) // the app language, for everything the server generates
             .build()
     }
 }

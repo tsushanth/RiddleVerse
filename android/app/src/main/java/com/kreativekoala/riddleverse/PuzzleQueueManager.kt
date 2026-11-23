@@ -68,6 +68,7 @@ class PuzzleQueueManager private constructor(internal val context: Context) {
     private val client = OkHttpClient.Builder()
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(ContentLanguage.interceptor)
         .build()
 
     private val mediaCache by lazy { MediaCacheManager.getInstance(context) }
