@@ -27,7 +27,12 @@ const app = express();
 app.use(express.json({ limit: '50mb' }));
 
 const PORT = process.env.WORKER_PORT || 3456;
-const WORKER_SECRET = process.env.WORKER_SECRET || 'game-worker-secret-2024';
+// No built-in default: a secret that is public in the repository protects nothing, so the worker refuses to start without one.
+const WORKER_SECRET = process.env.WORKER_SECRET;
+if (!WORKER_SECRET) {
+    console.error('WORKER_SECRET is not set: refusing to start');
+    process.exit(1);
+}
 const PROJECTS_DIR = path.join(os.homedir(), '.game-worker', 'projects');
 const GITHUB_PAT = process.env.GITHUB_PAT || '';
 const GITHUB_ORG = process.env.GITHUB_ORG || 'Kreative-Koala-LLC';

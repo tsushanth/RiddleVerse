@@ -128,7 +128,10 @@ const GAME_WORKER_URL = process.env.GAME_WORKER_URL || 'http://localhost:3456';
 if (/^http:\/\//i.test(GAME_WORKER_URL) && !/^http:\/\/(localhost|127\.0\.0\.1)/i.test(GAME_WORKER_URL)) {
     console.warn('[forge] GAME_WORKER_URL is plain http: the worker secret and prompts are sent unencrypted. Put the worker behind TLS and set GAME_WORKER_URL to https.');
 }
-const GAME_WORKER_SECRET = process.env.GAME_WORKER_SECRET || 'game-worker-secret-2024';
+// No built-in default: a secret that is public in the repository protects nothing. When GAME_WORKER_SECRET is unset the header is
+// empty and the build server answers 401, so every call to it fails closed (the boot warning below says why).
+const GAME_WORKER_SECRET = process.env.GAME_WORKER_SECRET || '';
+if (!GAME_WORKER_SECRET) console.warn('[gameCreation] GAME_WORKER_SECRET is not set: calls to the build server will be refused');
 const GAME_BUNDLES_BUCKET = 'game-bundles';
 const SCREENSHOT_SERVICE_URL = process.env.SCREENSHOT_SERVICE_URL || 'http://178.156.231.255:3465';
 const PLAY_BASE_URL = process.env.PLAY_BASE_URL || 'https://quiz-web-frontend.fly.dev';
