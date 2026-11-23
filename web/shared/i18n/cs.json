@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Stezka",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Nepřerušujte svou sérii!",
+    "streak_risk_body": "Vaše série {days} dní je v ohrožení. Zahrajte si dnes, abyste ji udrželi!",
+    "comeback_title": "Připraveni na návrat?",
+    "comeback_record": "Vaše nejlepší série trvala {days} dní. Je čas překonat tento rekord!",
+    "comeback_new": "Každý odborník byl kdysi začátečník. Začněte dnes novou sérii!",
+    "celebrate_title": "Série {days} dní!",
+    "celebrate_body": "Skvělé! {days} dní v kuse luštíte hádanky.",
+    "puzzles_ready_title": "Vlastní hádanky jsou připravené!",
+    "puzzles_ready_body": "Vaše sada „{topic}“ je připravena ke hraní! Vytvořeno hádanek: {count}."
   }
 }

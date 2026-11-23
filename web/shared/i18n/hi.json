@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "ट्रेल",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "अपनी स्ट्रीक न तोड़ें!",
+    "streak_risk_body": "आपकी {days} दिन की स्ट्रीक खतरे में है। इसे बनाए रखने के लिए आज खेलें!",
+    "comeback_title": "वापसी के लिए तैयार?",
+    "comeback_record": "आपकी सबसे अच्छी स्ट्रीक {days} दिन की थी। उस रिकॉर्ड को तोड़ने का समय है!",
+    "comeback_new": "हर विशेषज्ञ कभी शुरुआती था। आज नई स्ट्रीक शुरू करें!",
+    "celebrate_title": "{days} दिन की स्ट्रीक!",
+    "celebrate_body": "शानदार! लगातार {days} दिन पहेलियाँ सुलझाईं।",
+    "puzzles_ready_title": "कस्टम पहेलियाँ तैयार हैं!",
+    "puzzles_ready_body": "आपका \"{topic}\" पहेली सेट खेलने के लिए तैयार है! {count} पहेलियाँ बनाई गईं।"
   }
 }

@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Đường mòn",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Đừng làm đứt chuỗi của bạn!",
+    "streak_risk_body": "Chuỗi {days} ngày của bạn đang gặp nguy. Hãy chơi hôm nay để giữ nó!",
+    "comeback_title": "Sẵn sàng quay lại chưa?",
+    "comeback_record": "Chuỗi tốt nhất của bạn là {days} ngày. Đến lúc phá kỷ lục đó rồi!",
+    "comeback_new": "Chuyên gia nào cũng từng là người mới. Hãy bắt đầu chuỗi mới hôm nay!",
+    "celebrate_title": "Chuỗi {days} ngày!",
+    "celebrate_body": "Tuyệt vời! {days} ngày liên tiếp giải câu đố.",
+    "puzzles_ready_title": "Câu đố tùy chỉnh đã sẵn sàng!",
+    "puzzles_ready_body": "Bộ câu đố \"{topic}\" của bạn đã sẵn sàng để chơi! Đã tạo {count} câu đố."
   }
 }

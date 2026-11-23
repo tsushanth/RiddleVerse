@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "راستہ",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "اپنی اسٹریک نہ توڑیں!",
+    "streak_risk_body": "آپ کی {days} دن کی اسٹریک خطرے میں ہے۔ اسے برقرار رکھنے کے لیے آج کھیلیں!",
+    "comeback_title": "واپسی کے لیے تیار؟",
+    "comeback_record": "آپ کی بہترین اسٹریک {days} دن کی تھی۔ وہ ریکارڈ توڑنے کا وقت آ گیا!",
+    "comeback_new": "ہر ماہر کبھی مبتدی تھا۔ آج نئی اسٹریک شروع کریں!",
+    "celebrate_title": "{days} دن کی اسٹریک!",
+    "celebrate_body": "شاندار! مسلسل {days} دن پہیلیاں حل کیں۔",
+    "puzzles_ready_title": "حسبِ ضرورت پہیلیاں تیار ہیں!",
+    "puzzles_ready_body": "آپ کا \"{topic}\" پہیلی سیٹ کھیلنے کے لیے تیار ہے! {count} پہیلیاں بنائی گئیں۔"
   }
 }

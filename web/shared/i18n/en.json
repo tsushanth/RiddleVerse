@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Trail",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Don't break your streak!",
+    "streak_risk_body": "Your {days}-day streak is on the line. Play today to keep it alive!",
+    "comeback_title": "Ready for a comeback?",
+    "comeback_record": "Your best streak was {days} days. Time to beat that record!",
+    "comeback_new": "Every expert was once a beginner. Start a new streak today!",
+    "celebrate_title": "{days}-day streak!",
+    "celebrate_body": "Amazing! {days} days of consistent puzzle solving.",
+    "puzzles_ready_title": "Custom puzzles ready!",
+    "puzzles_ready_body": "Your \"{topic}\" puzzle set is ready to play! {count} puzzles generated."
   }
 }

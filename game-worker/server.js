@@ -21,6 +21,7 @@ import * as path from 'path';
 import * as os from 'os';
 import crypto from 'crypto';
 import zlib from 'zlib';
+import { statusCodes, errorCode } from './statusCodes.js';
 import { reportWorkerFailure, reportWorkerCrash, classifyCliFailure, reportCliFailure, createSlotTracker, freeDiskBytes, evaluateHealth, summarizeCliResult, createUsageTally } from './monitoring.js';
 
 const app = express();
@@ -818,14 +819,14 @@ async function runtimeValidation(projectDir, timeoutMs = 8000) {
 function authMiddleware(req, res, next) {
     const secret = req.headers['x-worker-secret'];
     if (secret !== WORKER_SECRET) {
-        return res.status(401).json({ error: 'Unauthorized' });
+        return res.status(401).json({ error: 'Unauthorized', code: errorCode('Unauthorized') });
     }
     next();
 }
 
 // Tokens / cost per UTC day as reported by the Claude CLI (same secret as the generation routes).
 app.get('/usage', (req, res) => {
-    if (req.headers['x-worker-secret'] !== WORKER_SECRET) return res.status(401).json({ error: 'Unauthorized' });
+    if (req.headers['x-worker-secret'] !== WORKER_SECRET) return res.status(401).json({ error: 'Unauthorized', code: errorCode('Unauthorized') });
     res.json({ days: usageTally.snapshot() });
 });
 
@@ -866,17 +867,18 @@ app.post('/generate', authMiddleware, async (req, res) => {
     const { prompt, userId, stream, referenceImage } = req.body;
 
     if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-        return res.status(400).json({ error: 'Game description is required' });
+        return res.status(400).json({ error: 'Game description is required', code: errorCode('Game description is required') });
     }
 
     if (slots.full()) {
-        return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
+        return res.status(429).json({ error: 'Worker busy. Try again in a moment.', code: errorCode('Worker busy. Try again in a moment.') });
     }
 
     // Check if we know quota is exhausted (fail fast)
     if (quotaExhausted) {
         return res.status(503).json({
             error: getQuotaErrorMessage(),
+            code: 'quota_exhausted',
             quotaExhausted: true,
             resetTime: quotaResetTime
         });
@@ -914,7 +916,7 @@ app.post('/generate', authMiddleware, async (req, res) => {
         console.log(`[${requestId}] [${phase}] ${message}${detail ? ': ' + detail : ''} (${progress.startPct}-${progress.endPct}%, ~${estimatedRemaining}s remaining)`);
         if (isSSE) {
             res.write(`data: ${JSON.stringify({
-                type: 'status', phase, message, detail,
+                type: 'status', phase, message, detail, ...statusCodes(message, detail),
                 progressPercent: progress.startPct,
                 progressEndPct: progress.endPct,
                 phaseDurationSeconds: progress.typicalSeconds,
@@ -925,10 +927,10 @@ app.post('/generate', authMiddleware, async (req, res) => {
 
     function sendError(error) {
         if (isSSE) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error, code: errorCode(error) })}\n\n`);
             res.end();
         } else {
-            res.status(503).json({ error });
+            res.status(503).json({ error, code: errorCode(error) });
         }
     }
 
@@ -1343,20 +1345,21 @@ app.post('/generate-harder', authMiddleware, async (req, res) => {
     const { parentBundle, difficultyLevel, gameTitle, stream, repoName } = req.body;
 
     if (!parentBundle || typeof parentBundle !== 'string') {
-        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)' });
+        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)', code: errorCode('parentBundle is required (base64 ZIP)') });
     }
 
     if (!difficultyLevel || difficultyLevel < 2 || difficultyLevel > 5) {
-        return res.status(400).json({ error: 'difficultyLevel must be 2-5' });
+        return res.status(400).json({ error: 'difficultyLevel must be 2-5', code: errorCode('difficultyLevel must be 2-5') });
     }
 
     if (slots.full()) {
-        return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
+        return res.status(429).json({ error: 'Worker busy. Try again in a moment.', code: errorCode('Worker busy. Try again in a moment.') });
     }
 
     if (quotaExhausted) {
         return res.status(503).json({
             error: getQuotaErrorMessage(),
+            code: 'quota_exhausted',
             quotaExhausted: true,
             resetTime: quotaResetTime
         });
@@ -1392,7 +1395,7 @@ app.post('/generate-harder', authMiddleware, async (req, res) => {
         console.log(`[${requestId}] [${phase}] ${message}${detail ? ': ' + detail : ''}`);
         if (isSSE) {
             res.write(`data: ${JSON.stringify({
-                type: 'status', phase, message, detail,
+                type: 'status', phase, message, detail, ...statusCodes(message, detail),
                 progressPercent: progress.startPct,
                 progressEndPct: progress.endPct,
                 phaseDurationSeconds: progress.typicalSeconds,
@@ -1403,10 +1406,10 @@ app.post('/generate-harder', authMiddleware, async (req, res) => {
 
     function sendError(error) {
         if (isSSE) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error, code: errorCode(error) })}\n\n`);
             res.end();
         } else {
-            res.status(503).json({ error });
+            res.status(503).json({ error, code: errorCode(error) });
         }
     }
 
@@ -1621,17 +1624,18 @@ app.post('/generate-next-level', authMiddleware, async (req, res) => {
     const { parentBundle, seriesTitle, seriesDescription, parentLevelIndex, nextLevelIndex, userId, stream } = req.body;
 
     if (!parentBundle || typeof parentBundle !== 'string') {
-        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)' });
+        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)', code: errorCode('parentBundle is required (base64 ZIP)') });
     }
     if (!nextLevelIndex || nextLevelIndex < 2) {
-        return res.status(400).json({ error: 'nextLevelIndex must be >= 2' });
+        return res.status(400).json({ error: 'nextLevelIndex must be >= 2', code: errorCode('nextLevelIndex must be >= 2') });
     }
     if (slots.full()) {
-        return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
+        return res.status(429).json({ error: 'Worker busy. Try again in a moment.', code: errorCode('Worker busy. Try again in a moment.') });
     }
     if (quotaExhausted) {
         return res.status(503).json({
             error: getQuotaErrorMessage(),
+            code: 'quota_exhausted',
             quotaExhausted: true,
             resetTime: quotaResetTime
         });
@@ -1666,7 +1670,7 @@ app.post('/generate-next-level', authMiddleware, async (req, res) => {
         console.log(`[${requestId}] [${phase}] ${message}${detail ? ': ' + detail : ''}`);
         if (isSSE) {
             res.write(`data: ${JSON.stringify({
-                type: 'status', phase, message, detail,
+                type: 'status', phase, message, detail, ...statusCodes(message, detail),
                 progressPercent: progress.startPct,
                 progressEndPct: progress.endPct,
                 phaseDurationSeconds: progress.typicalSeconds,
@@ -1677,10 +1681,10 @@ app.post('/generate-next-level', authMiddleware, async (req, res) => {
     }
     function sendError(error) {
         if (isSSE) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error, code: errorCode(error) })}\n\n`);
             res.end();
         } else {
-            res.status(503).json({ error });
+            res.status(503).json({ error, code: errorCode(error) });
         }
     }
     function sendResult(data) {
@@ -1848,20 +1852,21 @@ app.post('/customize', authMiddleware, async (req, res) => {
     const { parentBundle, customizeDescription, gameTitle, newTitle, stream } = req.body;
 
     if (!parentBundle || typeof parentBundle !== 'string') {
-        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)' });
+        return res.status(400).json({ error: 'parentBundle is required (base64 ZIP)', code: errorCode('parentBundle is required (base64 ZIP)') });
     }
 
     if (!customizeDescription || customizeDescription.trim().length === 0) {
-        return res.status(400).json({ error: 'customizeDescription is required' });
+        return res.status(400).json({ error: 'customizeDescription is required', code: errorCode('customizeDescription is required') });
     }
 
     if (slots.full()) {
-        return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
+        return res.status(429).json({ error: 'Worker busy. Try again in a moment.', code: errorCode('Worker busy. Try again in a moment.') });
     }
 
     if (quotaExhausted) {
         return res.status(503).json({
             error: getQuotaErrorMessage(),
+            code: 'quota_exhausted',
             quotaExhausted: true,
             resetTime: quotaResetTime
         });
@@ -1896,7 +1901,7 @@ app.post('/customize', authMiddleware, async (req, res) => {
         console.log(`[${requestId}] [${phase}] ${message}${detail ? ': ' + detail : ''}`);
         if (isSSE) {
             res.write(`data: ${JSON.stringify({
-                type: 'status', phase, message, detail,
+                type: 'status', phase, message, detail, ...statusCodes(message, detail),
                 progressPercent: progress.startPct,
                 progressEndPct: progress.endPct,
                 phaseDurationSeconds: progress.typicalSeconds,
@@ -1907,10 +1912,10 @@ app.post('/customize', authMiddleware, async (req, res) => {
 
     function sendError(error) {
         if (isSSE) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error, code: errorCode(error) })}\n\n`);
             res.end();
         } else {
-            res.status(503).json({ error });
+            res.status(503).json({ error, code: errorCode(error) });
         }
     }
 
@@ -2346,11 +2351,11 @@ app.post('/init-repo', authMiddleware, async (req, res) => {
     const { gameId, bundle } = req.body;
 
     if (!gameId || !bundle) {
-        return res.status(400).json({ error: 'gameId and bundle are required' });
+        return res.status(400).json({ error: 'gameId and bundle are required', code: errorCode('gameId and bundle are required') });
     }
 
     if (!GITHUB_PAT) {
-        return res.status(503).json({ error: 'Git integration not configured (missing GITHUB_PAT)' });
+        return res.status(503).json({ error: 'Git integration not configured (missing GITHUB_PAT)', code: errorCode('Git integration not configured (missing GITHUB_PAT)') });
     }
 
     const requestId = `init-${gameId.substring(0, 8)}`;
@@ -2366,7 +2371,7 @@ app.post('/init-repo', authMiddleware, async (req, res) => {
         });
     } catch (error) {
         console.error(`[${requestId}] Init repo error:`, error.message);
-        res.status(500).json({ error: `Failed to initialize repo: ${error.message}` });
+        res.status(500).json({ error: `Failed to initialize repo: ${error.message}`, code: errorCode(`Failed to initialize repo: ${error.message}`) });
     }
 });
 
@@ -2391,24 +2396,25 @@ app.post('/tweak', authMiddleware, async (req, res) => {
     const { gameId, repoName, tweakDescription, stream } = req.body;
 
     if (!tweakDescription || typeof tweakDescription !== 'string' || tweakDescription.trim().length === 0) {
-        return res.status(400).json({ error: 'tweakDescription is required' });
+        return res.status(400).json({ error: 'tweakDescription is required', code: errorCode('tweakDescription is required') });
     }
 
     if (!repoName) {
-        return res.status(400).json({ error: 'repoName is required (initialize repo first)' });
+        return res.status(400).json({ error: 'repoName is required (initialize repo first)', code: errorCode('repoName is required (initialize repo first)') });
     }
 
     if (!GITHUB_PAT) {
-        return res.status(503).json({ error: 'Git integration not configured (missing GITHUB_PAT)' });
+        return res.status(503).json({ error: 'Git integration not configured (missing GITHUB_PAT)', code: errorCode('Git integration not configured (missing GITHUB_PAT)') });
     }
 
     if (slots.full()) {
-        return res.status(429).json({ error: 'Worker busy. Try again in a moment.' });
+        return res.status(429).json({ error: 'Worker busy. Try again in a moment.', code: errorCode('Worker busy. Try again in a moment.') });
     }
 
     if (quotaExhausted) {
         return res.status(503).json({
             error: getQuotaErrorMessage(),
+            code: 'quota_exhausted',
             quotaExhausted: true,
             resetTime: quotaResetTime
         });
@@ -2444,7 +2450,7 @@ app.post('/tweak', authMiddleware, async (req, res) => {
         console.log(`[${requestId}] [${phase}] ${message}${detail ? ': ' + detail : ''}`);
         if (isSSE) {
             res.write(`data: ${JSON.stringify({
-                type: 'status', phase, message, detail,
+                type: 'status', phase, message, detail, ...statusCodes(message, detail),
                 progressPercent: progress.startPct,
                 progressEndPct: progress.endPct,
                 phaseDurationSeconds: progress.typicalSeconds,
@@ -2456,10 +2462,10 @@ app.post('/tweak', authMiddleware, async (req, res) => {
     function sendError(error) {
         console.error(`[${requestId}] Error: ${error}`);
         if (isSSE) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error, code: errorCode(error) })}\n\n`);
             res.end();
         } else {
-            res.status(503).json({ error });
+            res.status(503).json({ error, code: errorCode(error) });
         }
     }
 
@@ -2626,7 +2632,7 @@ app.get('/versions/:repoName', authMiddleware, async (req, res) => {
     console.log(`[versions] Fetching history for ${repoName}`);
 
     if (!GITHUB_PAT) {
-        return res.status(503).json({ error: 'Git integration not configured' });
+        return res.status(503).json({ error: 'Git integration not configured', code: errorCode('Git integration not configured') });
     }
 
     try {
@@ -2634,7 +2640,7 @@ app.get('/versions/:repoName', authMiddleware, async (req, res) => {
         res.json({ success: true, versions: commits });
     } catch (error) {
         console.error(`[versions] Error:`, error.message);
-        res.status(500).json({ error: 'Failed to fetch version history' });
+        res.status(500).json({ error: 'Failed to fetch version history', code: errorCode('Failed to fetch version history') });
     }
 });
 

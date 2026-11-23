@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "المسار",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "لا تقطع سلسلتك!",
+    "streak_risk_body": "سلسلتك من {days} أيام في خطر. العب اليوم للحفاظ عليها!",
+    "comeback_title": "هل أنت مستعد للعودة؟",
+    "comeback_record": "أفضل سلسلة لك كانت {days} أيام. حان وقت تحطيم هذا الرقم!",
+    "comeback_new": "كل خبير كان مبتدئًا يومًا ما. ابدأ سلسلة جديدة اليوم!",
+    "celebrate_title": "سلسلة {days} أيام!",
+    "celebrate_body": "رائع! {days} أيام متتالية من حل الألغاز.",
+    "puzzles_ready_title": "الألغاز المخصصة جاهزة!",
+    "puzzles_ready_body": "مجموعة \"{topic}\" جاهزة للعب! تم إنشاء {count} لغزًا."
   }
 }

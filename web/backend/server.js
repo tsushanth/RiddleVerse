@@ -74,6 +74,7 @@ import { registerFcmTokenHandler } from './routes/dailyPuzzles.routes.js';
 import { fcmTokenRegisterLimiter } from './config/middleware.js';
 import { createPlayPagesRouter } from './services/playPages.js';
 import { createPageHitRecorder } from './services/pageHits.js';
+import { contentLanguageMiddleware } from './utils/contentLanguage.js';
 import { createLimiter as createHitLimiter } from './services/puzzleMonitoring.js';
 
 const __dirname = path.resolve();
@@ -98,6 +99,8 @@ app.use('/api/puzzle-events', puzzleEventsRouter);
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+// The app's language (Accept-Language / x-app-language / ?lang=) -> req.contentLang, used by LLM prompts, caches and push.
+app.use(contentLanguageMiddleware);
 
 // Security middleware
 app.use((req, res, next) => {

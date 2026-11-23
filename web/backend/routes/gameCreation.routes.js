@@ -7,6 +7,8 @@ import { USAGE_CATEGORIES } from '../utils/usageTracker.js';
 import { DIFFICULTY_COSTS, MAX_DIFFICULTY_LEVEL, getDifficultyCost } from '../services/difficultyService.js';
 import { createForgeSessionCloser } from '../services/forgeSessionService.js';
 import { reportFailure } from '../utils/failureReporter.js';
+import { buildGamePrompt, DEFAULT_LANGUAGE } from '../utils/contentLanguage.js';
+import { pickSuggestions, normalizeSuggestionRows, buildReplenishPrompt, createReplenishGate } from '../services/gameSuggestions.js';
 
 const router = express.Router();
 
@@ -351,15 +353,24 @@ async function refreshSuggestionsCache() {
     if (suggestionsCache.isRefreshing) return;
     suggestionsCache.isRefreshing = true;
     try {
-        const { data, error } = await supabase
+        let { data, error } = await supabase
             .from('game_suggestions')
-            .select('label, prompt')
+            .select('label, prompt, language')
             .eq('status', 'active')
             .order('created_at', { ascending: false });
 
+        if (error && /language/i.test(error.message || '')) {
+            // migrations/game_suggestions_language.sql not applied yet: every row is English.
+            ({ data, error } = await supabase
+                .from('game_suggestions')
+                .select('label, prompt')
+                .eq('status', 'active')
+                .order('created_at', { ascending: false }));
+        }
+
         if (error) throw error;
 
-        suggestionsCache.items = data || [];
+        suggestionsCache.items = normalizeSuggestionRows(data);
         suggestionsCache.lastRefreshed = Date.now();
         console.log(`[suggestions-cache] Refreshed: ${suggestionsCache.items.length} active suggestions`);
     } catch (error) {
@@ -369,12 +380,12 @@ async function refreshSuggestionsCache() {
     }
 }
 
-function getRandomSuggestions(count = 6) {
-    const pool = suggestionsCache.items;
-    if (pool.length === 0) return [];
-    const shuffled = [...pool].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, Math.min(count, pool.length));
+// Chips of one language only (see services/gameSuggestions.js).
+function getRandomSuggestions(count = 6, lang = DEFAULT_LANGUAGE) {
+    return pickSuggestions(suggestionsCache.items, lang, count);
 }
+
+const replenishGate = createReplenishGate();
 
 // Initial load + periodic refresh
 refreshSuggestionsCache();
@@ -410,7 +421,7 @@ async function markSuggestionAsUsed(prompt) {
     }
 }
 
-async function replenishSuggestions() {
+async function replenishSuggestions(lang = DEFAULT_LANGUAGE) {
     try {
         // Get all labels (active + used) to avoid regenerating used ones too
         const { data: existingData, error: fetchError } = await supabase
@@ -421,19 +432,7 @@ async function replenishSuggestions() {
 
         const existingLabels = (existingData || []).map(s => s.label.toLowerCase());
 
-        const prompt = `You are a creative game designer. Generate 6 unique, fun mini-game ideas for a mobile game creation platform. Each game must be buildable as a single-file HTML5 game with touch controls.
-
-Return a JSON array of exactly 6 objects with "label" (2-3 word catchy name) and "prompt" (detailed game description in 2-4 sentences covering: core mechanic, controls, scoring, win/lose condition, and one visual flair detail).
-
-Do NOT suggest any of these existing games: ${existingLabels.join(', ')}
-
-Requirements:
-- Games must work on mobile (touch/tap/swipe/drag controls)
-- Each game should be a different genre (e.g., puzzle, action, arcade, strategy, word, reflex)
-- Descriptions should be specific enough that a developer could build the game from the description alone
-- Keep labels short and catchy (2-3 words max)
-
-Respond with ONLY the JSON array, no other text.`;
+        const prompt = buildReplenishPrompt(existingLabels, lang);
 
         const aiResponse = await callAI(prompt, null, 2, {
             category: USAGE_CATEGORIES.SUGGESTION_GENERATION,
@@ -473,11 +472,16 @@ Respond with ONLY the JSON array, no other text.`;
                     label: suggestion.label,
                     prompt: suggestion.prompt,
                     status: 'active',
-                    source: 'ai_generated'
+                    source: 'ai_generated',
+                    // English rows keep the pre-migration shape so replenishing works before the column exists.
+                    ...(lang === DEFAULT_LANGUAGE ? {} : { language: lang })
                 });
 
             if (insertError) {
-                if (insertError.code === '23505') {
+                if (insertError.code === '42703') {
+                    console.error('[suggestions] game_suggestions.language is missing (apply migrations/game_suggestions_language.sql)');
+                    break;
+                } else if (insertError.code === '23505') {
                     console.log(`[suggestions] DB duplicate skipped: "${suggestion.label}"`);
                 } else {
                     console.error(`[suggestions] Insert error for "${suggestion.label}":`, insertError.message);
@@ -529,11 +533,11 @@ router.post('/generate', async (req, res) => {
         const { prompt, userId, userName, title, referenceImage } = req.body;
 
         if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
-            return res.status(400).json({ error: 'Game description is required' });
+            return res.status(400).json({ error: 'Game description is required', code: 'description_required' });
         }
 
         if (prompt.length > 500) {
-            return res.status(400).json({ error: 'Description must be under 500 characters' });
+            return res.status(400).json({ error: 'Description must be under 500 characters', code: 'description_too_long' });
         }
 
         // Subscribers bypass all limits
@@ -544,7 +548,7 @@ router.post('/generate', async (req, res) => {
             const lifetimeCount = await getLifetimeGenerations(userId);
             if (lifetimeCount >= FREE_LIFETIME_GENERATIONS) {
                 return res.status(403).json({
-                    error: `You've used your ${FREE_LIFETIME_GENERATIONS} free generations. Subscribe to continue creating games!`,
+                    error: `You've used your ${FREE_LIFETIME_GENERATIONS} free generations. Subscribe to continue creating games!`, code: 'free_limit_reached',
                     requiresSubscription: true,
                     freeTrialAvailable: true,
                     lifetimeUsed: lifetimeCount,
@@ -566,7 +570,7 @@ router.post('/generate', async (req, res) => {
                 });
                 if (spendError || !spendResult.success) {
                     return res.status(402).json({
-                        error: 'Insufficient coins',
+                        error: 'Insufficient coins', code: 'insufficient_coins',
                         balance: spendResult?.balance || 0,
                         coinCost: GENERATION_COIN_COST,
                         canUseCoins: true
@@ -575,7 +579,7 @@ router.post('/generate', async (req, res) => {
                 console.log(`[generate] Rate limit bypassed with ${GENERATION_COIN_COST} coins for user ${userId}`);
             } else {
                 return res.status(429).json({
-                    error: `You've used all ${MAX_GENERATIONS_PER_HOUR} free generations this hour`,
+                    error: `You've used all ${MAX_GENERATIONS_PER_HOUR} free generations this hour`, code: 'hourly_limit_reached',
                     canUseCoins: true,
                     coinCost: GENERATION_COIN_COST
                 });
@@ -614,7 +618,8 @@ router.post('/generate', async (req, res) => {
         res.on('close', () => clearInterval(heartbeatInterval));
 
         // Build worker request body
-        const workerBody = { prompt: prompt.trim(), userId, stream: true };
+        // The language and the How to Play note are added here (not by the app) so they follow the user's UI language.
+        const workerBody = { prompt: buildGamePrompt(prompt, req.contentLang), userId, stream: true };
         if (referenceImage && typeof referenceImage === 'string') {
             workerBody.referenceImage = referenceImage;
         }
@@ -632,28 +637,30 @@ router.post('/generate', async (req, res) => {
 
         if (!workerResponse.ok) {
             let errorMsg = `Build server error (${workerResponse.status})`;
+            let errorCode = 'build_server_error';
             try {
                 if (workerResponse.headers.get('content-type')?.includes('application/json')) {
                     const err = await workerResponse.json();
                     errorMsg = err.error || errorMsg;
+                    errorCode = err.code || (err.quotaExhausted ? 'quota_exhausted' : errorCode);
                     // Forward quota info if present
                     if (err.quotaExhausted) {
                         closeForge('failed', 'worker_quota');
-                        res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, quotaExhausted: true, resetTime: err.resetTime })}\n\n`);
+                        res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode, quotaExhausted: true, resetTime: err.resetTime })}\n\n`);
                         res.end();
                         return;
                     }
                 }
             } catch {}
             closeForge('failed', 'worker_http_error');
-            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode })}\n\n`);
             res.end();
             return;
         }
 
         if (!workerResponse.body) {
             closeForge('failed', 'worker_unreachable');
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed', code: 'build_server_unavailable' })}\n\n`);
             res.end();
             return;
         }
@@ -688,6 +695,9 @@ router.post('/generate', async (req, res) => {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'status',
                                     phase: parsed.phase,
+                                    messageCode: parsed.messageCode,
+                                    detailCode: parsed.detailCode,
+                                    detailArgs: parsed.detailArgs,
                                     message: parsed.message,
                                     detail: parsed.detail,
                                     progressPercent: parsed.progressPercent,
@@ -794,7 +804,8 @@ router.post('/generate', async (req, res) => {
                                 errorForwarded = true;
                                 res.write(`data: ${JSON.stringify({
                                     type: 'error',
-                                    error: parsed.error
+                                    error: parsed.error,
+                                    code: parsed.code
                                 })}\n\n`);
                             }
                         } catch {
@@ -807,7 +818,7 @@ router.post('/generate', async (req, res) => {
             if (!resultReceived) {
                 closeForge('failed', streamError?.name === 'TimeoutError' ? 'timeout' : 'stream_lost');
                 errorForwarded = true;
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost' })}\n\n`);
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost', code: 'build_connection_lost' })}\n\n`);
             }
         }
 
@@ -816,7 +827,7 @@ router.post('/generate', async (req, res) => {
         if (!resultReceived) {
             closeForge('failed', workerErrorSeen ? 'worker_error' : 'stream_ended_without_result');
             if (!errorForwarded) {
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'The build server stopped before your game was ready. Please try again.' })}\n\n`);
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'The build server stopped before your game was ready. Please try again.', code: 'build_stopped' })}\n\n`);
             }
         }
 
@@ -832,13 +843,13 @@ router.post('/generate', async (req, res) => {
 
         // If headers already sent (SSE mode), send error event
         if (res.headersSent) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error. Please try again.' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error. Please try again.', code: 'server_error' })}\n\n`);
             res.end();
         } else {
             if (error.name === 'TimeoutError') {
-                return res.status(504).json({ error: 'Game generation timed out. Try a simpler game idea.' });
+                return res.status(504).json({ error: 'Game generation timed out. Try a simpler game idea.', code: 'generation_timeout' });
             }
-            res.status(500).json({ error: 'Failed to generate game. Please try again.' });
+            res.status(500).json({ error: 'Failed to generate game. Please try again.', code: 'generation_failed' });
         }
     }
 });
@@ -851,7 +862,7 @@ router.post('/save', async (req, res) => {
         const { title, bundle, creatorId, creatorName, initialPrompt, score, timePlayed } = req.body;
 
         if (!title || !bundle || !creatorId) {
-            return res.status(400).json({ error: 'title, bundle, and creatorId are required' });
+            return res.status(400).json({ error: 'title, bundle, and creatorId are required', code: 'missing_fields' });
         }
 
         const bundleSizeKB = (Buffer.from(bundle, 'base64').length / 1024).toFixed(1);
@@ -936,7 +947,7 @@ router.post('/save', async (req, res) => {
             markSuggestionAsUsed(initialPrompt)
                 .then(markedSuggestion => {
                     if (markedSuggestion) {
-                        replenishSuggestions();
+                        replenishSuggestions(req.contentLang || DEFAULT_LANGUAGE);
                     }
                 })
                 .catch(err => console.error('[suggestions] Background task error:', err.message));
@@ -949,7 +960,7 @@ router.post('/save', async (req, res) => {
 
     } catch (error) {
         console.error('[save] Error:', error.message);
-        res.status(500).json({ error: 'Failed to save game' });
+        res.status(500).json({ error: 'Failed to save game', code: 'save_failed' });
     }
 });
 
@@ -1013,7 +1024,7 @@ router.get('/browse', async (req, res) => {
         });
     } catch (error) {
         console.error('[browse] Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch games' });
+        res.status(500).json({ error: 'Failed to fetch games', code: 'fetch_failed' });
     }
 });
 
@@ -1022,9 +1033,17 @@ router.get('/browse', async (req, res) => {
 // No DB hit — served instantly from memory.
 router.get('/suggestions', (req, res) => {
     const count = Math.min(parseInt(req.query.count) || 6, 10);
+    const lang = req.contentLang || DEFAULT_LANGUAGE;
+    const suggestions = getRandomSuggestions(count, lang);
+    // A language with a short pool asks for a replenishment (at most one LLM call per language per hour). Until the
+    // pool exists the list is empty and the app shows its own localized chips, never English ones.
+    if (lang !== DEFAULT_LANGUAGE && suggestions.length < count && replenishGate(lang)) {
+        replenishSuggestions(lang).catch(err => console.error('[suggestions] Background replenish error:', err.message));
+    }
     res.json({
         success: true,
-        suggestions: getRandomSuggestions(count)
+        language: lang,
+        suggestions
     });
 });
 
@@ -1058,7 +1077,7 @@ router.get('/:gameId/difficulty-info', async (req, res) => {
         res.json({ success: true, levels, costs: DIFFICULTY_COSTS });
     } catch (error) {
         console.error('[difficulty-info] Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch difficulty info' });
+        res.status(500).json({ error: 'Failed to fetch difficulty info', code: 'fetch_failed' });
     }
 });
 
@@ -1071,7 +1090,7 @@ router.get('/:gameId/difficulty/:level', async (req, res) => {
         const parsedLevel = parseInt(level);
 
         if (isNaN(parsedLevel) || parsedLevel < 2 || parsedLevel > MAX_DIFFICULTY_LEVEL) {
-            return res.status(400).json({ error: 'Invalid difficulty level (must be 2-5)' });
+            return res.status(400).json({ error: 'Invalid difficulty level (must be 2-5)', code: 'invalid_level' });
         }
 
         const { data, error } = await supabase
@@ -1133,7 +1152,7 @@ router.get('/:gameId/difficulty/:level', async (req, res) => {
         });
     } catch (error) {
         console.error('[difficulty-fetch] Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch difficulty variant' });
+        res.status(500).json({ error: 'Failed to fetch difficulty variant', code: 'fetch_failed' });
     }
 });
 
@@ -1146,7 +1165,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
         const parsedLevel = parseInt(level);
 
         if (isNaN(parsedLevel) || parsedLevel < 2 || parsedLevel > MAX_DIFFICULTY_LEVEL) {
-            return res.status(400).json({ error: 'Invalid difficulty level (must be 2-5)' });
+            return res.status(400).json({ error: 'Invalid difficulty level (must be 2-5)', code: 'invalid_level' });
         }
 
         // Check if variant already exists or is being generated
@@ -1158,10 +1177,10 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
             .single();
 
         if (existing && existing.status === 'ready') {
-            return res.status(409).json({ error: 'Variant already exists', exists: true });
+            return res.status(409).json({ error: 'Variant already exists', code: 'variant_exists', exists: true });
         }
         if (existing && existing.status === 'generating') {
-            return res.status(409).json({ error: 'Variant is already being generated', generating: true });
+            return res.status(409).json({ error: 'Variant is already being generated', code: 'variant_in_progress', generating: true });
         }
 
         // Fetch parent bundle: level 2 uses original, level 3+ uses previous level
@@ -1176,7 +1195,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                 .eq('id', gameId)
                 .single();
             if (gameError || !game) {
-                return res.status(404).json({ error: 'Parent game not found' });
+                return res.status(404).json({ error: 'Parent game not found', code: 'parent_not_found' });
             }
             parentBundle = game.html_content;
             gameTitle = game.title;
@@ -1192,7 +1211,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                 .single();
 
             if (prevError || !prevVariant) {
-                return res.status(400).json({ error: `Level ${parsedLevel - 1} must be generated first` });
+                return res.status(400).json({ error: `Level ${parsedLevel - 1} must be generated first`, code: 'previous_level_required' });
             }
             parentBundle = prevVariant.html_content;
 
@@ -1224,7 +1243,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                 });
             if (insertError) {
                 if (insertError.code === '23505') {
-                    return res.status(409).json({ error: 'Variant generation already in progress' });
+                    return res.status(409).json({ error: 'Variant generation already in progress', code: 'variant_in_progress' });
                 }
                 throw insertError;
             }
@@ -1265,10 +1284,12 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
         if (!workerResponse.ok) {
             reportWorkerHttp('harder', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
+            let errorCode = 'build_server_error';
             try {
                 if (workerResponse.headers.get('content-type')?.includes('application/json')) {
                     const err = await workerResponse.json();
                     errorMsg = err.error || errorMsg;
+                    errorCode = err.code || (err.quotaExhausted ? 'quota_exhausted' : errorCode);
                 }
             } catch {}
 
@@ -1279,7 +1300,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                 .eq('parent_game_id', gameId)
                 .eq('difficulty_level', parsedLevel);
 
-            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode })}\n\n`);
             res.end();
             return;
         }
@@ -1291,7 +1312,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                 .eq('parent_game_id', gameId)
                 .eq('difficulty_level', parsedLevel);
 
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed', code: 'build_server_unavailable' })}\n\n`);
             res.end();
             return;
         }
@@ -1321,6 +1342,9 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'status',
                                     phase: parsed.phase,
+                                    messageCode: parsed.messageCode,
+                                    detailCode: parsed.detailCode,
+                                    detailArgs: parsed.detailArgs,
                                     message: parsed.message,
                                     detail: parsed.detail,
                                     progressPercent: parsed.progressPercent,
@@ -1354,7 +1378,8 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
                             } else if (parsed.type === 'error') {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'error',
-                                    error: parsed.error
+                                    error: parsed.error,
+                                    code: parsed.code
                                 })}\n\n`);
                             }
                         } catch {}
@@ -1363,7 +1388,7 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
             }
         } catch (streamError) {
             if (!resultReceived) {
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost' })}\n\n`);
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost', code: 'build_connection_lost' })}\n\n`);
             }
         }
 
@@ -1382,10 +1407,10 @@ router.post('/:gameId/difficulty/:level/generate', async (req, res) => {
         console.error('[difficulty-generate] Error:', error.message);
 
         if (res.headersSent) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during difficulty generation' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during difficulty generation', code: 'server_error' })}\n\n`);
             res.end();
         } else {
-            res.status(500).json({ error: 'Failed to generate difficulty variant' });
+            res.status(500).json({ error: 'Failed to generate difficulty variant', code: 'generation_failed' });
         }
     }
 });
@@ -1409,11 +1434,11 @@ router.post('/:gameId/tweak', async (req, res) => {
         console.log(`[tweak] Request: user=${userId}, game=${gameId}, desc="${(tweakDescription || '').substring(0, 80)}"`);
 
         if (!userId || !tweakDescription || tweakDescription.trim().length === 0) {
-            return res.status(400).json({ error: 'userId and tweakDescription are required' });
+            return res.status(400).json({ error: 'userId and tweakDescription are required', code: 'missing_fields' });
         }
 
         if (tweakDescription.length > 500) {
-            return res.status(400).json({ error: 'Tweak description must be under 500 characters' });
+            return res.status(400).json({ error: 'Tweak description must be under 500 characters', code: 'description_too_long' });
         }
 
         // 1. Verify user owns this game
@@ -1425,12 +1450,12 @@ router.post('/:gameId/tweak', async (req, res) => {
 
         if (gameError || !game) {
             console.log(`[tweak] Game not found: ${gameId}`);
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         }
 
         if (game.creator_id !== userId) {
             console.log(`[tweak] Not owner: user=${userId}, creator=${game.creator_id}`);
-            return res.status(403).json({ error: 'Only the game creator can tweak this game' });
+            return res.status(403).json({ error: 'Only the game creator can tweak this game', code: 'not_creator' });
         }
 
         // 2. Check free tweaks or spend coins
@@ -1451,13 +1476,13 @@ router.post('/:gameId/tweak', async (req, res) => {
 
             if (spendError) {
                 console.error(`[tweak] Coin spend error:`, spendError.message);
-                return res.status(500).json({ error: 'Failed to process payment' });
+                return res.status(500).json({ error: 'Failed to process payment', code: 'payment_failed' });
             }
 
             if (!spendResult.success) {
                 console.log(`[tweak] Insufficient coins: balance=${spendResult.balance}`);
                 return res.status(400).json({
-                    error: 'Insufficient coins',
+                    error: 'Insufficient coins', code: 'insufficient_coins',
                     balance: spendResult.balance || 0,
                     tweakCost: EDIT_COST
                 });
@@ -1502,7 +1527,7 @@ router.post('/:gameId/tweak', async (req, res) => {
                         });
                         console.log(`[tweak] Coins refunded: ${EDIT_COST}`);
                     }
-                    return res.status(500).json({ error: 'Failed to initialize game repository' });
+                    return res.status(500).json({ error: 'Failed to initialize game repository', code: 'repo_init_failed' });
                 }
 
                 const initData = await initResponse.json();
@@ -1517,7 +1542,7 @@ router.post('/:gameId/tweak', async (req, res) => {
                 console.log(`[tweak] Repo initialized: ${repoName}`);
             } catch (initErr) {
                 console.error(`[tweak] Repo init exception:`, initErr.message);
-                return res.status(500).json({ error: 'Failed to initialize game repository' });
+                return res.status(500).json({ error: 'Failed to initialize game repository', code: 'repo_init_failed' });
             }
         }
 
@@ -1564,9 +1589,11 @@ router.post('/:gameId/tweak', async (req, res) => {
         if (!workerResponse.ok) {
             reportWorkerHttp('tweak', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
+            let errorCode = 'build_server_error';
             try {
                 const err = await workerResponse.json();
                 errorMsg = err.error || errorMsg;
+                    errorCode = err.code || (err.quotaExhausted ? 'quota_exhausted' : errorCode);
             } catch {}
 
             // Refund if coins were spent
@@ -1588,13 +1615,13 @@ router.post('/:gameId/tweak', async (req, res) => {
                     .eq('id', gameId);
             }
 
-            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode })}\n\n`);
             res.end();
             return;
         }
 
         if (!workerResponse.body) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed', code: 'build_server_unavailable' })}\n\n`);
             res.end();
             return;
         }
@@ -1624,6 +1651,9 @@ router.post('/:gameId/tweak', async (req, res) => {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'status',
                                     phase: parsed.phase,
+                                    messageCode: parsed.messageCode,
+                                    detailCode: parsed.detailCode,
+                                    detailArgs: parsed.detailArgs,
                                     message: parsed.message,
                                     detail: parsed.detail,
                                     progressPercent: parsed.progressPercent,
@@ -1671,7 +1701,8 @@ router.post('/:gameId/tweak', async (req, res) => {
                             } else if (parsed.type === 'error') {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'error',
-                                    error: parsed.error
+                                    error: parsed.error,
+                                    code: parsed.code
                                 })}\n\n`);
                             }
                         } catch {}
@@ -1681,7 +1712,7 @@ router.post('/:gameId/tweak', async (req, res) => {
         } catch (streamError) {
             console.error(`[tweak] Stream error:`, streamError.message);
             if (!resultReceived) {
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost' })}\n\n`);
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost', code: 'build_connection_lost' })}\n\n`);
             }
         }
 
@@ -1691,10 +1722,10 @@ router.post('/:gameId/tweak', async (req, res) => {
         console.error('[tweak] Error:', error.message);
 
         if (res.headersSent) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during tweak' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during tweak', code: 'server_error' })}\n\n`);
             res.end();
         } else {
-            res.status(500).json({ error: 'Failed to apply tweak' });
+            res.status(500).json({ error: 'Failed to apply tweak', code: 'generation_failed' });
         }
     }
 });
@@ -1715,11 +1746,11 @@ router.post('/:gameId/customize', async (req, res) => {
         console.log(`[customize] Request: user=${userId}, game=${gameId}, desc="${(customizeDescription || '').substring(0, 80)}"`);
 
         if (!userId || !customizeDescription || customizeDescription.trim().length === 0) {
-            return res.status(400).json({ error: 'userId and customizeDescription are required' });
+            return res.status(400).json({ error: 'userId and customizeDescription are required', code: 'missing_fields' });
         }
 
         if (customizeDescription.length > 500) {
-            return res.status(400).json({ error: 'Description must be under 500 characters' });
+            return res.status(400).json({ error: 'Description must be under 500 characters', code: 'description_too_long' });
         }
 
         // 1. Fetch parent game bundle
@@ -1731,11 +1762,11 @@ router.post('/:gameId/customize', async (req, res) => {
 
         if (gameError || !game) {
             console.log(`[customize] Game not found: ${gameId}`);
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         }
 
         if (!game.html_content) {
-            return res.status(400).json({ error: 'Game has no bundle to customize' });
+            return res.status(400).json({ error: 'Game has no bundle to customize', code: 'no_bundle' });
         }
 
         const effectiveTitle = (newTitle && newTitle.trim()) || `My ${game.title}`;
@@ -1776,18 +1807,20 @@ router.post('/:gameId/customize', async (req, res) => {
         if (!workerResponse.ok) {
             reportWorkerHttp('customize', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
+            let errorCode = 'build_server_error';
             try {
                 const err = await workerResponse.json();
                 errorMsg = err.error || errorMsg;
+                    errorCode = err.code || (err.quotaExhausted ? 'quota_exhausted' : errorCode);
             } catch {}
 
-            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode })}\n\n`);
             res.end();
             return;
         }
 
         if (!workerResponse.body) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed', code: 'build_server_unavailable' })}\n\n`);
             res.end();
             return;
         }
@@ -1817,6 +1850,9 @@ router.post('/:gameId/customize', async (req, res) => {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'status',
                                     phase: parsed.phase,
+                                    messageCode: parsed.messageCode,
+                                    detailCode: parsed.detailCode,
+                                    detailArgs: parsed.detailArgs,
                                     message: parsed.message,
                                     detail: parsed.detail,
                                     progressPercent: parsed.progressPercent,
@@ -1843,7 +1879,7 @@ router.post('/:gameId/customize', async (req, res) => {
 
                                     if (updateError) {
                                         console.error(`[customize] Failed to update game in-place:`, updateError.message);
-                                        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Failed to save fixed game' })}\n\n`);
+                                        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Failed to save fixed game', code: 'save_failed' })}\n\n`);
                                     } else {
                                         console.log(`[customize] Game updated in-place: ${gameId} ("${game.title}")`);
 
@@ -1885,7 +1921,7 @@ router.post('/:gameId/customize', async (req, res) => {
 
                                     if (insertError) {
                                         console.error(`[customize] Failed to save new game:`, insertError.message);
-                                        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Failed to save customized game' })}\n\n`);
+                                        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Failed to save customized game', code: 'save_failed' })}\n\n`);
                                     } else {
                                         console.log(`[customize] New game created: ${newGameId} ("${effectiveTitle}") from parent ${gameId}`);
 
@@ -1903,7 +1939,8 @@ router.post('/:gameId/customize', async (req, res) => {
                             } else if (parsed.type === 'error') {
                                 res.write(`data: ${JSON.stringify({
                                     type: 'error',
-                                    error: parsed.error
+                                    error: parsed.error,
+                                    code: parsed.code
                                 })}\n\n`);
                             }
                         } catch {}
@@ -1913,7 +1950,7 @@ router.post('/:gameId/customize', async (req, res) => {
         } catch (streamError) {
             console.error(`[customize] Stream error:`, streamError.message);
             if (!resultReceived) {
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost' })}\n\n`);
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost', code: 'build_connection_lost' })}\n\n`);
             }
         }
 
@@ -1923,10 +1960,10 @@ router.post('/:gameId/customize', async (req, res) => {
         console.error('[customize] Error:', error.message);
 
         if (res.headersSent) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during customization' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during customization', code: 'server_error' })}\n\n`);
             res.end();
         } else {
-            res.status(500).json({ error: 'Failed to customize game' });
+            res.status(500).json({ error: 'Failed to customize game', code: 'generation_failed' });
         }
     }
 });
@@ -1948,7 +1985,7 @@ router.get('/:gameId/versions', async (req, res) => {
             .single();
 
         if (gameError || !game) {
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         }
 
         if (!game.github_repo) {
@@ -1989,7 +2026,7 @@ router.get('/:gameId/versions', async (req, res) => {
 
     } catch (error) {
         console.error('[versions] Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch version history' });
+        res.status(500).json({ error: 'Failed to fetch version history', code: 'fetch_failed' });
     }
 });
 
@@ -2003,7 +2040,7 @@ router.post('/:gameId/revert/:commitSha', async (req, res) => {
         console.log(`[revert] User ${userId} reverting game ${gameId} to commit ${commitSha.substring(0, 7)}`);
 
         if (!userId) {
-            return res.status(400).json({ error: 'userId is required' });
+            return res.status(400).json({ error: 'userId is required', code: 'missing_fields' });
         }
 
         // Verify ownership
@@ -2014,20 +2051,20 @@ router.post('/:gameId/revert/:commitSha', async (req, res) => {
             .single();
 
         if (gameError || !game) {
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         }
 
         if (game.creator_id !== userId) {
-            return res.status(403).json({ error: 'Only the game creator can revert' });
+            return res.status(403).json({ error: 'Only the game creator can revert', code: 'not_creator' });
         }
 
         if (!game.github_repo) {
-            return res.status(400).json({ error: 'Game has no version history' });
+            return res.status(400).json({ error: 'Game has no version history', code: 'no_version_history' });
         }
 
         // Download the repo at the specified commit via GitHub API
         if (!GITHUB_PAT_BACKEND) {
-            return res.status(503).json({ error: 'Git integration not configured' });
+            return res.status(503).json({ error: 'Git integration not configured', code: 'git_not_configured' });
         }
 
         console.log(`[revert] Downloading ${game.github_repo} at ${commitSha.substring(0, 7)}`);
@@ -2045,7 +2082,7 @@ router.post('/:gameId/revert/:commitSha', async (req, res) => {
 
         if (!ghResponse.ok) {
             console.error(`[revert] GitHub download error: ${ghResponse.status}`);
-            return res.status(500).json({ error: 'Failed to download version from GitHub' });
+            return res.status(500).json({ error: 'Failed to download version from GitHub', code: 'download_failed' });
         }
 
         // GitHub returns a zip with a top-level folder — we need to repackage it
@@ -2090,7 +2127,7 @@ router.post('/:gameId/revert/:commitSha', async (req, res) => {
 
     } catch (error) {
         console.error('[revert] Error:', error.message);
-        res.status(500).json({ error: 'Failed to revert game' });
+        res.status(500).json({ error: 'Failed to revert game', code: 'revert_failed' });
     }
 });
 
@@ -2205,15 +2242,15 @@ router.post('/remix', async (req, res) => {
         const { userId, puzzleType, difficulty, remixDescription, title } = req.body;
 
         if (!userId || !puzzleType) {
-            return res.status(400).json({ error: 'userId and puzzleType are required' });
+            return res.status(400).json({ error: 'userId and puzzleType are required', code: 'missing_fields' });
         }
 
         if (!remixDescription || remixDescription.trim().length === 0) {
-            return res.status(400).json({ error: 'remixDescription is required' });
+            return res.status(400).json({ error: 'remixDescription is required', code: 'missing_fields' });
         }
 
         if (remixDescription.length > 500) {
-            return res.status(400).json({ error: 'Description must be under 500 characters' });
+            return res.status(400).json({ error: 'Description must be under 500 characters', code: 'description_too_long' });
         }
 
         const typePrompt = PUZZLE_TYPE_PROMPTS[puzzleType] || PUZZLE_TYPE_PROMPTS[puzzleType.toLowerCase()]
@@ -2226,7 +2263,7 @@ router.post('/remix', async (req, res) => {
             const lifetimeCount = await getLifetimeGenerations(userId);
             if (lifetimeCount >= FREE_LIFETIME_GENERATIONS) {
                 return res.status(403).json({
-                    error: `You've used your ${FREE_LIFETIME_GENERATIONS} free generations. Subscribe to continue creating games!`,
+                    error: `You've used your ${FREE_LIFETIME_GENERATIONS} free generations. Subscribe to continue creating games!`, code: 'free_limit_reached',
                     requiresSubscription: true,
                     freeTrialAvailable: true,
                     lifetimeUsed: lifetimeCount,
@@ -2248,7 +2285,7 @@ router.post('/remix', async (req, res) => {
                 });
                 if (spendError || !spendResult.success) {
                     return res.status(402).json({
-                        error: 'Insufficient coins',
+                        error: 'Insufficient coins', code: 'insufficient_coins',
                         balance: spendResult?.balance || 0,
                         coinCost: GENERATION_COIN_COST,
                         canUseCoins: true
@@ -2257,7 +2294,7 @@ router.post('/remix', async (req, res) => {
                 console.log(`[remix] Rate limit bypassed with ${GENERATION_COIN_COST} coins for user ${userId}`);
             } else {
                 return res.status(429).json({
-                    error: `You've used all ${MAX_GENERATIONS_PER_HOUR} free generations this hour`,
+                    error: `You've used all ${MAX_GENERATIONS_PER_HOUR} free generations this hour`, code: 'hourly_limit_reached',
                     canUseCoins: true,
                     coinCost: GENERATION_COIN_COST
                 });
@@ -2274,7 +2311,7 @@ router.post('/remix', async (req, res) => {
 
 GAME TYPE: ${typePrompt}
 DIFFICULTY: ${difficulty || 'Medium'}
-USER CUSTOMIZATIONS: ${remixDescription.trim()}
+USER CUSTOMIZATIONS: ${buildGamePrompt(remixDescription, req.contentLang)}
 TITLE: ${gameTitle}
 
 Requirements:
@@ -2317,24 +2354,26 @@ Requirements:
         if (!workerResponse.ok) {
             reportWorkerHttp('generate_variant', workerResponse.status);
             let errorMsg = `Build server error (${workerResponse.status})`;
+            let errorCode = 'build_server_error';
             try {
                 if (workerResponse.headers.get('content-type')?.includes('application/json')) {
                     const err = await workerResponse.json();
                     errorMsg = err.error || errorMsg;
+                    errorCode = err.code || (err.quotaExhausted ? 'quota_exhausted' : errorCode);
                     if (err.quotaExhausted) {
-                        res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, quotaExhausted: true, resetTime: err.resetTime })}\n\n`);
+                        res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode, quotaExhausted: true, resetTime: err.resetTime })}\n\n`);
                         res.end();
                         return;
                     }
                 }
             } catch {}
-            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: errorMsg, code: errorCode })}\n\n`);
             res.end();
             return;
         }
 
         if (!workerResponse.body) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server connection failed', code: 'build_server_unavailable' })}\n\n`);
             res.end();
             return;
         }
@@ -2364,6 +2403,9 @@ Requirements:
                                 res.write(`data: ${JSON.stringify({
                                     type: 'status',
                                     phase: parsed.phase,
+                                    messageCode: parsed.messageCode,
+                                    detailCode: parsed.detailCode,
+                                    detailArgs: parsed.detailArgs,
                                     message: parsed.message,
                                     detail: parsed.detail,
                                     progressPercent: parsed.progressPercent,
@@ -2412,7 +2454,7 @@ Requirements:
                                     generationTime: parsed.generationTime
                                 })}\n\n`);
                             } else if (parsed.type === 'error') {
-                                res.write(`data: ${JSON.stringify({ type: 'error', error: parsed.error })}\n\n`);
+                                res.write(`data: ${JSON.stringify({ type: 'error', error: parsed.error, code: parsed.code })}\n\n`);
                             }
                         } catch {}
                     }
@@ -2420,7 +2462,7 @@ Requirements:
             }
         } catch (streamError) {
             if (!resultReceived) {
-                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost' })}\n\n`);
+                res.write(`data: ${JSON.stringify({ type: 'error', error: 'Connection to build server lost', code: 'build_connection_lost' })}\n\n`);
             }
         }
 
@@ -2429,13 +2471,13 @@ Requirements:
     } catch (error) {
         console.error('[remix] Error:', error.message);
         if (res.headersSent) {
-            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during remix' })}\n\n`);
+            res.write(`data: ${JSON.stringify({ type: 'error', error: 'Server error during remix', code: 'server_error' })}\n\n`);
             res.end();
         } else {
             if (error.name === 'TimeoutError') {
-                return res.status(504).json({ error: 'Game generation timed out. Try a simpler description.' });
+                return res.status(504).json({ error: 'Game generation timed out. Try a simpler description.', code: 'generation_timeout' });
             }
-            res.status(500).json({ error: 'Failed to create remixed game' });
+            res.status(500).json({ error: 'Failed to create remixed game', code: 'generation_failed' });
         }
     }
 });
@@ -2987,14 +3029,14 @@ router.post('/:gameId/play-event/start', async (req, res) => {
     try {
         const { gameId } = req.params;
         const { userId } = req.body || {};
-        if (!userId) return res.status(400).json({ error: 'userId is required' });
+        if (!userId) return res.status(400).json({ error: 'userId is required', code: 'missing_fields' });
 
         const { data: game } = await supabase
             .from('custom_games')
             .select('id, series_id')
             .eq('id', gameId)
             .maybeSingle();
-        if (!game) return res.status(404).json({ error: 'Game not found' });
+        if (!game) return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
 
         const { data, error } = await supabase
             .from('game_play_events')
@@ -3011,7 +3053,7 @@ router.post('/:gameId/play-event/start', async (req, res) => {
         res.json({ success: true, eventId: data.id });
     } catch (error) {
         console.error('[play-event/start] Error:', error.message);
-        res.status(500).json({ error: 'Failed to record play event' });
+        res.status(500).json({ error: 'Failed to record play event', code: 'fetch_failed' });
     }
 });
 
@@ -3029,7 +3071,7 @@ router.get('/:gameId/next-level', async (req, res) => {
             .eq('id', gameId)
             .single();
 
-        if (parentErr || !parent) return res.status(404).json({ error: 'Game not found' });
+        if (parentErr || !parent) return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         if (!parent.series_id || parent.level_index == null) {
             // Pre-backfill or standalone — treat as series of one starting at level 1
             return res.json({ exists: false, seriesId: null, nextLevelIndex: 2, parentLevelIndex: parent.level_index || 1 });
@@ -3062,7 +3104,7 @@ router.get('/:gameId/next-level', async (req, res) => {
         return res.json({ exists: false, seriesId: parent.series_id, nextLevelIndex: nextIdx, parentLevelIndex: parent.level_index });
     } catch (error) {
         console.error('[next-level lookup] Error:', error.message);
-        res.status(500).json({ error: 'Failed to look up next level' });
+        res.status(500).json({ error: 'Failed to look up next level', code: 'fetch_failed' });
     }
 });
 
@@ -3074,7 +3116,7 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
     const { gameId } = req.params;
     const { userId } = req.body || {};
 
-    if (!userId) return res.status(400).json({ error: 'userId is required' });
+    if (!userId) return res.status(400).json({ error: 'userId is required', code: 'missing_fields' });
 
     // Resolve parent + series
     const { data: parent, error: parentErr } = await supabase
@@ -3083,9 +3125,9 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
         .eq('id', gameId)
         .single();
 
-    if (parentErr || !parent) return res.status(404).json({ error: 'Parent game not found' });
+    if (parentErr || !parent) return res.status(404).json({ error: 'Parent game not found', code: 'parent_not_found' });
     if (!parent.series_id || parent.level_index == null) {
-        return res.status(409).json({ error: 'Parent game has not been migrated into a series. Run the game_series migration first.' });
+        return res.status(409).json({ error: 'Parent game has not been migrated into a series. Run the game_series migration first.', code: 'series_not_migrated' });
     }
 
     const nextIdx = parent.level_index + 1;
@@ -3142,13 +3184,13 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
             signal: AbortSignal.timeout(600000)
         });
     } catch (fetchErr) {
-        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server unreachable' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Build server unreachable', code: 'build_server_unavailable' })}\n\n`);
         return res.end();
     }
 
     if (!workerResponse.ok || !workerResponse.body) {
         if (!workerResponse.ok) reportWorkerHttp('next_level', workerResponse.status);
-        res.write(`data: ${JSON.stringify({ type: 'error', error: `Build server error (${workerResponse.status})` })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'error', error: `Build server error (${workerResponse.status})`, code: 'build_server_error' })}\n\n`);
         return res.end();
     }
 
@@ -3172,6 +3214,9 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
                     res.write(`data: ${JSON.stringify({
                         type: 'status',
                         phase: parsed.phase,
+                        messageCode: parsed.messageCode,
+                        detailCode: parsed.detailCode,
+                        detailArgs: parsed.detailArgs,
                         message: parsed.message,
                         detail: parsed.detail,
                         suggestedTitle: parsed.suggestedTitle,
@@ -3225,7 +3270,7 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
                             })}\n\n`);
                         } else {
                             console.error('[next-level] DB insert error:', dbError);
-                            res.write(`data: ${JSON.stringify({ type: 'result', success: false, error: 'Database save failed' })}\n\n`);
+                            res.write(`data: ${JSON.stringify({ type: 'result', success: false, error: 'Database save failed', code: 'save_failed' })}\n\n`);
                         }
                     } else {
                         await supabase
@@ -3249,13 +3294,13 @@ router.post('/:gameId/next-level/generate', async (req, res) => {
                         })}\n\n`);
                     }
                 } else if (parsed.type === 'error') {
-                    res.write(`data: ${JSON.stringify({ type: 'error', error: parsed.error })}\n\n`);
+                    res.write(`data: ${JSON.stringify({ type: 'error', error: parsed.error, code: parsed.code })}\n\n`);
                 }
             }
         }
     } catch (streamErr) {
         console.error('[next-level] Stream error:', streamErr.message);
-        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Stream interrupted' })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: 'error', error: 'Stream interrupted', code: 'build_connection_lost' })}\n\n`);
     }
     res.end();
 });
@@ -3276,10 +3321,10 @@ router.get('/:gameId', async (req, res) => {
 
         // PGRST116 = no rows, 22P02 = malformed uuid: both mean "no such game", not a server fault.
         if (error && (error.code === 'PGRST116' || error.code === '22P02')) {
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         }
         if (error) throw error;
-        if (!data) return res.status(404).json({ error: 'Game not found' });
+        if (!data) return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
 
         // Increment play count (lifetime serve counter) AND record a
         // game_plays row with player_id so we can split unique humans from
@@ -3358,7 +3403,7 @@ router.get('/:gameId', async (req, res) => {
 
     } catch (error) {
         console.error('[fetch] Error:', error.message);
-        res.status(500).json({ error: 'Failed to fetch game' });
+        res.status(500).json({ error: 'Failed to fetch game', code: 'fetch_failed' });
     }
 });
 
@@ -3369,7 +3414,7 @@ router.delete('/:gameId', async (req, res) => {
         const { userId } = req.query;
 
         if (!gameId || !userId) {
-            return res.status(400).json({ error: 'gameId and userId are required' });
+            return res.status(400).json({ error: 'gameId and userId are required', code: 'missing_fields' });
         }
 
         // Verify ownership
@@ -3380,11 +3425,11 @@ router.delete('/:gameId', async (req, res) => {
             .single();
 
         if (fetchError || !game) {
-            return res.status(404).json({ error: 'Game not found' });
+            return res.status(404).json({ error: 'Game not found', code: 'game_not_found' });
         }
 
         if (game.creator_id !== userId) {
-            return res.status(403).json({ error: 'Not authorized to delete this game' });
+            return res.status(403).json({ error: 'Not authorized to delete this game', code: 'not_creator' });
         }
 
         const { error: deleteError } = await supabase
@@ -3399,7 +3444,7 @@ router.delete('/:gameId', async (req, res) => {
 
     } catch (error) {
         console.error('[delete] Error:', error.message);
-        res.status(500).json({ error: 'Failed to delete game' });
+        res.status(500).json({ error: 'Failed to delete game', code: 'delete_failed' });
     }
 });
 

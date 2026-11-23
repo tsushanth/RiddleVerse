@@ -23,6 +23,7 @@ class FCMTokenManager(private val context: Context) {
         private const val PREFS_NAME = "fcm_token_prefs"
         private const val KEY_LAST_TOKEN = "last_token"
         private const val KEY_LAST_SENT_TIME = "last_sent_time"
+        private const val KEY_LAST_LANGUAGE = "last_language"
         private const val SERVER_URL = "https://puzzleverseai.com"// Replace with your server URL
 
         // Send token to server every 24 hours minimum
@@ -33,6 +34,7 @@ class FCMTokenManager(private val context: Context) {
         .connectTimeout(30, TimeUnit.SECONDS)
         .writeTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
+        .addInterceptor(ContentLanguage.interceptor)
         .build()
 
     private val sharedPrefs: SharedPreferences =
@@ -85,6 +87,7 @@ class FCMTokenManager(private val context: Context) {
                 if (success) {
                     // Save the token and timestamp
                     saveTokenInfo(token, System.currentTimeMillis())
+                    sharedPrefs.edit().putString(KEY_LAST_LANGUAGE, ContentLanguage.current()).apply()
                     Log.d(TAG, "FCM token registered successfully with server")
                 } else {
                     Log.e(TAG, "Failed to register FCM token with server")
@@ -229,6 +232,8 @@ class FCMTokenManager(private val context: Context) {
                 put("userId", FirebaseAuth.getInstance().currentUser?.uid)
                 put("fcmToken", token)
                 put("platform", "android")
+                // The server localizes push notifications (streak reminders, puzzles ready) in this language.
+                put("language", ContentLanguage.current())
                 put("timestamp", System.currentTimeMillis())
             }.toString()
 
@@ -265,8 +270,9 @@ class FCMTokenManager(private val context: Context) {
         val lastSentTime = sharedPrefs.getLong(KEY_LAST_SENT_TIME, 0)
         val currentTime = System.currentTimeMillis()
 
-        // Send if token is different or if enough time has passed
-        return lastToken != token || (currentTime - lastSentTime) > TOKEN_REFRESH_INTERVAL
+        // Send if token is different, the app language changed since the last registration, or enough time has passed
+        val languageChanged = sharedPrefs.getString(KEY_LAST_LANGUAGE, null) != ContentLanguage.current()
+        return lastToken != token || languageChanged || (currentTime - lastSentTime) > TOKEN_REFRESH_INTERVAL
     }
 
     private fun saveTokenInfo(token: String, timestamp: Long) {
@@ -294,6 +300,7 @@ class FCMTokenManager(private val context: Context) {
         sharedPrefs.edit()
             .remove(KEY_LAST_TOKEN)
             .remove(KEY_LAST_SENT_TIME)
+            .remove(KEY_LAST_LANGUAGE)
             .apply()
         Log.d(TAG, "Token info cleared")
     }

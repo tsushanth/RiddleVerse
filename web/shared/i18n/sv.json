@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Stig",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Bryt inte din svit!",
+    "streak_risk_body": "Din {days} dagar långa svit är i fara. Spela i dag för att behålla den!",
+    "comeback_title": "Redo för ett comeback?",
+    "comeback_record": "Din bästa svit var {days} dagar. Dags att slå rekordet!",
+    "comeback_new": "Varje expert var en gång nybörjare. Starta en ny svit i dag!",
+    "celebrate_title": "Svit på {days} dagar!",
+    "celebrate_body": "Fantastiskt! {days} dagar i rad med pussellösning.",
+    "puzzles_ready_title": "Egna pussel är klara!",
+    "puzzles_ready_body": "Din pusseluppsättning \"{topic}\" är redo att spelas! {count} pussel skapades."
   }
 }

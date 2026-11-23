@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "İz",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Serini bozma!",
+    "streak_risk_body": "{days} günlük serin tehlikede. Korumak için bugün oyna!",
+    "comeback_title": "Geri dönmeye hazır mısın?",
+    "comeback_record": "En iyi serin {days} gündü. Bu rekoru kırma zamanı!",
+    "comeback_new": "Her uzman bir zamanlar acemiydi. Bugün yeni bir seri başlat!",
+    "celebrate_title": "{days} günlük seri!",
+    "celebrate_body": "Harika! Art arda {days} gün bulmaca çözdün.",
+    "puzzles_ready_title": "Özel bulmacalar hazır!",
+    "puzzles_ready_body": "\"{topic}\" bulmaca setin oynamaya hazır! {count} bulmaca oluşturuldu."
   }
 }

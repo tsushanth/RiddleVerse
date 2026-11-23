@@ -423,7 +423,7 @@ fun fetchDailyPuzzleAndStart(
     val TAG = "FetchDailyPuzzleEnhanced"
     val url = "https://puzzleverseai.com/get-daily-puzzle?email=${URLEncoder.encode(userEmail, "UTF-8")}&topic=${URLEncoder.encode(topic, "UTF-8")}"
     val request = Request.Builder().url(url).build()
-    val client = OkHttpClient()
+    val client = ContentLanguage.newClient()
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {
@@ -2993,7 +2993,7 @@ private fun fetchFromAPIWithMediaCaching(
     val url = "https://puzzleverseai.com/fetch-next-puzzle-ios/$type?userId=${FirebaseAuth.getInstance().currentUser?.uid}&email=${FirebaseAuth.getInstance().currentUser?.email}&difficulty=$difficulty"
 
     val request = Request.Builder().url(url).build()
-    val client = OkHttpClient()
+    val client = ContentLanguage.newClient()
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {

@@ -155,8 +155,9 @@ fun GameCreationScreen(
     LaunchedEffect(Unit) {
         withContext(Dispatchers.IO) {
             try {
+                val appLanguage = ContentLanguage.current()
                 val request = Request.Builder()
-                    .url("https://puzzleverseai.com/api/game-creation/suggestions?count=6")
+                    .url("https://puzzleverseai.com/api/game-creation/suggestions?count=6&lang=$appLanguage")
                     .get()
                     .build()
                 val response = HttpClientProvider.client.newCall(request).execute()
@@ -165,7 +166,10 @@ fun GameCreationScreen(
                 if (body != null) {
                     val json = JSONObject(body)
                     val arr = json.optJSONArray("suggestions")
-                    if (arr != null && arr.length() > 0) {
+                    // A row of chips is in one language. The server says which one it is; chips in any other language
+                    // (an older server answers in English) are ignored and the localized fallback chips stay.
+                    val sameLanguage = json.optString("language", ContentLanguage.DEFAULT) == appLanguage
+                    if (sameLanguage && arr != null && arr.length() > 0) {
                         val fetched = (0 until arr.length()).map { i ->
                             val s = arr.getJSONObject(i)
                             Suggestion(s.optString("label", ""), s.optString("prompt", ""))

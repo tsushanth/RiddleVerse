@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "一笔画",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "别中断你的连续记录!",
+    "streak_risk_body": "你的 {days} 天连续记录岌岌可危。今天玩一局来保住它!",
+    "comeback_title": "准备好回归了吗?",
+    "comeback_record": "你的最佳连续记录是 {days} 天。是时候打破它了!",
+    "comeback_new": "每位高手都曾是新手。今天就开始新的连续记录吧!",
+    "celebrate_title": "连续 {days} 天!",
+    "celebrate_body": "太棒了!你已连续 {days} 天解谜。",
+    "puzzles_ready_title": "自定义谜题已就绪!",
+    "puzzles_ready_body": "你的“{topic}”谜题集可以玩了!已生成 {count} 道谜题。"
   }
 }

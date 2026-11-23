@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "مسیر",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "رشته‌ات را نشکن!",
+    "streak_risk_body": "رشته {days} روزه‌ات در خطر است. امروز بازی کن تا آن را نگه داری!",
+    "comeback_title": "آماده بازگشتی؟",
+    "comeback_record": "بهترین رشته‌ات {days} روز بود. وقت شکستن این رکورد است!",
+    "comeback_new": "هر متخصصی روزی مبتدی بود. امروز یک رشته جدید شروع کن!",
+    "celebrate_title": "رشته {days} روزه!",
+    "celebrate_body": "عالی! {days} روز پیاپی معما حل کرده‌ای.",
+    "puzzles_ready_title": "معماهای سفارشی آماده است!",
+    "puzzles_ready_body": "مجموعه معمای «{topic}» آماده بازی است! {count} معما ساخته شد."
   }
 }

@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Sentier",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Ne brisez pas votre série !",
+    "streak_risk_body": "Votre série de {days} jours est en jeu. Jouez aujourd'hui pour la garder !",
+    "comeback_title": "Prêt pour un retour ?",
+    "comeback_record": "Votre meilleure série était de {days} jours. Il est temps de battre ce record !",
+    "comeback_new": "Tout expert a été débutant un jour. Lancez une nouvelle série aujourd'hui !",
+    "celebrate_title": "Série de {days} jours !",
+    "celebrate_body": "Bravo ! {days} jours de résolution d'énigmes sans interruption.",
+    "puzzles_ready_title": "Énigmes personnalisées prêtes !",
+    "puzzles_ready_body": "Votre série « {topic} » est prête à jouer ! {count} énigmes générées."
   }
 }

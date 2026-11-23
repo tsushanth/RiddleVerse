@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Тропа",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Не прерывайте серию!",
+    "streak_risk_body": "Ваша серия из {days} дн. под угрозой. Сыграйте сегодня, чтобы сохранить её!",
+    "comeback_title": "Готовы вернуться?",
+    "comeback_record": "Ваша лучшая серия длилась {days} дн. Пора побить рекорд!",
+    "comeback_new": "Каждый эксперт когда-то был новичком. Начните новую серию сегодня!",
+    "celebrate_title": "Серия {days} дн.!",
+    "celebrate_body": "Отлично! {days} дн. подряд решаете головоломки.",
+    "puzzles_ready_title": "Ваши головоломки готовы!",
+    "puzzles_ready_body": "Набор «{topic}» готов к игре! Создано головоломок: {count}."
   }
 }

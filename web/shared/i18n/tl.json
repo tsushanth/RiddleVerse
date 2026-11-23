@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Trail",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Huwag putulin ang iyong streak!",
+    "streak_risk_body": "Nanganganib ang iyong {days}-araw na streak. Maglaro ngayon para mapanatili ito!",
+    "comeback_title": "Handa na bang bumalik?",
+    "comeback_record": "Ang pinakamahusay mong streak ay {days} araw. Oras na para lampasan ang rekord na iyon!",
+    "comeback_new": "Dating baguhan din ang bawat eksperto. Magsimula ng bagong streak ngayon!",
+    "celebrate_title": "{days}-araw na streak!",
+    "celebrate_body": "Galing! {days} araw na magkakasunod na paglutas ng puzzle.",
+    "puzzles_ready_title": "Handa na ang iyong custom na mga puzzle!",
+    "puzzles_ready_body": "Handa nang laruin ang iyong puzzle set na \"{topic}\"! {count} puzzle ang nagawa."
   }
 }

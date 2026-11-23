@@ -1000,7 +1000,7 @@ private fun fetchAntonymPuzzleDirect(
         .addHeader("Accept", "application/json")
         .build()
 
-    val client = OkHttpClient()
+    val client = ContentLanguage.newClient()
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {

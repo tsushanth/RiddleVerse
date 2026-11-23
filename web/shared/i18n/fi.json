@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Polku",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Älä katkaise putkeasi!",
+    "streak_risk_body": "{days} päivän putkesi on vaarassa. Pelaa tänään pitääksesi sen hengissä!",
+    "comeback_title": "Valmis paluuseen?",
+    "comeback_record": "Paras putkesi oli {days} päivää. On aika rikkoa se ennätys!",
+    "comeback_new": "Jokainen asiantuntija on joskus ollut aloittelija. Aloita uusi putki tänään!",
+    "celebrate_title": "{days} päivän putki!",
+    "celebrate_body": "Mahtavaa! {days} päivää putkeen pulmien ratkomista.",
+    "puzzles_ready_title": "Omat pulmat ovat valmiina!",
+    "puzzles_ready_body": "Pulmasarjasi \"{topic}\" on valmis pelattavaksi! Luotiin {count} pulmaa."
   }
 }

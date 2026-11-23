@@ -93,5 +93,16 @@
     "linkup": "Linkup",
     "trail": "Percorso",
     "crowns": "Crowns"
+  },
+  "push": {
+    "streak_risk_title": "Non interrompere la tua serie!",
+    "streak_risk_body": "La tua serie di {days} giorni è in gioco. Gioca oggi per mantenerla!",
+    "comeback_title": "Pronto per tornare?",
+    "comeback_record": "La tua serie migliore è stata di {days} giorni. È ora di battere quel record!",
+    "comeback_new": "Ogni esperto è stato un principiante. Inizia una nuova serie oggi!",
+    "celebrate_title": "Serie di {days} giorni!",
+    "celebrate_body": "Fantastico! {days} giorni di enigmi risolti di fila.",
+    "puzzles_ready_title": "Enigmi personalizzati pronti!",
+    "puzzles_ready_body": "Il tuo set «{topic}» è pronto per giocare! Sono stati generati {count} enigmi."
   }
 }

@@ -20,7 +20,7 @@ import {
     triggerAutoGenerationSafe,
     updatePuzzleLeaderboard
 } from '../services/puzzleService.js';
-import { getNextDailyPuzzle, hasDailyPuzzles } from '../services/dailyPuzzles.js';
+import { getNextDailyPuzzle, hasDailyPuzzles, dailyContentLanguage } from '../services/dailyPuzzles.js';
 import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
 const router = express.Router();
@@ -97,13 +97,16 @@ router.get("/fetch-next-puzzle-ios/:puzzleType", authenticateRiddleVerse, riddle
         const difficulty = normalizeDifficulty(req.query.difficulty || 'easy');
 
         // ---- Try daily cache first (no Firebase, no Redis) ----
-        if (hasDailyPuzzles(puzzleType, difficulty)) {
-            const puzzle = getNextDailyPuzzle(puzzleType, difficulty);
+        const lang = req.contentLang || 'en';
+        if (hasDailyPuzzles(puzzleType, difficulty, lang)) {
+            const contentLanguage = dailyContentLanguage(puzzleType, difficulty, lang);
+            const puzzle = getNextDailyPuzzle(puzzleType, difficulty, lang);
             if (puzzle) {
                 return res.json({
                     success: true,
                     puzzleData: puzzle,
                     source: 'daily_cache',
+                    contentLanguage,
                 });
             }
         }

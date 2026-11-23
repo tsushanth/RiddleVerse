@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Text of the game build status and errors. The server sends stable codes (see GameServerText.kt); the app shows these. -->
+    <string name="gen_phase_generate">Building your game</string>
+    <string name="gen_phase_validate">Checking game quality</string>
+    <string name="gen_phase_fix">Fixing issues</string>
+    <string name="gen_phase_polish">Polishing gameplay</string>
+    <string name="gen_phase_verify">Final verification</string>
+    <string name="gen_phase_package">Packaging game</string>
+    <string name="gen_status_prepare">Preparing your game</string>
+    <string name="gen_status_build_level">Building the next level</string>
+    <string name="gen_status_apply_changes">Applying your changes</string>
+    <string name="gen_status_no_issues">No issues found</string>
+    <string name="gen_status_more_fixes">More fixes needed</string>
+    <string name="gen_status_runtime_test">Testing the game</string>
+    <string name="gen_status_fix_runtime">Fixing errors found in testing</string>
+    <string name="gen_status_reverify">Checking again</string>
+    <string name="gen_status_save_changes">Saving your changes</string>
+    <string name="gen_detail_creating_files">Creating game files from your description</string>
+    <string name="gen_detail_running_checks">Running automated quality checks</string>
+    <string name="gen_detail_found_issues">Issues to resolve: %1$d</string>
+    <string name="gen_detail_critical_remaining">Critical issues remaining: %1$d</string>
+    <string name="gen_detail_passed_checks">The game passed all quality checks</string>
+    <string name="gen_detail_improving_feel">Improving game feel and completeness</string>
+    <string name="gen_detail_ensuring_works">Making sure everything works</string>
+    <string name="gen_detail_testing_browser">Testing the game in a headless browser</string>
+    <string name="gen_detail_fixing_test_issues">Fixing issues found during testing</string>
+    <string name="gen_detail_checking_fixes">Checking that the fixes worked</string>
+    <string name="gen_detail_creating_bundle">Creating the downloadable bundle</string>
+    <string name="gen_detail_committing">Saving to version history</string>
+    <string name="gen_detail_cloning">Cloning the game repository</string>
+    <string name="gen_err_description_required">Please describe your game.</string>
+    <string name="gen_err_description_too_long">The description must be under 500 characters.</string>
+    <string name="gen_err_free_limit">You\'ve used all your free generations. Subscribe to keep creating games.</string>
+    <string name="gen_err_hourly_limit">You\'ve used all your free generations this hour.</string>
+    <string name="gen_err_insufficient_coins">You don\'t have enough coins.</string>
+    <string name="gen_err_build_unavailable">The build server is unavailable or busy. Please try again.</string>
+    <string name="gen_err_connection_lost">The connection to the build server was lost. Please try again.</string>
+    <string name="gen_err_build_stopped">The build server stopped before your game was ready. Please try again.</string>
+    <string name="gen_err_timeout">Game generation timed out. Try a simpler idea.</string>
+    <string name="gen_err_generation_failed">Couldn\'t generate the game. Please try again.</string>
+    <string name="gen_err_server">Something went wrong on our side. Please try again.</string>
+    <string name="gen_err_not_found">Game not found.</string>
+    <string name="gen_err_not_creator">Only the game\'s creator can do this.</string>
+    <string name="gen_err_invalid_request">That request is not valid. Please try again.</string>
+    <string name="gen_err_variant_busy">This level already exists or is being built.</string>
+    <string name="gen_err_quota">Game building is at capacity right now. Please try again later.</string>
+    <string name="gen_err_rate_limited">Too many requests. Please try again in a while.</string>
+    <string name="gen_err_busy_today">Game creation is very busy today. Please try again tomorrow.</string>
+    <string name="gen_err_no_files">No game files were created. Try a different description.</string>
+</resources>

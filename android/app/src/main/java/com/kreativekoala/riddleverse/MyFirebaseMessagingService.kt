@@ -214,6 +214,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     put("userId", userId)
                     put("fcmToken", token)
                     put("platform", "android")
+                    put("language", ContentLanguage.current())
                 }.toString()
 
                 val request = Request.Builder()
