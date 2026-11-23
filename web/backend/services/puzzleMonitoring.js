@@ -9,7 +9,9 @@ const NEW_WAVE = new Set(NEW_WAVE_TYPES);
 
 // Public /play page measurement (web only, anonymous): puzzle_type = game slug. No new columns:
 // difficulty (enum, start/complete only), duration_ms only on complete, session_id is a random per-page-load id.
-export const WEB_PLAY_EVENT_TYPES = new Set(['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta']);
+// web_play_telegram = a click on a "Play in Telegram" button (puzzle_type = the game slug, or 'index' / 'welcome' for the pages
+// without a game; channel = the surface label, which is also the /start payload suffix the bot records).
+export const WEB_PLAY_EVENT_TYPES = new Set(['web_play_view', 'web_play_start', 'web_play_complete', 'web_play_cta', 'web_play_telegram']);
 export const WEB_PLAY_DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
 // Sharing and channel events (Android and web): who shared what through which channel, how deep links and the Telegram promos
 // perform. `channel` is a short [a-z0-9_] label (telegram, whatsapp, other, banner, result, settings, ...). share_open, the
@@ -22,6 +24,7 @@ const CHANNEL_RE = /^[a-z0-9_]{1,24}$/;
 // 'daily_solved' = one row per solved daily puzzle: days_since_install + score (= streak length after the solve).
 export const FUNNEL_EVENT_TYPES = new Set(['funnel', 'app_open', 'daily_solved']);
 export const APP_PUZZLE_TYPE = 'app';
+export const PAGE_SURFACES = new Set(['index', 'daily', 'welcome']);
 export const FUNNEL_STEPS = new Set([
     'first_open', 'welcome_shown', 'auth_started', 'auth_done', 'guest_started',
     'onboarding_done', 'home_shown', 'first_puzzle_started', 'first_puzzle_completed',
@@ -91,6 +94,7 @@ export function validatePayload(body, now = Date.now()) {
         if (isWebPlay) {
             // Whitelist only: nothing else the client sends is copied into the row.
             events.push({
+                ...(e.type === 'web_play_telegram' ? { channel: typeof e.channel === 'string' && CHANNEL_RE.test(e.channel) ? e.channel : null } : {}),
                 event_ts: eventTs,
                 event_type: e.type,
                 puzzle_type: e.puzzleType,
@@ -166,8 +170,8 @@ const rate = (num, den) => (den > 0 ? num / den : null);
 
 /** Turn the puzzle_monitoring_summary RPC payload into the admin response. */
 export function buildAdminPuzzles(raw, { days, platform }, now = Date.now()) {
-    // 'app' rows are install-funnel events, not a puzzle.
-    const rows = new Map((raw?.puzzles || []).filter((p) => p.puzzleType !== APP_PUZZLE_TYPE).map((p) => [p.puzzleType, p]));
+    // 'app' rows are install-funnel events, not a puzzle; index / daily / welcome are page surfaces (server page hits, Telegram button clicks).
+    const rows = new Map((raw?.puzzles || []).filter((p) => p.puzzleType !== APP_PUZZLE_TYPE && !PAGE_SURFACES.has(p.puzzleType)).map((p) => [p.puzzleType, p]));
     for (const t of NEW_WAVE_TYPES) if (!rows.has(t)) rows.set(t, { puzzleType: t });
     const byPuzzle = [...rows.values()].map((p) => {
         const starts = Number(p.starts) || 0, completes = Number(p.completes) || 0;

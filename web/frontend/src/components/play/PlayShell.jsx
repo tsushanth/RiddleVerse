@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom'
 import { trackEvent } from '../../services/firebase'
 import { playStoreUrl } from '../../utils/playLinks'
-import { telegramBotUrl } from '../../utils/telegramPlay'
+import { telegramBotUrl, telegramSrc } from '../../utils/telegramPlay'
+import { webPlay } from '../../utils/webPlayAnalytics'
 import usePlayLang from '../../hooks/usePlayLang'
 
 /** "Get the app" button. Link is UTM-tagged per game; the click is one GA event via the existing Firebase Analytics. */
@@ -21,15 +22,23 @@ export function PlayStoreButton({ campaign, className = '' }) {
   )
 }
 
-/** "Play in Telegram": opens the bot (with the game when a slug is given). One GA event per click. */
+/**
+ * "Play in Telegram": opens the bot (with the game when a slug is given). One GA event and one anonymous web_play_telegram event
+ * per click (the second stays silent under Global Privacy Control / Do Not Track). The /start payload carries the surface label.
+ */
 export function TelegramButton({ slug, campaign, className = '' }) {
   const { t } = usePlayLang()
+  const search = typeof window !== 'undefined' ? window.location.search : ''
+  const src = telegramSrc(slug ? 'web_game' : 'web_index', search)
   return (
     <a
-      href={telegramBotUrl(slug)}
+      href={telegramBotUrl(slug, src)}
       target="_blank"
       rel="noopener"
-      onClick={() => trackEvent('play_page_telegram_click', { puzzle_type: campaign || slug || 'index' })}
+      onClick={() => {
+        trackEvent('play_page_telegram_click', { puzzle_type: campaign || slug || 'index' })
+        webPlay.telegram(slug || 'index', src)
+      }}
       className={`inline-flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-semibold px-5 py-3 min-h-[48px] rounded-xl transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-white ${className}`}
     >
       <span aria-hidden="true">{'\u2708'}</span>

@@ -4,11 +4,12 @@ import { safeEqual, verifyInitData, verifyContext, LINK_CODE_RE } from './securi
 import { computeScore, gameUuid, boardKey } from './scoring.js';
 import { todayFor } from './dailySchedule.js';
 import { escapeHtml } from './telegramApi.js';
+import { noopChannelEvents } from './channelEvents.js';
 
 const DIFFICULTIES = new Set(['easy', 'medium', 'hard']);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
-export function createTelegramHandlers({ bot, api, store, i18n, linkService, catalog, config, now = () => Date.now(), limiter, log = console, sleepFn = sleep }) {
+export function createTelegramHandlers({ bot, api, store, i18n, linkService, catalog, config, now = () => Date.now(), limiter, log = console, sleepFn = sleep, events = noopChannelEvents }) {
     const slugs = new Set(catalog.games.map((g) => g.slug));
     const ipOf = (req) => req.ip || req.headers?.['x-forwarded-for'] || 'unknown';
 
@@ -64,6 +65,14 @@ export function createTelegramHandlers({ bot, api, store, i18n, linkService, cat
                 started_at: new Date(endedAt.getTime() - durationSec * 1000).toISOString(), ended_at: endedAt.toISOString(),
                 duration_seconds: durationSec, is_billable: durationSec > 15, score: points, score_source: 'reported', forced_by: 'user_button',
             }).catch((e) => log.warn?.('[telegram] session insert failed:', e?.message));
+            if (events.enabled) { // a verified finished round: the one bot event that comes from the Mini App, not from a chat update
+                const stored = await store.getUser(auth.user.id).catch(() => null);
+                events.emit('game_finished', {
+                    chatId, userId: auth.user.id, language: i18n.resolve(stored?.language || auth.user.language_code),
+                    props: { game: slug, kind, difficulty: b.difficulty, score: points, improved: result.improved, duration_s: durationSec,
+                        chat_type: String(chatId) === String(auth.user.id) ? 'private' : 'group' },
+                });
+            }
             const leaderboard = await store.topScores({ gameId: gameUuid(key), chatId, limit: 10 });
             if (result.improved) announce({ auth, chatId, slug, kind, points, best: result.best, leaderboard, username }).catch((e) => log.warn?.('[telegram] announce failed:', e?.message));
             return res.json({ ok: true, score: points, best: result.best, improved: result.improved,
@@ -98,7 +107,11 @@ export function createTelegramHandlers({ bot, api, store, i18n, linkService, cat
         const header = req.headers?.authorization || '';
         const idToken = header.startsWith('Bearer ') ? header.slice(7).trim() : null;
         const out = await linkService.redeem({ code: req.body?.code, idToken });
-        if (!out.ok) return res.status(out.status).json({ error: out.error });
+        if (!out.ok) {
+            events.emit('link_redeem_failed', { props: { error: out.error, status: out.status } });
+            return res.status(out.status).json({ error: out.error });
+        }
+        events.emit('link_redeemed', { userId: out.tgId, props: { mode: out.mode } });
         res.set?.('Cache-Control', 'no-store');
         return res.json({ mode: out.mode, uid: out.uid, ...(out.customToken ? { customToken: out.customToken } : {}) });
     }
@@ -122,13 +135,33 @@ export function createTelegramHandlers({ bot, api, store, i18n, linkService, cat
                 await store.markDailySent(u.tg_user_id, today);
                 sent++;
             } catch (e) {
-                if (e?.isGone) { await store.markBlocked(u.tg_user_id, true).catch(() => {}); gone++; }
+                if (e?.isGone) {
+                    events.emit('bot_blocked', { chatId: u.chat_id, userId: u.tg_user_id, language: u.language, props: { via: 'daily_push' } });
+                    await store.markBlocked(u.tg_user_id, true).catch(() => {}); gone++;
+                }
                 else { failed++; if (e?.retryAfter) await sleepFn(Math.min(e.retryAfter, 5) * 1000); }
             }
             await sleepFn(45); // stay well under Telegram's 30 messages per second
         }
         await store.pruneUpdates(new Date(now() - 3 * 86400e3).toISOString()).catch(() => {});
+        events.emit('daily_push', { props: { candidates: users.length, sent, gone, failed } });
         return res.json({ ok: true, candidates: users.length, sent, gone, failed });
+    }
+
+    // ------------------------------------------------------------ usage numbers (docs/channels-metrics.md), same secret as the daily push
+    async function stats(req, res) {
+        if (!config.cronSecret) return res.status(503).json({ error: 'not_configured' });
+        if (!safeEqual(String(req.headers?.['x-cron-secret'] || ''), config.cronSecret)) return res.status(401).json({ error: 'unauthorized' });
+        const days = Math.min(Math.max(parseInt(req.query?.days, 10) || 7, 1), 90);
+        try {
+            const data = await store.channelStats(days);
+            res.set?.('Cache-Control', 'no-store');
+            return res.json({ generatedAt: new Date(now()).toISOString(), days, ...(data && typeof data === 'object' ? data : {}) });
+        } catch (e) {
+            const missing = e?.code === 'PGRST202' || e?.code === '42883' || /rv_channel_stats|schema cache/i.test(String(e?.message || ''));
+            log.error?.('[telegram] stats failed:', e?.message);
+            return res.status(missing ? 503 : 500).json({ error: missing ? 'channel_events_not_migrated' : 'stats_failed' });
+        }
     }
 
     // ------------------------------------------------------------ https link page (opens the app, else Google Play)
@@ -152,5 +185,5 @@ export function createTelegramHandlers({ bot, api, store, i18n, linkService, cat
         return res.type('html').send(html);
     }
 
-    return { webhook, score, redeem, dailyPush, linkPage };
+    return { webhook, score, redeem, dailyPush, stats, linkPage };
 }

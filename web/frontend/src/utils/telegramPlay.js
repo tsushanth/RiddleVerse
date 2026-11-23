@@ -7,9 +7,24 @@ export const BOT_USERNAME = 'Riddleverse_bot'
 export const SCORE_ENDPOINT = '/api/telegram/score'
 const CTX_RE = /^[pd]_[a-z]{2,24}_m?\d{1,20}_[0-9a-f]{20}$/
 
-/** t.me link to the bot; with a slug it opens that game in the chat (/start g_<slug>). */
-export function telegramBotUrl(slug) {
-  return `https://t.me/${BOT_USERNAME}${slug ? `?start=g_${encodeURIComponent(slug)}` : ''}`
+const SRC_RE = /^[a-z0-9_]{1,16}$/
+
+/**
+ * t.me link to the bot; with a slug it opens that game in the chat. `src` labels the surface for the bot's own measurement:
+ * the /start payload is "g_<slug>-<src>", "<src>" (no slug) or "g_<slug>" (no src). Grammar: services/telegram/bot.js parseStartPayload.
+ */
+export function telegramBotUrl(slug, src) {
+  const parts = []
+  if (slug) parts.push(`g_${encodeURIComponent(slug)}`)
+  const bare = typeof src === 'string' && SRC_RE.test(src) ? src : null
+  const payload = slug && bare ? `${parts[0]}-${bare}` : slug ? parts[0] : bare
+  return `https://t.me/${BOT_USERNAME}${payload ? `?start=${payload}` : ''}`
+}
+
+/** Surface label for a Telegram button: a page opened from a shared link (src=share) reports web_share, otherwise `base`. */
+export function telegramSrc(base, search = '') {
+  try { if (new URLSearchParams(search).get('src') === 'share') return 'web_share' } catch { /* fall through */ }
+  return base
 }
 
 /** t.me share sheet with a playable link tagged src=share (the server counts the opens). */

@@ -80,6 +80,13 @@ The code is consumed by one atomic conditional update (replay and parallel reque
 
 **Why `/play` showed 0 events.** The deployed bundle does contain the telemetry and the backend (release v54, Nov 11) accepts the event types, so it is not a deploy gap. Nothing in the code path is broken: a 200 from the ingest needs a real browser to send it, and `/play` has had no organic visitors. To tell "no visitors" from "telemetry broken", the server now counts page opens itself (`web_play_hit`, and `share_open` for shared links): no JavaScript needed, Global Privacy Control and Do Not Track request headers honoured, crawlers and link-preview bots skipped, no IP / user agent / referrer stored. After deploy: `select event_type, puzzle_type, count(*) from puzzle_events where event_type in ('web_play_hit','share_open') group by 1,2;`. Hits without `web_play_view` rows would point at the client; no hits would mean no traffic.
 
+## Usage measurement for these channels
+
+Bot interactions, link issued vs redeemed, share and deep-link events, web `/play` hits by source and "Play in Telegram" clicks are measured in
+`public.rv_channel_events` (not in the app's `puzzle_events`) and read with the queries and the `GET /api/telegram/stats` endpoint in
+`docs/channels-metrics.md`. Apply `web/backend/supabase/migrations/20261123120000_rv_channel_events.sql` before deploying; without it the bot
+works as before and the event writer pauses quietly. The bot's `/start` payload now carries a surface label (`g_<game>-web_game`, `web_home`, ...).
+
 ## Forge hardening (small)
 
 - Worker (`game-worker/server.js`): logs the Claude CLI's `result` figures (cost, input / output / cache tokens, duration, turns) per generation and keeps per-UTC-day totals at `GET /usage` (needs `x-worker-secret`). Takes effect when the worker is redeployed on the Hetzner box (`pm2 restart vibecoder-worker`); the CLI broker account may not report a real dollar cost, so treat `costUsd` as indicative.

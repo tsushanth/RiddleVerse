@@ -44,7 +44,7 @@ test('view: one POST to the existing endpoint with the contract shape and nothin
 })
 
 test('event names are exactly the four allow-listed ones', () => {
-  assert.deepEqual(Object.values(WEB_PLAY_EVENTS).sort(), ['web_play_complete', 'web_play_cta', 'web_play_start', 'web_play_view'])
+  assert.deepEqual(Object.values(WEB_PLAY_EVENTS).sort(), ['web_play_complete', 'web_play_cta', 'web_play_start', 'web_play_telegram', 'web_play_view'])
 })
 
 test('view fires once per slug per browser session, also across a reload (sessionStorage)', () => {
@@ -191,5 +191,24 @@ test('round tracker: start on first interaction only, complete only after start 
   t.interact('easy') // next game in the same page counts as a new start
   assert.equal(calls.length, 3)
   t.reset(); t.interact('easy')
+  assert.equal(calls.length, 4)
+})
+
+test('Play in Telegram click: one event with the slug and a whitelisted surface label, silent under GPC and DNT', () => {
+  const { a, calls, env } = setup()
+  a.telegram('sudoku', 'web_game')
+  a.telegram('index', 'web_share')
+  a.telegram('welcome', 'web_home')
+  a.telegram('sudoku', 'Bad Label; drop')
+  a.telegram('app', 'web_game') // reserved placeholder
+  const ev = calls.map((c) => c.body.events[0])
+  assert.deepEqual(ev.map((e) => [e.type, e.puzzleType, e.channel]), [
+    ['web_play_telegram', 'sudoku', 'web_game'], ['web_play_telegram', 'index', 'web_share'], ['web_play_telegram', 'welcome', 'web_home'], ['web_play_telegram', 'sudoku', undefined],
+  ])
+  env.navigator.globalPrivacyControl = true
+  a.telegram('sudoku', 'web_game')
+  env.navigator.globalPrivacyControl = false
+  env.navigator.doNotTrack = '1'
+  a.telegram('sudoku', 'web_game')
   assert.equal(calls.length, 4)
 })
