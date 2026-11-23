@@ -223,6 +223,7 @@ class SubscriptionManager private constructor(
                     AnalyticsManager.getInstance()?.track(AnalyticsEvent.subscriptionPurchase(currentTier.name, 0.0, "USD"))
                     TikTokHelper.trackEvent("purchase_success", mapOf("product_id" to productId))
 
+                    AppStartup.ensureRatingKit()
                     RatingKit.trackPurchase(activity)
 
                     notifyBackendOfPurchase(storeTransaction)

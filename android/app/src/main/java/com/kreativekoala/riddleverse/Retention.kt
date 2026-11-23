@@ -31,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kreativekoala.riddleverse.ui.theme.*
 import java.util.TimeZone
+import java.util.concurrent.Executors
+import java.util.concurrent.Future
+import java.util.concurrent.TimeUnit
 
 // --- retention --- welcome-back state for returning players, the reminder opt-in card shown after a solve,
 // and the reminder switch in Settings. Everything is local; nothing here needs an account.
@@ -64,6 +67,11 @@ object Retention {
     private const val MAX_OFFERS = 3
     private var started = 0
 
+    // The foreground bookkeeping (SharedPreferences, alarm, supporter refresh) runs here, not on the main thread.
+    // [pendingWelcomeBackDays] waits (bounded) for it so the card never reads the previous open's state.
+    private val io = Executors.newSingleThreadExecutor { r -> Thread(r, "retention").apply { isDaemon = true } }
+    @Volatile private var foregroundTask: Future<*>? = null
+
     private fun prefs(c: Context): SharedPreferences = c.applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private fun localDay(ms: Long): Long = Math.floorDiv(ms + TimeZone.getDefault().getOffset(ms), 24 * 3600 * 1000L)
 
@@ -74,7 +82,10 @@ object Retention {
                 override fun onActivityCreated(a: Activity, b: Bundle?) {}
                 override fun onActivityStarted(a: Activity) {
                     val first = synchronized(Retention) { started++ == 0 }
-                    if (first) onForeground(a.applicationContext)
+                    if (first) {
+                        val ctx = a.applicationContext
+                        foregroundTask = try { io.submit { onForeground(ctx) } } catch (_: Throwable) { null }
+                    }
                 }
                 override fun onActivityResumed(a: Activity) {}
                 override fun onActivityPaused(a: Activity) {}
@@ -103,6 +114,7 @@ object Retention {
 
     /** Days the player was away, or 0 when there is nothing to welcome back (already dismissed, solved today, or not away). */
     fun pendingWelcomeBackDays(c: Context): Int {
+        try { foregroundTask?.get(1, TimeUnit.SECONDS) } catch (_: Throwable) { }
         val away = prefs(c).getInt(K_AWAY, 0)
         if (away <= 0) return 0
         return if (DailyPuzzleStore.resultFor(c, DailyPuzzleStore.today()) != null) 0 else away

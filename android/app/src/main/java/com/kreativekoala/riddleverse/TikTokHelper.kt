@@ -13,7 +13,7 @@ object TikTokHelper {
     private const val APP_ID = "7610536667425865746"
 
     /**
-     * Call once at app launch (in MyApplication.onCreate).
+     * Called once from [AppStartup] (background thread) at app launch.
      */
     fun initialize(context: Context) {
         try {
@@ -48,6 +48,14 @@ object TikTokHelper {
      * Track a custom event with optional properties.
      */
     fun trackEvent(eventName: String, properties: Map<String, Any> = emptyMap()) {
+        // The SDK is initialised on the startup thread: queue behind it so an early event is neither lost nor sent to an
+        // uninitialised SDK, and keep the SDK call off the main thread.
+        AppStartup.post {
+            if (AppStartup.ensureTikTok()) trackEventNow(eventName, properties)
+        }
+    }
+
+    private fun trackEventNow(eventName: String, properties: Map<String, Any>) {
         try {
             if (properties.isEmpty()) {
                 com.tiktok.TikTokBusinessSdk.trackEvent(eventName)

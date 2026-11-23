@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import java.util.TimeZone
+import java.util.concurrent.Executors
 
 /** Minimal key/value store so [FunnelState] is JVM-testable (SharedPreferences in production). */
 interface FunnelStore {
@@ -86,23 +87,23 @@ class FunnelState(
 object Funnel {
     private const val PREFS = "funnel_state"
     @Volatile private var state: FunnelState? = null
+    @Volatile private var initStarted = false
     private var startedActivities = 0
     @Volatile private var debugEmit = false
 
+    // All state work (SharedPreferences, package manager, first-run bookkeeping) runs on this one thread, in order, so
+    // nothing here touches the main thread and a step logged before init finished is queued behind it, not dropped.
+    private val io = Executors.newSingleThreadExecutor { r -> Thread(r, "funnel").apply { isDaemon = true } }
+    private fun async(block: () -> Unit) {
+        try { io.execute { try { block() } catch (_: Throwable) { } } } catch (_: Throwable) { }
+    }
+
+    /** Main thread: only registers the lifecycle hook. The prefs/package-manager work is queued on [io]. */
     fun init(app: Application) {
         try {
-            if (state != null) return
-            val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            // Debug builds track steps (logcat tag "Funnel") but only queue them when this pref is set, so test
-            // installs do not pollute the production funnel.
-            debugEmit = BuildConfig.DEBUG && prefs.getBoolean("debug_emit", false)
-            val installTime = try {
-                app.packageManager.getPackageInfo(app.packageName, 0).firstInstallTime
-            } catch (_: Throwable) { System.currentTimeMillis() }
-            state = FunnelState(object : FunnelStore {
-                override fun get(key: String) = prefs.getString(key, null)
-                override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
-            }, installTime)
+            if (initStarted) return
+            initStarted = true
+            async { initState(app) }
             app.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
                 override fun onActivityCreated(a: Activity, b: Bundle?) {}
                 override fun onActivityStarted(a: Activity) {
@@ -121,6 +122,22 @@ object Funnel {
         } catch (_: Throwable) { }
     }
 
+    /** Runs on [io]. */
+    private fun initState(app: Application) {
+        if (state != null) return
+        val prefs = app.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+        // Debug builds track steps (logcat tag "Funnel") but only queue them when this pref is set, so test
+        // installs do not pollute the production funnel.
+        debugEmit = BuildConfig.DEBUG && prefs.getBoolean("debug_emit", false)
+        val installTime = try {
+            app.packageManager.getPackageInfo(app.packageName, 0).firstInstallTime
+        } catch (_: Throwable) { System.currentTimeMillis() }
+        state = FunnelState(object : FunnelStore {
+            override fun get(key: String) = prefs.getString(key, null)
+            override fun put(key: String, value: String) { prefs.edit().putString(key, value).apply() }
+        }, installTime)
+    }
+
     /** Guest-flow steps ([FunnelStep]) mapped onto the allow-list; steps with no allow-listed equivalent stay local. */
     @Suppress("UNUSED_PARAMETER")
     fun log(step: FunnelStep, props: Map<String, Any?> = emptyMap()) {
@@ -130,7 +147,9 @@ object Funnel {
     }
 
     /** Report an install-funnel step (see [PuzzleEventsClient.FUNNEL_STEPS]). Only the first call per install sends. */
-    fun log(step: String) {
+    fun log(step: String) = async { logNow(step) }
+
+    private fun logNow(step: String) {
         try {
             val st = state ?: return
             if (!st.shouldLog(step)) return
@@ -147,11 +166,13 @@ object Funnel {
      * One event per solved daily puzzle (repeatable, unlike [log]): `score` carries the streak length after the solve.
      * Also reports the once-per-install retention steps `daily_completed`, `streak_3` and `streak_7`.
      */
-    fun dailySolved(streak: Int) {
+    fun dailySolved(streak: Int) = async { dailySolvedNow(streak) }
+
+    private fun dailySolvedNow(streak: Int) {
         try {
-            log("daily_completed")
-            if (streak >= 3) log("streak_3")
-            if (streak >= 7) log("streak_7")
+            logNow("daily_completed")
+            if (streak >= 3) logNow("streak_3")
+            if (streak >= 7) logNow("streak_7")
             val days = state?.daysSinceInstall() ?: return
             if (BuildConfig.DEBUG) android.util.Log.d("Funnel", "daily_solved streak=$streak days=$days emit=$debugEmit")
             if (BuildConfig.DEBUG && !debugEmit) return
@@ -162,7 +183,9 @@ object Funnel {
         } catch (_: Throwable) { }
     }
 
-    private fun appOpen() {
+    private fun appOpen() = async { appOpenNow() }
+
+    private fun appOpenNow() {
         try {
             val days = state?.appOpenDays() ?: return
             if (BuildConfig.DEBUG) android.util.Log.d("Funnel", "app_open days=$days emit=$debugEmit")
