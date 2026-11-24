@@ -69,6 +69,13 @@ class GameServerTextTest {
         assertEquals("tl", ContentLanguage.codeFor("fil"))
         assertEquals("pt", ContentLanguage.codeFor("pt"))
         assertEquals("zh", ContentLanguage.codeFor("zh"))
+        assertEquals("zh", ContentLanguage.codeFor("zh", "Hans", "CN"))
+        assertEquals("zh", ContentLanguage.codeFor("zh", null, "SG"))
+        assertEquals("zh-TW", ContentLanguage.codeFor("zh", null, "TW"))
+        assertEquals("zh-TW", ContentLanguage.codeFor("zh", "Hant", ""))
+        assertEquals("zh-TW", ContentLanguage.codeFor("zh", "Hant", "MO"))
+        assertEquals("zh-HK", ContentLanguage.codeFor("ZH", "", "hk"))
+        assertEquals("zh-HK", ContentLanguage.codeFor("zh", "Hant", "HK"))
         assertEquals("de", ContentLanguage.codeFor("DE"))
         // Not a shipped language: the app shows English, so the server text is English too.
         assertEquals("en", ContentLanguage.codeFor("he"))
@@ -79,11 +86,33 @@ class GameServerTextTest {
         val doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(File(resDir, "xml/locales_config.xml"))
         val nodes = doc.getElementsByTagName("locale")
         val codes = (0 until nodes.length).map { (nodes.item(it) as org.w3c.dom.Element).getAttribute("android:name") }
-        assertEquals(30, codes.size)
+        assertEquals(32, codes.size)
         for (tag in codes) {
-            val language = Locale.forLanguageTag(tag).language
-            // Java reports Indonesian as "in" on older runtimes; the server code is "id".
-            assertEquals(tag, if (language == "in") "id" else language, ContentLanguage.codeFor(language))
+            val locale = Locale.forLanguageTag(tag)
+            val language = locale.language
+            // Java reports Indonesian as "in" on older runtimes; the server code is "id". Simplified Chinese is "zh",
+            // Traditional keeps its region so the server can tell Taiwan from Hong Kong.
+            val expected = when (tag) { "zh-CN" -> "zh"; "zh-TW", "zh-HK" -> tag; else -> if (language == "in") "id" else language }
+            assertEquals(tag, expected, ContentLanguage.codeFor(language, locale.script, locale.country))
+        }
+    }
+
+    @Test fun theInterceptorKeepsTraditionalChineseDistinguishable() {
+        val seen = ArrayList<Request>()
+        val client = OkHttpClient.Builder()
+            .addInterceptor(ContentLanguage.interceptor)
+            .addInterceptor { chain ->
+                seen += chain.request()
+                Response.Builder().request(chain.request()).protocol(Protocol.HTTP_1_1).code(200).message("ok")
+                    .body("".toResponseBody(null)).build()
+            }
+            .build()
+        val expected = mapOf("zh-TW" to "zh-TW", "zh-HK" to "zh-HK", "zh-Hant-TW" to "zh-TW", "zh-Hant-HK" to "zh-HK", "zh-CN" to "zh", "zh-Hans-CN" to "zh", "zh-SG" to "zh")
+        for ((tag, code) in expected) {
+            Locale.setDefault(Locale.forLanguageTag(tag))
+            client.newCall(Request.Builder().url("https://puzzleverseai.com/x").build()).execute().close()
+            assertEquals(tag, code, seen.last().header(ContentLanguage.HEADER))
+            assertEquals(tag, code, seen.last().header("Accept-Language"))
         }
     }
 

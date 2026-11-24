@@ -53,7 +53,7 @@ class LocaleResourceParityTest {
     private val defaults by lazy { parseDir(File(resDir, "values")).filterKeys { it !in ignoredKeys } }
     private val localeDirs by lazy {
         resDir.listFiles { f -> f.isDirectory && f.name.startsWith("values-") && f.listFiles { x -> x.name.endsWith(".xml") }.orEmpty().isNotEmpty() }
-            .orEmpty().filter { Regex("""values-[a-z]{2,3}(-r[A-Z]{2})?""").matches(it.name) }.sortedBy { it.name }
+            .orEmpty().filter { Regex("""values-([a-z]{2,3}(-r[A-Z]{2})?|b\+zh\+Hant)""").matches(it.name) }.sortedBy { it.name }
     }
 
     @Test fun everyLanguageHasEveryString() {
@@ -95,9 +95,15 @@ class LocaleResourceParityTest {
             doc.getElementsByTagName("locale").item(it).attributes.getNamedItem("android:name").nodeValue.lowercase()
         }.toSet()
         fun tag(dir: String): String = when (val q = dir.removePrefix("values-")) {
-            "in" -> "id"; "zh-rCN" -> "zh-hans"; "zh-rTW" -> "zh-hant"; else -> q.replace("-r", "-").lowercase()
+            "in" -> "id"; else -> q.replace("-r", "-").lowercase()
         }
-        val shipped = localeDirs.map { tag(it.name) }.toSet() + "en"
-        assertEquals("locales_config.xml vs shipped values-* folders", shipped.sorted(), listed.map { if (it == "zh-cn") "zh-hans" else it }.toSet().sorted())
+        // values-b+zh+Hant is the script fallback (Macau and other Hant regions, same strings as zh-rTW): it is not a picker entry.
+        val shipped = localeDirs.filter { it.name != "values-b+zh+Hant" }.map { tag(it.name) }.toSet() + "en"
+        assertEquals("locales_config.xml vs shipped values-* folders", shipped.sorted(), listed.sorted())
+    }
+
+    @Test fun traditionalChineseShipsTaiwanHongKongAndTheHantFallback() {
+        val names = localeDirs.map { it.name }.toSet()
+        assertTrue(names.containsAll(listOf("values-zh-rCN", "values-zh-rTW", "values-zh-rHK", "values-b+zh+Hant")))
     }
 }

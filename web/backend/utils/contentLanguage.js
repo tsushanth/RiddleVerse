@@ -1,7 +1,7 @@
 // Content language for server-generated text.
 //
-// The Android app ships 30 UI locales. Before this module the server never knew which one the user had picked, so
-// every LLM prompt, every cache and every push notification was English. The client now sends its locale on every
+// The Android app ships 32 UI locales (Traditional Chinese for Taiwan and Hong Kong included). Before this module the
+// server never knew which one the user had picked, so every LLM prompt, every cache and every push notification was English. The client now sends its locale on every
 // request (Accept-Language and x-app-language) and the backend resolves it here to one of SUPPORTED_LANGUAGES.
 //
 // Rules:
@@ -19,6 +19,8 @@ export const LANGUAGE_NAMES = Object.freeze(Object.assign(Object.create(null), {
     ko: 'Korean', ms: 'Malay', nl: 'Dutch', pl: 'Polish', pt: 'Brazilian Portuguese', ro: 'Romanian', ru: 'Russian',
     sv: 'Swedish', th: 'Thai', tl: 'Filipino (Tagalog)', tr: 'Turkish', uk: 'Ukrainian', ur: 'Urdu', vi: 'Vietnamese',
     zh: 'Simplified Chinese',
+    // Traditional script, regional wording: its own languages, never Simplified (files zh-TW.json / zh-HK.json).
+    'zh-TW': 'Traditional Chinese (Taiwan)', 'zh-HK': 'Traditional Chinese (Hong Kong)',
 }));
 
 export const SUPPORTED_LANGUAGES = Object.freeze(Object.keys(LANGUAGE_NAMES));
@@ -26,9 +28,25 @@ export const SUPPORTED_LANGUAGES = Object.freeze(Object.keys(LANGUAGE_NAMES));
 // Android / legacy codes that differ from the codes of web/shared/i18n.
 const ALIASES = Object.freeze(Object.assign(Object.create(null), {
     in: 'id', fil: 'tl', 'pt-br': 'pt', 'pt-pt': 'pt', 'zh-cn': 'zh', 'zh-hans': 'zh', 'zh-sg': 'zh',
-    // Traditional Chinese is not a shipped locale: do not pretend it is Simplified.
     nb: null, no: null,
 }));
+
+// Lower-case tag -> canonical code ('zh-tw' -> 'zh-TW'); tags are matched lower-cased. Null-prototype like the maps above.
+const CANONICAL = Object.freeze(Object.assign(Object.create(null),
+    Object.fromEntries(Object.keys(LANGUAGE_NAMES).map(k => [k.toLowerCase(), k]))));
+
+/**
+ * Chinese tag (lower-cased, e.g. 'zh-hant-hk', 'zh-mo', 'zh-sg') -> 'zh' | 'zh-TW' | 'zh-HK'.
+ * Hans / CN / SG / MY and a bare 'zh' stay Simplified (old clients send just 'zh'); Hant or TW / HK / MO is Traditional,
+ * with Hong Kong wording for HK and Taiwan wording for everything else (Macau, bare zh-Hant), as the app's resources do.
+ */
+export function matchChinese(c) {
+    const parts = c.split('-').slice(1);
+    if (parts.includes('hans')) return 'zh';
+    if (parts.includes('hk')) return 'zh-HK';
+    if (parts.includes('hant') || parts.includes('tw') || parts.includes('mo')) return 'zh-TW';
+    return 'zh';
+}
 
 /** Best supported language for one tag ('de', 'de-AT', 'pt_BR', 'in'). Returns null when unsupported. */
 export function matchLanguage(tag) {
@@ -36,10 +54,11 @@ export function matchLanguage(tag) {
     const c = tag.trim().toLowerCase().replace(/_/g, '-');
     if (!c || c === '*') return null;
     if (c in ALIASES) return ALIASES[c];
-    if (LANGUAGE_NAMES[c]) return c;
+    if (c in CANONICAL) return CANONICAL[c];
     const base = c.split('-')[0];
+    if (base === 'zh') return matchChinese(c);
     if (base in ALIASES) return ALIASES[base];
-    return LANGUAGE_NAMES[base] ? base : null;
+    return base in CANONICAL ? CANONICAL[base] : null;
 }
 
 /** First supported language of an Accept-Language header, honouring q-values ('de-AT,de;q=0.9,en;q=0.8'). */

@@ -1,0 +1,442 @@
+<resources>
+    <string name="app_name">RiddleVerse</string>
+    <string name="default_web_client_id">719851629523-oorgsaiq57ecs8jdpjtmk3bs8eg7fcul.apps.googleusercontent.com</string>
+    <string name="app_id">1:719851629523:android:9075a087f0cbcc6a129d26</string>
+
+    <!-- Puzzle descriptions -->
+    <string name="word_search_description">在網格中找到隱藏的單詞</string>
+    <string name="crossword_description">根據提示填寫單詞</string>
+    <string name="anagram_description">重新排列字母組成單詞</string>
+
+    <!-- Game Over Overlay -->
+    <string name="game_over">遊戲結束！</string>
+    <string name="points">分</string>
+    <string name="score_submitted">分數已提交！</string>
+    <string name="play_again">再玩一次</string>
+    <string name="try_harder_version">挑戰更難版本</string>
+    <string name="try_hard_version">挑戰困難版本</string>
+    <string name="try_very_hard_version">挑戰超難版本</string>
+    <string name="try_expert_version">挑戰專家版本</string>
+    <string name="customize">自定義</string>
+    <string name="get_coins">獲取金幣</string>
+    <string name="view_leaderboard">查看排行榜</string>
+    <string name="done">完成</string>
+    <string name="earn_coins_tip">每天玩謎題賺取金幣！</string>
+    <string name="coins_label">金幣</string>
+    <string name="no_games_yet">還沒有遊戲</string>
+    <string name="be_first_to_create">成為第一個創建和分享遊戲的人！</string>
+
+    <!-- Sort/Filter -->
+    <string name="newest">最新</string>
+    <string name="most_played">最多人玩</string>
+
+    <!-- Bottom Navigation Tabs -->
+    <string name="tab_for_you">推薦</string>
+    <string name="tab_categories">分類</string>
+    <string name="tab_games">遊戲</string>
+    <string name="tab_puzzles">謎題</string>
+    <string name="tab_settings">設置</string>
+
+    <!-- Custom Puzzle Subtabs -->
+    <string name="subtab_browse">瀏覽</string>
+    <string name="subtab_your_puzzles">我的謎題</string>
+    <string name="subtab_featured">精選</string>
+
+    <!-- Shared dialog strings (feedback form, upgrade dialog) -->
+    <string name="enjoying_app">喜歡RiddleVerse嗎？</string>
+    <string name="help_us_improve">幫助我們改進！</string>
+    <string name="continue_label">繼續</string>
+    <string name="maybe_later">以後再説</string>
+
+    <!-- Dialog buttons -->
+    <string name="cancel">取消</string>
+
+    <!-- Feedback Dialog -->
+    <string name="tell_us_what_you_love">告訴我們您喜歡什麼！</string>
+    <string name="what_enjoy_most">您最喜歡RiddleVerse的什麼？</string>
+    <string name="what_can_we_improve">我們如何改進？您的反饋幫助我們變得更好。</string>
+    <string name="your_feedback">您的反饋</string>
+    <string name="feedback_placeholder_positive">我喜歡豐富的謎題種類\u2026</string>
+    <string name="feedback_placeholder_negative">我希望應用程式能有\u2026</string>
+    <string name="submitted_successfully">提交成功！</string>
+    <string name="submission_failed">提交失敗</string>
+    <string name="submit">提交</string>
+
+    <!-- Coin Store -->
+    <string name="coin_store">金幣商店</string>
+    <string name="your_coins">您的金幣</string>
+    <string name="coins_used_description">金幣用於繼續遊戲和支持創作者。</string>
+    <string name="best_value">超值</string>
+
+    <!-- Common Buttons -->
+    <string name="ok">確定</string>
+    <string name="back">返回</string>
+    <string name="close">關閉</string>
+    <string name="start">開始</string>
+    <string name="next">下一步</string>
+
+    <!-- Game UI -->
+    <string name="correct">正確！</string>
+    <string name="wrong">錯誤！</string>
+    <string name="times_up">時間到！</string>
+    <string name="score_label">分數</string>
+    <string name="streak_label">連續</string>
+    <string name="level_label">等級</string>
+    <string name="hint">提示</string>
+
+    <!-- Leaderboard -->
+    <string name="no_scores_yet">還沒有分數</string>
+    <string name="play_to_set_score">開始遊戲，創造第一個高分！</string>
+
+    <!-- Greetings -->
+    <string name="good_morning">早上好</string>
+    <string name="good_afternoon">下午好</string>
+    <string name="good_evening">晚上好</string>
+
+    <!-- Settings -->
+    <string name="premium_label">高級版</string>
+    <string name="unlimited_label">無限</string>
+    <string name="daily_rewards">每日獎勵</string>
+    <string name="notifications">通知</string>
+
+    <!-- Error Messages -->
+    <string name="something_went_wrong">出了點問題</string>
+    <string name="no_internet">無網絡連接</string>
+    <string name="please_try_again">請重試</string>
+
+    <!-- Customization -->
+    <string name="customize_this_game">自定義此遊戲</string>
+    <string name="what_would_you_change">您想修改什麼？</string>
+    <string name="customizing_game">正在自定義遊戲\u2026</string>
+
+    <!-- Language Picker -->
+    <string name="language">語言</string>
+    <string name="language_picker_title">選擇語言</string>
+    <string name="language_english">English</string>
+    <string name="language_spanish">Español</string>
+    <string name="language_french">Français</string>
+    <string name="language_german">Deutsch</string>
+    <string name="language_japanese">日本語</string>
+    <string name="language_chinese">中文(簡體)</string>
+    <string name="language_korean">한국어</string>
+    <string name="language_portuguese">Português</string>
+    <string name="language_italian">Italiano</string>
+    <string name="language_hindi">हिन्दी</string>
+
+    <!-- Common Actions -->
+    <string name="try_again">重試</string>
+    <string name="skip">跳過</string>
+    <string name="skip_puzzle">跳過謎題</string>
+    <string name="retry">重試</string>
+    <string name="share">分享</string>
+    <string name="share_puzzle">分享謎題</string>
+    <string name="play">開始</string>
+    <string name="edit">編輯</string>
+    <string name="create">創建</string>
+    <string name="explore">探索</string>
+    <string name="reset">重置</string>
+    <string name="reveal">揭示</string>
+    <string name="clear">清除</string>
+    <string name="clear_all">全部清除</string>
+    <string name="check">檢查</string>
+    <string name="go_back">返回</string>
+    <string name="home">首頁</string>
+    <string name="upgrade">升級</string>
+    <string name="manage">管理</string>
+    <string name="got_it">明白了！</string>
+    <string name="fix_it">修復</string>
+    <string name="just_close">直接關閉</string>
+    <string name="modify">修改</string>
+    <string name="load_more">加載更多</string>
+    <string name="loading">加載中\u2026</string>
+    <string name="save">保存</string>
+    <string name="yes">是</string>
+    <string name="yes_finish">是，結束</string>
+    <string name="yes_it_works">是，可以運行！</string>
+    <string name="no_it_has_issues">不，有問題</string>
+    <string name="finish_now">立即結束</string>
+    <string name="keep_playing">繼續玩</string>
+    <string name="finish_early">提前結束</string>
+    <string name="give_up">放棄</string>
+    <string name="back_to_home">返回首頁</string>
+    <string name="submit_answer">提交答案</string>
+    <string name="start_game">開始遊戲</string>
+    <string name="start_puzzle">開始謎題</string>
+    <string name="start_challenge">開始挑戰</string>
+    <string name="begin">開始</string>
+    <string name="im_ready">準備好了！</string>
+    <string name="im_done">完成了！</string>
+    <string name="skip_tutorial">跳過教程</string>
+    <string name="same">相同</string>
+    <string name="different">不同</string>
+    <string name="next_puzzle">下一個謎題</string>
+
+    <!-- Loading Messages -->
+    <string name="loading_next_puzzle">正在加載下一個謎題\u2026</string>
+    <string name="loading_puzzle">正在加載謎題\u2026</string>
+    <string name="generating">正在生成\u2026</string>
+
+    <!-- For You Tab -->
+    <string name="quick_actions">快捷操作</string>
+    <string name="start_playing_instantly">立即開始遊戲</string>
+    <string name="your_favorites">我的收藏</string>
+    <string name="trending_now">熱門趨勢</string>
+    <string name="recommended_for_you">為您推薦</string>
+    <string name="puzzle_collections">謎題合集</string>
+
+    <!-- Home Screen -->
+    <string name="game_error">遊戲錯誤</string>
+    <string name="quiz_categories">問答分類</string>
+    <string name="subscription">訂閱</string>
+    <string name="current_tier">當前等級</string>
+    <string name="active_streaks">進行中的連續記錄</string>
+    <string name="time_label">時間</string>
+    <string name="badges">徽章</string>
+    <string name="unable_to_load_progress">無法加載進度數據</string>
+    <string name="custom_puzzles">自定義謎題</string>
+
+    <!-- Creator Monetization -->
+    <string name="create_share_games">創建並分享您自己的遊戲</string>
+    <string name="coins_earned">已賺取金幣</string>
+    <string name="plays_monetized">已變現次數</string>
+    <string name="per_game">每個遊戲</string>
+    <string name="cash_out">提現</string>
+    <string name="cash_out_earnings">提現收益</string>
+    <string name="connect_stripe_to_receive">連接Stripe以接收付款</string>
+    <string name="connect_stripe_account">連接Stripe賬戶</string>
+    <string name="complete_stripe_setup">完成Stripe設置</string>
+    <string name="continue_setup">繼續設置</string>
+    <string name="request_payout">申請付款</string>
+    <string name="payout_history">付款記錄</string>
+    <string name="checking_eligibility">正在檢查資格\u2026</string>
+
+    <!-- Game Creation -->
+    <string name="create_a_game">創建遊戲</string>
+    <string name="describe_game_prompt">描述任何遊戲，AI將為您構建</string>
+    <string name="describe_game_placeholder">描述您的遊戲\u2026</string>
+    <string name="generate_game">生成遊戲</string>
+    <string name="free_generations_used_up">免費生成次數已用完</string>
+    <string name="buy_coins">購買金幣</string>
+    <string name="subscribe_for_unlimited">訂閱無限版</string>
+    <string name="get_unlimited_generations">無限生成+每月金幣</string>
+    <string name="reference_image">參考圖片</string>
+    <string name="try_these_ideas">試試這些創意</string>
+    <string name="game_title">遊戲標題</string>
+    <string name="describe_your_version">描述您的版本</string>
+    <string name="create_game">創建遊戲</string>
+    <string name="create_your_version">創建您的版本</string>
+    <string name="creating_your_game">正在創建您的遊戲</string>
+    <string name="this_may_take_2_5_minutes">這可能需要2\u20135分鐘\u2026</string>
+    <string name="notify_me_when_done">完成後通知我</string>
+
+    <!-- Game Browse -->
+    <string name="community_games">社區遊戲</string>
+    <string name="my_games">我的遊戲</string>
+    <string name="draft">草稿</string>
+    <string name="generating_harder_challenge">正在生成更難的挑戰</string>
+    <string name="did_this_game_work">這個遊戲正常運行嗎？</string>
+    <string name="whats_wrong">哪裏有問題？</string>
+    <string name="modify_game">修改遊戲</string>
+    <string name="game_name">遊戲名稱</string>
+    <string name="create_customized_game">創建自定義遊戲</string>
+    <string name="original">原版</string>
+    <string name="sort_by">排序方式</string>
+
+    <!-- Game Preview -->
+    <string name="game_may_have_issues">此遊戲可能存在問題</string>
+    <string name="game_saved">遊戲已保存！</string>
+    <string name="game_ready">遊戲準備就緒！</string>
+
+    <!-- Premium -->
+    <string name="skip_the_wait">跳過等待！</string>
+    <string name="get_instant_generation">獲取即時謎題生成</string>
+    <string name="wait_time">等待時間</string>
+    <string name="instant">即時</string>
+    <string name="premium_member">高級會員</string>
+    <string name="upgrade_now">立即升級</string>
+    <string name="upgrade_for_unlimited">升級為無限版</string>
+
+    <!-- Puzzle Settings -->
+    <string name="game_settings">遊戲設置</string>
+    <string name="difficulty_level">難度等級</string>
+    <string name="game_mode">遊戲模式</string>
+    <string name="default_difficulty">默認難度</string>
+    <string name="checking">檢查中\u2026</string>
+
+    <!-- Puzzle Group -->
+    <string name="how_it_works">玩法説明：</string>
+    <string name="progress">進度</string>
+
+    <!-- Social Sharing -->
+    <string name="send_via_email">通過郵件發送</string>
+    <string name="copy_to_clipboard">複製到剪貼板</string>
+    <string name="puzzle_completed">謎題完成！</string>
+    <string name="achievement_unlocked">成就解鎖！</string>
+    <string name="level_up">升級了！</string>
+    <string name="recipient_email">收件人電郵</string>
+    <string name="recipient_name">收件人姓名</string>
+    <string name="copied_to_clipboard">已複製到剪貼板！</string>
+
+    <!-- Leaderboard (Extended) -->
+    <string name="leaderboard">排行榜</string>
+    <string name="your_performance">您的表現</string>
+    <string name="other_top_players">其他頂尖玩家</string>
+    <string name="puzzle_statistics">謎題統計</string>
+    <string name="overview">概覽</string>
+    <string name="detailed_statistics">詳細統計</string>
+    <string name="records">記錄</string>
+    <string name="no_players_yet">還沒有玩家</string>
+    <string name="rank_label">排名</string>
+    <string name="percentile_label">百分位</string>
+    <string name="total_players">總玩家數</string>
+    <string name="avg_score">平均分</string>
+    <string name="fastest_time">最快時間</string>
+    <string name="highest_score">最高分</string>
+
+    <!-- Game State -->
+    <string name="game_complete">遊戲完成！</string>
+    <string name="final_score">最終分數</string>
+    <string name="final_results">最終結果</string>
+    <string name="session_score">本次分數</string>
+    <string name="total_score">總分</string>
+    <string name="correct_answers">正確答案</string>
+    <string name="accuracy">準確率</string>
+    <string name="avg_time">平均時間</string>
+    <string name="puzzle_complete">謎題完成！</string>
+    <string name="difficulty_advanced">難度提升！</string>
+    <string name="continue_label_caps">繼續</string>
+
+    <!-- Memory Squares -->
+    <string name="memory_squares">記憶方塊</string>
+    <string name="get_ready">準備好！</string>
+    <string name="memorize_the_pattern">記住圖案！</string>
+    <string name="click_squares_you_remember">點擊你記住的方塊！</string>
+
+    <!-- Color Text Matching -->
+    <string name="color_match_question">文字含義和文字顏色一致嗎？</string>
+
+    <!-- Image Puzzle -->
+    <string name="how_to_play">玩法</string>
+    <string name="drop_here">拖放到此處</string>
+    <string name="completed">已完成</string>
+    <string name="time_used">用時</string>
+
+    <!-- Crossword -->
+    <string name="some_answers_incorrect">部分答案不正確</string>
+    <string name="all_hints">所有提示</string>
+
+    <!-- Word Search -->
+    <string name="found">已找到</string>
+    <string name="revealed">已揭示</string>
+    <string name="best_streak">最佳連續</string>
+    <string name="drag_to_find_words">滑動字母找到隱藏的單詞</string>
+    <string name="find_these_words">找到這些單詞：</string>
+
+    <!-- Word Prefix -->
+    <string name="gold_level_reached">達到金牌等級！</string>
+    <string name="bonus_words_found">獎勵單詞已找到：</string>
+    <string name="great_job">太棒了！</string>
+
+    <!-- Tutorial -->
+    <string name="tutorial">教程</string>
+    <string name="tutorial_mode">教程模式</string>
+    <string name="got_it_lets_play">明白了！開始玩吧</string>
+
+    <!-- Preferred Topics -->
+    <string name="preferred_topics">偏好主題</string>
+    <string name="popular_topics">熱門主題</string>
+    <string name="add_custom_topic">添加自定義主題</string>
+    <string name="your_selected_topics">已選主題</string>
+    <string name="no_topics_selected">還未選擇主題</string>
+    <string name="saving">保存中\u2026</string>
+
+    <!-- Analytics -->
+    <string name="performance_analytics">表現分析</string>
+    <string name="performance_stats">表現統計</string>
+    <string name="daily_streak">每日連續</string>
+    <string name="lets_play">開始玩吧！</string>
+
+    <!-- Errors -->
+    <string name="error_loading_puzzle">加載謎題出錯</string>
+    <string name="no_hint_available">沒有可用提示</string>
+
+    <!-- Number Sequence -->
+    <string name="tap_ascending_order">按升序點擊數字（從小到大）</string>
+
+    <!-- Geography -->
+    <string name="country_geography_challenge">國家地理挑戰</string>
+
+    <!-- Home discovery rows and language suggestion -->
+    <string name="home_new_title">新遊戲</string>
+    <string name="home_new_subtitle">來試試最新的謎題</string>
+    <string name="home_new_badge">新</string>
+    <string name="home_foryou_title">為你推薦</string>
+    <string name="foryou_reason_continue">繼續遊玩</string>
+    <string name="foryou_reason_similar">類似%1$s</string>
+    <string name="foryou_reason_winner">你擅長的遊戲</string>
+    <string name="foryou_reason_quick">輕鬆取勝</string>
+    <string name="lang_switch_prompt">切換到%1$s？</string>
+    <string name="lang_switch_action">切換</string>
+    <string name="lang_not_now">暫不</string>
+
+    <!-- needs native review (machine translation) -->
+    <string name="refresh">刷新</string>
+    <string name="daily_reminder_title">今日謎題已就緒</string>
+    <plurals name="daily_reminder_title_streak">
+        <item quantity="other">保持你的 %d 天連續記錄</item>
+    </plurals>
+    <string name="daily_reminder_body">每天一道題，所有人都一樣。只需幾分鐘。</string>
+    <string name="daily_reminder_body_streak">今日謎題已就緒。只需幾分鐘。</string>
+    <string name="daily_reminder_channel_name">每日謎題提醒</string>
+    <string name="daily_reminder_channel_desc">每天為每日謎題提醒一次。你可以在“設置”中關閉。</string>
+    <string name="daily_card_title">今日謎題</string>
+    <string name="daily_card_cd">今日謎題第 %1$d 期，%2$s</string>
+    <string name="daily_card_solved">#%1$d  %2$s  用時 %3$s 解開</string>
+    <string name="daily_card_unsolved">#%1$d  %2$s  •  所有人的謎題相同</string>
+    <string name="daily_card_next_in">下一道謎題將在 %1$s 後開始</string>
+    <string name="daily_card_view_result">查看結果</string>
+    <string name="daily_card_play">開始</string>
+    <string name="daily_result_title">每日 #%1$d 已解開 ✅</string>
+    <string name="daily_result_first_try">一次答對</string>
+    <plurals name="daily_result_tries">
+        <item quantity="other">%d 次嘗試</item>
+    </plurals>
+    <plurals name="daily_result_streak">
+        <item quantity="other">🔥 連續 %d 天</item>
+    </plurals>
+    <plurals name="daily_result_freeze_used">
+        <item quantity="other">連續記錄凍結卡抵消了你錯過的 %d 天，所以你的連續記錄得以保留。</item>
+    </plurals>
+    <string name="daily_result_freeze_earned">你獲得了一張連續記錄凍結卡，以備不時之需。</string>
+    <string name="daily_result_coins">+%d 金幣</string>
+    <string name="daily_result_card_cd">你的可分享結果卡片。卡片不會顯示答案。</string>
+    <string name="daily_result_share_image">分享圖片卡片</string>
+    <string name="daily_result_share_text">以文字分享</string>
+    <string name="welcome_back_title">歡迎回來</string>
+    <string name="welcome_back_msg_streak">你離開了 %1$d 天，你的 %2$d 天連續記錄依然保留。今日謎題 #%3$d 已就緒。</string>
+    <string name="welcome_back_msg_best">已經過去 %1$d 天了。你的最佳連續記錄是 %2$d 天，今天的謎題 #%3$d 正適合重新開始一段新的記錄。</string>
+    <string name="welcome_back_msg_plain">已經過去 %1$d 天了。今日謎題 #%2$d 已就緒，所有人的題目都一樣。</string>
+    <string name="welcome_back_play">玩今日謎題</string>
+    <string name="welcome_back_dismiss">關閉</string>
+    <string name="reminder_on_note">提醒已開啟。你可以在“設置”中更改時間或關閉提醒。</string>
+    <string name="reminder_later_note">沒關係。你可以稍後在“設置”中開啟提醒。</string>
+    <string name="reminder_offer_title">要接收明天謎題的提醒嗎？</string>
+    <string name="reminder_offer_body">每天一條通知，僅在你尚未解開時發送，幫你輕鬆保持連續記錄。通知中沒有廣告。你可以隨時在“設置”中關閉。</string>
+    <string name="reminder_offer_yes">提醒我</string>
+    <string name="reminder_offer_no">暫不</string>
+    <string name="daily_settings_title">每日謎題</string>
+    <string name="daily_settings_reminder">每日提醒</string>
+    <string name="daily_settings_reminder_desc">每天一條通知，僅在你尚未解開今日謎題時發送。</string>
+    <string name="daily_settings_blocked">此手機已屏蔽 RiddleVerse 的通知。</string>
+    <string name="daily_settings_open_settings">打開通知設置</string>
+    <string name="daily_settings_time">提醒時間</string>
+    <string name="daily_settings_time_cd">在 %1$s 提醒我</string>
+    <string name="guest_tour_title">新來的？花 20 秒看看導覽</string>
+    <string name="guest_tour_subtitle">點按了解 RiddleVerse 的玩法</string>
+    <string name="guest_tour_dismiss">關閉導覽</string>
+    <string name="guest_save_title">保存你的進度？</string>
+    <string name="guest_save_body">創建免費賬戶，即使換手機也能保留你的得分和連續記錄，還可以加入排行榜。你目前的所有進度都會一併轉移。</string>
+    <string name="guest_save_yes">保存我的進度</string>
+    <string name="guest_save_not_now">暫不</string>
+    <string name="guest_save_never">不再詢問</string>
+</resources>

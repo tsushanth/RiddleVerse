@@ -14,11 +14,11 @@ process.env.SUPABASE_SERVICE_KEY = 'test-service-key';
 const { buildRiddlePrompt } = await import('../services/puzzleService.js');
 const { getNextDailyPuzzle, hasDailyPuzzles, dailyContentLanguage, getDailyPuzzles, setLocalizedPool, _resetDailyCacheForTests } = await import('../services/dailyPuzzles.js');
 
-test('the 30 app locales are exactly the 30 shared i18n languages', () => {
+test('the 32 app locales are exactly the 32 shared i18n languages', () => {
     const dir = new URL('../../shared/i18n/', import.meta.url);
     const files = fs.readdirSync(dir).filter(f => f.endsWith('.json')).map(f => f.slice(0, -5)).sort();
     assert.deepEqual([...SUPPORTED_LANGUAGES].sort(), files);
-    assert.equal(SUPPORTED_LANGUAGES.length, 30);
+    assert.equal(SUPPORTED_LANGUAGES.length, 32);
 });
 
 test('matchLanguage: Android tags, regions, aliases, unsupported', () => {
@@ -27,6 +27,7 @@ test('matchLanguage: Android tags, regions, aliases, unsupported', () => {
     assert.equal(matchLanguage('pt-BR'), 'pt');
     assert.equal(matchLanguage('pt_BR'), 'pt');
     assert.equal(matchLanguage('zh-CN'), 'zh');
+    assert.equal(matchLanguage('zh'), 'zh');
     assert.equal(matchLanguage('in'), 'id');
     assert.equal(matchLanguage('fil'), 'tl');
     assert.equal(matchLanguage('he'), null);
@@ -34,6 +35,37 @@ test('matchLanguage: Android tags, regions, aliases, unsupported', () => {
     assert.equal(matchLanguage(''), null);
     assert.equal(matchLanguage(undefined), null);
     assert.equal(matchLanguage('*'), null);
+});
+
+test('Chinese: Simplified stays zh, Traditional is zh-TW / zh-HK (never Simplified), old clients unchanged', () => {
+    for (const t of ['zh', 'zh-CN', 'zh_CN', 'zh-Hans', 'zh-Hans-CN', 'zh-SG', 'zh-Hans-HK']) assert.equal(matchLanguage(t), 'zh', t);
+    for (const t of ['zh-TW', 'zh-tw', 'zh_TW', 'zh-Hant', 'zh-Hant-TW', 'zh-MO', 'zh-Hant-MO']) assert.equal(matchLanguage(t), 'zh-TW', t);
+    for (const t of ['zh-HK', 'zh-hk', 'zh-Hant-HK']) assert.equal(matchLanguage(t), 'zh-HK', t);
+    assert.equal(LANGUAGE_NAMES['zh'], 'Simplified Chinese');
+    assert.equal(LANGUAGE_NAMES['zh-TW'], 'Traditional Chinese (Taiwan)');
+    assert.equal(LANGUAGE_NAMES['zh-HK'], 'Traditional Chinese (Hong Kong)');
+    assert.equal(fromAcceptLanguage('zh-TW,zh;q=0.9,en;q=0.8'), 'zh-TW');
+    assert.equal(fromAcceptLanguage('zh-HK,zh;q=0.9'), 'zh-HK');
+    assert.equal(fromAcceptLanguage('zh'), 'zh');
+    assert.equal(resolveRequestLanguage({ headers: { 'x-app-language': 'zh-TW', 'accept-language': 'zh-TW' } }), 'zh-TW');
+    assert.equal(resolveRequestLanguage({ headers: { 'x-app-language': 'zh' } }), 'zh');
+    assert.match(languageDirective('zh-TW'), /in Traditional Chinese \(Taiwan\)/);
+    assert.match(languageDirective('zh-HK'), /in Traditional Chinese \(Hong Kong\)/);
+    assert.match(languageDirective('zh'), /in Simplified Chinese/);
+    assert.equal(langCacheSuffix('zh-TW'), '_zh-TW');
+    assert.equal(langCacheSuffix('zh'), '_zh');
+    assert.match(buildGamePrompt('a maze', 'zh-HK'), /in Traditional Chinese \(Hong Kong\)/);
+});
+
+test('Chinese lookups never resolve inherited members (constructor, __proto__, toString)', () => {
+    for (const t of ['constructor', '__proto__', 'toString', 'zh-__proto__', 'zh-constructor', 'hasOwnProperty']) {
+        const m = matchLanguage(t);
+        assert.ok(m === null || m === 'zh' || SUPPORTED_LANGUAGES.includes(m), `${t} -> ${m}`);
+        assert.equal(LANGUAGE_NAMES[t], undefined);
+    }
+    assert.equal(matchLanguage('constructor'), null);
+    assert.equal(matchLanguage('__proto__'), null);
+    assert.equal(languageDirective('constructor'), '');
 });
 
 test('fromAcceptLanguage: q-values order, skips unsupported tags', () => {

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tut_grid_sudoku_rules">填滿每個空格，使每一行、每一列和每個宮格中的每個數字都恰好出現一次。可以用鉛筆工具記下候選數字。每道題都只有一個解。</string>
+    <string name="tut_grid_binary_rules">在每個格子裏填入 0 或 1。同一行或同一列中不能有超過兩個相同的數字相鄰，每一行和每一列中 0 和 1 的個數相等，並且不能有兩行（或兩列）完全相同。</string>
+    <string name="tut_grid_cagemath_rules">在網格中填入數字，使每一行和每一列中都沒有重複。籠子角落的數字和符號是目標：籠子裏的數字經過加、減、乘或除必須得到它。只有數字的籠子就是一個格子。如果數字位於不同的行和列，籠子內部可以重複。</string>
+    <string name="tut_grid_signgrid_rules">填滿網格，使每一行和每一列中都沒有重複數字。兩個格子之間的符號指向較小的一個：窄端的格子裏是較小的數字。</string>
+    <string name="tut_grid_sudoku_tip">點按一個格子，再點按一個數字。打開鉛筆可記下候選數字；錯 3 次遊戲結束。</string>
+    <string name="tut_grid_binary_tip">如果兩個 1 並排，兩端的格子必須是 0。</string>
+    <string name="tut_grid_cagemath_tip">先從單格籠子和較大的乘積入手，再用行和列縮小其餘格子的範圍。</string>
+    <string name="tut_grid_signgrid_tip">最大的數字絕不可能出現在符號的窄端。</string>
+    <string name="tut_purchasing_instruction">每道題會顯示一項訂閱：你付多少錢，多久付一次。算出一年的總費用，然後點按匹配的總數。例如：每月 10 就是 10 × 12 = 每年 120。</string>
+    <string name="tut_purchasing_tip">每天 × 365，每週 × 52，每月 × 12，每季度 × 4。提示有幫助，但會降低你的得分。</string>
+</resources>

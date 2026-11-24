@@ -1,6 +1,6 @@
 // The app shows server errors and build status in the user's language by mapping stable codes to string resources.
 // These tests keep the three sides in step: every error the routes send has a code, and every code the backend or the
-// worker can send is one the Android app knows (GameServerText.kt) with a string in all 30 locales.
+// worker can send is one the Android app knows (GameServerText.kt) with a string in all 32 locales.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -61,13 +61,13 @@ test('worker errors that the backend proxies keep their code', () => {
     assert.equal([...routes.matchAll(/code: parsed\.code/g)].length, [...routes.matchAll(/error: parsed\.error/g)].length);
 });
 
-test('every new app string exists in all 30 locales', () => {
+test('every new app string exists in all 32 locales', () => {
     const resDir = new URL('../../../android/app/src/main/res/', import.meta.url);
     const names = (f) => [...fs.readFileSync(f, 'utf8').matchAll(/<string name="(\w+)"/g)].map(m => m[1]);
     const base = names(new URL('values/strings_server_text.xml', resDir));
     assert.equal(base.length, 47);
-    const dirs = fs.readdirSync(resDir).filter(d => /^values-[a-z]{2}(-r[A-Z]{2})?$/.test(d));
-    assert.equal(dirs.length, 29);
+    const dirs = fs.readdirSync(resDir).filter(d => /^values-([a-z]{2}(-r[A-Z]{2})?|b\+zh\+Hant)$/.test(d));
+    assert.equal(dirs.length, 32);
     for (const d of dirs) assert.deepEqual(names(new URL(`${d}/strings_server_text.xml`, resDir)), base, d);
     // every resource the app maps exists
     for (const m of kt.matchAll(/R\.string\.(gen_\w+)/g)) assert.ok(base.includes(m[1]), m[1]);
