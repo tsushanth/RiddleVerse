@@ -22,21 +22,40 @@ import * as os from 'os';
 import crypto from 'crypto';
 import zlib from 'zlib';
 import { statusCodes, errorCode } from './statusCodes.js';
+import { loadSecrets, startAnthropicProxy, buildAgentEnv, buildAgentCommand, buildChildEnv, buildGitEnv, listRegularFiles } from './agentSandbox.js';
 import { reportWorkerFailure, reportWorkerCrash, classifyCliFailure, reportCliFailure, createSlotTracker, freeDiskBytes, evaluateHealth, summarizeCliResult, createUsageTally } from './monitoring.js';
 
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 
 const PORT = process.env.WORKER_PORT || 3456;
+// Secrets are read ONCE here and then removed from process.env, so no child process (the Claude CLI
+// with permissions skipped, chromium, git) and no later code can inherit them. See agentSandbox.js.
+const SECRETS = loadSecrets({ secretsFile: process.env.GW_SECRETS_FILE || '/run/gw/secrets.json' });
 // No built-in default: a secret that is public in the repository protects nothing, so the worker refuses to start without one.
-const WORKER_SECRET = process.env.WORKER_SECRET;
+const WORKER_SECRET = SECRETS.WORKER_SECRET;
 if (!WORKER_SECRET) {
     console.error('WORKER_SECRET is not set: refusing to start');
     process.exit(1);
 }
-const PROJECTS_DIR = path.join(os.homedir(), '.game-worker', 'projects');
-const GITHUB_PAT = process.env.GITHUB_PAT || '';
+// Unix user the Claude CLI runs as (Docker image: `agent`). Unset = run as the worker's own user (local dev).
+const AGENT_USER = process.env.GW_AGENT_USER || '';
+const AGENT_HOME = process.env.GW_AGENT_HOME || os.homedir();
+if (AGENT_USER) process.umask(0o002); // the agent user shares our group: files we create must be group-writable
+const PROJECTS_DIR = process.env.GW_PROJECTS_DIR || path.join(os.homedir(), '.game-worker', 'projects');
+const GITHUB_PAT = SECRETS.GITHUB_PAT;
 const GITHUB_ORG = process.env.GITHUB_ORG || 'Kreative-Koala-LLC';
+
+// The real Anthropic key lives only inside this proxy's closure. The CLI talks to it on 127.0.0.1 with a
+// throwaway token. Without a key (local dev on a logged-in CLI) there is no proxy and the CLI uses its own login.
+const agentProxy = SECRETS.ANTHROPIC_API_KEY
+    ? await startAnthropicProxy({ apiKey: SECRETS.ANTHROPIC_API_KEY })
+    : null;
+SECRETS.ANTHROPIC_API_KEY = '';
+
+// git never runs with project hooks or inherited secrets
+const GIT_ENV = buildGitEnv();
+function gitSync(cmd, opts = {}) { return execSync(cmd, { ...opts, env: GIT_ENV }); }
 
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
 
@@ -286,20 +305,7 @@ function cleanupProjectFolder(projectDir) {
  * Builds a valid ZIP archive with local file headers, data, and central directory.
  */
 function zipProjectFolder(projectDir) {
-    const files = [];
-    function walk(dir, prefix = '') {
-        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-            if (entry.name === 'CLAUDE.md' || entry.name === '.claude') continue;
-            const fullPath = path.join(dir, entry.name);
-            const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
-            if (entry.isDirectory()) {
-                walk(fullPath, rel);
-            } else {
-                files.push({ rel, fullPath });
-            }
-        }
-    }
-    walk(projectDir);
+    const files = listRegularFiles(projectDir);
 
     const entries = [];
     const buffers = [];
@@ -467,21 +473,7 @@ function unzipBundle(base64Bundle, targetDir) {
  * List files in project (excluding CLAUDE.md) for metadata
  */
 function listProjectFiles(projectDir) {
-    const files = [];
-    function walk(dir, prefix = '') {
-        for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-            if (entry.name === 'CLAUDE.md' || entry.name === '.claude') continue;
-            const rel = prefix ? `${prefix}/${entry.name}` : entry.name;
-            if (entry.isDirectory()) {
-                walk(path.join(dir, entry.name), rel);
-            } else {
-                const stat = fs.statSync(path.join(dir, entry.name));
-                files.push({ path: rel, size: stat.size });
-            }
-        }
-    }
-    walk(projectDir);
-    return files;
+    return listRegularFiles(projectDir).map(f => ({ path: f.rel, size: fs.statSync(f.fullPath).size }));
 }
 
 // ============================================
@@ -756,7 +748,8 @@ async function runtimeValidation(projectDir, timeoutMs = 8000) {
         const puppeteer = await import('puppeteer');
         browser = await puppeteer.default.launch({
             headless: 'new',
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage']
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
+            env: buildChildEnv() // chromium runs generated game code: no inherited secrets
         });
         const page = await browser.newPage();
         await page.setViewport({ width: 390, height: 844 });
@@ -836,7 +829,7 @@ app.get('/health', (req, res) => {
     try { cliPath = findClaudeCLI(); cliAvailable = true; } catch {}
 
     let gitAvail = false;
-    try { execSync('git --version', { stdio: 'pipe' }); gitAvail = true; } catch {}
+    try { gitSync('git --version', { stdio: 'pipe' }); gitAvail = true; } catch {}
 
     const freeBytes = freeDiskBytes(PROJECTS_DIR);
     const verdict = evaluateHealth({ cliAvailable, quotaExhausted, activeGenerations: slots.active, freeBytes });
@@ -1240,13 +1233,13 @@ function runClaudeCommand(claudePath, prompt, cwd, requestId, maxTurns = 10) {
 
         console.log(`[${requestId}] Claude CLI starting (maxTurns: ${maxTurns})...`);
 
-        const proc = spawn(claudePath, args, {
+        // The agent can run shell commands, so its environment is built from scratch (never process.env):
+        // no WORKER_SECRET / GITHUB_PAT, and the API key is a throwaway token for the local proxy.
+        const agentEnv = buildAgentEnv({ home: AGENT_HOME, proxy: agentProxy });
+        const launch = buildAgentCommand({ claudePath, args, env: agentEnv, agentUser: AGENT_USER });
+        const proc = spawn(launch.cmd, launch.args, {
             cwd,
-            env: {
-                ...process.env,
-                PATH: `${process.env.PATH || ''}:/usr/bin:/usr/local/bin:/opt/homebrew/bin`,
-                HOME: os.homedir()
-            },
+            env: launch.env,
             stdio: ['ignore', 'pipe', 'pipe']
         });
 
@@ -2062,7 +2055,7 @@ Make any small fixes needed. Don't rewrite — just polish.`;
  */
 function checkGitAvailable() {
     try {
-        const version = execSync('git --version', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+        const version = gitSync('git --version', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] }).trim();
         console.log(`[git] ${version}`);
         return true;
     } catch {
@@ -2174,13 +2167,13 @@ function gitClone(repoName, targetDir) {
     const cloneUrl = getCloneUrl(repoName);
     console.log(`[git] Cloning ${GITHUB_ORG}/${repoName} -> ${targetDir}`);
     try {
-        execSync(`git clone "${cloneUrl}" "${targetDir}"`, {
+        gitSync(`git clone "${cloneUrl}" "${targetDir}"`, {
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
             timeout: 60000,
         });
-        execSync(`git -C "${targetDir}" config user.email "bot@riddleverse.com"`, { stdio: 'pipe' });
-        execSync(`git -C "${targetDir}" config user.name "RiddleVerse Bot"`, { stdio: 'pipe' });
+        gitSync(`git -C "${targetDir}" config user.email "bot@riddleverse.com"`, { stdio: 'pipe' });
+        gitSync(`git -C "${targetDir}" config user.name "RiddleVerse Bot"`, { stdio: 'pipe' });
         console.log(`[git] Clone successful`);
         return true;
     } catch (err) {
@@ -2200,19 +2193,19 @@ function gitCommitAndPush(repoDir, message, branch = 'main') {
         // Switch to target branch (create if doesn't exist)
         if (branch !== 'main') {
             try {
-                execSync(`git -C "${repoDir}" checkout ${branch}`, { stdio: 'pipe' });
+                gitSync(`git -C "${repoDir}" checkout ${branch}`, { stdio: 'pipe' });
                 console.log(`[git] Switched to existing branch ${branch}`);
             } catch {
-                execSync(`git -C "${repoDir}" checkout -b ${branch}`, { stdio: 'pipe' });
+                gitSync(`git -C "${repoDir}" checkout -b ${branch}`, { stdio: 'pipe' });
                 console.log(`[git] Created new branch ${branch}`);
             }
         }
 
-        execSync(`git -C "${repoDir}" add -A`, { stdio: 'pipe' });
+        gitSync(`git -C "${repoDir}" add -A`, { stdio: 'pipe' });
 
         // Check if there are staged changes
         try {
-            execSync(`git -C "${repoDir}" diff --cached --quiet`, { stdio: 'pipe' });
+            gitSync(`git -C "${repoDir}" diff --cached --quiet`, { stdio: 'pipe' });
             console.log(`[git] No changes to commit`);
             return null;
         } catch {
@@ -2221,29 +2214,29 @@ function gitCommitAndPush(repoDir, message, branch = 'main') {
 
         // Exclude CLAUDE.md from commit
         try {
-            execSync(`git -C "${repoDir}" reset HEAD CLAUDE.md`, { stdio: 'pipe' });
+            gitSync(`git -C "${repoDir}" reset HEAD CLAUDE.md`, { stdio: 'pipe' });
         } catch {
             // CLAUDE.md might not be tracked — that's fine
         }
         // Also exclude .claude directory
         try {
-            execSync(`git -C "${repoDir}" reset HEAD .claude`, { stdio: 'pipe' });
+            gitSync(`git -C "${repoDir}" reset HEAD .claude`, { stdio: 'pipe' });
         } catch {}
 
         const safeMessage = message.replace(/"/g, '\\"').replace(/\$/g, '\\$');
-        execSync(`git -C "${repoDir}" commit -m "${safeMessage}"`, {
+        gitSync(`git -C "${repoDir}" commit -m "${safeMessage}"`, {
             stdio: 'pipe',
             encoding: 'utf-8',
         });
 
-        const sha = execSync(`git -C "${repoDir}" rev-parse HEAD`, {
+        const sha = gitSync(`git -C "${repoDir}" rev-parse HEAD`, {
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
         }).trim();
 
         console.log(`[git] Commit created: ${sha.substring(0, 7)}`);
 
-        execSync(`git -C "${repoDir}" push origin ${branch}`, {
+        gitSync(`git -C "${repoDir}" push origin ${branch}`, {
             stdio: 'pipe',
             timeout: 60000,
         });
@@ -2303,10 +2296,10 @@ async function initGameRepo(gameId, base64Bundle) {
     try {
         // Init local git repo
         console.log(`[git:init] Setting up local repo at ${tempDir}`);
-        execSync(`git init "${tempDir}"`, { stdio: 'pipe' });
-        execSync(`git -C "${tempDir}" config user.email "bot@riddleverse.com"`, { stdio: 'pipe' });
-        execSync(`git -C "${tempDir}" config user.name "RiddleVerse Bot"`, { stdio: 'pipe' });
-        execSync(`git -C "${tempDir}" branch -M main`, { stdio: 'pipe' });
+        gitSync(`git init "${tempDir}"`, { stdio: 'pipe' });
+        gitSync(`git -C "${tempDir}" config user.email "bot@riddleverse.com"`, { stdio: 'pipe' });
+        gitSync(`git -C "${tempDir}" config user.name "RiddleVerse Bot"`, { stdio: 'pipe' });
+        gitSync(`git -C "${tempDir}" branch -M main`, { stdio: 'pipe' });
 
         // Add .gitignore
         fs.writeFileSync(path.join(tempDir, '.gitignore'), 'CLAUDE.md\n.claude/\n');
@@ -2322,14 +2315,14 @@ async function initGameRepo(gameId, base64Bundle) {
         }
 
         // Commit and push
-        execSync(`git -C "${tempDir}" add -A`, { stdio: 'pipe' });
-        execSync(`git -C "${tempDir}" commit -m "Initial game creation"`, { stdio: 'pipe' });
+        gitSync(`git -C "${tempDir}" add -A`, { stdio: 'pipe' });
+        gitSync(`git -C "${tempDir}" commit -m "Initial game creation"`, { stdio: 'pipe' });
 
         const cloneUrl = getCloneUrl(repoName);
-        execSync(`git -C "${tempDir}" remote add origin "${cloneUrl}"`, { stdio: 'pipe' });
-        execSync(`git -C "${tempDir}" push -u origin main`, { stdio: 'pipe', timeout: 60000 });
+        gitSync(`git -C "${tempDir}" remote add origin "${cloneUrl}"`, { stdio: 'pipe' });
+        gitSync(`git -C "${tempDir}" push -u origin main`, { stdio: 'pipe', timeout: 60000 });
 
-        const sha = execSync(`git -C "${tempDir}" rev-parse HEAD`, {
+        const sha = gitSync(`git -C "${tempDir}" rev-parse HEAD`, {
             encoding: 'utf-8',
             stdio: ['pipe', 'pipe', 'pipe'],
         }).trim();
@@ -2669,6 +2662,7 @@ const server = app.listen(PORT, () => {
     console.log(`Game Worker running on http://localhost:${PORT}`);
     console.log(`Claude CLI: ${cliPath}`);
     console.log(`Projects: ${PROJECTS_DIR}`);
+    console.log(`Agent isolation: user=${AGENT_USER || 'same as worker'}, api proxy=${agentProxy ? 'on' : 'off'}`);
     console.log(`Max concurrent: ${MAX_CONCURRENT}`);
     console.log(`GitHub org: ${GITHUB_ORG}`);
     console.log(`GitHub PAT: ${GITHUB_PAT ? '***configured***' : 'NOT SET'}`);
