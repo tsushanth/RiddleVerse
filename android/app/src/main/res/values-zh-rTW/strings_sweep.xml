@@ -347,15 +347,15 @@
     <string name="home_tier_premium_yearly">高階版年付</string>
     <string name="home_premium_benefits">無限生成 • 無廣告 • 優先支援</string>
     <string name="home_free_limits">每日 10 次生成 • 每月 100 次生成</string>
-    <string name="home_support_feedback_title">支援與反饋</string>
+    <string name="home_support_feedback_title">支援與回饋</string>
     <string name="home_rate_app_title">為 RiddleVerse 評分</string>
     <string name="home_rate_app_subtitle">在 Google Play 上開啟 RiddleVerse</string>
     <string name="home_toast_cannot_open_play">無法開啟 Google Play</string>
-    <string name="home_send_feedback_title">傳送反饋</string>
+    <string name="home_send_feedback_title">傳送回饋</string>
     <string name="home_send_feedback_subtitle">告訴我們需要改進或出問題的地方</string>
     <string name="home_contact_support_title">聯絡客服</string>
     <string name="home_contact_support_subtitle">獲取帳戶或技術問題方面的幫助</string>
-    <string name="home_toast_feedback_thanks">感謝您的反饋！</string>
+    <string name="home_toast_feedback_thanks">感謝您的回饋！</string>
     <string name="home_progress_stats_title">進度與統計</string>
     <string name="home_level_number">等級 %1$s</string>
     <string name="home_xp_amount">%1$d XP</string>
@@ -398,7 +398,7 @@
     <string name="home_paywall_unlimited_title">無限遊戲</string>
     <string name="home_paywall_unlimited_desc">無限制創作</string>
     <string name="home_paywall_play_all_title">暢玩所有遊戲</string>
-    <string name="home_paywall_play_all_desc">訪問每一款社群遊戲</string>
+    <string name="home_paywall_play_all_desc">存取每一款社群遊戲</string>
     <string name="home_paywall_speed_title">優先速度</string>
     <string name="home_paywall_speed_desc">更快生成遊戲</string>
     <string name="home_paywall_share_title">分享你的遊戲</string>
@@ -496,7 +496,7 @@
     <string name="onb_topic_psychology">心理學</string>
     <string name="onb_tier_price_monthly">$5.99/月</string>
     <string name="onb_tier_price_yearly">$24.99/年</string>
-    <string name="onb_tier_benefit_all_types">可訪問所有謎題類型</string>
+    <string name="onb_tier_benefit_all_types">可存取所有謎題類型</string>
     <string name="onb_tier_benefit_gen_per_day">每天 %1$d 次謎題生成</string>
     <string name="onb_tier_benefit_ad_supported">含廣告體驗</string>
     <string name="onb_tier_benefit_earn_coins">透過遊玩賺取金幣</string>
@@ -693,7 +693,7 @@
     <string name="create_no_bundle">構建已完成，但未收到遊戲包。請重試。</string>
     <string name="create_extract_failed">解壓遊戲包失敗。請重試。</string>
     <string name="create_connection_timed_out">連線超時。請檢查網路後重試。</string>
-    <string name="create_cannot_reach_server">無法訪問伺服器。請檢查網路連線。</string>
+    <string name="create_cannot_reach_server">無法存取伺服器。請檢查網路連線。</string>
     <string name="create_cannot_connect_server">無法連線到伺服器。請稍後重試。</string>
     <string name="create_request_timed_out">請求超時。請重試。</string>
     <string name="create_no_job_id">伺服器未返回 jobId</string>
@@ -1008,7 +1008,7 @@
     <string name="stats_reward_streak_bonus">🔥 連續獎勵</string>
     <string name="stats_reward_elite_challenges">🎯 精英挑戰</string>
     <string name="stats_reward_platinum_theme">💎 鉑金主題</string>
-    <string name="stats_reward_leaderboard_access">🏆 排行榜許可權</string>
+    <string name="stats_reward_leaderboard_access">🏆 排行榜權限</string>
     <string name="stats_reward_exclusive_puzzles">🌟 專屬謎題</string>
     <string name="stats_reward_speed_boosts">⚡ 加速道具</string>
     <string name="stats_reward_vip_features">🎪 VIP 功能</string>
@@ -1359,15 +1359,15 @@
     <plurals name="done_more_achievements">
         <item quantity="other">還有 +%d 項成就！</item>
     </plurals>
-    <string name="done_feedback_sign_in_required">請登入後再提交反饋</string>
+    <string name="done_feedback_sign_in_required">請登入後再提交回饋</string>
     <string name="done_feedback_network_error">網路錯誤 - 請重試</string>
     <string name="done_feedback_server_error">伺服器錯誤 - 請稍後重試</string>
-    <string name="done_feedback_submit_error">提交反饋出錯 - 請重試</string>
+    <string name="done_feedback_submit_error">提交回饋出錯 - 請重試</string>
     <string name="done_feedback_email_us">請傳送郵件至 %1$s</string>
     <string name="done_achievement_unlocked">🏆 成就解鎖！</string>
     <string name="done_achievements_unlocked">🏆 成就解鎖！</string>
     <string name="done_share_your_success">分享你的成功！</string>
-    <string name="done_share_to_social">分享到社交媒體</string>
+    <string name="done_share_to_social">分享到社群媒體</string>
     <string name="done_send_via_messages">透過資訊傳送</string>
     <string name="done_share_puzzle_result">🧠 我剛解開了一個%1$s謎題，得了 %2$d 分！🔥 當前連續 %3$d 天。你能超過我的分數嗎？</string>
     <string name="done_share_achievement">剛剛解鎖了“%1$s”徽章！%2$s 🎯</string>
