@@ -181,7 +181,12 @@ object ForYouRanking {
 data class AppLanguage(val tag: String, val nativeName: String)
 
 object AppLanguages {
-    /** English (the default resources) plus the 29 translated locales. Keep in sync with xml/locales_config.xml. */
+    private const val TAG_ZH_CN = "zh-CN"
+    private const val TAG_ZH_TW = "zh-TW"
+    private const val TAG_ZH_HK = "zh-HK"
+
+
+    /** English (the default resources) plus the 31 translated locales. Keep in sync with xml/locales_config.xml. */
     val ALL: List<AppLanguage> = listOf(
         AppLanguage("en", "English"),
         AppLanguage("es", "Español"),
@@ -198,6 +203,8 @@ object AppLanguages {
         AppLanguage("ja", "日本語"),
         AppLanguage("ko", "한국어"),
         AppLanguage("zh-CN", "中文(简体)"),
+        AppLanguage("zh-TW", "繁體中文（台灣）"),
+        AppLanguage("zh-HK", "繁體中文（香港）"),
         AppLanguage("th", "ไทย"),
         AppLanguage("vi", "Tiếng Việt"),
         AppLanguage("id", "Bahasa Indonesia"),
@@ -221,7 +228,7 @@ object AppLanguages {
     /**
      * Maps any Android locale (language, script, country) to one of the [ALL] tags, or null if the
      * app has no translation for it. Handles the legacy codes (in/iw-style, fil) and that the app
-     * ships only pt-BR and zh-CN.
+     * ships only pt-BR, zh-CN (Simplified), zh-TW and zh-HK (Traditional).
      */
     fun supportedTagFor(language: String, script: String = "", country: String = ""): String? {
         val lang = when (language.lowercase()) {
@@ -231,9 +238,21 @@ object AppLanguages {
         }
         return when (lang) {
             "pt" -> "pt-BR"
-            "zh" -> if (script.equals("Hant", true) || country.uppercase() in setOf("TW", "HK", "MO")) null else "zh-CN"
+            "zh" -> chineseTag(script, country)
             else -> ALL.firstOrNull { it.tag == lang }?.tag
         }
+    }
+
+    /**
+     * Simplified (zh-CN) for Hans / CN / SG / no region; Traditional for Hant or TW / HK / MO: Hong Kong wording for HK,
+     * Taiwan wording for everything else (Macau and a bare zh-Hant fall back to the zh-TW resources on Android too).
+     */
+    private fun chineseTag(script: String, country: String): String {
+        val c = country.uppercase()
+        if (script.equals("Hans", true)) return TAG_ZH_CN
+        if (c == "HK") return TAG_ZH_HK
+        if (script.equals("Hant", true) || c == "TW" || c == "MO") return TAG_ZH_TW
+        return TAG_ZH_CN
     }
 
     fun byTag(tag: String?): AppLanguage? = ALL.firstOrNull { it.tag == tag }

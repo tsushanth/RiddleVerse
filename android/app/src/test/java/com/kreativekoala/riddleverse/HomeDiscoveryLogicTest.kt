@@ -171,8 +171,15 @@ class HomeDiscoveryLogicTest {
         assertEquals("pt-BR", AppLanguages.supportedTagFor("pt", country = "PT"))
         assertEquals("zh-CN", AppLanguages.supportedTagFor("zh", script = "Hans", country = "CN"))
         assertEquals("zh-CN", AppLanguages.supportedTagFor("zh", country = "SG"))
-        assertNull(AppLanguages.supportedTagFor("zh", country = "TW"))
-        assertNull(AppLanguages.supportedTagFor("zh", script = "Hant"))
+        assertEquals("zh-TW", AppLanguages.supportedTagFor("zh", country = "TW"))
+        assertEquals("zh-TW", AppLanguages.supportedTagFor("zh", script = "Hant"))
+        assertEquals("zh-TW", AppLanguages.supportedTagFor("zh", script = "Hant", country = "TW"))
+        assertEquals("zh-TW", AppLanguages.supportedTagFor("zh", country = "MO"))
+        assertEquals("zh-HK", AppLanguages.supportedTagFor("zh", country = "HK"))
+        assertEquals("zh-HK", AppLanguages.supportedTagFor("zh", script = "Hant", country = "HK"))
+        assertEquals("zh-CN", AppLanguages.supportedTagFor("zh"))
+        assertEquals("繁體中文（台灣）", AppLanguages.byTag("zh-TW")?.nativeName)
+        assertEquals("繁體中文（香港）", AppLanguages.byTag("zh-HK")?.nativeName)
         assertEquals("es", AppLanguages.supportedTagFor("es", country = "MX"))
         assertEquals("sv", AppLanguages.supportedTagFor("sv"))
         assertEquals("fa", AppLanguages.supportedTagFor("fa", country = "IR"))
@@ -181,8 +188,8 @@ class HomeDiscoveryLogicTest {
     }
 
     @Test fun languageListMatchesTwentyShippedLocales() {
-        assertEquals(30, AppLanguages.ALL.size)   // English + the 29 translated locales
-        assertEquals(30, AppLanguages.ALL.map { it.tag }.toSet().size)
+        assertEquals(32, AppLanguages.ALL.size)   // English + the 31 translated locales
+        assertEquals(32, AppLanguages.ALL.map { it.tag }.toSet().size)
         assertNotNull(AppLanguages.byTag("ar"))
     }
 }

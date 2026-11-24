@@ -28,7 +28,7 @@ test('/language shows every language and choosing one persists it for later repl
     const t = build();
     await t.bot.handleUpdate(msg('/language'));
     const kb = buttons(t.api.sent()[0]);
-    assert.equal(kb.length, 30);
+    assert.equal(kb.length, 32);
     await t.bot.handleUpdate(cb('lang:ja'));
     assert.equal((await t.store.getUser(42)).language, 'ja');
     t.api.calls.length = 0;

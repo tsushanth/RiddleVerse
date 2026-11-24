@@ -1,0 +1,17 @@
+Language: 繁體中文（香港） (zh-HK)  [BotFather/API: not registrable, language_code must be 2 letters; the zh list covers it]  [machine translation: needs native review]
+
+BotFather > /setcommands (default list) or API setMyCommands with language_code=zh-HK:
+daily - 今日謎題
+play - 選擇遊戲
+leaderboard - 本聊天的分數
+link - 連接 RiddleVerse 應用程式
+remind - 開啟或關閉每日提醒
+language - 更換語言
+app - 獲取 Android 應用程式
+help - 顯示幫助
+
+BotFather > /setabouttext (short description, max 120):
+Telegram 上的免費益智遊戲：每日謎題、羣排行榜、和好友一起玩。
+
+BotFather > /setdescription (shown in an empty chat, max 512):
+RiddleVerse 把 23 款免費益智遊戲帶到 Telegram。玩每日謎題，在聊天中挑戰好友，衝上羣排行榜。連接免費的 Android 應用程式，即可在各處使用同一個賬號。

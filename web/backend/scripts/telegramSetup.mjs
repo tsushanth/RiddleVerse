@@ -23,6 +23,9 @@ const plan = [...locales.entries()].map(([code, l]) => ({
   code,
   // The default (no language_code) list is English; every other list is shown to clients in that language.
   languageCode: code === 'en' ? undefined : code,
+  // Telegram only takes two-letter ISO 639-1 language_codes: zh-TW / zh-HK have no list of their own (docs only), the
+  // 'zh' list is what Telegram clients show for every Chinese variant.
+  register: code === 'en' || /^[a-z]{2}$/.test(code),
   commands: COMMANDS.map((c) => ({ command: c, description: l.bot[`cmd_${c}`] })),
   shortDescription: l.bot.bot_short_description,
   description: l.bot.bot_description,
@@ -31,7 +34,7 @@ const plan = [...locales.entries()].map(([code, l]) => ({
 function docFor(p) {
   const name = locales.get(p.code)._meta?.name || p.code;
   return [
-    `Language: ${name} (${p.code})${locales.get(p.code)._meta?.review === 'machine' ? '  [machine translation: needs native review]' : ''}`,
+    `Language: ${name} (${p.code})${p.register ? '' : '  [BotFather/API: not registrable, language_code must be 2 letters; the zh list covers it]'}${locales.get(p.code)._meta?.review === 'machine' ? '  [machine translation: needs native review]' : ''}`,
     '',
     'BotFather > /setcommands (default list) or API setMyCommands with language_code=' + (p.languageCode || '(none)') + ':',
     ...p.commands.map((c) => `${c.command} - ${c.description}`),
@@ -77,7 +80,7 @@ if (!/^[A-Za-z0-9_-]{16,256}$/.test(secret)) { console.error('TELEGRAM_WEBHOOK_S
 
 const me = await call('getMe', {});
 console.log(`bot: @${me.username}`);
-for (const p of plan) {
+for (const p of plan.filter((x) => x.register)) {
   const lc = p.languageCode ? { language_code: p.languageCode } : {};
   await call('setMyCommands', { commands: p.commands, ...lc });
   await call('setMyShortDescription', { short_description: p.shortDescription, ...lc });

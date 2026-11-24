@@ -4,7 +4,16 @@
 // Free of imports and of top-level browser globals so node tests can load it.
 
 export const RTL = new Set(['ar', 'fa', 'ur', 'he'])
-const ALIASES = { in: 'id', iw: 'he', fil: 'tl', 'zh-hans': 'zh', 'zh-cn': 'zh', 'zh-sg': 'zh', 'zh-hant': 'zh', 'zh-tw': 'zh', 'zh-hk': 'zh' }
+const ALIASES = { in: 'id', iw: 'he', fil: 'tl' }
+
+/** Chinese tag (lower-cased) -> 'zh' (Simplified) | 'zh-TW' | 'zh-HK'. Same rules as web/backend/utils/contentLanguage.js. */
+export function chineseVariant(c) {
+  const parts = c.split('-').slice(1)
+  if (parts.includes('hans')) return 'zh'
+  if (parts.includes('hk')) return 'zh-HK'
+  if (parts.includes('hant') || parts.includes('tw') || parts.includes('mo')) return 'zh-TW'
+  return 'zh'
+}
 
 /** First supported language among the candidates (query ?lang=, then navigator.languages). Defaults to 'en'. */
 export function pickLang(candidates, supported) {
@@ -12,10 +21,16 @@ export function pickLang(candidates, supported) {
   for (const raw of candidates || []) {
     if (typeof raw !== 'string' || !raw) continue
     const c = raw.toLowerCase().replace(/_/g, '-')
-    if (ALIASES[c] && has.has(ALIASES[c])) return ALIASES[c]
-    if (has.has(c)) return c
     const base = c.split('-')[0]
-    const b = ALIASES[base] || base
+    if (base === 'zh') {
+      const zh = chineseVariant(c)
+      if (has.has(zh)) return zh
+      if (has.has('zh')) return 'zh'
+      continue
+    }
+    if (Object.prototype.hasOwnProperty.call(ALIASES, c) && has.has(ALIASES[c])) return ALIASES[c]
+    if (has.has(c)) return c
+    const b = Object.prototype.hasOwnProperty.call(ALIASES, base) ? ALIASES[base] : base
     if (has.has(b)) return b
   }
   return 'en'

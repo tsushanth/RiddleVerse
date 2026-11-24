@@ -3,6 +3,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { matchChinese } from '../../utils/contentLanguage.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 // Local: web/backend/services/telegram -> web/shared/i18n. Docker: /backend/services/telegram -> /shared/i18n.
@@ -20,17 +21,22 @@ export function loadLocales(dir = DEFAULT_I18N_DIR) {
     return out;
 }
 
-// Telegram sends IETF tags (en, pt-br, zh-hans, in some clients "fil" or the legacy "in" / "iw").
-const ALIASES = { in: 'id', iw: 'he', fil: 'tl', nb: 'no', 'zh-hans': 'zh', 'zh-cn': 'zh', 'zh-sg': 'zh', 'zh-hant': 'zh', 'zh-tw': 'zh', 'zh-hk': 'zh' };
+// Telegram sends IETF tags (en, pt-br, zh-hans, zh-hant, zh-tw, in some clients "fil" or the legacy "in" / "iw").
+// Chinese is resolved by script/region (see matchChinese): Simplified -> zh, Taiwan/Macau/zh-Hant -> zh-TW, Hong Kong -> zh-HK.
+const ALIASES = { in: 'id', iw: 'he', fil: 'tl', nb: 'no' };
 
 /** Best supported language code for a Telegram language_code (or a stored choice). Always returns a loaded code. */
 export function resolveLang(code, locales) {
     if (typeof code !== 'string' || !code) return DEFAULT_LANG;
     const c = code.toLowerCase().replace(/_/g, '-');
-    if (ALIASES[c] && locales.has(ALIASES[c])) return ALIASES[c];
-    if (locales.has(c)) return c;
     const base = c.split('-')[0];
-    const b = ALIASES[base] || base;
+    if (base === 'zh') {
+        const zh = matchChinese(c);
+        return locales.has(zh) ? zh : locales.has('zh') ? 'zh' : DEFAULT_LANG;
+    }
+    if (Object.hasOwn(ALIASES, c) && locales.has(ALIASES[c])) return ALIASES[c];
+    if (locales.has(c)) return c;
+    const b = Object.hasOwn(ALIASES, base) ? ALIASES[base] : base;
     return locales.has(b) ? b : DEFAULT_LANG;
 }
 

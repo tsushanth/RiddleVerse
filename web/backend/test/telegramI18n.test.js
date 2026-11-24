@@ -6,12 +6,12 @@ import { loadCatalog } from '../services/playCatalog.js';
 
 const locales = loadLocales();
 const en = locales.get('en');
-const EXPECTED = ['ar', 'bn', 'cs', 'de', 'el', 'en', 'es', 'fa', 'fi', 'fr', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'ms', 'nl', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'zh'];
+const EXPECTED = ['ar', 'bn', 'cs', 'de', 'el', 'en', 'es', 'fa', 'fi', 'fr', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'ms', 'nl', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tl', 'tr', 'uk', 'ur', 'vi', 'zh', 'zh-HK', 'zh-TW'];
 const ph = (s) => (String(s).match(/\{\w+\}/g) || []).sort().join(',');
 
-test('all 29 app languages plus English are present', () => {
+test('all 31 app languages plus English are present', () => {
     assert.deepEqual([...locales.keys()].sort(), EXPECTED);
-    assert.equal(readdirSync(DEFAULT_I18N_DIR).filter((f) => f.endsWith('.json')).length, 30);
+    assert.equal(readdirSync(DEFAULT_I18N_DIR).filter((f) => f.endsWith('.json')).length, 32);
 });
 
 test('every language has exactly the English keys, with the same placeholders and newline count', () => {
@@ -58,7 +58,20 @@ test('language resolution: Telegram tags, aliases, regions and fallback', () => 
     assert.equal(r('pt-br'), 'pt');
     assert.equal(r('pt-PT'), 'pt');
     assert.equal(r('zh-hans'), 'zh');
-    assert.equal(r('zh-TW'), 'zh');
+    assert.equal(r('zh-TW'), 'zh-TW');
+    assert.equal(r('zh-tw'), 'zh-TW');
+    assert.equal(r('zh_TW'), 'zh-TW');
+    assert.equal(r('zh-hant'), 'zh-TW');
+    assert.equal(r('zh-Hant-TW'), 'zh-TW');
+    assert.equal(r('zh-MO'), 'zh-TW');
+    assert.equal(r('zh-HK'), 'zh-HK');
+    assert.equal(r('zh-hant-hk'), 'zh-HK');
+    assert.equal(r('zh'), 'zh');
+    assert.equal(r('zh-cn'), 'zh');
+    assert.equal(r('zh-sg'), 'zh');
+    assert.equal(r('constructor'), 'en');
+    assert.equal(r('__proto__'), 'en');
+    assert.equal(resolveLang('zh-TW', new Map([['en', {}], ['zh', {}]])), 'zh', 'no Traditional file: falls back to zh, not English');
     assert.equal(r('in'), 'id');
     assert.equal(r('fil'), 'tl');
     assert.equal(r('xx'), 'en');
