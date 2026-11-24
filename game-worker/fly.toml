@@ -1,5 +1,6 @@
 # fly.toml for riddleverse-game-worker (RiddleVerse game generation worker, server.js).
 # Secrets (names only, set with `flyctl secrets import`): WORKER_SECRET, ANTHROPIC_API_KEY.
+# The worker reads them once at startup (entrypoint.sh hands them over in a node-only file) and the Claude CLI never sees them, see agentSandbox.js.
 # GITHUB_PAT is intentionally NOT set: repo features (init-repo, versions, customize persistence) stay disabled.
 app = 'riddleverse-game-worker'
 primary_region = 'sjc'
