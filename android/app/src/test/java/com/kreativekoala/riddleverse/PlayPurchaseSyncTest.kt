@@ -17,7 +17,8 @@ class PlayPurchaseSyncTest {
     }
 
     @Test fun aWaitingPurchaseSurvivesStorageAndSendsNoAmounts() {
-        val coins = PendingPurchase("token-1", "com.kreativekoala.riddleverse.coins.500", PendingPurchase.COINS, "uid-1", "GPA.1")
+        val pack = "com.kreativekoala.riddleverse.coins.500"
+        val coins = PendingPurchase("token-1", pack, PendingPurchase.COINS, "uid-1", "GPA.1")
         assertEquals(coins, PendingPurchase.fromJson("token-1", coins.toJson()))
         assertEquals("https://puzzleverseai.com/api/coins/purchase", coins.url)
         val body = coins.requestBody()
