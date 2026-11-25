@@ -3,6 +3,7 @@ import express from 'express';
 import { supabase } from '../config/database.js';
 import { clampScoreDelta } from '../utils/scoreBounds.js';
 import { publicUserId, publicName, ownRowMarker } from '../utils/publicIdentity.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -94,7 +95,7 @@ router.get('/get-score', async (req, res) => {
 /**
  * Delete user score
  */
-router.post('/delete-score', async (req, res) => {
+router.post('/delete-score', requireAdminKey, async (req, res) => {
     const { name } = req.body;
 
     if (!name) {

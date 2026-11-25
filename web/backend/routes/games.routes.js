@@ -3,12 +3,15 @@ import { supabase } from '../config/database.js';
 import multer from 'multer';
 import fs from 'fs';
 import { publicUserId, publicName } from '../utils/publicIdentity.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
 const upload = multer({ dest: 'uploads/' });
 
-router.post('/upload-screenshot', upload.single('screenshot'), async (req, res) => {
+// Writes on this router have no caller in any shipped app or the web (only has-played and the reads are used): admin only.
+// The key is checked before multer so an anonymous upload is never written to disk.
+router.post('/upload-screenshot', requireAdminKey, upload.single('screenshot'), async (req, res) => {
     try {
         const file = req.file;
         if (!file) {
@@ -88,7 +91,7 @@ router.get('/screenshots', async (req, res) => {
     }
 });
 
-router.post('/screenshots', upload.single('screenshot'), async (req, res) => {
+router.post('/screenshots', requireAdminKey, upload.single('screenshot'), async (req, res) => {
     try {
         const file = req.file;
         const { title, description, gameType, uploadedByUserId, uploadedByName } = req.body;
@@ -143,7 +146,7 @@ router.post('/screenshots', upload.single('screenshot'), async (req, res) => {
     }
 });
 
-router.post('/screenshots/:id/use', async (req, res) => {
+router.post('/screenshots/:id/use', requireAdminKey, async (req, res) => {
     try {
         const { id } = req.params;
         
@@ -187,7 +190,7 @@ function detectClientPlatform(req) {
 }
 
 // POST - Create new game
-router.post('/', async (req, res) => {
+router.post('/', requireAdminKey, async (req, res) => {
     try {
         const { 
             title, 
@@ -394,7 +397,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // POST - Record game play
-router.post('/:id/play', async (req, res) => {
+router.post('/:id/play', requireAdminKey, async (req, res) => {
     try {
         const { id } = req.params;
         const { playerId, score = 0, completionTime } = req.body;
@@ -496,7 +499,7 @@ router.get('/stats/platforms', async (req, res) => {
 });
 
 // PUT - Update existing game
-router.put('/:id', async (req, res) => {
+router.put('/:id', requireAdminKey, async (req, res) => {
     try {
         const { id } = req.params;
         const { 
@@ -572,7 +575,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // PATCH - Partial update (alternative, allows updating specific fields)
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requireAdminKey, async (req, res) => {
     try {
         const { id } = req.params;
         

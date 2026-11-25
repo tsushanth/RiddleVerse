@@ -108,6 +108,7 @@ router.delete('/delete-user-account', async (req, res) => {
             { table: 'puzzle_regeneration_requests', column: 'user_email', identifier: userEmail },
             { table: 'puzzle_sets', column: 'creator', identifier: userEmail },
             { table: 'custom_leaderboard', column: 'userid', identifier: userId },
+            { table: 'deleted_games', column: 'creator_id', identifier: userId },
         ];
 
         const supabasePromises = supabaseOperations.map(async ({ table, column, identifier }) => {

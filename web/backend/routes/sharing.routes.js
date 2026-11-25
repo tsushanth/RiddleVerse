@@ -3,6 +3,7 @@ import express from 'express';
 import nodemailer from 'nodemailer';
 import path from 'path';
 import { admin, db } from '../config/firebaseAdmin.js';
+import { singleRecipient, mailName, shareLimiters } from '../utils/shareMail.js';
 
 const router = express.Router();
 const __dirname = path.resolve();
@@ -20,13 +21,19 @@ function getTransporter() {
 /**
  * Share riddle via email
  */
-router.post('/share-riddle', async (req, res) => {
+router.post('/share-riddle', ...shareLimiters(), async (req, res) => {
     try {
         const { puzzleId, recipientEmail, recipientName, senderId } = req.body;
 
         if (!puzzleId || !recipientEmail || !recipientName || !senderId) {
             return res.status(400).json({ error: "Missing required fields" });
         }
+        const to = singleRecipient(recipientEmail);
+        if (!to || typeof puzzleId !== 'string' || puzzleId.length > 128) {
+            return res.status(400).json({ error: "Invalid recipient or puzzle" });
+        }
+        const toName = mailName(recipientName, 'there');
+        const fromName = mailName(senderId, 'A friend');
 
         const mailer = getTransporter();
         if (!mailer) {
@@ -36,22 +43,22 @@ router.post('/share-riddle', async (req, res) => {
 
         await db.collection('sharedRiddles').add({
             puzzleId,
-            recipientEmail,
-            recipientName,
-            senderId,
+            recipientEmail: to,
+            recipientName: String(recipientName).slice(0, 80),
+            senderId: String(senderId).slice(0, 128),
             sharedAt: admin.firestore.Timestamp.now(),
             status: "pending"
         });
 
-        const deepLink = `https://puzzleverseai.com/open-riddle?puzzleId=${puzzleId}`;
+        const deepLink = `https://puzzleverseai.com/open-riddle?puzzleId=${encodeURIComponent(puzzleId)}`;
 
         const mailOptions = {
             from: `"Puzzleverse" <${process.env.SHARE_SMTP_USER}>`,
-            to: recipientEmail,
+            to,
             subject: `🧩 You've Been Invited to Solve a Riddle!`,
             html: `
-                <h2>Hi ${recipientName},</h2>
-                <p><strong>Your friend ${senderId} has shared a riddle with you!</strong></p>
+                <h2>Hi ${toName},</h2>
+                <p><strong>Your friend ${fromName} has shared a riddle with you!</strong></p>
                 <p>Click below to open the puzzle in the app:</p>
                 <p><a href="${deepLink}" style="background:#007bff;padding:10px 20px;color:white;text-decoration:none;border-radius:5px;">🔓 Open Riddle</a></p>
                 <p>Don't have the app? <a href="https://puzzleverseai.com/download">Download it here.</a></p>
@@ -65,7 +72,7 @@ router.post('/share-riddle', async (req, res) => {
 
     } catch (error) {
         console.error("Error sharing riddle:", error);
-        res.status(500).json({ error: "Failed to share riddle" + error });
+        res.status(500).json({ error: "Failed to share riddle" });
     }
 });
 
@@ -79,7 +86,7 @@ router.get('/open-riddle', (req, res) => {
         return res.status(400).send('Missing puzzleId');
     }
 
-    const deepLink = `puzzleverse://riddle?puzzleId=${puzzleId}`;
+    const deepLink = `puzzleverse://riddle?puzzleId=${encodeURIComponent(String(puzzleId)).replace(/'/g, '%27')}`;
 
     const userAgent = req.headers['user-agent'] || '';
     const isAndroid = /android/i.test(userAgent);

@@ -7,6 +7,7 @@ import {
 import { supabase } from '../config/database.js';
 import { clampScoreDelta } from '../utils/scoreBounds.js';
 import { publicUserId, publicName, ownRowMarker } from '../utils/publicIdentity.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -120,7 +121,7 @@ router.post('/update-score', async (req, res) => {
 });
 
 // Delete user score
-router.post('/delete-score', async (req, res) => {
+router.post('/delete-score', requireAdminKey, async (req, res) => {
     const { name } = req.body;
 
     if (!name) {
@@ -322,7 +323,7 @@ router.post('/puzzle/:puzzleId', async (req, res) => {
 });
 
 // Delete leaderboard entry
-router.delete('/puzzle/:puzzleId/user/:userId', async (req, res) => {
+router.delete('/puzzle/:puzzleId/user/:userId', requireAdminKey, async (req, res) => {
     try {
         const { puzzleId, userId } = req.params;
 

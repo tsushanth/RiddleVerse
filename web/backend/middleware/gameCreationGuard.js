@@ -45,8 +45,9 @@ export function readConfig(env = process.env) {
 
 /** Which spend-bearing action a request to /api/game-creation is, or null for reads and unknown routes. Path is router-relative. */
 export function classify(method, path) {
-    if (method !== 'POST') return null;
     const p = String(path || '').split('?')[0].replace(/\/+$/, '');
+    if (method === 'DELETE') return /^\/[^/]+$/.test(p) ? 'delete' : null; // no cost: only the require-auth flag applies
+    if (method !== 'POST') return null;
     if (p === '/generate') return 'generate';
     if (p === '/remix') return 'remix';
     if (p === '/save') return 'save';
@@ -111,7 +112,7 @@ export function createGameCreationGuard({ env = process.env, now = Date.now, ver
         if (token) {
             try { const id = await verify(token); uid = id && id.uid ? String(id.uid) : null; } catch { uid = null; }
             if (!uid) return reject(401, 'Invalid or expired credentials.', { code: 'auth_required' });
-            const bodyUser = req.body && typeof req.body === 'object' ? req.body.userId : undefined;
+            const bodyUser = (req.body && typeof req.body === 'object' ? req.body.userId : undefined) || req.query?.userId; // DELETE sends it in the query
             if (typeof bodyUser === 'string' && bodyUser && bodyUser !== uid) return reject(403, 'Credentials do not match userId.', { code: 'auth_required' });
         } else if (cfg.requireAuth && kind) {
             return reject(401, 'Authentication required.', { code: 'auth_required' });
