@@ -36,6 +36,7 @@ const { default: analytics } = await import('../routes/analytics.routes.js');
 const { default: ltv } = await import('../routes/ltv.routes.js');
 const { default: cache } = await import('../routes/dailyPuzzleCache.routes.js');
 const { default: endpoints } = await import('../routes/puzzleEndpoints.routes.js');
+const { default: account } = await import('../routes/account.routes.js');
 const { dailyPuzzleCache } = await import('../services/dailyPuzzleCache.js');
 globalThis.setInterval = realSetInterval;
 
@@ -50,6 +51,7 @@ app.use('/api/analytics', analytics);
 app.use('/api/ltv', ltv);
 app.use('/api/daily-puzzle-cache', cache);
 app.use('/', endpoints);
+app.use('/', account);
 const server = http.createServer(app);
 await new Promise((r) => server.listen(0, r));
 const base = `http://127.0.0.1:${server.address().port}`;
@@ -87,6 +89,12 @@ test('batch fetch still serves puzzles when Firestore is unavailable', async () 
     const body = await r.json();
     assert.equal(body.success, true);
     assert.equal(body.puzzleData.math.length, 1);
+});
+
+test('rewards and badges answer "unavailable", not an error, when Firestore cannot be read', async () => {
+    const r = await realFetch(`${base}/get-user-rewards-badges?email=someone%40example.test`);
+    assert.equal(r.status, 200);
+    assert.deepEqual(await r.json(), { rewards: [], badges: [], unavailable: true });
 });
 
 test('boot does not read puzzle configuration from Firestore', () => {
