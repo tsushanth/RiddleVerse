@@ -24,10 +24,9 @@ export default function LeaderboardPage() {
 
   const leaderboard = data?.leaderboard || []
 
-  // Find current user's rank
-  const userRank = leaderboard.findIndex(
-    entry => entry.email === user?.email || entry.userId === user?.uid
-  ) + 1
+  // The server marks the signed-in player's row (it no longer publishes addresses to match on)
+  const isOwnEntry = (entry) => Boolean(entry.isCurrentUser || (user?.uid && entry.userId === user.uid))
+  const userRank = leaderboard.findIndex(isOwnEntry) + 1
 
   const getRankIcon = (rank) => {
     switch (rank) {
@@ -139,11 +138,11 @@ export default function LeaderboardPage() {
         {/* Leaderboard entries */}
         {leaderboard.map((entry, index) => {
           const rank = index + 1
-          const isCurrentUser = entry.email === user?.email || entry.userId === user?.uid
+          const isCurrentUser = isOwnEntry(entry)
 
           return (
             <motion.div
-              key={entry.id || entry.email || index}
+              key={entry.userId || index}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}

@@ -39,7 +39,7 @@ router.get('/user-config', async (req, res) => {
     // Build config response
     const config = {
       userId: user.user_id,
-      email: user.email,
+      email, // echo of the caller's own value; the stored address is never returned (this route is not authenticated)
       subscriptionTier: user.subscription_tier || 'free',
       shouldShowTrialPrompt: shouldShowTrial(user),
       trialPromptReason: getTrialReason(user),

@@ -6,6 +6,7 @@ import {
 } from '../services/puzzleService.js';
 import { supabase } from '../config/database.js';
 import { clampScoreDelta } from '../utils/scoreBounds.js';
+import { publicUserId, publicName, ownRowMarker } from '../utils/publicIdentity.js';
 
 const router = express.Router();
 
@@ -25,11 +26,13 @@ router.get('/', async (req, res) => {
 
         if (error) throw error;
 
+        const markOwn = await ownRowMarker(req);
         const leaderboard = data.map(row => ({
-            userId: row.user_id,
-            name: row.name,
+            userId: publicUserId(row.user_id),
+            name: publicName(row.name),
             score: row.score,
-            lastUpdated: row.last_updated
+            lastUpdated: row.last_updated,
+            ...markOwn(row.user_id)
         }));
         res.json({ success: true, leaderboard });
     } catch (error) {
@@ -367,7 +370,7 @@ router.delete('/puzzle/:puzzleId/user/:userId', async (req, res) => {
             success: true,
             message: "Leaderboard entry deleted successfully", 
             deletedEntry: {
-                userId: deletedEntry.userid,
+                userId: publicUserId(deletedEntry.userid),
                 score: deletedEntry.score,
                 timeTaken: deletedEntry.timetaken,
                 formattedTime: formatTime(deletedEntry.timetaken)

@@ -22,6 +22,7 @@ import {
 } from '../services/puzzleService.js';
 import { getNextDailyPuzzle, hasDailyPuzzles, dailyContentLanguage } from '../services/dailyPuzzles.js';
 import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
+import { publicUserId } from '../utils/publicIdentity.js';
 
 const router = express.Router();
 
@@ -764,7 +765,7 @@ router.post("/delete-puzzle-leaderboard-entry", async (req, res) => {
             success: true,
             message: "Leaderboard entry deleted successfully",
             deletedEntry: {
-                userId: deletedEntry.userid,
+                userId: publicUserId(deletedEntry.userid),
                 score: deletedEntry.score,
                 timeTaken: deletedEntry.timetaken
             },
