@@ -186,8 +186,9 @@ router.get('/get-user-rewards-badges', async (req, res) => {
 
         return res.json({ rewards, badges });
     } catch (err) {
-        console.error("❌ Firestore error:", err);
-        res.status(500).json({ error: "Failed to fetch user data" });
+        // Firestore quota or outage: answer with nothing to show, marked as unavailable, rather than an error.
+        console.error("❌ Firestore error:", err.message);
+        return res.json({ rewards: [], badges: [], unavailable: true });
     }
 });
 
