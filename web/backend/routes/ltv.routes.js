@@ -3,6 +3,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import { supabase } from '../config/database.js';
 import { isAdminKey } from '../middleware/adminKey.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -663,7 +664,7 @@ router.get('/audiences', publicLimiter, async (req, res) => {
 });
 
 // Get individual user LTV
-router.get('/user/:userId', publicLimiter, async (req, res) => {
+router.get('/user/:userId', publicLimiter, requireAdminKey, async (req, res) => {
     try {
         const { userId } = req.params;
         

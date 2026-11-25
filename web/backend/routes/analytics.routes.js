@@ -1,7 +1,9 @@
 import express from 'express';
 import { analyticsService } from '../services/analyticsService.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
+router.use(requireAdminKey); // no app or web page calls these
 
 // Get today's DAU
 router.get('/dau', async (req, res) => {

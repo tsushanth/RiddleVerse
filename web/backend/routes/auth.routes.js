@@ -11,39 +11,36 @@ router.post("/google", async (req, res) => {
     const { idToken } = req.body;
 
     try {
-        console.log("Received ID Token:", idToken);
-        
         // Verify Google ID Token (From Firebase Auth)
         const identity = await verifyToken(idToken);
         // Firebase: raw is the decoded token (unchanged). Supabase: uid is the canonical uid.
         const decodedToken = identity.provider === 'firebase' ? identity.raw : { ...identity.raw, uid: identity.uid };
-        console.log("✅ Decoded Token:", decodedToken);
-
         const email = decodedToken.email;
         const userId = decodedToken.uid;
 
-        // Check if user exists in Firestore
-        const userRef = db.collection("users").doc(userId);
-        let userDoc = await userRef.get();
+        // The Firestore user document is bookkeeping: a quota or outage there must not read as "invalid token".
+        try {
+            const userRef = db.collection("users").doc(userId);
+            const userDoc = await userRef.get();
 
-        if (!userDoc.exists) {
-            await userRef.set({
-                email,
-                lastPuzzleTimestamp: null,
-                puzzlesAttempted: 0,
-                puzzlesSolved: 0
-            });
-        } else {
-            console.log("✅ User exists. Updating last login timestamp.");
-            await userRef.update({
-                lastLogin: admin.firestore.FieldValue.serverTimestamp()
-            });
+            if (!userDoc.exists) {
+                await userRef.set({
+                    email,
+                    lastPuzzleTimestamp: null,
+                    puzzlesAttempted: 0,
+                    puzzlesSolved: 0
+                });
+            } else {
+                await userRef.update({
+                    lastLogin: admin.firestore.FieldValue.serverTimestamp()
+                });
+            }
+        } catch (bookkeepingError) {
+            console.error('Sign-in bookkeeping failed (non-fatal):', bookkeepingError.message);
         }
 
         // Create JWT for session authentication
         const token = jwt.sign({ email, userId }, JWT_SECRET, { expiresIn: "24h" });
-        console.log("signed token:", token);
-
         res.json({ success: true, token, email, userId });
 
     } catch (error) {
