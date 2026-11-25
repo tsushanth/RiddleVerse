@@ -1,5 +1,12 @@
 # Deployed releases (Play)
 
+## Yearly plan coins paid each month 2026-11-25: quiz-web-frontend v66 (PR #98, main 1f88cad)
+- v65 -> v66 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 1f88cad (web tree d604000c; `services/playPurchases.js` and `server.js` on the machine hash-identical to main), image deployment-01M8AHJZXKK88JM9PNDKJCCT1E. No secrets, no migration. Rollback: `flyctl releases rollback 65 -a quiz-web-frontend`.
+- Was: the yearly plan's 700 coins were credited once per yearly period while the app says every month. Now: once in each month of a paid year (ledger id `sub_coins_<order>_m<1..12>`), current month only, nothing back-filled; the sweep also re-checks running yearly subscriptions whose month is unpaid.
+- Nothing was credited under the old id: `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` is still not set (checked by secret name), so subscription requests answer 503 and the sweep does nothing.
+- Tests before merge (Node 20): 450 tests, 444 pass; 1 failure (`openaiImage.test.js`) and 5 cancelled are the same on unmodified main (445, 439 pass).
+- Checked live: `/api/health` 200, `/api/subscription-purchase` without a sign-in 401. No route that reads Firestore was called. NOT verified: any real purchase or credit.
+
 ## Play purchases verified by token 2026-11-25: quiz-web-frontend v65 (PR #95, main f7de2a4); Android merged, NOT released (PRs #94, #96)
 - v64 -> v65 with `flyctl deploy --remote-only` from a clean detached worktree of origin/main f7de2a4 (web tree 272cd13d identical to main; 135 files under services, routes, middleware, auth, config and server.js match the running machine), image deployment-01M8AFRX5XSECKP1H2FQ2SJZJG. No secrets changed. Rollback: `flyctl releases rollback 64 -a quiz-web-frontend` (the new tables can stay).
 - Migration applied through the Supabase management API before the deploy: `20261126000000_play_purchases.sql` (rollback next to it). Verified: row level security on, no privilege for anon or authenticated, 0 rows, still no table in schema public open to those roles.
