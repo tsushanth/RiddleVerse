@@ -8,7 +8,7 @@ process.env.SUPABASE_URL = 'http://supabase.test';
 process.env.SUPABASE_ANON_KEY = 'test-anon-key';
 process.env.SUPABASE_SERVICE_KEY = 'test-service-key';
 
-const { applySubscription, refreshDueSubscriptions, planFor, isPurchaseToken } = await import('../services/playPurchases.js');
+const { applySubscription, refreshDueSubscriptions, planFor, isPurchaseToken, monthOfPaidYear } = await import('../services/playPurchases.js');
 const { createSubscriptionPurchaseHandler } = await import('../services/subscription-purchase.js');
 const { createPurchaseHandler } = await import('../services/coinService.js');
 const { createPlayPurchaseVerifier, PLAY_CREDENTIAL } = await import('../services/playPurchaseVerifier.js');
@@ -22,7 +22,7 @@ const COINS = 'com.kreativekoala.riddleverse.coins.500';
 const ORDER = 'GPA.1111-2222-3333-44444';
 
 function mkDb({ failSave = false } = {}) {
-    const tables = { play_purchases: [], user_subscriptions: [], users: [] };
+    const tables = { play_purchases: [], user_subscriptions: [], users: [], coin_transactions: [] };
     const ledger = [];
     const writes = [];
     function from(name) {
@@ -49,7 +49,8 @@ function mkDb({ failSave = false } = {}) {
             eq: (k, v) => { filters.push((r) => r[k] === v); return q; },
             in: (k, v) => { filters.push((r) => v.includes(r[k])); return q; },
             lt: (k, v) => { filters.push((r) => r[k] < v); return q; },
-            like: () => q, gte: () => q, order: () => q,
+            gte: (k, v) => { filters.push((r) => r[k] >= v); return q; },
+            like: () => q, order: () => q,
             limit: () => Promise.resolve({ data: name === 'coin_transactions' ? [] : rows.filter(match), error: null }),
             maybeSingle: async () => ({ data: rows.find(match) || null, error: null }),
             then: (ok, no) => { if (patch) rows.filter(match).forEach((r) => Object.assign(r, patch)); return Promise.resolve({ error: null }).then(ok, no); },
@@ -63,6 +64,7 @@ function mkDb({ failSave = false } = {}) {
             writes.push(['rpc', name]);
             if (ledger.some((l) => l.id === a.p_iap_transaction_id)) return { data: { success: true, duplicate: true }, error: null };
             ledger.push({ id: a.p_iap_transaction_id, user: a.p_user_id, amount: a.p_amount });
+            tables.coin_transactions.push({ id: ledger.length, iap_transaction_id: a.p_iap_transaction_id });
             return { data: { success: true, new_balance: ledger.filter((l) => l.user === a.p_user_id).reduce((s, l) => s + l.amount, 0) }, error: null };
         },
     };
@@ -203,6 +205,83 @@ test('the sweep credits a renewal once and does nothing without the Play account
     assert.deepEqual(await refreshDueSubscriptions({ db, verifier: renewed, now: later }), { checked: 1 });
     assert.deepEqual(await refreshDueSubscriptions({ db, verifier: renewed, now: later }), { checked: 0 });
     assert.equal(db.balance('u1'), 450);
+});
+
+const at = (iso) => () => Date.parse(iso);
+// A year bought on 2026-12-01, as Play reports it.
+const yearly = ({ order = ORDER, expiry = '2027-12-01T12:00:00Z', ...more } = {}) => {
+    const data = subscription({ product: `${P}.yr`, order, ...more });
+    data.lineItems[0].expiryTime = expiry;
+    return data;
+};
+const applyAt = (db, data, iso) => applySubscription({ db, verifier: play(data), userId: 'u1', purchaseToken: TOKEN, now: at(iso) });
+
+test('months of a paid year run from the purchase day, and short months end on their last day', () => {
+    const expiry = Date.parse('2027-12-01T12:00:00Z');
+    assert.equal(monthOfPaidYear(expiry, Date.parse('2026-12-01T12:00:00Z')), 1);
+    assert.equal(monthOfPaidYear(expiry, Date.parse('2027-01-01T11:59:59Z')), 1);
+    assert.equal(monthOfPaidYear(expiry, Date.parse('2027-01-01T12:00:00Z')), 2);
+    assert.equal(monthOfPaidYear(expiry, Date.parse('2027-11-01T12:00:00Z')), 12);
+    assert.equal(monthOfPaidYear(expiry, expiry - 1), 12);
+    // a renewal reported a few hours before the old year ended counts as the new year's first month
+    assert.equal(monthOfPaidYear(expiry, Date.parse('2026-11-30T20:00:00Z')), 1);
+    // bought on the 31st
+    const end = Date.parse('2028-01-31T00:00:00Z');
+    assert.equal(monthOfPaidYear(end, Date.parse('2027-02-27T23:59:59Z')), 1);
+    assert.equal(monthOfPaidYear(end, Date.parse('2027-02-28T00:00:00Z')), 2);
+    assert.equal(monthOfPaidYear(end, Date.parse('2027-03-30T23:59:59Z')), 2);
+    assert.equal(monthOfPaidYear(end, Date.parse('2027-03-31T00:00:00Z')), 3);
+});
+
+test('a yearly plan is credited once in each paid month, twelve times a year, never twice', async () => {
+    const db = mkDb();
+    assert.equal((await applyAt(db, yearly(), '2026-12-01T12:00:00Z')).body.coinsGranted, 1200); // 700 and the signup bonus
+    assert.equal((await applyAt(db, yearly(), '2026-12-31T00:00:00Z')).body.coinsGranted, 0);
+    assert.equal((await applyAt(db, yearly(), '2027-01-01T12:00:00Z')).body.coinsGranted, 700);
+    assert.equal((await applyAt(db, yearly(), '2027-01-15T00:00:00Z')).body.coinsGranted, 0);
+    for (let m = 3; m <= 12; m += 1) {
+        const day = new Date(Date.UTC(2026, 11 + m - 1, 2)).toISOString();
+        assert.equal((await applyAt(db, yearly(), day)).body.coinsGranted, 700, day);
+        assert.equal((await applyAt(db, yearly(), day)).body.coinsGranted, 0, day);
+    }
+    assert.equal(db.balance('u1'), 12 * 700 + 500);
+    // the next paid year is a new order
+    const renewed = yearly({ order: `${ORDER}..0`, expiry: '2028-12-01T12:00:00Z' });
+    assert.equal((await applyAt(db, renewed, '2027-12-01T13:00:00Z')).body.coinsGranted, 700);
+});
+
+test('months that passed are not made up', async () => {
+    const db = mkDb();
+    // first seen in the sixth month of the year: this month only
+    assert.equal((await applyAt(db, yearly(), '2027-05-10T00:00:00Z')).body.coinsGranted, 1200);
+    // not seen again until the ninth month: one month, not three
+    assert.equal((await applyAt(db, yearly(), '2027-08-10T00:00:00Z')).body.coinsGranted, 700);
+    assert.equal(db.balance('u1'), 1900);
+});
+
+test('a monthly plan is still credited once per billing period, whenever it is asked again', async () => {
+    const db = mkDb();
+    const data = subscription({ days: 31 });
+    assert.equal((await apply(db, data)).body.coinsGranted, 300);
+    const nearEnd = () => NOW + 30 * 86_400_000;
+    assert.equal((await applySubscription({ db, verifier: play(data), userId: 'u1', purchaseToken: TOKEN, now: nearEnd })).body.coinsGranted, 0);
+});
+
+test('the sweep credits each new month of a running yearly plan once, and only after Play confirms it', async () => {
+    const db = mkDb();
+    await applyAt(db, yearly(), '2026-12-01T12:00:00Z');
+    let asked = 0;
+    const verifier = play(() => { asked += 1; return { ok: true, data: yearly() }; });
+    assert.deepEqual(await refreshDueSubscriptions({ db, verifier, now: at('2026-12-20T00:00:00Z') }), { checked: 0 });
+    assert.equal(asked, 0);
+    assert.deepEqual(await refreshDueSubscriptions({ db, verifier, now: at('2027-01-02T00:00:00Z') }), { checked: 1 });
+    assert.deepEqual(await refreshDueSubscriptions({ db, verifier, now: at('2027-01-02T06:00:00Z') }), { checked: 0 });
+    assert.equal(asked, 1);
+    assert.equal(db.balance('u1'), 1900);
+    // on hold at Play: asked, not paid
+    const held = await refreshDueSubscriptions({ db, verifier: play(yearly({ state: 'ON_HOLD' })), now: at('2027-02-02T00:00:00Z') });
+    assert.deepEqual(held, { checked: 1 });
+    assert.equal(db.balance('u1'), 1900);
 });
 
 test('the subscription route needs a signed-in user, a real token, and ignores client amounts', async () => {

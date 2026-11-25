@@ -7,9 +7,10 @@ const sha256 = (s) => crypto.createHash('sha256').update(s).digest('hex');
 export const tokenHash = sha256;
 
 const PREMIUM = 'com.kreativekoala.riddleverse.premium';
-// Coins per paid billing period, and once per account on its first paid period. Same figures the app shows.
+// Coins per paid month, and once per account on its first paid period. Same figures the app shows. A monthly plan's
+// billing period is one month; a yearly plan pays `coins` in each month of its paid year (`coinsEveryMonth`).
 const MONTHLY = { tier: 'premium', coins: 150, signupBonus: 150 };
-const YEARLY = { tier: 'premium_yearly', coins: 700, signupBonus: 500 };
+const YEARLY = { tier: 'premium_yearly', coins: 700, signupBonus: 500, coinsEveryMonth: true };
 
 export function planFor(productId, basePlanId) {
     if (productId === `${PREMIUM}.mo`) return MONTHLY;
@@ -60,6 +61,35 @@ async function creditOnce(db, { userId, amount, reason, id }) {
     return { ok: true, added: amount, balance: data.new_balance };
 }
 
+/** `ms` moved back `n` calendar months (UTC); a day the target month does not have becomes its last day. */
+function monthsBefore(ms, n) {
+    const from = new Date(ms);
+    const to = new Date(ms);
+    to.setUTCDate(1);
+    to.setUTCMonth(to.getUTCMonth() - n);
+    const lastDay = new Date(Date.UTC(to.getUTCFullYear(), to.getUTCMonth() + 1, 0)).getUTCDate();
+    to.setUTCDate(Math.min(from.getUTCDate(), lastDay));
+    return to.getTime();
+}
+
+/** Which month (1 to 12) of the paid year ending at `expiry` contains the time `at`. */
+export function monthOfPaidYear(expiry, at) {
+    for (let month = 12; month > 1; month -= 1) {
+        if (at >= monthsBefore(expiry, 13 - month)) return month;
+    }
+    return 1;
+}
+
+/**
+ * Ledger id of the coins due now for a paid period. A yearly order has one id for each of its months, so a month is paid
+ * at most once and a year at most twelve times. Only the month containing `at` is ever asked for: months that passed
+ * without a check are not made up.
+ */
+function periodCreditId(plan, orderId, expiry, at) {
+    const id = `sub_coins_${orderId}`;
+    return plan.coinsEveryMonth ? `${id}_m${monthOfPaidYear(expiry, at)}` : id;
+}
+
 const STATUS = {
     SUBSCRIPTION_STATE_ACTIVE: 'active',
     SUBSCRIPTION_STATE_CANCELED: 'active', // auto-renew off; paid up to the expiry time
@@ -70,9 +100,10 @@ const STATUS = {
 };
 
 /**
- * Looks a subscription token up at Play, records it for `userId` and credits the coins of the current paid period if
- * that period has not been credited. Returns { status, body } for the HTTP answer; safe to call any number of times.
- * Periods that already ended are never credited, and neither is a free trial.
+ * Looks a subscription token up at Play, records it for `userId` and credits the coins of the current paid period (for a
+ * yearly plan, of the current month of the paid year) if they have not been credited. Returns { status, body } for the
+ * HTTP answer; safe to call any number of times. Periods and months that already ended are never credited, and neither
+ * is a free trial.
  */
 export async function applySubscription({ db, verifier = getPlayTokenVerifier(), userId, purchaseToken, now = Date.now }) {
     if (!verifier.isConfigured()) return { status: 503, body: UNAVAILABLE };
@@ -139,7 +170,7 @@ export async function applySubscription({ db, verifier = getPlayTokenVerifier(),
     let newBalance = null;
     if (paid && current && !trial && orderId) {
         for (const grant of [
-            { amount: plan.coins, reason: `subscription_${plan.tier}_coins`, id: `sub_coins_${orderId}` },
+            { amount: plan.coins, reason: `subscription_${plan.tier}_coins`, id: periodCreditId(plan, orderId, expiry, now()) },
             { amount: plan.signupBonus, reason: 'subscription_signup_bonus', id: `sub_signup_${sha256(userId).slice(0, 32)}` },
         ]) {
             const c = await creditOnce(db, { userId, ...grant });
@@ -180,8 +211,10 @@ export function startSubscriptionSweep({ db, intervalMs = 6 * 60 * 60 * 1000 }) 
 }
 
 /**
- * Renewals happen at Play without the app. Looks up again every recorded subscription whose period has ended, so a new
- * paid period is credited even if the app is not opened. Does nothing while the Play account is not configured.
+ * Renewals happen at Play without the app, and a yearly plan earns coins every month although nothing changes at Play.
+ * Looks up again every recorded subscription whose period has ended, and every running yearly one whose current month has
+ * not been credited, so the coins arrive even if the app is not opened. Does nothing while the Play account is not
+ * configured.
  */
 export async function refreshDueSubscriptions({ db, verifier = getPlayTokenVerifier(), now = Date.now, limit = 200 }) {
     if (!db || !verifier.isConfigured()) return { checked: 0 };
@@ -196,7 +229,7 @@ export async function refreshDueSubscriptions({ db, verifier = getPlayTokenVerif
         return { checked: 0 };
     }
     let checked = 0;
-    for (const row of data || []) {
+    for (const row of [...(data || []), ...await yearlyMonthsDue({ db, now })]) {
         const r = await applySubscription({ db, verifier, userId: row.user_id, purchaseToken: row.purchase_token, now });
         if (r.status === 503) break; // Play cannot be asked at all: try again on the next pass
         checked += 1;
@@ -207,4 +240,36 @@ export async function refreshDueSubscriptions({ db, verifier = getPlayTokenVerif
         }
     }
     return { checked };
+}
+
+/**
+ * Running yearly subscriptions whose current month has no coins in the ledger. Reading the ledger first keeps Play out of
+ * it for everyone already paid this month.
+ * ponytail: reads the first 1000 running yearly rows, one ledger query for each; page through them when there are more.
+ */
+async function yearlyMonthsDue({ db, now }) {
+    const { data, error } = await db.from('user_subscriptions')
+        .select('user_id, purchase_token, latest_order_id, subscription_end_date')
+        .eq('subscription_tier', YEARLY.tier)
+        .eq('status', 'active')
+        .gte('subscription_end_date', new Date(now()).toISOString())
+        .order('updated_at', { ascending: true })
+        .limit(1000);
+    if (error) {
+        console.error('[Play] could not list yearly subscriptions:', error.message);
+        return [];
+    }
+    const due = [];
+    for (const row of data || []) {
+        if (!row.latest_order_id) continue;
+        const id = periodCreditId(YEARLY, row.latest_order_id, Date.parse(row.subscription_end_date), now());
+        const { data: paid, error: ledgerError } = await db.from('coin_transactions')
+            .select('id').eq('iap_transaction_id', id).maybeSingle();
+        if (ledgerError) {
+            console.error('[Play] could not read the coin ledger:', ledgerError.message);
+            break;
+        }
+        if (!paid) due.push(row);
+    }
+    return due;
 }
