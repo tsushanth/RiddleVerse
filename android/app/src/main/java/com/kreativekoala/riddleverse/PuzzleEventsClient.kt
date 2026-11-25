@@ -227,10 +227,12 @@ class PuzzleEventsClient(
 class PuzzleSessionTracker(private val clock: () -> Long = { System.currentTimeMillis() }) {
     private class Session(val id: String, val startedAt: Long, val type: String, val difficulty: String?)
     private val active = HashMap<String, Session>()
+    /** Results already reported for a screen that is still open: no second result, no new start after a rotation. */
+    private val ended = HashSet<String>()
 
     @Synchronized
     fun start(key: String, puzzleType: String, difficulty: String?): PuzzleEvent? {
-        if (active.containsKey(key)) return null
+        if (active.containsKey(key) || key in ended) return null
         if (active.size > 50) active.clear()
         val s = Session(PuzzleEventsClient.newId(), clock(), puzzleType, difficulty)
         active[key] = s
@@ -238,7 +240,9 @@ class PuzzleSessionTracker(private val clock: () -> Long = { System.currentTimeM
     }
 
     @Synchronized
-    fun finish(key: String, puzzleType: String, difficulty: String?, success: Boolean, score: Int?): PuzzleEvent {
+    fun finish(key: String, puzzleType: String, difficulty: String?, success: Boolean, score: Int?): PuzzleEvent? {
+        if (ended.size > 50) ended.clear()
+        if (!ended.add(key)) return null
         val s = active.remove(key)
         val now = clock()
         return PuzzleEvent(
@@ -248,9 +252,10 @@ class PuzzleSessionTracker(private val clock: () -> Long = { System.currentTimeM
         )
     }
 
-    /** Returns an abandon event if the puzzle is still active, else null. */
+    /** The screen was left. Returns an abandon event if the puzzle is still active, else null. */
     @Synchronized
     fun abandon(key: String): PuzzleEvent? {
+        ended.remove(key)
         val s = active.remove(key) ?: return null
         val now = clock()
         return PuzzleEvent("abandon", s.type, s.difficulty, s.id, durationMs = now - s.startedAt, ts = now)

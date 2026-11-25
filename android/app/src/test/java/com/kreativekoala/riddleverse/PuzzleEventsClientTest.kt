@@ -131,7 +131,7 @@ class PuzzleEventsClientTest {
         assertEquals("start", s.type)
         assertNull(t.start("p1", "sudoku", "easy"))      // recompose: no duplicate start
         now += 4000
-        val f = t.finish("p1", "sudoku", "easy", true, 90)
+        val f = t.finish("p1", "sudoku", "easy", true, 90)!!
         assertEquals("complete", f.type); assertEquals(4000L, f.durationMs); assertEquals(s.sessionId, f.sessionId)
         assertNull(t.abandon("p1"))                       // completed: no abandon
         t.start("p2", "wordguess", null)
@@ -139,6 +139,17 @@ class PuzzleEventsClientTest {
         val a = t.abandon("p2")!!
         assertEquals("abandon", a.type); assertEquals(1000L, a.durationMs)
         assertNull(t.abandon("p2"))                       // only once
-        assertEquals("fail", t.finish("p3", "x", null, false, 0).type)
+        assertEquals("fail", t.finish("p3", "x", null, false, 0)!!.type)
+    }
+
+    @Test fun trackerReportsOneResultPerOpenScreen() {
+        val t = PuzzleSessionTracker { now }
+        t.start("p1", "linkup", "easy")
+        assertEquals("complete", t.finish("p1", "linkup", "easy", true, 80)!!.type)   // result card shown
+        assertNull(t.start("p1", "linkup", "easy"))                                   // rotation: no new session
+        assertNull(t.finish("p1", "linkup", "easy", true, 80))                        // Continue, or the card again
+        assertNull(t.abandon("p1"))                                                   // leaving after a result
+        assertEquals("start", t.start("p1", "linkup", "easy")!!.type)                 // opened again: a new session
+        assertEquals("fail", t.finish("p1", "linkup", "easy", false, 0)!!.type)
     }
 }

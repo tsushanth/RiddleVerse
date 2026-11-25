@@ -221,6 +221,9 @@ private fun androidx.compose.ui.semantics.SemanticsPropertyReceiver.liveRegionPo
     liveRegion = LiveRegionMode.Polite
 }
 
+/** Called when a result card appears, so a result counts even if the player leaves without tapping Continue. */
+val LocalWordResult = androidx.compose.runtime.compositionLocalOf<(Boolean, Int) -> Unit> { { _, _ -> } }
+
 /** Shared end-of-puzzle card: outcome, detail lines, optional share, and the Continue button that reports completion once. */
 @Composable
 fun WordPuzzleResultCard(
@@ -228,6 +231,8 @@ fun WordPuzzleResultCard(
     stats: WordPuzzleStatsSnapshot?, shareText: String?, continueLabel: String = stringResource(R.string.continue_label), onContinue: () -> Unit
 ) {
     val context = LocalContext.current
+    val report = LocalWordResult.current
+    androidx.compose.runtime.LaunchedEffect(Unit) { report(success, score) }
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
