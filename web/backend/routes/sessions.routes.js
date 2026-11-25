@@ -1,6 +1,7 @@
 // routes/sessions.routes.js - Host-controlled game session lifecycle
 import express from 'express';
 import { supabase } from '../config/database.js';
+import { publicUserId } from '../utils/publicIdentity.js';
 
 const router = express.Router();
 
@@ -300,7 +301,7 @@ router.get('/:session_id', async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    return res.json(data);
+    return res.json({ ...data, user_id: publicUserId(data.user_id) });
   } catch (err) {
     console.error('❌ Failed to fetch session:', err);
     return res.status(500).json({ error: 'Failed to fetch session' });

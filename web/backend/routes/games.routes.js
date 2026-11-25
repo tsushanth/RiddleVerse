@@ -2,6 +2,7 @@ import express from 'express';
 import { supabase } from '../config/database.js';
 import multer from 'multer';
 import fs from 'fs';
+import { publicUserId, publicName } from '../utils/publicIdentity.js';
 
 const router = express.Router();
 
@@ -73,8 +74,8 @@ router.get('/screenshots', async (req, res) => {
                 imageUrl: s.image_url,
                 thumbnailUrl: s.thumbnail_url,
                 gameType: s.game_type,
-                uploadedByUserId: s.uploaded_by_user_id,
-                uploadedByName: s.uploaded_by_name,
+                uploadedByUserId: publicUserId(s.uploaded_by_user_id),
+                uploadedByName: publicName(s.uploaded_by_name),
                 isFeatured: s.is_featured,
                 useCount: s.use_count,
                 createdAt: s.created_at
@@ -333,7 +334,7 @@ router.get('/', async (req, res) => {
             id: game.id,
             title: game.title,
             description: game.description,
-            creatorName: game.creator_name,
+            creatorName: publicName(game.creator_name),
             gameType: game.game_type,
             platformType: game.platform_type,
             playCount: game.play_count,
@@ -378,7 +379,7 @@ router.get('/:id', async (req, res) => {
             htmlContent: data.html_content,
             sourceCode: data.source_code,
             platformType: data.platform_type,
-            creatorName: data.creator_name,
+            creatorName: publicName(data.creator_name),
             gameType: data.game_type,
             playCount: data.play_count,
             rating: data.rating,

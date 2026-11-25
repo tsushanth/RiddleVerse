@@ -15,7 +15,8 @@ router.get('/status', async (req, res) => {
 
         const { data: recentJobs, error } = await supabase
             .from('streak_notification_jobs')
-            .select('*')
+            // No error_details: this route is public and those rows name individual accounts.
+            .select('job_id, status, started_at, completed_at, duration_seconds, total_users_checked, notifications_sent, at_risk_users, comeback_users, celebration_users, errors_count')
             .order('started_at', { ascending: false })
             .limit(10);
 

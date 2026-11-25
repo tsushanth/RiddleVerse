@@ -9,6 +9,7 @@ import { createForgeSessionCloser } from '../services/forgeSessionService.js';
 import { reportFailure } from '../utils/failureReporter.js';
 import { buildGamePrompt, DEFAULT_LANGUAGE } from '../utils/contentLanguage.js';
 import { pickSuggestions, normalizeSuggestionRows, buildReplenishPrompt, createReplenishGate } from '../services/gameSuggestions.js';
+import { publicUserId, publicName } from '../utils/publicIdentity.js';
 
 const router = express.Router();
 
@@ -964,6 +965,8 @@ router.post('/save', async (req, res) => {
     }
 });
 
+const publicGameRow = (row) => ({ ...row, creator_id: publicUserId(row.creator_id), creator_name: publicName(row.creator_name) });
+
 // GET /api/game-creation/browse
 // Served from in-memory cache — fast, no DB hit per request.
 // Supports pagination: ?limit=20&offset=0&sort=newest|popular
@@ -1003,7 +1006,7 @@ router.get('/browse', async (req, res) => {
 
             return res.json({
                 success: true,
-                games: data || [],
+                games: (data || []).map(publicGameRow),
                 totalCount: count || 0,
                 hasMore: (parsedOffset + parsedLimit) < (count || 0)
             });
@@ -1018,7 +1021,7 @@ router.get('/browse', async (req, res) => {
 
         res.json({
             success: true,
-            games: page,
+            games: page.map(publicGameRow),
             totalCount,
             hasMore: (parsedOffset + parsedLimit) < totalCount
         });
@@ -3093,7 +3096,7 @@ router.get('/:gameId/next-level', async (req, res) => {
                     id: next.id,
                     title: next.title,
                     description: next.description,
-                    creatorName: next.creator_name,
+                    creatorName: publicName(next.creator_name),
                     playCount: next.play_count,
                     rating: next.rating,
                     createdAt: next.created_at,
@@ -3394,7 +3397,7 @@ router.get('/:gameId', async (req, res) => {
                 title: data.title,
                 description: data.description,
                 bundle: data.html_content, // base64 zip
-                creatorName: data.creator_name,
+                creatorName: publicName(data.creator_name),
                 playCount: data.play_count,
                 rating: data.rating,
                 createdAt: data.created_at

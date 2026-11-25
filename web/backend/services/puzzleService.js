@@ -23,6 +23,7 @@ import { enhancedWordSnakeGenerator } from './snakeWordSearch.js';
 import { ProgressivePuzzleSystem } from './progressivePuzzleSystem.js';
 import { notificationService } from './notificationService.js';
 import { maskEmail } from './puzzleLeaderboard.js';
+import { publicUserId, publicName } from '../utils/publicIdentity.js';
 import { DEFAULT_LANGUAGE, languageDirective } from '../utils/contentLanguage.js';
 import { pushLanguage, localizedPuzzlesReadyPush } from './pushText.js';
 
@@ -3115,7 +3116,7 @@ export async function fetchCustomPuzzle(parentSetId) {
                     estimatedTimeRemaining: '30-60 seconds',
                     puzzleSet: {
                         name: puzzleSet.name,
-                        creator: puzzleSet.creator,
+                        creator: publicName(puzzleSet.creator),
                         format: puzzleSet.format
                     }
                 };
@@ -3147,7 +3148,7 @@ export async function fetchCustomPuzzle(parentSetId) {
         
             return {
                 puzzleId: row.puzzleid,
-                userId: row.source,
+                userId: publicUserId(row.source),
                 topic: row.type,
                 format: puzzleFormat,
                 question: row.question,
@@ -3171,14 +3172,14 @@ export async function fetchCustomPuzzle(parentSetId) {
         }
 
         const leaderboard = (leaderboardData || []).map(entry => ({
-            userId: entry.userid,
+            userId: publicUserId(entry.userid),
             timeTaken: entry.timetaken,
             score: entry.score
         }));
 
         // Step 6: Build response in the nested format the Android client expects
         const response = {
-            userId: puzzleSet.creator,
+            userId: publicUserId(puzzleSet.creator),
             topic: puzzleSet.name,
             format: puzzleSet.format,
             numPuzzles: puzzles.length,
@@ -3248,7 +3249,7 @@ async function handleMissingPuzzlesWithRegeneration(parentSetId, puzzleSet) {
             estimatedTimeRemaining: '30-60 seconds',
             puzzleSet: {
                 name: puzzleSet.name,
-                creator: puzzleSet.creator,
+                creator: publicName(puzzleSet.creator),
                 format: puzzleSet.format,
                 originalPuzzleCount: puzzleSet.puzzle_count
             },
@@ -3310,7 +3311,7 @@ async function handleFailedPuzzleSetRegeneration(parentSetId, puzzleSet) {
                 estimatedTimeRemaining: '30-60 seconds',
                 puzzleSet: {
                     name: puzzleSet.name,
-                    creator: puzzleSet.creator,
+                    creator: publicName(puzzleSet.creator),
                     format: puzzleSet.format
                 },
                 action: 'auto_regeneration_after_failure'
@@ -3322,7 +3323,7 @@ async function handleFailedPuzzleSetRegeneration(parentSetId, puzzleSet) {
                 message: 'Puzzle generation failed. Please try creating the puzzle set again.',
                 puzzleSet: {
                     name: puzzleSet.name,
-                    creator: puzzleSet.creator,
+                    creator: publicName(puzzleSet.creator),
                     format: puzzleSet.format
                 },
                 failedAt: puzzleSet.updated_at,
@@ -3470,7 +3471,7 @@ export async function listCustomPuzzles(page = 1, limit = 10, offset = 0, userEm
             return {
                 id: set.id,
                 name: set.name || "Unknown Topic",
-                creator: set.creator || "Unknown Creator",
+                creator: publicName(set.creator) || "Unknown Creator",
                 status: set.status || "completed",
                 createdAt: set.created_at,
                 updatedAt: set.updated_at,
@@ -3542,7 +3543,7 @@ export async function getPuzzleLeaderboard(puzzleId, userId = null) {
         }
 
         const puzzleName = puzzleInfo?.[0]?.name || "Unknown Puzzle";
-        const puzzleCreator = puzzleInfo?.[0]?.creator || "Unknown Creator";
+        const puzzleCreator = publicName(puzzleInfo?.[0]?.creator) || "Unknown Creator";
 
         if (!leaderboardData || leaderboardData.length === 0) {
             return {
@@ -3576,8 +3577,8 @@ export async function getPuzzleLeaderboard(puzzleId, userId = null) {
         // Format top players (limit to top 10 for the response)
         const topPlayers = leaderboardData.slice(0, 10).map((entry, index) => ({
             rank: index + 1,
-            playerName: displayNameMap[entry.userid] || maskEmail(entry.userid),
-            userId: entry.userid, // Keep original for matching current user
+            playerName: publicName(displayNameMap[entry.userid] || maskEmail(entry.userid)),
+            userId: publicUserId(entry.userid), // uids pass through so clients can match the current user
             score: entry.score,
             completionTime: entry.timetaken,
             formattedTime: formatTime(entry.timetaken)
@@ -3673,7 +3674,7 @@ export async function getFeaturedPuzzles(limit = 5) {
             return {
                 id: set.id,
                 name: set.name,
-                creator: set.creator,
+                creator: publicName(set.creator),
                 format: set.format,
                 numPuzzles: set.puzzle_count,
                 createdAt: set.created_at,
@@ -3808,14 +3809,14 @@ export async function updatePuzzleLeaderboard(puzzleId, userId, timeTaken, score
         // Enhanced formatting with rankings and stats
         const formattedLeaderboard = leaderboard.map((entry, index) => ({
             rank: index + 1,
-            userId: entry.userId,
+            userId: publicUserId(entry.userId),
             timeTaken: entry.timeTaken,
             score: entry.score,
             formattedTime: formatTime(entry.timeTaken)
         }));
 
         // Calculate user's new rank and stats
-        const userRank = formattedLeaderboard.findIndex(entry => entry.userId === userId) + 1;
+        const userRank = leaderboard.findIndex(entry => entry.userId === userId) + 1;
         const totalPlayers = formattedLeaderboard.length;
 
         // Calculate percentile

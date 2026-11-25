@@ -2,6 +2,7 @@ import express from 'express';
 import { supabase } from '../config/database.js';
 import { createTelegramApi, escapeHtml } from '../services/telegram/telegramApi.js';
 import { createLimiter } from '../services/puzzleMonitoring.js';
+import { publicUserId, publicName } from '../utils/publicIdentity.js';
 
 const router = express.Router();
 
@@ -118,7 +119,7 @@ router.post('/', async (req, res) => {
                 if (game?.title) gameName = game.title.split('\n')[0].trim().slice(0, 50);
             } catch {}
             sendTelegramLeaderboard(chatId, gameName, leaderboard.map(s => ({
-                username: s.username,
+                username: publicName(s.username),
                 score: s.score
             })));
         }
@@ -126,8 +127,8 @@ router.post('/', async (req, res) => {
         res.json({
             success: true,
             leaderboard: leaderboard.map(s => ({
-                userId: s.user_id,
-                username: s.username,
+                userId: publicUserId(s.user_id),
+                username: publicName(s.username),
                 score: s.score,
                 avatarUrl: s.avatar_url,
                 updatedAt: s.updated_at
@@ -170,8 +171,8 @@ router.get('/:gameId/:chatId', async (req, res) => {
 
         res.json({
             scores: (scores || []).map(s => ({
-                userId: s.user_id,
-                username: s.username,
+                userId: publicUserId(s.user_id),
+                username: publicName(s.username),
                 score: s.score,
                 avatarUrl: s.avatar_url,
                 updatedAt: s.updated_at
