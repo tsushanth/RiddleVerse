@@ -12,16 +12,17 @@
 - Coins come from the server tables. A pack is credited under the Play order id, the same ledger key as the older route.
   Packs bought before 2026-11-25 are not credited by this route (`purchase_needs_review`).
 - Subscriptions (`services/playPurchases.js`, table `user_subscriptions`): monthly 150 coins per paid period plus 150
-  once per account; yearly 700 per paid period (a year) plus 500 once per account. Nothing for a free trial, a grace
-  period, a hold, a period that already ended or a license-pending purchase. Renewals are picked up by the app and by a
-  sweep at start and every six hours.
+  once per account; yearly 700 in each month of a paid year (ledger id `sub_coins_<order>_m<1..12>`, months counted
+  back from the expiry time) plus 500 once per account. Nothing for a free trial, a grace period, a hold, a period or
+  month that already ended (no back-fill) or a license-pending purchase. Renewals and new yearly months are picked up by
+  the app and by a sweep at start and every six hours. The machine stops when idle, so a month is paid at the next start
+  or app check inside that month.
 - The app saves each purchase before sending it, retries until a final answer, and picks up purchases Play still lists
   (twice a day, or on Restore). RevenueCat still acknowledges and consumes.
 - Permission needed in Play Console for the account: view financial data / manage orders and subscriptions for this app.
 
-Open points: the app and store text say "700 free coins every month" for yearly while the server credits once per billing
-period; versions up to 188 cannot get subscription coins (they send neither a token nor a credential); refunds are not
-clawed back.
+Open points: versions up to 188 cannot get subscription coins (they send neither a token nor a credential); refunds are
+not clawed back.
 
 ## Coin packs sent with an order id only (Android up to 188)
 
