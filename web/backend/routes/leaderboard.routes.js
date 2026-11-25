@@ -153,6 +153,19 @@ router.post('/delete-score', async (req, res) => {
     }
 });
 
+// Leaderboard of one AI game, for the web page /game/:gameId/leaderboard
+router.get('/game/:gameId', async (req, res) => {
+    const result = await getPuzzleLeaderboard(req.params.gameId);
+    if (!result.success) {
+        return res.status(500).json({ success: false, error: 'Failed to fetch leaderboard' });
+    }
+    res.json({
+        success: true,
+        leaderboard: result.topPlayers.map(p => ({ rank: p.rank, displayName: p.playerName, userId: p.userId, score: p.score })),
+        totalPlayers: result.totalPlayers
+    });
+});
+
 // Get puzzle-specific leaderboard
 router.get('/puzzle/:puzzleId', async (req, res) => {
     try {

@@ -703,20 +703,19 @@ class NotificationService {
         try {
             const notificationLog = {
                 user_email: userEmail,
-                config_id: config.id,
-                config_name: config.name,
                 notification_type: 'scheduled',
                 title: config.title,
                 body: config.message,
-                timezone: timezone,
+                data: { config_id: config.id, config_name: config.name, timezone },
                 success: success,
                 error_message: error,
                 sent_at: new Date().toISOString()
             };
 
-            await supabase
+            const { error: insertError } = await supabase
                 .from('notification_logs')
                 .insert([notificationLog]);
+            if (insertError) console.error('❌ Error logging user notification:', insertError.message);
 
         } catch (logError) {
             console.error('❌ Error logging user notification:', logError);
@@ -737,14 +736,16 @@ class NotificationService {
                 .gte('sent_at', cutoffDate.toISOString());
 
             if (configId) {
-                query = query.eq('config_id', configId);
+                query = query.eq('data->>config_id', String(configId));
             }
 
-            const { data: logs, error } = await query;
+            const { data: rows, error } = await query;
 
             if (error) {
                 throw error;
             }
+            // config_id, config_name and timezone live in the data column
+            const logs = (rows || []).map(l => ({ ...(l.data || {}), ...l }));
 
             const stats = {
                 totalNotifications: logs.length,

@@ -130,7 +130,10 @@ router.post('/delete-score', async (req, res) => {
 /**
  * Get leaderboard
  */
-router.get('/leaderboard', async (req, res) => {
+router.get('/leaderboard', async (req, res, next) => {
+    // The same path is a page of the web app: a browser asking for HTML falls through to it; the apps (no Accept or */*) get JSON.
+    res.vary('Accept');
+    if (req.accepts(['json', 'html']) === 'html') return next('router');
     try {
         const { data, error } = await supabase
             .from('leaderboard')
