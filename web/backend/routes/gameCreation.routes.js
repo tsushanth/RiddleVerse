@@ -10,6 +10,7 @@ import { reportFailure } from '../utils/failureReporter.js';
 import { buildGamePrompt, DEFAULT_LANGUAGE } from '../utils/contentLanguage.js';
 import { pickSuggestions, normalizeSuggestionRows, buildReplenishPrompt, createReplenishGate } from '../services/gameSuggestions.js';
 import { publicUserId, publicName } from '../utils/publicIdentity.js';
+import { jsLiteral } from '../utils/jsLiteral.js';
 
 const router = express.Router();
 
@@ -2810,11 +2811,12 @@ function generateLeaderboardSnippet(gameId, chatId, apiBase, platform, urlUserId
     return `
 <script>
 (function() {
-  var GAME_ID = '${gameId}';
-  var CHAT_ID = '${chatId || ''}';
-  var PLATFORM = '${platform || 'telegram'}';
-  var URL_USER_ID = '${urlUserId || ''}';
-  var API_BASE = '${apiBase}';
+  var GAME_ID = ${jsLiteral(gameId)};
+  var CHAT_ID = ${jsLiteral(chatId || '')};
+  var PLATFORM = ${jsLiteral(platform || 'telegram')};
+  var URL_USER_ID = ${jsLiteral(urlUserId || '')};
+  var API_BASE = ${jsLiteral(apiBase)};
+  function esc(v) { return String(v).replace(/[&<>"']/g, function(c) { return '&#' + c.charCodeAt(0) + ';'; }); }
   var isTelegram = PLATFORM === 'telegram';
   var isApp = PLATFORM === 'app';
 
@@ -2917,8 +2919,8 @@ function generateLeaderboardSnippet(gameId, chatId, apiBase, platform, urlUserId
         var isMe = s.userId === userId;
         return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.08)">'
           +'<span style="width:20px;text-align:center;font-size:13px">'+(medals[i]||(i+1)+'.')+'</span>'
-          +'<span style="flex:1;color:'+(isMe?'#FF8C00':'#fff')+';font-weight:'+(isMe?'bold':'normal')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(s.username||'Player')+'</span>'
-          +'<span style="font-weight:bold;color:#FFD700">'+s.score+'</span></div>';
+          +'<span style="flex:1;color:'+(isMe?'#FF8C00':'#fff')+';font-weight:'+(isMe?'bold':'normal')+';overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(s.username||'Player')+'</span>'
+          +'<span style="font-weight:bold;color:#FFD700">'+esc(s.score)+'</span></div>';
       }).join('');
     },
     _poll: function() {
@@ -3374,11 +3376,11 @@ router.get('/:gameId', async (req, res) => {
 
             if (html.includes('</head>') && platform === 'session') {
                 // Inject bridge early so it's ready before game code runs
-                modifiedHtml = html.replace('</head>', snippet + '</head>');
+                modifiedHtml = html.replace('</head>', () => snippet + '</head>');
             } else if (html.includes('</body>')) {
-                modifiedHtml = html.replace('</body>', snippet + '</body>');
+                modifiedHtml = html.replace('</body>', () => snippet + '</body>');
             } else if (html.includes('</html>')) {
-                modifiedHtml = html.replace('</html>', snippet + '</html>');
+                modifiedHtml = html.replace('</html>', () => snippet + '</html>');
             } else {
                 modifiedHtml = html + snippet;
             }

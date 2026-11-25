@@ -293,20 +293,18 @@ router.post('/send-notifications', requireNotificationAdmin, async (req, res) =>
             });
         }
 
-        try {
-            await supabase
-                .from('notification_logs')
-                .insert({
-                    title,
-                    message: body,
-                    sent_count: response.successCount,
-                    failed_count: response.failureCount,
-                    total_tokens: tokens.length,
-                    created_at: new Date().toISOString()
-                });
-        } catch (logError) {
-            console.error('⚠️ Failed to log notification:', logError);
-        }
+        const { error: logError } = await supabase
+            .from('notification_logs')
+            .insert({
+                notification_type: 'broadcast',
+                title,
+                body,
+                success: response.successCount > 0,
+                data: { targeted: tokens.length },
+                fcm_response: { sent: response.successCount, failed: response.failureCount },
+                sent_at: new Date().toISOString()
+            });
+        if (logError) console.error('⚠️ Failed to log notification:', logError.message);
 
         res.status(200).json({
             success: true,

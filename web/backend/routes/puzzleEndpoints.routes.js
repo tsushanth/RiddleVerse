@@ -238,7 +238,7 @@ router.post("/batch-fetch-puzzles", async (req, res) => {
 
             if (!puzzleError && allPuzzles) {
                 puzzleDataMap = allPuzzles.reduce((map, puzzle) => {
-                    map[puzzle.puzzleid] = puzzle;
+                    map[puzzle.puzzleid] = { ...puzzle, source: publicUserId(puzzle.source) };
                     return map;
                 }, {});
             }
@@ -584,7 +584,8 @@ router.get('/list-custom-puzzles', async (req, res) => {
 /**
  * Get puzzle leaderboard
  */
-router.get('/get-puzzle-leaderboard/:puzzleId', async (req, res) => {
+// /api/puzzle-leaderboard/:puzzleId is what the daily completion screen of the Android app requests.
+router.get(['/get-puzzle-leaderboard/:puzzleId', '/puzzle-leaderboard/:puzzleId'], async (req, res) => {
     try {
         const { puzzleId } = req.params;
         const { userId } = req.query;

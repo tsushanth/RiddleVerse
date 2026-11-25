@@ -74,6 +74,9 @@ import { registerFcmTokenHandler } from './routes/dailyPuzzles.routes.js';
 import { fcmTokenRegisterLimiter } from './config/middleware.js';
 import { createPlayPagesRouter } from './services/playPages.js';
 import { createPageHitRecorder } from './services/pageHits.js';
+import { createMissingApiRouter } from './middleware/missingApi.js';
+import { jsLiteral } from './utils/jsLiteral.js';
+import { publicUserId } from './utils/publicIdentity.js';
 import { contentLanguageMiddleware } from './utils/contentLanguage.js';
 import { createLimiter as createHitLimiter } from './services/puzzleMonitoring.js';
 
@@ -568,14 +571,15 @@ app.get('/play/:gameId', async (req, res) => {
 
         // Inject minimal score bridge in <head> — non-destructive, doesn't override game code
         const headScript = `<script>
-window.__VB_GAME_ID='${gameId}';window.__VB_USER_ID='${userId}';window.__VB_CREATOR_ID='${creatorId}';window.__VB_ENDED=false;
+window.__VB_GAME_ID=${jsLiteral(gameId)};window.__VB_USER_ID=${jsLiteral(userId)};window.__VB_CREATOR_ID=${jsLiteral(publicUserId(creatorId))};window.__VB_ENDED=false;
 window.AndroidBridge={postScore:function(){},gameOver:function(s){if(!window.__VB_ENDED){window.__VB_ENDED=true;window.__VB_SUBMIT(s)}},reportError:function(){}};
 window.webkit=window.webkit||{};window.webkit.messageHandlers=window.webkit.messageHandlers||{};
 window.webkit.messageHandlers.gameScore={postMessage:function(d){if(d.gameOver&&!window.__VB_ENDED){window.__VB_ENDED=true;window.__VB_SUBMIT(d.score)}}};
 window.__VB_SUBMIT=function(score){
 fetch('/api/game-score/'+window.__VB_GAME_ID,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:window.__VB_USER_ID,score:score})}).catch(function(){});
 setTimeout(function(){
-  var dl='riddleverse://game-complete?gameId='+window.__VB_GAME_ID+'&score='+score+'&userId='+window.__VB_USER_ID+'&creatorId='+window.__VB_CREATOR_ID;
+  var q=encodeURIComponent;
+  var dl='riddleverse://game-complete?gameId='+q(window.__VB_GAME_ID)+'&score='+q(score)+'&userId='+q(window.__VB_USER_ID)+'&creatorId='+q(window.__VB_CREATOR_ID);
   var o=document.createElement('div');
   o.id='__vb_game_over';
   o.style.cssText='position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.75);font-family:system-ui';
@@ -594,9 +598,9 @@ setTimeout(function(){
 
         // Inject in <head> so bridges exist before game code runs
         if (html.includes('</head>')) {
-            html = html.replace('</head>', headScript + '</head>');
+            html = html.replace('</head>', () => headScript + '</head>');
         } else if (html.includes('<body')) {
-            html = html.replace('<body', headScript + '<body');
+            html = html.replace('<body', () => headScript + '<body');
         } else {
             html = headScript + html;
         }
@@ -636,6 +640,9 @@ app.post('/api/game-score/:gameId', writeRateLimit, async (req, res) => {
         res.json({ success: true }); // Don't fail the game over a score submission error
     }
 });
+
+// Paths the apps call that do not exist, and every unknown /api path: a JSON error instead of 200 + the web page.
+app.use(createMissingApiRouter());
 
 // Catch-all for SPA
 app.get("*", (req, res) => {

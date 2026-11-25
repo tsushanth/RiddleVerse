@@ -2980,7 +2980,7 @@ function buildOldPuzzleFormat(puzzle) {
         answer: puzzle.answer,     
         hint: puzzle.hint || "",
         difficulty: puzzle.difficulty,
-        generatedBy: puzzle.source || "",
+        generatedBy: publicUserId(puzzle.source) || "",
         validatedBy: "",
         timestamp: puzzle.timestamp,
         options: puzzle.options || [],
@@ -3580,6 +3580,8 @@ export async function getPuzzleLeaderboard(puzzleId, userId = null) {
             playerName: publicName(displayNameMap[entry.userid] || maskEmail(entry.userid)),
             userId: publicUserId(entry.userid), // uids pass through so clients can match the current user
             score: entry.score,
+            timeTaken: entry.timetaken, // the names the Android model reads
+            badgeIcon: ['🥇', '🥈', '🥉'][index] || '🏆',
             completionTime: entry.timetaken,
             formattedTime: formatTime(entry.timetaken)
         }));
@@ -3610,6 +3612,7 @@ export async function getPuzzleLeaderboard(puzzleId, userId = null) {
         
         const statistics = {
             totalPlayers: leaderboardData.length,
+            totalCompletions: leaderboardData.length,
             highestScore: Math.max(...scores),
             lowestScore: Math.min(...scores),
             averageScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
