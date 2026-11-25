@@ -41,11 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
@@ -76,11 +77,16 @@ fun LeaderboardScreen() {
     LaunchedEffect(Unit) {
         coroutineScope.launch(Dispatchers.IO) {
             try {
-                val request = Request.Builder()
+                val requestBuilder = Request.Builder()
                     .url("https://puzzleverseai.com/leaderboard")
-                    .build()
+                // Signed-in players send their token so the server can mark their own row.
+                FirebaseAuth.getInstance().currentUser?.let { user ->
+                    runCatching { Tasks.await(user.getIdToken(false), 10, TimeUnit.SECONDS).token }.getOrNull()
+                        ?.let { requestBuilder.header("Authorization", "Bearer $it") }
+                }
+                val request = requestBuilder.build()
 
-                val client = OkHttpClient()
+                val client = FailureReporterInterceptor.newClient()
                 val response = client.newCall(request).execute()
                 val responseBody = response.body?.string()
 
@@ -98,16 +104,13 @@ fun LeaderboardScreen() {
                 val leaderboardArray = root.optJSONArray("leaderboard") ?: JSONArray()
                 val fetchedUsers = mutableListOf<User>()
 
-                val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email
                 for (i in 0 until leaderboardArray.length()) {
                     val obj = leaderboardArray.getJSONObject(i)
-                    // Use masked name from backend for privacy, compare userId for highlighting current user
-                    val userId = obj.optString("userId", "")
                     fetchedUsers.add(
                         User(
                             name = obj.optString("name", context.getString(R.string.done_unknown_creator_label)),
                             score = context.getString(R.string.stats_score_pts, obj.optInt("score", 0)),
-                            isHighlighted = userId == currentUserEmail,
+                            isHighlighted = obj.optBoolean("isCurrentUser", false),
                             avatarNumber = (1..9).random()
                         )
                     )

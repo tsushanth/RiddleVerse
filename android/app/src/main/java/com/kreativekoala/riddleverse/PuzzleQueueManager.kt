@@ -69,6 +69,7 @@ class PuzzleQueueManager private constructor(internal val context: Context) {
         .connectTimeout(10, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(ContentLanguage.interceptor)
+        .addInterceptor(FailureReporterInterceptor())
         .build()
 
     private val mediaCache by lazy { MediaCacheManager.getInstance(context) }

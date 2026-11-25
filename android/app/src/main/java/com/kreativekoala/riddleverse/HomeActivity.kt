@@ -522,9 +522,6 @@ fun HomeScreen(navController: NavHostController,
                     onNavigateToLeaderboard = {
                         context.startActivity(Intent(context, LeaderboardActivity::class.java))
                     },
-                    onNavigateToTopics = {
-                        context.startActivity(Intent(context, PreferredTopicsActivity::class.java))
-                    },
                     onNavigateToAchievements = {
                         context.startActivity(Intent(context, TierProgressDashboardActivity::class.java))
                     },
@@ -1617,7 +1614,6 @@ fun SubscriptionSection() {
 @Composable
 fun SettingsTab(
     onNavigateToLeaderboard: () -> Unit,
-    onNavigateToTopics: () -> Unit,
     onNavigateToAchievements: () -> Unit,
     onSignOut: () -> Unit,
     onSignIn: () -> Unit,
@@ -1671,7 +1667,6 @@ fun SettingsTab(
             item {
                 AppFeaturesSection(
                     onNavigateToLeaderboard = onNavigateToLeaderboard,
-                    onNavigateToTopics = onNavigateToTopics,
                     onNavigateToAchievements = onNavigateToAchievements
                 )
             }
@@ -2404,7 +2399,6 @@ fun PayoutDialog(onDismiss: () -> Unit) {
 @Composable
 fun AppFeaturesSection(
     onNavigateToLeaderboard: () -> Unit,
-    onNavigateToTopics: () -> Unit,
     onNavigateToAchievements: () -> Unit
 ) {
     SettingsSection(title = stringResource(R.string.home_app_features_title)) {
@@ -2414,15 +2408,6 @@ fun AppFeaturesSection(
                 title = stringResource(R.string.leaderboard),
                 subtitle = stringResource(R.string.home_leaderboard_row_subtitle),
                 onClick = onNavigateToLeaderboard
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(start = 50.dp))
-
-            SettingsRow(
-                icon = Icons.Default.Tag,
-                title = stringResource(R.string.preferred_topics),
-                subtitle = stringResource(R.string.home_topics_row_subtitle),
-                onClick = onNavigateToTopics
             )
 
             HorizontalDivider(modifier = Modifier.padding(start = 50.dp))
@@ -2831,7 +2816,7 @@ fun UserScoreView() {
                 val encodedUserId = URLEncoder.encode(userId, "UTF-8")
                 val url = "https://puzzleverseai.com/get-score?userId=$encodedUserId"
                 val request = Request.Builder().url(url).build()
-                val client = OkHttpClient()
+                val client = FailureReporterInterceptor.newClient()
 
                 try {
                     val response = client.newCall(request).execute()
@@ -3035,7 +3020,7 @@ fun fetchCustomPuzzleDetail(
     val TAG = "FetchCustomPuzzle"
     val url = "https://puzzleverseai.com/fetch-custom-puzzle?puzzleId=$puzzleId"
     val request = Request.Builder().url(url).build()
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
 
     Log.d(TAG, "📡 Sending request to: $url")
 
@@ -3134,7 +3119,7 @@ fun fetchCustomPuzzles(
     }
 
     val request = Request.Builder().url(url).build()
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {

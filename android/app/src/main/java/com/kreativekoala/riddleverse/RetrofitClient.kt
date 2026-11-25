@@ -23,6 +23,7 @@ object HttpClientProvider {
             .writeTimeout(30, TimeUnit.SECONDS)
             .retryOnConnectionFailure(true)
             .addInterceptor(ContentLanguage.interceptor) // the app language, for everything the server generates
+            .addInterceptor(FailureReporterInterceptor()) // backend 5xx -> app-failure-reporter
             .build()
     }
 }

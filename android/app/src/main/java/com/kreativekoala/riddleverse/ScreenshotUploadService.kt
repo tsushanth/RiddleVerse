@@ -21,7 +21,7 @@ sealed class UploadResult {
 }
 
 class ScreenshotUploadService {
-    private val client = OkHttpClient()
+    private val client = FailureReporterInterceptor.newClient()
     private val baseUrl = "https://puzzleverseai.com/api/games"
 
     suspend fun uploadScreenshot(imageUri: Uri, context: Context): UploadResult {

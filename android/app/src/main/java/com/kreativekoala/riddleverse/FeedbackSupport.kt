@@ -38,7 +38,7 @@ fun submitFeedbackToServer(
     }
 
     val url = "https://puzzleverseai.com/submit-feedback"
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
 
     try {
         val appVersion = try {

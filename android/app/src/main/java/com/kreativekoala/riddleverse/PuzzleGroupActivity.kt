@@ -626,7 +626,7 @@ fun fetchGroupCompletionStatus(
 ) {
     val encodedUserId = URLEncoder.encode(userId, "UTF-8")
     val url = "https://puzzleverseai.com/group-completion-status?userId=$encodedUserId&groupId=$groupId"
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
     val request = Request.Builder().url(url).build()
 
     client.newCall(request).enqueue(object : Callback {

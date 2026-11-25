@@ -756,7 +756,7 @@ fun sharePuzzle(puzzleId: String, recipientEmail: String, recipientName: String,
         .post(RequestBody.create("application/json".toMediaTypeOrNull(), json.toString()))
         .build()
 
-    OkHttpClient().newCall(request).enqueue(object : Callback {
+    FailureReporterInterceptor.newClient().newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {
             Log.e("SharePuzzle", "❌ Failed to share puzzle", e)
         }

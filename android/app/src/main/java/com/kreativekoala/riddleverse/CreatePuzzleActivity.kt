@@ -1386,7 +1386,7 @@ class CreatePuzzleActivity : AppCompatActivity() {
 
         // The screen stays open (button shows "Creating...") until the server answers or 10s pass.
         val appContext = applicationContext
-        val client = OkHttpClient.Builder().callTimeout(10, java.util.concurrent.TimeUnit.SECONDS).addInterceptor(ContentLanguage.interceptor).build()
+        val client = OkHttpClient.Builder().callTimeout(10, java.util.concurrent.TimeUnit.SECONDS).addInterceptor(ContentLanguage.interceptor).addInterceptor(FailureReporterInterceptor()).build()
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 Log.w("CreatePuzzle", "generate-riddle failed: ${e.javaClass.simpleName}: ${e.message}")
