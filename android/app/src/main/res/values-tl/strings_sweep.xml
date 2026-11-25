@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Hindi available ang produkto</string>
     <string name="create_purchase_failed">Nabigo ang pagbili: %1$s</string>
     <string name="create_coins_added">Naidagdag na ang mga barya!</string>
+    <string name="create_coins_pending">Hindi pa nakukumpirma ang iyong binili. Awtomatikong idadagdag ang iyong mga coin.</string>
     <string name="create_format_qa">Format na Tanong at Sagot</string>
     <string name="create_format_anagrams">Mga Anagram</string>
     <string name="create_generate_crossword">Gumawa ng Crossword</string>

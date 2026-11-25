@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">A termék nem érhető el</string>
     <string name="create_purchase_failed">A vásárlás nem sikerült: %1$s</string>
     <string name="create_coins_added">Érmék hozzáadva!</string>
+    <string name="create_coins_pending">A vásárlásodat még nem erősítettük meg. Az érméid automatikusan jóváíródnak.</string>
     <string name="create_format_qa">Kérdés/válasz formátum</string>
     <string name="create_format_anagrams">Anagrammák</string>
     <string name="create_generate_crossword">Keresztrejtvény létrehozása</string>

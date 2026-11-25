@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">Produk tidak tersedia</string>
     <string name="create_purchase_failed">Pembelian gagal: %1$s</string>
     <string name="create_coins_added">Koin ditambahkan!</string>
+    <string name="create_coins_pending">Pembelian Anda belum dikonfirmasi. Koin Anda akan ditambahkan secara otomatis.</string>
     <string name="create_format_qa">Format T/J</string>
     <string name="create_format_anagrams">Anagram</string>
     <string name="create_generate_crossword">Buat Teka-teki Silang</string>

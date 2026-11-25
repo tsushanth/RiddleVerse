@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">商品不可用</string>
     <string name="create_purchase_failed">購買失敗：%1$s</string>
     <string name="create_coins_added">金幣已到帳！</string>
+    <string name="create_coins_pending">尚未確認你的購買。金幣會自動新增。</string>
     <string name="create_format_qa">問答格式</string>
     <string name="create_format_anagrams">字母重組</string>
     <string name="create_generate_crossword">生成填字遊戲</string>

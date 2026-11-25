@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">ไม่มีสินค้านี้</string>
     <string name="create_purchase_failed">ซื้อไม่สำเร็จ: %1$s</string>
     <string name="create_coins_added">เพิ่มเหรียญแล้ว!</string>
+    <string name="create_coins_pending">ยังไม่ได้ยืนยันการซื้อของคุณ เหรียญจะถูกเพิ่มให้โดยอัตโนมัติ</string>
     <string name="create_format_qa">รูปแบบถามตอบ</string>
     <string name="create_format_anagrams">อนาแกรม</string>
     <string name="create_generate_crossword">สร้างอักษรไขว้</string>

@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">商品を利用できません</string>
     <string name="create_purchase_failed">購入に失敗しました：%1$s</string>
     <string name="create_coins_added">コインを追加しました！</string>
+    <string name="create_coins_pending">購入はまだ確認できていません。コインは自動的に追加されます。</string>
     <string name="create_format_qa">Q/A形式</string>
     <string name="create_format_anagrams">アナグラム</string>
     <string name="create_generate_crossword">クロスワードを生成</string>

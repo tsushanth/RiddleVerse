@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Ürün kullanılamıyor</string>
     <string name="create_purchase_failed">Satın alma başarısız: %1$s</string>
     <string name="create_coins_added">Jetonlar eklendi!</string>
+    <string name="create_coins_pending">Satın alma işleminiz henüz onaylanmadı. Jetonlarınız otomatik olarak eklenecek.</string>
     <string name="create_format_qa">Soru/Cevap Biçimi</string>
     <string name="create_format_anagrams">Anagramlar</string>
     <string name="create_generate_crossword">Çapraz Bulmaca Oluştur</string>

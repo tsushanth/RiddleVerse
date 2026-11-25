@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">उत्पाद उपलब्ध नहीं है</string>
     <string name="create_purchase_failed">खरीदारी विफल रही: %1$s</string>
     <string name="create_coins_added">सिक्के जुड़ गए!</string>
+    <string name="create_coins_pending">आपकी ख़रीदारी की अभी पुष्टि नहीं हुई है। आपके सिक्के अपने आप जोड़ दिए जाएँगे।</string>
     <string name="create_format_qa">प्रश्न/उत्तर प्रारूप</string>
     <string name="create_format_anagrams">अनाग्राम</string>
     <string name="create_generate_crossword">क्रॉसवर्ड बनाएँ</string>

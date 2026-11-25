@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">پروڈکٹ دستیاب نہیں ہے</string>
     <string name="create_purchase_failed">خریداری ناکام ہو گئی: %1$s</string>
     <string name="create_coins_added">سکے شامل ہو گئے!</string>
+    <string name="create_coins_pending">آپ کی خریداری کی ابھی تصدیق نہیں ہوئی۔ آپ کے سکے خود بخود شامل کر دیے جائیں گے۔</string>
     <string name="create_format_qa">سوال و جواب کی شکل</string>
     <string name="create_format_anagrams">انگرامز</string>
     <string name="create_generate_crossword">کراس ورڈ تیار کریں</string>

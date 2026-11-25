@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">محصول در دسترس نیست</string>
     <string name="create_purchase_failed">خرید ناموفق بود: %1$s</string>
     <string name="create_coins_added">سکه‌ها افزوده شد!</string>
+    <string name="create_coins_pending">خرید شما هنوز تأیید نشده است. سکه‌های شما به‌طور خودکار اضافه می‌شوند.</string>
     <string name="create_format_qa">قالب پرسش و پاسخ</string>
     <string name="create_format_anagrams">جابه‌جایی حروف</string>
     <string name="create_generate_crossword">ساخت جدول کلمات متقاطع</string>

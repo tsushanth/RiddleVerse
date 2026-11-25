@@ -798,6 +798,7 @@
     <string name="create_product_unavailable">Produkt není k dispozici</string>
     <string name="create_purchase_failed">Nákup se nezdařil: %1$s</string>
     <string name="create_coins_added">Mince přidány!</string>
+    <string name="create_coins_pending">Váš nákup zatím nebyl potvrzen. Mince budou přidány automaticky.</string>
     <string name="create_format_qa">Formát otázek a odpovědí</string>
     <string name="create_format_anagrams">Anagramy</string>
     <string name="create_generate_crossword">Vytvořit křížovku</string>

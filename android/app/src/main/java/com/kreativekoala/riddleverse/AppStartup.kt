@@ -92,6 +92,10 @@ object AppStartup {
             // Main will touch FirebaseAuth in the first screen (signed-in check): build it here, in parallel with the
             // activity start, instead of on the main thread.
             safely("FirebaseAuth warm-up") { com.google.firebase.auth.FirebaseAuth.getInstance() }
+            // Runs now if signed in, and again after a sign-in: sends purchases the server has not credited yet.
+            safely("purchase sync") {
+                com.google.firebase.auth.FirebaseAuth.getInstance().addAuthStateListener { PlayPurchaseSync.sync(application) }
+            }
             ratingKit.ensure()
             experimentManager.ensure()
             // Home's SharedPreferences files and the puzzle queue (a JSON parse in its constructor): load them here so the

@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Produkt nicht verfügbar</string>
     <string name="create_purchase_failed">Kauf fehlgeschlagen: %1$s</string>
     <string name="create_coins_added">Münzen hinzugefügt!</string>
+    <string name="create_coins_pending">Dein Kauf wurde noch nicht bestätigt. Deine Münzen werden automatisch gutgeschrieben.</string>
     <string name="create_format_qa">Frage-Antwort-Format</string>
     <string name="create_format_anagrams">Anagramme</string>
     <string name="create_generate_crossword">Kreuzworträtsel generieren</string>

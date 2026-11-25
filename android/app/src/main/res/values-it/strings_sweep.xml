@@ -778,6 +778,7 @@
     <string name="create_product_unavailable">Prodotto non disponibile</string>
     <string name="create_purchase_failed">Acquisto non riuscito: %1$s</string>
     <string name="create_coins_added">Monete aggiunte!</string>
+    <string name="create_coins_pending">Il tuo acquisto non è ancora stato confermato. Le monete verranno aggiunte automaticamente.</string>
     <string name="create_format_qa">Formato D/R</string>
     <string name="create_format_anagrams">Anagrammi</string>
     <string name="create_generate_crossword">Genera cruciverba</string>

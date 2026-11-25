@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">Produk tidak tersedia</string>
     <string name="create_purchase_failed">Pembelian gagal: %1$s</string>
     <string name="create_coins_added">Syiling ditambah!</string>
+    <string name="create_coins_pending">Pembelian anda belum disahkan. Syiling anda akan ditambah secara automatik.</string>
     <string name="create_format_qa">Format S/J</string>
     <string name="create_format_anagrams">Anagram</string>
     <string name="create_generate_crossword">Jana Silang Kata</string>

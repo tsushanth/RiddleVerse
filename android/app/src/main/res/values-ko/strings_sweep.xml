@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">상품을 사용할 수 없습니다</string>
     <string name="create_purchase_failed">구매 실패: %1$s</string>
     <string name="create_coins_added">코인이 추가되었습니다!</string>
+    <string name="create_coins_pending">구매가 아직 확인되지 않았습니다. 코인은 자동으로 추가됩니다.</string>
     <string name="create_format_qa">Q/A 형식</string>
     <string name="create_format_anagrams">애너그램</string>
     <string name="create_generate_crossword">크로스워드 생성</string>

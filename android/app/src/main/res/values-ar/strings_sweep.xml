@@ -838,6 +838,7 @@
     <string name="create_product_unavailable">المنتج غير متاح</string>
     <string name="create_purchase_failed">فشلت عملية الشراء: %1$s</string>
     <string name="create_coins_added">تمت إضافة العملات!</string>
+    <string name="create_coins_pending">لم نتمكن من تأكيد عملية الشراء بعد. ستتم إضافة عملاتك تلقائيًا.</string>
     <string name="create_format_qa">تنسيق سؤال/جواب</string>
     <string name="create_format_anagrams">تبديل الحروف</string>
     <string name="create_generate_crossword">إنشاء كلمات متقاطعة</string>

@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Tuote ei ole saatavilla</string>
     <string name="create_purchase_failed">Osto epäonnistui: %1$s</string>
     <string name="create_coins_added">Kolikot lisätty!</string>
+    <string name="create_coins_pending">Ostostasi ei ole vielä vahvistettu. Kolikot lisätään automaattisesti.</string>
     <string name="create_format_qa">Kysymys/vastaus-muoto</string>
     <string name="create_format_anagrams">Anagrammit</string>
     <string name="create_generate_crossword">Luo ristikko</string>

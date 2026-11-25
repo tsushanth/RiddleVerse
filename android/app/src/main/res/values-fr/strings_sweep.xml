@@ -778,6 +778,7 @@
     <string name="create_product_unavailable">Produit indisponible</string>
     <string name="create_purchase_failed">Échec de l\'achat : %1$s</string>
     <string name="create_coins_added">Pièces ajoutées !</string>
+    <string name="create_coins_pending">Votre achat n’est pas encore confirmé. Vos pièces seront ajoutées automatiquement.</string>
     <string name="create_format_qa">Format Q/R</string>
     <string name="create_format_anagrams">Anagrammes</string>
     <string name="create_generate_crossword">Générer des mots croisés</string>

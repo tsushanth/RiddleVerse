@@ -778,6 +778,7 @@
     <string name="create_product_unavailable">Produsul nu este disponibil</string>
     <string name="create_purchase_failed">Achiziția a eșuat: %1$s</string>
     <string name="create_coins_added">Monede adăugate!</string>
+    <string name="create_coins_pending">Achiziția ta nu a fost confirmată încă. Monedele vor fi adăugate automat.</string>
     <string name="create_format_qa">Format întrebare/răspuns</string>
     <string name="create_format_anagrams">Anagrame</string>
     <string name="create_generate_crossword">Generează cuvinte încrucișate</string>

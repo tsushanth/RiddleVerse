@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Product niet beschikbaar</string>
     <string name="create_purchase_failed">Aankoop mislukt: %1$s</string>
     <string name="create_coins_added">Munten toegevoegd!</string>
+    <string name="create_coins_pending">Je aankoop is nog niet bevestigd. Je munten worden automatisch toegevoegd.</string>
     <string name="create_format_qa">Vraag-en-antwoordformaat</string>
     <string name="create_format_anagrams">Anagrammen</string>
     <string name="create_generate_crossword">Kruiswoordpuzzel genereren</string>

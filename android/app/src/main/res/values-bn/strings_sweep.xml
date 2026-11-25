@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">পণ্যটি উপলব্ধ নয়</string>
     <string name="create_purchase_failed">ক্রয় ব্যর্থ হয়েছে: %1$s</string>
     <string name="create_coins_added">কয়েন যোগ হয়েছে!</string>
+    <string name="create_coins_pending">আপনার কেনাকাটা এখনও নিশ্চিত হয়নি। আপনার কয়েন স্বয়ংক্রিয়ভাবে যোগ করা হবে।</string>
     <string name="create_format_qa">প্রশ্ন/উত্তর ফরম্যাট</string>
     <string name="create_format_anagrams">অ্যানাগ্রাম</string>
     <string name="create_generate_crossword">ক্রসওয়ার্ড তৈরি করুন</string>
