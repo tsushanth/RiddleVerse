@@ -7,6 +7,7 @@ import { notificationService } from '../services/notificationService.js';
 import { sendMulticastNotification, listUserDailyTopics } from '../services/dailyPuzzleService.js';
 import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware/notificationAuth.js';
 import { verifiedCaller } from '../middleware/callerIdentity.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 // POST /test-notification is called by the shipped mobile apps (their "Test Notification" button) without credentials, so it
 // cannot require the admin key. Without the key it is limited: fixed text (no caller-chosen title/body) and a small per-account cap.
@@ -127,7 +128,7 @@ router.post('/configs', requireNotificationAdmin, notificationLimiter, async (re
 /**
  * Get notification stats
  */
-router.get('/stats', notificationLimiter, async (req, res) => {
+router.get('/stats', notificationLimiter, requireAdminKey, async (req, res) => {
     try {
         const { configId, days = 30 } = req.query;
 

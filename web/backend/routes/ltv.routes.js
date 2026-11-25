@@ -575,7 +575,7 @@ router.post('/generate-audiences', adminLimiter, validateAdmin, async (req, res)
 });
 
 // Get audience summary
-router.get('/audiences', publicLimiter, async (req, res) => {
+router.get('/audiences', publicLimiter, requireAdminKey, async (req, res) => {
     try {
         // Get latest summary from Supabase
         const { data: summary, error } = await supabase

@@ -231,6 +231,15 @@ export function createPurchaseHandler(deps = {}) {
 
 export const purchaseCoins = createPurchaseHandler();
 
+/** The creator the 55% share may go to: the one named by the client only if the game really is theirs. */
+export async function shareRecipient(db, { userId, gameId, creatorId }) {
+    // A creator's own spend never earns them a share (stops mint-and-recycle through their own game).
+    if (!creatorId || !gameId || creatorId === userId) return null;
+    const { data, error } = await db.from('custom_games').select('creator_id').eq('id', gameId).maybeSingle();
+    if (error || !data || data.creator_id !== creatorId) return null;
+    return creatorId;
+}
+
 /**
  * Spend coins (e.g. continue playing)
  */
@@ -242,13 +251,22 @@ export async function spendCoins(req, res) {
             return res.status(400).json({ error: 'userId and reason are required' });
         }
 
+        // Shipped apps send no credential, so a token is optional; when one is sent it must belong to userId.
+        // COIN_SPEND_REQUIRE_AUTH=true makes it mandatory once the apps send it.
+        const hasAuth = typeof req.headers?.authorization === 'string' && req.headers.authorization.startsWith('Bearer ');
+        if (hasAuth) {
+            const caller = await verifiedCaller(req);
+            if (!caller) return res.status(401).json({ error: 'Invalid or expired credentials' });
+            if (caller.uid !== userId) return res.status(403).json({ error: 'Credentials do not match userId' });
+        } else if (String(process.env.COIN_SPEND_REQUIRE_AUTH || '').toLowerCase() === 'true') {
+            return res.status(401).json({ error: 'Authentication required' });
+        }
+
         // Determine cost based on reason
         let amount;
         // Creator gets their share on replay, customize, and harder_challenge
         // Owner customizing their own game should not send creatorId from the client
-        let effectiveCreatorId = creatorId || null;
-        // A creator's own spend never earns them a share (stops mint-and-recycle through their own game).
-        if (effectiveCreatorId && effectiveCreatorId === userId) effectiveCreatorId = null;
+        const effectiveCreatorId = await shareRecipient(supabase, { userId, gameId, creatorId });
 
         if (reason === 'harder_challenge') {
             if (!difficultyLevel || difficultyLevel < 2 || difficultyLevel > MAX_DIFFICULTY_LEVEL) {

@@ -7,6 +7,7 @@ import {
     cancelSubscription,
     getSubscriptionMetrics
 } from '../services/subscription-purchase.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -27,21 +28,21 @@ router.get('/subscription-status', async (req, res) => {
 /**
  * Sync subscription status from app
  */
-router.post('/sync-subscription-status', async (req, res) => {
+router.post('/sync-subscription-status', requireAdminKey, async (req, res) => {
     await syncSubscriptionStatus(req, res);
 });
 
 /**
  * Cancel subscription
  */
-router.post('/subscription-cancel', async (req, res) => {
+router.post('/subscription-cancel', requireAdminKey, async (req, res) => {
     await cancelSubscription(req, res);
 });
 
 /**
  * Get subscription metrics (admin endpoint)
  */
-router.get('/subscription-metrics', async (req, res) => {
+router.get('/subscription-metrics', requireAdminKey, async (req, res) => {
     await getSubscriptionMetrics(req, res);
 });
 

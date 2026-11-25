@@ -805,37 +805,24 @@ router.get("/health", async (req, res) => {
     }
 });
 
+/** 401 unless the scheduler secret (when one is configured) or the admin key is presented. */
+function requireSchedulerOrAdmin(req, res, next) {
+    const secret = process.env.SCHEDULER_SECRET;
+    if (secret && isAdminKey(req.headers['x-scheduler-secret'], secret)) return next();
+    if (isAdminKey(req.headers['x-admin-key'])) return next();
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+}
+
 // ============================================================================
 // CLOUD SCHEDULER ENDPOINTS (for Google Cloud Scheduler)
 // ============================================================================
 
 /**
  * Trigger daily puzzle cache refresh
- * This endpoint is designed to be called by Google Cloud Scheduler
- * It validates the request using a secret token in the header
+ * For an external scheduler: x-scheduler-secret (SCHEDULER_SECRET) or the admin key. The app's own cron does the daily work.
  */
-router.post("/scheduler/trigger-daily-refresh", async (req, res) => {
+router.post("/scheduler/trigger-daily-refresh", requireSchedulerOrAdmin, async (req, res) => {
     const startTime = Date.now();
-
-    // Validate scheduler secret (set this in Cloud Scheduler job headers)
-    const schedulerSecret = req.headers['x-scheduler-secret'];
-    const expectedSecret = process.env.SCHEDULER_SECRET;
-
-    if (!expectedSecret) {
-        console.error('[SCHEDULER-ENDPOINT] SCHEDULER_SECRET env var not configured');
-        return res.status(500).json({
-            success: false,
-            error: 'Scheduler not configured'
-        });
-    }
-
-    if (schedulerSecret !== expectedSecret) {
-        console.warn('[SCHEDULER-ENDPOINT] Invalid scheduler secret');
-        return res.status(403).json({
-            success: false,
-            error: 'Invalid scheduler secret'
-        });
-    }
 
     try {
         console.log('[SCHEDULER-ENDPOINT] Daily refresh triggered by Cloud Scheduler');
@@ -872,14 +859,7 @@ router.post("/scheduler/trigger-daily-refresh", async (req, res) => {
 /**
  * Trigger health check (can be used for monitoring)
  */
-router.post("/scheduler/trigger-health-check", async (req, res) => {
-    const schedulerSecret = req.headers['x-scheduler-secret'];
-    const expectedSecret = process.env.SCHEDULER_SECRET;
-
-    if (!expectedSecret || schedulerSecret !== expectedSecret) {
-        return res.status(403).json({ success: false, error: 'Invalid scheduler secret' });
-    }
-
+router.post("/scheduler/trigger-health-check", requireSchedulerOrAdmin, async (req, res) => {
     try {
         await cacheScheduler.performHealthCheck();
         res.json({

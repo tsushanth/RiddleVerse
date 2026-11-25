@@ -1,5 +1,6 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -155,7 +156,7 @@ function getDefaultConfig(userId, email) {
  *
  * Body: { userId, email, timestamp }
  */
-router.post('/trial-prompt-shown', async (req, res) => {
+router.post('/trial-prompt-shown', requireAdminKey, async (req, res) => {
   try {
     const { userId, email, timestamp } = req.body;
 

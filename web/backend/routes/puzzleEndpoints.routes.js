@@ -23,6 +23,7 @@ import {
 import { getNextDailyPuzzle, hasDailyPuzzles, dailyContentLanguage } from '../services/dailyPuzzles.js';
 import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 import { publicUserId } from '../utils/publicIdentity.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -408,7 +409,7 @@ router.post("/check-answer", async (req, res) => {
 /**
  * Reset puzzle progress endpoints
  */
-router.get('/reset-puzzle-progress', (req, res) => {
+router.get('/reset-puzzle-progress', requireAdminKey, (req, res) => {
     req.body = {
         userId: req.query.userId,
         puzzleType: req.query.puzzleType,
@@ -723,7 +724,7 @@ router.post("/update-puzzle-leaderboard", async (req, res) => {
 /**
  * Delete puzzle leaderboard entry
  */
-router.post("/delete-puzzle-leaderboard-entry", async (req, res) => {
+router.post("/delete-puzzle-leaderboard-entry", requireAdminKey, async (req, res) => {
     try {
         const { puzzleId, userId } = req.body;
 

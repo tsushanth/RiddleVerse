@@ -11,6 +11,8 @@ import { buildGamePrompt, DEFAULT_LANGUAGE } from '../utils/contentLanguage.js';
 import { pickSuggestions, normalizeSuggestionRows, buildReplenishPrompt, createReplenishGate } from '../services/gameSuggestions.js';
 import { publicUserId, publicName } from '../utils/publicIdentity.js';
 import { jsLiteral } from '../utils/jsLiteral.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
+import { archiveGame } from '../services/gameArchive.js';
 
 const router = express.Router();
 
@@ -2036,7 +2038,7 @@ router.get('/:gameId/versions', async (req, res) => {
 
 // POST /api/game-creation/:gameId/revert/:commitSha
 // Revert a game to a specific version (commit)
-router.post('/:gameId/revert/:commitSha', async (req, res) => {
+router.post('/:gameId/revert/:commitSha', requireAdminKey, async (req, res) => {
     try {
         const { gameId, commitSha } = req.params;
         const { userId } = req.body;
@@ -3436,6 +3438,10 @@ router.delete('/:gameId', async (req, res) => {
         if (game.creator_id !== userId) {
             return res.status(403).json({ error: 'Not authorized to delete this game', code: 'not_creator' });
         }
+
+        // Shipped apps send no credential here and creator ids are public, so every delete must be reversible: the game
+        // (and its difficulty variants, which the delete cascades to) is copied to deleted_games first. No copy, no delete.
+        await archiveGame(supabase, gameId, { verified: Boolean(req.gameCreationUid) });
 
         const { error: deleteError } = await supabase
             .from('custom_games')
