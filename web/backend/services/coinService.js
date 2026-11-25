@@ -1,7 +1,8 @@
 // coinService.js - Virtual currency service
 import { supabase } from '../config/database.js';
 import { getDifficultyCost, MAX_DIFFICULTY_LEVEL } from './difficultyService.js';
-import { getPlayPurchaseVerifier, PLAY_ORDER_ID_RE } from './playPurchaseVerifier.js';
+import { getPlayPurchaseVerifier, getPlayTokenVerifier, PLAY_ORDER_ID_RE } from './playPurchaseVerifier.js';
+import { claimToken, isPurchaseToken, tokenHash, UNAVAILABLE } from './playPurchases.js';
 import { readPolicy, createCounters, recentPurchases, logAnomaly } from './coinPurchasePolicy.js';
 import { verifiedCaller } from '../middleware/callerIdentity.js';
 
@@ -14,6 +15,8 @@ const COIN_PACKS = {
 const CONTINUE_COST = 10; // coins to continue playing after game over
 const CUSTOMIZE_COST = 10; // coins per game customization
 const CREATOR_SHARE_PCT = 55; // creator gets 55% of spent coins
+// Purchases sent with a token are credited from this date on; anything bought earlier needs a person to decide.
+const TOKEN_CREDIT_NOT_BEFORE = Date.parse('2026-11-25T00:00:00Z');
 const AWARD_REASONS = { app_rating_reward: 100 }; // reason -> the only amount POST /api/coins/award will grant
 
 /**
@@ -68,8 +71,11 @@ export async function getCoinBalance(req, res) {
  * (see services/playPurchaseVerifier.js and services/coinPurchasePolicy.js). The coin amount always comes from COIN_PACKS,
  * never from the request. Crediting is idempotent on the transaction id (add_purchased_coins).
  *
- * Shipped Android clients send no credential, so an Authorization header is optional: when present it must verify and match
- * userId; COIN_PURCHASE_REQUIRE_AUTH=true makes it mandatory once clients send it.
+ * A request with a purchaseToken must be signed in; the token is looked up at Play (services/playPurchases.js), bound to
+ * that account and credited under the order id Play returns, so the same order is never credited twice by either route.
+ *
+ * Android versions up to 188 send no token and no credential, so for them an Authorization header is optional: when present
+ * it must verify and match userId; COIN_PURCHASE_REQUIRE_AUTH=true makes it mandatory once clients send it.
  */
 export function createPurchaseHandler(deps = {}) {
     const d = {
@@ -77,6 +83,7 @@ export function createPurchaseHandler(deps = {}) {
         supabase,
         now: Date.now,
         verifier: null,
+        tokenVerifier: null,
         counters: null,
         verifyCaller: null,
         ...deps,
@@ -89,17 +96,17 @@ export function createPurchaseHandler(deps = {}) {
         try {
             const policy = readPolicy(d.env);
             const body = req.body && typeof req.body === 'object' ? req.body : {};
-            const { userId, productId, transactionId, platform } = body;
+            const { userId, productId, transactionId, platform, purchaseToken } = body;
+            const withToken = purchaseToken !== undefined && purchaseToken !== null && purchaseToken !== '';
             const ip = String(req.ip || req.socket?.remoteAddress || 'unknown');
 
-            if (!userId || !productId || !transactionId || !platform) {
+            if (!userId || !productId || !(transactionId || withToken) || !platform) {
                 return res.status(400).json({
                     error: 'userId, productId, transactionId, and platform are required'
                 });
             }
-            if (typeof userId !== 'string' || userId.length > 128 ||
-                typeof productId !== 'string' || typeof transactionId !== 'string' || transactionId.length > 128 ||
-                typeof platform !== 'string') {
+            if (typeof userId !== 'string' || userId.length > 128 || typeof productId !== 'string' || typeof platform !== 'string' ||
+                (withToken ? !isPurchaseToken(purchaseToken) : (typeof transactionId !== 'string' || transactionId.length > 128))) {
                 return res.status(400).json({ error: 'Invalid purchase fields' });
             }
 
@@ -125,7 +132,7 @@ export function createPurchaseHandler(deps = {}) {
                     logAnomaly('uid_mismatch', { userId });
                     return res.status(403).json({ error: 'Credentials do not match userId' });
                 }
-            } else if (String(d.env.COIN_PURCHASE_REQUIRE_AUTH || '').toLowerCase() === 'true') {
+            } else if (withToken || String(d.env.COIN_PURCHASE_REQUIRE_AUTH || '').toLowerCase() === 'true') {
                 return res.status(401).json({ error: 'Authentication required' });
             }
 
@@ -136,13 +143,39 @@ export function createPurchaseHandler(deps = {}) {
             }
             counters.recordIp(ip);
 
-            if (inflight.has(transactionId)) {
-                return res.status(409).json({ error: 'This purchase is already being processed' });
+            const claimKey = withToken ? tokenHash(purchaseToken) : transactionId;
+            if (inflight.has(claimKey)) {
+                return res.status(409).json({ error: 'This purchase is already being processed', retryable: true });
             }
-            inflight.add(transactionId);
-            lockKey = transactionId;
+            inflight.add(claimKey);
+            lockKey = claimKey;
 
-            if (policy.mode === 'enforce') {
+            // The id the ledger is unique on: the order id Play knows.
+            let creditId = transactionId;
+            if (withToken) {
+                // Always verified, whatever COIN_PURCHASE_VERIFY says.
+                const verifier = d.tokenVerifier || getPlayTokenVerifier();
+                if (!verifier.isConfigured()) {
+                    logAnomaly('verifier_not_configured', { productId, userId, token: true });
+                    return res.status(503).json(UNAVAILABLE);
+                }
+                const v = await verifier.getProduct(productId, purchaseToken);
+                if (!v.ok && v.code === 'unavailable') {
+                    logAnomaly('verifier_unavailable', { detail: v.detail, productId, userId, token: true });
+                    return res.status(503).json(UNAVAILABLE);
+                }
+                const p = v.ok ? v.data : null;
+                if (p?.purchaseState === 2) return res.status(202).json({ success: false, pending: true, retryable: true });
+                if (!p || p.purchaseState !== 0 || Number(p.quantity ?? 1) !== 1) {
+                    logAnomaly('purchase_not_verified', { code: v.ok ? 'state_or_quantity' : v.code, productId, userId, token: true, ip });
+                    return res.status(400).json({ success: false, error: 'purchase_not_verified', retryable: false });
+                }
+                if (!(Number(p.purchaseTimeMillis) >= TOKEN_CREDIT_NOT_BEFORE)) {
+                    logAnomaly('purchase_predates_token_crediting', { productId, userId });
+                    return res.status(400).json({ success: false, error: 'purchase_needs_review', retryable: false });
+                }
+                creditId = p.orderId || `play_${claimKey}`;
+            } else if (policy.mode === 'enforce') {
                 const verifier = d.verifier || getPlayPurchaseVerifier();
                 if (!verifier.isConfigured()) {
                     logAnomaly('verifier_not_configured', { productId, userId, authed: hasAuth });
@@ -165,6 +198,7 @@ export function createPurchaseHandler(deps = {}) {
                     logAnomaly('purchase_not_verified', { code: v.code, productId, userId, authed: hasAuth, ip });
                     return res.status(400).json({ error: 'purchase_not_verified' });
                 }
+                creditId = v.order?.orderId || transactionId;
             } else {
                 // interim: no receipt check; the shape check is the only validation of the id.
                 if (!PLAY_ORDER_ID_RE.test(transactionId)) {
@@ -188,14 +222,23 @@ export function createPurchaseHandler(deps = {}) {
                 return res.status(503).json({ error: 'purchase_verification_unavailable', retryable: true });
             }
 
-            console.log(`[Coins] Purchase: ${userId.slice(0, 6)}… buying ${pack.coins} coins (${productId}) via ${platform} [${policy.mode}]`);
+            if (withToken) {
+                const claim = await claimToken(d.supabase, { token: purchaseToken, userId, kind: 'coins', productId });
+                if (claim === 'other_account') {
+                    logAnomaly('token_other_account', { productId, userId });
+                    return res.status(409).json({ success: false, error: 'purchase_belongs_to_another_account', retryable: false });
+                }
+                if (claim !== 'ok') return res.status(500).json({ error: 'Failed to record purchase', retryable: true });
+            }
+
+            console.log(`[Coins] Purchase: ${userId.slice(0, 6)}… buying ${pack.coins} coins (${productId}) via ${platform} [${withToken ? 'token' : policy.mode}]`);
 
             const { data, error } = await d.supabase.rpc('add_purchased_coins', {
                 p_user_id: userId,
                 p_amount: pack.coins,
                 p_reason: productId,
                 p_platform: platform,
-                p_iap_transaction_id: transactionId
+                p_iap_transaction_id: creditId
             });
 
             if (error && error.code === '23505') {
@@ -208,7 +251,7 @@ export function createPurchaseHandler(deps = {}) {
             }
 
             if (data.duplicate) {
-                console.log(`[Coins] Duplicate transaction ${transactionId}, returning success`);
+                console.log('[Coins] Duplicate transaction, returning success');
                 return res.json({ success: true, message: 'Transaction already processed', balance: data.new_balance });
             }
 

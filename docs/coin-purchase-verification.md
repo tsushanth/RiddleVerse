@@ -1,4 +1,29 @@
-# Coin purchase verification
+# Play purchase verification (coin packs and subscriptions)
+
+## Purchases sent with a purchase token (Android releases after 188)
+
+`POST /api/coins/purchase {userId, productId, purchaseToken, transactionId, platform}` and
+`POST /api/subscription-purchase {userId, purchaseToken}`, both with `Authorization: Bearer <ID token>` (required).
+
+- The token is looked up at Play (`purchases.products.get`, `purchases.subscriptionsv2.get`) with the service account in
+  `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` only. Without it, or while Play answers 401/403/5xx, the answer is
+  `503 purchase_verification_unavailable, retryable: true` and nothing is written.
+- A token belongs to the first account that presents it (`play_purchases`, token hash); another account gets 409.
+- Coins come from the server tables. A pack is credited under the Play order id, the same ledger key as the older route.
+  Packs bought before 2026-11-25 are not credited by this route (`purchase_needs_review`).
+- Subscriptions (`services/playPurchases.js`, table `user_subscriptions`): monthly 150 coins per paid period plus 150
+  once per account; yearly 700 per paid period (a year) plus 500 once per account. Nothing for a free trial, a grace
+  period, a hold, a period that already ended or a license-pending purchase. Renewals are picked up by the app and by a
+  sweep at start and every six hours.
+- The app saves each purchase before sending it, retries until a final answer, and picks up purchases Play still lists
+  (twice a day, or on Restore). RevenueCat still acknowledges and consumes.
+- Permission needed in Play Console for the account: view financial data / manage orders and subscriptions for this app.
+
+Open points: the app and store text say "700 free coins every month" for yearly while the server credits once per billing
+period; versions up to 188 cannot get subscription coins (they send neither a token nor a credential); refunds are not
+clawed back.
+
+## Coin packs sent with an order id only (Android up to 188)
 
 `POST /api/coins/purchase` credits a coin pack. Before this change it trusted a client-supplied transaction id.
 
