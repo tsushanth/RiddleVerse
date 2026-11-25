@@ -15,8 +15,8 @@ const { createPlayPurchaseVerifier, PLAY_CREDENTIAL } = await import('../service
 
 const NOW = Date.parse('2026-12-01T12:00:00Z');
 const now = () => NOW;
-const TOKEN = 'tok-abcdefghijklmnopqrstuvwxyz.AO-J1Oz_0123456789';
-const TOKEN2 = 'tok-zyxwvutsrqponmlkjihgfedcba.AO-J1Oz_9876543210';
+const TOKEN = 'made-up-play-token-number-one';
+const TOKEN2 = 'made-up-play-token-number-two';
 const P = 'com.kreativekoala.riddleverse.premium';
 const COINS = 'com.kreativekoala.riddleverse.coins.500';
 const ORDER = 'GPA.1111-2222-3333-44444';
