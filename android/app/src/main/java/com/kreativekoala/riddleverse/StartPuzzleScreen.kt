@@ -4235,7 +4235,7 @@ fun fetchCustomPuzzleAndStart(
     val TAG = "FetchCustomPuzzleEnhanced"
     val url = "https://puzzleverseai.com/fetch-custom-puzzle?puzzleId=$customPuzzleId"
     val request = Request.Builder().url(url).build()
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {

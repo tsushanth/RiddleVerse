@@ -35,6 +35,7 @@ class FCMTokenManager(private val context: Context) {
         .writeTimeout(30, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
         .addInterceptor(ContentLanguage.interceptor)
+        .addInterceptor(FailureReporterInterceptor())
         .build()
 
     private val sharedPrefs: SharedPreferences =

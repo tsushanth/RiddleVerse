@@ -922,7 +922,7 @@ class ScoreManager {
                             .post(requestBody)
                             .build()
 
-                        val client = OkHttpClient()
+                        val client = FailureReporterInterceptor.newClient()
                         val response = client.newCall(request).execute()
 
                         if (response.isSuccessful) {

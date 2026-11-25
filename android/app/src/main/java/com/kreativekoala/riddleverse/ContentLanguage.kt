@@ -61,5 +61,5 @@ object ContentLanguage {
     }
 
     /** A plain client (default timeouts) that sends the language, for call sites that used a bare OkHttpClient(). */
-    fun newClient(): OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).build()
+    fun newClient(): OkHttpClient = OkHttpClient.Builder().addInterceptor(interceptor).addInterceptor(FailureReporterInterceptor()).build()
 }

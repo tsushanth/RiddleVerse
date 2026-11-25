@@ -83,10 +83,6 @@ import kotlin.random.Random
 fun ScrollableNoPuzzlesContent(
     puzzleType: String,
     difficulty: String,
-    isGenerating: Boolean,
-    generationStatus: String?,
-    showGenerationSuccess: Boolean,
-    onGeneratePuzzles: () -> Unit,
     onStartPuzzle: () -> Unit,
     onReturnHome: () -> Unit
 ) {
@@ -134,85 +130,6 @@ fun ScrollableNoPuzzlesContent(
                         textAlign = TextAlign.Center,
                         lineHeight = 22.sp
                     )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Text(
-                        text = stringResource(R.string.done_generate_to_continue),
-                        fontSize = 14.sp,
-                        color = RvInkSoft,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
-            }
-
-            // Generation Status
-            AnimatedVisibility(
-                visible = generationStatus != null,
-                enter = slideInVertically() + fadeIn(),
-                exit = slideOutVertically() + fadeOut()
-            ) {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = RvSuccess),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        if (isGenerating) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp),
-                                color = RvOnTone,
-                                strokeWidth = 3.dp
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.AutoFixHigh,
-                                contentDescription = null,
-                                tint = RvOnTone,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-
-                        Text(
-                            text = generationStatus ?: "",
-                            color = RvOnTone,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
-
-            // Generate button (only show if not generating)
-            if (!isGenerating) {
-                Button(
-                    onClick = onGeneratePuzzles,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = RvViolet),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AutoFixHigh,
-                            contentDescription = null,
-                            tint = RvOnTone
-                        )
-                        Text(
-                            stringResource(R.string.done_generate_new_puzzles),
-                            color = RvOnTone,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
                 }
             }
         }
@@ -371,9 +288,6 @@ fun DailyCompletionScreen(
 ) {
     val context = LocalContext.current
     val gameGenVM: GameGenerationViewModel = viewModel()
-    var isGenerating by remember { mutableStateOf(false) }
-    var generationStatus by remember { mutableStateOf<String?>(null) }
-    var showGenerationSuccess by remember { mutableStateOf(false) }
     var showRemixSheet by remember { mutableStateOf(false) }
 
 
@@ -441,33 +355,9 @@ fun DailyCompletionScreen(
             }
 
             is CompletionType.NoPuzzlesFound -> {
-                val generationRequestSentMsg = stringResource(R.string.done_generation_request_sent)
-                val generationStartedToast = stringResource(
-                    R.string.done_generation_started_toast,
-                    getPuzzleDisplayName(completionType.puzzleType)
-                )
                 ScrollableNoPuzzlesContent(
                     puzzleType = completionType.puzzleType,
                     difficulty = completionType.difficulty,
-                    isGenerating = isGenerating,
-                    generationStatus = generationStatus,
-                    showGenerationSuccess = showGenerationSuccess,
-                    onGeneratePuzzles = {
-                        isGenerating = true
-                        generationStatus = generationRequestSentMsg
-
-                        kickOffPuzzleGeneration(
-                            puzzleType = completionType.puzzleType,
-                            difficulty = completionType.difficulty
-                        ) {
-                            Toast.makeText(
-                                context,
-                                generationStartedToast,
-                                Toast.LENGTH_LONG
-                            ).show()
-                            onReturnHome()
-                        }
-                    },
                     onStartPuzzle = {
                         onStartPuzzle(completionType.puzzleType, completionType.difficulty)
                     },

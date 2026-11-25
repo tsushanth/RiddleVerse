@@ -160,7 +160,7 @@ class SubscriptionManager private constructor(
         private set
 
     private val gson = Gson()
-    private val httpClient = OkHttpClient()
+    private val httpClient = FailureReporterInterceptor.newClient()
 
     companion object {
         @Volatile

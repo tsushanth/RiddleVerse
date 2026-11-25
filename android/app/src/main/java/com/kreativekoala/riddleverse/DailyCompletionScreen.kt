@@ -33,14 +33,6 @@ sealed class CompletionType {
     data class GenerationInProgress(val puzzleType: String, val difficulty: String) : CompletionType()
 }
 
-data class GenerationRequest(
-    val puzzleType: String,
-    val difficulty: String,
-    val count: Int = 5,
-    val modelName: String = "randomized_generator",
-    val repairFirst: Boolean = true
-)
-
 data class GenerationResponse(
     val success: Boolean,
     val message: String,
@@ -439,7 +431,7 @@ class DailyCompletionActivity : AppCompatActivity() {
         score: Int
     ) {
         val url = "https://puzzleverseai.com/update-puzzle-leaderboard"
-        val client = OkHttpClient()
+        val client = FailureReporterInterceptor.newClient()
 
         val json = JSONObject().apply {
             put("puzzleId", puzzleId)
@@ -496,7 +488,7 @@ class DailyCompletionActivity : AppCompatActivity() {
         onResult: (PuzzleLeaderboard?) -> Unit
     ) {
         val url = "https://puzzleverseai.com/api/puzzle-leaderboard/$puzzleId"
-        val client = OkHttpClient()
+        val client = FailureReporterInterceptor.newClient()
 
         val request = Request.Builder()
             .url(url)
@@ -542,62 +534,6 @@ class DailyCompletionActivity : AppCompatActivity() {
             else -> PuzzleTypeNames.display(this, puzzleType)
         }
     }
-}
-
-// Network function to generate puzzles on demand
-fun kickOffPuzzleGeneration(
-    puzzleType: String,
-    difficulty: String,
-    onComplete: () -> Unit
-) {
-    val url = "https://puzzleverseai.com/api/force-generate-with-path-management"
-
-    val requestData = GenerationRequest(
-        puzzleType = puzzleType,
-        difficulty = difficulty,
-        count = 5,
-        modelName = "randomized_generator",
-        repairFirst = true
-    )
-
-    val requestBody = Gson().toJson(requestData).toRequestBody("application/json".toMediaType())
-    val request = Request.Builder()
-        .url(url)
-        .post(requestBody)
-        .addHeader("Content-Type", "application/json")
-        .build()
-
-    val client = OkHttpClient()
-
-    // Track generation attempt
-    try {
-        AnalyticsManager.getInstance()?.track(AnalyticsEvent("puzzle_generation_kicked_off", mapOf(
-            "puzzle_type" to puzzleType,
-            "difficulty" to difficulty,
-            "requested_count" to 5,
-            "source" to "no_puzzles_screen",
-            "approach" to "fire_and_forget"
-        )))
-    } catch (e: Exception) {
-        Log.e("GenerationKickOff", "Analytics failed", e)
-    }
-
-    // Fire and forget - don't wait for response
-    client.newCall(request).enqueue(object : Callback {
-        override fun onFailure(call: Call, e: IOException) {
-            Log.w("GenerationKickOff", "Generation request sent but network failed: ${e.message}")
-            // Still call onComplete - we tried our best
-            Handler(Looper.getMainLooper()).post { onComplete() }
-        }
-
-        override fun onResponse(call: Call, response: Response) {
-            val responseBody = response.body?.string()
-            Log.d("GenerationKickOff", "Generation request sent - Response: ${response.code}")
-
-            // Don't parse or worry about the response - just complete
-            Handler(Looper.getMainLooper()).post { onComplete() }
-        }
-    })
 }
 
 @Composable

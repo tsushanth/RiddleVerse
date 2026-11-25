@@ -913,7 +913,7 @@ fun fetchPuzzleLeaderboard(
     onResult: (PuzzleLeaderboard?) -> Unit
 ) {
     val url = "https://puzzleverseai.com/get-puzzle-leaderboard/$puzzleId"
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
     val request = Request.Builder().url(url).build()
 
     client.newCall(request).enqueue(object : Callback {
@@ -1015,7 +1015,7 @@ fun fetchEnhancedCustomPuzzles(
     }
 
     val request = Request.Builder().url(url).build()
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
 
     client.newCall(request).enqueue(object : Callback {
         override fun onFailure(call: Call, e: IOException) {
@@ -1090,7 +1090,7 @@ fun fetchFeaturedPuzzles(
     onResult: (List<CustomPuzzle>) -> Unit
 ) {
     val url = "https://puzzleverseai.com/get-featured-puzzles?limit=$limit"
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
     val request = Request.Builder().url(url).build()
 
     client.newCall(request).enqueue(object : Callback {
@@ -1181,7 +1181,7 @@ fun updatePuzzleLeaderboard(
     onResult: (Boolean, String?) -> Unit
 ) {
     val url = "https://puzzleverseai.com/update-puzzle-leaderboard"
-    val client = OkHttpClient()
+    val client = FailureReporterInterceptor.newClient()
 
     val json = JSONObject().apply {
         put("puzzleId", puzzleId)
