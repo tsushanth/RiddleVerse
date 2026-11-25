@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Το προϊόν δεν είναι διαθέσιμο</string>
     <string name="create_purchase_failed">Η αγορά απέτυχε: %1$s</string>
     <string name="create_coins_added">Τα νομίσματα προστέθηκαν!</string>
+    <string name="create_coins_pending">Η αγορά σας δεν έχει επιβεβαιωθεί ακόμη. Τα νομίσματά σας θα προστεθούν αυτόματα.</string>
     <string name="create_format_qa">Μορφή Ε/Α</string>
     <string name="create_format_anagrams">Αναγραμματισμοί</string>
     <string name="create_generate_crossword">Δημιουργία σταυρολέξου</string>

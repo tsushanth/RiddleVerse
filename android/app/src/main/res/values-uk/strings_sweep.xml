@@ -798,6 +798,7 @@
     <string name="create_product_unavailable">Товар недоступний</string>
     <string name="create_purchase_failed">Не вдалося здійснити покупку: %1$s</string>
     <string name="create_coins_added">Монети додано!</string>
+    <string name="create_coins_pending">Покупку ще не підтверджено. Монети буде нараховано автоматично.</string>
     <string name="create_format_qa">Формат «запитання-відповідь»</string>
     <string name="create_format_anagrams">Анаграми</string>
     <string name="create_generate_crossword">Створити кросворд</string>

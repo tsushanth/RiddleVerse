@@ -798,6 +798,7 @@
     <string name="create_product_unavailable">Товар недоступен</string>
     <string name="create_purchase_failed">Не удалось совершить покупку: %1$s</string>
     <string name="create_coins_added">Монеты добавлены!</string>
+    <string name="create_coins_pending">Покупка ещё не подтверждена. Монеты будут начислены автоматически.</string>
     <string name="create_format_qa">Формат «вопрос-ответ»</string>
     <string name="create_format_anagrams">Анаграммы</string>
     <string name="create_generate_crossword">Создать кроссворд</string>

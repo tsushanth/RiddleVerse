@@ -1,6 +1,7 @@
 package com.kreativekoala.riddleverse
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -736,7 +737,7 @@ class CoinManager private constructor() {
                 override fun onCompleted(storeTransaction: StoreTransaction, customerInfo: CustomerInfo) {
                     Log.d(TAG, "Coin purchase successful: ${pack.productId}")
                     isPurchasing = false
-                    recordPurchaseOnBackend(pack, storeTransaction.orderId ?: "")
+                    recordPurchaseOnBackend(activity.applicationContext, pack, storeTransaction)
                 }
 
                 override fun onError(error: PurchasesError, userCancelled: Boolean) {
@@ -750,41 +751,27 @@ class CoinManager private constructor() {
         )
     }
 
-    private fun recordPurchaseOnBackend(pack: CoinPack, transactionId: String) {
+    private fun recordPurchaseOnBackend(context: Context, pack: CoinPack, transaction: StoreTransaction) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        PlayPurchaseSync.remember(
+            context,
+            PendingPurchase(transaction.purchaseToken, pack.productId, PendingPurchase.COINS, userId, transaction.orderId)
+        )
+        PlayPurchaseSync.coinListener = ::onCoinPurchaseReport
+        PlayPurchaseSync.sync(context)
+    }
 
-        scope.launch {
-            withContext(Dispatchers.IO) {
-                try {
-                    val json = JSONObject().apply {
-                        put("userId", userId)
-                        put("productId", pack.productId)
-                        put("transactionId", transactionId)
-                        put("platform", "android")
-                    }
-
-                    val body = json.toString().toRequestBody("application/json".toMediaTypeOrNull())
-                    val request = Request.Builder()
-                        .url("https://puzzleverseai.com/api/coins/purchase")
-                        .addHeader("Content-Type", "application/json")
-                        .post(body)
-                        .build()
-
-                    val response = HttpClientProvider.client.newCall(request).execute()
-                    val responseBody = response.body?.string()
-                    response.close()
-
-                    if (responseBody != null) {
-                        val result = JSONObject(responseBody)
-                        val newBalance = result.optInt("newBalance", balance)
-                        withContext(Dispatchers.Main) {
-                            balance = newBalance
-                            purchaseMessage = UiText.Res(R.string.create_coins_added)
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Record purchase error", e)
+    private fun onCoinPurchaseReport(report: PurchaseReport, answer: JSONObject) {
+        scope.launch(Dispatchers.Main) {
+            when (report) {
+                PurchaseReport.DONE -> {
+                    val newBalance = answer.optInt("newBalance", answer.optInt("balance", -1))
+                    if (newBalance >= 0) balance = newBalance else fetchBalance()
+                    purchaseMessage = UiText.Res(R.string.create_coins_added)
                 }
+                PurchaseReport.REJECTED ->
+                    purchaseMessage = UiText.Res(R.string.create_purchase_failed, listOf(answer.optString("error")))
+                PurchaseReport.RETRY -> purchaseMessage = UiText.Res(R.string.create_coins_pending)
             }
         }
     }

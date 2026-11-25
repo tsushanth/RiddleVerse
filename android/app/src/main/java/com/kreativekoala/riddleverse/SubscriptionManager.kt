@@ -7,7 +7,6 @@ import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.Gson
 import com.revenuecat.purchases.CustomerInfo
 import com.revenuecat.purchases.Offerings
 import com.revenuecat.purchases.Package
@@ -21,15 +20,6 @@ import com.revenuecat.purchases.interfaces.ReceiveOfferingsCallback
 import com.revenuecat.purchases.models.StoreProduct
 import com.revenuecat.purchases.models.StoreTransaction
 import com.kreativekoala.ratingkit.RatingKit
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
 
 // MARK: - Subscription Tier Enum
 // Note: PREMIUM = monthly billing, PREMIUM_YEARLY = yearly billing
@@ -145,7 +135,6 @@ class SubscriptionManager private constructor(
     private val context: Context
 ) {
     private val TAG = "SubscriptionManager"
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val preferences: SharedPreferences =
         context.getSharedPreferences("subscription_prefs", Context.MODE_PRIVATE)
 
@@ -159,8 +148,6 @@ class SubscriptionManager private constructor(
     var availablePackages by mutableStateOf<List<Package>>(emptyList())
         private set
 
-    private val gson = Gson()
-    private val httpClient = FailureReporterInterceptor.newClient()
 
     companion object {
         @Volatile
@@ -242,6 +229,7 @@ class SubscriptionManager private constructor(
     }
 
     fun restorePurchases() {
+        PlayPurchaseSync.sync(context, restore = true)
         RevenueCatBootstrap.instance.restorePurchases(object : ReceiveCustomerInfoCallback {
             override fun onReceived(customerInfo: CustomerInfo) {
                 updateTierFromCustomerInfo(customerInfo)
@@ -334,6 +322,8 @@ class SubscriptionManager private constructor(
 
         if (currentTier != SubscriptionTier.FREE && oldTier == SubscriptionTier.FREE) {
             clearLimitsAfterUpgrade()
+            // Covers a purchase made on a paywall that does not report back here.
+            PlayPurchaseSync.sync(context, restore = true)
         }
     }
 
@@ -350,51 +340,14 @@ class SubscriptionManager private constructor(
         }
     }
 
+    /** The server verifies the token with Google Play and decides the coins; retried until it answers. */
     internal fun notifyBackendOfPurchase(transaction: StoreTransaction) {
-        val auth = FirebaseAuth.getInstance()
-        val user = auth.currentUser
-        if (user?.email == null) {
-            Log.w(TAG, "No authenticated user for backend notification")
-            return
-        }
-        scope.launch {
-            val productId = transaction.productIds.firstOrNull() ?: return@launch
-            val tier = getTierFromProductId(productId)
-            val firstPurchaseKey = "first_purchase_$productId"
-            val prefs = context.getSharedPreferences("subscription_prefs", android.content.Context.MODE_PRIVATE)
-            val isFirstPurchase = !prefs.getBoolean(firstPurchaseKey, false)
-            if (isFirstPurchase) prefs.edit().putBoolean(firstPurchaseKey, true).apply()
-
-            val purchaseData = mapOf(
-                "userId" to user.uid,
-                "email" to user.email,
-                "productId" to productId,
-                "purchaseToken" to (transaction.orderId ?: ""),
-                "purchaseTime" to transaction.purchaseTime,
-                "tier" to tier.value,
-                "monthlyCoins" to tier.monthlyCoins,
-                "signupBonus" to if (isFirstPurchase) tier.signupBonus else 0
-            )
-
-            val json = gson.toJson(purchaseData)
-            val requestBody = json.toRequestBody("application/json".toMediaType())
-
-            val request = Request.Builder()
-                .url("https://puzzleverseai.com/api/subscription-purchase")
-                .post(requestBody)
-                .build()
-
-            try {
-                httpClient.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) {
-                        Log.d(TAG, "Successfully notified backend of purchase")
-                    } else {
-                        Log.e(TAG, "Backend notification failed: ${response.code}")
-                    }
-                }
-            } catch (e: IOException) {
-                Log.e(TAG, "Failed to notify backend", e)
-            }
-        }
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val productId = transaction.productIds.firstOrNull() ?: return
+        PlayPurchaseSync.remember(
+            context,
+            PendingPurchase(transaction.purchaseToken, productId, PendingPurchase.SUBSCRIPTION, userId, transaction.orderId)
+        )
+        PlayPurchaseSync.sync(context)
     }
 }

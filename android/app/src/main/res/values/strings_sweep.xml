@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Product not available</string>
     <string name="create_purchase_failed">Purchase failed: %1$s</string>
     <string name="create_coins_added">Coins added!</string>
+    <string name="create_coins_pending">We have not confirmed your purchase yet. Your coins will be added automatically.</string>
     <string name="create_format_qa">Q/A Format</string>
     <string name="create_format_anagrams">Anagrams</string>
     <string name="create_generate_crossword">Generate Crossword</string>

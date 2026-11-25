@@ -798,6 +798,7 @@
     <string name="create_product_unavailable">Produkt niedostępny</string>
     <string name="create_purchase_failed">Zakup nie powiódł się: %1$s</string>
     <string name="create_coins_added">Dodano monety!</string>
+    <string name="create_coins_pending">Twój zakup nie został jeszcze potwierdzony. Monety zostaną dodane automatycznie.</string>
     <string name="create_format_qa">Format pytań i odpowiedzi</string>
     <string name="create_format_anagrams">Anagramy</string>
     <string name="create_generate_crossword">Wygeneruj krzyżówkę</string>

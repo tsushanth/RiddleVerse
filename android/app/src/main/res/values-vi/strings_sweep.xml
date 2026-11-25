@@ -738,6 +738,7 @@
     <string name="create_product_unavailable">Sản phẩm không khả dụng</string>
     <string name="create_purchase_failed">Mua thất bại: %1$s</string>
     <string name="create_coins_added">Đã thêm xu!</string>
+    <string name="create_coins_pending">Giao dịch mua của bạn chưa được xác nhận. Xu sẽ được cộng tự động.</string>
     <string name="create_format_qa">Dạng hỏi đáp</string>
     <string name="create_format_anagrams">Đảo chữ</string>
     <string name="create_generate_crossword">Tạo ô chữ</string>

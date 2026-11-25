@@ -758,6 +758,7 @@
     <string name="create_product_unavailable">Produkten är inte tillgänglig</string>
     <string name="create_purchase_failed">Köpet misslyckades: %1$s</string>
     <string name="create_coins_added">Mynten har lagts till!</string>
+    <string name="create_coins_pending">Ditt köp har inte bekräftats än. Dina mynt läggs till automatiskt.</string>
     <string name="create_format_qa">Fråga/svar-format</string>
     <string name="create_format_anagrams">Anagram</string>
     <string name="create_generate_crossword">Skapa korsord</string>
