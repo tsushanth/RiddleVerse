@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.key
 import androidx.compose.ui.graphics.Color
 import org.json.JSONObject
@@ -145,7 +146,10 @@ fun WordPuzzleScreenWrapper(
         "${if (viewModel.isCustomPuzzleFlow) viewModel.totalQuestions else viewModel.targetPuzzleCount}"
     val done: (Boolean, Int) -> Unit = { success, score -> handlePuzzleCompletion(success, true, score) }
     val json = currentPuzzle.question
-    key(currentPuzzle.puzzleId) {
+    val shown: (Boolean, Int) -> Unit = { success, score ->
+        PuzzleEvents.puzzleFinished(currentPuzzle, viewModel.screenType.typeName, success, score)
+    }
+    CompositionLocalProvider(LocalWordResult provides shown) { key(currentPuzzle.puzzleId) {
         when (JSONObject(json).optString("game", currentPuzzle.puzzleType ?: "")) {
             WordPuzzleRegistry.WORD_GUESS -> WordGuessScreen(json, level, onBack, done)
             WordPuzzleRegistry.WORD_LADDER -> WordLadderScreen(json, level, onBack, done)
@@ -155,5 +159,5 @@ fun WordPuzzleScreenWrapper(
             WordPuzzleRegistry.LINKUP -> LinkupScreen(json, level, onBack, done) // linkup
             else -> CodeCrackerScreen(json, level, onBack, done)
         }
-    }
+    } }
 }

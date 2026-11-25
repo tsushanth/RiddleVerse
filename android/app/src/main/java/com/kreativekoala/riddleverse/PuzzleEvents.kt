@@ -90,10 +90,14 @@ object PuzzleEvents {
         Funnel.log("first_puzzle_started")
     }
 
-    /** Result reported through PuzzleCompletionHandler: `complete` or `fail`. */
+    /**
+     * `complete` or `fail`. Reported when a word game shows its result, and again through PuzzleCompletionHandler on
+     * Continue (which is the only report for the other games); the second report of one result is dropped.
+     */
     fun puzzleFinished(puzzle: Puzzle?, fallbackType: String?, success: Boolean, score: Int) = guarded {
         val (key, type, diff) = describe(puzzle, fallbackType) ?: return@guarded
-        emit(tracker.finish(key, type, diff, success, score))
+        val event = tracker.finish(key, type, diff, success, score) ?: return@guarded
+        emit(event)
         if (success) Funnel.log("first_puzzle_completed")
     }
 
