@@ -58,6 +58,7 @@ import { firebaseStreakNotificationService } from './services/firebaseStreakNoti
 import { remixDigestService } from './services/remixDigestService.js';
 import { startForgeSessionSweeper, startForgeInvariantMonitor } from './services/forgeSessionService.js';
 import { supabase } from './config/database.js';
+import { startSubscriptionSweep } from './services/playPurchases.js';
 import { createDeepHealthHandler, buildChecks as buildDeepChecks } from './services/deepHealth.js';
 import { wordFrequencyManager } from './services/wordFrequencyManager.js';
 import { errorHandler, reportUnhandled5xx } from './middleware/errorHandler.js';
@@ -149,6 +150,8 @@ async function initializeServer() {
         startForgeSessionSweeper({ supabase });
         // Read-only dead-man + completion-rate check on forge_sessions (ON; FORGE_INVARIANT_MONITOR=false to stop).
         startForgeInvariantMonitor({ supabase });
+        // Credits renewed subscriptions; does nothing until GOOGLE_PLAY_SERVICE_ACCOUNT_JSON is set.
+        startSubscriptionSweep({ db: supabase });
         const cacheInitResult = await initializeDailyPuzzleSystem();
 
         if (!cacheInitResult.success) {

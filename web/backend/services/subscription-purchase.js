@@ -1,199 +1,72 @@
 // subscription-purchase.js
-// Node.js endpoint for handling subscription purchases from iOS app
+// Subscription endpoints. A purchase counts only after Google Play confirms its purchase token (services/playPurchases.js).
 
 import { supabase } from "../config/database.js";
+import { verifiedCaller } from "../middleware/callerIdentity.js";
+import { createCounters, logAnomaly } from "./coinPurchasePolicy.js";
+import { applySubscription, isPurchaseToken, tokenHash } from "./playPurchases.js";
 
-const TIER_MONTHLY_COINS = {
-    premium: 100,
-    unlimited: 500
-};
+const IP_REQUESTS_PER_HOUR = 60;
 
 /**
- * Handle subscription purchase notification from iOS app
- * POST /api/subscription-purchase
+ * POST /api/subscription-purchase  { purchaseToken, userId? }  with Authorization: Bearer <the signed-in user's ID token>
+ *
+ * Sent after a purchase, and again by the app to restore or to pick up a renewal. The account is the one in the bearer
+ * token; the product, the period and the coins all come from Play and the server's own table, never from the request.
+ * 503 (verification unavailable) and 5xx change nothing and are safe to retry.
  */
-export async function handleSubscriptionPurchase(req, res) {
-    try {
-        // Validate request method
-        if (req.method !== 'POST') {
-            return res.status(405).json({ 
-                error: 'Method not allowed',
-                message: 'Only POST requests are supported'
-            });
-        }
+export function createSubscriptionPurchaseHandler(deps = {}) {
+    const d = { supabase, now: Date.now, verifier: undefined, verifyCaller: verifiedCaller, ...deps };
+    const counters = createCounters(d.now);
+    const inflight = new Set();
 
-        // Extract purchase data from request body
-        const {
-            userId,
-            email,
-            productId,
-            transactionId,
-            purchaseDate,
-            tier
-        } = req.body;
-
-        // Validate required fields
-        if (!userId || !email || !productId || !transactionId || !tier) {
-            return res.status(400).json({
-                error: 'Missing required fields',
-                message: 'userId, email, productId, transactionId, and tier are required',
-                received: { userId: !!userId, email: !!email, productId: !!productId, transactionId: !!transactionId, tier: !!tier }
-            });
-        }
-
-        // Validate tier value
-        const validTiers = ['free', 'premium', 'unlimited'];
-        if (!validTiers.includes(tier)) {
-            return res.status(400).json({
-                error: 'Invalid tier',
-                message: `Tier must be one of: ${validTiers.join(', ')}`,
-                received: tier
-            });
-        }
-
-        // Validate product ID format
-        const validProductIds = [
-            'com.puzzleforge.premium.monthly',
-            'com.puzzleforge.unlimited.monthly',
-            "com.kreativekoala.riddleverse.premium.mo",
-            "com.kreativekoala.riddleverse.premium.yr"
-        ];
-        if (!validProductIds.includes(productId)) {
-            return res.status(400).json({
-                error: 'Invalid product ID',
-                message: `Product ID must be one of: ${validProductIds.join(', ')}`,
-                received: productId
-            });
-        }
-
-        console.log(`Processing subscription purchase for user ${email} (${userId})`);
-        console.log(`Product: ${productId}, Tier: ${tier}, Transaction: ${transactionId}`);
-
-        // Check if transaction already exists (prevent duplicates)
-        const { data: existingTransaction, error: checkError } = await supabase
-            .from('user_subscriptions')
-            .select('id, transaction_id')
-            .eq('transaction_id', transactionId)
-            .single();
-
-        if (checkError && checkError.code !== 'PGRST116') { // PGRST116 = no rows found
-            console.error('Error checking existing transaction:', checkError);
-            return res.status(500).json({
-                error: 'Database error',
-                message: 'Failed to check existing transaction'
-            });
-        }
-
-        if (existingTransaction) {
-            console.log(`Transaction ${transactionId} already exists, skipping duplicate`);
-            return res.status(200).json({
-                success: true,
-                message: 'Transaction already processed',
-                subscriptionId: existingTransaction.id
-            });
-        }
-
-        // Convert purchase date (assuming it's a timestamp)
-        const purchaseDateObj = purchaseDate ? new Date(purchaseDate * 1000) : new Date();
-
-        // Calculate subscription end date (monthly subscription)
-        const subscriptionEndDate = new Date(purchaseDateObj);
-        subscriptionEndDate.setMonth(subscriptionEndDate.getMonth() + 1);
-
-        // Insert subscription record
-        const { data: subscription, error: insertError } = await supabase
-            .from('user_subscriptions')
-            .insert({
-                user_id: userId,
-                email: email,
-                product_id: productId,
-                transaction_id: transactionId,
-                subscription_tier: tier,
-                purchase_date: purchaseDateObj.toISOString(),
-                subscription_start_date: purchaseDateObj.toISOString(),
-                subscription_end_date: subscriptionEndDate.toISOString(),
-                status: 'active',
-                platform: 'ios',
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString()
-            })
-            .select()
-            .single();
-
-        if (insertError) {
-            console.error('Error inserting subscription:', insertError);
-            return res.status(500).json({
-                error: 'Database error',
-                message: 'Failed to save subscription',
-                details: insertError.message
-            });
-        }
-
-        console.log(`Successfully saved subscription ${subscription.id} for user ${email}`);
-
-        // Update user's current tier in users table (if you have one)
-        const { error: updateUserError } = await supabase
-            .from('users')
-            .update({
-                subscription_tier: tier,
-                updated_at: new Date().toISOString()
-            })
-            .eq('user_id', userId);
-
-        if (updateUserError) {
-            console.warn('Warning: Failed to update user tier in users table:', updateUserError);
-            // Don't fail the request since subscription was saved successfully
-        }
-
-        // Credit monthly coins based on subscription tier
-        const monthlyCoins = req.body.monthlyCoins || TIER_MONTHLY_COINS[tier] || 0;
-        let newBalance = null;
-        if (monthlyCoins > 0) {
-            const { data: coinData, error: coinError } = await supabase.rpc('add_purchased_coins', {
-                p_user_id: userId,
-                p_amount: monthlyCoins,
-                p_reason: `subscription_${tier}_monthly_coins`,
-                p_platform: 'ios',
-                p_iap_transaction_id: `sub_coins_${transactionId}`
-            });
-
-            if (coinError) {
-                console.warn('Warning: Failed to credit subscription coins:', coinError);
-            } else {
-                newBalance = coinData?.new_balance ?? null;
-                console.log(`Credited ${monthlyCoins} subscription coins to user ${email}, new balance: ${newBalance}`);
+    return async function subscriptionPurchaseHandler(req, res) {
+        let lockKey = null;
+        try {
+            const body = req.body && typeof req.body === 'object' ? req.body : {};
+            const ip = String(req.ip || req.socket?.remoteAddress || 'unknown');
+            if (counters.ipOverLimit(ip, IP_REQUESTS_PER_HOUR)) {
+                res.setHeader('Retry-After', '3600');
+                return res.status(429).json({ success: false, error: 'Too many purchase requests. Please try again later.', retryable: true });
             }
+            counters.recordIp(ip);
+
+            const caller = await d.verifyCaller(req);
+            if (!caller) {
+                return res.status(401).json({ success: false, error: 'Authentication required', message: 'Update the app and sign in.' });
+            }
+            if (body.userId !== undefined && body.userId !== caller.uid) {
+                logAnomaly('subscription_uid_mismatch', { userId: caller.uid });
+                return res.status(403).json({ success: false, error: 'Credentials do not match userId' });
+            }
+            if (!isPurchaseToken(body.purchaseToken)) {
+                return res.status(400).json({ success: false, error: 'purchaseToken is required', retryable: false });
+            }
+
+            const key = tokenHash(body.purchaseToken);
+            if (inflight.has(key)) {
+                return res.status(409).json({ success: false, error: 'This purchase is already being processed', retryable: true });
+            }
+            inflight.add(key);
+            lockKey = key;
+
+            const result = await applySubscription({
+                db: d.supabase, verifier: d.verifier, userId: caller.uid, purchaseToken: body.purchaseToken, now: d.now,
+            });
+            if (result.status >= 400) {
+                logAnomaly('subscription_not_recorded', { status: result.status, error: result.body.error, userId: caller.uid });
+            }
+            return res.status(result.status).json(result.body);
+        } catch (error) {
+            console.error('Unexpected error in subscription purchase handler:', error);
+            return res.status(500).json({ success: false, error: 'Internal server error', retryable: true });
+        } finally {
+            if (lockKey) inflight.delete(lockKey);
         }
-
-        // Clear any existing regeneration limits for this user
-        await clearUserRegenerationLimits(userId, email);
-
-        // Log analytics event
-        await logSubscriptionAnalytics(userId, email, tier, productId, purchaseDateObj);
-
-        // Return success response
-        res.status(200).json({
-            success: true,
-            message: 'Subscription processed successfully',
-            subscription: {
-                id: subscription.id,
-                tier: tier,
-                startDate: subscription.subscription_start_date,
-                endDate: subscription.subscription_end_date,
-                status: subscription.status
-            },
-            coinsGranted: monthlyCoins,
-            newBalance: newBalance
-        });
-
-    } catch (error) {
-        console.error('Unexpected error in subscription purchase handler:', error);
-        res.status(500).json({
-            error: 'Internal server error',
-            message: 'An unexpected error occurred while processing the subscription'
-        });
-    }
+    };
 }
+
+export const handleSubscriptionPurchase = createSubscriptionPurchaseHandler();
 
 /**
  * Clear regeneration limits for user when they upgrade
@@ -227,40 +100,6 @@ async function clearUserRegenerationLimits(userId, email) {
     } catch (error) {
         console.error('Error clearing user regeneration limits:', error);
         // Don't throw - this is cleanup, not critical
-    }
-}
-
-/**
- * Log subscription analytics events
- */
-async function logSubscriptionAnalytics(userId, email, tier, productId, purchaseDate) {
-    try {
-        const analyticsData = {
-            user_id: userId,
-            email: email,
-            event_type: 'subscription_purchased',
-            event_data: {
-                tier: tier,
-                product_id: productId,
-                purchase_date: purchaseDate.toISOString(),
-                platform: 'ios'
-            },
-            created_at: new Date().toISOString()
-        };
-
-        const { error: analyticsError } = await supabase
-            .from('analytics_events')
-            .insert(analyticsData);
-
-        if (analyticsError) {
-            console.warn('Failed to log subscription analytics:', analyticsError);
-        } else {
-            console.log(`Logged subscription analytics for ${email}`);
-        }
-
-    } catch (error) {
-        console.error('Error logging subscription analytics:', error);
-        // Don't throw - analytics failure shouldn't fail the purchase
     }
 }
 
@@ -322,15 +161,7 @@ export async function getSubscriptionStatus(req, res) {
         const isExpired = now > endDate;
 
         if (isExpired) {
-            // Mark as expired in database
-            await supabase
-                .from('user_subscriptions')
-                .update({ 
-                    status: 'expired',
-                    updated_at: new Date().toISOString()
-                })
-                .eq('id', activeSubscription.id);
-
+            // Not written here: the renewal sweep looks this subscription up at Play and records what happened.
             return res.status(200).json({
                 success: true,
                 subscription: {
