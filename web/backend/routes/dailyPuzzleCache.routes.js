@@ -11,6 +11,7 @@ import { triggerAutoGenerationSafe } from '../services/puzzleService.js';
 import { cacheScheduler } from '../services/cacheScheduler.js';
 import { PUZZLE_TYPES } from '../config/puzzleConfig.js';
 import { isAdminKey } from '../middleware/adminKey.js';
+import { requireAdminKey } from '../middleware/requireAdminKey.js';
 
 const router = express.Router();
 
@@ -61,7 +62,8 @@ const AUTO_GENERATION_COUNT = 10; // How many new puzzles to generate
 const EMPTY_CACHE_GENERATION_COUNT = 20; // Generate more when completely empty
 
 
-router.get("/popular-categories", publicLimiter, async (req, res) => {
+// Admin only: an uncached call reads up to 1,000 Firestore documents per puzzle type, and the cache is lost on every boot.
+router.get("/popular-categories", publicLimiter, requireAdminKey, async (req, res) => {
     try {
         const cacheKey = 'popular_categories';
         const cachedData = await dailyPuzzleCache.redis.get(cacheKey);

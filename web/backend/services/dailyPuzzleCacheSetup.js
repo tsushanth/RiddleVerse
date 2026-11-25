@@ -98,104 +98,14 @@ export async function initializeDailyPuzzleSystem() {
  */
 async function performBackgroundInitialization() {
     try {
-        await initializeFirebaseCollections();
+        // No Firestore work per boot: machines start many times a day, and reading one config document per type and
+        // difficulty here used about half of the daily free read quota.
         await dailyPuzzleCache.initializeCacheStartPositions();
         await warmupCriticalCaches();
         await cacheScheduler.startScheduledTasks();
     } catch (error) {
         console.error('Background initialization failed:', error.message);
     }
-}
-
-/**
- * Initialize Firebase collections - but only create documents that don't exist
- */
-async function initializeFirebaseCollections() {
-    try {
-        const systemConfigDoc = await db.collection('system_config').doc('cache_scheduler').get();
-        if (!systemConfigDoc.exists) {
-            await db.collection('system_config').doc('cache_scheduler').set({
-                schedules: {
-                    dailyRefresh: '0 2 * * *',
-                    healthCheck: '*/30 * * * *',
-                    cleanupStale: '0 3 * * 0',
-                    configRefresh: '0 1 * * *'
-                },
-                enabled: true,
-                timezone: 'UTC',
-                lastUpdated: new Date().toISOString(),
-                createdAt: new Date().toISOString()
-            });
-        }
-        await initializePuzzleTypeConfigs();
-    } catch (error) {
-        // Non-critical failure
-    }
-}
-
-/**
- * Initialize default configurations for all puzzle types
- */
-async function initializePuzzleTypeConfigs() {
-    const batch = db.batch();
-    let createdConfigs = 0;
-
-    for (const puzzleType of ALL_PUZZLE_TYPES) {
-        for (const difficulty of DIFFICULTY_LEVELS) {
-            const configKey = `${puzzleType}_${difficulty}`;
-            const configRef = db.collection('puzzle_config').doc(configKey);
-
-            const existingConfig = await configRef.get();
-            if (!existingConfig.exists) {
-                batch.set(configRef, {
-                    puzzleType,
-                    difficulty,
-                    enabled: true,
-                    cacheSize: getDefaultCacheSize(puzzleType, difficulty),
-                    refreshInterval: getDefaultRefreshInterval(puzzleType),
-                    priority: getPuzzlePriority(puzzleType),
-                    createdAt: new Date().toISOString(),
-                    lastUpdated: new Date().toISOString()
-                });
-                createdConfigs++;
-            }
-        }
-    }
-
-    if (createdConfigs > 0) {
-        await batch.commit();
-    }
-}
-
-/**
- * Get default cache size based on puzzle type and difficulty
- */
-function getDefaultCacheSize(puzzleType, difficulty) {
-    // Larger cache for popular/fast puzzles, smaller for resource-intensive ones
-    const baseSizes = {
-        critical: { easy: 100, medium: 75, hard: 50 },
-        important: { easy: 50, medium: 40, hard: 30 },
-        deferred: { easy: 25, medium: 20, hard: 15 }
-    };
-    
-    const category = getPuzzleCategory(puzzleType);
-    return baseSizes[category][difficulty];
-}
-
-/**
- * Get default refresh interval based on puzzle type
- */
-function getDefaultRefreshInterval(puzzleType) {
-    const category = getPuzzleCategory(puzzleType);
-    
-    // More frequent refresh for popular puzzles
-    const intervals = {
-        critical: '0 */6 * * *',  // Every 6 hours
-        important: '0 */12 * * *', // Every 12 hours
-        deferred: '0 2 * * *'      // Daily at 2 AM
-    };
-    
-    return intervals[category];
 }
 
 /**

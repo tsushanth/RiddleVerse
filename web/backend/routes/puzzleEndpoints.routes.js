@@ -199,20 +199,27 @@ router.post("/batch-fetch-puzzles", async (req, res) => {
             });
         }
 
-        const userRef = db.collection("users").doc(userId);
-        let userDoc = await userRef.get();
+        // Firestore only holds the player's position. If it cannot be read (quota, outage) serve from the start of each
+        // path and save nothing, so the stored position is not overwritten.
+        let userRef = null;
+        let progress = {};
+        try {
+            userRef = db.collection("users").doc(userId);
+            const userDoc = await userRef.get();
 
-        if (!userDoc.exists) {
-            await userRef.set({
-                email: email || "",
-                lastPuzzleProgress: {},
-                lastPuzzleTimestamps: {}
-            });
-            userDoc = await userRef.get();
+            if (!userDoc.exists) {
+                await userRef.set({
+                    email: email || "",
+                    lastPuzzleProgress: {},
+                    lastPuzzleTimestamps: {}
+                });
+            } else {
+                progress = userDoc.data()?.lastPuzzleProgress || {};
+            }
+        } catch (progressError) {
+            userRef = null;
+            console.error('Batch fetch: progress unavailable (non-fatal):', progressError.message);
         }
-
-        const userData = userDoc.data() || {};
-        const progress = userData.lastPuzzleProgress || {};
 
         const batchPromises = puzzleTypes.map(async (puzzleType) => {
             const progressKey = `${puzzleType}_${difficulty}`;
@@ -265,8 +272,12 @@ router.post("/batch-fetch-puzzles", async (req, res) => {
             }
         });
 
-        if (JSON.stringify(newProgress) !== JSON.stringify(progress)) {
-            await userRef.set({ lastPuzzleProgress: newProgress }, { merge: true });
+        if (userRef && JSON.stringify(newProgress) !== JSON.stringify(progress)) {
+            try {
+                await userRef.set({ lastPuzzleProgress: newProgress }, { merge: true });
+            } catch (saveError) {
+                console.error('Batch fetch: progress not saved (non-fatal):', saveError.message);
+            }
         }
 
         const response = {
