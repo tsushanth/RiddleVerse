@@ -41,14 +41,17 @@ router.post('/share-riddle', ...shareLimiters(), async (req, res) => {
             return res.status(503).json({ error: "Email sharing is not configured" });
         }
 
-        await db.collection('sharedRiddles').add({
-            puzzleId,
-            recipientEmail: to,
-            recipientName: String(recipientName).slice(0, 80),
-            senderId: String(senderId).slice(0, 128),
-            sharedAt: admin.firestore.Timestamp.now(),
-            status: "pending"
-        });
+        // A record of the share; nothing reads it back, so the email does not wait for it or fail with it.
+        Promise.resolve()
+            .then(() => db.collection('sharedRiddles').add({
+                puzzleId,
+                recipientEmail: to,
+                recipientName: String(recipientName).slice(0, 80),
+                senderId: String(senderId).slice(0, 128),
+                sharedAt: admin.firestore.Timestamp.now(),
+                status: "pending"
+            }))
+            .catch((e) => console.error('Share record not saved (non-fatal):', e.message));
 
         const deepLink = `https://puzzleverseai.com/open-riddle?puzzleId=${encodeURIComponent(puzzleId)}`;
 
