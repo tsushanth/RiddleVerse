@@ -4,7 +4,7 @@ import { getDifficultyCost, MAX_DIFFICULTY_LEVEL } from './difficultyService.js'
 import { getPlayPurchaseVerifier, getPlayTokenVerifier, PLAY_ORDER_ID_RE } from './playPurchaseVerifier.js';
 import { claimToken, isPurchaseToken, tokenHash, UNAVAILABLE } from './playPurchases.js';
 import { readPolicy, createCounters, recentPurchases, logAnomaly } from './coinPurchasePolicy.js';
-import { verifiedCaller } from '../middleware/callerIdentity.js';
+import { verifiedCaller, callerIsUid } from '../middleware/callerIdentity.js';
 
 const COIN_PACKS = {
     'com.kreativekoala.riddleverse.coins.100': { coins: 100, price: '$0.99' },
@@ -51,12 +51,16 @@ export async function getCoinBalance(req, res) {
             return res.status(500).json({ error: 'Failed to fetch balance' });
         }
 
+        // Released apps read the balance without a sign-in; the lifetime totals go to the account itself.
+        const own = await callerIsUid(req, userId);
         res.json({
             success: true,
             balance: data.balance,
-            totalPurchased: data.total_purchased,
-            totalSpent: data.total_spent,
-            totalEarned: data.total_earned
+            ...(own && {
+                totalPurchased: data.total_purchased,
+                totalSpent: data.total_spent,
+                totalEarned: data.total_earned
+            })
         });
     } catch (error) {
         console.error('Unexpected error in getCoinBalance:', error);

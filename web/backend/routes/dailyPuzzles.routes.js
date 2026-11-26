@@ -18,11 +18,12 @@ import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware
 import { verifiedCaller } from '../middleware/callerIdentity.js';
 import { fcmTokenRegisterLimiter } from '../config/middleware.js';
 import { matchLanguage } from '../utils/contentLanguage.js';
+import { ownAccountOnly } from '../middleware/accountReads.js';
 
 const router = express.Router();
 
 // Get daily puzzle set
-router.get('/', async (req, res) => {
+router.get('/', ownAccountOnly('email', 'email'), async (req, res) => {
     const { email, topic, date } = req.query;
     
     if (!email || !topic) {
@@ -88,7 +89,7 @@ router.get('/', async (req, res) => {
 });
 
 // List user daily topics
-router.get('/topics', async (req, res) => {
+router.get('/topics', ownAccountOnly('email', 'email'), async (req, res) => {
     const { email } = req.query;
     
     if (!email) {
@@ -331,7 +332,7 @@ router.post('/test-generation', requireNotificationAdmin, async (req, res) => {
 });
 
 // Get puzzle history
-router.get('/history', async (req, res) => {
+router.get('/history', ownAccountOnly('email', 'email'), async (req, res) => {
     const { email, days = 7 } = req.query;
     
     if (!email) {
@@ -380,7 +381,7 @@ router.get('/history', async (req, res) => {
 });
 
 // Get statistics
-router.get('/statistics', async (req, res) => {
+router.get('/statistics', ownAccountOnly('email', 'email'), async (req, res) => {
     const { email, days = 30 } = req.query;
     
     try {

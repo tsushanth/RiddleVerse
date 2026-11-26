@@ -5,6 +5,7 @@ import { admin, db } from '../config/firebaseAdmin.js';
 import { hasNotificationAdminKey } from '../middleware/notificationAuth.js';
 import { callerIsUid } from '../middleware/callerIdentity.js';
 import { firestoreRead } from '../utils/firestoreBestEffort.js';
+import { isOwnAccount } from '../middleware/accountReads.js';
 
 const router = express.Router();
 
@@ -184,6 +185,8 @@ const rewardsCache = new Map(); // email -> { at, body }
 router.get('/get-user-rewards-badges', async (req, res) => {
     const { email } = req.query;
     if (!email) return res.status(400).json({ error: "Missing email" });
+
+    if (!(await isOwnAccount(req, 'email', email))) return res.json({ rewards: [], badges: [] });
 
     const cached = rewardsCache.get(email);
     if (cached && Date.now() - cached.at < REWARDS_TTL_MS) return res.json(cached.body);

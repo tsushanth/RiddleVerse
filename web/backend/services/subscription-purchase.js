@@ -2,7 +2,7 @@
 // Subscription endpoints. A purchase counts only after Google Play confirms its purchase token (services/playPurchases.js).
 
 import { supabase } from "../config/database.js";
-import { verifiedCaller } from "../middleware/callerIdentity.js";
+import { verifiedCaller, callerOwnsEmail } from "../middleware/callerIdentity.js";
 import { createCounters, logAnomaly } from "./coinPurchasePolicy.js";
 import { applySubscription, isPurchaseToken, tokenHash } from "./playPurchases.js";
 
@@ -109,29 +109,25 @@ async function clearUserRegenerationLimits(userId, email) {
  */
 export async function getSubscriptionStatus(req, res) {
     try {
-        const { userId, email } = req.query;
-
-        if (!userId && !email) {
-            return res.status(400).json({
-                error: 'Missing identifier',
-                message: 'Either userId or email is required'
-            });
+        const caller = await verifiedCaller(req);
+        if (!caller) {
+            return res.status(401).json({ error: 'Unauthorized', message: 'Sign in to read subscription status' });
         }
 
-        // Build query
-        let query = supabase
+        // userId and email are optional; when sent they must be the signed-in account's own.
+        const { userId, email } = req.query;
+        const otherUser = userId !== undefined && userId !== caller.uid;
+        const otherEmail = email !== undefined && !(await callerOwnsEmail(req, email));
+        if (otherUser || otherEmail) {
+            return res.status(403).json({ error: 'Forbidden', message: 'Credentials do not match the requested account' });
+        }
+
+        const { data: subscriptions, error } = await supabase
             .from('user_subscriptions')
             .select('*')
             .eq('status', 'active')
+            .eq('user_id', caller.uid)
             .order('created_at', { ascending: false });
-
-        if (userId) {
-            query = query.eq('user_id', userId);
-        } else {
-            query = query.eq('email', email);
-        }
-
-        const { data: subscriptions, error } = await query;
 
         if (error) {
             console.error('Error fetching subscription status:', error);

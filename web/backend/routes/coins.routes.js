@@ -9,6 +9,7 @@ import {
     getCoinStore,
     awardCoins
 } from '../services/coinService.js';
+import { ownAccountOnly } from '../middleware/accountReads.js';
 
 const router = express.Router();
 
@@ -38,7 +39,7 @@ router.get('/earnings', async (req, res) => {
 });
 
 // GET /api/coins/transactions?userId=xxx - Transaction history
-router.get('/transactions', async (req, res) => {
+router.get('/transactions', ownAccountOnly('userId', 'uid'), async (req, res) => {
     await getTransactionHistory(req, res);
 });
 
