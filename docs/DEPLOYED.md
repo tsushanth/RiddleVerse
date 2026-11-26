@@ -5,6 +5,9 @@
 - Checked 2026-11-26 00:26 UTC on the running machine (names and mode only): `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` unset.
 - Before releasing: set the secret (account invited in Play Console with view financial data and manage orders and subscriptions), then one license-tester purchase of a pack and of a subscription. Or change the server to verify a coin pack by order id while the Play account is not configured, and deploy that first. No 189 build or version bump was made.
 
+## Server release 2026-11-26 03:32 UTC (PR #105, main 211aaab): quiz-web-frontend v69
+- v68 -> v69 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 211aaab (web tree ba4af028; the 11 changed runtime files on the machine are hash-identical to main), image deployment-01M8AYF9PCVXJ5AY474K4YE2D6. No secrets, no migration. Rollback and details: private ops notes, `riddleverse-account-reads/`.
+
 ## Daily puzzle cache fills fully 2026-11-26 03:10 UTC (PR #103, main 02c4106): quiz-web-frontend v68
 - v67 -> v68 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 02c4106 (web tree 660a4c5; the 3 changed files on the machine are hash-identical to main), image deployment-01M8AX66MQADB9MDMGG5BB86V5. No secrets, no migration. The game worker reported 0 active generations. Rollback: `flyctl releases rollback 67 -a quiz-web-frontend`.
 - Cause of the check's "0 daily entries" at 03:00 UTC: its request started a stopped machine and read the cache before the fill ended. Separately a filled cache held 54 of 60 (statement timeout on large OFFSETs; crossword hard has no rows). Not the Firestore quota and not v67: this cache reads the database only.
