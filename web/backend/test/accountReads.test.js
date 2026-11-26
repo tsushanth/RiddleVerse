@@ -1,5 +1,5 @@
-// Reads about one account are answered for that account's own sign-in; the paths released apps call without one keep
-// answering in the shape they parse. No real Supabase or Firebase: fetch and token verification are replaced.
+// Reads about one account are answered for that account's own sign-in, in the shapes the apps parse.
+// No real Supabase or Firebase: fetch and token verification are replaced.
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
@@ -106,7 +106,7 @@ test('subscription status answers the signed-in account, by its own id', async (
     }
 });
 
-test('reads no released app makes without a sign-in refuse everyone but the account', async () => {
+test('account reads refuse everyone but the account', async () => {
     const paths = [`/api/coins/transactions?userId=${ME}`, `/api/daily-puzzles?email=${MAIL}&topic=space`, `/api/daily-puzzles/topics?email=${MAIL}`,
         `/api/daily-puzzles/history?email=${MAIL}`, `/api/daily-puzzles/statistics?email=${MAIL}`];
     for (const path of paths) {
@@ -120,7 +120,7 @@ test('reads no released app makes without a sign-in refuse everyone but the acco
     }
 });
 
-test('paths released apps call without a sign-in keep their shape and look nothing up', async () => {
+test('fallback answers keep their shape and look nothing up', async () => {
     for (const token of OTHERS) {
         const rewards = await get(`/get-user-rewards-badges?email=${MAIL}`, token);
         assert.deepEqual([rewards.status, rewards.body, rewards.queried], [200, { rewards: [], badges: [] }, 0]);

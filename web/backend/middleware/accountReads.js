@@ -14,7 +14,7 @@ export const ownAccountOnly = (param, kind) => async (req, res, next) => {
     return res.status(status).json({ success: false, error: status === 401 ? 'Unauthorized' : 'Forbidden' });
 };
 
-/** For reads released apps make without a sign-in: other requests get `fallback` and no account is looked up. */
+/** Answers `fallback` to other requests, without looking the account up. */
 export const ownAccountOr = (param, kind, fallback) => async (req, res, next) => {
     const value = req.query?.[param];
     if (!value || await isOwnAccount(req, kind, value)) return next();
