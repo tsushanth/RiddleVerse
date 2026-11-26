@@ -5,6 +5,12 @@
 - Checked 2026-11-26 00:26 UTC on the running machine (names and mode only): `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` unset.
 - Before releasing: set the secret (account invited in Play Console with view financial data and manage orders and subscriptions), then one license-tester purchase of a pack and of a subscription. Or change the server to verify a coin pack by order id while the Play account is not configured, and deploy that first. No 189 build or version bump was made.
 
+## Daily puzzle cache fills fully 2026-11-26 03:10 UTC (PR #103, main 02c4106): quiz-web-frontend v68
+- v67 -> v68 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 02c4106 (web tree 660a4c5; the 3 changed files on the machine are hash-identical to main), image deployment-01M8AX66MQADB9MDMGG5BB86V5. No secrets, no migration. The game worker reported 0 active generations. Rollback: `flyctl releases rollback 67 -a quiz-web-frontend`.
+- Cause of the check's "0 daily entries" at 03:00 UTC: its request started a stopped machine and read the cache before the fill ended. Separately a filled cache held 54 of 60 (statement timeout on large OFFSETs; crossword hard has no rows). Not the Firestore quota and not v67: this cache reads the database only.
+- Checked live: fill 59 of 60 in 5.4 s; after stopping the machines, the first `/api/puzzles/daily/stats` request answered 59 in 9.5 s. Health probes 01:35-03:10 UTC all passed.
+- Open: crossword hard has no puzzles.
+
 ## Firestore quota: stay responsive and read less, LIVE 2026-11-26 01:31 UTC (PR #101, main 188e6b6): quiz-web-frontend v67
 - v66 -> v67 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 188e6b6 (web tree de81ffa9; the 10 changed runtime files on the machine are hash-identical to main), image deployment-01M8AQH7FQAERHY8NEKJZH4FGN. No secrets, no migration. The game worker reported 0 active generations before the deploy. Rollback: `flyctl releases rollback 66 -a quiz-web-frontend`.
 - Reads on quota day 2026-11-25 (from 08:00 UTC), Cloud Monitoring: 36,892 query reads at 18:31-18:32 and 18:44-18:45 (verification requests), about 12,000 from machine-start configuration reads until #89, about 200 from the health probe, under 800 from everything else. About 49,900 by the time the quota ran out. Without the verification requests the day would not have run out. On 11-14 to 11-24: 22,400-27,600 a day, of which 20,700-23,400 machine-start reads, about 300 health probe and 0-4,400 queries sent straight from clients.
