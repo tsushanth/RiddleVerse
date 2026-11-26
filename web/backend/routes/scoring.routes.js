@@ -82,7 +82,7 @@ router.get('/get-score', async (req, res) => {
 
         res.json({
             userId: userId,
-            name: data.name,
+            name: publicName(data.name),
             score: data.score,
             lastUpdated: data.last_updated
         });

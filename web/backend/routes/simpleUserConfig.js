@@ -1,6 +1,7 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
 import { requireAdminKey } from '../middleware/requireAdminKey.js';
+import { isOwnAccount } from '../middleware/accountReads.js';
 
 const router = express.Router();
 
@@ -22,7 +23,9 @@ router.get('/user-config', async (req, res) => {
       });
     }
 
-    console.log(`📥 Fetching config for: ${email}`);
+    if (!(await isOwnAccount(req, 'uid', userId))) {
+      return res.json({ ...getDefaultConfig(userId, email), shouldShowTrialPrompt: false, trialPromptReason: 'none' });
+    }
 
     // Fetch user from database
     const { data: user, error } = await supabase

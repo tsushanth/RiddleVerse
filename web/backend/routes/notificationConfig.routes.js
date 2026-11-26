@@ -8,6 +8,7 @@ import { sendMulticastNotification, listUserDailyTopics } from '../services/dail
 import { requireNotificationAdmin, hasNotificationAdminKey } from '../middleware/notificationAuth.js';
 import { verifiedCaller } from '../middleware/callerIdentity.js';
 import { requireAdminKey } from '../middleware/requireAdminKey.js';
+import { ownAccountOr } from '../middleware/accountReads.js';
 
 // POST /test-notification is called by the shipped mobile apps (their "Test Notification" button) without credentials, so it
 // cannot require the admin key. Without the key it is limited: fixed text (no caller-chosen title/body) and a small per-account cap.
@@ -326,7 +327,7 @@ router.post('/send-notifications', requireNotificationAdmin, async (req, res) =>
 /**
  * List user daily topics
  */
-router.get('/list-user-daily-topics', async (req, res) => {
+router.get('/list-user-daily-topics', ownAccountOr('email', 'email', () => ({ topics: [] })), async (req, res) => {
     const { email } = req.query;
 
     if (!email) {

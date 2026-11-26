@@ -44,6 +44,9 @@ const { default: cache } = await import('../routes/dailyPuzzleCache.routes.js');
 const { default: endpoints } = await import('../routes/puzzleEndpoints.routes.js');
 const { default: account } = await import('../routes/account.routes.js');
 const { dailyPuzzleCache } = await import('../services/dailyPuzzleCache.js');
+const identity = await import('../auth/verifyIdentity.js');
+identity.__setDeps({ getFirebaseAuth: async () => ({ verifyIdToken: async (email) => ({ uid: 'u', email, email_verified: true }) }) });
+const signedInAs = (email) => ({ headers: { authorization: `Bearer ${email}` } });
 globalThis.setInterval = realSetInterval;
 
 // Every Firestore access fails the way an exhausted quota does, and is counted.
@@ -98,7 +101,7 @@ test('batch fetch still serves puzzles when Firestore is unavailable', async () 
 });
 
 test('rewards and badges answer "unavailable", not an error, when Firestore cannot be read', async () => {
-    const r = await realFetch(`${base}/get-user-rewards-badges?email=someone%40example.test`);
+    const r = await realFetch(`${base}/get-user-rewards-badges?email=someone%40example.test`, signedInAs('someone@example.test'));
     assert.equal(r.status, 200);
     assert.deepEqual(await r.json(), { rewards: [], badges: [], unavailable: true });
 });
@@ -112,7 +115,7 @@ test('single puzzle fetch is served when Firestore is unavailable, and a rewards
     let reads = 0;
     Object.defineProperty(firebase.db, 'collection', { configurable: true, value: () => ({ doc: () => ({ get: async () => { reads += 1; return { exists: false }; } }) }) });
     for (let i = 0; i < 3; i++) {
-        const r = await realFetch(`${base}/get-user-rewards-badges?email=cached%40example.test`);
+        const r = await realFetch(`${base}/get-user-rewards-badges?email=cached%40example.test`, signedInAs('cached@example.test'));
         assert.deepEqual(await r.json(), { rewards: [], badges: [] });
     }
     assert.equal(reads, 2);

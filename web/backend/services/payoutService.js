@@ -1,4 +1,5 @@
 // payoutService.js - Creator payout service via Stripe Connect
+import { callerIsUid } from '../middleware/callerIdentity.js';
 import Stripe from 'stripe';
 import { supabase } from '../config/database.js';
 
@@ -359,7 +360,9 @@ export async function getPayoutHistory(req, res) {
             return res.status(500).json({ error: 'Failed to fetch payout history' });
         }
 
-        res.json({ success: true, payouts: data || [] });
+        const own = await callerIsUid(req, creatorId);
+        const payouts = (data || []).map(({ failure_reason, ...p }) => (own ? { ...p, failure_reason } : p));
+        res.json({ success: true, payouts });
     } catch (error) {
         console.error('Unexpected error in getPayoutHistory:', error);
         res.status(500).json({ error: 'Internal server error' });
