@@ -155,6 +155,10 @@ function formatPuzzle(puzzle) {
   };
 }
 
+// Postgres walks every row an OFFSET skips: far into the larger pools the query hits the statement timeout and the entry
+// never fills. Large pools are therefore read at most this far in, from the oldest or the newest end by the date seed.
+export const MAX_SKIP = 1000;
+
 // ---------------------------------------------------------------------------
 // Core: fetch or generate puzzles for one type+difficulty
 // ---------------------------------------------------------------------------
@@ -178,17 +182,21 @@ async function fetchPuzzlesFromDB(type, difficulty, count) {
     }
 
     // Pick a deterministic offset based on the date seed
-    const offset = seed % Math.max(1, totalCount - count);
+    const span = totalCount - count;
+    const reach = Math.max(1, Math.min(span, MAX_SKIP));
+    const offset = seed % reach;
+    const ascending = span <= MAX_SKIP || Math.floor(seed / reach) % 2 === 0;
 
     const { data: puzzles, error } = await supabase
       .from('puzzles')
       .select('*')
       .eq('type', type.toLowerCase())
       .eq('difficulty', difficulty)
-      .order('timestamp', { ascending: true })
+      .order('timestamp', { ascending })
       .range(offset, offset + count - 1);
 
     if (error || !puzzles) {
+      console.error(`[DailyPuzzles] DB fetch failed for ${type}/${difficulty}: ${error?.code || 'no rows returned'}`);
       return [];
     }
 
@@ -251,11 +259,21 @@ async function generatePuzzlesViaAI(type, difficulty, count) {
 // Public API
 // ---------------------------------------------------------------------------
 
+let inFlight = null;
+
+/** The refresh now running, or null. */
+export const pendingDailyRefresh = () => inFlight;
+
 /**
  * Refresh daily puzzles for ALL types and difficulties.
- * Called on startup and by the daily cron.
+ * Called on startup, by the daily cron and by requests that find the cache empty; callers share one run.
  */
-export async function refreshDailyPuzzles() {
+export function refreshDailyPuzzles() {
+  inFlight ??= fillDailyCache().finally(() => { inFlight = null; });
+  return inFlight;
+}
+
+async function fillDailyCache() {
   const date = todayUTC();
   console.log(`[DailyPuzzles] Refreshing puzzles for ${date}...`);
   const startTime = Date.now();
