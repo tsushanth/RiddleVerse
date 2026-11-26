@@ -7,6 +7,7 @@ import {
   getDailyPuzzles,
   getDailyCacheStats,
   refreshDailyPuzzles,
+  pendingDailyRefresh,
 } from '../services/dailyPuzzles.js';
 import { requireNotificationAdmin } from '../middleware/notificationAuth.js';
 
@@ -85,12 +86,22 @@ router.get('/daily', async (req, res) => {
   }
 });
 
+// The cache is in memory, so the request that wakes a stopped machine finds it empty. The monitor gives up after 20 s,
+// and boot takes about 7 of them.
+const STATS_WAIT_MS = 11_000;
+
 /**
  * GET /api/puzzles/daily/stats
- * Returns cache statistics for monitoring.
+ * Returns cache statistics for monitoring, after waiting for a fill that is empty or under way.
  */
-router.get('/daily/stats', (req, res) => {
+router.get('/daily/stats', async (req, res) => {
   try {
+    const pending = getDailyCacheStats().todayEntries === 0 ? refreshDailyPuzzles() : pendingDailyRefresh();
+    if (pending) {
+      let timer;
+      await Promise.race([pending.catch(() => {}), new Promise((resolve) => { timer = setTimeout(resolve, STATS_WAIT_MS); })]);
+      clearTimeout(timer);
+    }
     const stats = getDailyCacheStats();
     return res.json({ success: true, ...stats });
   } catch (error) {
