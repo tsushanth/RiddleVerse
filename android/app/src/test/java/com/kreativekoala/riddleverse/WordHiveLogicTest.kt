@@ -69,7 +69,9 @@ class WordHiveLogicTest {
     }
 
     @Test fun targetRankByDifficulty() {
-        assertTrue(WordHiveRules.targetRankIndex("easy") < WordHiveRules.targetRankIndex("medium"))
-        assertTrue(WordHiveRules.targetRankIndex("medium") < WordHiveRules.targetRankIndex("hard"))
+        fun goal(difficulty: String) = WordHiveRules.ranks[WordHiveRules.targetRankIndex(difficulty)]
+        assertEquals("Solid" to 15, goal("Easy"))
+        assertEquals("Sharp" to 25, goal("Medium")) // the daily puzzle's level
+        assertEquals("Great" to 40, goal("Hard"))
     }
 }

@@ -68,6 +68,7 @@ fun WordHiveScreen(
     var hints by rememberSaveable(puzzleJson) { mutableStateOf(0) }
     var finished by rememberSaveable(puzzleJson) { mutableStateOf(false) }
     var reported by rememberSaveable(puzzleJson) { mutableStateOf(false) }
+    var recorded by rememberSaveable(puzzleJson) { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     LaunchedEffect(message) { if (message.isNotEmpty()) { delay(1800); message = "" } }
 
@@ -81,7 +82,7 @@ fun WordHiveScreen(
     }
 
     LaunchedEffect(finished) {
-        if (finished) stats.record("wordhive", success)
+        if (finished && !recorded) { recorded = true; stats.record("wordhive", success) }
     }
 
     fun submit() {

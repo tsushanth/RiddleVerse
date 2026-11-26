@@ -22,7 +22,7 @@ test('ranks: percent thresholds', () => {
   assert.equal(wh.rankIndex(100, 100), 9)
   assert.equal(wh.rankIndex(5, 0), 0)
   assert.equal(wh.RANKS[9][0], 'Queen of the Hive')
-  assert.deepEqual([wh.targetRankIndex('easy'), wh.targetRankIndex('medium'), wh.targetRankIndex('hard')], [6, 7, 8])
+  assert.deepEqual([wh.targetRankIndex('easy'), wh.targetRankIndex('medium'), wh.targetRankIndex('hard')].map((i) => wh.RANKS[i]), [['Solid', 15], ['Sharp', 25], ['Great', 40]])
 })
 test('solutions need centre letter, only hive letters, 4+', () => {
   const s = wh.solutions(['abed', 'bad', 'cafe', 'face', 'zebra', 'abed', 'dead'], L, 'a')
