@@ -11,6 +11,12 @@ const METHODS = {
   Firestore: ['getAll', 'runTransaction', 'listCollections'],
 };
 
+const READS = new Set(['get', 'getAll']);
+let readRejectedAt = -Infinity;
+/** When a read was last refused for quota (ms), for callers that can skip an optional read. */
+export const readQuotaRejectedAt = () => readRejectedAt;
+export function _resetReadQuotaForTests() { readRejectedAt = -Infinity; }
+
 /** classes: { DocumentReference, Query, ... } constructors; onQuota(flow) is called per quota rejection. */
 export function installFirestoreQuotaGuard(classes, onQuota = reportFirestoreQuota) {
   let wrapped = 0;
@@ -23,7 +29,11 @@ export function installFirestoreQuotaGuard(classes, onQuota = reportFirestoreQuo
       const fn = function (...args) {
         const out = orig.apply(this, args);
         if (out && typeof out.then === 'function') {
-          out.then(undefined, (e) => { if (isFirestoreQuotaError(e)) { try { onQuota(`${cname}.${m}`); } catch { /* never throw */ } } });
+          out.then(undefined, (e) => {
+            if (!isFirestoreQuotaError(e)) return;
+            if (READS.has(m)) readRejectedAt = Date.now();
+            try { onQuota(`${cname}.${m}`); } catch { /* never throw */ }
+          });
         }
         return out;
       };

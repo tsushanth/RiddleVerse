@@ -47,8 +47,7 @@ class CacheScheduler {
     if (this.tasksStarted) return;
 
     try {
-      await this.loadScheduleConfiguration();
-
+      // Schedules are the defaults above. Reading them from Firestore cost one read on every machine start.
       this.setupDailyRefresh();
       this.setupHealthCheck();
       this.setupStaleCleanup();
@@ -58,24 +57,6 @@ class CacheScheduler {
       console.log('[SCHEDULER] Tasks started - Daily refresh:', this.scheduleConfig.dailyRefresh);
     } catch (error) {
       console.error('[SCHEDULER] Failed to start tasks:', error.message);
-    }
-  }
-
-  /**
-   * Load schedule configuration from Firebase
-   */
-  async loadScheduleConfiguration() {
-    try {
-      const configDoc = await db.collection('system_config').doc('cache_scheduler').get();
-
-      if (configDoc.exists) {
-        const config = configDoc.data();
-        if (config.schedules) {
-          this.scheduleConfig = { ...this.scheduleConfig, ...config.schedules };
-        }
-      }
-    } catch (error) {
-      // Use defaults on error
     }
   }
 
@@ -265,7 +246,6 @@ class CacheScheduler {
       if (configKeys.length > 0) {
         await dailyPuzzleCache.redis.del(...configKeys);
       }
-      await this.loadScheduleConfiguration();
     } catch (error) {
       console.error('[SCHEDULER] Config refresh failed:', error.message);
     }

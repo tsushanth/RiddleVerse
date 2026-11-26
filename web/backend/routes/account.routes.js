@@ -4,6 +4,7 @@ import { supabase } from '../config/database.js';
 import { admin, db } from '../config/firebaseAdmin.js';
 import { hasNotificationAdminKey } from '../middleware/notificationAuth.js';
 import { callerIsUid } from '../middleware/callerIdentity.js';
+import { firestoreRead } from '../utils/firestoreBestEffort.js';
 
 const router = express.Router();
 
@@ -37,6 +38,7 @@ router.delete('/delete-user-account', async (req, res) => {
         }
 
         console.log(`🗑️ Starting account deletion for user: ${email}`);
+        rewardsCache.delete(email);
 
         const deletionResults = {
             firestore: [],
@@ -172,6 +174,10 @@ router.delete('/delete-user-account', async (req, res) => {
     }
 });
 
+// Rewards and badges are two document reads per call and nothing in this backend writes them: keep an answer for a while.
+const REWARDS_TTL_MS = 10 * 60 * 1000;
+const rewardsCache = new Map(); // email -> { at, body }
+
 /**
  * Get user rewards and badges
  */
@@ -179,13 +185,20 @@ router.get('/get-user-rewards-badges', async (req, res) => {
     const { email } = req.query;
     if (!email) return res.status(400).json({ error: "Missing email" });
 
+    const cached = rewardsCache.get(email);
+    if (cached && Date.now() - cached.at < REWARDS_TTL_MS) return res.json(cached.body);
+
     try {
-        const rewardsDoc = await db.collection("user_rewards").doc(email).get();
-        const badgesDoc = await db.collection("user_badges").doc(email).get();
+        const [rewardsDoc, badgesDoc] = await firestoreRead(() => Promise.all([
+            db.collection("user_rewards").doc(email).get(),
+            db.collection("user_badges").doc(email).get(),
+        ]));
 
         const rewards = rewardsDoc.exists ? rewardsDoc.data().rewards || [] : [];
         const badges = badgesDoc.exists ? badgesDoc.data().badges || [] : [];
 
+        if (rewardsCache.size >= 2000) rewardsCache.clear();
+        rewardsCache.set(email, { at: Date.now(), body: { rewards, badges } });
         return res.json({ rewards, badges });
     } catch (err) {
         // Firestore quota or outage: answer with nothing to show, marked as unavailable, rather than an error.

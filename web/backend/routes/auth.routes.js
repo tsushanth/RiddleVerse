@@ -2,6 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { admin, db } from '../config/firebaseAdmin.js';
 import { verifyToken } from '../auth/verifyIdentity.js';
+import { firestoreRead } from '../utils/firestoreBestEffort.js';
 import { JWT_SECRET } from '../config/constants.js';
 
 const router = express.Router();
@@ -21,7 +22,7 @@ router.post("/google", async (req, res) => {
         // The Firestore user document is bookkeeping: a quota or outage there must not read as "invalid token".
         try {
             const userRef = db.collection("users").doc(userId);
-            const userDoc = await userRef.get();
+            const userDoc = await firestoreRead(() => userRef.get());
 
             if (!userDoc.exists) {
                 await userRef.set({

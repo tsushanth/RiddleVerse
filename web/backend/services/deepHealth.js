@@ -1,11 +1,15 @@
 // GET /api/health/deep: a cheap, real check of the dependencies a player's request needs, for external probes.
 //   supabase     one row from `puzzles`
-//   firestore    one document read
+//   firestore    one document read, repeated at most every 15 min while it works. Puzzles are served without Firestore, so a
+//                used-up quota or a read that does not answer in time is a warning (ok:true), not an outage: the quota is
+//                alerted on its own (failure report `firestore.quota`, outcome check on the read count). Other errors fail.
 //   forge_worker the game-build worker's /health on the Hetzner box (GAME_WORKER_URL)
 // Answers 200 {ok:true} or 503 {ok:false}; the probe (app-failure-reporter Worker, or the harness canary) only has to read
 // the status. It does NOT call an LLM and does NOT write anything (contrast /api/health/comprehensive, which generates
 // puzzles and calls two AI providers, so it must never be probed). Failure details are generic on purpose (no URLs,
 // hostnames or driver messages leave the server). Result is cached 30 s so a probe storm cannot hammer Firestore/Supabase.
+import { firestoreRead, isFirestoreUnavailable } from '../utils/firestoreBestEffort.js';
+
 const withTimeout = (p, ms, label) => Promise.race([
   Promise.resolve(p),
   new Promise((_, rej) => setTimeout(() => rej(Object.assign(new Error(`${label} timed out`), { timeout: true })), ms).unref?.()),
@@ -14,7 +18,11 @@ const withTimeout = (p, ms, label) => Promise.race([
 /** workerUrl may be the bare origin or end in /game (the VibeBuild-style mount); /health lives on the origin. */
 export const workerBase = (url) => String(url ?? '').replace(/\/+$/, '').replace(/\/game$/, '');
 
-export function buildChecks({ supabase, getDb, workerUrl, fetchFn = fetch }) {
+const FIRESTORE_OK_MS = 15 * 60_000;
+export const FIRESTORE_READ_MS = 5000;
+const OK_AT = Symbol('lastGoodHealthRead'); // kept on the client: the server builds the checks anew on every request
+
+export function buildChecks({ supabase, getDb, workerUrl, fetchFn = fetch, now = Date.now, firestoreTimeoutMs = FIRESTORE_READ_MS }) {
   return {
     supabase: async () => {
       if (!supabase) throw new Error('supabase client missing');
@@ -24,7 +32,15 @@ export function buildChecks({ supabase, getDb, workerUrl, fetchFn = fetch }) {
     firestore: async () => {
       const db = await getDb();
       if (!db) throw new Error('firestore not initialised');
-      await db.collection('health_check').doc('test').get();
+      if (now() - (db[OK_AT] ?? -Infinity) < FIRESTORE_OK_MS) return undefined;
+      try {
+        await firestoreRead(() => db.collection('health_check').doc('test').get(), { timeoutMs: firestoreTimeoutMs, now });
+      } catch (e) {
+        if (!isFirestoreUnavailable(e)) throw e;
+        return { degraded: e.timeout ? 'timeout' : 'quota' };
+      }
+      db[OK_AT] = now();
+      return undefined;
     },
     forge_worker: async () => {
       const base = workerBase(workerUrl);
@@ -44,7 +60,9 @@ export async function runDeepHealth(checks, { timeoutMs = 8000, now = Date.now }
     const t0 = now();
     try {
       const extra = await withTimeout(fn(), timeoutMs, name);
-      out.checks[name] = { ok: true, ms: now() - t0 };
+      out.checks[name] = extra?.degraded ? { ok: false, ms: now() - t0, detail: extra.degraded } : { ok: true, ms: now() - t0 };
+      if (extra?.degraded)
+        out.warnings.push(`${name} unavailable (${extra.degraded}): saved progress and rewards are degraded, puzzles are still served`);
       if (name === 'forge_worker' && typeof extra?.activeGenerations === 'number' && extra.activeGenerations < 0)
         out.warnings.push(`forge_worker activeGenerations is ${extra.activeGenerations} (slot counter bug in the deployed worker; not a failure)`);
     } catch (e) {

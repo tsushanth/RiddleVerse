@@ -2,6 +2,7 @@
 import express from 'express';
 import { supabase } from '../config/database.js';
 import { db } from '../config/firebaseAdmin.js';
+import { ensureUserDoc, firestoreRead } from '../utils/firestoreBestEffort.js';
 import { riddleVerseRateLimit } from '../config/middleware.js';
 import { normalizeDifficulty } from '../utils/puzzleUtils.js';
 import { userLimitService } from '../services/userLimitService.js';
@@ -124,19 +125,14 @@ router.get("/fetch-next-puzzle-ios/:puzzleType", authenticateRiddleVerse, riddle
             // puzzle" error for anonymous users (2026-08-04) — puzzles
             // existed and were reachable the whole time.
             try {
-                const anonUserRef = db.collection("users").doc(ANONYMOUS_USER_ID);
-                const anonUserDoc = await anonUserRef.get();
-
-                if (!anonUserDoc.exists) {
-                    await anonUserRef.set({
-                        email: "anonymous@sequential.user",
-                        lastPuzzleTimestamp: null,
-                        puzzlesAttempted: 0,
-                        puzzlesSolved: 0,
-                        lastPuzzleTimestamps: {},
-                        puzzleProgress: {}
-                    });
-                }
+                await ensureUserDoc(db.collection("users").doc(ANONYMOUS_USER_ID), ANONYMOUS_USER_ID, {
+                    email: "anonymous@sequential.user",
+                    lastPuzzleTimestamp: null,
+                    puzzlesAttempted: 0,
+                    puzzlesSolved: 0,
+                    lastPuzzleTimestamps: {},
+                    puzzleProgress: {}
+                });
             } catch (bookkeepingError) {
                 console.error('Anonymous user bookkeeping failed (non-fatal):', bookkeepingError.message);
             }
@@ -151,19 +147,14 @@ router.get("/fetch-next-puzzle-ios/:puzzleType", authenticateRiddleVerse, riddle
         // Same non-fatal bookkeeping guard as the anonymous branch above —
         // this doc is attempt/solve counters, not required to serve a puzzle.
         try {
-            const userRef = db.collection("users").doc(userId);
-            const userDoc = await userRef.get();
-
-            if (!userDoc.exists) {
-                await userRef.set({
-                    email,
-                    lastPuzzleTimestamp: null,
-                    puzzlesAttempted: 0,
-                    puzzlesSolved: 0,
-                    lastPuzzleTimestamps: {},
-                    puzzleProgress: {}
-                });
-            }
+            await ensureUserDoc(db.collection("users").doc(userId), userId, {
+                email,
+                lastPuzzleTimestamp: null,
+                puzzlesAttempted: 0,
+                puzzlesSolved: 0,
+                lastPuzzleTimestamps: {},
+                puzzleProgress: {}
+            });
         } catch (bookkeepingError) {
             console.error('User bookkeeping failed (non-fatal):', bookkeepingError.message);
         }
@@ -206,7 +197,7 @@ router.post("/batch-fetch-puzzles", async (req, res) => {
         let progress = {};
         try {
             userRef = db.collection("users").doc(userId);
-            const userDoc = await userRef.get();
+            const userDoc = await firestoreRead(() => userRef.get());
 
             if (!userDoc.exists) {
                 await userRef.set({

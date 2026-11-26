@@ -12,6 +12,7 @@ import { PuzzleGenerator } from '../services/puzzleGeneration.js';
 import { type } from "os";
 import { supabase } from "../config/database.js";
 import {admin, db} from "../config/firebaseAdmin.js";
+import { firestoreRead } from '../utils/firestoreBestEffort.js';
 import { generateTTSAudio } from '../utils/aiClient.js';
 import { deduplicationService } from './deduplicationService.js';
 import { wordSearchService } from './wordSearchGeneratorService.js';
@@ -1094,7 +1095,7 @@ async function trackPuzzleReset(userId, puzzleType, difficulty, resetReason = 'c
         const userRef = db.collection("users").doc(userId);
         
         // Get current user data to update reset count
-        const userDoc = await userRef.get();
+        const userDoc = await firestoreRead(() => userRef.get());
         const userData = userDoc.data() || {};
         
         // Initialize reset tracking if it doesn't exist
