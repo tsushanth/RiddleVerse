@@ -5,6 +5,9 @@
 - Checked 2026-11-26 00:26 UTC on the running machine (names and mode only): `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` unset.
 - Before releasing: set the secret (account invited in Play Console with view financial data and manage orders and subscriptions), then one license-tester purchase of a pack and of a subscription. Or change the server to verify a coin pack by order id while the Play account is not configured, and deploy that first. No 189 build or version bump was made.
 
+## Server release 2026-11-26 03:38 UTC (PR #107, main 9417b1f): quiz-web-frontend v70
+- v69 -> v70, same deploy method (web tree 40db2976; changed runtime files on the machine hash-identical to main), image deployment-01M8AYW3DWMM9F7K5YP12XS5GH. Comment wording only. Rollback: `flyctl releases rollback 69 -a quiz-web-frontend`.
+
 ## Server release 2026-11-26 03:32 UTC (PR #105, main 211aaab): quiz-web-frontend v69
 - v68 -> v69 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 211aaab (web tree ba4af028; the 11 changed runtime files on the machine are hash-identical to main), image deployment-01M8AYF9PCVXJ5AY474K4YE2D6. No secrets, no migration. Rollback and details: private ops notes, `riddleverse-account-reads/`.
 
