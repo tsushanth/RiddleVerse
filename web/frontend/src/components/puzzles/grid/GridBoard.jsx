@@ -109,8 +109,10 @@ export default function GridBoard({ spec, state, rev, onCell, cellRefs, revealed
     return cg.cells[0] === i ? cageLabel(cg) : null
   }
 
+  // dir="ltr": a board must not mirror on right-to-left pages; signs and cage borders use physical left/right.
   return (
     <div
+      dir="ltr"
       role="group"
       aria-label={`${spec.game} board, ${n} by ${n}`}
       data-rev={rev}

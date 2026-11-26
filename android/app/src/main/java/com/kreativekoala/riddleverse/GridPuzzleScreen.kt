@@ -38,6 +38,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +58,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -64,6 +66,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kreativekoala.riddleverse.ui.theme.RvCanvas
@@ -256,6 +259,12 @@ private fun GridHeader(spec: GridSpec, state: GridPlayState, level: String, onBa
 
 @Composable
 fun GridBoard(spec: GridSpec, state: GridPlayState, side: Dp) {
+    // Never mirror a board in right-to-left languages: signs, box lines and cage borders are drawn in left-to-right coordinates.
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) { GridBoardCells(spec, state, side) }
+}
+
+@Composable
+private fun GridBoardCells(spec: GridSpec, state: GridPlayState, side: Dp) {
     val n = spec.n
     val cell = side / n
     val density = LocalDensity.current
