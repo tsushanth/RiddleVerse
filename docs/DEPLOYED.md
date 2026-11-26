@@ -1,5 +1,12 @@
 # Deployed releases (Play)
 
+## Word Hive goal lowered 2026-11-26 15:11 UTC (PR #111, main f3338aa): quiz-web-frontend v72; Android merged, NOT released
+- v71 -> v72 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main f3338aa (web tree 8a3cd7a), image deployment-01M8C6GY2EMC6WS0127JG67J5S. Only front-end source changed since v71; no secrets, no migration. No game creation or puzzle set had started in the 45 minutes before. Rollback: `flyctl releases rollback 71 -a quiz-web-frontend`.
+- Goal to solve: Easy Great (40%) -> Solid (15%); Medium, including the daily, Amazing (50%) -> Sharp (25%); Hard Genius (70%) -> Great (40%). Puzzles, rank names and scoring unchanged. Approved by the owner 2026-11-26.
+- Saved games: a restored game already past the new goal shows Finish and counts as solved. Recorded daily solves, streaks and per-game counters are not re-evaluated. Android also no longer counts a result again when the result card is recreated (the same fault was not fixed in Linkup).
+- Checked live: `/api/health` 200; /play/wordhive in a headless browser (API requests blocked) played to the goal and finished as solved at all three levels. No route that reads Firestore was called.
+- Android (next release, not uploaded): `:app:testDebugUnitTest` 1088 tests, 0 failures. Not run on a device. Versions up to 188 keep the old goal until players update.
+
 ## Right-to-left puzzle boards 2026-11-26 14:57 UTC (PR #109, main a819432): quiz-web-frontend v71; Android merged, NOT released
 - v70 -> v71 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main a819432 (web tree 4624796), image deployment-01M8C5QB27EHF93YJ3P01520C5. Only front-end source changed since v70; no secrets, no migration. No game creation or puzzle set had started in the 45 minutes before. Rollback: `flyctl releases rollback 70 -a quiz-web-frontend`.
 - Was: on right-to-left layouts the grid cells were mirrored but Sign Grid signs were not placed with them (live /play/signgrid in Arabic: 9 of 9 horizontal signs not between their cells), and the Word Hive entry showed the word backwards.
