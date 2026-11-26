@@ -1,5 +1,10 @@
 # Deployed releases (Play)
 
+## Android 189 NOT released 2026-11-25: waiting for the server's Play account
+- The app since #96 sends a purchase token with coin pack purchases. Without `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` the server answers every token request 503 and credits nothing, so a buyer on 189 would pay and get no coins until it is set. Versions up to 188 send the order id only and are verified that way (`COIN_PURCHASE_VERIFY` is in enforce mode).
+- Checked 2026-11-26 00:26 UTC on the running machine (names and mode only): `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` unset.
+- Before releasing: set the secret (account invited in Play Console with view financial data and manage orders and subscriptions), then one license-tester purchase of a pack and of a subscription. Or change the server to verify a coin pack by order id while the Play account is not configured, and deploy that first. No 189 build or version bump was made.
+
 ## Yearly plan coins paid each month 2026-11-25: quiz-web-frontend v66 (PR #98, main 1f88cad)
 - v65 -> v66 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main 1f88cad (web tree d604000c; `services/playPurchases.js` and `server.js` on the machine hash-identical to main), image deployment-01M8AHJZXKK88JM9PNDKJCCT1E. No secrets, no migration. Rollback: `flyctl releases rollback 65 -a quiz-web-frontend`.
 - Was: the yearly plan's 700 coins were credited once per yearly period while the app says every month. Now: once in each month of a paid year (ledger id `sub_coins_<order>_m<1..12>`), current month only, nothing back-filled; the sweep also re-checks running yearly subscriptions whose month is unpaid.
