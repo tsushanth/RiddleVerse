@@ -1,5 +1,12 @@
 # Deployed releases (Play)
 
+## Right-to-left puzzle boards 2026-11-26 14:57 UTC (PR #109, main a819432): quiz-web-frontend v71; Android merged, NOT released
+- v70 -> v71 with `flyctl deploy --remote-only` from `web/` of a clean detached worktree of origin/main a819432 (web tree 4624796), image deployment-01M8C5QB27EHF93YJ3P01520C5. Only front-end source changed since v70; no secrets, no migration. No game creation or puzzle set had started in the 45 minutes before. Rollback: `flyctl releases rollback 70 -a quiz-web-frontend`.
+- Was: on right-to-left layouts the grid cells were mirrored but Sign Grid signs were not placed with them (live /play/signgrid in Arabic: 9 of 9 horizontal signs not between their cells), and the Word Hive entry showed the word backwards.
+- Checked live: `/api/health` 200; /play in Arabic in a headless browser (API requests blocked): signs between their cells, word left to right; English unchanged. No route that reads Firestore was called.
+- Android (next release, not uploaded): grid boards and the Word Hive entry are always left to right. `:app:testDebugUnitTest` 1086 tests, 0 failures. Not run on a device.
+- Sign Grid and Word Hive "never completed" (checked 2026-11-26): the real daily puzzles were played to completion through the Compose screens in unit tests (left-to-right layout). 500 random medium Sign Grids all had one solution. Word Hive can be completed but the goal is high: a Medium puzzle needs about 24 words, and in 500 puzzles a player knowing every word in the 10,000 most frequent could reach the goal in 3%. Goal unchanged.
+
 ## Android 189 NOT released 2026-11-25: waiting for the server's Play account
 - The app since #96 sends a purchase token with coin pack purchases. Without `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` the server answers every token request 503 and credits nothing, so a buyer on 189 would pay and get no coins until it is set. Versions up to 188 send the order id only and are verified that way (`COIN_PURCHASE_VERIFY` is in enforce mode).
 - Checked 2026-11-26 00:26 UTC on the running machine (names and mode only): `GOOGLE_PLAY_SERVICE_ACCOUNT_JSON` unset.
