@@ -13,12 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.geometry.Offset
@@ -135,11 +137,13 @@ fun WordHiveScreen(
 
         if (!finished) {
             Spacer(Modifier.height(8.dp))
-            // current entry
-            Row(Modifier.heightIn(min = 44.dp).clearAndSetSemantics { contentDescription = "Current word ${entry.uppercase()}" }) {
-                entry.forEach {
-                    Text(it.uppercase(), fontSize = 28.sp, fontWeight = FontWeight.Bold,
-                        color = if (it == puzzle.center) WordPuzzleColors.present else if (it in puzzle.letterSet) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error)
+            // current entry: an English word, so left to right in every app language
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                Row(Modifier.heightIn(min = 44.dp).clearAndSetSemantics { contentDescription = "Current word ${entry.uppercase()}" }) {
+                    entry.forEach {
+                        Text(it.uppercase(), fontSize = 28.sp, fontWeight = FontWeight.Bold,
+                            color = if (it == puzzle.center) WordPuzzleColors.present else if (it in puzzle.letterSet) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.error)
+                    }
                 }
             }
             WordPuzzleMessage(message)

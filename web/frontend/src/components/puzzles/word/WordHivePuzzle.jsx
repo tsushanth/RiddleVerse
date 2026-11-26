@@ -83,7 +83,7 @@ function Hive({ lists, puzzle, onAnswer }) {
       <p className="text-white/70 text-sm">Goal: reach {wh.RANKS[targetIdx][0]} &nbsp; Words {found.length}/{p.words.length}</p>
       {!finished ? (
         <>
-          <div className="min-h-[44px] flex items-center text-3xl font-extrabold tracking-wide" aria-label={`Current word ${entry.toUpperCase()}`}>
+          <div dir="ltr" className="min-h-[44px] flex items-center text-3xl font-extrabold tracking-wide" aria-label={`Current word ${entry.toUpperCase()}`}>
             {[...entry].map((c, i) => (
               <span key={i} className={c === p.center ? 'text-amber-300' : letters.has(c) ? 'text-white' : 'text-red-300'}>{c.toUpperCase()}</span>
             ))}
