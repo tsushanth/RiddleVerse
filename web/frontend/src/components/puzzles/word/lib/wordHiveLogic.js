@@ -44,7 +44,7 @@ export function rankIndex(score, maxScore) {
 
 export function targetRankIndex(difficulty) {
   const d = String(difficulty).toLowerCase()
-  return d === 'easy' ? 6 : d === 'hard' ? 8 : 7
+  return d === 'easy' ? 4 : d === 'hard' ? 6 : 5
 }
 
 export function rejection(entry, letters, center, solutionSet, found) {

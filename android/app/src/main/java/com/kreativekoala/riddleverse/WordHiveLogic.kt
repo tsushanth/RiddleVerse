@@ -34,11 +34,11 @@ object WordHiveRules {
         return idx
     }
 
-    /** Percent thresholds of the rank the player must reach to count the puzzle as solved. */
+    /** Index into [ranks] of the rank the player must reach to count the puzzle as solved. */
     fun targetRankIndex(difficulty: String): Int = when (difficulty.lowercase()) {
-        "easy" -> 6      // Great
-        "hard" -> 8      // Genius
-        else -> 7        // Amazing
+        "easy" -> 4      // Solid
+        "hard" -> 6      // Great
+        else -> 5        // Sharp
     }
 
     fun rejection(
