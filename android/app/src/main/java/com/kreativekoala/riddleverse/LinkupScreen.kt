@@ -49,6 +49,7 @@ fun LinkupScreen(
 
     var enc by rememberSaveable(puzzleJson) { mutableStateOf(LinkupState().encode()) }
     var reported by rememberSaveable(puzzleJson) { mutableStateOf(false) }
+    var recorded by rememberSaveable(puzzleJson) { mutableStateOf(false) }
     var message by remember { mutableStateOf("") }
     LaunchedEffect(message) { if (message.isNotEmpty()) { delay(2200); message = "" } }
 
@@ -59,7 +60,7 @@ fun LinkupScreen(
     val score = LinkupRules.score(state, profile)
     val tiles = remember(puzzle, state.solved, state.shuffle) { LinkupRules.available(puzzle, state) }
 
-    LaunchedEffect(finished) { if (finished) stats.record("linkup", won) }
+    LaunchedEffect(finished) { if (finished && !recorded) { recorded = true; stats.record("linkup", won) } }
 
     fun update(s: LinkupState) { enc = s.encode() }
 
