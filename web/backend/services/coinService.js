@@ -51,7 +51,7 @@ export async function getCoinBalance(req, res) {
             return res.status(500).json({ error: 'Failed to fetch balance' });
         }
 
-        // Released apps read the balance without a sign-in; the lifetime totals go to the account itself.
+        // Lifetime totals go to the account itself.
         const own = await callerIsUid(req, userId);
         res.json({
             success: true,
