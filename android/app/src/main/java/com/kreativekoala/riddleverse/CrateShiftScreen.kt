@@ -161,14 +161,15 @@ private fun CrateShiftBoard(args: SpatialArgs, level: CrateLevel) {
             }
         }
         // arrow pad (accessible alternative to swiping)
-        Row(
-            Modifier.fillMaxWidth().padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
-        ) {
-            PadButton(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move left") { go(3) }
-            PadButton(Icons.Default.KeyboardArrowUp, "Move up") { go(0) }
-            PadButton(Icons.Default.KeyboardArrowDown, "Move down") { go(2) }
-            PadButton(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move right") { go(1) }
+        val pad = Modifier.fillMaxWidth().padding(bottom = 4.dp)
+        val padSpacing = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally)
+        LeftToRightBoard {
+            Row(pad, horizontalArrangement = padSpacing) {
+                PadButton(Icons.AutoMirrored.Filled.KeyboardArrowLeft, "Move left") { go(3) }
+                PadButton(Icons.Default.KeyboardArrowUp, "Move up") { go(0) }
+                PadButton(Icons.Default.KeyboardArrowDown, "Move down") { go(2) }
+                PadButton(Icons.AutoMirrored.Filled.KeyboardArrowRight, "Move right") { go(1) }
+            }
         }
     }
 

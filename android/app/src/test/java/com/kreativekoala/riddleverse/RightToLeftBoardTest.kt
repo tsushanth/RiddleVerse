@@ -44,4 +44,31 @@ class RightToLeftBoardTest : LayoutMatrixBase() {
         ).fetchSemanticsNode().boundsInRoot.left
         assertTrue("first typed letter must be on the left", left(typed[0]) < left(typed[1]))
     }
+
+    private val spatial = SpatialArgs(7L, "Medium", "1/1", { _, _ -> }, {})
+
+    private fun leftOf(description: String): Float {
+        compose.waitUntil(10_000) {
+            compose.onAllNodes(hasContentDescription(description, substring = true)).fetchSemanticsNodes().isNotEmpty()
+        }
+        return compose.onNode(hasContentDescription(description, substring = true)).fetchSemanticsNode().boundsInRoot.left
+    }
+
+    @Test @Config(qualifiers = Devices.TYPICAL_PHONE)
+    fun crownsBoardKeepsColumnOrder() {
+        renderRtl { CrownsScreen(spatial) }
+        assertTrue(leftOf("Row 1, column 1, ") < leftOf("Row 1, column 2, "))
+    }
+
+    @Test @Config(qualifiers = Devices.TYPICAL_PHONE)
+    fun conduitBoardKeepsColumnOrder() {
+        renderRtl { ConduitScreen(spatial) }
+        assertTrue(leftOf("Row 1, column 1: ") < leftOf("Row 1, column 2: "))
+    }
+
+    @Test @Config(qualifiers = Devices.TYPICAL_PHONE)
+    fun crateShiftArrowsPointWhereTheyMove() {
+        renderRtl { CrateShiftScreen(spatial) }
+        assertTrue(leftOf("Move left") < leftOf("Move right"))
+    }
 }
