@@ -216,14 +216,14 @@ fun openFeedbackEmail(context: Context) {
     try {
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@riddleverse.com"))
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@kreativekoala.llc"))
             putExtra(Intent.EXTRA_SUBJECT, "RiddleVerse App Feedback")
             putExtra(Intent.EXTRA_TEXT, "Hi,\n\nI'd like to share some feedback about RiddleVerse:\n\n")
         }
         context.startActivity(intent)
     } catch (e: Exception) {
         Log.e("RatingDialog", "Failed to open email client", e)
-        Toast.makeText(context, context.getString(R.string.done_feedback_email_us, "support@riddleverse.com"), Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.done_feedback_email_us, "support@kreativekoala.llc"), Toast.LENGTH_LONG).show()
     }
 }
 
