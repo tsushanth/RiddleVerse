@@ -36,15 +36,15 @@ Most "new installs" are not people. Release-time crawlers sign in, open the firs
 query splits them off by the `traffic` label (rows from 2026-11-26) and, for older rows, by two heuristics (three or more
 first opens of one version within an hour; first tap 35 to 65 seconds after first open). Both are inferences.
 
-Baseline, 2026-11-26 (installs of the last 30 days that are old enough):
+Baseline, 2026-11-27 00:36 UTC, before any Android release with the new first run (installs of the last 30 days that are old enough):
 
 | Cohort | Eligible | Started a puzzle | Completed one | Back next day | Back any later day |
 |---|---|---|---|---|---|
-| All new installs | 107 | 79 | 15 | 0 | 3 |
+| All new installs | 110 | 82 | 15 | 0 | 3 |
 | Likely people (inferred) | 28 | 15 | 5 | 0 | 3 |
-| Looks automated (inferred) | 79 | 64 | 10 | 0 | 0 |
+| Looks automated (inferred) | 82 | 67 | 10 | 0 | 0 |
 
-Among the likely people the first puzzle was an anagram for 11 of 15 starters, and 1 of those 11 solved it. All 32
+Among the likely people the first puzzle was an anagram for 11 of 15 starters, and 1 of those 11 solved it. All 33
 installs that met Trail first are in the automated group. With about one likely person a day, a change in this measure
 takes weeks to show.
 
