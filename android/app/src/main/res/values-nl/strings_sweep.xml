@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Je puzzels en voortgang tot nu toe blijven op deze telefoon en gaan mee naar je account zodra je inlogt. Het is gratis.</string>
     <string name="onb_gate_sign_in_to_create">Log in om spellen te maken. Het is gratis en kost minder dan een minuut.</string>
     <string name="onb_first_run_tagline">Snelle breinpuzzels. Geen aanmelding nodig.</string>
-    <string name="onb_first_run_load_failed">Kan geen puzzel laden. In plaats daarvan wordt de puzzellijst geopend.</string>
     <string name="onb_first_run_play_cd">Speel je eerste puzzel</string>
     <string name="onb_intro_welcome_title">Welkom bij RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Daag je brein uit met boeiende puzzels, quizzen en breinbrekers. Van rekensommen tot woordspellen: er is voor ieder wat wils.</string>

@@ -284,7 +284,8 @@ fun DailyCompletionScreen(
     onStartPuzzle: (String, String) -> Unit = { _, _ -> },
     showAdBeforeNavigation: ((() -> Unit) -> Unit)? = null,
     isGroupCompletion: Boolean,
-    sourceGroupName: String?
+    sourceGroupName: String?,
+    offerReminder: Boolean = false
 ) {
     val context = LocalContext.current
     val gameGenVM: GameGenerationViewModel = viewModel()
@@ -350,7 +351,8 @@ fun DailyCompletionScreen(
                     onReturnHome = {
                         showAdBeforeNavigation?.invoke { onReturnHome() }
                             ?: onReturnHome()
-                    }
+                    },
+                    offerReminder = offerReminder
                 )
             }
 
@@ -651,7 +653,8 @@ fun EnhancedSuccessContentWithRanking(
     onViewLeaderboard: (String) -> Unit = { },
     onStartPuzzle: (String, String) -> Unit = { _, _ -> },
     onCreateRemix: () -> Unit = {},
-    onReturnHome: () -> Unit
+    onReturnHome: () -> Unit,
+    offerReminder: Boolean = false
 ) {
     val context = LocalContext.current
     val totalUserScore = remember { UserScoreStore.load(context) }
@@ -785,6 +788,8 @@ fun EnhancedSuccessContentWithRanking(
                     }
                 }
             }
+
+            if (offerReminder && celebrationStage >= 1) ReminderOfferCard()
 
             // Rest of the success content remains the same...
             AnimatedVisibility(

@@ -431,7 +431,6 @@
     <string name="onb_gate_message">Teka-teki dan kemajuan anda setakat ini kekal pada telefon ini dan berpindah ke akaun anda apabila anda log masuk. Ia percuma.</string>
     <string name="onb_gate_sign_in_to_create">Log masuk untuk mencipta permainan. Ia percuma dan mengambil masa kurang seminit.</string>
     <string name="onb_first_run_tagline">Teka-teki otak yang pantas. Tidak perlu mendaftar.</string>
-    <string name="onb_first_run_load_failed">Tidak dapat memuatkan teka-teki. Membuka senarai teka-teki sebagai gantinya.</string>
     <string name="onb_first_run_play_cd">Main teka-teki pertama anda</string>
     <string name="onb_intro_welcome_title">Selamat Datang ke RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Cabar minda anda dengan teka-teki, kuiz dan teka-teki otak yang menarik. Daripada soalan matematik hingga permainan perkataan, ada sesuatu untuk semua orang.</string>

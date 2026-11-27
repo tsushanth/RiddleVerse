@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">最大的數字絕不可能出現在符號的窄端。</string>
     <string name="tut_purchasing_instruction">每道題會顯示一項訂閱：你付多少錢，多久付一次。算出一年的總費用，然後點按匹配的總數。例如：每月 10 就是 10 × 12 = 每年 120。</string>
     <string name="tut_purchasing_tip">每天 × 365，每週 × 52，每月 × 12，每季度 × 4。提示有幫助，但會降低你的得分。</string>
+    <string name="starter_instruction">點選數字填入反白的格子。每一列、每一行和每個小宮格都要有 1、2、3、4。</string>
 </resources>

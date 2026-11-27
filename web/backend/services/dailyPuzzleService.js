@@ -843,6 +843,17 @@ export async function storeFCMToken(userEmail, userId, fcmToken, platform, langu
 }
 
 /**
+ * The player answered the reminder question in the app: no server daily reminder for this address
+ * (services/newPlayerReminder.js reads puzzle_reminders). Never fails the token registration it comes with.
+ */
+export async function optOutOfDailyReminder(userEmail) {
+    const { error } = await supabase
+        .from('user_notification_preferences')
+        .upsert({ user_email: userEmail, puzzle_reminders: false, updated_at: new Date().toISOString() }, { onConflict: 'user_email' });
+    if (error) console.warn('Could not record the reminder opt-out:', error.message);
+}
+
+/**
  * Emails (as stored) that currently have this push token bound as active, de-duplicated.
  * Used to refuse an unauthenticated registration that would attach a token to a second account.
  */

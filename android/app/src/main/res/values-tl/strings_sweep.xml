@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Mananatili sa telepono na ito ang iyong mga palaisipan at progreso, at ililipat sa iyong account kapag nag-sign in ka. Libre ito.</string>
     <string name="onb_gate_sign_in_to_create">Mag-sign in para gumawa ng laro. Libre ito at wala pang isang minuto.</string>
     <string name="onb_first_run_tagline">Mabilisang palaisipan para sa utak. Hindi kailangan ng sign-up.</string>
-    <string name="onb_first_run_load_failed">Hindi ma-load ang palaisipan. Bubuksan na lang ang listahan ng palaisipan.</string>
     <string name="onb_first_run_play_cd">Laruin ang una mong palaisipan</string>
     <string name="onb_intro_welcome_title">Maligayang pagdating sa RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Hamunin ang iyong isip sa mga nakakaaliw na palaisipan, quiz, at brain teaser. Mula sa mga problema sa matematika hanggang sa mga larong salita, may para sa lahat.</string>

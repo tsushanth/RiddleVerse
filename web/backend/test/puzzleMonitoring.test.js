@@ -128,6 +128,32 @@ test('ingest: db failure -> 500 (never claims accepted)', async () => {
     s.close();
 });
 
+test('ingest: rows are labelled by where they came from; the address is not stored', async () => {
+    const s = await boot();
+    const android = { installId: 'abc', platform: 'android', events: [{ type: 'start', puzzleType: 'starter' }] };
+    await post(s.base, android, { 'cf-connecting-ip': '70.32.128.5' });
+    await post(s.base, android, { 'cf-connecting-ip': '203.0.113.9' });
+    await post(s.base, { ...android, testLab: true }, { 'cf-connecting-ip': '203.0.113.9' });
+    await post(s.base, { ...android, testLab: 'yes' }, { 'cf-connecting-ip': '203.0.113.9' });
+    assert.deepEqual(s.client.inserted.map((r) => r.traffic), ['testlab', 'other', 'testlab', 'other']);
+    assert.ok(!JSON.stringify(s.client.inserted).includes('70.32.128.5'));
+    s.close();
+});
+test('ingest: a database without the later columns still accepts the batch', async () => {
+    const inserted = [];
+    const client = {
+        from: () => ({ insert: async (rows) => {
+            for (const column of ['traffic', 'channel']) if (rows.some((r) => column in r)) return { error: { message: `Could not find the '${column}' column` } };
+            inserted.push(...rows);
+            return { error: null };
+        } }),
+    };
+    const s = await boot({ client });
+    const r = await post(s.base, { installId: 'abc', platform: 'android', events: [{ type: 'deeplink_open', puzzleType: 'daily', channel: 'push_reminder' }] });
+    assert.equal(r.status, 202);
+    assert.equal(inserted.length, 1);
+    s.close();
+});
 test('admin: requires admin (mirrors /api/dash/overview: 404 for non-admin)', async () => {
     const s = await boot();
     for (const h of [{}, { authorization: 'Bearer good' }, { authorization: 'Bearer nonsense' }]) {

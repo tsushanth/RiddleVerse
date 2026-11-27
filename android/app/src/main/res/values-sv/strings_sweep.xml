@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Dina pussel och dina framsteg hittills finns kvar på den här telefonen och flyttas till ditt konto när du loggar in. Det är gratis.</string>
     <string name="onb_gate_sign_in_to_create">Logga in för att skapa spel. Det är gratis och tar mindre än en minut.</string>
     <string name="onb_first_run_tagline">Snabba hjärnpussel. Ingen registrering behövs.</string>
-    <string name="onb_first_run_load_failed">Det gick inte att ladda ett pussel. Öppnar pussellistan i stället.</string>
     <string name="onb_first_run_play_cd">Spela ditt första pussel</string>
     <string name="onb_intro_welcome_title">Välkommen till RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Utmana hjärnan med engagerande pussel, quiz och hjärngymnastik. Från mattetal till ordspel, vi har något för alla.</string>

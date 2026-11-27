@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Your puzzles and progress so far stay on this phone and move to your account when you sign in. It is free.</string>
     <string name="onb_gate_sign_in_to_create">Sign in to create games. It is free and takes under a minute.</string>
     <string name="onb_first_run_tagline">Quick brain puzzles. No sign-up needed.</string>
-    <string name="onb_first_run_load_failed">Could not load a puzzle. Opening the puzzle list instead.</string>
     <string name="onb_first_run_play_cd">Play your first puzzle</string>
     <string name="onb_intro_welcome_title">Welcome to RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Challenge your mind with engaging puzzles, quizzes, and brain teasers. From math problems to word games, we have something for everyone.</string>

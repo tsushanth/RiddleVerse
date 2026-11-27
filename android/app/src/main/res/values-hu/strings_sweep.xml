@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Az eddigi fejtörőid és haladásod ezen a telefonon maradnak, és bejelentkezéskor átkerülnek a fiókodba. Ingyenes.</string>
     <string name="onb_gate_sign_in_to_create">Jelentkezz be játékok létrehozásához. Ingyenes, és egy percnél kevesebb időt vesz igénybe.</string>
     <string name="onb_first_run_tagline">Gyors agytornák. Regisztráció nélkül.</string>
-    <string name="onb_first_run_load_failed">A fejtörőt nem sikerült betölteni. Megnyitjuk helyette a fejtörők listáját.</string>
     <string name="onb_first_run_play_cd">Első fejtörőd elindítása</string>
     <string name="onb_intro_welcome_title">Üdv a RiddleVerse-ben!</string>
     <string name="onb_intro_welcome_desc">Edzd az elmédet izgalmas fejtörőkkel, kvízekkel és agytornákkal. A matekfeladatoktól a szójátékokig mindenkinek van valami.</string>

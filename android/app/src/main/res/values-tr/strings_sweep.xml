@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Şimdiye kadarki bulmacalarınız ve ilerlemeniz bu telefonda kalır ve giriş yaptığınızda hesabınıza taşınır. Ücretsizdir.</string>
     <string name="onb_gate_sign_in_to_create">Oyun oluşturmak için giriş yapın. Ücretsizdir ve bir dakikadan kısa sürer.</string>
     <string name="onb_first_run_tagline">Hızlı zeka bulmacaları. Kayıt gerekmez.</string>
-    <string name="onb_first_run_load_failed">Bulmaca yüklenemedi. Bunun yerine bulmaca listesi açılıyor.</string>
     <string name="onb_first_run_play_cd">İlk bulmacanızı oynayın</string>
     <string name="onb_intro_welcome_title">RiddleVerse\'e Hoş Geldiniz!</string>
     <string name="onb_intro_welcome_desc">Zihninizi ilgi çekici bulmacalar, quizler ve zeka oyunlarıyla zorlayın. Matematik problemlerinden kelime oyunlarına kadar herkes için bir şeyimiz var.</string>

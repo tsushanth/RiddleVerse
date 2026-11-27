@@ -443,7 +443,6 @@
     <string name="onb_gate_message">I tuoi puzzle e i progressi fatti finora restano su questo telefono e passano al tuo account quando accedi. È gratis.</string>
     <string name="onb_gate_sign_in_to_create">Accedi per creare giochi. È gratis e richiede meno di un minuto.</string>
     <string name="onb_first_run_tagline">Rompicapo veloci. Nessuna registrazione necessaria.</string>
-    <string name="onb_first_run_load_failed">Impossibile caricare un puzzle. Apro invece l\'elenco dei puzzle.</string>
     <string name="onb_first_run_play_cd">Gioca il tuo primo puzzle</string>
     <string name="onb_intro_welcome_title">Benvenuto in RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Metti alla prova la tua mente con puzzle, quiz e rompicapo coinvolgenti. Dai problemi di matematica ai giochi di parole, c\'è qualcosa per tutti.</string>

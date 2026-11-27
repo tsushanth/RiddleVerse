@@ -2,8 +2,6 @@ package com.kreativekoala.riddleverse
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,7 +28,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,89 +41,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.google.gson.Gson
 import com.kreativekoala.riddleverse.ui.theme.RvGrape
 import com.kreativekoala.riddleverse.ui.theme.RvInk
 import com.kreativekoala.riddleverse.ui.theme.RvViolet
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeoutOrNull
-
-/** First puzzle for a brand new guest: prefetched while the first-run screen is up, with an on-device fallback. */
-class FirstPuzzleLoader(context: Context) {
-    data class Loaded(val puzzle: Puzzle, val choice: FirstPuzzleChoice, val fellBack: Boolean)
-
-    private val app = context.applicationContext
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    private var job: Deferred<Loaded?>? = null
-
-    fun prefetch() {
-        if (job == null) job = scope.async { load() }
-    }
-
-    suspend fun await(): Loaded? {
-        prefetch()
-        return job!!.await()
-    }
-
-    private suspend fun load(): Loaded? {
-        // The blocking OkHttp call inside the queue manager ignores cancellation, so race it against a timer
-        // instead of wrapping it in withTimeout: the timer wins and the stray request finishes in the background.
-        val remote = scope.async(Dispatchers.IO) {
-            val queue = PuzzleQueueManager.getInstance(app)
-            for (c in FirstRunPlan.remoteCandidates) {
-                val q = try { queue.getNextPuzzleForPlay(c.type, c.difficulty) } catch (e: Exception) { null }
-                if (q != null) return@async Loaded(q.toPuzzle(), c, fellBack = false)
-            }
-            null
-        }
-        withTimeoutOrNull(FirstRunPlan.REMOTE_BUDGET_MS) { remote.await() }?.let { return it }
-
-        val fb = FirstRunPlan.localFallback
-        return try {
-            Loaded(WordPuzzleRegistry.createPuzzle(fb.type, fb.difficulty, app), fb, fellBack = true)
-        } catch (e: Exception) {
-            Log.e("FirstRun", "On-device fallback puzzle failed", e)
-            null
-        }
-    }
-}
 
 object FirstRun {
     /**
-     * Starts Home (as the back-stack root, so Back from the puzzle lands on a real screen) and the puzzle on top of it.
-     * Guest mode is switched on here: from now on a cold start goes straight to Home.
+     * Starts Home (as the back-stack root, so Back from the puzzle lands on a real screen) and the starter puzzle on top
+     * of it. Guest mode is switched on here: from now on a cold start goes straight to Home.
      */
-    fun launchFirstPuzzle(context: Context, loaded: FirstPuzzleLoader.Loaded) {
+    fun launchFirstPuzzle(context: Context) {
         GuestPrefs.markStarted(context)
-        val c = loaded.choice
-        val puzzleIntent = Intent(context, PuzzleActivity::class.java).apply {
-            putExtra("puzzle", Gson().toJson(loaded.puzzle))
-            putExtra("screenType", c.screenType)
-            putExtra("difficulty", c.difficulty.replaceFirstChar { it.uppercase() })
-            putExtra("score", 0)
-            putExtra("targetPuzzleCount", FirstRunPlan.TARGET_PUZZLE_COUNT)
-            putExtra("startTime", System.currentTimeMillis())
-            putExtra("puzzleSource", if (loaded.fellBack) "first_run_local" else "first_run")
-            putExtra(EXTRA_IS_FIRST_RUN_PUZZLE, true)
-        }
+        StarterOffer.markOffered(context) // Home underneath must not open a second one
         val home = Intent(context, HomeActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
-        Funnel.log(FunnelStep.FIRST_PUZZLE_LAUNCHED, mapOf("type" to c.type, "source" to if (loaded.fellBack) "local_fallback" else "remote"))
-        context.startActivities(arrayOf(home, puzzleIntent))
-    }
-
-    /** No puzzle could be built at all: still let the person in as a guest rather than strand them. */
-    fun enterHomeAsGuest(context: Context) {
-        GuestPrefs.markStarted(context)
-        context.startActivity(Intent(context, HomeActivity::class.java).apply {
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        })
+        Funnel.log(FunnelStep.FIRST_PUZZLE_LAUNCHED, mapOf("type" to StarterPuzzle.TELEMETRY_TYPE))
+        context.startActivities(arrayOf(home, StarterOffer.intent(context)))
     }
 
     const val EXTRA_IS_FIRST_RUN_PUZZLE = "is_first_run_puzzle"
@@ -137,15 +67,10 @@ object FirstRun {
 @Composable
 fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val loader = remember { FirstPuzzleLoader(context) }
     var busy by remember { mutableStateOf(false) }
     val playFirstPuzzleCd = stringResource(R.string.onb_first_run_play_cd)
 
-    LaunchedEffect(Unit) {
-        Funnel.log(FunnelStep.FIRST_RUN_SHOWN)
-        loader.prefetch()
-    }
+    LaunchedEffect(Unit) { Funnel.log(FunnelStep.FIRST_RUN_SHOWN) }
 
     Box(
         modifier = Modifier
@@ -184,16 +109,8 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
                     if (busy) return@Button
                     busy = true
                     Funnel.log(FunnelStep.PLAY_TAPPED)
-                    scope.launch {
-                        val loaded = loader.await()
-                        if (loaded != null) {
-                            FirstRun.launchFirstPuzzle(context, loaded)
-                        } else {
-                            Toast.makeText(context, R.string.onb_first_run_load_failed, Toast.LENGTH_LONG).show()
-                            FirstRun.enterHomeAsGuest(context)
-                        }
-                        onFinished()
-                    }
+                    FirstRun.launchFirstPuzzle(context)
+                    onFinished()
                 },
                 enabled = !busy,
                 shape = RoundedCornerShape(32.dp),
@@ -204,13 +121,9 @@ fun FirstRunScreen(onSignInClick: () -> Unit, onFinished: () -> Unit) {
                     .heightIn(min = 64.dp)
                     .semantics { contentDescription = playFirstPuzzleCd }
             ) {
-                if (busy) {
-                    CircularProgressIndicator(color = Color.White, strokeWidth = 3.dp, modifier = Modifier.size(26.dp))
-                } else {
-                    Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(28.dp))
-                    Spacer(Modifier.size(8.dp))
-                    Text(stringResource(R.string.play), fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                }
+                Icon(Icons.Default.PlayArrow, contentDescription = null, modifier = Modifier.size(28.dp))
+                Spacer(Modifier.size(8.dp))
+                Text(stringResource(R.string.play), fontSize = 22.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(Modifier.height(20.dp))

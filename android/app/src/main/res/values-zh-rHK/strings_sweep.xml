@@ -431,7 +431,6 @@
     <string name="onb_gate_message">你目前的謎題和進度會保留在這部手機上，並在你登錄後轉移到你的賬戶。此服務免費。</string>
     <string name="onb_gate_sign_in_to_create">登錄後即可創建遊戲。免費，且不到一分鐘。</string>
     <string name="onb_first_run_tagline">快速燒腦謎題。無需註冊。</string>
-    <string name="onb_first_run_load_failed">無法加載謎題。改為打開謎題列表。</string>
     <string name="onb_first_run_play_cd">玩你的第一個謎題</string>
     <string name="onb_intro_welcome_title">歡迎來到 RiddleVerse！</string>
     <string name="onb_intro_welcome_desc">用有趣的謎題、問答和腦筋急轉彎挑戰你的頭腦。從數學題到文字遊戲，總有一款適合你。</string>

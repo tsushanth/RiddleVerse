@@ -5,7 +5,6 @@ import com.kreativekoala.riddleverse.ui.theme.*
 import android.content.Intent
 import com.revenuecat.purchases.Purchases
 import com.revenuecat.purchases.PurchasesConfiguration
-import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -50,10 +49,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.app.ActivityCompat
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.gson.Gson
 import com.kreativekoala.ratingkit.RatingKit
 import com.kreativekoala.riddleverse.ui.theme.RiddleVerseTheme
@@ -70,7 +67,6 @@ import org.json.JSONObject
 class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
-        private const val NOTIFICATION_PERMISSION_REQUEST_CODE = 1001
         private const val SERVER_URL = "https://puzzleverseai.com" // Replace with your server URL
     }
     // Use singleton HttpClient to prevent memory leaks
@@ -90,19 +86,18 @@ class MainActivity : AppCompatActivity() {
         AppStartup.post { AppStartup.ensureRatingKit(); RatingKit.trackAppOpen(null) }
 
         // Defer FCM setup to background thread - not critical for startup
+        val appContext = applicationContext
         CoroutineScope(Dispatchers.IO).launch {
-            setupFCM()
+            PushRegistration.registerCurrent(appContext)
         }
 
-        // Request notification permissions. Signed-in users are asked here as before; a brand new or guest user is
-        // asked later from Home, once they have played, so the first screen is the game and not a system dialog.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && FirebaseAuth.getInstance().currentUser != null) {
-            GuestPrefs.markNotificationPermissionAsked(this)
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.POST_NOTIFICATIONS),
-                1001
-            )
+        // Notification permission is not requested at launch: it is offered after the first solved puzzle
+        // (ReminderOfferCard) and from Settings.
+
+        // A tap on the server's daily reminder push opens today's puzzle (the data keys arrive as extras).
+        if (intent?.getStringExtra("type") == DailyReminder.PUSH_TYPE) {
+            if (savedInstanceState == null) PuzzleEvents.deepLinkOpen("daily", "push_reminder")
+            if (openPuzzleLink("daily")) return
         }
 
         // Incoming links: a custom game, a built-in puzzle page (/play/<type>), or the Telegram bot's one-time /link code.
@@ -295,62 +290,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupFCM() {
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w(TAG, "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-
-            // Get new FCM registration token
-            val token = task.result
-            Log.d(TAG, "FCM Token: $token")
-
-            // Send token to server
-            sendTokenToServer(token)
-        }
-    }
-
-    private fun sendTokenToServer(token: String) {
-        val userEmail = getCurrentUserEmail() // Implement this based on your auth system
-        val userId = getCurrentUserId()
-
-        if (userEmail == null || userId == null) {
-            Log.w(TAG, "User not authenticated, cannot send token to server")
-            return
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                val requestBody = JSONObject().apply {
-                    put("userEmail", userEmail)
-                    put("userId", userId)
-                    put("fcmToken", token)
-                    put("platform", "android")
-                }.toString()
-
-                val request = Request.Builder()
-                    .url("$SERVER_URL/register-fcm-token")
-                    .post(requestBody.toRequestBody("application/json".toMediaType()))
-                    .addHeader("Content-Type", "application/json")
-                    .build()
-
-                val response = httpClient.newCall(request).execute()
-
-                if (response.isSuccessful) {
-                    Log.d(TAG, "FCM token registered successfully")
-                } else {
-                    Log.e(TAG, "Failed to register FCM token: ${response.code}")
-                }
-
-                response.close()
-
-            } catch (e: Exception) {
-                Log.e(TAG, "Error registering FCM token", e)
-            }
-        }
-    }
-
     private fun handleNotificationIntent() {
         val notificationType = intent.getStringExtra("notification_type")
         val openDailyPuzzles = intent.getBooleanExtra("open_daily_puzzles", false)
@@ -376,12 +315,6 @@ class MainActivity : AppCompatActivity() {
         // Return the current user's email
         // This could be from FirebaseAuth, SharedPreferences, etc.
         return com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.email
-    }
-
-    private fun getCurrentUserId(): String? {
-        // Return the current user's ID
-        // This could be from FirebaseAuth, SharedPreferences, etc.
-        return com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
     }
 
     // Method to manually test notifications

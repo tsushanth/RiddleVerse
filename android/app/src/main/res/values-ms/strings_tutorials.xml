@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Digit terbesar tidak boleh berada di hujung sempit sesuatu tanda.</string>
     <string name="tut_purchasing_instruction">Setiap teka-teki menunjukkan langganan: berapa yang anda bayar dan berapa kerap. Kira kosnya selama setahun dan ketik jumlah yang sepadan. Contoh: 10 sebulan ialah 10 × 12 = 120 setahun.</string>
     <string name="tut_purchasing_tip">Harian × 365, mingguan × 52, bulanan × 12, suku tahunan × 4. Petunjuk membantu, tetapi menurunkan skor anda.</string>
+    <string name="starter_instruction">Ketik nombor untuk mengisi petak yang diserlahkan. Setiap baris, lajur dan kotak kecil perlu ada 1, 2, 3 dan 4.</string>
 </resources>

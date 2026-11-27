@@ -431,7 +431,6 @@
     <string name="onb_gate_message">지금까지의 퍼즐과 진행 상황은 이 휴대폰에 남아 있다가 로그인하면 계정으로 옮겨집니다. 무료예요.</string>
     <string name="onb_gate_sign_in_to_create">게임을 만들려면 로그인하세요. 무료이며 1분도 걸리지 않아요.</string>
     <string name="onb_first_run_tagline">가벼운 두뇌 퍼즐. 가입 없이 바로 시작하세요.</string>
-    <string name="onb_first_run_load_failed">퍼즐을 불러오지 못했습니다. 대신 퍼즐 목록을 엽니다.</string>
     <string name="onb_first_run_play_cd">첫 퍼즐 플레이</string>
     <string name="onb_intro_welcome_title">RiddleVerse에 오신 것을 환영합니다!</string>
     <string name="onb_intro_welcome_desc">재미있는 퍼즐, 퀴즈, 두뇌 게임으로 머리를 단련해 보세요. 수학 문제부터 단어 게임까지 누구나 즐길 거리가 있어요.</string>

@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">La cifra più grande non può mai stare dal lato stretto di un segno.</string>
     <string name="tut_purchasing_instruction">Ogni puzzle mostra un abbonamento: quanto paghi e ogni quanto. Calcola quanto costa in un anno e tocca il totale giusto. Esempio: 10 al mese sono 10 × 12 = 120 all\'anno.</string>
     <string name="tut_purchasing_tip">Giornaliero × 365, settimanale × 52, mensile × 12, trimestrale × 4. Gli indizi aiutano, ma abbassano il punteggio.</string>
+    <string name="starter_instruction">Tocca un numero per riempire la casella evidenziata. Ogni riga, colonna e riquadro piccolo deve contenere 1, 2, 3 e 4.</string>
 </resources>

@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Cea mai mare cifră nu poate sta niciodată la capătul îngust al unui semn.</string>
     <string name="tut_purchasing_instruction">Fiecare puzzle arată un abonament: cât plătești și cât de des. Calculează cât costă într-un an și atinge totalul potrivit. Exemplu: 10 pe lună înseamnă 10 × 12 = 120 pe an.</string>
     <string name="tut_purchasing_tip">Zilnic × 365, săptămânal × 52, lunar × 12, trimestrial × 4. Indiciile ajută, dar îți scad scorul.</string>
+    <string name="starter_instruction">Atingeți un număr pentru a completa căsuța evidențiată. Fiecare rând, coloană și pătrat mic are nevoie de 1, 2, 3 și 4.</string>
 </resources>

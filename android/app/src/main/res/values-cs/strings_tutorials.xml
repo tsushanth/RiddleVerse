@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Největší číslice nikdy nemůže stát na úzkém konci znaménka.</string>
     <string name="tut_purchasing_instruction">Každá hádanka ukazuje předplatné: kolik platíte a jak často. Spočítejte, kolik stojí za rok, a klepněte na odpovídající součet. Příklad: 10 měsíčně je 10 × 12 = 120 ročně.</string>
     <string name="tut_purchasing_tip">Denně × 365, týdně × 52, měsíčně × 12, čtvrtletně × 4. Nápovědy pomáhají, ale snižují skóre.</string>
+    <string name="starter_instruction">Klepnutím na číslo vyplňte zvýrazněné políčko. Každý řádek, sloupec i malý čtverec musí obsahovat 1, 2, 3 a 4.</string>
 </resources>

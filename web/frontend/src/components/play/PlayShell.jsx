@@ -60,7 +60,7 @@ export default function PlayShell({ children }) {
           </Link>
           <nav className="flex items-center gap-4 text-sm">
             <Link to="/play" className="hover:underline">{t('nav_all_games')}</Link>
-            <Link to="/welcome" className="hover:underline">{t('nav_sign_in')}</Link>
+            <Link to="/welcome?signin=1" className="hover:underline">{t('nav_sign_in')}</Link>
           </nav>
         </div>
       </header>

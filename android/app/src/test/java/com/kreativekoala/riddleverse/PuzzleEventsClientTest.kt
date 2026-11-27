@@ -27,6 +27,14 @@ class PuzzleEventsClientTest {
         assertTrue(b.startsWith("""{"installId":"inst-1","platform":"android","appVersion":"1.2.3","events":[{"type":"complete","puzzleType":"sudoku","difficulty":"hard","sessionId":"s1","durationMs":5000,"score":7,"moves":3,"hintsUsed":1,"mistakes":2,"ts":$now}]}"""))
     }
 
+    @Test fun testLabDevicesSaySo() {
+        val lab = PuzzleEventsClient("inst-1", "1.2.3", send = { b, t -> sent += b to t; status }, clock = { now }, testLab = true)
+        lab.enqueue(ev()); lab.flush()
+        assertTrue(sent[0].first.startsWith("""{"installId":"inst-1","platform":"android","appVersion":"1.2.3","testLab":true,"events":["""))
+        val normal = client(); normal.enqueue(ev()); normal.flush()
+        assertFalse(sent[1].first.contains("testLab"))
+    }
+
     @Test fun bearerTokenPassedWhenPresent() {
         val c = client("tok"); c.enqueue(ev()); c.flush()
         assertEquals("tok", sent[0].second)

@@ -437,7 +437,6 @@
     <string name="onb_gate_message">معماها و پیشرفت شما تا اینجا روی این تلفن می‌ماند و پس از ورود به حسابتان منتقل می‌شود. رایگان است.</string>
     <string name="onb_gate_sign_in_to_create">برای ساخت بازی وارد شوید. رایگان است و کمتر از یک دقیقه طول می‌کشد.</string>
     <string name="onb_first_run_tagline">معماهای ذهنی سریع. نیازی به ثبت‌نام نیست.</string>
-    <string name="onb_first_run_load_failed">بارگذاری معما ممکن نشد. فهرست معماها باز می‌شود.</string>
     <string name="onb_first_run_play_cd">اولین معمای خود را بازی کنید</string>
     <string name="onb_intro_welcome_title">به RiddleVerse خوش آمدید!</string>
     <string name="onb_intro_welcome_desc">ذهن خود را با معماها، مسابقه‌ها و چیستان‌های جذاب به چالش بکشید. از مسئله‌های ریاضی تا بازی‌های کلمه، برای هر سلیقه‌ای چیزی داریم.</string>

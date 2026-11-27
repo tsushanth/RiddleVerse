@@ -431,7 +431,6 @@
     <string name="onb_gate_message">Puzzle dan progres Anda sejauh ini tetap ada di ponsel ini dan pindah ke akun Anda saat Anda masuk. Gratis.</string>
     <string name="onb_gate_sign_in_to_create">Masuk untuk membuat permainan. Gratis dan hanya butuh kurang dari semenit.</string>
     <string name="onb_first_run_tagline">Puzzle otak yang singkat. Tanpa perlu mendaftar.</string>
-    <string name="onb_first_run_load_failed">Tidak dapat memuat puzzle. Membuka daftar puzzle sebagai gantinya.</string>
     <string name="onb_first_run_play_cd">Mainkan puzzle pertama Anda</string>
     <string name="onb_intro_welcome_title">Selamat Datang di RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Tantang pikiran Anda dengan puzzle, kuis, dan teka-teki otak yang seru. Dari soal matematika hingga permainan kata, ada sesuatu untuk semua orang.</string>

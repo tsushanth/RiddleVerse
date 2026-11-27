@@ -46,7 +46,7 @@ function int(v) {
     return n < 0 || n > INT_MAX ? null : n;
 }
 
-/** Returns { installId, platform, appVersion, events:[row fragments] } or null when malformed. */
+/** Returns { installId, platform, appVersion, testLab, events:[row fragments] } or null when malformed. */
 export function validatePayload(body, now = Date.now()) {
     if (!body || typeof body !== 'object' || Array.isArray(body)) return null;
     const installId = typeof body.installId === 'string' ? body.installId : '';
@@ -128,7 +128,7 @@ export function validatePayload(body, now = Date.now()) {
             error_message: str(e.errorMessage, 300),
         });
     }
-    return { installId, platform: body.platform, appVersion: str(body.appVersion, 32), events };
+    return { installId, platform: body.platform, appVersion: str(body.appVersion, 32), testLab: body.testLab === true, events };
 }
 
 /** In-memory sliding-window limiter (single Fly machine scale; resets on restart). */
@@ -155,8 +155,10 @@ export function createLimiter({ now = () => Date.now(), maxKeys = 50000 } = {}) 
 export const IP_LIMIT = { limit: 60, windowMs: 60e3 };
 export const INSTALL_LIMIT = { limit: 300, windowMs: 3600e3 };
 
-export function toRows(v, userId) {
+export function toRows(v, userId, traffic = null) {
     return v.events.map((e) => ({
+        // Only set when known, so inserts keep working before the traffic column exists.
+        ...(traffic ? { traffic } : {}),
         // web_play_* rows are anonymous by design: never attach the signed-in uid.
         user_id: e.event_type && WEB_PLAY_EVENT_TYPES.has(e.event_type) ? null : (userId || null),
         install_id: v.installId,

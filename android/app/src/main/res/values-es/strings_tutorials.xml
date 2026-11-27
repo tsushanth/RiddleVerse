@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">El dígito más grande nunca puede ir en el extremo estrecho de un signo.</string>
     <string name="tut_purchasing_instruction">Cada puzle muestra una suscripción: cuánto pagas y con qué frecuencia. Calcula cuánto cuesta en un año y toca el total correcto. Ejemplo: 10 al mes son 10 × 12 = 120 al año.</string>
     <string name="tut_purchasing_tip">Diario × 365, semanal × 52, mensual × 12, trimestral × 4. Las pistas ayudan, pero bajan tu puntuación.</string>
+    <string name="starter_instruction">Toca un número para rellenar la casilla resaltada. Cada fila, columna y recuadro pequeño necesita 1, 2, 3 y 4.</string>
 </resources>

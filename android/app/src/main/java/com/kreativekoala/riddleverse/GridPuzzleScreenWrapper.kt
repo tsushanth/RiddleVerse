@@ -23,7 +23,8 @@ fun GridPuzzleScreenWrapper(
         seed = seed,
         level = level,
         onGameComplete = { success, score -> handlePuzzleCompletion(success, true, score) },
-        onBack = onBack
+        onBack = onBack,
+        starter = StarterPuzzle.isStarter(currentPuzzle)
     )
 }
 

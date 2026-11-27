@@ -443,7 +443,6 @@
     <string name="onb_gate_message">Tus puzzles y tu progreso hasta ahora se quedan en este teléfono y pasan a tu cuenta cuando inicies sesión. Es gratis.</string>
     <string name="onb_gate_sign_in_to_create">Inicia sesión para crear juegos. Es gratis y lleva menos de un minuto.</string>
     <string name="onb_first_run_tagline">Puzzles mentales rápidos. Sin necesidad de registrarte.</string>
-    <string name="onb_first_run_load_failed">No se pudo cargar un puzzle. Abriendo la lista de puzzles.</string>
     <string name="onb_first_run_play_cd">Juega tu primer puzzle</string>
     <string name="onb_intro_welcome_title">¡Te damos la bienvenida a RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Desafía tu mente con puzzles, quizzes y acertijos entretenidos. Desde problemas de matemáticas hasta juegos de palabras, tenemos algo para todos.</string>

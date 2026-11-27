@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Największa cyfra nigdy nie może stać przy wąskim końcu znaku.</string>
     <string name="tut_purchasing_instruction">Każda łamigłówka pokazuje subskrypcję: ile płacisz i jak często. Policz, ile kosztuje przez rok, i stuknij pasującą sumę. Przykład: 10 miesięcznie to 10 × 12 = 120 rocznie.</string>
     <string name="tut_purchasing_tip">Codziennie × 365, tygodniowo × 52, miesięcznie × 12, kwartalnie × 4. Podpowiedzi pomagają, ale obniżają wynik.</string>
+    <string name="starter_instruction">Dotknij liczby, aby wypełnić zaznaczone pole. Każdy wiersz, kolumna i mały kwadrat musi zawierać 1, 2, 3 i 4.</string>
 </resources>

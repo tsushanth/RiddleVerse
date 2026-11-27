@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">最大の数字が記号の細い側に入ることはありません。</string>
     <string name="tut_purchasing_instruction">各パズルでは、サブスクリプションの支払い額と頻度が表示されます。1年間の合計を計算して、一致する合計をタップします。例: 月10なら 10 × 12 = 年120です。</string>
     <string name="tut_purchasing_tip">毎日 × 365、毎週 × 52、毎月 × 12、四半期ごと × 4。ヒントは役立ちますが、スコアが下がります。</string>
+    <string name="starter_instruction">数字をタップして、ハイライトされたマスを埋めましょう。各行、各列、各ブロックに 1、2、3、4 が入ります。</string>
 </resources>

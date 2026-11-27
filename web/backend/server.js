@@ -56,13 +56,15 @@ import { handleStripeWebhook } from './services/payoutService.js';
 import { initializeDailyPuzzleSystem } from './services/dailyPuzzleCacheSetup.js';
 import { firebaseStreakNotificationService } from './services/firebaseStreakNotificationService.js';
 import { remixDigestService } from './services/remixDigestService.js';
+import { startNewPlayerReminder } from './services/newPlayerReminder.js';
+import { admin as firebaseApp } from './config/firebaseAdmin.js';
 import { startForgeSessionSweeper, startForgeInvariantMonitor } from './services/forgeSessionService.js';
 import { supabase } from './config/database.js';
 import { startSubscriptionSweep } from './services/playPurchases.js';
 import { createDeepHealthHandler, buildChecks as buildDeepChecks } from './services/deepHealth.js';
 import { wordFrequencyManager } from './services/wordFrequencyManager.js';
 import { errorHandler, reportUnhandled5xx } from './middleware/errorHandler.js';
-import { reportCrash } from './utils/failureReporter.js';
+import { reportCrash, reportFailure } from './utils/failureReporter.js';
 
 // New simple daily puzzle system (in-memory, no Redis)
 import { refreshDailyPuzzles } from './services/dailyPuzzles.js';
@@ -146,6 +148,11 @@ async function initializeServer() {
         await wordFrequencyManager.load();
         await initializeStreakNotificationService();
         remixDigestService.start();
+        // OFF unless NEW_PLAYER_REMINDER_ENABLED=true (see services/newPlayerReminder.js).
+        startNewPlayerReminder({ deps: {
+            db: supabase, report: reportFailure, messaging: () => firebaseApp.messaging(),
+            auth: { getUsers: (ids) => firebaseApp.auth().getUsers(ids) },
+        } });
         // OFF unless FORGE_SESSION_SWEEPER_ENABLED=true (marks forge sessions stuck 'generating' > 15 min as failed).
         startForgeSessionSweeper({ supabase });
         // Read-only dead-man + completion-rate check on forge_sessions (ON; FORGE_INVARIANT_MONITOR=false to stop).

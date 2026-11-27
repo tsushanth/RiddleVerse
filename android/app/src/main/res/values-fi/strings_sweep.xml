@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Tähänastiset pulmasi ja edistymisesi pysyvät tässä puhelimessa ja siirtyvät tilillesi, kun kirjaudut sisään. Se on ilmaista.</string>
     <string name="onb_gate_sign_in_to_create">Kirjaudu sisään luodaksesi pelejä. Se on ilmaista ja kestää alle minuutin.</string>
     <string name="onb_first_run_tagline">Nopeita aivopulmia. Rekisteröitymistä ei tarvita.</string>
-    <string name="onb_first_run_load_failed">Pulmaa ei voitu ladata. Avataan pulmaluettelo sen sijaan.</string>
     <string name="onb_first_run_play_cd">Pelaa ensimmäinen pulmasi</string>
     <string name="onb_intro_welcome_title">Tervetuloa RiddleVerseen!</string>
     <string name="onb_intro_welcome_desc">Haasta mielesi mukaansatempaavilla pulmilla, tietovisoilla ja aivopähkinöillä. Matematiikkatehtävistä sanapeleihin, meiltä löytyy jokaiselle jotakin.</string>

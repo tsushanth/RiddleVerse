@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">The biggest digit can never sit at the narrow end of a sign.</string>
     <string name="tut_purchasing_instruction">Each puzzle shows a subscription: what you pay and how often. Work out what it costs in one year and tap the matching total. Example: 10 a month is 10 × 12 = 120 a year.</string>
     <string name="tut_purchasing_tip">Daily × 365, weekly × 52, monthly × 12, quarterly × 4. Hints help, but they lower your score.</string>
+    <string name="starter_instruction">Tap a number to fill the highlighted square. Every row, column and small box needs 1, 2, 3 and 4.</string>
 </resources>

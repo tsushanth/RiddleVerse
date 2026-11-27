@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { Link, useSearchParams } from 'react-router-dom'
+import StarterPuzzle from '../components/play/StarterPuzzle'
+import { isNewVisitor } from '../utils/starterPuzzle'
 import { useAuth } from '../context/AuthContext'
 import { Mail, Lock, Eye, EyeOff, Loader2 } from 'lucide-react'
 import { playStoreUrl } from '../utils/playLinks'
@@ -14,6 +17,9 @@ export default function WelcomePage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [localError, setLocalError] = useState('')
+  // A first-time visitor meets a puzzle, not a sign-in form. The header "Sign in" links pass ?signin=1.
+  const [params] = useSearchParams()
+  const [starter, setStarter] = useState(() => !params.has('signin') && isNewVisitor(() => window.localStorage))
 
   const handleGoogleSignIn = async () => {
     setLoading(true)
@@ -43,6 +49,22 @@ export default function WelcomePage() {
       setLocalError(result.error)
     }
     setLoading(false)
+  }
+
+  if (starter) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 px-4 py-6">
+        <div className="w-full max-w-md space-y-5">
+          <h1 className="text-3xl font-bold text-white text-center">RIDDLEVERSE</h1>
+          <StarterPuzzle />
+          <p className="text-center">
+            <button type="button" onClick={() => setStarter(false)} className="text-white/60 hover:text-white text-sm underline min-h-[44px]">
+              I have an account: sign in
+            </button>
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -201,6 +223,10 @@ export default function WelcomePage() {
             </button>
           </form>
         </div>
+
+        <p className="mt-4 text-center">
+          <Link to="/play" className="text-white/80 hover:text-white text-sm underline">Play without an account</Link>
+        </p>
 
         {/* App Store Links */}
         <div className="mt-6 text-center">

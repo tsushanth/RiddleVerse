@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Le plus grand chiffre ne peut jamais se trouver du côté étroit d\'un signe.</string>
     <string name="tut_purchasing_instruction">Chaque énigme montre un abonnement : ce que vous payez et à quelle fréquence. Calculez son coût sur un an et touchez le bon total. Exemple : 10 par mois, c\'est 10 × 12 = 120 par an.</string>
     <string name="tut_purchasing_tip">Par jour × 365, par semaine × 52, par mois × 12, par trimestre × 4. Les indices aident, mais baissent votre score.</string>
+    <string name="starter_instruction">Touchez un chiffre pour remplir la case en surbrillance. Chaque ligne, colonne et petit carré doit contenir 1, 2, 3 et 4.</string>
 </resources>

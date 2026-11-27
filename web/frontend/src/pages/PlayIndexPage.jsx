@@ -1,18 +1,24 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import PlayShell, { PlayStoreButton, TelegramButton } from '../components/play/PlayShell'
+import StarterPuzzle from '../components/play/StarterPuzzle'
+import { isNewVisitor } from '../utils/starterPuzzle'
 import usePlayLang from '../hooks/usePlayLang'
 import { PLAY_CATEGORIES, PLAY_GAMES, PLAY_INDEX_TITLE, playIndexDescription } from '../utils/playCatalog'
 import { applyPageMeta } from '../utils/pageMeta'
 
 export default function PlayIndexPage() {
   const { t } = usePlayLang()
+  const [starter] = useState(() => isNewVisitor(() => window.localStorage))
   useEffect(() => {
     applyPageMeta({ title: PLAY_INDEX_TITLE, description: playIndexDescription(), path: '/play' })
   }, [])
 
   return (
     <PlayShell>
+      {/* Above the heading so the whole puzzle, keypad included, fits a small phone without scrolling. */}
+      {starter && <StarterPuzzle />}
+
       <section className="space-y-2">
         <h1 className="text-3xl font-extrabold">Free online puzzle games</h1>
         <p className="text-white/80">Pick a game and start playing right away. No account, no download, no sign-up.</p>

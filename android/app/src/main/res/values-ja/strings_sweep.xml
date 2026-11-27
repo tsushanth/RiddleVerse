@@ -431,7 +431,6 @@
     <string name="onb_gate_message">これまでのパズルと進捗はこのスマートフォンに残り、ログインするとアカウントに引き継がれます。無料です。</string>
     <string name="onb_gate_sign_in_to_create">ゲームを作るにはログインしてください。無料で、1分もかかりません。</string>
     <string name="onb_first_run_tagline">サクッと脳トレパズル。登録は不要です。</string>
-    <string name="onb_first_run_load_failed">パズルを読み込めませんでした。代わりにパズル一覧を開きます。</string>
     <string name="onb_first_run_play_cd">最初のパズルをプレイ</string>
     <string name="onb_intro_welcome_title">RiddleVerseへようこそ！</string>
     <string name="onb_intro_welcome_desc">楽しいパズル、クイズ、頭の体操で脳に刺激を。数学の問題から言葉遊びまで、みんなが楽しめるものがそろっています。</string>
