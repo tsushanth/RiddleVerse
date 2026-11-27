@@ -461,7 +461,6 @@
     <string name="onb_gate_message">تبقى ألغازك وتقدمك حتى الآن على هذا الهاتف وتنتقل إلى حسابك عند تسجيل الدخول. الخدمة مجانية.</string>
     <string name="onb_gate_sign_in_to_create">سجّل الدخول لإنشاء الألعاب. الخدمة مجانية ولا تستغرق أكثر من دقيقة.</string>
     <string name="onb_first_run_tagline">ألغاز ذهنية سريعة. لا حاجة إلى التسجيل.</string>
-    <string name="onb_first_run_load_failed">تعذر تحميل اللغز. سيتم فتح قائمة الألغاز بدلًا من ذلك.</string>
     <string name="onb_first_run_play_cd">العب أول لغز لك</string>
     <string name="onb_intro_welcome_title">مرحبًا بك في RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">تحدَّ عقلك بألغاز واختبارات وأحاجٍ ممتعة. من المسائل الرياضية إلى ألعاب الكلمات، لدينا ما يناسب الجميع.</string>

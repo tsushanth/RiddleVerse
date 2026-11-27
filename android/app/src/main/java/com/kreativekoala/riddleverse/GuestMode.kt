@@ -81,40 +81,12 @@ object SignupPromptPolicy {
     fun afterOptOut(s: SignupPromptState): SignupPromptState = s.copy(optedOut = true)
 }
 
-data class FirstPuzzleChoice(
-    val type: String,
-    /** Wire difficulty: the server wants lower case, the local generators want "Easy". */
-    val difficulty: String,
-    val screenType: String,
-    /** true = fetched from the puzzle API (needs network); false = generated on the device. */
-    val remote: Boolean
-)
-
 object FirstRunPlan {
-    /** One puzzle, then the normal completion screen (and the account nudge). */
+    /** One puzzle, then the normal completion screen (reminder offer or account nudge). */
     const val TARGET_PUZZLE_COUNT = 1
 
-    /** Give the network this long before falling back to the on-device puzzle. */
-    const val REMOTE_BUDGET_MS = 4_000L
-
-    /**
-     * Ordered by preference. Short, instantly understood, no setup. The API serves both without a user id
-     * (checked against production: the anonymous branch of /fetch-next-puzzle-ios). The last entry is generated on
-     * the device so the very first run still works offline or when the API is down.
-     */
-    val CANDIDATES: List<FirstPuzzleChoice> = listOf(
-        FirstPuzzleChoice("anagram", "easy", "Jumble Input Screen", remote = true),
-        FirstPuzzleChoice("wordprefix", "easy", "Word Prefix Screen", remote = true),
-        FirstPuzzleChoice(WordPuzzleRegistry.WORD_GUESS, "Easy", "Word Guess Screen", remote = false)
-    )
-
-    /** Types the owner asked us to keep out of the first-run pick while they are being triaged. */
-    val EXCLUDED_TYPES: Set<String> = setOf("math", "memorysquares", "memorypreviouspair", "memoryprevioussingle", "memorystory",
-        "memorysequencing", "memoryretention", "triangledotmemory", "mathexpression", "mathcomparison", "mathestimation",
-        "mathcrossword", "mathtipping")
-
-    val remoteCandidates: List<FirstPuzzleChoice> get() = CANDIDATES.filter { it.remote }
-    val localFallback: FirstPuzzleChoice get() = CANDIDATES.last { !it.remote }
+    /** The screen of [StarterPuzzle]. */
+    const val SCREEN_TYPE = "Grid Puzzle Screen"
 }
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -125,7 +97,7 @@ enum class FunnelStep(val key: String) {
     FIRST_RUN_SHOWN("first_run_shown"),
     PLAY_TAPPED("play_tapped"),
     SIGN_IN_LINK_TAPPED("sign_in_link_tapped"),
-    FIRST_PUZZLE_LAUNCHED("first_puzzle_launched"),       // props: type, source ("remote" | "local_fallback")
+    FIRST_PUZZLE_LAUNCHED("first_puzzle_launched"),       // props: type
     FIRST_PUZZLE_COMPLETED("first_puzzle_completed"),
     SESSION_COMPLETED_AS_GUEST("session_completed_as_guest"),
     SIGNUP_PROMPT_SHOWN("signup_prompt_shown"),           // props: nth
@@ -168,7 +140,6 @@ object GuestPrefs {
     private const val K_LAST_SHOWN = "last_shown_at_session"
     private const val K_OPTED_OUT = "prompt_opted_out"
     private const val K_ONBOARDING_CARD_DISMISSED = "onboarding_card_dismissed"
-    private const val K_NOTIF_ASKED = "notification_permission_asked"
 
     private fun p(ctx: Context) = ctx.applicationContext.getSharedPreferences(FILE, Context.MODE_PRIVATE)
 
@@ -208,11 +179,6 @@ object GuestPrefs {
     fun isOnboardingCardDismissed(ctx: Context): Boolean = p(ctx).getBoolean(K_ONBOARDING_CARD_DISMISSED, false)
 
     fun dismissOnboardingCard(ctx: Context) { p(ctx).edit().putBoolean(K_ONBOARDING_CARD_DISMISSED, true).apply() }
-
-    /** Notification permission is asked once Home is reached, not as the first thing a new person sees. */
-    fun notificationPermissionAsked(ctx: Context): Boolean = p(ctx).getBoolean(K_NOTIF_ASKED, false)
-
-    fun markNotificationPermissionAsked(ctx: Context) { p(ctx).edit().putBoolean(K_NOTIF_ASKED, true).apply() }
 }
 
 // ---------------------------------------------------------------------------------------------------------------

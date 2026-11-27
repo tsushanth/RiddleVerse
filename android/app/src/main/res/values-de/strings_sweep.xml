@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Deine bisherigen Rätsel und dein Fortschritt bleiben auf diesem Handy und werden beim Anmelden in dein Konto übernommen. Das ist kostenlos.</string>
     <string name="onb_gate_sign_in_to_create">Melde dich an, um Spiele zu erstellen. Das ist kostenlos und dauert weniger als eine Minute.</string>
     <string name="onb_first_run_tagline">Schnelle Denkrätsel. Keine Anmeldung nötig.</string>
-    <string name="onb_first_run_load_failed">Ein Rätsel konnte nicht geladen werden. Stattdessen wird die Rätselliste geöffnet.</string>
     <string name="onb_first_run_play_cd">Dein erstes Rätsel spielen</string>
     <string name="onb_intro_welcome_title">Willkommen bei RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Fordere deinen Verstand mit spannenden Rätseln, Quiz und Denkaufgaben heraus. Von Matheaufgaben bis zu Wortspielen ist für jeden etwas dabei.</string>

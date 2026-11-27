@@ -62,6 +62,8 @@ class DailyCompletionActivity : AppCompatActivity() {
     // Guest-first: set once per real launch (not on rotation) when this completion should nudge for an account.
     private var guestPromptDue = false
 
+    private var offerReminder = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
@@ -146,12 +148,17 @@ class DailyCompletionActivity : AppCompatActivity() {
             }
         }
 
+        // Right after a solve is when a reminder makes sense: this is where notification permission is asked.
+        val solved = completionType is CompletionType.Success && (sessionStats?.correctAnswers ?: 0) > 0
+        offerReminder = solved && Retention.shouldOfferReminder(this)
+
         if (savedInstanceState == null && completionType is CompletionType.Success) {
-            if (intent.getBooleanExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, false)) Funnel.log(FunnelStep.FIRST_PUZZLE_COMPLETED)
+            if (solved && intent.getBooleanExtra(FirstRun.EXTRA_IS_FIRST_RUN_PUZZLE, false)) Funnel.log(FunnelStep.FIRST_PUZZLE_COMPLETED)
             if (GuestGate.isGuest()) {
                 val state = GuestPrefs.recordSessionCompleted(this)
                 Funnel.log(FunnelStep.SESSION_COMPLETED_AS_GUEST, mapOf("completed_sessions" to state.completedSessions))
-                if (SignupPromptPolicy.shouldShow(isGuest = true, s = state)) {
+                // One ask at a time: the account nudge waits for a later session while the reminder is being offered.
+                if (!offerReminder && SignupPromptPolicy.shouldShow(isGuest = true, s = state)) {
                     val shown = GuestPrefs.recordPromptShown(this)
                     guestPromptDue = true
                     Funnel.log(FunnelStep.SIGNUP_PROMPT_SHOWN, mapOf("nth" to shown.promptsShown))
@@ -217,7 +224,8 @@ class DailyCompletionActivity : AppCompatActivity() {
                             navigateToStartPuzzle(puzzleTypeParam, difficulty)
                         }
                     },
-                    showAdBeforeNavigation = ::showAdBeforeNavigation
+                    showAdBeforeNavigation = ::showAdBeforeNavigation,
+                    offerReminder = offerReminder
                 )
                 // Gentle account nudge, a moment after the result is on screen. Always dismissible.
                 var promptVisible by rememberSaveable { mutableStateOf(false) }

@@ -7,6 +7,7 @@ import {
     cleanupOldDailyPuzzles,
     generateUserDailyPuzzlesWithNotifications,
     storeFCMToken,
+    optOutOfDailyReminder,
     getActiveTokenOwners,
     deactivateTokenForOtherAccounts,
     hasActiveFcmToken,
@@ -502,6 +503,9 @@ export async function registerFcmTokenHandler(req, res) {
         const result = await storeFCMToken(userEmail, userId, fcmToken, platform, language);
         
         if (result.success) {
+            // The app says the player answered the reminder question itself (on-device reminder, or declined): the
+            // server must not send its own. Opt-out only, so an unsigned request can never switch reminders back on.
+            if (req.body?.serverDailyReminder === false) await optOutOfDailyReminder(wantEmail);
             res.json({
                 success: true,
                 message: `FCM token registered for ${platform}`

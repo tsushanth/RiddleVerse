@@ -80,27 +80,9 @@ class SignupPromptPolicyTest {
 }
 
 class FirstRunPlanTest {
-    @Test fun excludesTypesUnderTriage() {
-        FirstRunPlan.CANDIDATES.forEach { assertFalse(it.type, it.type in FirstRunPlan.EXCLUDED_TYPES) }
-        assertTrue("math" in FirstRunPlan.EXCLUDED_TYPES)
-        assertTrue("memorysquares" in FirstRunPlan.EXCLUDED_TYPES)
-    }
-
-    @Test fun lastCandidateIsLocalSoOfflineFirstRunWorks() {
-        assertFalse(FirstRunPlan.CANDIDATES.last().remote)
-        assertEquals(FirstRunPlan.CANDIDATES.last(), FirstRunPlan.localFallback)
-    }
-
-    @Test fun remoteCandidatesComeFirstAndNeverIncludeTheFallback() {
-        assertTrue(FirstRunPlan.remoteCandidates.isNotEmpty())
-        assertTrue(FirstRunPlan.remoteCandidates.all { it.remote })
-        assertEquals(FirstRunPlan.remoteCandidates, FirstRunPlan.CANDIDATES.take(FirstRunPlan.remoteCandidates.size))
-    }
-
     @Test fun firstSessionIsOnePuzzle() { assertEquals(1, FirstRunPlan.TARGET_PUZZLE_COUNT) }
 
-    @Test fun screenTypesAreKnownToThePuzzleScreen() {
-        val known = PuzzleScreenType.values().map { it.typeName }.toSet()
-        FirstRunPlan.CANDIDATES.forEach { assertTrue(it.screenType, it.screenType in known) }
+    @Test fun screenTypeIsKnownToThePuzzleScreen() {
+        assertTrue(PuzzleScreenType.values().any { it.typeName == FirstRunPlan.SCREEN_TYPE })
     }
 }

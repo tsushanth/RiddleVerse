@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Die größte Ziffer kann nie am spitzen Ende eines Zeichens stehen.</string>
     <string name="tut_purchasing_instruction">Jedes Rätsel zeigt ein Abo: was du zahlst und wie oft. Rechne aus, was es in einem Jahr kostet, und tippe auf die passende Summe. Beispiel: 10 im Monat sind 10 × 12 = 120 im Jahr.</string>
     <string name="tut_purchasing_tip">Täglich × 365, wöchentlich × 52, monatlich × 12, vierteljährlich × 4. Hinweise helfen, senken aber deine Punktzahl.</string>
+    <string name="starter_instruction">Tippe auf eine Zahl, um das markierte Feld zu füllen. Jede Zeile, Spalte und jeder kleine Block braucht 1, 2, 3 und 4.</string>
 </resources>

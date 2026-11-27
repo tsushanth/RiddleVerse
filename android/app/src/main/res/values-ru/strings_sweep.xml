@@ -449,7 +449,6 @@
     <string name="onb_gate_message">Ваши головоломки и прогресс пока хранятся на этом телефоне и перейдут в ваш аккаунт после входа. Это бесплатно.</string>
     <string name="onb_gate_sign_in_to_create">Войдите, чтобы создавать игры. Это бесплатно и займёт меньше минуты.</string>
     <string name="onb_first_run_tagline">Быстрые головоломки для ума. Регистрация не нужна.</string>
-    <string name="onb_first_run_load_failed">Не удалось загрузить головоломку. Открываем список головоломок.</string>
     <string name="onb_first_run_play_cd">Сыграть в первую головоломку</string>
     <string name="onb_intro_welcome_title">Добро пожаловать в RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Бросайте вызов своему разуму с помощью увлекательных головоломок, викторин и задач на смекалку. От математических задач до игр со словами — здесь есть что-то для каждого.</string>

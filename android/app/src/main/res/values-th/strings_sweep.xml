@@ -431,7 +431,6 @@
     <string name="onb_gate_message">ปริศนาและความคืบหน้าของคุณจนถึงตอนนี้จะอยู่บนโทรศัพท์เครื่องนี้ และจะย้ายไปยังบัญชีของคุณเมื่อเข้าสู่ระบบ ใช้งานฟรี</string>
     <string name="onb_gate_sign_in_to_create">เข้าสู่ระบบเพื่อสร้างเกม ฟรีและใช้เวลาไม่ถึงนาที</string>
     <string name="onb_first_run_tagline">ปริศนาฝึกสมองแบบสั้นๆ ไม่ต้องสมัครสมาชิก</string>
-    <string name="onb_first_run_load_failed">ไม่สามารถโหลดปริศนาได้ กำลังเปิดรายการปริศนาแทน</string>
     <string name="onb_first_run_play_cd">เล่นปริศนาแรกของคุณ</string>
     <string name="onb_intro_welcome_title">ยินดีต้อนรับสู่ RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">ท้าทายสมองด้วยปริศนา แบบทดสอบ และเกมฝึกสมองที่น่าสนใจ ตั้งแต่โจทย์คณิตศาสตร์ไปจนถึงเกมคำศัพท์ มีให้ทุกคน</string>

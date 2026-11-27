@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">En büyük rakam hiçbir zaman bir işaretin dar ucunda olamaz.</string>
     <string name="tut_purchasing_instruction">Her bulmaca bir abonelik gösterir: ne kadar ve ne sıklıkla ödediğiniz. Bir yıllık maliyeti hesaplayın ve doğru toplama dokunun. Örnek: ayda 10, 10 × 12 = yılda 120 eder.</string>
     <string name="tut_purchasing_tip">Günlük × 365, haftalık × 52, aylık × 12, üç aylık × 4. İpuçları yardımcı olur ama puanınızı düşürür.</string>
+    <string name="starter_instruction">Vurgulanan kareyi doldurmak için bir sayıya dokunun. Her satırda, sütunda ve küçük kutuda 1, 2, 3 ve 4 bulunmalı.</string>
 </resources>

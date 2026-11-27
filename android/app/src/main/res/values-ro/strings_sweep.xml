@@ -443,7 +443,6 @@
     <string name="onb_gate_message">Puzzle-urile și progresul tău de până acum rămân pe acest telefon și se mută în contul tău când te conectezi. Este gratuit.</string>
     <string name="onb_gate_sign_in_to_create">Conectează-te pentru a crea jocuri. Este gratuit și durează sub un minut.</string>
     <string name="onb_first_run_tagline">Puzzle-uri rapide pentru minte. Fără înregistrare.</string>
-    <string name="onb_first_run_load_failed">Nu s-a putut încărca un puzzle. Se deschide lista de puzzle-uri.</string>
     <string name="onb_first_run_play_cd">Joacă primul tău puzzle</string>
     <string name="onb_intro_welcome_title">Bun venit în RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Provoacă-ți mintea cu puzzle-uri captivante, teste și ghicitori. De la probleme de matematică la jocuri de cuvinte, avem ceva pentru toată lumea.</string>

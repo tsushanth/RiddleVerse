@@ -98,12 +98,13 @@ fun GridPuzzleScreen(
     seed: Long,
     level: String,
     onGameComplete: (Boolean, Int) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    starter: Boolean = false
 ) {
     val spec by produceState<GridSpec?>(null, game, difficulty, seed) {
         value = withContext(Dispatchers.Default) {
             try {
-                GridPuzzleFactory.build(game, difficulty, seed)
+                if (starter) StarterPuzzle.spec(seed) else GridPuzzleFactory.build(game, difficulty, seed)
             } catch (e: Exception) {
                 PuzzleEvents.error(game.key, difficulty, "grid generation failed: ${e.javaClass.simpleName}")
                 throw e
@@ -116,7 +117,7 @@ fun GridPuzzleScreen(
             Text("Building your puzzle...", color = RvInkSoft, fontSize = 16.sp)
         }
     } else {
-        GridPuzzleContent(s, level, onGameComplete, onBack)
+        GridPuzzleContent(s, level, onGameComplete, onBack, starter)
     }
 }
 
@@ -125,12 +126,13 @@ fun GridPuzzleContent(
     spec: GridSpec,
     level: String,
     onGameComplete: (Boolean, Int) -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    starter: Boolean = false
 ) {
     val state = rememberSaveable(
         spec.solution.contentHashCode(),
-        saver = Saver<GridPlayState, IntArray>(save = { it.toSaved() }, restore = { GridPlayState(spec).apply { restore(it) } })
-    ) { GridPlayState(spec) }
+        saver = Saver<GridPlayState, IntArray>(save = { it.toSaved() }, restore = { GridPlayState(spec, starter).apply { restore(it) } })
+    ) { GridPlayState(spec, starter).apply { if (starter) selectNextOpen() } }
     var showRules by rememberSaveable { mutableStateOf(false) }
     var finished by rememberSaveable { mutableStateOf(false) }
 
@@ -145,15 +147,17 @@ fun GridPuzzleContent(
 
     BoxWithConstraints(Modifier.fillMaxSize().background(RvCanvas).statusBarsPadding().navigationBarsPadding()) {
         val headerH = 52.dp
+        val instructionH = if (starter) 64.dp else 0.dp
         val controlsH = 56.dp
         // Landscape phone: board on the left, controls + number pad on the right, so nothing is cut off at the bottom.
         val sideBySide = maxHeight < 420.dp && maxWidth > maxHeight * 1.3f
         if (sideBySide) {
             val side = com.kreativekoala.riddleverse.ui.BoardFit.squareSide(
-                maxWidth.value / 2f, maxHeight.value, reservedH = headerH.value + 16f, hPad = 12f, minSide = 120f
+                maxWidth.value / 2f, maxHeight.value, reservedH = (headerH + instructionH).value + 16f, hPad = 12f, minSide = 120f
             ).dp
             Column(Modifier.fillMaxSize().padding(horizontal = 12.dp)) {
                 GridHeader(spec, state, level, onBack, headerH) { showRules = true }
+                if (starter) StarterInstruction()
                 Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     Box(Modifier.weight(1f).fillMaxHeight(), contentAlignment = Alignment.Center) { GridBoard(spec, state, side) }
                     Column(
@@ -171,7 +175,7 @@ fun GridPuzzleContent(
         val padH = 52.dp * padRows + 8.dp * (padRows - 1)
         val gaps = 8.dp * 4 + 12.dp
         val side = com.kreativekoala.riddleverse.ui.BoardFit.squareSide(
-            maxWidth.value, maxHeight.value, (headerH + controlsH + padH + gaps).value, hPad = 24f, minSide = 200f
+            maxWidth.value, maxHeight.value, (headerH + instructionH + controlsH + padH + gaps).value, hPad = 24f, minSide = 200f
         ).dp
 
         Column(
@@ -179,6 +183,7 @@ fun GridPuzzleContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             GridHeader(spec, state, level, onBack, headerH) { showRules = true }
+            if (starter) StarterInstruction()
             Spacer(Modifier.height(8.dp))
             GridBoard(spec, state, side)
             Spacer(Modifier.height(8.dp))
@@ -227,7 +232,9 @@ private fun formatClock(sec: Int) = String.format("%02d:%02d", sec / 60, sec % 6
 @Composable
 private fun GridHeader(spec: GridSpec, state: GridPlayState, level: String, onBack: () -> Unit, height: Dp, onRules: () -> Unit) {
     Row(Modifier.fillMaxWidth().height(height), verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = onBack, modifier = Modifier.size(48.dp)) {
+        // Starter puzzle: the way out stays available but quiet until the player has tried once.
+        val quietBack = state.forgiving && state.undoDepth == 0
+        IconButton(onClick = onBack, modifier = Modifier.size(48.dp).alpha(if (quietBack) 0.3f else 1f)) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back), tint = RvInk)
         }
         Column(Modifier.weight(1f)) {
@@ -237,22 +244,32 @@ private fun GridHeader(spec: GridSpec, state: GridPlayState, level: String, onBa
                 color = RvInkSoft, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis
             )
         }
-        Text(
-            formatClock(state.elapsedSeconds), color = RvInk, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1,
-            modifier = Modifier.semantics { contentDescription = "Elapsed time ${state.elapsedSeconds / 60} minutes ${state.elapsedSeconds % 60} seconds" }
-        )
-        Row(
-            Modifier.padding(horizontal = 6.dp).semantics { contentDescription = "${state.lives} lives left" },
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            repeat(GridPlayState.MAX_LIVES) { i ->
-                Icon(Icons.Filled.Favorite, contentDescription = null, tint = if (i < state.lives) RvCoral else RvDisabled, modifier = Modifier.size(16.dp))
+        if (!state.forgiving) { // no clock and no hearts on the starter puzzle
+            Text(
+                formatClock(state.elapsedSeconds), color = RvInk, fontWeight = FontWeight.Bold, fontSize = 15.sp, maxLines = 1,
+                modifier = Modifier.semantics { contentDescription = "Elapsed time ${state.elapsedSeconds / 60} minutes ${state.elapsedSeconds % 60} seconds" }
+            )
+            Row(
+                Modifier.padding(horizontal = 6.dp).semantics { contentDescription = "${state.lives} lives left" },
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
+                repeat(GridPlayState.MAX_LIVES) { i ->
+                    Icon(Icons.Filled.Favorite, contentDescription = null, tint = if (i < state.lives) RvCoral else RvDisabled, modifier = Modifier.size(16.dp))
+                }
             }
         }
         IconButton(onClick = onRules, modifier = Modifier.size(48.dp)) {
             Icon(Icons.Filled.Info, contentDescription = stringResource(R.string.xa_rules), tint = RvViolet)
         }
     }
+}
+
+@Composable
+private fun StarterInstruction() {
+    Text(
+        stringResource(R.string.starter_instruction), color = RvInk, fontSize = 15.sp, textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp)
+    )
 }
 
 // ---------------------------------------------------------------- Board
@@ -459,9 +476,12 @@ private fun SignOverlay(spec: GridSpec, modifier: Modifier) {
 @Composable
 private fun GridControls(state: GridPlayState, height: Dp) {
     Row(Modifier.fillMaxWidth().height(height), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        ControlButton(stringResource(R.string.xa_undo), Icons.AutoMirrored.Filled.Undo, enabled = state.undoDepth > 0, modifier = Modifier.weight(1f)) { state.undo() }
-        ControlButton("Erase", Icons.Filled.Clear, enabled = state.selected >= 0 && !state.isGiven(state.selected), modifier = Modifier.weight(1f)) { state.erase() }
-        if (state.usesNotes) {
+        // The starter puzzle only needs the hint: a wrong digit is replaced by tapping another one.
+        if (!state.forgiving) {
+            ControlButton(stringResource(R.string.xa_undo), Icons.AutoMirrored.Filled.Undo, enabled = state.undoDepth > 0, modifier = Modifier.weight(1f)) { state.undo() }
+            ControlButton("Erase", Icons.Filled.Clear, enabled = state.selected >= 0 && !state.isGiven(state.selected), modifier = Modifier.weight(1f)) { state.erase() }
+        }
+        if (state.usesNotes && !state.forgiving) {
             ControlButton(if (state.notesMode) "Notes on" else "Notes", Icons.Filled.Edit, active = state.notesMode, modifier = Modifier.weight(1f)) {
                 state.notesMode = !state.notesMode
             }

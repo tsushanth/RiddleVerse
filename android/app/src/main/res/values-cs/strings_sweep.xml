@@ -449,7 +449,6 @@
     <string name="onb_gate_message">Vaše dosavadní hádanky a pokrok zůstávají v tomto telefonu a po přihlášení se přenesou do vašeho účtu. Je to zdarma.</string>
     <string name="onb_gate_sign_in_to_create">Přihlaste se a vytvářejte hry. Je to zdarma a zabere to méně než minutu.</string>
     <string name="onb_first_run_tagline">Rychlé hádanky pro mozek. Bez registrace.</string>
-    <string name="onb_first_run_load_failed">Hádanku se nepodařilo načíst. Místo toho otevíráme seznam hádanek.</string>
     <string name="onb_first_run_play_cd">Zahrát si první hádanku</string>
     <string name="onb_intro_welcome_title">Vítejte v RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Vyzvěte svou mysl poutavými hádankami, kvízy a hlavolamy. Od matematických příkladů po slovní hry, máme něco pro každého.</string>

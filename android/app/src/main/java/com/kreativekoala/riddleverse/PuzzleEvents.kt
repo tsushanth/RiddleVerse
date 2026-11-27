@@ -70,8 +70,10 @@ object PuzzleEvents {
         enabledFlag = prefs.getBoolean("enabled", true)
         var id = prefs.getString("install_id", null)
         if (id.isNullOrEmpty()) { id = UUID.randomUUID().toString(); prefs.edit().putString("install_id", id).apply() }
+        // Set on Firebase Test Lab devices, which also run Play's pre-launch checks: the server labels those events.
+        val testLab = try { android.provider.Settings.System.getString(app.contentResolver, "firebase.test.lab") == "true" } catch (_: Throwable) { false }
         client = PuzzleEventsClient(
-            installId = id, appVersion = BuildConfig.VERSION_NAME,
+            installId = id, appVersion = BuildConfig.VERSION_NAME, testLab = testLab,
             send = { body, token -> post(body, token) },
             tokenProvider = { null }, // events are anonymous: no account id is attached (privacy)
             enabled = { enabledFlag }
@@ -86,6 +88,7 @@ object PuzzleEvents {
     /** Puzzle screen composed: emits `start` once per puzzle id. */
     fun puzzleShown(puzzle: Puzzle?, fallbackType: String?) = guarded {
         val (key, type, diff) = describe(puzzle, fallbackType) ?: return@guarded
+        appCtx?.let { StarterOffer.markPuzzleShown(it) }
         tracker.start(key, type, diff)?.let { emit(it) }
         Funnel.log("first_puzzle_started")
     }
@@ -130,7 +133,8 @@ object PuzzleEvents {
     }
 
     private fun describe(p: Puzzle?, fallback: String?): Triple<String, String, String?>? {
-        val type = PuzzleEventsClient.sanitizePuzzleType(p?.puzzleType ?: fallback) ?: return null
+        val raw = if (StarterPuzzle.isStarter(p)) StarterPuzzle.TELEMETRY_TYPE else p?.puzzleType ?: fallback
+        val type = PuzzleEventsClient.sanitizePuzzleType(raw) ?: return null
         return Triple(p?.puzzleId ?: type, type, PuzzleEventsClient.sanitizeDifficulty(p?.difficulty))
     }
 

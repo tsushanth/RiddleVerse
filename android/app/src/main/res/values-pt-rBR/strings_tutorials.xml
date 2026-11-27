@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">O maior dígito nunca pode ficar na ponta estreita de um sinal.</string>
     <string name="tut_purchasing_instruction">Cada quebra-cabeça mostra uma assinatura: quanto você paga e com que frequência. Calcule quanto custa em um ano e toque no total certo. Exemplo: 10 por mês são 10 × 12 = 120 por ano.</string>
     <string name="tut_purchasing_tip">Diário × 365, semanal × 52, mensal × 12, trimestral × 4. As dicas ajudam, mas reduzem sua pontuação.</string>
+    <string name="starter_instruction">Toque em um número para preencher o quadrado destacado. Cada linha, coluna e bloco pequeno precisa de 1, 2, 3 e 4.</string>
 </resources>

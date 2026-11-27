@@ -449,7 +449,6 @@
     <string name="onb_gate_message">Twoje dotychczasowe łamigłówki i postępy pozostają na tym telefonie i po zalogowaniu przenoszą się na Twoje konto. To nic nie kosztuje.</string>
     <string name="onb_gate_sign_in_to_create">Zaloguj się, aby tworzyć gry. To nic nie kosztuje i zajmuje mniej niż minutę.</string>
     <string name="onb_first_run_tagline">Szybkie łamigłówki dla mózgu. Bez rejestracji.</string>
-    <string name="onb_first_run_load_failed">Nie udało się załadować łamigłówki. Otwieram zamiast tego listę łamigłówek.</string>
     <string name="onb_first_run_play_cd">Zagraj w pierwszą łamigłówkę</string>
     <string name="onb_intro_welcome_title">Witaj w RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Rzuć wyzwanie swojemu umysłowi wciągającymi łamigłówkami, quizami i zagadkami. Od zadań matematycznych po gry słowne, mamy coś dla każdego.</string>

@@ -196,6 +196,24 @@ test('POST /register-fcm-token (alias) validates exactly like /api/daily-puzzles
     }
 });
 
+test('registration records only a reminder opt-out, never an opt-in', async () => {
+    const good = { userEmail: 'U@Example.test', fcmToken: 'x'.repeat(150), platform: 'android' };
+    const prefWrites = () => supabaseCalls.filter((c) => c.method === 'POST' && c.url.includes('user_notification_preferences'));
+    for (const serverDailyReminder of [undefined, true, 'false', 0]) {
+        reset();
+        assert.equal((await post('/register-fcm-token', { ...good, serverDailyReminder })).status, 200);
+        assert.equal(prefWrites().length, 0, String(serverDailyReminder));
+    }
+    reset();
+    assert.equal((await post('/register-fcm-token', { ...good, serverDailyReminder: false })).status, 200);
+    assert.equal(prefWrites().length, 1);
+    const row = [].concat(JSON.parse(prefWrites()[0].body))[0];
+    assert.equal(row.user_email, 'u@example.test');
+    assert.equal(row.puzzle_reminders, false);
+    assert.ok(prefWrites()[0].url.includes('on_conflict=user_email'));
+    assert.equal(sent.length, 0);
+});
+
 test('the alias is rate limited', async () => {
     reset();
     let limited = 0;

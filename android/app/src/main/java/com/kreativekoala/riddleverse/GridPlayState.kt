@@ -17,7 +17,11 @@ object GridStatus {
  * Mutable, Compose-observable play state for one grid puzzle. Pure logic (no UI) so it is unit-testable.
  * Serialises to an IntArray for rememberSaveable (rotation / process death).
  */
-class GridPlayState(val spec: GridSpec) {
+class GridPlayState(
+    val spec: GridSpec,
+    /** The starter puzzle: wrong digits are only marked (no lives lost) and the selection moves on by itself. */
+    val forgiving: Boolean = false,
+) {
     val n = spec.n
     val cells = n * n
 
@@ -72,10 +76,19 @@ class GridPlayState(val spec: GridSpec) {
         if (usesNotes) clearPeerNotes(i, d)
         if (d != spec.solution[i]) {
             mistakes++
-            lives--
-            if (lives <= 0) { status = GridStatus.LOST; return }
+            if (!forgiving) {
+                lives--
+                if (lives <= 0) { status = GridStatus.LOST; return }
+            }
+        } else if (forgiving) {
+            selectNextOpen()
         }
         checkWin()
+    }
+
+    /** Selects the first empty or wrong cell (keeps the selection when there is none). */
+    fun selectNextOpen() {
+        (0 until cells).firstOrNull { !isGiven(it) && (values[it] == 0 || isWrong(it)) }?.let { selected = it }
     }
 
     fun erase() {

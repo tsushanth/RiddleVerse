@@ -1,5 +1,6 @@
 package com.kreativekoala.riddleverse
 
+import androidx.lifecycle.lifecycleScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.verticalScroll
 import com.kreativekoala.riddleverse.ui.RvActivityTheme
@@ -2703,6 +2704,9 @@ class HomeActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Funnel.log("home_shown")
+        // A player who just signed in must have a push token on the server now, not only from their next launch.
+        PushRegistration.registerIfNewAccount(this)
+        if (savedInstanceState == null) openStarterPuzzleForNewPlayer()
         val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         var dailyStreakReward: StreakReward? = null
         activityScope.launch {
@@ -2753,6 +2757,14 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
+    /** A brand-new install that has not seen any puzzle yet (signed in from the first screen) starts with the easy one. */
+    private fun openStarterPuzzleForNewPlayer() {
+        lifecycleScope.launch {
+            val due = withContext(Dispatchers.IO) { StarterOffer.claim(this@HomeActivity) }
+            if (due && !isFinishing) startActivity(StarterOffer.intent(this@HomeActivity))
+        }
+    }
+
     private fun handleDailySystemOnAppOpen(context: Context): StreakReward? {
         val (shouldReset, streakReward) = DailyStreakManager.processAppOpen(context)
 
@@ -2780,8 +2792,8 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    // The notification permission is no longer requested here on Home. It is asked just in time, with the reason,
-    // from the daily puzzle result screen (ReminderOfferCard) or the Settings > Daily puzzle switch.
+    // The notification permission is not requested here or at launch. It is asked just in time, with the reason,
+    // after a solved puzzle (ReminderOfferCard) or from the Settings > Daily puzzle switch.
 }
 
 @Composable

@@ -437,7 +437,6 @@
     <string name="onb_gate_message">Οι γρίφοι και η πρόοδός σας μέχρι τώρα μένουν σε αυτό το τηλέφωνο και μεταφέρονται στον λογαριασμό σας όταν συνδεθείτε. Είναι δωρεάν.</string>
     <string name="onb_gate_sign_in_to_create">Συνδεθείτε για να δημιουργήσετε παιχνίδια. Είναι δωρεάν και διαρκεί λιγότερο από ένα λεπτό.</string>
     <string name="onb_first_run_tagline">Γρήγοροι γρίφοι για το μυαλό. Χωρίς εγγραφή.</string>
-    <string name="onb_first_run_load_failed">Δεν ήταν δυνατή η φόρτωση γρίφου. Άνοιγμα της λίστας γρίφων.</string>
     <string name="onb_first_run_play_cd">Παίξτε τον πρώτο σας γρίφο</string>
     <string name="onb_intro_welcome_title">Καλώς ήρθατε στο RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Προκαλέστε το μυαλό σας με συναρπαστικούς γρίφους, κουίζ και παζλ λογικής. Από μαθηματικά προβλήματα μέχρι παιχνίδια λέξεων, έχουμε κάτι για όλους.</string>

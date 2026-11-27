@@ -195,6 +195,7 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
         DailyReminder.markOfferShown(context)
         visible = false
         note = context.getString(R.string.reminder_on_note)
+        PushRegistration.registerCurrent(context)
     }
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -204,6 +205,7 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
             DailyReminder.markOfferShown(context)
             visible = false
             note = context.getString(R.string.reminder_later_note)
+            PushRegistration.registerCurrent(context)
         }
     }
 
@@ -235,7 +237,7 @@ fun ReminderOfferCard(modifier: Modifier = Modifier) {
                 ) { Text(stringResource(R.string.reminder_offer_yes), fontSize = 14.sp, fontWeight = FontWeight.ExtraBold, color = RvOnTone) }
                 Box(
                     Modifier.clip(RoundedCornerShape(50))
-                        .clickable { DailyReminder.markOfferShown(context); visible = false }
+                        .clickable { DailyReminder.markOfferShown(context); visible = false; PushRegistration.registerCurrent(context) }
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) { Text(stringResource(R.string.reminder_offer_no), fontSize = 14.sp, color = RvInkSoft) }
             }
@@ -257,6 +259,7 @@ fun DailyPuzzleSettingsSection() {
             Funnel.log("notif_permission_granted"); Funnel.log("reminder_enabled")
             DailyReminder.setEnabled(context, true); DailyReminder.markOfferShown(context)
             enabled = true; blocked = false
+            PushRegistration.registerCurrent(context)
         } else {
             Funnel.log("notif_permission_denied")
             DailyReminder.setEnabled(context, false); enabled = false; blocked = true
@@ -273,10 +276,10 @@ fun DailyPuzzleSettingsSection() {
                 Switch(
                     checked = enabled,
                     onCheckedChange = { want ->
-                        if (!want) { DailyReminder.setEnabled(context, false); enabled = false; blocked = false }
+                        if (!want) { DailyReminder.setEnabled(context, false); enabled = false; blocked = false; PushRegistration.registerCurrent(context) }
                         else if (DailyReminder.needsRuntimePermission(context)) launcher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
                         else if (!DailyReminder.notificationsAllowed(context)) blocked = true
-                        else { DailyReminder.setEnabled(context, true); Funnel.log("reminder_enabled"); DailyReminder.markOfferShown(context); enabled = true; blocked = false }
+                        else { DailyReminder.setEnabled(context, true); Funnel.log("reminder_enabled"); DailyReminder.markOfferShown(context); enabled = true; blocked = false; PushRegistration.registerCurrent(context) }
                     },
                 )
             }

@@ -431,7 +431,6 @@
     <string name="onb_gate_message">Câu đố và tiến trình của bạn cho đến nay vẫn nằm trên điện thoại này và sẽ chuyển sang tài khoản của bạn khi bạn đăng nhập. Hoàn toàn miễn phí.</string>
     <string name="onb_gate_sign_in_to_create">Đăng nhập để tạo trò chơi. Miễn phí và mất chưa đến một phút.</string>
     <string name="onb_first_run_tagline">Câu đố luyện não nhanh gọn. Không cần đăng ký.</string>
-    <string name="onb_first_run_load_failed">Không thể tải câu đố. Đang mở danh sách câu đố thay thế.</string>
     <string name="onb_first_run_play_cd">Chơi câu đố đầu tiên của bạn</string>
     <string name="onb_intro_welcome_title">Chào mừng đến với RiddleVerse!</string>
     <string name="onb_intro_welcome_desc">Thử thách trí óc với các câu đố, đố vui và trò chơi rèn trí não hấp dẫn. Từ bài toán đến trò chơi từ ngữ, có thứ dành cho mọi người.</string>

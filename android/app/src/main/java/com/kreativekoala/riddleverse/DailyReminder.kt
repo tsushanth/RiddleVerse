@@ -62,6 +62,8 @@ object DailyReminder {
     private const val K_OFFER_SHOWN = "offer_shown"
     private const val K_UNOPENED = "unopened"
     const val CHANNEL_ID = "daily_reminder"
+    /** `data.type` of the server's daily reminder push (web/backend/services/newPlayerReminder.js). */
+    const val PUSH_TYPE = "daily_reminder"
     private const val NOTIF_ID = 7101
     private const val REQ_ALARM = 7102
     private const val REQ_OPEN = 7103

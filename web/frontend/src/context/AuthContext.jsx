@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { auth, onAuthChange, signInWithGoogle, signInWithEmail, signUpWithEmail, signOut, trackEvent } from '../services/firebase'
 import { api } from '../services/api'
+import { remember, KNOWN_PLAYER_KEY } from '../utils/starterPuzzle'
 
 const AuthContext = createContext(null)
 
@@ -12,6 +13,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const unsubscribe = onAuthChange(async (firebaseUser) => {
       if (firebaseUser) {
+        remember(() => window.localStorage, KNOWN_PLAYER_KEY)
         const token = localStorage.getItem('token')
         setUser({
           uid: firebaseUser.uid,

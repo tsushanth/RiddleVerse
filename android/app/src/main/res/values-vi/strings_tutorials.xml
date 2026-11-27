@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Chữ số lớn nhất không bao giờ nằm ở đầu hẹp của một dấu.</string>
     <string name="tut_purchasing_instruction">Mỗi câu đố hiển thị một gói đăng ký: bạn trả bao nhiêu và bao lâu một lần. Hãy tính chi phí trong một năm và chạm vào tổng đúng. Ví dụ: 10 mỗi tháng là 10 × 12 = 120 mỗi năm.</string>
     <string name="tut_purchasing_tip">Hằng ngày × 365, hằng tuần × 52, hằng tháng × 12, hằng quý × 4. Gợi ý có ích nhưng làm giảm điểm của bạn.</string>
+    <string name="starter_instruction">Chạm vào một số để điền ô được tô sáng. Mỗi hàng, cột và ô nhỏ đều cần có 1, 2, 3 và 4.</string>
 </resources>

@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Suurin numero ei voi koskaan olla merkin kapeassa päässä.</string>
     <string name="tut_purchasing_instruction">Jokainen tehtävä näyttää tilauksen: mitä maksat ja kuinka usein. Laske, paljonko se maksaa vuodessa, ja napauta oikeaa summaa. Esimerkki: 10 kuukaudessa on 10 × 12 = 120 vuodessa.</string>
     <string name="tut_purchasing_tip">Päivittäin × 365, viikoittain × 52, kuukausittain × 12, neljännesvuosittain × 4. Vihjeet auttavat, mutta laskevat pisteitäsi.</string>
+    <string name="starter_instruction">Täytä korostettu ruutu napauttamalla numeroa. Jokaisella rivillä, sarakkeessa ja pienessä ruudukossa on oltava 1, 2, 3 ja 4.</string>
 </resources>

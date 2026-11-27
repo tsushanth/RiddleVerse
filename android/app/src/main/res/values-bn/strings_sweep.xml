@@ -437,7 +437,6 @@
     <string name="onb_gate_message">এখন পর্যন্ত আপনার পাজল ও অগ্রগতি এই ফোনেই থাকে এবং সাইন ইন করলে আপনার অ্যাকাউন্টে সরে যায়। এটি বিনামূল্যে।</string>
     <string name="onb_gate_sign_in_to_create">গেম তৈরি করতে সাইন ইন করুন। এটি বিনামূল্যে এবং এক মিনিটেরও কম সময় লাগে।</string>
     <string name="onb_first_run_tagline">দ্রুত মস্তিষ্কের পাজল। সাইন-আপ লাগবে না।</string>
-    <string name="onb_first_run_load_failed">পাজল লোড করা যায়নি। এর বদলে পাজলের তালিকা খোলা হচ্ছে।</string>
     <string name="onb_first_run_play_cd">আপনার প্রথম পাজল খেলুন</string>
     <string name="onb_intro_welcome_title">RiddleVerse-এ স্বাগতম!</string>
     <string name="onb_intro_welcome_desc">মজার পাজল, কুইজ ও ধাঁধায় আপনার মনকে চ্যালেঞ্জ করুন। গণিতের সমস্যা থেকে শব্দের গেম, সবার জন্যই কিছু না কিছু আছে।</string>

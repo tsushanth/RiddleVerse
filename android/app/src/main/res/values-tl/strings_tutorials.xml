@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Ang pinakamalaking digit ay hindi kailanman puwede sa makitid na dulo ng simbolo.</string>
     <string name="tut_purchasing_instruction">Ipinapakita ng bawat puzzle ang isang subscription: magkano ang binabayad mo at gaano kadalas. Kalkulahin kung magkano ito sa isang taon at i-tap ang tamang kabuuan. Halimbawa: 10 kada buwan ay 10 × 12 = 120 kada taon.</string>
     <string name="tut_purchasing_tip">Araw-araw × 365, lingguhan × 52, buwanan × 12, kada quarter × 4. Nakakatulong ang mga pahiwatig, pero binabawasan nito ang iyong iskor.</string>
+    <string name="starter_instruction">I-tap ang isang numero para punan ang naka-highlight na kahon. Kailangan ng bawat hanay, kolum, at maliit na kahon ang 1, 2, 3 at 4.</string>
 </resources>

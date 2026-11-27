@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">가장 큰 숫자는 기호의 좁은 쪽에 올 수 없습니다.</string>
     <string name="tut_purchasing_instruction">각 퍼즐에는 구독이 표시됩니다. 얼마를 얼마나 자주 내는지 알려 줍니다. 1년 동안의 비용을 계산해서 맞는 합계를 누르세요. 예: 월 10이면 10 × 12 = 연 120입니다.</string>
     <string name="tut_purchasing_tip">매일 × 365, 매주 × 52, 매월 × 12, 분기마다 × 4. 힌트는 도움이 되지만 점수가 줄어듭니다.</string>
+    <string name="starter_instruction">숫자를 눌러 강조 표시된 칸을 채우세요. 모든 가로줄, 세로줄, 작은 상자에 1, 2, 3, 4가 들어가야 합니다.</string>
 </resources>

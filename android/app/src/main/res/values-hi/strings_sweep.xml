@@ -437,7 +437,6 @@
     <string name="onb_gate_message">अब तक की आपकी पहेलियाँ और प्रगति इसी फ़ोन पर रहती हैं और साइन इन करने पर आपके खाते में चली जाती हैं। यह मुफ़्त है।</string>
     <string name="onb_gate_sign_in_to_create">खेल बनाने के लिए साइन इन करें। यह मुफ़्त है और एक मिनट से कम लगता है।</string>
     <string name="onb_first_run_tagline">दिमाग़ की झटपट पहेलियाँ। साइन-अप की ज़रूरत नहीं।</string>
-    <string name="onb_first_run_load_failed">पहेली लोड नहीं हो सकी। इसके बजाय पहेली सूची खोली जा रही है।</string>
     <string name="onb_first_run_play_cd">अपनी पहली पहेली खेलें</string>
     <string name="onb_intro_welcome_title">RiddleVerse में आपका स्वागत है!</string>
     <string name="onb_intro_welcome_desc">रोचक पहेलियों, क्विज़ और दिमागी कसरतों से अपने दिमाग़ को चुनौती दें। गणित की समस्याओं से लेकर शब्द खेलों तक, हर किसी के लिए कुछ न कुछ है।</string>

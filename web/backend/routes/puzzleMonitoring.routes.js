@@ -6,6 +6,7 @@ import { isAdminRequest } from './dashProxy.js';
 import {
     validatePayload, createLimiter, toRows, buildAdminPuzzles, IP_LIMIT, INSTALL_LIMIT,
 } from '../services/puzzleMonitoring.js';
+import { clientAddress, trafficLabel } from '../services/trafficClass.js';
 
 const MAX_BODY = '64kb';
 
@@ -33,11 +34,15 @@ export function createPuzzleMonitoringRouters(deps = {}) {
             try { userId = (await d.verifyBearerToken(req.headers.authorization))?.uid || null; } catch { userId = null; }
         }
         try {
-            const rows = toRows(v, userId);
+            let rows = toRows(v, userId, trafficLabel(clientAddress(req), v.testLab));
             let { error } = await d.getClient().from('puzzle_events').insert(rows);
-            // The channel column ships in migration 20261122120000. Until it is applied, drop it instead of losing the batch.
-            if (error && /channel/i.test(error.message || '') && rows.some((r) => 'channel' in r)) {
-                ({ error } = await d.getClient().from('puzzle_events').insert(rows.map(({ channel, ...rest }) => rest)));
+            // traffic (20261126120000) and channel (20261122120000) are later columns. If one is missing, drop it
+            // instead of losing the batch.
+            for (const column of ['traffic', 'channel']) {
+                if (error && new RegExp(column, 'i').test(error.message || '') && rows.some((r) => column in r)) {
+                    rows = rows.map(({ [column]: _dropped, ...rest }) => rest);
+                    ({ error } = await d.getClient().from('puzzle_events').insert(rows));
+                }
             }
             if (error) throw error;
         } catch (e) {

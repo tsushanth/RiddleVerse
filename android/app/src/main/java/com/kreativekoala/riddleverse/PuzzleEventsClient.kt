@@ -35,7 +35,8 @@ class PuzzleEventsClient(
     private val send: (body: String, token: String?) -> Int,
     private val tokenProvider: () -> String? = { null },
     private val clock: () -> Long = { System.currentTimeMillis() },
-    private val enabled: () -> Boolean = { true }
+    private val enabled: () -> Boolean = { true },
+    private val testLab: Boolean = false
 ) {
     companion object {
         const val MAX_QUEUE = 200
@@ -164,7 +165,9 @@ class PuzzleEventsClient(
     fun buildBody(events: List<PuzzleEvent>): String {
         val sb = StringBuilder()
         sb.append("{\"installId\":\"").append(esc(installId)).append("\",\"platform\":\"android\",\"appVersion\":\"")
-            .append(esc(appVersion)).append("\",\"events\":[")
+            .append(esc(appVersion)).append('"')
+        if (testLab) sb.append(",\"testLab\":true")
+        sb.append(",\"events\":[")
         events.forEachIndexed { i, e ->
             if (i > 0) sb.append(',')
             sb.append("{\"type\":\"").append(esc(e.type)).append("\",\"puzzleType\":\"").append(esc(e.puzzleType)).append('"')

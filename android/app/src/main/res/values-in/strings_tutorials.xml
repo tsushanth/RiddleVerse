@@ -10,4 +10,5 @@
     <string name="tut_grid_signgrid_tip">Angka terbesar tidak pernah bisa berada di ujung sempit sebuah tanda.</string>
     <string name="tut_purchasing_instruction">Setiap teka-teki menampilkan langganan: berapa yang Anda bayar dan seberapa sering. Hitung biayanya selama satu tahun dan ketuk total yang cocok. Contoh: 10 per bulan adalah 10 × 12 = 120 per tahun.</string>
     <string name="tut_purchasing_tip">Harian × 365, mingguan × 52, bulanan × 12, per kuartal × 4. Petunjuk membantu, tetapi menurunkan skor Anda.</string>
+    <string name="starter_instruction">Ketuk angka untuk mengisi kotak yang disorot. Setiap baris, kolom, dan kotak kecil harus berisi 1, 2, 3, dan 4.</string>
 </resources>
