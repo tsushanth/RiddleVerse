@@ -88,48 +88,50 @@ private fun ConduitBoard(args: SpatialArgs, puzzle: ConduitPuzzle) {
         )
         BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 8.dp), contentAlignment = Alignment.TopCenter) {
             val side = minOf(maxWidth, maxHeight)
-            Column(Modifier.size(side)) {
-                for (r in 0 until n) {
-                    Row(Modifier.weight(1f)) {
-                        for (c in 0 until n) {
-                            val i = r * n + c
-                            val m = game.masks[i]
-                            val on = powered[i]
-                            val isSource = i == puzzle.source
-                            val leaf = Integer.bitCount(m) == 1 && !isSource
-                            val desc = "Row ${r + 1}, column ${c + 1}: " +
-                                (if (isSource) "power source, " else if (leaf) "lamp, " else "") +
-                                "pipe to ${maskWords(m)}" + (if (on) ", powered" else ", not powered")
-                            Box(
-                                Modifier
-                                    .weight(1f)
-                                    .fillMaxHeight()
-                                    .semantics { contentDescription = desc; role = Role.Button }
-                                    .clickable(onClickLabel = "Rotate tile") {
-                                        if (!done) { hintTile = -1; game.rotate(i); commit() }
-                                    }
-                                    .padding(1.dp)
-                            ) {
-                                Canvas(Modifier.fillMaxSize()) {
-                                    val s = size.minDimension
-                                    val ctr = Offset(size.width / 2f, size.height / 2f)
-                                    drawRoundRect(colBg, Offset.Zero, size, CornerRadius(s * 0.12f))
-                                    if (hintTile == i) {
-                                        drawRoundRect(colHint, Offset(2f, 2f), Size(size.width - 4f, size.height - 4f), CornerRadius(s * 0.12f), style = Stroke(width = s * 0.08f))
-                                    }
-                                    val col = if (on) colOn else colOff
-                                    val w = s * 0.2f
-                                    if (m and ConduitEngine.N != 0) drawLine(col, ctr, Offset(ctr.x, 0f), w, StrokeCap.Butt)
-                                    if (m and ConduitEngine.S != 0) drawLine(col, ctr, Offset(ctr.x, size.height), w, StrokeCap.Butt)
-                                    if (m and ConduitEngine.W != 0) drawLine(col, ctr, Offset(0f, ctr.y), w, StrokeCap.Butt)
-                                    if (m and ConduitEngine.E != 0) drawLine(col, ctr, Offset(size.width, ctr.y), w, StrokeCap.Butt)
-                                    drawCircle(col, w / 2f, ctr)
-                                    if (isSource) {
-                                        drawCircle(Color(0xFFFFB020), s * 0.26f, ctr)
-                                        drawCircle(Color.White, s * 0.1f, ctr)
-                                    } else if (leaf) {
-                                        drawCircle(if (on) Color(0xFFFFEB3B) else colOff.copy(alpha = 0.3f), s * 0.24f, ctr)
-                                        drawCircle(col, s * 0.24f, ctr, style = Stroke(width = s * 0.05f))
+            LeftToRightBoard {
+                Column(Modifier.size(side)) {
+                    for (r in 0 until n) {
+                        Row(Modifier.weight(1f)) {
+                            for (c in 0 until n) {
+                                val i = r * n + c
+                                val m = game.masks[i]
+                                val on = powered[i]
+                                val isSource = i == puzzle.source
+                                val leaf = Integer.bitCount(m) == 1 && !isSource
+                                val desc = "Row ${r + 1}, column ${c + 1}: " +
+                                    (if (isSource) "power source, " else if (leaf) "lamp, " else "") +
+                                    "pipe to ${maskWords(m)}" + (if (on) ", powered" else ", not powered")
+                                Box(
+                                    Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight()
+                                        .semantics { contentDescription = desc; role = Role.Button }
+                                        .clickable(onClickLabel = "Rotate tile") {
+                                            if (!done) { hintTile = -1; game.rotate(i); commit() }
+                                        }
+                                        .padding(1.dp)
+                                ) {
+                                    Canvas(Modifier.fillMaxSize()) {
+                                        val s = size.minDimension
+                                        val ctr = Offset(size.width / 2f, size.height / 2f)
+                                        drawRoundRect(colBg, Offset.Zero, size, CornerRadius(s * 0.12f))
+                                        if (hintTile == i) {
+                                            drawRoundRect(colHint, Offset(2f, 2f), Size(size.width - 4f, size.height - 4f), CornerRadius(s * 0.12f), style = Stroke(width = s * 0.08f))
+                                        }
+                                        val col = if (on) colOn else colOff
+                                        val w = s * 0.2f
+                                        if (m and ConduitEngine.N != 0) drawLine(col, ctr, Offset(ctr.x, 0f), w, StrokeCap.Butt)
+                                        if (m and ConduitEngine.S != 0) drawLine(col, ctr, Offset(ctr.x, size.height), w, StrokeCap.Butt)
+                                        if (m and ConduitEngine.W != 0) drawLine(col, ctr, Offset(0f, ctr.y), w, StrokeCap.Butt)
+                                        if (m and ConduitEngine.E != 0) drawLine(col, ctr, Offset(size.width, ctr.y), w, StrokeCap.Butt)
+                                        drawCircle(col, w / 2f, ctr)
+                                        if (isSource) {
+                                            drawCircle(Color(0xFFFFB020), s * 0.26f, ctr)
+                                            drawCircle(Color.White, s * 0.1f, ctr)
+                                        } else if (leaf) {
+                                            drawCircle(if (on) Color(0xFFFFEB3B) else colOff.copy(alpha = 0.3f), s * 0.24f, ctr)
+                                            drawCircle(col, s * 0.24f, ctr, style = Stroke(width = s * 0.05f))
+                                        }
                                     }
                                 }
                             }

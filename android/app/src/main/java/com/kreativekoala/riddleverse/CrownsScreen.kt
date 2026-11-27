@@ -163,23 +163,24 @@ private fun CrownsBoard(args: SpatialArgs, puzzle: CrownsPuzzle) {
         ) {
             val side = min(maxWidth.value, maxHeight.value).dp
             val cell = side / n
-            Column(
-                Modifier.size(side).semantics { collectionInfo = CollectionInfo(rowCount = n, columnCount = n) }
-            ) {
-                for (r in 0 until n) {
-                    Row {
-                        for (c in 0 until n) {
-                            val i = r * n + c
-                            val value = game.cells[i]
-                            val wave = if (value == 2) crownWave(win.value, r, c, n) else 1f
-                            CrownCell(
-                                r = r, c = c, n = n, regions = puzzle.regions, value = value,
-                                conflict = conflicts[i], hinted = hintCell == i, waveScale = wave,
-                                size = cell, enabled = !done,
-                                onTap = {
-                                    game.tap(i); hintCell = -1; toast = ""; commit()
-                                }
-                            )
+            val board = Modifier.size(side).semantics { collectionInfo = CollectionInfo(rowCount = n, columnCount = n) }
+            LeftToRightBoard {
+                Column(board) {
+                    for (r in 0 until n) {
+                        Row {
+                            for (c in 0 until n) {
+                                val i = r * n + c
+                                val value = game.cells[i]
+                                val wave = if (value == 2) crownWave(win.value, r, c, n) else 1f
+                                CrownCell(
+                                    r = r, c = c, n = n, regions = puzzle.regions, value = value,
+                                    conflict = conflicts[i], hinted = hintCell == i, waveScale = wave,
+                                    size = cell, enabled = !done,
+                                    onTap = {
+                                        game.tap(i); hintCell = -1; toast = ""; commit()
+                                    }
+                                )
+                            }
                         }
                     }
                 }

@@ -8,6 +8,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +32,14 @@ class SpatialArgs(
     val onFinished: (success: Boolean, score: Int) -> Unit,
     val onBack: () -> Unit
 )
+
+/**
+ * Never mirrors a board or a direction pad in right-to-left languages: pipes, region borders and moves are in
+ * left-to-right coordinates, so mirrored cells draw them on the wrong sides.
+ */
+@Composable
+fun LeftToRightBoard(content: @Composable () -> Unit) =
+    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr, content = content)
 
 /** Distinct hues for liquids / pieces. Names double as accessibility labels. */
 val SpatialPalette = listOf(
